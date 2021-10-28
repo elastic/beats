@@ -10,7 +10,7 @@
         "cyberarkpas.audit.safe": "PSMSessions",
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.source_user": "Administrator",
-        "cyberarkpas.audit.station": "81.32.170.205",
+        "cyberarkpas.audit.station": "67.43.156.14",
         "cyberarkpas.audit.timestamp": "Mar 10 09:59:33",
         "event.action": "remove owner",
         "event.code": "273",
@@ -29,11 +29,16 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "81.32.170.205"
+            "67.43.156.14"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "81.32.170.205",
-        "source.ip": "81.32.170.205",
+        "source.address": "67.43.156.14",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.14",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"

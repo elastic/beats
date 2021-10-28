@@ -2,7 +2,7 @@
     {
         "@timestamp": "2020-05-18T14:38:46.000-02:00",
         "client.bytes": 1419,
-        "client.ip": "89.68.140.204",
+        "client.ip": "216.160.83.61",
         "destination.bytes": 401,
         "destination.ip": "185.8.209.207",
         "event.action": "denied",
@@ -14,7 +14,7 @@
         "event.dataset": "sophos.xg",
         "event.kind": "alert",
         "event.module": "sophos",
-        "event.original": "device=\"SFW\" date=2020-05-18 time=14:38:46 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=075000617071 log_type=\"WAF\" log_component=\"Web Application Firewall\" priority=Information user_name=\"-\" server=webmail.elasticuser.com sourceip=89.68.140.204 localip=185.8.209.207 ws_protocol=\"HTTP/1.1\" url=/mapi/nspi/ querystring=?MailboxId=642ea57c-90ab-4571-8e05-c6997b2256f8@elastic.user.com cookie=\"MapiContext=MAPIAAAAAPaw98Xx0uDQ4tL/z/rX59b2x/LI+8z2x/+lhrKGtIO7jbmBsxYNAAAAAAAA;MapiRouting=UlVNOjdmNWY0OGE3LTM5OWItNDc4Yi04ZDgwLWFmZTRmMzAyZTViMDoAitM4bv3XCA==;MapiSequence=10-GtgsIA==;X-BackEndCookie=642ea57c-90ab-4571-8e05-c6997b2256f8=u56Lnp2ejJqByZrHyZ7Mys7Sm8zJnNLLnM3J0sbJxsvSnZzIxs2ans+ezMrLgYHNz83P0s/J0s3Pq87Pxc7PxcrL\" referer=- method=POST httpstatus=401 reason=\"-\" extra=\"-\" contenttype=\"-\" useragent=\"Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.4954; Pro)\" host=89.68.140.204 responsetime=11199 bytessent=5669 bytesrcv=1419 fw_rule_id=79",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:38:46 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123456 log_id=075000617071 log_type=\"WAF\" log_component=\"Web Application Firewall\" priority=Information user_name=\"-\" server=webmail.elasticuser.com sourceip=216.160.83.61 localip=185.8.209.207 ws_protocol=\"HTTP/1.1\" url=/mapi/nspi/ querystring=?MailboxId=642ea57c-90ab-4571-8e05-c6997b2256f8@elastic.user.com cookie=\"MapiContext=MAPIAAAAAPaw98Xx0uDQ4tL/z/rX59b2x/LI+8z2x/+lhrKGtIO7jbmBsxYNAAAAAAAA;MapiRouting=UlVNOjdmNWY0OGE3LTM5OWItNDc4Yi04ZDgwLWFmZTRmMzAyZTViMDoAitM4bv3XCA==;MapiSequence=10-GtgsIA==;X-BackEndCookie=642ea57c-90ab-4571-8e05-c6997b2256f8=u56Lnp2ejJqByZrHyZ7Mys7Sm8zJnNLLnM3J0sbJxsvSnZzIxs2ans+ezMrLgYHNz83P0s/J0s3Pq87Pxc7PxcrL\" referer=- method=POST httpstatus=401 reason=\"-\" extra=\"-\" contenttype=\"-\" useragent=\"Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.4954; Pro)\" host=216.160.83.61 responsetime=11199 bytessent=5669 bytesrcv=1419 fw_rule_id=79",
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
@@ -37,7 +37,7 @@
         ],
         "related.ip": [
             "185.8.209.207",
-            "89.68.140.204"
+            "216.160.83.61"
         ],
         "server.bytes": 5669,
         "server.ip": "185.8.209.207",
@@ -46,7 +46,7 @@
         "sophos.xg.device": "SFW",
         "sophos.xg.device_name": "XG230",
         "sophos.xg.fw_rule_id": "79",
-        "sophos.xg.host": "89.68.140.204",
+        "sophos.xg.host": "216.160.83.61",
         "sophos.xg.log_component": "Web Application Firewall",
         "sophos.xg.log_type": "WAF",
         "sophos.xg.message_id": "17071",
@@ -54,8 +54,17 @@
         "sophos.xg.querystring": "?MailboxId=642ea57c-90ab-4571-8e05-c6997b2256f8@elastic.user.com",
         "sophos.xg.responsetime": "11199",
         "sophos.xg.server": "webmail.elasticuser.com",
+        "source.as.number": 209,
         "source.bytes": 1419,
-        "source.ip": "89.68.140.204",
+        "source.geo.city_name": "Milton",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
+        "source.geo.location.lat": 47.2513,
+        "source.geo.location.lon": -122.3149,
+        "source.geo.region_iso_code": "US-WA",
+        "source.geo.region_name": "Washington",
+        "source.ip": "216.160.83.61",
         "tags": [
             "forwarded",
             "sophos-xg"
@@ -68,7 +77,7 @@
     {
         "@timestamp": "2020-05-18T14:38:47.000-02:00",
         "client.bytes": 1774,
-        "client.ip": "89.68.140.204",
+        "client.ip": "216.160.83.61",
         "destination.bytes": 200,
         "destination.ip": "185.8.209.207",
         "event.action": "denied",
@@ -80,7 +89,7 @@
         "event.dataset": "sophos.xg",
         "event.kind": "alert",
         "event.module": "sophos",
-        "event.original": "device=\"SFW\" date=2020-05-18 time=14:38:47 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123457 log_id=075000617071 log_type=\"WAF\" log_component=\"Web Application Firewall\" priority=Information user_name=\"-\" server=webmail.elasticuser.com sourceip=89.68.140.204 localip=185.8.209.207 ws_protocol=\"HTTP/1.1\" url=/mapi/nspi/ querystring=?MailboxId=642ea57c-90ab-4571-8e05-c6997b2256f8@elastic.user.com cookie=\"MapiContext=MAPIAAAAAPaw98Xx0uDQ4tL/z/rX59b2x/LI+8z2x/+lhrKGtIO7jbmBsw0NAAAAAAAA;MapiRouting=UlVNOjdmNWY0OGE3LTM5OWItNDc4Yi04ZDgwLWFmZTRmMzAyZTViMDpeyft5bv3XCA==;MapiSequence=9-Km2JMg==;X-BackEndCookie=642ea57c-90ab-4571-8e05-c6997b2256f8=u56Lnp2ejJqByZrHyZ7Mys7Sm8zJnNLLnM3J0sbJxsvSnZzIxs2ans+ezMrLgYHNz83P0s/J0s3Pq87Pxc7Oxc3M\" referer=- method=POST httpstatus=200 reason=\"-\" extra=\"-\" contenttype=\"application/mapi-http\" useragent=\"Microsoft Office/16.0 (Windows NT 6.2; Microsoft Outlook 16.0.4954; Pro)\" host=89.68.140.204 responsetime=14086 bytessent=1357 bytesrcv=1774 fw_rule_id=79",
+        "event.original": "device=\"SFW\" date=2020-05-18 time=14:38:47 timezone=\"CEST\" device_name=\"XG230\" device_id=1234567890123457 log_id=075000617071 log_type=\"WAF\" log_component=\"Web Application Firewall\" priority=Information user_name=\"-\" server=webmail.elasticuser.com sourceip=216.160.83.61 localip=185.8.209.207 ws_protocol=\"HTTP/1.1\" url=/mapi/nspi/ querystring=?MailboxId=642ea57c-90ab-4571-8e05-c6997b2256f8@elastic.user.com cookie=\"MapiContext=MAPIAAAAAPaw98Xx0uDQ4tL/z/rX59b2x/LI+8z2x/+lhrKGtIO7jbmBsw0NAAAAAAAA;MapiRouting=UlVNOjdmNWY0OGE3LTM5OWItNDc4Yi04ZDgwLWFmZTRmMzAyZTViMDpeyft5bv3XCA==;MapiSequence=9-Km2JMg==;X-BackEndCookie=642ea57c-90ab-4571-8e05-c6997b2256f8=u56Lnp2ejJqByZrHyZ7Mys7Sm8zJnNLLnM3J0sbJxsvSnZzIxs2ans+ezMrLgYHNz83P0s/J0s3Pq87Pxc7Oxc3M\" referer=- method=POST httpstatus=200 reason=\"-\" extra=\"-\" contenttype=\"application/mapi-http\" useragent=\"Microsoft Office/16.0 (Windows NT 6.2; Microsoft Outlook 16.0.4954; Pro)\" host=216.160.83.61 responsetime=14086 bytessent=1357 bytesrcv=1774 fw_rule_id=79",
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
@@ -103,7 +112,7 @@
         ],
         "related.ip": [
             "185.8.209.207",
-            "89.68.140.204"
+            "216.160.83.61"
         ],
         "server.bytes": 1357,
         "server.ip": "185.8.209.207",
@@ -113,7 +122,7 @@
         "sophos.xg.device": "SFW",
         "sophos.xg.device_name": "XG230",
         "sophos.xg.fw_rule_id": "79",
-        "sophos.xg.host": "89.68.140.204",
+        "sophos.xg.host": "216.160.83.61",
         "sophos.xg.log_component": "Web Application Firewall",
         "sophos.xg.log_type": "WAF",
         "sophos.xg.message_id": "17071",
@@ -121,8 +130,17 @@
         "sophos.xg.querystring": "?MailboxId=642ea57c-90ab-4571-8e05-c6997b2256f8@elastic.user.com",
         "sophos.xg.responsetime": "14086",
         "sophos.xg.server": "webmail.elasticuser.com",
+        "source.as.number": 209,
         "source.bytes": 1774,
-        "source.ip": "89.68.140.204",
+        "source.geo.city_name": "Milton",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
+        "source.geo.location.lat": 47.2513,
+        "source.geo.location.lon": -122.3149,
+        "source.geo.region_iso_code": "US-WA",
+        "source.geo.region_name": "Washington",
+        "source.ip": "216.160.83.61",
         "tags": [
             "forwarded",
             "sophos-xg"
@@ -283,7 +301,7 @@
     {
         "@timestamp": "2020-05-20T18:03:31.000-02:00",
         "client.bytes": 295,
-        "client.ip": "83.97.20.30",
+        "client.ip": "89.160.20.112",
         "destination.bytes": 403,
         "destination.ip": "216.167.51.72",
         "event.action": "denied",
@@ -295,7 +313,7 @@
         "event.dataset": "sophos.xg",
         "event.kind": "alert",
         "event.module": "sophos",
-        "event.original": "device=\"SFW\" date=2020-05-20 time=18:03:31 timezone=\"IST\" device_name=\"XG230\" device_id=1234567890123457 log_id=075000617071 log_type=\"WAF\" log_component=\"Web Application Firewall\" priority=Information user_name=\"-\" server=- sourceip=83.97.20.30 localip=216.167.51.72 ws_protocol=\"HTTP/1.0\" url=/ querystring=\"\" cookie=\"-\" referer=\"-\" method=GET httpstatus=403 reason=\"WAF Anomaly\" extra=\"Inbound Anomaly Score Exceeded (Total Score: 7, SQLi=, XSS=): Last Matched Message: Request Missing a User Agent Header\" contenttype=\"text/html\" useragent=\"-\" host=83.97.20.30 responsetime=608 bytessent=5353 bytesrcv=295 fw_rule_id=3",
+        "event.original": "device=\"SFW\" date=2020-05-20 time=18:03:31 timezone=\"IST\" device_name=\"XG230\" device_id=1234567890123457 log_id=075000617071 log_type=\"WAF\" log_component=\"Web Application Firewall\" priority=Information user_name=\"-\" server=- sourceip=89.160.20.112 localip=216.167.51.72 ws_protocol=\"HTTP/1.0\" url=/ querystring=\"\" cookie=\"-\" referer=\"-\" method=GET httpstatus=403 reason=\"WAF Anomaly\" extra=\"Inbound Anomaly Score Exceeded (Total Score: 7, SQLi=, XSS=): Last Matched Message: Request Missing a User Agent Header\" contenttype=\"text/html\" useragent=\"-\" host=89.160.20.112 responsetime=608 bytessent=5353 bytesrcv=295 fw_rule_id=3",
         "event.outcome": "success",
         "event.severity": "6",
         "event.timezone": "-02:00",
@@ -319,7 +337,7 @@
         ],
         "related.ip": [
             "216.167.51.72",
-            "83.97.20.30"
+            "89.160.20.112"
         ],
         "server.bytes": 5353,
         "server.ip": "216.167.51.72",
@@ -329,7 +347,7 @@
         "sophos.xg.device_name": "XG230",
         "sophos.xg.extra": "Inbound Anomaly Score Exceeded (Total Score: 7,",
         "sophos.xg.fw_rule_id": "3",
-        "sophos.xg.host": "83.97.20.30",
+        "sophos.xg.host": "89.160.20.112",
         "sophos.xg.log_component": "Web Application Firewall",
         "sophos.xg.log_type": "WAF",
         "sophos.xg.message_id": "17071",
@@ -338,8 +356,18 @@
         "sophos.xg.responsetime": "608",
         "sophos.xg.sqli": ",",
         "sophos.xg.xss": "): Last Matched Message: Request Missing a User Agent Header",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
         "source.bytes": 295,
-        "source.ip": "83.97.20.30",
+        "source.geo.city_name": "Link\u00f6ping",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.112",
         "tags": [
             "forwarded",
             "sophos-xg"

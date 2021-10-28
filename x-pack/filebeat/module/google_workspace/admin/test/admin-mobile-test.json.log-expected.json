@@ -8,7 +8,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"ACTION_CANCELLED\",\"parameters\":[{\"name\":\"ACTION_ID\",\"value\":\"id\"},{\"name\":\"ACTION_TYPE\",\"value\":\"ACCOUNT_WIPE\"},{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"ACTION_CANCELLED\",\"parameters\":[{\"name\":\"ACTION_ID\",\"value\":\"id\"},{\"name\":\"ACTION_TYPE\",\"value\":\"ACCOUNT_WIPE\"},{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "info",
@@ -28,16 +28,20 @@
         "log.offset": 0,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo",
             "user"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -61,7 +65,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"ACTION_REQUESTED\",\"parameters\":[{\"name\":\"ACTION_ID\",\"value\":\"id\"},{\"name\":\"ACTION_TYPE\",\"value\":\"ACCOUNT_WIPE\"},{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"ACTION_REQUESTED\",\"parameters\":[{\"name\":\"ACTION_ID\",\"value\":\"id\"},{\"name\":\"ACTION_TYPE\",\"value\":\"ACCOUNT_WIPE\"},{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "info",
@@ -78,19 +82,23 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 534,
+        "log.offset": 533,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo",
             "user"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -114,7 +122,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"ADD_MOBILE_CERTIFICATE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"MOBILE_CERTIFICATE_COMMON_NAME\",\"value\":\"name\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"ADD_MOBILE_CERTIFICATE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"MOBILE_CERTIFICATE_COMMON_NAME\",\"value\":\"name\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -128,18 +136,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1068,
+        "log.offset": 1066,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -160,7 +172,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"COMPANY_DEVICES_BULK_CREATION\",\"parameters\":[{\"name\":\"NUMBER_OF_COMPANY_OWNED_DEVICES\",\"intValue\":10}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"COMPANY_DEVICES_BULK_CREATION\",\"parameters\":[{\"name\":\"NUMBER_OF_COMPANY_OWNED_DEVICES\",\"intValue\":10}]}}",
         "event.provider": "admin",
         "event.type": [
             "creation"
@@ -172,18 +184,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1548,
+        "log.offset": 1545,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -204,7 +220,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"COMPANY_OWNED_DEVICE_BLOCKED\",\"parameters\":[{\"name\":\"COMPANY_DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"COMPANY_OWNED_DEVICE_BLOCKED\",\"parameters\":[{\"name\":\"COMPANY_DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -217,18 +233,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1951,
+        "log.offset": 1947,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -249,7 +269,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"COMPANY_DEVICE_DELETION\",\"parameters\":[{\"name\":\"COMPANY_DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"COMPANY_DEVICE_DELETION\",\"parameters\":[{\"name\":\"COMPANY_DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "deletion"
@@ -262,18 +282,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2376,
+        "log.offset": 2371,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -294,7 +318,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"COMPANY_OWNED_DEVICE_UNBLOCKED\",\"parameters\":[{\"name\":\"COMPANY_DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"COMPANY_OWNED_DEVICE_UNBLOCKED\",\"parameters\":[{\"name\":\"COMPANY_DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -307,18 +331,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2796,
+        "log.offset": 2790,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -339,7 +367,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"COMPANY_OWNED_DEVICE_WIPED\",\"parameters\":[{\"name\":\"COMPANY_DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"COMPANY_OWNED_DEVICE_WIPED\",\"parameters\":[{\"name\":\"COMPANY_DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -352,18 +380,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3223,
+        "log.offset": 3216,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -384,7 +416,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"CHANGE_MOBILE_APPLICATION_PERMISSION_GRANT\",\"parameters\":[{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"DISTRIBUTION_ENTITY_NAME\",\"value\":\"ANY\"},{\"name\":\"DISTRIBUTION_ENTITY_TYPE\",\"value\":\"GROUP\"},{\"name\":\"MOBILE_APP_PACKAGE_ID\",\"value\":\"id\"},{\"name\":\"NEW_PERMISSION_GRANT_STATE\",\"value\":\"GRANTED\"},{\"name\":\"OLD_PERMISSION_GRANT_STATE\",\"value\":\"DENIED\"},{\"name\":\"PERMISSION_GROUP_NAME\",\"value\":\"LOCATION\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"CHANGE_MOBILE_APPLICATION_PERMISSION_GRANT\",\"parameters\":[{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"DISTRIBUTION_ENTITY_NAME\",\"value\":\"ANY\"},{\"name\":\"DISTRIBUTION_ENTITY_TYPE\",\"value\":\"GROUP\"},{\"name\":\"MOBILE_APP_PACKAGE_ID\",\"value\":\"id\"},{\"name\":\"NEW_PERMISSION_GRANT_STATE\",\"value\":\"GRANTED\"},{\"name\":\"OLD_PERMISSION_GRANT_STATE\",\"value\":\"DENIED\"},{\"name\":\"PERMISSION_GROUP_NAME\",\"value\":\"LOCATION\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -402,18 +434,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3646,
+        "log.offset": 3638,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -434,7 +470,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"CHANGE_MOBILE_APPLICATION_PRIORITY_ORDER\",\"parameters\":[{\"name\":\"MOBILE_APP_PACKAGE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"CHANGE_MOBILE_APPLICATION_PRIORITY_ORDER\",\"parameters\":[{\"name\":\"MOBILE_APP_PACKAGE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -447,18 +483,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 4354,
+        "log.offset": 4345,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -479,7 +519,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"REMOVE_MOBILE_APPLICATION_FROM_WHITELIST\",\"parameters\":[{\"name\":\"MOBILE_APP_PACKAGE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"DISTRIBUTION_ENTITY_NAME\",\"value\":\"ANY\"},{\"name\":\"DISTRIBUTION_ENTITY_TYPE\",\"value\":\"ORG_UNIT\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"REMOVE_MOBILE_APPLICATION_FROM_WHITELIST\",\"parameters\":[{\"name\":\"MOBILE_APP_PACKAGE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"DISTRIBUTION_ENTITY_NAME\",\"value\":\"ANY\"},{\"name\":\"DISTRIBUTION_ENTITY_TYPE\",\"value\":\"ORG_UNIT\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -494,18 +534,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 4795,
+        "log.offset": 4785,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -527,7 +571,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"CHANGE_MOBILE_APPLICATION_SETTINGS\",\"parameters\":[{\"name\":\"MOBILE_APP_PACKAGE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"DISTRIBUTION_ENTITY_NAME\",\"value\":\"ANY\"},{\"name\":\"DISTRIBUTION_ENTITY_TYPE\",\"value\":\"ORG_UNIT\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"CHANGE_MOBILE_APPLICATION_SETTINGS\",\"parameters\":[{\"name\":\"MOBILE_APP_PACKAGE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"DISTRIBUTION_ENTITY_NAME\",\"value\":\"ANY\"},{\"name\":\"DISTRIBUTION_ENTITY_TYPE\",\"value\":\"ORG_UNIT\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -545,18 +589,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 5341,
+        "log.offset": 5330,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -577,7 +625,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"ADD_MOBILE_APPLICATION_TO_WHITELIST\",\"parameters\":[{\"name\":\"MOBILE_APP_PACKAGE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"DISTRIBUTION_ENTITY_NAME\",\"value\":\"ANY\"},{\"name\":\"DISTRIBUTION_ENTITY_TYPE\",\"value\":\"ORG_UNIT\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"ADD_MOBILE_APPLICATION_TO_WHITELIST\",\"parameters\":[{\"name\":\"MOBILE_APP_PACKAGE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"DISTRIBUTION_ENTITY_NAME\",\"value\":\"ANY\"},{\"name\":\"DISTRIBUTION_ENTITY_TYPE\",\"value\":\"ORG_UNIT\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -592,18 +640,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 5993,
+        "log.offset": 5981,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -624,7 +676,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"MOBILE_DEVICE_APPROVE\",\"parameters\":[{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"MOBILE_DEVICE_APPROVE\",\"parameters\":[{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -639,19 +691,23 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 6534,
+        "log.offset": 6521,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo",
             "user"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -675,7 +731,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"MOBILE_DEVICE_BLOCK\",\"parameters\":[{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"MOBILE_DEVICE_BLOCK\",\"parameters\":[{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -690,19 +746,23 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 6993,
+        "log.offset": 6979,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo",
             "user"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -726,7 +786,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"MOBILE_DEVICE_DELETE\",\"parameters\":[{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"MOBILE_DEVICE_DELETE\",\"parameters\":[{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "deletion",
@@ -741,19 +801,23 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 7450,
+        "log.offset": 7435,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo",
             "user"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -777,7 +841,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"MOBILE_DEVICE_WIPE\",\"parameters\":[{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"MOBILE_DEVICE_WIPE\",\"parameters\":[{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -792,19 +856,23 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 7908,
+        "log.offset": 7892,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo",
             "user"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -829,7 +897,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"CHANGE_MOBILE_SETTING\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"CHANGE_MOBILE_SETTING\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -845,18 +913,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 8364,
+        "log.offset": 8347,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -877,7 +949,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"CHANGE_ADMIN_RESTRICTIONS_PIN\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"CHANGE_ADMIN_RESTRICTIONS_PIN\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -890,18 +962,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 8898,
+        "log.offset": 8880,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -922,7 +998,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"CHANGE_MOBILE_WIRELESS_NETWORK\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"MOBILE_WIRELESS_NETWORK_NAME\",\"value\":\"network\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"CHANGE_MOBILE_WIRELESS_NETWORK\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"MOBILE_WIRELESS_NETWORK_NAME\",\"value\":\"network\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -935,19 +1011,23 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 9328,
+        "log.offset": 9309,
         "network.name": "network",
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -968,7 +1048,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"ADD_MOBILE_WIRELESS_NETWORK\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"MOBILE_WIRELESS_NETWORK_NAME\",\"value\":\"network\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"ADD_MOBILE_WIRELESS_NETWORK\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"MOBILE_WIRELESS_NETWORK_NAME\",\"value\":\"network\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -981,19 +1061,23 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 9817,
+        "log.offset": 9797,
         "network.name": "network",
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -1014,7 +1098,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"REMOVE_MOBILE_WIRELESS_NETWORK\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"MOBILE_WIRELESS_NETWORK_NAME\",\"value\":\"network\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"REMOVE_MOBILE_WIRELESS_NETWORK\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"MOBILE_WIRELESS_NETWORK_NAME\",\"value\":\"network\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -1027,19 +1111,23 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 10303,
+        "log.offset": 10282,
         "network.name": "network",
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -1060,7 +1148,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"CHANGE_MOBILE_WIRELESS_NETWORK_PASSWORD\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"MOBILE_WIRELESS_NETWORK_NAME\",\"value\":\"network\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"CHANGE_MOBILE_WIRELESS_NETWORK_PASSWORD\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"MOBILE_WIRELESS_NETWORK_NAME\",\"value\":\"network\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -1073,19 +1161,23 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 10792,
+        "log.offset": 10770,
         "network.name": "network",
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -1106,7 +1198,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"REMOVE_MOBILE_CERTIFICATE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"MOBILE_CERTIFICATE_COMMON_NAME\",\"value\":\"cert\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"REMOVE_MOBILE_CERTIFICATE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"MOBILE_CERTIFICATE_COMMON_NAME\",\"value\":\"cert\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -1120,18 +1212,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 11290,
+        "log.offset": 11267,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -1152,7 +1248,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"ENROLL_FOR_GOOGLE_DEVICE_MANAGEMENT\"}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"ENROLL_FOR_GOOGLE_DEVICE_MANAGEMENT\"}}",
         "event.provider": "admin",
         "event.type": [
             "info"
@@ -1163,18 +1259,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 11773,
+        "log.offset": 11749,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -1195,7 +1295,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"USE_GOOGLE_MOBILE_MANAGEMENT\"}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"USE_GOOGLE_MOBILE_MANAGEMENT\"}}",
         "event.provider": "admin",
         "event.type": [
             "info"
@@ -1206,18 +1306,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 12110,
+        "log.offset": 12085,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -1238,7 +1342,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"USE_GOOGLE_MOBILE_MANAGEMENT_FOR_NON_IOS\"}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"USE_GOOGLE_MOBILE_MANAGEMENT_FOR_NON_IOS\"}}",
         "event.provider": "admin",
         "event.type": [
             "info"
@@ -1249,18 +1353,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 12440,
+        "log.offset": 12414,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -1281,7 +1389,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"USE_GOOGLE_MOBILE_MANAGEMENT_FOR_IOS\"}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"USE_GOOGLE_MOBILE_MANAGEMENT_FOR_IOS\"}}",
         "event.provider": "admin",
         "event.type": [
             "info"
@@ -1292,18 +1400,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 12782,
+        "log.offset": 12755,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -1324,7 +1436,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"MOBILE_ACCOUNT_WIPE\",\"parameters\":[{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"MOBILE_ACCOUNT_WIPE\",\"parameters\":[{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -1339,19 +1451,23 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 13120,
+        "log.offset": 13092,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo",
             "user"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -1375,7 +1491,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"MOBILE_DEVICE_CANCEL_WIPE_THEN_APPROVE\",\"parameters\":[{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"MOBILE_DEVICE_CANCEL_WIPE_THEN_APPROVE\",\"parameters\":[{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -1390,19 +1506,23 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 13577,
+        "log.offset": 13548,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo",
             "user"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -1426,7 +1546,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"MOBILE_DEVICE_CANCEL_WIPE_THEN_BLOCK\",\"parameters\":[{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"MOBILE_SETTINGS\",\"name\":\"MOBILE_DEVICE_CANCEL_WIPE_THEN_BLOCK\",\"parameters\":[{\"name\":\"DEVICE_ID\",\"value\":\"id\"},{\"name\":\"DEVICE_TYPE\",\"value\":\"type\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change",
@@ -1441,19 +1561,23 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 14053,
+        "log.offset": 14023,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo",
             "user"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, Inc.",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",

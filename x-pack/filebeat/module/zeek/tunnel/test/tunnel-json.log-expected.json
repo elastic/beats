@@ -22,13 +22,21 @@
         "network.direction": "external",
         "related.ip": [
             "132.16.110.133",
-            "132.16.146.79"
+            "89.160.20.112"
         ],
         "service.type": "zeek",
-        "source.address": "132.16.146.79",
-        "source.as.number": 721,
-        "source.as.organization.name": "DoD Network Information Center",
-        "source.ip": "132.16.146.79",
+        "source.address": "89.160.20.112",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.112",
         "source.port": 0,
         "tags": [
             "zeek.tunnel"
