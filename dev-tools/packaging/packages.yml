@@ -432,7 +432,7 @@ shared:
       dockerfile: 'Dockerfile.elastic-agent.tmpl'
       docker_entrypoint: 'docker-entrypoint.elastic-agent.tmpl'
       user: '{{ .BeatName }}'
-      linux_capabilities: 'cap_net_raw+eip'
+      linux_capabilities: ''
       image_name: ''
     files:
       'elastic-agent.yml':
@@ -455,6 +455,11 @@ shared:
     extra_vars:
       image_name: '{{.BeatName}}-cloud'
       repository: 'docker.elastic.co/beats-ci'
+
+  - &agent_docker_complete_spec
+    <<: *agent_docker_spec
+    extra_vars:
+      image_name: '{{.BeatName}}-complete'
 
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
@@ -1007,9 +1012,20 @@ specs:
         <<: *agent_docker_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
-        # This image gets a 'complete' variant for synthetics and other large
-        # packages too big to fit in the main image
-        variants: ["complete"]
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    # Complete image gets a 'complete' variant for synthetics and other large
+    # packages too big to fit in the main image
+    - os: linux
+      arch: amd64
+      types: [docker]
+      spec:
+        <<: *agent_docker_spec
+        <<: *agent_docker_complete_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
@@ -1046,9 +1062,20 @@ specs:
         <<: *agent_docker_arm_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
-        # This image gets a 'complete' variant for synthetics and other large
-        # packages too big to fit in the main image
-        variants: ["complete"]
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    # Complete image gets a 'complete' variant for synthetics and other large
+    # packages too big to fit in the main image
+    - os: linux
+      arch: arm64
+      types: [docker]
+      spec:
+        <<: *agent_docker_arm_spec
+        <<: *agent_docker_complete_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}

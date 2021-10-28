@@ -173,13 +173,15 @@ func runCmd(
 		wg.Done()
 	}()
 	err = cmd.Start()
+	if err != nil {
+		logp.Warn("Could not start command %s: %s", cmd, err)
+		return nil, err
+	}
 
 	// Kill the process if the context ends
 	go func() {
-		select {
-		case <-ctx.Done():
-			cmd.Process.Kill()
-		}
+		<-ctx.Done()
+		cmd.Process.Kill()
 	}()
 
 	// Close mpx after the process is done and all events have been sent / consumed
@@ -194,7 +196,7 @@ func runCmd(
 				Type:  "cmd/status",
 				Error: &SynthError{Name: "cmdexit", Message: str},
 			})
-			logp.Warn("Error executing command '%s': %s", cmd.String(), err)
+			logp.Warn("Error executing command '%s' (%d): %s", cmd.String(), cmd.ProcessState.ExitCode(), err)
 		}
 		wg.Wait()
 		mpx.Close()

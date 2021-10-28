@@ -1,0 +1,41 @@
+- name: threatq
+  type: group
+  description: >
+    Fields for ThreatQ Threat Library
+  fields:
+  - name: updated_at
+    type: date
+    description: >
+      Last modification time
+  - name: created_at
+    type: date
+    description: >
+      Object creation time
+  - name: expires_at
+    type: date
+    description: >
+      Expiration time
+  - name: expires_calculated_at
+    type: date
+    description: >
+      Expiration calculation time
+  - name: published_at
+    type: date
+    description: >
+      Object publication time
+  - name: status
+    type: keyword
+    description: >
+      Object status within the Threat Library
+  - name: indicator_value
+    type: keyword
+    description: >
+      Original indicator value
+  - name: adversaries
+    type: keyword
+    description: >
+      Adversaries that are linked to the object
+  - name: attributes
+    type: flattened
+    description: >
+      These provide additional context about an object
