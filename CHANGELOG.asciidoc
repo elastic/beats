@@ -60,6 +60,7 @@ https://github.com/elastic/beats/compare/v7.14.2...v7.15.0[View commits]
 *Auditbeat*
 
 - File Integrity Module: Honor `include_files` when doing initial scan. {issue}27273[27273] {pull}27722[27722]
+- Fix handling of root and relative paths {issue}24430[24430] {pull}28354[28354]
 
 *Filebeat*
 
