@@ -4199,7 +4199,7 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-4-106023: Deny icmp src OUTSIDE:2a05:d016:add:4002:91f2:a9b2:e09a:6fc6 dst OUTSIDE:fe00:afa0::1 (type 128, code 0) by access-group \"OUTSIDE_in\"",
+        "event.original": "%ASA-4-106023: Deny icmp src OUTSIDE:2a02:cf40:add:4002:91f2:a9b2:e09a:6fc6 dst OUTSIDE:fe00:afa0::1 (type 128, code 0) by access-group \"OUTSIDE_in\"",
         "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
@@ -4225,12 +4225,12 @@
             "dev01"
         ],
         "related.ip": [
-            "2a05:d016:add:4002:91f2:a9b2:e09a:6fc6",
+            "2a02:cf40:add:4002:91f2:a9b2:e09a:6fc6",
             "fe00:afa0::1"
         ],
         "service.type": "cisco",
-        "source.address": "2a05:d016:add:4002:91f2:a9b2:e09a:6fc6",
-        "source.ip": "2a05:d016:add:4002:91f2:a9b2:e09a:6fc6",
+        "source.address": "2a02:cf40:add:4002:91f2:a9b2:e09a:6fc6",
+        "source.ip": "2a02:cf40:add:4002:91f2:a9b2:e09a:6fc6",
         "tags": [
             "cisco-asa",
             "forwarded"
