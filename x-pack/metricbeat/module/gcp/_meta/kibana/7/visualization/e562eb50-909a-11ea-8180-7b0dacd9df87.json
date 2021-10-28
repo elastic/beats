@@ -16,7 +16,7 @@
                 "drop_last_bucket": 1,
                 "filter": {
                     "language": "kuery",
-                    "query": "gcp.loadbalancing.l3.internal.egress_bytes_count.value : * "
+                    "query": "gcp.loadbalancing.l3.internal.egress.bytes : * "
                 },
                 "id": "61ca57f0-469d-11e7-af02-69e470af7417",
                 "index_pattern": "metricbeat-*",
@@ -34,7 +34,7 @@
                         "line_width": "2",
                         "metrics": [
                             {
-                                "field": "gcp.loadbalancing.l3.internal.egress_bytes_count.value",
+                                "field": "gcp.loadbalancing.l3.internal.egress.bytes",
                                 "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "type": "avg"
                             }

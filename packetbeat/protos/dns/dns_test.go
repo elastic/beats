@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 // Common variables, functions and tests for the dns package tests
@@ -211,8 +212,14 @@ func assertMapStrData(t testing.TB, m common.MapStr, q dnsTestMessage) {
 	assertFlags(t, m, q.flags)
 	assert.Equal(t, q.rcode, mapValue(t, m, "dns.response_code"))
 
-	assert.Equal(t, len(q.answers), mapValue(t, m, "dns.answers_count"),
-		"Expected dns.answers_count to be %d", len(q.answers))
+	truncated, ok := mapValue(t, m, "dns.flags.truncated_response").(bool)
+	if !ok {
+		t.Fatal("dns.flags.truncated_response value is not a bool.")
+	}
+	if !truncated {
+		assert.Equal(t, len(q.answers), mapValue(t, m, "dns.answers_count"),
+			"Expected dns.answers_count to be %d", len(q.answers))
+	}
 	if len(q.answers) > 0 {
 		assert.Len(t, mapValue(t, m, "dns.answers"), len(q.answers),
 			"Expected dns.answers to be length %d", len(q.answers))

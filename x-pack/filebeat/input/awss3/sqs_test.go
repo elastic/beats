@@ -131,6 +131,7 @@ func newS3Event(key string) s3EventV2 {
 		AWSRegion:   "us-east-1",
 		EventSource: "aws:s3",
 		EventName:   "ObjectCreated:Put",
+		Provider:    "aws",
 	}
 	record.S3.Bucket.Name = "foo"
 	record.S3.Bucket.ARN = "arn:aws:s3:::foo"

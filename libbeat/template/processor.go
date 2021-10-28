@@ -26,12 +26,16 @@ import (
 	"github.com/elastic/beats/v7/libbeat/mapping"
 )
 
+// DefaultField controls the default value for the default_field flag.
+const DefaultField = true
+
 var (
 	minVersionAlias                   = common.MustNewVersion("6.4.0")
 	minVersionFieldMeta               = common.MustNewVersion("7.6.0")
 	minVersionHistogram               = common.MustNewVersion("7.6.0")
 	minVersionWildcard                = common.MustNewVersion("7.9.0")
 	minVersionExplicitDynamicTemplate = common.MustNewVersion("7.13.0")
+	minVersionMatchOnlyText           = common.MustNewVersion("7.14.0")
 )
 
 // Processor struct to process fields to template
@@ -62,7 +66,7 @@ type fieldState struct {
 func (p *Processor) Process(fields mapping.Fields, state *fieldState, output common.MapStr) error {
 	if state == nil {
 		// Set the defaults.
-		state = &fieldState{DefaultField: true}
+		state = &fieldState{DefaultField: DefaultField}
 	}
 
 	for _, field := range fields {
@@ -87,6 +91,13 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 			indexMapping = p.integer(&field)
 		case "text":
 			indexMapping = p.text(&field)
+		case "match_only_text":
+			noMatchOnlyText := p.EsVersion.LessThan(minVersionMatchOnlyText)
+			if !p.ElasticLicensed || noMatchOnlyText {
+				indexMapping = p.text(&field)
+			} else {
+				indexMapping = p.matchOnlyText(&field)
+			}
 		case "wildcard":
 			noWildcards := p.EsVersion.LessThan(minVersionWildcard)
 			if !p.ElasticLicensed || noWildcards {
@@ -257,6 +268,23 @@ func (p *Processor) ip(f *mapping.Field) common.MapStr {
 	return property
 }
 
+func stateFromField(f *mapping.Field) *fieldState {
+	if f == nil {
+		return nil
+	}
+	st := &fieldState{
+		DefaultField: DefaultField,
+		Path:         f.Name,
+	}
+	if f.DefaultField != nil {
+		st.DefaultField = *f.DefaultField
+	}
+	if f.Path != "" {
+		st.Path = f.Path + "." + f.Name
+	}
+	return st
+}
+
 func (p *Processor) keyword(f *mapping.Field) common.MapStr {
 	property := p.getDefaultProperties(f)
 
@@ -277,7 +305,7 @@ func (p *Processor) keyword(f *mapping.Field) common.MapStr {
 
 	if len(f.MultiFields) > 0 {
 		fields := common.MapStr{}
-		p.Process(f.MultiFields, nil, fields)
+		p.Process(f.MultiFields, stateFromField(f), fields)
 		property["fields"] = fields
 	}
 
@@ -299,7 +327,7 @@ func (p *Processor) wildcard(f *mapping.Field) common.MapStr {
 
 	if len(f.MultiFields) > 0 {
 		fields := common.MapStr{}
-		p.Process(f.MultiFields, nil, fields)
+		p.Process(f.MultiFields, stateFromField(f), fields)
 		property["fields"] = fields
 	}
 
@@ -324,6 +352,28 @@ func (p *Processor) text(f *mapping.Field) common.MapStr {
 			properties["norms"] = false
 		}
 	}
+
+	if f.Analyzer != "" {
+		properties["analyzer"] = f.Analyzer
+	}
+
+	if f.SearchAnalyzer != "" {
+		properties["search_analyzer"] = f.SearchAnalyzer
+	}
+
+	if len(f.MultiFields) > 0 {
+		fields := common.MapStr{}
+		p.Process(f.MultiFields, stateFromField(f), fields)
+		properties["fields"] = fields
+	}
+
+	return properties
+}
+
+func (p *Processor) matchOnlyText(f *mapping.Field) common.MapStr {
+	properties := p.getDefaultProperties(f)
+
+	properties["type"] = "match_only_text"
 
 	if f.Analyzer != "" {
 		properties["analyzer"] = f.Analyzer

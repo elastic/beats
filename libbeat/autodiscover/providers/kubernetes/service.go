@@ -15,6 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !aix
+// +build !aix
+
 package kubernetes
 
 import (
@@ -137,7 +140,8 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 		}
 
 		// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
-		if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
+		rawNsAnn, err := kubeMeta.GetValue("namespace.annotations")
+		if err == nil {
 			nsAnn, _ := rawNsAnn.(common.MapStr)
 			if len(nsAnn) != 0 {
 				annotations.DeepUpdateNoOverwrite(nsAnn)
@@ -211,7 +215,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 				for k, v := range namespace.GetAnnotations() {
 					safemapstr.Put(nsAnns, k, v)
 				}
-				kubemeta["namespace_annotations"] = nsAnns
+				kubemeta.Put("namespace.annotations", nsAnns)
 			}
 		}
 	}

@@ -27,32 +27,59 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+// Expanded with Elastic custom extensions so we have only one binary to manager
+
 package main
 
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
-	"os/signal"
 	"time"
+
+	"github.com/osquery/osquery-go"
+)
+
+var (
+	socket   = flag.String("socket", "", "Path to the extensions UNIX domain socket")
+	timeout  = flag.Int("timeout", 3, "Seconds to wait for autoloaded extensions")
+	interval = flag.Int("interval", 3, "Seconds delay between connectivity checks")
+	verbose  = flag.Bool("verbose", false, "Verbose logging")
 )
 
 func main() {
-	var (
-		_ = flag.Bool("verbose", false, "")
-		_ = flag.Int("interval", 0, "")
-		_ = flag.Int("timeout", 0, "")
-		_ = flag.String("socket", "", "")
-	)
 	flag.Parse()
 
-	fmt.Fprintf(os.Stderr, "%+v", os.Args)
+	if *socket == "" {
+		log.Fatalln("Missing required --socket argument")
+	}
+
+	serverTimeout := osquery.ServerTimeout(
+		time.Second * time.Duration(*timeout),
+	)
+	serverPingInterval := osquery.ServerPingInterval(
+		time.Second * time.Duration(*interval),
+	)
 
 	go monitorForParent()
 
-	sig := make(chan os.Signal)
-	signal.Notify(sig, os.Interrupt)
-	<-sig
+	server, err := osquery.NewExtensionManagerServer(
+		"osquery-extension",
+		*socket,
+		serverTimeout,
+		serverPingInterval,
+	)
+	if err != nil {
+		log.Fatalf("Error creating extension: %s\n", err)
+	}
+
+	// Register the tables avaiable for the specific pltaform build
+	RegisterTables(server)
+
+	if err := server.Run(); err != nil {
+		log.Fatal(err)
+	}
 }
 
 // continuously monitor for ppid and exit if osqueryd is no longer the parent process.

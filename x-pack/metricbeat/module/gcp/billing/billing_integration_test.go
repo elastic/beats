@@ -2,8 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build integration
-// +build gcp
+//go:build integration && gcp && billing
+// +build integration,gcp,billing
 
 package billing
 
@@ -21,8 +21,8 @@ func TestFetch(t *testing.T) {
 	config["period"] = "24h"
 	config["dataset_id"] = "master_gcp"
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	events, errs := mbtest.ReportingFetchV2Error(metricSet)
+	metricSet := mbtest.NewReportingMetricSetV2WithContext(t, config)
+	events, errs := mbtest.ReportingFetchV2WithContext(metricSet)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}

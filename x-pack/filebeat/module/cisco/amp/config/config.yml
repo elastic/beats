@@ -1,7 +1,6 @@
 {{ if eq .input "httpjson" }}
 
 type: httpjson
-config_version: "2"
 interval: {{ .interval }}
 
 {{ if .client_id }}
@@ -77,4 +76,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.11.0
+        ecs.version: 1.12.0
