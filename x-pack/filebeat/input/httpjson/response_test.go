@@ -16,7 +16,7 @@ import (
 func TestTemplateValues(t *testing.T) {
 	resp := &response{
 		page: 1,
-		url:  newURL("http://test?p1=v1"),
+		url:  *(newURL("http://test?p1=v1")),
 		header: http.Header{
 			"Authorization": []string{"Bearer token"},
 		},
