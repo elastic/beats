@@ -578,7 +578,7 @@ func (http *httpPlugin) newTransaction(requ, resp *message) beat.Event {
 		httpFields.Version = requ.version.String()
 		httpFields.RequestBytes = int64(requ.size)
 		httpFields.RequestBodyBytes = int64(requ.contentLength)
-		httpFields.RequestMethod = bytes.ToLower(requ.method)
+		httpFields.RequestMethod = requ.method
 		httpFields.RequestReferrer = requ.referer
 		pbf.AddHost(string(requ.referer))
 		if requ.sendBody && len(requ.body) > 0 {
