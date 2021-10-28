@@ -149,3 +149,4 @@
 - Add diagnostics command to gather beat metadata. {pull}28265[28265]
 - Add diagnostics collect command to gather beat metadata, config, policy, and logs and bundle it into an archive. {pull}28461[28461]
 - Add `KIBANA_FLEET_SERVICE_TOKEN` to Elastic Agent container. {pull}28096[28096]
+- Pass the `logging.level` setting to all configs that the Elastic Agent renders for its processes. {issue}28392[28392]

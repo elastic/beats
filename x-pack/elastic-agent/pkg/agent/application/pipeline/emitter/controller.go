@@ -70,6 +70,11 @@ func (e *Controller) Update(c *config.Config) error {
 		return err
 	}
 
+	// Merge agent logging level
+	if err := c.Merge(map[string]interface{}{"logging": map[string]interface{}{"level": e.agentInfo.LogLevel()}}); err != nil {
+		return err // TODO fail here or just log that the level is present?
+	}
+
 	// perform and verify ast translation
 	m, err := c.ToMapStr()
 	if err != nil {
