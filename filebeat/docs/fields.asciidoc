@@ -543,7 +543,7 @@ alias to: process.pid
 --
 type: alias
 
-alias to: process.ppid
+alias to: process.parent.pid
 
 --
 
