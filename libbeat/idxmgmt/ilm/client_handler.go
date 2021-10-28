@@ -20,7 +20,6 @@ package ilm
 import (
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"path"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -29,9 +28,6 @@ import (
 // ClientHandler defines the interface between a remote service and the Manager.
 type ClientHandler interface {
 	CheckILMEnabled(bool) (bool, error)
-
-	HasAlias(name string) (bool, error)
-	CreateAlias(alias Alias) error
 
 	HasILMPolicy(name string) (bool, error)
 	CreateILMPolicy(policy Policy) error
@@ -43,7 +39,7 @@ type ESClientHandler struct {
 }
 
 // ESClient defines the minimal interface required for the Loader to
-// prepare a policy and write alias.
+// prepare a policy.
 type ESClient interface {
 	GetVersion() common.Version
 	Request(
@@ -60,7 +56,7 @@ type FileClientHandler struct {
 }
 
 // FileClient defines the minimal interface required for the Loader to
-// prepare a policy and write alias.
+// prepare a policy.
 type FileClient interface {
 	GetVersion() common.Version
 	Write(component string, name string, body string) error
@@ -72,8 +68,6 @@ const (
 	esFeaturesPath = "/_xpack"
 
 	esILMPath = "/_ilm/policy"
-
-	esAliasPath = "/_alias"
 )
 
 var (
@@ -139,62 +133,6 @@ func (h *ESClientHandler) HasILMPolicy(name string) (bool, error) {
 	return status == 200, nil
 }
 
-// HasAlias queries Elasticsearch to see if alias exists. If other resource
-// with the same name exists, it returns an error.
-func (h *ESClientHandler) HasAlias(name string) (bool, error) {
-	status, b, err := h.client.Request("GET", esAliasPath+"/"+name, "", nil, nil)
-	if err != nil && status != 404 {
-		return false, wrapErrf(err, ErrRequestFailed,
-			"failed to check for alias '%v': (status=%v) %s", name, status, b)
-	}
-	if status == 200 {
-		return true, nil
-	}
-
-	// Alias doesn't exist, check if there is an index with the same name
-	status, b, err = h.client.Request("HEAD", "/"+name, "", nil, nil)
-	if err != nil && status != 404 {
-		return false, wrapErrf(err, ErrRequestFailed,
-			"failed to check for alias '%v': (status=%v) %s", name, status, b)
-	}
-	if status == 200 {
-		return false, errf(ErrInvalidAlias,
-			"resource '%v' exists, but it is not an alias", name)
-	}
-	return false, nil
-}
-
-// CreateAlias sends request to Elasticsearch for creating alias.
-func (h *ESClientHandler) CreateAlias(alias Alias) error {
-	// Escaping because of date pattern
-	// This always assume it's a date pattern by sourrounding it by <...>
-	firstIndex := fmt.Sprintf("<%s-%s>", alias.Name, alias.Pattern)
-	firstIndex = url.PathEscape(firstIndex)
-
-	body := common.MapStr{
-		"aliases": common.MapStr{
-			alias.Name: common.MapStr{
-				"is_write_index": true,
-			},
-		},
-	}
-
-	// Note: actual aliases are accessible via the index
-	if _, res, err := h.client.Request("PUT", "/"+firstIndex, "", nil, body); err != nil {
-		// Creating the index may fail for multiple reasons, e.g. because
-		// the index exists, or because the write alias exists and points
-		// to another index.
-		if ok, err := h.HasAlias(alias.Name); err != nil {
-			// HasAlias fails if there is an index with the same name.
-			return err
-		} else if ok {
-			return errOf(ErrAliasAlreadyExists)
-		}
-		return wrapErrf(err, ErrAliasCreateFailed, "failed to create alias: %s", res)
-	}
-	return nil
-}
-
 func (h *ESClientHandler) checkILMSupport() (avail, enabled bool, err error) {
 	var response struct {
 		Features struct {
@@ -256,16 +194,6 @@ func (h *FileClientHandler) CreateILMPolicy(policy Policy) error {
 
 // HasILMPolicy always returns false.
 func (h *FileClientHandler) HasILMPolicy(name string) (bool, error) {
-	return false, nil
-}
-
-// CreateAlias is a noop implementation.
-func (h *FileClientHandler) CreateAlias(alias Alias) error {
-	return nil
-}
-
-// HasAlias always returns false.
-func (h *FileClientHandler) HasAlias(name string) (bool, error) {
 	return false, nil
 }
 

@@ -63,7 +63,6 @@ type indexSelector struct {
 
 type ilmIndexSelector struct {
 	index    outil.Selector
-	alias    outil.Selector
 	st       *indexState
 	beatInfo beat.Info
 }
@@ -175,12 +174,6 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 		if err != nil {
 			return nil, err
 		}
-	}
-
-	if s.ilm.Enabled() {
-		alias := s.ilm.Alias().Name
-		log.Infof("Set %v to '%s' as ILM is enabled.", cfg.PathOf("index"), alias)
-		indexName = alias
 	}
 
 	// no index name configuration found yet -> define default index name based on
