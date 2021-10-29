@@ -10,6 +10,7 @@ class IdxMgmt(unittest.TestCase):
     def __init__(self, client, index):
         self._client = client
         self._index = index if index != '' and index != '*' else 'mockbeat'
+        self.patterns = [self.default_pattern(), "1", datetime.datetime.now().strftime("%Y.%m.%d")]
 
     def needs_init(self, s):
         return s == '' or s == '*'
@@ -30,12 +31,14 @@ class IdxMgmt(unittest.TestCase):
 
         es_version = self.get_es_version()
         if es_version["major"] <= 8:
-            try:
-                index_with_pattern = index+"-"+self.default_pattern()
-                self._client.indices.delete(index_with_pattern)
-                self._client.indices.delete_alias(index, index_with_pattern)
-            except NotFoundError:
-                pass
+            for pattern in self.patterns:
+                index_with_pattern = index+"-"+pattern
+                try:
+                    print(index_with_pattern)
+                    self._client.indices.delete(index_with_pattern)
+                    self._client.indices.delete_alias(index, index_with_pattern)
+                except NotFoundError:
+                    continue
             return
 
         try:
@@ -135,7 +138,6 @@ class IdxMgmt(unittest.TestCase):
             pattern = self.default_pattern()
         name = alias + "-" + pattern
         resp = self._client.transport.perform_request('GET', '/_alias/' + alias)
-        print(name)
         assert name in resp
         assert resp[name]["aliases"][alias]["is_write_index"] == True
 
@@ -157,6 +159,7 @@ class IdxMgmt(unittest.TestCase):
         if pattern is None:
             pattern = self.default_pattern()
         name = alias + "-" + pattern
+        #data = self._client.transport.perform_request('GET', '/' + alias + '/_search')
         data = self._client.transport.perform_request('GET', '/' + name + '/_search')
         self.assertGreater(data["hits"]["total"]["value"], 0)
 
