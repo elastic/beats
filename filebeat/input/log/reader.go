@@ -118,8 +118,7 @@ func (r *ReuseHarvester) OnMessage(message ReuseMessage) error {
 	select {
 	case <-r.done:
 		return ErrHarvesterDone
-	default:
-		r.message <- message
+	case r.message <- message:
 		return nil
 	}
 }
