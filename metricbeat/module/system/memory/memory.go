@@ -27,6 +27,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -54,7 +55,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if !ok {
 		return nil, fmt.Errorf("unexpected module type")
 	}
-
+	if runtime.GOOS == "linux" {
+		cfgwarn.Deprecate("8.0", "linux-only memory stats, such as hugepages, and page_stats, will be moved to the linux module")
+	}
 	return &MetricSet{BaseMetricSet: base, IsAgent: systemModule.IsAgent}, nil
 }
 
