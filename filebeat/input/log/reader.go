@@ -327,6 +327,7 @@ func (h *FileHarvester) Run() {
 		h.Close()
 	}()
 
+	isEmptyForwarderTimes := 0
 	newForwarders := make([]*ReuseHarvester, 0)
 	tick := time.NewTicker(3 * time.Second)
 	defer tick.Stop()
@@ -340,7 +341,7 @@ func (h *FileHarvester) Run() {
 			newForwarders = append(newForwarders, reuseReader)
 		case <-tick.C:
 			if len(newForwarders) > 0 {
-				logp.Info("time is up, reload file:%s", h.state.Source)
+				logp.Info("found new forward join, reload file:%s", h.state.Source)
 				for _, reuseReader := range newForwarders {
 					h.forwarders[reuseReader.HarvesterID] = reuseReader
 				}
@@ -359,6 +360,16 @@ func (h *FileHarvester) Run() {
 
 				// read file
 				go h.loopRead()
+			}
+
+			if len(h.forwarders) > 0 {
+				isEmptyForwarderTimes = 0
+			} else {
+				isEmptyForwarderTimes++
+				if isEmptyForwarderTimes >= 3 {
+					logp.Info("forwarder is empty reach 3 times, stop fileharvester")
+					return
+				}
 			}
 		}
 	}
