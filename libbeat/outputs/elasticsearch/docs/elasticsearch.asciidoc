@@ -115,7 +115,7 @@ The default value is `false`.
 
 The number of workers per configured host publishing events to Elasticsearch. This
 is best used with load balancing mode enabled. Example: If you have 2 hosts and
-3 workers, in total 6 workers are started (3 for each host).
+3 workers, in total 6 workers are started (3 for each host). `workers` is an alias.
 
 The default value is `1`.
 

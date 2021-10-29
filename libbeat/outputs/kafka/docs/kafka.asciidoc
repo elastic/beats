@@ -203,7 +203,7 @@ The configurable ClientID used for logging, debugging, and auditing purposes. Th
 
 ===== `worker`
 
-The number of concurrent load-balanced Kafka output workers.
+The number of concurrent load-balanced Kafka output workers. `workers` is an alias.
 
 ===== `codec`
 

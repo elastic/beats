@@ -24,10 +24,12 @@ import "github.com/elastic/beats/v7/libbeat/common"
 // host list by the number of `workers`.
 func ReadHostList(cfg *common.Config) ([]string, error) {
 	config := struct {
-		Hosts  []string `config:"hosts"  validate:"required"`
-		Worker int      `config:"worker" validate:"min=1"`
+		Hosts   []string `config:"hosts"  validate:"required"`
+		Worker  int      `config:"worker" validate:"min=1"`
+		Workers int      `config:"workers" validate:"min=1"`
 	}{
-		Worker: 1,
+		Worker:  1,
+		Workers: 1,
 	}
 
 	err := cfg.Unpack(&config)
@@ -36,6 +38,11 @@ func ReadHostList(cfg *common.Config) ([]string, error) {
 	}
 
 	lst := config.Hosts
+
+	if config.Workers > config.Worker {
+		config.Worker = config.Workers
+	}
+
 	if len(lst) == 0 || config.Worker <= 1 {
 		return lst, nil
 	}
