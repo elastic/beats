@@ -90,6 +90,18 @@
   # to arrive in the queue before returning.
   #sqs.wait_time: 20s
 
+  # Bucket ARN used for polling AWS S3 buckets
+  #bucket_arn: arn:aws:s3:::test-s3-bucket
+
+  # Bucket Name used for polling non-AWS S3 buckets
+  #non_aws_bucket_name: test-s3-bucket
+
+  # Configures the AWS S3 API to use path style instead of virtual host style (default)
+  #path_style: false
+
+  # Overrides the `cloud.provider` field for non-AWS S3 buckets. See docs for auto recognized providers.
+  #provider: minio
+
 #------------------------------ AWS CloudWatch input --------------------------------
 # Beta: Config options for AWS CloudWatch input
 #- type: aws-cloudwatch

@@ -138,10 +138,15 @@ func getRoleArn(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
 // service clients when endpoint is given in config.
 func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName string, awsConfig awssdk.Config) awssdk.Config {
 	if endpoint != "" {
-		if regionName == "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + endpoint)
+		parsedEndpoint, _ := url.Parse(endpoint)
+		if parsedEndpoint.Scheme != "" {
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL(endpoint)
 		} else {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + regionName + "." + endpoint)
+			if regionName == "" {
+				awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + endpoint)
+			} else {
+				awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + regionName + "." + endpoint)
+			}
 		}
 	}
 	return awsConfig
