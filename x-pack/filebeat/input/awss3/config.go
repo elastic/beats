@@ -53,7 +53,8 @@ func defaultConfig() config {
 
 func (c *config) Validate() error {
 	if c.QueueURL == "" && c.BucketARN == "" {
-		logp.NewLogger(inputName).Warnf("neither queue_url nor bucket_arn were provided, input %s will stop", inputName)
+		logp.NewLogger(inputName).Warnf("Neither queue_url nor bucket_arn were provided, input %s will stop."+
+			"Starting from v8.0 this will prevent Filebeat to start.", inputName)
 		return nil
 	}
 
