@@ -9,30 +9,37 @@ class IdxMgmt(unittest.TestCase):
     def __init__(self, client, index):
         self._client = client
         self._index = index if index != '' and index != '*' else 'mockbeat'
+        self.patterns = [self.default_pattern(), "1", datetime.datetime.now().strftime("%Y.%m.%d")]
 
     def needs_init(self, s):
         return s == '' or s == '*'
 
-    def delete(self, indices=[], policies=[]):
-        indices = list([x for x in indices if x != ''])
-        if not indices:
-            indices == [self._index]
+    def delete(self, indices=[], policies=[], data_streams=[]):
+        for ds in data_streams:
+            self.delete_data_stream(ds)
         for i in indices:
             self.delete_index_and_alias(i)
             self.delete_template(template=i)
         for i in [x for x in policies if x != '']:
             self.delete_policy(i)
 
+    def delete_data_stream(self, data_stream):
+            try:
+                resp = self._client.transport.perform_request('DELETE', '/_data_stream/' + data_stream)
+            except NotFoundError:
+                pass
+
     def delete_index_and_alias(self, index=""):
         if self.needs_init(index):
             index = self._index
 
-        try:
-            concrete_index = index+"-1"
-            self._client.indices.delete_alias(concrete_index, index)
-            self._client.indices.delete(concrete_index)
-        except NotFoundError:
-            pass
+        for pattern in self.patterns:
+            index_with_pattern = index+"-"+pattern
+            try:
+                self._client.indices.delete(index_with_pattern)
+                self._client.indices.delete_alias(index, index_with_pattern)
+            except NotFoundError:
+                continue
 
     def delete_template(self, template=""):
         if self.needs_init(template):
@@ -67,6 +74,7 @@ class IdxMgmt(unittest.TestCase):
         resp = self._client.transport.perform_request('GET', '/_index_template/' + template)
         found = False
         for index_template in resp['index_templates']:
+            print(index_template)
             if index_template['name'] == template:
                 found = True
         assert found
