@@ -36,8 +36,7 @@ prepare-test:: mage
 	export NEWBEAT_FULL_NAME="Nicolas Ruflin" ; \
 	export NEWBEAT_TYPE=${BEAT_TYPE} ; \
 	export NEWBEAT_DEV=1 ; \
-	export NEWBEAT_BEATS_REVISION=$(shell git rev-parse HEAD) ; \
-	export NEWBEAT_BEATS_LOCAL_REPLACE=true ; \
+	export NEWBEAT_BEATS_REVISION=local ; \
 	mage GenerateCustomBeat
 
 # Runs test build for the created beat

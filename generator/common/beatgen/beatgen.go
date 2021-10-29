@@ -157,7 +157,7 @@ func Generate() error {
 }
 
 func getConfiguredBeatsRevision(beatsModule, revision string) error {
-	if _, ok := os.LookupEnv("NEWBEAT_BEATS_LOCAL_REPLACE"); ok {
+	if revision == "local" {
 		beatsPath := getAbsoluteBeatsPath()
 		return gotool.Mod.Edit(
 			gotool.Mod.Edit.Replace(beatsModule + "=" + beatsPath),
