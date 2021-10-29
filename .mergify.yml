@@ -2,7 +2,7 @@ pull_request_rules:
   - name: forward-port patches to master branch
     conditions:
       - merged
-      - label=backport-v8.0.0
+      - label=backport-v8.1.0
     actions:
       backport:
         assignees:
@@ -160,6 +160,19 @@ pull_request_rules:
           - "{{ author }}"
         branches:
           - "7.16"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.0 branch
+    conditions:
+      - merged
+      - label=backport-v8.0.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.0"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
