@@ -157,12 +157,19 @@ func Generate() error {
 }
 
 func getConfiguredBeatsRevision(beatsModule, revision string) error {
-	beatsPkg := beatsModule + "@" + revision
-	return gotool.Get(
-		gotool.Get.Download(),
-		gotool.Get.Update(),
-		gotool.Get.Package(beatsPkg),
-	)
+	if _, ok := os.LookupEnv("NEWBEAT_BEATS_LOCAL_REPLACE"); ok {
+		beatsPath := getAbsoluteBeatsPath()
+		return gotool.Mod.Edit(
+			gotool.Mod.Edit.Replace(beatsModule + "=" + beatsPath),
+		)
+	} else {
+		beatsPkg := beatsModule + "@" + revision
+		return gotool.Get(
+			gotool.Get.Download(),
+			gotool.Get.Update(),
+			gotool.Get.Package(beatsPkg),
+		)
+	}
 }
 
 // VendorUpdate updates the vendor directory if used

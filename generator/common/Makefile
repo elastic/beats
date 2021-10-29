@@ -4,10 +4,6 @@ BEAT_NAME?=beatpath/test${BEAT_TYPE}
 BEAT_PATH=${GOPATH}/src/${BEAT_NAME}
 ES_BEATS=${GOPATH}/src/github.com/elastic/beats
 
-# In CI, use current commit.
-GIT_BASE_COMMIT?=origin/master
-BEATS_REVISION:=$(shell git rev-parse ${GIT_BASE_COMMIT})
-
 -include ${ES_BEATS}/dev-tools/make/mage-install.mk
 
 # Runs test build for mock beat
@@ -40,7 +36,8 @@ prepare-test:: mage
 	export NEWBEAT_FULL_NAME="Nicolas Ruflin" ; \
 	export NEWBEAT_TYPE=${BEAT_TYPE} ; \
 	export NEWBEAT_DEV=1 ; \
-	export NEWBEAT_BEATS_REVISION=$(shell git rev-parse ${BEATS_REVISION}) ; \
+	export NEWBEAT_BEATS_REVISION=$(shell git rev-parse HEAD) ; \
+	export NEWBEAT_BEATS_LOCAL_REPLACE=true ; \
 	mage GenerateCustomBeat
 
 # Runs test build for the created beat

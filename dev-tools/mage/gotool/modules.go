@@ -20,6 +20,7 @@ package gotool
 // Mod is the command go mod.
 var Mod = goMod{
 	Download: modCommand{"download"}.run,
+	Edit:     modCommand{"edit"}.run,
 	Init:     modCommand{"init"}.run,
 	Tidy:     modCommand{"tidy"}.run,
 	Verify:   modCommand{"verify"}.run,
@@ -42,6 +43,7 @@ func (cmd modCommand) run(opts ...ArgOpt) error {
 
 type goMod struct {
 	Download modDownload
+	Edit     modEdit
 	Init     modInit
 	Tidy     modTidy
 	Verify   modVerify
@@ -50,6 +52,13 @@ type goMod struct {
 
 // modDownload cleans the go.mod file
 type modDownload func(opts ...ArgOpt) error
+
+// modEdit edits the go.mod file
+type modEdit func(opts ...ArgOpt) error
+
+func (modEdit) Replace(replacement string) ArgOpt {
+	return combine(posArg("-replace"), posArg(replacement))
+}
 
 // modInit initializes a new go module in folder.
 type modInit func(opts ...ArgOpt) error
