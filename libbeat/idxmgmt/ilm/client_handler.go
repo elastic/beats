@@ -28,7 +28,6 @@ import (
 // ClientHandler defines the interface between a remote service and the Manager.
 type ClientHandler interface {
 	CheckILMEnabled(bool) (bool, error)
-
 	HasILMPolicy(name string) (bool, error)
 	CreateILMPolicy(policy Policy) error
 }

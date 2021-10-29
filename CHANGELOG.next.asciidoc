@@ -104,6 +104,7 @@ to `legacy`. {pull}28538[28538]
 - Remove deprecated fields in coredns module. {pull}28196[28196]
 - Remove old `httpjson` config implementation. {pull}28054[28054]
 - Added dataset `threatq` to the `threatintel` module to ingest indicators from ThreatQ {issue}27423[27423]
+- Fail to start Filebat if none between `queue_url`, `bucket_arn` or `non_aws_bucket_name` is set for a configured aws-s3 input {issue}13911[13911] {pull}28666[28666]
 
 *Heartbeat*
 
@@ -336,6 +337,8 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Correctly track bytes read when max_bytes is exceeded. {issue}28317[28317] {pull}28352[28352]
 - Fix initialization of http client in Cloudfoundry input. {issue}28271[28271] {pull}28277[28277]
 - Fix aws-s3 input by checking if GetObject API call response content type exists. {pull}28457[28457]
+- Set `url` as a pointer in the `httpjson` template context to ensure access to all methods. {pull}28695[28695]
+- Fix `google_workspace` documentation links. {pull}28657[28657]
 
 *Heartbeat*
 
@@ -783,10 +786,12 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Add support for secondary object attribute handling in ThreatIntel MISP module {pull}28124[28124]
 - Azure signinlogs - Add support for ManagedIdentitySignInLogs, NonInteractiveUserSignInLogs, and ServicePrincipalSignInLogs. {issue}23653[23653]
 - Add `base64Decode` and `base64DecodeNoPad` functions to `httpsjon` templates. {pull}28385[28385]
+- Add 'early_limit' config option for Rate-Limiting `httpjson`. Default rate-limiting for Okta will start when remaining is `1`. {pull}28513[28513]
 - Add latency config option for aws-cloudwatch input. {pull}28509[28509]
 - Added proxy support to threatintel/malwarebazaar. {pull}28533[28533]
 - Add `text/csv` decoder to `httpjson` input {pull}28564[28564]
 - Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
+- Sophos UTM: Support logs containing hostname in syslog header. {pull}28638[28638]
 
 *Heartbeat*
 
@@ -932,6 +937,7 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Add support for parallelization factor for kinesis. {pull}20727[20727]
 - Provide more ways to set AWS credentials. {issue}12464[12464] {pull}23344[23344]
 - Add support for multiple regions {pull}21065[21065]
+- Add support for AWS Kinesis record deaggregation {pull}28241[28241]
 
 *Winlogbeat*
 
