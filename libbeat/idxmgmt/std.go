@@ -136,7 +136,7 @@ func (s *indexSupport) enabled(c componentType) bool {
 	case componentTemplate:
 		return s.templateCfg.Enabled
 	case componentILM:
-		return s.ilm.Mode() != ilm.ModeDisabled
+		return s.ilm.Enabled()
 	}
 	return false
 }
@@ -177,13 +177,9 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 		}
 	}
 
-	var alias string
-	mode := s.ilm.Mode()
-	if mode != ilm.ModeDisabled {
-		alias = s.ilm.Alias().Name
+	if s.ilm.Enabled() {
+		alias := s.ilm.Alias().Name
 		log.Infof("Set %v to '%s' as ILM is enabled.", cfg.PathOf("index"), alias)
-	}
-	if mode == ilm.ModeEnabled {
 		indexName = alias
 	}
 
@@ -198,7 +194,7 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 		Key:              "index",
 		MultiKey:         "indices",
 		EnableSingleOnly: true,
-		FailEmpty:        mode != ilm.ModeEnabled,
+		FailEmpty:        !s.ilm.Enabled(),
 		Case:             outil.SelectorLowerCase,
 	}
 
@@ -207,17 +203,7 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 		return nil, err
 	}
 
-	if mode != ilm.ModeAuto {
-		return indexSelector{indexSel, s.info}, nil
-	}
-
-	selCfg.SetString("index", -1, alias)
-	aliasSel, err := outil.BuildSelectorFromConfig(selCfg, buildSettings)
-	return &ilmIndexSelector{
-		index: indexSel,
-		alias: aliasSel,
-		st:    &s.st,
-	}, nil
+	return indexSelector{indexSel, s.info}, nil
 }
 
 func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string) {
