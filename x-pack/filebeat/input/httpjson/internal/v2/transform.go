@@ -161,7 +161,7 @@ func (tr transformable) body() common.MapStr {
 }
 
 func (tr transformable) setURL(v url.URL) {
-	tr.Put("url", v)
+	tr.Put("url", &v)
 }
 
 func (tr transformable) url() url.URL {
@@ -170,12 +170,12 @@ func (tr transformable) url() url.URL {
 		return url.URL{}
 	}
 
-	u, ok := val.(url.URL)
+	u, ok := val.(*url.URL)
 	if !ok {
 		return url.URL{}
 	}
 
-	return u
+	return *u
 }
 
 type transform interface {
