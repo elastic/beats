@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package dev_tools
+package main
 
 // This file contains tests that can be run on the generated packages.
 // To run these tests use `go test package_test.go`.
@@ -69,41 +69,54 @@ var (
 	rootUserContainer = flag.Bool("root-user-container", false, "expect root in container user")
 )
 
-func TestRPM(t *testing.T) {
-	rpms := getFiles(t, regexp.MustCompile(`\.rpm$`))
-	for _, rpm := range rpms {
-		checkRPM(t, rpm)
+func main() {
+	testing.Init()
+	tests := []testing.InternalTest{
+		{
+			"TestRPM", func(t *testing.T) {
+				rpms := getFiles(t, regexp.MustCompile(`\.rpm$`))
+				for _, rpm := range rpms {
+					checkRPM(t, rpm)
+				}
+			},
+		},
+		{
+			"TestDeb", func(t *testing.T) {
+				debs := getFiles(t, regexp.MustCompile(`\.deb$`))
+				buf := new(bytes.Buffer)
+				for _, deb := range debs {
+					checkDeb(t, deb, buf)
+				}
+			},
+		},
+		{
+			"TestTar", func(t *testing.T) {
+				// Regexp matches *-arch.tar.gz, but not *-arch.docker.tar.gz
+				tars := getFiles(t, regexp.MustCompile(`-\w+\.tar\.gz$`))
+				for _, tar := range tars {
+					checkTar(t, tar)
+				}
+			},
+		},
+		{
+			"TestZip", func(t *testing.T) {
+				zips := getFiles(t, regexp.MustCompile(`^\w+beat-\S+.zip$`))
+				for _, zip := range zips {
+					checkZip(t, zip)
+				}
+			},
+		},
+		{
+			"TestDocker", func(t *testing.T) {
+				dockers := getFiles(t, regexp.MustCompile(`\.docker\.tar\.gz$`))
+				for _, docker := range dockers {
+					checkDocker(t, docker)
+				}
+			},
+		},
 	}
-}
-
-func TestDeb(t *testing.T) {
-	debs := getFiles(t, regexp.MustCompile(`\.deb$`))
-	buf := new(bytes.Buffer)
-	for _, deb := range debs {
-		checkDeb(t, deb, buf)
-	}
-}
-
-func TestTar(t *testing.T) {
-	// Regexp matches *-arch.tar.gz, but not *-arch.docker.tar.gz
-	tars := getFiles(t, regexp.MustCompile(`-\w+\.tar\.gz$`))
-	for _, tar := range tars {
-		checkTar(t, tar)
-	}
-}
-
-func TestZip(t *testing.T) {
-	zips := getFiles(t, regexp.MustCompile(`^\w+beat-\S+.zip$`))
-	for _, zip := range zips {
-		checkZip(t, zip)
-	}
-}
-
-func TestDocker(t *testing.T) {
-	dockers := getFiles(t, regexp.MustCompile(`\.docker\.tar\.gz$`))
-	for _, docker := range dockers {
-		checkDocker(t, docker)
-	}
+	matcher := func(string, string) (bool, error) { return true, nil }
+	testing.Main(matcher, tests, nil, nil)
 }
 
 // Sub-tests

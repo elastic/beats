@@ -305,7 +305,14 @@ func findElasticBeatsDir() (string, error) {
 	if repo.IsElasticBeats() {
 		return repo.RootDir, nil
 	}
-	return gotool.ListModuleCacheDir(elasticBeatsModulePath)
+	dir, err := gotool.ListModuleCacheDir(elasticBeatsModulePath)
+	if err != nil {
+		vendored := filepath.Join("./vendor", elasticBeatsModulePath)
+		if info, err := os.Stat(vendored); err == nil && info.IsDir() {
+			return vendored, nil
+		}
+	}
+	return dir, err
 }
 
 var (

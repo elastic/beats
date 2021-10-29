@@ -20,6 +20,7 @@ test: prepare-test
 .PHONY: test-package
 test-package: test
 	cd ${BEAT_PATH} ; \
+	go mod vendor
 	export PATH=$${GOPATH}/bin:$${PATH}; \
 	mage package
 

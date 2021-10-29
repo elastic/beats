@@ -199,14 +199,13 @@ func TestPackages(options ...TestPackagesOption) error {
 	}
 
 	fmt.Println(">> Testing package contents")
-	goTest := sh.OutCmd("go", "test")
 
 	var args []string
 	if mg.Verbose() {
-		args = append(args, "-v")
+		args = append(args, "-test.v")
 	}
 
-	args = append(args, MustExpand("{{ elastic_beats_dir }}/dev-tools/packaging/package_test.go"))
+	args = append(args, MustExpand("{{ elastic_beats_dir }}/dev-tools/packaging"))
 
 	if params.HasModules {
 		args = append(args, "--modules")
@@ -234,7 +233,8 @@ func TestPackages(options ...TestPackagesOption) error {
 
 	args = append(args, "-files", MustExpand("{{.PWD}}/build/distributions/*"))
 
-	if out, err := goTest(args...); err != nil {
+	goRun := sh.OutCmd("go", "test")
+	if out, err := goRun(args...); err != nil {
 		if !mg.Verbose() {
 			fmt.Println(out)
 		}
