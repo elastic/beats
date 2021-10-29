@@ -26,11 +26,11 @@ Please note that the docker container is built in both standard and 'complete' v
 The 'complete' variant contains extra files, like the chromium browser, that are too large
 for the standard variant.
 
-### Testing on Kubernetes
+### Testing Elastic Agent in standalone mode on Kubernetes
 
 #### Prerequisites
 - create kubernetes cluster using kind, check [here](https://github.com/elastic/beats/blob/master/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
-- deploy kube-state-metrics
+- deploy kube-state-metrics, check [here](https://github.com/elastic/beats/blob/master/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
 - deploy ELK stack or use [elastic cloud](https://cloud.elastic.co), check [here](https://github.com/elastic/beats/blob/master/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
 
 
