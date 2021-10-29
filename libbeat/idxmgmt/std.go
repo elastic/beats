@@ -234,7 +234,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 	if err != nil {
 		return err
 	}
-	if withILM && loadILM.Enabled() {
+	if withILM {
 		log.Info("Auto ILM enable success.")
 	}
 

@@ -33,7 +33,7 @@ import (
 )
 
 type mockClientHandler struct {
-	alias, policy string
+	policy        string
 	expectsPolicy bool
 
 	tmplCfg   *template.TemplateConfig
@@ -47,7 +47,6 @@ type mockCreateOp uint8
 const (
 	mockCreatePolicy mockCreateOp = iota
 	mockCreateTemplate
-	mockCreateAlias
 )
 
 func TestDefaultSupport_Enabled(t *testing.T) {
@@ -99,10 +98,9 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 	type nameFunc func(time.Time) string
 
 	noILM := []onCall{onEnabled().Return(false)}
-	ilmTemplateSettings := func(alias, policy string) []onCall {
+	ilmTemplateSettings := func(policy string) []onCall {
 		return []onCall{
 			onEnabled().Return(true),
-			onAlias().Return(ilm.Alias{Name: alias}),
 			onPolicy().Return(ilm.Policy{Name: policy}),
 		}
 	}
@@ -168,17 +166,17 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			},
 		},
 		"with ilm": {
-			ilmCalls: ilmTemplateSettings("test-9.9.9", "test-9.9.9"),
+			ilmCalls: ilmTemplateSettings("test-9.9.9"),
 			cfg:      map[string]interface{}{"index": "wrong-%{[agent.version]}"},
 			want:     stable("test-9.9.9"),
 		},
 		"with ilm must be lowercase": {
-			ilmCalls: ilmTemplateSettings("Test-9.9.9", "Test-9.9.9"),
+			ilmCalls: ilmTemplateSettings("Test-9.9.9"),
 			cfg:      map[string]interface{}{"index": "wrong-%{[agent.version]}"},
 			want:     stable("test-9.9.9"),
 		},
 		"event alias wit ilm": {
-			ilmCalls: ilmTemplateSettings("test-9.9.9", "test-9.9.9"),
+			ilmCalls: ilmTemplateSettings("test-9.9.9"),
 			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
 			want:     stable("event-alias"),
 			meta: common.MapStr{
@@ -186,7 +184,7 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			},
 		},
 		"event alias wit ilm must be lowercase": {
-			ilmCalls: ilmTemplateSettings("test-9.9.9", "test-9.9.9"),
+			ilmCalls: ilmTemplateSettings("test-9.9.9"),
 			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
 			want:     stable("event-alias"),
 			meta: common.MapStr{
@@ -194,7 +192,7 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			},
 		},
 		"event index with ilm": {
-			ilmCalls: ilmTemplateSettings("test-9.9.9", "test-9.9.9"),
+			ilmCalls: ilmTemplateSettings("test-9.9.9"),
 			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
 			want:     dateIdx("event-index"),
 			meta: common.MapStr{
@@ -202,7 +200,7 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			},
 		},
 		"use indices": {
-			ilmCalls: ilmTemplateSettings("test-9.9.9", "test-9.9.9"),
+			ilmCalls: ilmTemplateSettings("test-9.9.9"),
 			cfg: map[string]interface{}{
 				"index": "test-%{[agent.version]}",
 				"indices": []map[string]interface{}{
@@ -212,7 +210,7 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			want: stable("myindex"),
 		},
 		"use indices settings must be lowercase": {
-			ilmCalls: ilmTemplateSettings("test-9.9.9", "test-9.9.9"),
+			ilmCalls: ilmTemplateSettings("test-9.9.9"),
 			cfg: map[string]interface{}{
 				"index": "test-%{[agent.version]}",
 				"indices": []map[string]interface{}{
@@ -504,16 +502,6 @@ func (h *mockClientHandler) Load(config template.TemplateConfig, _ beat.Info, fi
 
 func (h *mockClientHandler) CheckILMEnabled(enabled bool) (bool, error) {
 	return enabled, nil
-}
-
-func (h *mockClientHandler) HasAlias(name string) (bool, error) {
-	return h.alias == name, nil
-}
-
-func (h *mockClientHandler) CreateAlias(alias ilm.Alias) error {
-	h.recordOp(mockCreateAlias)
-	h.alias = alias.Name
-	return nil
 }
 
 func (h *mockClientHandler) HasILMPolicy(name string) (bool, error) {

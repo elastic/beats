@@ -89,10 +89,6 @@ func (m *stdManager) CheckEnabled() (bool, error) {
 		return ilmEnabled, err
 	}
 
-	if !ilmEnabled && m.enabled {
-		return false, errOf(ErrESILMDisabled)
-	}
-
 	m.cache.Enabled = ilmEnabled
 	m.cache.LastUpdate = time.Now()
 	return ilmEnabled, nil
