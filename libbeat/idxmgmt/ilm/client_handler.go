@@ -28,7 +28,7 @@ import (
 
 // ClientHandler defines the interface between a remote service and the Manager.
 type ClientHandler interface {
-	CheckILMEnabled(Mode) (bool, error)
+	CheckILMEnabled(bool) (bool, error)
 
 	HasAlias(name string) (bool, error)
 	CreateAlias(alias Alias) error
@@ -92,40 +92,29 @@ func NewFileClientHandler(c FileClient) *FileClientHandler {
 }
 
 // CheckILMEnabled indicates whether or not ILM is supported for the configured mode and ES instance.
-func (h *ESClientHandler) CheckILMEnabled(mode Mode) (bool, error) {
-	if mode == ModeDisabled {
+func (h *ESClientHandler) CheckILMEnabled(enabled bool) (bool, error) {
+	if !enabled {
 		return false, nil
 	}
 
-	avail, probe := checkILMVersion(mode, h.client.GetVersion())
-	if !avail {
-		if mode == ModeEnabled {
-			ver := h.client.GetVersion()
-			return false, errf(ErrESVersionNotSupported,
-				"Elasticsearch %v does not support ILM", ver.String())
-		}
-		return false, nil
+	ver := h.client.GetVersion()
+	if !checkILMVersion(h.client.GetVersion()) {
+		return false, errf(ErrESVersionNotSupported, "Elasticsearch %v does not support ILM", ver.String())
 	}
 
-	if !probe {
-		// version potentially supports ILM, but mode + version indicates that we
-		// want to disable ILM support.
-		return false, nil
-	}
-
-	avail, enabled, err := h.checkILMSupport()
+	avail, enabledILM, err := h.checkILMSupport()
 	if err != nil {
 		return false, err
 	}
 
 	if !avail {
-		if mode == ModeEnabled {
+		if enabledILM {
 			return false, errOf(ErrESVersionNotSupported)
 		}
 		return false, nil
 	}
 
-	if !enabled && mode == ModeEnabled {
+	if !enabledILM && enabled {
 		return false, errOf(ErrESILMDisabled)
 	}
 	return enabled, nil
@@ -244,18 +233,14 @@ func (h *ESClientHandler) queryFeatures(to interface{}) (int, error) {
 }
 
 // CheckILMEnabled indicates whether or not ILM is supported for the configured mode and client version.
-func (h *FileClientHandler) CheckILMEnabled(mode Mode) (bool, error) {
-	if mode == ModeDisabled {
-		return false, nil
-	}
-	avail, probe := checkILMVersion(mode, h.client.GetVersion())
-	if avail {
-		return probe, nil
-	}
-	if mode != ModeEnabled {
+func (h *FileClientHandler) CheckILMEnabled(enabled bool) (bool, error) {
+	if !enabled {
 		return false, nil
 	}
 	version := h.client.GetVersion()
+	if checkILMVersion(version) {
+		return enabled, nil
+	}
 	return false, errf(ErrESVersionNotSupported,
 		"Elasticsearch %v does not support ILM", version.String())
 }
@@ -287,11 +272,6 @@ func (h *FileClientHandler) HasAlias(name string) (bool, error) {
 // avail: indicates whether version supports ILM
 // probe: in case version potentially supports ILM, check the combination of mode + version
 // to indicate whether or not ILM support should be enabled or disabled
-func checkILMVersion(mode Mode, ver common.Version) (avail, probe bool) {
-	avail = !ver.LessThan(esMinILMVersion)
-	if avail {
-		probe = (mode == ModeEnabled) ||
-			(mode == ModeAuto && !ver.LessThan(esMinDefaultILMVersion))
-	}
-	return avail, probe
+func checkILMVersion(ver common.Version) (avail bool) {
+	return !ver.LessThan(esMinILMVersion)
 }
