@@ -37,7 +37,7 @@ import (
 	"testing"
 
 	"github.com/blakesmith/ar"
-	rpm "github.com/cavaliercoder/go-rpm"
+	"github.com/cavaliergopher/rpm"
 )
 
 const (
@@ -481,7 +481,7 @@ func ensureNoBuildIDLinks(t *testing.T, p *packageFile) {
 
 // checkRPMDigestTypeSHA256 verifies that the RPM contains sha256 digests.
 // https://github.com/elastic/beats/issues/23670
-func checkRPMDigestTypeSHA256(t *testing.T, rpmPkg *rpm.PackageFile) {
+func checkRPMDigestTypeSHA256(t *testing.T, rpmPkg *rpm.Package) {
 	t.Run("rpm_digest_type_is_sha256", func(t *testing.T) {
 		if rpmPkg.ChecksumType() != "sha256" {
 			t.Errorf("expected SHA256 digest type but got %v", rpmPkg.ChecksumType())
@@ -518,8 +518,8 @@ func getFiles(t *testing.T, pattern *regexp.Regexp) []string {
 	return files
 }
 
-func readRPM(rpmFile string) (*packageFile, *rpm.PackageFile, error) {
-	p, err := rpm.OpenPackageFile(rpmFile)
+func readRPM(rpmFile string) (*packageFile, *rpm.Package, error) {
+	p, err := rpm.Open(rpmFile)
 	if err != nil {
 		return nil, nil, err
 	}
