@@ -324,6 +324,7 @@ func (h *FileHarvester) Run() {
 			}
 		}
 		h.closeFile()
+		h.readerDone.Wait()
 		h.Close()
 	}()
 
@@ -359,6 +360,7 @@ func (h *FileHarvester) Run() {
 				h.readerDone.Wait()
 
 				// read file
+				h.readerDone.Add(1)
 				go h.loopRead()
 			}
 
@@ -382,7 +384,6 @@ func (h *FileHarvester) loopRead() {
 		logp.Info("loop Read quit. because file(%s) is close.", h.state.Source)
 	}()
 
-	h.readerDone.Add(1)
 	for {
 		select {
 		case <-h.done:
