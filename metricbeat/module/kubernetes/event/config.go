@@ -24,12 +24,12 @@ import (
 )
 
 type kubeEventsConfig struct {
-	KubeConfig        string        `config:"kube_config"`
+	KubeConfig        string                       `config:"kube_config"`
 	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
-	Namespace         string        `config:"namespace"`
-	SyncPeriod        time.Duration `config:"sync_period"`
-	LabelsDedot       bool          `config:"labels.dedot"`
-	AnnotationsDedot  bool          `config:"annotations.dedot"`
+	Namespace         string                       `config:"namespace"`
+	SyncPeriod        time.Duration                `config:"sync_period"`
+	LabelsDedot       bool                         `config:"labels.dedot"`
+	AnnotationsDedot  bool                         `config:"annotations.dedot"`
 }
 
 type Enabled struct {

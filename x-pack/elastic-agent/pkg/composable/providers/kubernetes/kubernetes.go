@@ -77,9 +77,8 @@ func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 // and starts watching for such resource's events.
 func (p *dynamicProvider) watchResource(
 	comm composable.DynamicProviderComm,
-	resourceType string,
-	config *Config) error {
-	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
+	resourceType string) error {
+	client, err := kubernetes.GetKubernetesClient(p.config.KubeConfig, p.config.KubeClientOptions)
 	if err != nil {
 		// info only; return nil (do nothing)
 		p.logger.Debugf("Kubernetes provider for resource %s skipped, unable to connect: %s", resourceType, err)
