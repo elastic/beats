@@ -27,7 +27,6 @@ import (
 // from a common.Config use logp/config.Build.
 type Config struct {
 	Beat      string   `config:",ignore"`   // Name of the Beat (for default file name).
-	JSON      bool     `config:"json"`      // Write logs as JSON.
 	Level     Level    `config:"level"`     // Logging level (error, warning, info, debug).
 	Selectors []string `config:"selectors"` // Selectors for debug level logging.
 
@@ -76,7 +75,6 @@ const (
 func DefaultConfig(environment Environment) Config {
 	return Config{
 		Level: defaultLevel,
-		JSON:  true,
 		Files: FileConfig{
 			Suffix:          file.SuffixCount,
 			MaxSize:         10 * 1024 * 1024,

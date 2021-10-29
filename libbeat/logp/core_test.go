@@ -48,7 +48,7 @@ func TestLogger(t *testing.T) {
 
 	TestingSetup()
 	exerciseLogger()
-	TestingSetup(AsJSON())
+	TestingSetup()
 	exerciseLogger()
 }
 
