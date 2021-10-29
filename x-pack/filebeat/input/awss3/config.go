@@ -57,12 +57,19 @@ func defaultConfig() config {
 }
 
 func (c *config) Validate() error {
+<<<<<<< HEAD
 	configs := []bool{c.QueueURL != "", c.BucketARN != "", c.NonAWSBucketName != ""}
 	enabled := []bool{}
 	for i := range configs {
 		if configs[i] {
 			enabled = append(enabled, configs[i])
 		}
+=======
+	if c.QueueURL == "" && c.BucketARN == "" {
+		logp.NewLogger(inputName).Warnf("Neither queue_url nor bucket_arn were provided, input %s will stop."+
+			"Starting from v8.0 this will prevent Filebeat to start.", inputName)
+		return nil
+>>>>>>> b3789b56fc (Explicitly warns about misconfiguration preventing Filebeat to start from v8.0 (#28667))
 	}
 	if len(enabled) == 0 {
 		logp.NewLogger(inputName).Warnf("neither queue_url, bucket_arn, non_aws_bucket_name were provided, input %s will stop", inputName)
