@@ -214,6 +214,16 @@ func (f *flow) Timestamp() time.Time {
 	return f.lastSeenTime
 }
 
+// sockAddr returns a socket lookup key.
+func (f *flow) sockAddr() sockAddr {
+	return sockAddr{pid: f.pid, sock: f.sock}
+}
+
+// flowAddr returns a flow lookup key.
+func (f *flow) flowAddr() flowAddr {
+	return flowAddr{pid: f.pid, addr: f.remote.addr.String()}
+}
+
 type process struct {
 	// RWMutex is used to arbitrate reads and writes to resolvedDomains.
 	sync.RWMutex
@@ -253,7 +263,7 @@ func (p *process) ResolveIP(ip net.IP) (domain string, found bool) {
 
 type socket struct {
 	sock  uintptr
-	flows map[string]*flow
+	flows map[flowAddr]*flow
 	// Sockets have direction if they have been connect()ed or accept()ed.
 	dir     flowDirection
 	bound   bool
@@ -264,6 +274,12 @@ type socket struct {
 	prev, next linkedElement
 
 	createdTime, lastSeenTime time.Time
+}
+
+// flowAddr is a key into a socket's flows.
+type flowAddr struct {
+	pid  uint32
+	addr string
 }
 
 // Prev returns the previous socket in the linked list.
@@ -289,6 +305,11 @@ func (s *socket) SetNext(e linkedElement) {
 // Timestamp returns the time reference used to expire sockets.
 func (s *socket) Timestamp() time.Time {
 	return s.lastSeenTime
+}
+
+// sockAddr returns a socket lookup key.
+func (s *socket) sockAddr() sockAddr {
+	return sockAddr{pid: s.pid, sock: s.sock}
 }
 
 type dnsTracker struct {
@@ -356,7 +377,7 @@ type state struct {
 	log      helper.Logger
 
 	processes map[uint32]*process
-	socks     map[uintptr]*socket
+	socks     map[sockAddr]*socket
 	threads   map[uint32]event
 
 	numFlows uint64
@@ -384,17 +405,24 @@ type state struct {
 	clock func() time.Time
 }
 
-func (s *state) getSocket(sock uintptr) *socket {
-	if socket, found := s.socks[sock]; found {
+// sockAddr is a key into a state's sockets.
+type sockAddr struct {
+	pid  uint32
+	sock uintptr
+}
+
+func (s *state) getSocket(addr sockAddr) *socket {
+	if socket, found := s.socks[addr]; found {
 		return socket
 	}
 	now := s.clock()
 	socket := &socket{
-		sock:         sock,
+		pid:          addr.pid,
+		sock:         addr.sock,
 		createdTime:  now,
 		lastSeenTime: now,
 	}
-	s.socks[sock] = socket
+	s.socks[addr] = socket
 	s.socketLRU.add(socket)
 	return socket
 }
@@ -416,7 +444,7 @@ func makeState(r mb.PushReporterV2, log helper.Logger, inactiveTimeout, socketTi
 		reporter:        r,
 		log:             log,
 		processes:       make(map[uint32]*process),
-		socks:           make(map[uintptr]*socket),
+		socks:           make(map[sockAddr]*socket),
 		threads:         make(map[uint32]event),
 		inactiveTimeout: inactiveTimeout,
 		socketTimeout:   socketTimeout,
@@ -617,7 +645,7 @@ func (s *state) onSockTerminated(sock *socket) {
 	for _, flow := range sock.flows {
 		s.onFlowTerminated(flow)
 	}
-	delete(s.socks, sock.sock)
+	delete(s.socks, sock.sockAddr())
 	if sock.closing {
 		s.closing.remove(sock)
 	} else {
@@ -632,7 +660,7 @@ func (s *state) CreateSocket(ref flow) error {
 	ref.createdTime = s.kernTimestampToTime(ref.created)
 	ref.lastSeenTime = s.kernTimestampToTime(ref.lastSeen)
 	// terminate existing if sock ptr is reused
-	if prev, found := s.socks[ref.sock]; found {
+	if prev, found := s.socks[ref.sockAddr()]; found {
 		s.onSockTerminated(prev)
 	}
 	return s.createFlow(ref)
@@ -662,13 +690,6 @@ func (s *state) mutualEnrich(sock *socket, f *flow) {
 			f.dir = sock.dir
 		}
 	}
-	if sockNoPID := sock.pid == 0; sockNoPID != (f.pid == 0) {
-		if sockNoPID {
-			sock.pid = f.pid
-		} else {
-			f.pid = sock.pid
-		}
-	}
 	if sockNoProcess := sock.process == nil; sockNoProcess != (f.process == nil) {
 		if sockNoProcess {
 			sock.process = f.process
@@ -688,7 +709,7 @@ func (s *state) mutualEnrich(sock *socket, f *flow) {
 
 func (s *state) createFlow(ref flow) error {
 	// Get or create a socket for this flow
-	sock := s.getSocket(ref.sock)
+	sock := s.getSocket(ref.sockAddr())
 	ref.createdTime = ref.lastSeenTime
 	s.mutualEnrich(sock, &ref)
 
@@ -696,13 +717,11 @@ func (s *state) createFlow(ref flow) error {
 	if ref.remote.addr.IP == nil {
 		return nil
 	}
-	ptr := new(flow)
-	*ptr = ref
 	if sock.flows == nil {
-		sock.flows = make(map[string]*flow, 1)
+		sock.flows = make(map[flowAddr]*flow, 1)
 	}
-	sock.flows[ref.remote.addr.String()] = ptr
-	s.flowLRU.add(ptr)
+	sock.flows[ref.flowAddr()] = &ref
+	s.flowLRU.add(&ref)
 	s.numFlows++
 	return nil
 }
@@ -718,7 +737,7 @@ func (s *state) OnSockDestroyed(ptr uintptr, pid uint32) error {
 func (s *state) onSockDestroyed(ptr uintptr, sock *socket, pid uint32) error {
 	var found bool
 	if sock == nil {
-		sock, found = s.socks[ptr]
+		sock, found = s.socks[sockAddr{pid: pid, sock: ptr}]
 		if !found {
 			return nil
 		}
@@ -758,11 +777,11 @@ func (s *state) UpdateFlowWithCondition(ref flow, cond func(*flow) bool) error {
 	defer s.Unlock()
 	ref.createdTime = s.kernTimestampToTime(ref.created)
 	ref.lastSeenTime = s.kernTimestampToTime(ref.lastSeen)
-	sock, found := s.socks[ref.sock]
+	sock, found := s.socks[ref.sockAddr()]
 	if !found {
 		return s.createFlow(ref)
 	}
-	prev, found := sock.flows[ref.remote.addr.String()]
+	prev, found := sock.flows[ref.flowAddr()]
 	if !found {
 		return s.createFlow(ref)
 	}
@@ -827,8 +846,8 @@ func (s *state) onFlowTerminated(f *flow) {
 	s.flowLRU.remove(f)
 	f.done = true
 	// Unbind this flow from its parent
-	if parent, found := s.socks[f.sock]; found {
-		delete(parent.flows, f.remote.addr.String())
+	if parent, found := s.socks[f.sockAddr()]; found {
+		delete(parent.flows, f.flowAddr())
 	}
 	if f.isValid() {
 		s.done.add(f)
@@ -974,6 +993,10 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 			"pid": int(f.pid),
 		}
 		if f.process != nil {
+			if f.pid != f.process.pid {
+				// This should never happen, but make sure we know if it does.
+				err = fmt.Errorf("pid mismatch: flow pid:%d != process pid:%d cmd=%s", f.pid, f.process.pid, f.process.name)
+			}
 			process["name"] = f.process.name
 			process["args"] = f.process.args
 			process["executable"] = f.process.path
@@ -1012,7 +1035,7 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 	return mb.Event{
 		RootFields:      root,
 		MetricSetFields: metricset,
-	}, nil
+	}, err
 }
 
 func (s *state) SyncClocks(kernelNanos, userNanos uint64) error {
