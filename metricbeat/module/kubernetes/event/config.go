@@ -19,16 +19,17 @@ package event
 
 import (
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 )
 
 type kubeEventsConfig struct {
-	KubeConfig       string        `config:"kube_config"`
-	KubeClientQps    float32       `config:"kube_client_qps"`
-	KubeClientBurst  int           `config:"kube_client_burst"`
-	Namespace        string        `config:"namespace"`
-	SyncPeriod       time.Duration `config:"sync_period"`
-	LabelsDedot      bool          `config:"labels.dedot"`
-	AnnotationsDedot bool          `config:"annotations.dedot"`
+	KubeConfig        string        `config:"kube_config"`
+	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
+	Namespace         string        `config:"namespace"`
+	SyncPeriod        time.Duration `config:"sync_period"`
+	LabelsDedot       bool          `config:"labels.dedot"`
+	AnnotationsDedot  bool          `config:"annotations.dedot"`
 }
 
 type Enabled struct {

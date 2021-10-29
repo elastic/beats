@@ -4,11 +4,12 @@
 
 package kubernetesleaderelection
 
+import "github.com/elastic/beats/v7/libbeat/common/kubernetes"
+
 // Config for kubernetes_leaderelection provider
 type Config struct {
-	KubeConfig      string  `config:"kube_config"`
-	KubeClientQps   float32 `config:"kube_client_qps"`
-	KubeClientBurst int     `config:"kube_client_burst"`
+	KubeConfig        string                       `config:"kube_config"`
+	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
 	// Name of the leaderelection lease
 	LeaderLease string `config:"leader_lease"`
 }

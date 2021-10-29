@@ -1,6 +1,6 @@
 package kubernetes
 
-type KubeOptions struct {
-	QPS   float32
-	Burst int
+type KubeClientOptions struct {
+	QPS   float32 `config:"qps"`
+	Burst int     `config:"burst"`
 }

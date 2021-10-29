@@ -141,7 +141,7 @@ func newProcessorConfig(cfg *common.Config, register *Register) (kubeAnnotatorCo
 
 func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Config) {
 	k.initOnce.Do(func() {
-		client, err := kubernetes.GetKubernetesClient(config.KubeConfig, &kubernetes.KubeOptions{QPS: config.KubeClientQps, Burst: config.KubeClientBurst})
+		client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 		if err != nil {
 			if kubernetes.IsInCluster(config.KubeConfig) {
 				k.log.Debugf("Could not create kubernetes client using in_cluster config: %+v", err)

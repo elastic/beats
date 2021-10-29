@@ -7,6 +7,7 @@ package kubernetes
 import (
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -16,13 +17,12 @@ type Config struct {
 	Scope     string    `config:"scope"`
 	Resources Resources `config:"resources"`
 
-	KubeConfig      string        `config:"kube_config"`
-	KubeClientQps   float32       `config:"kube_client_qps"`
-	KubeClientBurst int           `config:"kube_client_burst"`
+	KubeConfig        string                       `config:"kube_config"`
+	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
 
-	Namespace       string        `config:"namespace"`
-	SyncPeriod      time.Duration `config:"sync_period"`
-	CleanupTimeout  time.Duration `config:"cleanup_timeout" validate:"positive"`
+	Namespace      string        `config:"namespace"`
+	SyncPeriod     time.Duration `config:"sync_period"`
+	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
 
 	// Needed when resource is a Pod or Node
 	Node string `config:"node"`
