@@ -59,7 +59,7 @@ func TestDefaultSupport_Enabled(t *testing.T) {
 		"templates and ilm disabled": {
 			enabled: false,
 			ilmCalls: []onCall{
-				onMode().Return(ilm.ModeDisabled),
+				onEnabled().Return(false),
 			},
 			cfg: map[string]interface{}{
 				"setup.template.enabled": false,
@@ -68,7 +68,7 @@ func TestDefaultSupport_Enabled(t *testing.T) {
 		"templates only": {
 			enabled: true,
 			ilmCalls: []onCall{
-				onMode().Return(ilm.ModeDisabled),
+				onEnabled().Return(false),
 			},
 			cfg: map[string]interface{}{
 				"setup.template.enabled": true,
@@ -77,16 +77,7 @@ func TestDefaultSupport_Enabled(t *testing.T) {
 		"ilm only": {
 			enabled: true,
 			ilmCalls: []onCall{
-				onMode().Return(ilm.ModeEnabled),
-			},
-			cfg: map[string]interface{}{
-				"setup.template.enabled": false,
-			},
-		},
-		"ilm tentatively": {
-			enabled: true,
-			ilmCalls: []onCall{
-				onMode().Return(ilm.ModeAuto),
+				onEnabled().Return(true),
 			},
 			cfg: map[string]interface{}{
 				"setup.template.enabled": false,
@@ -107,10 +98,10 @@ func TestDefaultSupport_Enabled(t *testing.T) {
 func TestDefaultSupport_BuildSelector(t *testing.T) {
 	type nameFunc func(time.Time) string
 
-	noILM := []onCall{onMode().Return(ilm.ModeDisabled)}
+	noILM := []onCall{onEnabled().Return(false)}
 	ilmTemplateSettings := func(alias, policy string) []onCall {
 		return []onCall{
-			onMode().Return(ilm.ModeEnabled),
+			onEnabled().Return(true),
 			onAlias().Return(ilm.Alias{Name: alias}),
 			onPolicy().Return(ilm.Policy{Name: policy}),
 		}
@@ -512,8 +503,8 @@ func (h *mockClientHandler) Load(config template.TemplateConfig, _ beat.Info, fi
 	return nil
 }
 
-func (h *mockClientHandler) CheckILMEnabled(m ilm.Mode) (bool, error) {
-	return m == ilm.ModeEnabled || m == ilm.ModeAuto, nil
+func (h *mockClientHandler) CheckILMEnabled(enabled bool) (bool, error) {
+	return enabled, nil
 }
 
 func (h *mockClientHandler) HasAlias(name string) (bool, error) {
