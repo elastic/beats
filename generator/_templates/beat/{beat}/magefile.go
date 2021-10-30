@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
@@ -41,8 +40,8 @@ func Package() {
 }
 
 // Update updates the generated files (aka make update).
-func Update() error {
-	return sh.Run("make", "update")
+func Update() {
+	mg.SerialDeps(Fields, Config)
 }
 
 // Fields generates a fields.yml for the Beat.

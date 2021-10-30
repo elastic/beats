@@ -94,7 +94,7 @@ func GenerateFieldsYAMLTo(output string, moduleDirs ...string) error {
 }
 
 func generateFieldsYAML(baseDir, output string, moduleDirs ...string) error {
-	const globalFieldsCmdPath = "libbeat/scripts/cmd/global_fields/main.go"
+	const globalFieldsCmdPackage = "github.com/elastic/beats/v7/libbeat/scripts/cmd/global_fields"
 
 	beatsDir, err := ElasticBeatsDir()
 	if err != nil {
@@ -103,7 +103,7 @@ func generateFieldsYAML(baseDir, output string, moduleDirs ...string) error {
 
 	cmd := []string{"run",
 		"-mod=readonly",
-		filepath.Join(beatsDir, globalFieldsCmdPath),
+		globalFieldsCmdPackage,
 		"-es_beats_path", beatsDir,
 		"-beat_path", baseDir,
 		"-out", CreateDir(output),

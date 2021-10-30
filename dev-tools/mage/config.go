@@ -19,6 +19,7 @@ package mage
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -34,12 +35,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// Paths to generated config file templates.
-var (
-	shortTemplate     = filepath.Join("build", BeatName+".yml.tmpl")
-	referenceTemplate = filepath.Join("build", BeatName+".reference.yml.tmpl")
-	dockerTemplate    = filepath.Join("build", BeatName+".docker.yml.tmpl")
-)
+//go:embed _config/*.tmpl
+var configTemplates embed.FS
 
 // ConfigFileType is a bitset that indicates what types of config files to
 // generate.
@@ -77,16 +74,16 @@ type ConfigParams struct {
 
 func DefaultConfigFileParams() ConfigFileParams {
 	return ConfigFileParams{
-		Templates: []string{LibbeatDir("_meta/config/*.tmpl")},
+		Templates: []string{"_config/*.tmpl"},
 		ExtraVars: map[string]interface{}{},
 		Short: ConfigParams{
-			Template: LibbeatDir("_meta/config/default.short.yml.tmpl"),
+			Template: "_config/default.short.yml.tmpl",
 		},
 		Reference: ConfigParams{
-			Template: LibbeatDir("_meta/config/default.reference.yml.tmpl"),
+			Template: "_config/default.reference.yml.tmpl",
 		},
 		Docker: ConfigParams{
-			Template: LibbeatDir("_meta/config/default.docker.yml.tmpl"),
+			Template: "_config/default.docker.yml.tmpl",
 		},
 	}
 }
@@ -180,15 +177,30 @@ func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigF
 	})
 	tmpl = tmpl.Funcs(funcs)
 
+	parseGlob := func(tmpl *template.Template, glob string) (*template.Template, error) {
+		if strings.HasPrefix(glob, "_config") {
+			return tmpl.ParseFS(configTemplates, glob)
+		} else {
+			return tmpl.ParseGlob(glob)
+		}
+	}
+
 	fmt.Printf(">> Building %v for %v/%v\n", destination, params["GOOS"], params["GOARCH"])
 	var err error
 	for _, templateGlob := range confParams.Templates {
-		if tmpl, err = tmpl.ParseGlob(templateGlob); err != nil {
+		if tmpl, err = parseGlob(tmpl, templateGlob); err != nil {
 			return errors.Wrapf(err, "failed to parse config templates in %q", templateGlob)
 		}
 	}
 
-	data, err := ioutil.ReadFile(confFile.Template)
+	readFile := func(path string) ([]byte, error) {
+		if strings.HasPrefix(path, "_config") {
+			return configTemplates.ReadFile(path)
+		} else {
+			return ioutil.ReadFile(path)
+		}
+	}
+	data, err := readFile(confFile.Template)
 	if err != nil {
 		return errors.Wrapf(err, "failed to read config template %q", confFile.Template)
 	}

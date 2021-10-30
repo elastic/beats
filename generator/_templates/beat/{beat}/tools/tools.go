@@ -16,4 +16,5 @@ import (
 
 	_ "github.com/elastic/beats/v7"
 	_ "github.com/elastic/beats/v7/dev-tools/packaging"
+	_ "github.com/elastic/beats/v7/libbeat/scripts/cmd/global_fields"
 )
