@@ -3,6 +3,11 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.0.0-beta1]]
+=== Beats version 8.0.0-beta1
+
+Changes will be described in a later RC / GA.
+
 [[release-notes-8.0.0-alpha2]]
 === Beats version 8.0.0-alpha2
 
