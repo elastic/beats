@@ -1,0 +1,14 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.2.3
+    hooks:
+    -   id: check-case-conflict
+    -   id: check-executables-have-shebangs
+    -   id: check-merge-conflict
+
+-   repo: git@github.com:elastic/apm-pipeline-library
+    rev: current
+    hooks:
+    -   id: check-bash-syntax
+    -   id: check-jenkins-pipelines
+    -   id: check-jjbb

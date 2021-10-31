@@ -1,0 +1,6 @@
+*.swp
+*.test
+*.out
+docs/html
+build
+.idea

@@ -1,0 +1,28 @@
+language: go
+
+# prevent double test runs for PRs
+branches:
+  only:
+    - "master"
+
+# In theory, older versions would probably work fine, but since this isn't a 
+# library, I'm not going to worry about older versions for now.
+go:
+  - tip
+  - 1.15.x
+  - 1.14.x
+  - 1.13.x
+  - 1.12.x
+  - 1.11.x
+  - 1.10.x
+  - 1.9.x
+
+# don't call go get ./... because this hides when deps are
+# not packaged into the vendor directory.
+install: true
+
+# don't call go test -v because we want to be able to only show t.Log output when
+# a test fails
+script:  
+  - go vet ./...
+  - go test -tags CI -race ./...

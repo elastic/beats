@@ -1,6 +1,7 @@
 package beater
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"time"
@@ -9,14 +10,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/open-policy-agent/opa/sdk"
+	sdktest "github.com/open-policy-agent/opa/sdk/test"
 )
 
 // kubebeat configuration.
 type kubebeat struct {
-	done      chan struct{}
-	config    config.Config
-	client    beat.Client
-	clientset *kubernetes.Clientset
+	done         chan struct{}
+	config       config.Config
+	client       beat.Client
+	watcher      kubernetes.Watcher
+	opa          *sdk.OPA
+	bundleServer *sdktest.Server
 }
 
 // New creates an instance of kubebeat.
@@ -47,10 +52,60 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 
 	logp.Info("Watcher initiated.")
 
+	// create a mock HTTP bundle bundleServer
+	bundleServer, err := sdktest.NewServer(sdktest.MockBundle("/bundles/bundle.tar.gz", map[string]string{
+		"example.rego": `
+				package authz
+
+				default allow = false
+
+				allow {
+					input.open == "sesame"
+				}
+			`,
+	}))
+	if err != nil {
+		return nil, fmt.Errorf("fail to init bundle server: %s", err.Error())
+	}
+
+	// provide the OPA configuration which specifies
+	// fetching policy bundles from the mock bundleServer
+	// and logging decisions locally to the console
+	config := []byte(fmt.Sprintf(`{
+		"services": {
+			"test": {
+				"url": %q
+			}
+		},
+		"bundles": {
+			"test": {
+				"resource": "/bundles/bundle.tar.gz"
+			}
+		},
+		"decision_logs": {
+			"console": true
+		}
+	}`, bundleServer.URL()))
+
+	// create an instance of the OPA object
+	opa, err := sdk.New(context.Background(), sdk.Options{
+		Config: bytes.NewReader(config),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail to init opa: %s", err.Error())
+	}
+
+	//if err := opacmd.RootCommand.Execute(); err != nil {
+	//	fmt.Println(err)
+	//	os.Exit(1)
+	//}
+
 	bt := &kubebeat{
-		done:      make(chan struct{}),
-		config:    c,
-		clientset: clientset,
+		done:         make(chan struct{}),
+		config:       c,
+		opa:          opa,
+		bundleServer: bundleServer,
+		watcher:      watcher,
 	}
 	return bt, nil
 }
@@ -90,6 +145,11 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 			pod.SetManagedFields(nil)
 			pod.Status.Reset()
 
+			result, err := bt.Decision(pod)
+			if err != nil {
+				result = map[string]interface{}{"err": err.Error()}
+			}
+
 			event := beat.Event{
 				Timestamp: timestamp,
 				Fields: common.MapStr{
@@ -102,6 +162,7 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 					"service_account":  pod.Spec.ServiceAccountName,
 					"node_name":        pod.Spec.NodeName,
 					"security_context": pod.Spec.SecurityContext,
+					"result":           result,
 				},
 			}
 			events[i] = event
@@ -112,8 +173,25 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 	}
 }
 
+func (bt *kubebeat) Decision(input interface{}) (interface{}, error) {
+	// get the named policy decision for the specified input
+	result, err := bt.opa.Decision(context.Background(), sdk.DecisionOptions{
+		Path:  "/authz/allow",
+		Input: map[string]interface{}{"open": "sesame"},
+		//Input: input,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return result.Result, nil
+}
+
 // Stop stops kubebeat.
 func (bt *kubebeat) Stop() {
 	bt.client.Close()
+	bt.opa.Stop(context.Background())
+	bt.bundleServer.Stop()
+
 	close(bt.done)
 }

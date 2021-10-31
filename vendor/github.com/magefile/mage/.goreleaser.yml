@@ -1,0 +1,52 @@
+project_name: mage
+release:
+  github:
+    owner: magefile
+    name: mage
+  draft: true
+build:
+  binary: mage
+  main: .
+  ldflags: -s -w -X github.com/magefile/mage/mage.timestamp={{.Date}} -X github.com/magefile/mage/mage.commitHash={{.Commit}} -X github.com/magefile/mage/mage.gitTag={{.Version}}
+  goos:
+    - darwin
+    - linux
+    - windows
+    - freebsd
+    - netbsd
+    - openbsd
+    - dragonfly
+  goarch:
+    - amd64
+    - arm
+    - arm64
+  ignore:
+    - goos: openbsd
+      goarch: arm
+      goarm: 6
+  env:
+    - CGO_ENABLED=0
+archive:
+  name_template: "{{.Binary}}_{{.Version}}_{{.Os}}-{{.Arch}}"
+  replacements:
+    amd64: 64bit
+    386: 32bit
+    arm: ARM
+    arm64: ARM64
+    darwin: macOS
+    linux: Linux
+    windows: Windows
+    openbsd: OpenBSD
+    netbsd: NetBSD
+    freebsd: FreeBSD
+    dragonfly: DragonFlyBSD
+  format: tar.gz
+  format_overrides:
+    - goos: windows
+      format: zip
+  files:
+  - LICENSE
+snapshot:
+  name_template: SNAPSHOT-{{ .Commit }}
+checksum:
+  name_template: '{{ .ProjectName }}_{{ .Version }}_checksums.txt'
