@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/v7/kubebeat/config"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/open-policy-agent/opa/sdk"
 	sdktest "github.com/open-policy-agent/opa/sdk/test"
@@ -94,11 +95,6 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	if err != nil {
 		return nil, fmt.Errorf("fail to init opa: %s", err.Error())
 	}
-
-	//if err := opacmd.RootCommand.Execute(); err != nil {
-	//	fmt.Println(err)
-	//	os.Exit(1)
-	//}
 
 	bt := &kubebeat{
 		done:         make(chan struct{}),
