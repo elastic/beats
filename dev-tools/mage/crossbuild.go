@@ -290,9 +290,14 @@ func (b GolangCrossBuilder) Build() error {
 		args = append(args, "-v", hostDir+":/go/pkg/mod:ro")
 	}
 
+	downloadMode := "readonly"
+	if _, err := os.Stat(filepath.Join(repoInfo.RootDir, "vendor")); err == nil {
+		downloadMode = "vendor"
+	}
+
 	args = append(args,
 		"--rm",
-		"--env", "GOFLAGS=-mod=readonly",
+		"--env", "GOFLAGS=-mod="+downloadMode,
 		"--env", "MAGEFILE_VERBOSE="+verbose,
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
 		"--env", fmt.Sprintf("SNAPSHOT=%v", Snapshot),
