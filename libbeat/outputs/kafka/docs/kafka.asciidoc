@@ -93,6 +93,11 @@ are provided. Otherwise, SASL authentication is disabled.
 To use `GSSAPI` mechanism to authenticate with Kerberos, you must leave this
 field empty, and use the <<kerberos-option-kafka>> options.
 
+===== `enable_idempotent`
+
+The `enable_idempotent` config is a boolean setting to enable or disable the output support Idempotent. If set
+to false, the idempotent output is disabled. 
+When enable_idempotent set to true, the config must net.max_open_request equal 1 and required_acks equal 1 too.
 
 [[topic-option-kafka]]
 ===== `topic`
