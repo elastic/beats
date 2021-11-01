@@ -122,10 +122,10 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Add sorting to array fields for generated data files (*-generated.json) {pull}25320[25320]
 - Update to go-concert 0.2.0 {pull}27162[27162]
 - Update Go version to 1.16.5. {issue}26182[26182] {pull}26186[26186]
--- The `enable_idempotent` config is a boolean setting to enable or disable the output support Idempotent. {pull}28095[28095]
 - Introduce `libbeat/beat.Beat.OutputConfigReloader` {pull}28048[28048]
 - Update Go version to 1.17.1. {pull}27543[27543]
 - Whitelist `GCP_*` environment variables in dev tools {pull}28364[28364]
+- The `enable_idempotent` config is a boolean setting to enable or disable the output support Idempotent. {pull}28095[28095]
 
 ==== Deprecated
 
