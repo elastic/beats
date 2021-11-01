@@ -57,7 +57,8 @@
         "source.packets": 20,
         "source.port": 20641,
         "tags": [
-            "forwarded"
+            "forwarded",
+            "preserve_original_event"
         ]
     },
     {
@@ -118,7 +119,8 @@
         "source.packets": 20,
         "source.port": 49761,
         "tags": [
-            "forwarded"
+            "forwarded",
+            "preserve_original_event"
         ]
     },
     {
@@ -161,7 +163,8 @@
         "source.packets": 4,
         "source.port": 0,
         "tags": [
-            "forwarded"
+            "forwarded",
+            "preserve_original_event"
         ]
     },
     {
@@ -204,7 +207,8 @@
         "source.packets": 4,
         "source.port": 0,
         "tags": [
-            "forwarded"
+            "forwarded",
+            "preserve_original_event"
         ]
     }
 ]

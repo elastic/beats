@@ -27,6 +27,15 @@ var allowEmptyPgp string
 // with upgrade without requiring Agent to be installed correctly
 var allowUpgrade string
 
+// TrimCommit trims commit up to 6 characters.
+func TrimCommit(commit string) string {
+	hash := commit
+	if len(hash) > hashLen {
+		hash = hash[:hashLen]
+	}
+	return hash
+}
+
 // Commit returns the current build hash or unknown if it was not injected in the build process.
 func Commit() string {
 	return libbeatVersion.Commit()
@@ -34,11 +43,7 @@ func Commit() string {
 
 // ShortCommit returns commit up to 6 characters.
 func ShortCommit() string {
-	hash := Commit()
-	if len(hash) > hashLen {
-		hash = hash[:hashLen]
-	}
-	return hash
+	return TrimCommit(Commit())
 }
 
 // BuildTime returns the build time of the binaries.

@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Navigation Webserver Overview [Metricbeat IIS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 10,
+                "markdown": "### IIS\n\n[**Webserver**](#/dashboard/ebc23240-8572-11ea-91bc-ab084c7ec0e7)| [Webserver processes](#/dashboard/2c171500-858b-11ea-91bc-ab084c7ec0e7) | [Websites](#/dashboard/4b975820-85a1-11ea-91bc-ab084c7ec0e7) | [Application Pools](#/dashboard/b4108810-861c-11ea-91bc-ab084c7ec0e7) \n\n\n\n",
+                "openLinksInNewTab": false
+            },
+            "title": "Navigation Webserver Overview [Metricbeat IIS]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "40614070-8573-11ea-91bc-ab084c7ec0e7",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:29.081Z",
+    "version": "WzM5MTksMV0="
+}

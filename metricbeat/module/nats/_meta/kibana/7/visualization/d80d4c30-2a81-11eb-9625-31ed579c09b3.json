@@ -1,0 +1,152 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Subscription Cache Actions [Metricbeat NATS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": 0,
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "a9b96760-2a81-11eb-8cd4-770b42226f97",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#6092C0",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "a9b96761-2a81-11eb-8cd4-770b42226f97",
+                        "label": "rate(inserts)",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "nats.subscriptions.inserts",
+                                "id": "a9b96762-2a81-11eb-8cd4-770b42226f97",
+                                "type": "max"
+                            },
+                            {
+                                "field": "a9b96762-2a81-11eb-8cd4-770b42226f97",
+                                "id": "a9b96764-2a81-11eb-8cd4-770b42226f97",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "a9b96764-2a81-11eb-8cd4-770b42226f97",
+                                "id": "a9b96763-2a81-11eb-8cd4-770b42226f97",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}/s"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#D36086",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "a9b96765-2a81-11eb-8cd4-770b42226f97",
+                        "label": "rate(removes)",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "nats.subscriptions.removes",
+                                "id": "a9b96766-2a81-11eb-8cd4-770b42226f97",
+                                "type": "max"
+                            },
+                            {
+                                "field": "a9b96766-2a81-11eb-8cd4-770b42226f97",
+                                "id": "a9b96768-2a81-11eb-8cd4-770b42226f97",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "a9b96768-2a81-11eb-8cd4-770b42226f97",
+                                "id": "a9b96767-2a81-11eb-8cd4-770b42226f97",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}/s"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#54B399",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "a9b96769-2a81-11eb-8cd4-770b42226f97",
+                        "label": "rate(matches)",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "nats.subscriptions.matches",
+                                "id": "a9b9676a-2a81-11eb-8cd4-770b42226f97",
+                                "type": "max"
+                            },
+                            {
+                                "field": "a9b9676a-2a81-11eb-8cd4-770b42226f97",
+                                "id": "a9b9676c-2a81-11eb-8cd4-770b42226f97",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "a9b9676c-2a81-11eb-8cd4-770b42226f97",
+                                "id": "a9b9676b-2a81-11eb-8cd4-770b42226f97",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}/s"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "tooltip_mode": "show_all",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Subscription Cache Actions [Metricbeat NATS]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d80d4c30-2a81-11eb-9625-31ed579c09b3",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:44.486Z",
+    "version": "WzQxMDAsMV0="
+}

@@ -129,7 +129,7 @@ type crossBuildParams struct {
 
 // CrossBuild executes a given build target once for each target platform.
 func CrossBuild(options ...CrossBuildOption) error {
-	params := crossBuildParams{Platforms: Platforms, Target: defaultCrossBuildTarget, ImageSelector: crossBuildImage}
+	params := crossBuildParams{Platforms: Platforms, Target: defaultCrossBuildTarget, ImageSelector: CrossBuildImage}
 	for _, opt := range options {
 		opt(&params)
 	}
@@ -193,7 +193,7 @@ func buildMage() error {
 		"-compile", CreateDir(filepath.Join("build", "mage-linux-"+arch)))
 }
 
-func crossBuildImage(platform string) (string, error) {
+func CrossBuildImage(platform string) (string, error) {
 	tagSuffix := "main"
 
 	switch {

@@ -30,28 +30,41 @@ import (
 
 var (
 	responseToDecode = []string{
-		"attributes.uiStateJSON",
-		"attributes.visState",
+		"attributes.kibanaSavedObjectMeta.searchSourceJSON",
+		"attributes.layerListJSON",
+		"attributes.mapStateJSON",
 		"attributes.optionsJSON",
 		"attributes.panelsJSON",
-		"attributes.kibanaSavedObjectMeta.searchSourceJSON",
+		"attributes.uiStateJSON",
+		"attributes.visState",
 	}
 )
 
 // DecodeExported decodes an exported dashboard
 func DecodeExported(exported []byte) []byte {
 	// remove unsupported chars
-	var result []byte
+	var result bytes.Buffer
 	r := bufio.NewReader(bytes.NewReader(exported))
 	for {
 		line, err := r.ReadBytes('\n')
 		if err != nil {
 			if err == io.EOF {
-				return append(result, decodeLine(line)...)
+				_, err = result.Write(decodeLine(line))
+				if err != nil {
+					return exported
+				}
+				return result.Bytes()
 			}
 			return exported
 		}
-		result = append(result, decodeLine(line)...)
+		_, err = result.Write(decodeLine(line))
+		if err != nil {
+			return exported
+		}
+		_, err = result.WriteRune('\n')
+		if err != nil {
+			return exported
+		}
 	}
 }
 
@@ -65,17 +78,51 @@ func decodeLine(line []byte) []byte {
 	if err != nil {
 		return line
 	}
-	var result []byte
+	o = decodeObject(o)
+	o = decodeEmbeddableConfig(o)
+
+	return []byte(o.String())
+}
+
+func decodeObject(o common.MapStr) common.MapStr {
 	for _, key := range responseToDecode {
 		// All fields are optional, so errors are not caught
 		err := decodeValue(o, key)
 		if err != nil {
 			logger := logp.NewLogger("dashboards")
 			logger.Debugf("Error while decoding dashboard objects: %+v", err)
+			continue
 		}
-		result = append(result, []byte(o.String())...)
 	}
-	return result
+
+	return o
+}
+
+func decodeEmbeddableConfig(o common.MapStr) common.MapStr {
+	p, err := o.GetValue("attributes.panelsJSON")
+	if err != nil {
+		return o
+	}
+
+	if panels, ok := p.([]interface{}); ok {
+		for i, pan := range panels {
+			if panel, ok := pan.(map[string]interface{}); ok {
+				panelObj := common.MapStr(panel)
+				embedded, err := panelObj.GetValue("embeddableConfig")
+				if err != nil {
+					continue
+				}
+				if embeddedConfig, ok := embedded.(map[string]interface{}); ok {
+					embeddedConfigObj := common.MapStr(embeddedConfig)
+					panelObj.Put("embeddableConfig", decodeObject(embeddedConfigObj))
+					panels[i] = panelObj
+				}
+			}
+		}
+		o.Put("attributes.panelsJSON", panels)
+	}
+
+	return o
 }
 
 func decodeValue(data common.MapStr, key string) error {

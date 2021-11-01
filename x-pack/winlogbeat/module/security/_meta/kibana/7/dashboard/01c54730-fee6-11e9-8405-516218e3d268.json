@@ -1,0 +1,518 @@
+{
+    "attributes": {
+        "description": "Group management activity with TSVB metrics.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "22",
+                    "w": 17,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "22",
+                "panelRefName": "panel_22",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "36",
+                    "w": 9,
+                    "x": 0,
+                    "y": 59
+                },
+                "panelIndex": "36",
+                "panelRefName": "panel_36",
+                "title": "Group Creation Summary [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "37",
+                    "w": 9,
+                    "x": 9,
+                    "y": 59
+                },
+                "panelIndex": "37",
+                "panelRefName": "panel_37",
+                "title": "Group Changes Summary [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "38",
+                    "w": 9,
+                    "x": 18,
+                    "y": 59
+                },
+                "panelIndex": "38",
+                "panelRefName": "panel_38",
+                "title": "Group Deletion Summary [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "39",
+                    "w": 16,
+                    "x": 0,
+                    "y": 81
+                },
+                "panelIndex": "39",
+                "panelRefName": "panel_39",
+                "title": "Users Added to Group Summary [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "40",
+                    "w": 17,
+                    "x": 16,
+                    "y": 81
+                },
+                "panelIndex": "40",
+                "panelRefName": "panel_40",
+                "title": "Users Removed From Group Summary [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "42",
+                    "w": 15,
+                    "x": 33,
+                    "y": 81
+                },
+                "panelIndex": "42",
+                "panelRefName": "panel_42",
+                "title": "Group Membership Enumeration Summary [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 22,
+                    "i": "43",
+                    "w": 21,
+                    "x": 27,
+                    "y": 50
+                },
+                "panelIndex": "43",
+                "panelRefName": "panel_43",
+                "title": "Logon Details  [Winlogbeat Security]",
+                "type": "search",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "44",
+                    "w": 16,
+                    "x": 0,
+                    "y": 72
+                },
+                "panelIndex": "44",
+                "panelRefName": "panel_44",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "45",
+                    "w": 9,
+                    "x": 18,
+                    "y": 50
+                },
+                "panelIndex": "45",
+                "panelRefName": "panel_45",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "46",
+                    "w": 9,
+                    "x": 0,
+                    "y": 50
+                },
+                "panelIndex": "46",
+                "panelRefName": "panel_46",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "47",
+                    "w": 9,
+                    "x": 9,
+                    "y": 50
+                },
+                "panelIndex": "47",
+                "panelRefName": "panel_47",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "48",
+                    "w": 17,
+                    "x": 16,
+                    "y": 72
+                },
+                "panelIndex": "48",
+                "panelRefName": "panel_48",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "49",
+                    "w": 15,
+                    "x": 33,
+                    "y": 72
+                },
+                "panelIndex": "49",
+                "panelRefName": "panel_49",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 21,
+                    "i": "51",
+                    "w": 48,
+                    "x": 0,
+                    "y": 95
+                },
+                "panelIndex": "51",
+                "panelRefName": "panel_51",
+                "type": "search",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "45614e1c-b2bb-4243-9a74-a4bdd0124c87",
+                    "w": 31,
+                    "x": 17,
+                    "y": 0
+                },
+                "panelIndex": "45614e1c-b2bb-4243-9a74-a4bdd0124c87",
+                "panelRefName": "panel_45614e1c-b2bb-4243-9a74-a4bdd0124c87",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 21,
+                    "i": "88e75800-8125-4c9e-96b8-5c36f6e91664",
+                    "w": 9,
+                    "x": 21,
+                    "y": 8
+                },
+                "panelIndex": "88e75800-8125-4c9e-96b8-5c36f6e91664",
+                "panelRefName": "panel_88e75800-8125-4c9e-96b8-5c36f6e91664",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 21,
+                    "i": "4b793b8e-72d4-42a2-b377-1c70f0307414",
+                    "w": 18,
+                    "x": 30,
+                    "y": 8
+                },
+                "panelIndex": "4b793b8e-72d4-42a2-b377-1c70f0307414",
+                "panelRefName": "panel_4b793b8e-72d4-42a2-b377-1c70f0307414",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": null
+                },
+                "gridData": {
+                    "h": 21,
+                    "i": "82d229f9-44f4-4c4b-baf7-f9673a14c87f",
+                    "w": 26,
+                    "x": 0,
+                    "y": 29
+                },
+                "panelIndex": "82d229f9-44f4-4c4b-baf7-f9673a14c87f",
+                "panelRefName": "panel_82d229f9-44f4-4c4b-baf7-f9673a14c87f",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "colors": {
+                        "added-group-account": "#1F78C1",
+                        "added-member-to-group": "#0A437C",
+                        "deleted-group-account": "#5195CE",
+                        "modified-group-account": "#0A50A1",
+                        "type-changed-group-account": "#82B5D8",
+                        "user-member-enumerated": "#2F575E"
+                    },
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "added-group-account": "#1F78C1",
+                            "added-member-to-group": "#0A437C",
+                            "deleted-group-account": "#5195CE",
+                            "modified-group-account": "#0A50A1",
+                            "removed-member-from-group": "#82B5D8",
+                            "type-changed-group-account": "#82B5D8",
+                            "user-member-enumerated": "#2F575E"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 21,
+                    "i": "f44255b0-d9a8-479f-be3f-829c1f6ed794",
+                    "w": 22,
+                    "x": 26,
+                    "y": 29
+                },
+                "panelIndex": "f44255b0-d9a8-479f-be3f-829c1f6ed794",
+                "panelRefName": "panel_f44255b0-d9a8-479f-be3f-829c1f6ed794",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "colors": {
+                        "added-group-account": "#0A50A1",
+                        "added-member-to-group": "#1F78C1",
+                        "deleted-group-account": "#5195CE",
+                        "modified-group-account": "#0A437C",
+                        "user-member-enumerated": "#052B51"
+                    },
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "added-group-account": "#0A50A1",
+                            "added-member-to-group": "#1F78C1",
+                            "deleted-group-account": "#5195CE",
+                            "modified-group-account": "#0A437C",
+                            "user-member-enumerated": "#2F575E"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 21,
+                    "i": "9c42bff2-b295-4617-8d8c-455bd5948b66",
+                    "w": 21,
+                    "x": 0,
+                    "y": 8
+                },
+                "panelIndex": "9c42bff2-b295-4617-8d8c-455bd5948b66",
+                "panelRefName": "panel_9c42bff2-b295-4617-8d8c-455bd5948b66",
+                "type": "visualization",
+                "version": "7.7.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Winlogbeat Security] Group Management Events - Simple Metrics",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "01c54730-fee6-11e9-8405-516218e3d268",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "6f0f2ea0-f414-11e9-8405-516218e3d268",
+            "name": "22:panel_22",
+            "type": "visualization"
+        },
+        {
+            "id": "98884120-f49d-11e9-8405-516218e3d268",
+            "name": "36:panel_36",
+            "type": "visualization"
+        },
+        {
+            "id": "9e534190-f49d-11e9-8405-516218e3d268",
+            "name": "37:panel_37",
+            "type": "visualization"
+        },
+        {
+            "id": "bb9cf7a0-f49d-11e9-8405-516218e3d268",
+            "name": "38:panel_38",
+            "type": "visualization"
+        },
+        {
+            "id": "ce867840-f49e-11e9-8405-516218e3d268",
+            "name": "39:panel_39",
+            "type": "visualization"
+        },
+        {
+            "id": "fee83900-f49f-11e9-8405-516218e3d268",
+            "name": "40:panel_40",
+            "type": "visualization"
+        },
+        {
+            "id": "bc165210-f4b8-11e9-8405-516218e3d268",
+            "name": "42:panel_42",
+            "type": "visualization"
+        },
+        {
+            "id": "7e178c80-fee1-11e9-8405-516218e3d268",
+            "name": "43:panel_43",
+            "type": "search"
+        },
+        {
+            "id": "a13bf640-fee8-11e9-8405-516218e3d268",
+            "name": "44:panel_44",
+            "type": "visualization"
+        },
+        {
+            "id": "5eeaafd0-fee7-11e9-8405-516218e3d268",
+            "name": "45:panel_45",
+            "type": "visualization"
+        },
+        {
+            "id": "f42f3b20-fee6-11e9-8405-516218e3d268",
+            "name": "46:panel_46",
+            "type": "visualization"
+        },
+        {
+            "id": "b5f38780-fee6-11e9-8405-516218e3d268",
+            "name": "47:panel_47",
+            "type": "visualization"
+        },
+        {
+            "id": "1b5f17d0-feea-11e9-8405-516218e3d268",
+            "name": "48:panel_48",
+            "type": "visualization"
+        },
+        {
+            "id": "0f2f5280-feeb-11e9-8405-516218e3d268",
+            "name": "49:panel_49",
+            "type": "visualization"
+        },
+        {
+            "id": "9066d5b0-fef2-11e9-8405-516218e3d268",
+            "name": "51:panel_51",
+            "type": "search"
+        },
+        {
+            "id": "d770b040-9b35-11ea-87e4-49f31ec44891",
+            "name": "45614e1c-b2bb-4243-9a74-a4bdd0124c87:panel_45614e1c-b2bb-4243-9a74-a4bdd0124c87",
+            "type": "visualization"
+        },
+        {
+            "id": "33462600-9b47-11ea-87e4-49f31ec44891",
+            "name": "88e75800-8125-4c9e-96b8-5c36f6e91664:panel_88e75800-8125-4c9e-96b8-5c36f6e91664",
+            "type": "visualization"
+        },
+        {
+            "id": "58fb9480-9b46-11ea-87e4-49f31ec44891",
+            "name": "4b793b8e-72d4-42a2-b377-1c70f0307414:panel_4b793b8e-72d4-42a2-b377-1c70f0307414",
+            "type": "visualization"
+        },
+        {
+            "id": "e20c02d0-9b48-11ea-87e4-49f31ec44891",
+            "name": "82d229f9-44f4-4c4b-baf7-f9673a14c87f:panel_82d229f9-44f4-4c4b-baf7-f9673a14c87f",
+            "type": "visualization"
+        },
+        {
+            "id": "7de2e3f0-9b4d-11ea-87e4-49f31ec44891",
+            "name": "f44255b0-d9a8-479f-be3f-829c1f6ed794:panel_f44255b0-d9a8-479f-be3f-829c1f6ed794",
+            "type": "visualization"
+        },
+        {
+            "id": "b89b0c90-9b41-11ea-87e4-49f31ec44891",
+            "name": "9c42bff2-b295-4617-8d8c-455bd5948b66:panel_9c42bff2-b295-4617-8d8c-455bd5948b66",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-11T13:18:55.318Z",
+    "version": "WzIyMDUsMl0="
+}

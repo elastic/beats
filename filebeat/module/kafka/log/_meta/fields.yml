@@ -3,15 +3,6 @@
   description: >
     Kafka log lines.
   fields:
-    - name: level
-      type: alias
-      path: log.level
-      migration: true
-    - name: message
-      type: alias
-      path: message
-      migration: true
-
     - name: component
       type: keyword
       description: >

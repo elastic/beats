@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build mage
 // +build mage
 
 package main
@@ -46,12 +47,9 @@ func Build() error {
 		return err
 	}
 
-	// Building osquery-extension.ext
-	inputFiles := filepath.Join("ext/osquery-extension/main.go")
-	params.InputFiles = []string{inputFiles}
+	params.InputFiles = []string{"./ext/osquery-extension/."}
 	params.Name = "osquery-extension"
 	params.CGO = false
-	params.Env = make(map[string]string)
 	err = devtools.Build(params)
 	if err != nil {
 		return err

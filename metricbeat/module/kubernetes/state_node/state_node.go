@@ -48,8 +48,22 @@ var (
 			"kube_node_status_allocatable_memory_bytes": p.Metric("memory.allocatable.bytes"),
 			"kube_node_status_capacity_cpu_cores":       p.Metric("cpu.capacity.cores"),
 			"kube_node_status_allocatable_cpu_cores":    p.Metric("cpu.allocatable.cores"),
-			"kube_node_spec_unschedulable":              p.BooleanMetric("status.unschedulable"),
-			"kube_node_status_ready":                    p.LabelMetric("status.ready", "condition"),
+			"kube_node_status_capacity": p.Metric("", p.OpFilterMap(
+				"resource", map[string]string{
+					"pods":   "pod.capacity.total",
+					"cpu":    "cpu.capacity.cores",
+					"memory": "memory.capacity.bytes",
+				},
+			)),
+			"kube_node_status_allocatable": p.Metric("", p.OpFilterMap(
+				"resource", map[string]string{
+					"pods":   "pod.allocatable.total",
+					"cpu":    "cpu.allocatable.cores",
+					"memory": "memory.allocatable.bytes",
+				},
+			)),
+			"kube_node_spec_unschedulable": p.BooleanMetric("status.unschedulable"),
+			"kube_node_status_ready":       p.LabelMetric("status.ready", "condition"),
 			"kube_node_status_condition": p.LabelMetric("status", "status", p.OpFilterMap(
 				"condition", map[string]string{
 					"Ready":          "ready",

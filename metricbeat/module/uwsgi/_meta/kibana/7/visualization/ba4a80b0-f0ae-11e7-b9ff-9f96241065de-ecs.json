@@ -1,0 +1,28 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Errors [Metricbeat uWSGI] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "params": {
+                "expression": ".es(metric=max:uwsgi.status.total.read_errors).label('Read errors').title('Errors'),\n.es(metric=max:uwsgi.status.total.write_errors).label('Write errors'),\n.es(metric=max:uwsgi.status.worker.harakiri_count).label('Timeouted requests')",
+                "interval": "15s"
+            },
+            "title": "Errors [Metricbeat uWSGI] ECS",
+            "type": "timelion"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ba4a80b0-f0ae-11e7-b9ff-9f96241065de-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:52.731Z",
+    "version": "WzQxNjksMV0="
+}

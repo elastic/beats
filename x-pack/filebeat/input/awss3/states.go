@@ -144,7 +144,7 @@ func (s *states) Update(newState state, listingID string) {
 		// No existing state found, add new one
 		s.idx[id] = len(s.states)
 		s.states = append(s.states, newState)
-		s.log.Debug("input", "New state added for %s", newState.ID)
+		s.log.Debug("New state added for ", newState.ID)
 	}
 
 	if listingID == "" || (!newState.Stored && !newState.Error) {

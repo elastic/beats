@@ -29,8 +29,10 @@ import (
 	"math/big"
 	"math/rand"
 	"os"
+	"os/user"
 	"runtime"
 	"runtime/debug"
+	"strconv"
 	"strings"
 	"time"
 
@@ -162,7 +164,7 @@ func Run(settings Settings, bt beat.Creator) error {
 
 	name := settings.Name
 	idxPrefix := settings.IndexPrefix
-	version := settings.Version
+	agentVersion := settings.Version
 	elasticLicensed := settings.ElasticLicensed
 
 	return handleError(func() error {
@@ -172,7 +174,7 @@ func Run(settings Settings, bt beat.Creator) error {
 					"panic", r, zap.Stack("stack"))
 			}
 		}()
-		b, err := NewBeat(name, idxPrefix, version, elasticLicensed)
+		b, err := NewBeat(name, idxPrefix, agentVersion, elasticLicensed)
 		if err != nil {
 			return err
 		}
@@ -183,6 +185,27 @@ func Run(settings Settings, bt beat.Creator) error {
 		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
 		monitoring.NewString(registry, "name").Set(b.Info.Name)
 		monitoring.NewString(registry, "hostname").Set(b.Info.Hostname)
+
+		// Add more beat metadata
+		monitoring.NewString(registry, "binary_arch").Set(runtime.GOARCH)
+		monitoring.NewString(registry, "build_commit").Set(version.Commit())
+		monitoring.NewTimestamp(registry, "build_time").Set(version.BuildTime())
+		monitoring.NewBool(registry, "elastic_licensed").Set(b.Info.ElasticLicensed)
+
+		if u, err := user.Current(); err != nil {
+			if _, ok := err.(user.UnknownUserIdError); ok {
+				// This usually happens if the user UID does not exist in /etc/passwd. It might be the case on K8S
+				// if the user set securityContext.runAsUser to an arbitrary value.
+				monitoring.NewString(registry, "uid").Set(strconv.Itoa(os.Getuid()))
+				monitoring.NewString(registry, "gid").Set(strconv.Itoa(os.Getgid()))
+			} else {
+				return err
+			}
+		} else {
+			monitoring.NewString(registry, "username").Set(u.Username)
+			monitoring.NewString(registry, "uid").Set(u.Uid)
+			monitoring.NewString(registry, "gid").Set(u.Gid)
+		}
 
 		// Add additional info to state registry. This is also reported to monitoring
 		stateRegistry := monitoring.GetNamespace("state").GetRegistry()
@@ -414,6 +437,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Set Beat ID in registry vars, in case it was loaded from meta file
 	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
 	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())
+	monitoring.NewString(infoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
 
 	serviceRegistry := monitoring.GetNamespace("state").GetRegistry().GetRegistry("service")
 	monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
@@ -531,7 +555,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			if outCfg.Name() != "elasticsearch" {
 				return fmt.Errorf("Index management requested but the Elasticsearch output is not configured/enabled")
 			}
-			esClient, err := eslegclient.NewConnectedClient(outCfg.Config())
+			esClient, err := eslegclient.NewConnectedClient(outCfg.Config(), b.Info.Beat)
 			if err != nil {
 				return err
 			}
@@ -808,7 +832,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 		// initKibanaConfig will attach the username and password into kibana config as a part of the initialization.
 		kibanaConfig := InitKibanaConfig(b.Config)
 
-		client, err := kibana.NewKibanaClient(kibanaConfig)
+		client, err := kibana.NewKibanaClient(kibanaConfig, b.Info.Beat)
 		if err != nil {
 			return fmt.Errorf("error connecting to Kibana: %v", err)
 		}
@@ -861,6 +885,11 @@ func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 
 func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Reloadable {
 	return reload.ReloadableFunc(func(config *reload.ConfigWithMeta) error {
+		if b.OutputConfigReloader != nil {
+			if err := b.OutputConfigReloader.Reload(config); err != nil {
+				return err
+			}
+		}
 		return outReloader.Reload(config, b.createOutput)
 	})
 }
@@ -1085,12 +1114,16 @@ func InitKibanaConfig(beatConfig beatConfig) *common.Config {
 	if esConfig.Enabled() {
 		username, _ := esConfig.String("username", -1)
 		password, _ := esConfig.String("password", -1)
+		api_key, _ := esConfig.String("api_key", -1)
 
 		if !kibanaConfig.HasField("username") && username != "" {
 			kibanaConfig.SetString("username", -1, username)
 		}
 		if !kibanaConfig.HasField("password") && password != "" {
 			kibanaConfig.SetString("password", -1, password)
+		}
+		if !kibanaConfig.HasField("api_key") && api_key != "" {
+			kibanaConfig.SetString("api_key", -1, api_key)
 		}
 	}
 	return kibanaConfig

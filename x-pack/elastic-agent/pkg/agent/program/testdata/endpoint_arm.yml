@@ -113,3 +113,5 @@ inputs:
         network: true
 runtime:
   arch: arm64
+  family: redhat
+  major: "7"

@@ -1,0 +1,123 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Events by Direction [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "filter": {
+                    "language": "lucene",
+                    "query": "cef.device.product:\"DNS Trace Log\""
+                },
+                "id": "be556a57-cd1c-496c-8714-0bd210947c85",
+                "index_pattern": "filebeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "bar",
+                        "color": "#68BC00",
+                        "fill": "0.2",
+                        "filter": {
+                            "language": "lucene",
+                            "query": "device"
+                        },
+                        "formatter": "number",
+                        "id": "9aae7344-9de9-4378-b21d-296cb964f93b",
+                        "label": "Inbound Requests",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "1cd0b964-45cf-408e-a7e4-e26955f8a3b0",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "rgba(0,156,224,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "deviceDirection:\"0\""
+                                },
+                                "id": "f860f6e0-fbd4-4949-8046-6300322dfe84",
+                                "label": "Inbound Requests"
+                            }
+                        ],
+                        "split_mode": "filters",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "bar",
+                        "color": "#68BC00",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "ed1abe18-e01b-4202-9db4-06fda10692e0",
+                        "label": "Outbound Requests",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "cfbcfc79-394b-4ec0-a2c2-7a47177d6469",
+                                "type": "count"
+                            },
+                            {
+                                "id": "6bc37118-ddac-41ec-85b3-9db7e1b3636b",
+                                "script": "params.outbound > 0 ? params.outbound * -1 : 0",
+                                "type": "calculation",
+                                "variables": [
+                                    {
+                                        "field": "cfbcfc79-394b-4ec0-a2c2-7a47177d6469",
+                                        "id": "f73f4f22-03d5-446a-b031-04eee531e3cc",
+                                        "name": "outbound"
+                                    }
+                                ]
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "rgba(211,49,21,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "deviceDirection:\"1\""
+                                },
+                                "id": "a9c50e1b-8f11-4bc2-9077-bb8870ed0b62",
+                                "label": "Outbound Requests"
+                            }
+                        ],
+                        "split_mode": "filters",
+                        "stacked": "none"
+                    }
+                ],
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Events by Direction [Filebeat CEF]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "16aef3e9-e33b-4bab-b32f-d8c5b1263ac0",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:38.313Z",
+    "version": "WzQ3NDAsMV0="
+}

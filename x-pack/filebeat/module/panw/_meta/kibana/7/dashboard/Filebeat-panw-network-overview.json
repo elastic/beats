@@ -1,0 +1,187 @@
+{
+    "attributes": {
+        "description": "Palo Alto Networks PAN-OS Networks Overview",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "1",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "2",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "3",
+                    "w": 24,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4",
+                    "w": 12,
+                    "x": 24,
+                    "y": 15
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "5",
+                    "w": 12,
+                    "x": 36,
+                    "y": 15
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "6",
+                    "w": 24,
+                    "x": 0,
+                    "y": 30
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "7",
+                    "w": 24,
+                    "x": 24,
+                    "y": 30
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat PANW] Network Flows ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "e40ba240-7572-11e9-976e-65a8f47cc4c1",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "091fe860-756a-11e9-976e-65a8f47cc4c1",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "87f30f60-7569-11e9-976e-65a8f47cc4c1",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "78e7e820-756d-11e9-976e-65a8f47cc4c1",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "d9cab170-756f-11e9-976e-65a8f47cc4c1",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "135930b0-7570-11e9-976e-65a8f47cc4c1",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "e46331c0-756a-11e9-976e-65a8f47cc4c1",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "0407a3e0-756f-11e9-976e-65a8f47cc4c1",
+            "name": "7:panel_7",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:20.886Z",
+    "version": "WzQ1MTQsMV0="
+}

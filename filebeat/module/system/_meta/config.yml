@@ -1,7 +1,7 @@
 - module: system
   # Syslog
   syslog:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -9,7 +9,7 @@
 
   # Authorization logs
   auth:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.

@@ -1,0 +1,339 @@
+{
+    "attributes": {
+        "description": "Overview of Netflow",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "globalState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "input.type",
+                            "negate": false,
+                            "params": {
+                                "query": "netflow"
+                            },
+                            "type": "phrase",
+                            "value": "netflow"
+                        },
+                        "query": {
+                            "match": {
+                                "input.type": {
+                                    "query": "netflow",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "12",
+                    "w": 16,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "12",
+                "panelRefName": "panel_12",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "13",
+                    "w": 16,
+                    "x": 16,
+                    "y": 4
+                },
+                "panelIndex": "13",
+                "panelRefName": "panel_13",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "14",
+                    "w": 16,
+                    "x": 32,
+                    "y": 4
+                },
+                "panelIndex": "14",
+                "panelRefName": "panel_14",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "15",
+                    "w": 16,
+                    "x": 16,
+                    "y": 12
+                },
+                "panelIndex": "15",
+                "panelRefName": "panel_15",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "17",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "17",
+                "panelRefName": "panel_17",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "21",
+                    "w": 16,
+                    "x": 32,
+                    "y": 12
+                },
+                "panelIndex": "21",
+                "panelRefName": "panel_21",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "22",
+                    "w": 16,
+                    "x": 16,
+                    "y": 20
+                },
+                "panelIndex": "22",
+                "panelRefName": "panel_22",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "23",
+                    "w": 16,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "23",
+                "panelRefName": "panel_23",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "24",
+                    "w": 16,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "24",
+                "panelRefName": "panel_24",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "25",
+                    "w": 16,
+                    "x": 32,
+                    "y": 20
+                },
+                "panelIndex": "25",
+                "panelRefName": "panel_25",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "26",
+                    "w": 16,
+                    "x": 0,
+                    "y": 28
+                },
+                "panelIndex": "26",
+                "panelRefName": "panel_26",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "27",
+                    "w": 16,
+                    "x": 16,
+                    "y": 28
+                },
+                "panelIndex": "27",
+                "panelRefName": "panel_27",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "29",
+                    "w": 16,
+                    "x": 32,
+                    "y": 28
+                },
+                "panelIndex": "29",
+                "panelRefName": "panel_29",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Netflow] Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "34e26884-161a-4448-9556-43b5bf2f62a2",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "ae334aec-31fa-4df7-a064-40b18831d819",
+            "name": "12:panel_12",
+            "type": "visualization"
+        },
+        {
+            "id": "67fdca65-a9df-47f0-a8a4-1e8b056325de",
+            "name": "13:panel_13",
+            "type": "visualization"
+        },
+        {
+            "id": "1558508d-591c-49be-bef4-85fdac18a960",
+            "name": "14:panel_14",
+            "type": "visualization"
+        },
+        {
+            "id": "1cf30eac-aae8-47fa-a156-37f6346d2d5a",
+            "name": "15:panel_15",
+            "type": "visualization"
+        },
+        {
+            "id": "d4e6520a-9ced-47c9-a8f2-7246e8cbd2d3",
+            "name": "17:panel_17",
+            "type": "visualization"
+        },
+        {
+            "id": "7fa6cb0a-518d-46e9-a228-15cd4253a957",
+            "name": "21:panel_21",
+            "type": "visualization"
+        },
+        {
+            "id": "f772028b-d5a6-4d55-b441-493871981a60",
+            "name": "22:panel_22",
+            "type": "visualization"
+        },
+        {
+            "id": "57e13a20-e94f-4465-a942-42148634a1d2",
+            "name": "23:panel_23",
+            "type": "visualization"
+        },
+        {
+            "id": "b02c2713-17f0-41dd-88a3-ce33b446f19d",
+            "name": "24:panel_24",
+            "type": "visualization"
+        },
+        {
+            "id": "5ccac452-e90a-4dde-ae9b-1be36ce3f761",
+            "name": "25:panel_25",
+            "type": "visualization"
+        },
+        {
+            "id": "31708a70-4957-4a8a-8065-5c88a344ad02",
+            "name": "26:panel_26",
+            "type": "visualization"
+        },
+        {
+            "id": "b677cd82-b33e-49b3-8b6e-0e110177b163",
+            "name": "27:panel_27",
+            "type": "visualization"
+        },
+        {
+            "id": "3dec20c0-0d4f-43ef-8864-3779e1a1b33f",
+            "name": "29:panel_29",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:47.530Z",
+    "version": "WzQ4MjEsMV0="
+}

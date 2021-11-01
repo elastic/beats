@@ -16,6 +16,7 @@ The following cloud providers are supported:
 - Google Compute Engine (GCE)
 - https://www.qcloud.com/?lang=en[Tencent Cloud] (QCloud)
 - Alibaba Cloud (ECS)
+- Huawei Cloud (ECS)
 - Azure Virtual Machine
 - Openstack Nova
 
@@ -54,6 +55,7 @@ List of names the `providers` setting supports:
 - "openstack", or "nova" for Openstack Nova (enabled by default).
 - "openstack-ssl", or "nova-ssl" for Openstack Nova when SSL metadata APIs are enabled (enabled by default).
 - "tencent", or "qcloud" for Tencent Cloud (disabled by default).
+- "huawei" for Huawei Cloud (enabled by default).
 
 The third optional configuration setting is `overwrite`. When `overwrite` is
 `true`, `add_cloud_metadata` overwrites existing `cloud.*` fields (`false` by
@@ -120,6 +122,20 @@ _Tencent Cloud_
     "instance.id": "ins-qcloudv5",
     "provider": "qcloud",
     "region": "china-south-gz"
+  }
+}
+-------------------------------------------------------------------------------
+
+_Huawei Cloud_
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "cloud": {
+    "availability_zone": "cn-east-2b",
+    "instance.id": "37da9890-8289-4c58-ba34-a8271c4a8216",
+    "provider": "huawei",
+    "region": "cn-east-2"
   }
 }
 -------------------------------------------------------------------------------

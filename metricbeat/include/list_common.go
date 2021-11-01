@@ -101,6 +101,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/memory"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/pageinfo"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/pressure"
+	_ "github.com/elastic/beats/v7/metricbeat/module/linux/rapl"
 	_ "github.com/elastic/beats/v7/metricbeat/module/logstash"
 	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node_stats"

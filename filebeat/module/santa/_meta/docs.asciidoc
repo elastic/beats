@@ -3,6 +3,8 @@
 
 == Santa module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module collects and parses logs from
 https://github.com/google/santa[Google Santa], a security
 tool for macOS that monitors process executions and can blacklist/whitelist

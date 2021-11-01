@@ -60,6 +60,7 @@ type s3EventsV2 struct {
 // s3EventV2 is a S3 change notification event.
 type s3EventV2 struct {
 	AWSRegion   string `json:"awsRegion"`
+	Provider    string `json:"provider"`
 	EventName   string `json:"eventName"`
 	EventSource string `json:"eventSource"`
 	S3          struct {
@@ -173,7 +174,7 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 
 			// Renew visibility.
 			if err := p.sqs.ChangeMessageVisibility(ctx, msg, p.sqsVisibilityTimeout); err != nil {
-				log.Warn("Failed to extend message visibility timeout.", "error", err)
+				log.Warnw("Failed to extend message visibility timeout.", "error", err)
 			}
 		}
 	}

@@ -1,0 +1,108 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Healthcheck [Metricbeat HAProxy] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(255,0,4,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "198f56e0-47e4-11e8-b45e-f10c3845381c",
+                        "label": "Down",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "haproxy.stat.downtime",
+                                "id": "198f56e1-47e4-11e8-b45e-f10c3845381c",
+                                "type": "sum"
+                            },
+                            {
+                                "field": "198f56e1-47e4-11e8-b45e-f10c3845381c",
+                                "id": "dbf38560-47e6-11e8-b45e-f10c3845381c",
+                                "sigma": "",
+                                "type": "derivative",
+                                "unit": ""
+                            },
+                            {
+                                "field": "dbf38560-47e6-11e8-b45e-f10c3845381c",
+                                "id": "62274b80-47e7-11e8-b45e-f10c3845381c",
+                                "type": "positive_only",
+                                "unit": ""
+                            },
+                            {
+                                "id": "7b7a7300-47e7-11e8-b45e-f10c3845381c",
+                                "script": "(params.down > 0) ? 1 : 0",
+                                "type": "calculation",
+                                "variables": [
+                                    {
+                                        "field": "62274b80-47e7-11e8-b45e-f10c3845381c",
+                                        "id": "7e577b40-47e7-11e8-b45e-f10c3845381c",
+                                        "name": "down"
+                                    }
+                                ]
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 1,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(255,218,0,1)",
+                        "fill": 0.5,
+                        "formatter": "ms,ms,0",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Duration (ms)",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "haproxy.stat.check.duration",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "HAProxy healthcheck ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "976b0910-47e4-11e8-bc13-1397384faad3-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:22.960Z",
+    "version": "WzM4NDcsMV0="
+}

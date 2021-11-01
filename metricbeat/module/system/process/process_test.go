@@ -15,16 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build darwin || freebsd || linux || windows
 // +build darwin freebsd linux windows
 
 package process
 
 import (
+	"runtime"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
@@ -36,8 +39,27 @@ func TestFetch(t *testing.T) {
 	if !assert.NotEmpty(t, events) {
 		t.FailNow()
 	}
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-		events[0].BeatEvent("system", "process").Fields.StringToPrint())
+
+	// We have root cgroups disabled
+	// This will pick a "populated" event to print
+	if runtime.GOOS == "linux" {
+		for _, evt := range events {
+			field := evt.BeatEvent("system", "process").Fields["system"].(common.MapStr)["process"].(common.MapStr)["cgroup"].(common.MapStr)["cpu"]
+			if field == nil {
+				continue
+			}
+			if field.(map[string]interface{})["path"].(string) == "/" {
+				continue
+			}
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+				evt.BeatEvent("system", "process").Fields.StringToPrint())
+			return
+		}
+	} else {
+		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+			events[0].BeatEvent("system", "process").Fields.StringToPrint())
+	}
+
 }
 
 func TestData(t *testing.T) {

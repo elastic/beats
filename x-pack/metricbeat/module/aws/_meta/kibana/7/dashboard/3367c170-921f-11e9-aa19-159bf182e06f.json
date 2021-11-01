@@ -1,0 +1,880 @@
+{
+    "attributes": {
+        "description": "Overview of AWS RDS Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "5",
+                    "w": 6,
+                    "x": 0,
+                    "y": 8
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "title": "Transaction Blocked",
+                "type": "visualization",
+                "version": "7.14.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "6",
+                    "w": 6,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "title": "Filters",
+                "type": "visualization",
+                "version": "7.14.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4abe34b0-e220-4d15-8da1-e32da039bd49",
+                    "w": 18,
+                    "x": 6,
+                    "y": 0
+                },
+                "panelIndex": "4abe34b0-e220-4d15-8da1-e32da039bd49",
+                "panelRefName": "panel_4abe34b0-e220-4d15-8da1-e32da039bd49",
+                "title": "Database Connections",
+                "type": "lens",
+                "version": "7.14.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4d89e43f-299c-4f43-bde2-0ada0983ff23",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "4d89e43f-299c-4f43-bde2-0ada0983ff23",
+                "panelRefName": "panel_4d89e43f-299c-4f43-bde2-0ada0983ff23",
+                "title": "Free Storage",
+                "type": "lens",
+                "version": "7.14.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "d409ab5d-84b5-4ecc-86ae-1f79a882b626",
+                    "w": 24,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "d409ab5d-84b5-4ecc-86ae-1f79a882b626",
+                "panelRefName": "panel_d409ab5d-84b5-4ecc-86ae-1f79a882b626",
+                "title": "Read Latency",
+                "type": "lens",
+                "version": "7.14.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-75b24975-5ca3-4da5-bc1a-92013a901a21",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "75b24975-5ca3-4da5-bc1a-92013a901a21": {
+                                            "columnOrder": [
+                                                "bfa06179-6b6f-43e5-a446-f856ff3e51bf",
+                                                "af96ca6c-7ab9-47a3-ad8b-29e1578c0076",
+                                                "6a87f496-b929-4d24-aede-325d54fedfa1",
+                                                "6a87f496-b929-4d24-aede-325d54fedfa1X0"
+                                            ],
+                                            "columns": {
+                                                "6a87f496-b929-4d24-aede-325d54fedfa1": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Write Latency (Milliseconds)",
+                                                    "operationType": "formula",
+                                                    "params": {
+                                                        "formula": "average(aws.rds.latency.write)",
+                                                        "isFormulaBroken": false
+                                                    },
+                                                    "references": [
+                                                        "6a87f496-b929-4d24-aede-325d54fedfa1X0"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "6a87f496-b929-4d24-aede-325d54fedfa1X0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of average(aws.rds.latency.write)",
+                                                    "operationType": "average",
+                                                    "scale": "ratio",
+                                                    "sourceField": "aws.rds.latency.write"
+                                                },
+                                                "af96ca6c-7ab9-47a3-ad8b-29e1578c0076": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "bfa06179-6b6f-43e5-a446-f856ff3e51bf": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top values of aws.rds.db_instance.identifier",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "fallback": true,
+                                                            "type": "alphabetical"
+                                                        },
+                                                        "orderDirection": "asc",
+                                                        "otherBucket": true,
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "aws.rds.db_instance.identifier"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "6a87f496-b929-4d24-aede-325d54fedfa1"
+                                        ],
+                                        "layerId": "75b24975-5ca3-4da5-bc1a-92013a901a21",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "splitAccessor": "bfa06179-6b6f-43e5-a446-f856ff3e51bf",
+                                        "xAccessor": "af96ca6c-7ab9-47a3-ad8b-29e1578c0076"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "1abf12dc-d009-4a02-acd4-463383d32a63",
+                    "w": 24,
+                    "x": 24,
+                    "y": 15
+                },
+                "panelIndex": "1abf12dc-d009-4a02-acd4-463383d32a63",
+                "panelRefName": "panel_1abf12dc-d009-4a02-acd4-463383d32a63",
+                "title": "Write Latency",
+                "type": "lens",
+                "version": "7.14.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "c5476b0e-6a44-43e5-8bb4-0795c4d097c1",
+                    "w": 24,
+                    "x": 0,
+                    "y": 30
+                },
+                "panelIndex": "c5476b0e-6a44-43e5-8bb4-0795c4d097c1",
+                "panelRefName": "panel_c5476b0e-6a44-43e5-8bb4-0795c4d097c1",
+                "title": "Read Throughput",
+                "type": "lens",
+                "version": "7.14.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "bf74bb77-3503-4682-9f0e-6df0994dce5d",
+                    "w": 24,
+                    "x": 24,
+                    "y": 30
+                },
+                "panelIndex": "bf74bb77-3503-4682-9f0e-6df0994dce5d",
+                "panelRefName": "panel_bf74bb77-3503-4682-9f0e-6df0994dce5d",
+                "title": "Write Throughput",
+                "type": "lens",
+                "version": "7.14.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-dd0a4706-5286-4976-9bc4-f5e7a4964bf6",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "dd0a4706-5286-4976-9bc4-f5e7a4964bf6": {
+                                            "columnOrder": [
+                                                "a2bb9c7a-0ddc-4bf7-ae24-98a535a916cc",
+                                                "103900c0-dcfa-416f-a272-6efa09c84fce",
+                                                "18e6079e-e955-41d0-8196-d2b932cf1fa6",
+                                                "18e6079e-e955-41d0-8196-d2b932cf1fa6X0"
+                                            ],
+                                            "columns": {
+                                                "103900c0-dcfa-416f-a272-6efa09c84fce": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "18e6079e-e955-41d0-8196-d2b932cf1fa6": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "average(aws.rds.cpu.total.pct)",
+                                                    "operationType": "formula",
+                                                    "params": {
+                                                        "formula": "average(aws.rds.cpu.total.pct)",
+                                                        "isFormulaBroken": false
+                                                    },
+                                                    "references": [
+                                                        "18e6079e-e955-41d0-8196-d2b932cf1fa6X0"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "18e6079e-e955-41d0-8196-d2b932cf1fa6X0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of average(aws.rds.cpu.total.pct)",
+                                                    "operationType": "average",
+                                                    "scale": "ratio",
+                                                    "sourceField": "aws.rds.cpu.total.pct"
+                                                },
+                                                "a2bb9c7a-0ddc-4bf7-ae24-98a535a916cc": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top values of aws.rds.db_instance.identifier",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "fallback": true,
+                                                            "type": "alphabetical"
+                                                        },
+                                                        "orderDirection": "asc",
+                                                        "otherBucket": true,
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "aws.rds.db_instance.identifier"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "18e6079e-e955-41d0-8196-d2b932cf1fa6"
+                                        ],
+                                        "layerId": "dd0a4706-5286-4976-9bc4-f5e7a4964bf6",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "splitAccessor": "a2bb9c7a-0ddc-4bf7-ae24-98a535a916cc",
+                                        "xAccessor": "103900c0-dcfa-416f-a272-6efa09c84fce"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "249ff0a6-3fd3-4935-85c3-0c3222d3c498",
+                    "w": 24,
+                    "x": 0,
+                    "y": 45
+                },
+                "panelIndex": "249ff0a6-3fd3-4935-85c3-0c3222d3c498",
+                "panelRefName": "panel_249ff0a6-3fd3-4935-85c3-0c3222d3c498",
+                "title": "CPU Total Pct",
+                "type": "lens",
+                "version": "7.14.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-14d4ba6b-f4e1-4d40-818a-6aa829d90422",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "14d4ba6b-f4e1-4d40-818a-6aa829d90422": {
+                                            "columnOrder": [
+                                                "8954842c-4056-46ef-adfc-29dfc3b0cbd3",
+                                                "40493df1-c805-49eb-8dfa-9ff81f7acd4b",
+                                                "c7c3ebb2-d611-40a5-aab3-491fa36fe729",
+                                                "c7c3ebb2-d611-40a5-aab3-491fa36fe729X0"
+                                            ],
+                                            "columns": {
+                                                "40493df1-c805-49eb-8dfa-9ff81f7acd4b": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "8954842c-4056-46ef-adfc-29dfc3b0cbd3": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top values of aws.rds.db_instance.identifier",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "fallback": true,
+                                                            "type": "alphabetical"
+                                                        },
+                                                        "orderDirection": "asc",
+                                                        "otherBucket": true,
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "aws.rds.db_instance.identifier"
+                                                },
+                                                "c7c3ebb2-d611-40a5-aab3-491fa36fe729": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Queue Depth (Count)",
+                                                    "operationType": "formula",
+                                                    "params": {
+                                                        "formula": "average(aws.rds.disk_queue_depth)",
+                                                        "isFormulaBroken": false
+                                                    },
+                                                    "references": [
+                                                        "c7c3ebb2-d611-40a5-aab3-491fa36fe729X0"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "c7c3ebb2-d611-40a5-aab3-491fa36fe729X0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Queue Depth (Count)",
+                                                    "operationType": "average",
+                                                    "scale": "ratio",
+                                                    "sourceField": "aws.rds.disk_queue_depth"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "c7c3ebb2-d611-40a5-aab3-491fa36fe729"
+                                        ],
+                                        "layerId": "14d4ba6b-f4e1-4d40-818a-6aa829d90422",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "splitAccessor": "8954842c-4056-46ef-adfc-29dfc3b0cbd3",
+                                        "xAccessor": "40493df1-c805-49eb-8dfa-9ff81f7acd4b"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "c28488ce-a20e-447f-9a68-ba49b542ab0a",
+                    "w": 24,
+                    "x": 24,
+                    "y": 45
+                },
+                "panelIndex": "c28488ce-a20e-447f-9a68-ba49b542ab0a",
+                "panelRefName": "panel_c28488ce-a20e-447f-9a68-ba49b542ab0a",
+                "title": "Disk Queue Depth",
+                "type": "lens",
+                "version": "7.14.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "29549114-6ebf-4047-aa56-bc035f66d3b4",
+                    "w": 24,
+                    "x": 0,
+                    "y": 60
+                },
+                "panelIndex": "29549114-6ebf-4047-aa56-bc035f66d3b4",
+                "panelRefName": "panel_29549114-6ebf-4047-aa56-bc035f66d3b4",
+                "title": "Write IOPS",
+                "type": "lens",
+                "version": "7.14.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-e2611df6-ca73-4d53-b0b5-afd8b718c369",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "e2611df6-ca73-4d53-b0b5-afd8b718c369": {
+                                            "columnOrder": [
+                                                "53a07fa4-b348-44c7-b644-83f3617e5b5c",
+                                                "b9e82720-e098-4dd7-ac5b-f3becccd344a",
+                                                "85528f23-48f2-462f-8075-eaddd94b21f2"
+                                            ],
+                                            "columns": {
+                                                "53a07fa4-b348-44c7-b644-83f3617e5b5c": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Read IOPS (Count/Second)",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "85528f23-48f2-462f-8075-eaddd94b21f2",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "aws.rds.db_instance.identifier"
+                                                },
+                                                "85528f23-48f2-462f-8075-eaddd94b21f2": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Average of aws.rds.read.iops",
+                                                    "operationType": "average",
+                                                    "scale": "ratio",
+                                                    "sourceField": "aws.rds.read.iops"
+                                                },
+                                                "b9e82720-e098-4dd7-ac5b-f3becccd344a": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "85528f23-48f2-462f-8075-eaddd94b21f2"
+                                        ],
+                                        "layerId": "e2611df6-ca73-4d53-b0b5-afd8b718c369",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "splitAccessor": "53a07fa4-b348-44c7-b644-83f3617e5b5c",
+                                        "xAccessor": "b9e82720-e098-4dd7-ac5b-f3becccd344a"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "addd441f-fa2b-4725-8015-619ee176ed0a",
+                    "w": 24,
+                    "x": 24,
+                    "y": 60
+                },
+                "panelIndex": "addd441f-fa2b-4725-8015-619ee176ed0a",
+                "panelRefName": "panel_addd441f-fa2b-4725-8015-619ee176ed0a",
+                "title": "Read IOPS",
+                "type": "lens",
+                "version": "7.14.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS] RDS Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "3367c170-921f-11e9-aa19-159bf182e06f",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "00b29040-921d-11e9-aa19-159bf182e06f",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "b5308940-7347-11e9-816b-07687310a99a",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "be8d8d30-09ae-11ec-8d29-f3a1bb757c14",
+            "name": "4abe34b0-e220-4d15-8da1-e32da039bd49:panel_4abe34b0-e220-4d15-8da1-e32da039bd49",
+            "type": "lens"
+        },
+        {
+            "id": "68f36fb0-f0a0-11eb-b61f-a53cb4913361",
+            "name": "4d89e43f-299c-4f43-bde2-0ada0983ff23:panel_4d89e43f-299c-4f43-bde2-0ada0983ff23",
+            "type": "lens"
+        },
+        {
+            "id": "f9ff3450-f094-11eb-b61f-a53cb4913361",
+            "name": "d409ab5d-84b5-4ecc-86ae-1f79a882b626:panel_d409ab5d-84b5-4ecc-86ae-1f79a882b626",
+            "type": "lens"
+        },
+        {
+            "id": "8560b400-f096-11eb-b61f-a53cb4913361",
+            "name": "1abf12dc-d009-4a02-acd4-463383d32a63:panel_1abf12dc-d009-4a02-acd4-463383d32a63",
+            "type": "lens"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "1abf12dc-d009-4a02-acd4-463383d32a63:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "1abf12dc-d009-4a02-acd4-463383d32a63:indexpattern-datasource-layer-75b24975-5ca3-4da5-bc1a-92013a901a21",
+            "type": "index-pattern"
+        },
+        {
+            "id": "b0077d10-f09b-11eb-b61f-a53cb4913361",
+            "name": "c5476b0e-6a44-43e5-8bb4-0795c4d097c1:panel_c5476b0e-6a44-43e5-8bb4-0795c4d097c1",
+            "type": "lens"
+        },
+        {
+            "id": "41e37710-f09d-11eb-b61f-a53cb4913361",
+            "name": "bf74bb77-3503-4682-9f0e-6df0994dce5d:panel_bf74bb77-3503-4682-9f0e-6df0994dce5d",
+            "type": "lens"
+        },
+        {
+            "id": "c4419a90-f091-11eb-b61f-a53cb4913361",
+            "name": "249ff0a6-3fd3-4935-85c3-0c3222d3c498:panel_249ff0a6-3fd3-4935-85c3-0c3222d3c498",
+            "type": "lens"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "249ff0a6-3fd3-4935-85c3-0c3222d3c498:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "249ff0a6-3fd3-4935-85c3-0c3222d3c498:indexpattern-datasource-layer-dd0a4706-5286-4976-9bc4-f5e7a4964bf6",
+            "type": "index-pattern"
+        },
+        {
+            "id": "bbc80900-f09e-11eb-b61f-a53cb4913361",
+            "name": "c28488ce-a20e-447f-9a68-ba49b542ab0a:panel_c28488ce-a20e-447f-9a68-ba49b542ab0a",
+            "type": "lens"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "c28488ce-a20e-447f-9a68-ba49b542ab0a:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "c28488ce-a20e-447f-9a68-ba49b542ab0a:indexpattern-datasource-layer-14d4ba6b-f4e1-4d40-818a-6aa829d90422",
+            "type": "index-pattern"
+        },
+        {
+            "id": "30fd4e40-f0a1-11eb-b61f-a53cb4913361",
+            "name": "29549114-6ebf-4047-aa56-bc035f66d3b4:panel_29549114-6ebf-4047-aa56-bc035f66d3b4",
+            "type": "lens"
+        },
+        {
+            "id": "f757eba0-f0a0-11eb-b61f-a53cb4913361",
+            "name": "addd441f-fa2b-4725-8015-619ee176ed0a:panel_addd441f-fa2b-4725-8015-619ee176ed0a",
+            "type": "lens"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "addd441f-fa2b-4725-8015-619ee176ed0a:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "addd441f-fa2b-4725-8015-619ee176ed0a:indexpattern-datasource-layer-e2611df6-ca73-4d53-b0b5-afd8b718c369",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-30T19:07:33.984Z",
+    "version": "WzEyMzQyLDJd"
+}

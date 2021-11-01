@@ -1,0 +1,103 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "91e62734-6524-424c-b2b5-3974c835dd6c": {
+                            "columnOrder": [
+                                "4f8dae5f-b49c-4a10-8f94-a29039f93919",
+                                "f0d11f8d-e2f9-408a-9114-a0b9b18142d4",
+                                "27a71166-d245-471d-b550-ee0b1899ea88"
+                            ],
+                            "columns": {
+                                "27a71166-d245-471d-b550-ee0b1899ea88": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Topic Send Request Count",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "gcp.pubsub.topic.send_request.count"
+                                },
+                                "4f8dae5f-b49c-4a10-8f94-a29039f93919": {
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top values of gcp.labels.resource.topic_id",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "columnId": "27a71166-d245-471d-b550-ee0b1899ea88",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "size": 3
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "gcp.labels.resource.topic_id"
+                                },
+                                "f0d11f8d-e2f9-408a-9114-a0b9b18142d4": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "1m"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "fittingFunction": "None",
+                "layers": [
+                    {
+                        "accessors": [
+                            "27a71166-d245-471d-b550-ee0b1899ea88"
+                        ],
+                        "layerId": "91e62734-6524-424c-b2b5-3974c835dd6c",
+                        "seriesType": "line",
+                        "splitAccessor": "4f8dae5f-b49c-4a10-8f94-a29039f93919",
+                        "xAccessor": "f0d11f8d-e2f9-408a-9114-a0b9b18142d4"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line"
+            }
+        },
+        "title": "Topic Send Request [Metricbeat GCP]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "bd399790-01a2-11eb-b032-d59f894a5072",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-91e62734-6524-424c-b2b5-3974c835dd6c",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:31:13.736Z",
+    "version": "WzM4MDcsMV0="
+}

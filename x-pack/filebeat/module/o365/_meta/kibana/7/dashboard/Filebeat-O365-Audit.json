@@ -1,0 +1,198 @@
+{
+    "attributes": {
+        "description": "Sample dashboard for Office 365 Management Activity events",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "b6942e2a-81dc-40e4-a932-8b7a864b28bc",
+                    "w": 10,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "b6942e2a-81dc-40e4-a932-8b7a864b28bc",
+                "panelRefName": "panel_b6942e2a-81dc-40e4-a932-8b7a864b28bc",
+                "title": "Total audit events",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "9673e6df-4b1e-4771-b1c6-c41c9bfc7272",
+                    "w": 38,
+                    "x": 10,
+                    "y": 0
+                },
+                "panelIndex": "9673e6df-4b1e-4771-b1c6-c41c9bfc7272",
+                "panelRefName": "panel_9673e6df-4b1e-4771-b1c6-c41c9bfc7272",
+                "title": "Event histogram by service",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "colors": {
+                        "alert": "#EF843C",
+                        "event": "#7EB26D"
+                    },
+                    "enhancements": {},
+                    "legendOpen": true,
+                    "vis": {
+                        "colors": {
+                            "alert": "#E24D42",
+                            "event": "#7EB26D"
+                        },
+                        "legendOpen": true
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "70ab7239-c65c-41da-8242-da61750745d7",
+                    "w": 10,
+                    "x": 0,
+                    "y": 6
+                },
+                "panelIndex": "70ab7239-c65c-41da-8242-da61750745d7",
+                "panelRefName": "panel_70ab7239-c65c-41da-8242-da61750745d7",
+                "title": "Events by type",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "colors": {
+                        "failure": "#E24D42",
+                        "success": "#629E51"
+                    },
+                    "enhancements": {},
+                    "legendOpen": false,
+                    "vis": {
+                        "colors": {
+                            "failure": "#E24D42",
+                            "success": "#629E51"
+                        },
+                        "legendOpen": true
+                    }
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "775ced7d-7c58-44bc-8d4e-2a757d2c218c",
+                    "w": 10,
+                    "x": 0,
+                    "y": 14
+                },
+                "panelIndex": "775ced7d-7c58-44bc-8d4e-2a757d2c218c",
+                "panelRefName": "panel_775ced7d-7c58-44bc-8d4e-2a757d2c218c",
+                "title": "Top users by authentication failures",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hiddenLayers": [],
+                    "isLayerTOCOpen": false,
+                    "mapCenter": {
+                        "lat": 42.68781,
+                        "lon": -48.94209,
+                        "zoom": 1.88
+                    },
+                    "openTOCDetails": []
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "15fe975b-6b8b-4445-872d-e06c041e2c31",
+                    "w": 38,
+                    "x": 10,
+                    "y": 14
+                },
+                "panelIndex": "15fe975b-6b8b-4445-872d-e06c041e2c31",
+                "panelRefName": "panel_15fe975b-6b8b-4445-872d-e06c041e2c31",
+                "title": "Client geolocation map",
+                "type": "map",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "481f1778-caad-4971-b598-bb61c94bf998",
+                    "w": 48,
+                    "x": 0,
+                    "y": 31
+                },
+                "panelIndex": "481f1778-caad-4971-b598-bb61c94bf998",
+                "panelRefName": "panel_481f1778-caad-4971-b598-bb61c94bf998",
+                "title": "Data Loss Prevention alerts",
+                "type": "search",
+                "version": "7.6.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat o365] Audit Dashboard ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "712e2c00-685d-11ea-8d6a-292ef5d68366",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "0be1adb0-6860-11ea-8d6a-292ef5d68366",
+            "name": "b6942e2a-81dc-40e4-a932-8b7a864b28bc:panel_b6942e2a-81dc-40e4-a932-8b7a864b28bc",
+            "type": "visualization"
+        },
+        {
+            "id": "8b033510-685a-11ea-8d6a-292ef5d68366",
+            "name": "9673e6df-4b1e-4771-b1c6-c41c9bfc7272:panel_9673e6df-4b1e-4771-b1c6-c41c9bfc7272",
+            "type": "visualization"
+        },
+        {
+            "id": "d43c95a0-6864-11ea-8d6a-292ef5d68366",
+            "name": "70ab7239-c65c-41da-8242-da61750745d7:panel_70ab7239-c65c-41da-8242-da61750745d7",
+            "type": "visualization"
+        },
+        {
+            "id": "897d0c70-6869-11ea-8d6a-292ef5d68366",
+            "name": "775ced7d-7c58-44bc-8d4e-2a757d2c218c:panel_775ced7d-7c58-44bc-8d4e-2a757d2c218c",
+            "type": "visualization"
+        },
+        {
+            "id": "dbae13c0-685c-11ea-8d6a-292ef5d68366",
+            "name": "15fe975b-6b8b-4445-872d-e06c041e2c31:panel_15fe975b-6b8b-4445-872d-e06c041e2c31",
+            "type": "map"
+        },
+        {
+            "id": "8b8e5a10-6886-11ea-8d6a-292ef5d68366",
+            "name": "481f1778-caad-4971-b598-bb61c94bf998:panel_481f1778-caad-4971-b598-bb61c94bf998",
+            "type": "search"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:33:49.253Z",
+    "version": "WzQzMDQsMV0="
+}

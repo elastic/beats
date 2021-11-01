@@ -1,3 +1,7 @@
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
 The System module allows you to monitor your servers. Because the System module
 always applies to the local server, the `hosts` config option is not needed.
 

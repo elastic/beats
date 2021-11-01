@@ -90,7 +90,6 @@ type PackageSpec struct {
 	Files             map[string]PackageFile `yaml:"files"`
 	OutputFile        string                 `yaml:"output_file,omitempty"` // Optional
 	ExtraVars         map[string]string      `yaml:"extra_vars,omitempty"`  // Optional
-	Variants          []string               `yaml:"variants"`              // Optional
 
 	evalContext            map[string]interface{}
 	packageDir             string

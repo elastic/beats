@@ -1,0 +1,97 @@
+{
+    "attributes": {
+        "description": "This dashboard shows application logs collected by the ActiveMQ filebeat module.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "f0cad176-b0ef-4623-bd59-a9ce65db8b73",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "f0cad176-b0ef-4623-bd59-a9ce65db8b73",
+                "panelRefName": "panel_f0cad176-b0ef-4623-bd59-a9ce65db8b73",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "7e3a3b6b-5fd9-491d-ad73-423bca90206f",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "7e3a3b6b-5fd9-491d-ad73-423bca90206f",
+                "panelRefName": "panel_7e3a3b6b-5fd9-491d-ad73-423bca90206f",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 22,
+                    "i": "a3093cd3-7edf-4e25-949e-631f3e5e8dec",
+                    "w": 48,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "a3093cd3-7edf-4e25-949e-631f3e5e8dec",
+                "panelRefName": "panel_a3093cd3-7edf-4e25-949e-631f3e5e8dec",
+                "type": "search",
+                "version": "7.4.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat ActiveMQ] Application Events",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "26434790-1464-11ea-8fd8-030a13064883",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "a0f15d50-1460-11ea-8fd8-030a13064883",
+            "name": "f0cad176-b0ef-4623-bd59-a9ce65db8b73:panel_f0cad176-b0ef-4623-bd59-a9ce65db8b73",
+            "type": "visualization"
+        },
+        {
+            "id": "026da780-1463-11ea-8fd8-030a13064883",
+            "name": "7e3a3b6b-5fd9-491d-ad73-423bca90206f:panel_7e3a3b6b-5fd9-491d-ad73-423bca90206f",
+            "type": "visualization"
+        },
+        {
+            "id": "d784ec10-1460-11ea-8fd8-030a13064883",
+            "name": "a3093cd3-7edf-4e25-949e-631f3e5e8dec:panel_a3093cd3-7edf-4e25-949e-631f3e5e8dec",
+            "type": "search"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:33:53.367Z",
+    "version": "WzQzMjksMV0="
+}

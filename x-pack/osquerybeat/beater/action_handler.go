@@ -6,20 +6,39 @@ package beater
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/action"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 )
+
+var (
+	ErrNoPublisher     = errors.New("no publisher configured")
+	ErrNoQueryExecutor = errors.New("no query executor configures")
+)
+
+type publisher interface {
+	Publish(index, actionID, responseID string, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
+}
+
+type queryExecutor interface {
+	Query(ctx context.Context, sql string) ([]map[string]interface{}, error)
+}
+
+type namespaceProvider interface {
+	GetNamespace() string
+}
 
 type actionHandler struct {
 	log       *logp.Logger
 	inputType string
-	bt        *osquerybeat
-	cli       *osqdcli.Client
+	publisher publisher
+	queryExec queryExecutor
+	np        namespaceProvider
 }
 
 func (a *actionHandler) Name() string {
@@ -30,7 +49,7 @@ func (a *actionHandler) Name() string {
 func (a *actionHandler) Execute(ctx context.Context, req map[string]interface{}) (map[string]interface{}, error) {
 
 	start := time.Now().UTC()
-	err := a.execute(ctx, req)
+	count, err := a.execute(ctx, req)
 	end := time.Now().UTC()
 
 	res := map[string]interface{}{
@@ -40,33 +59,52 @@ func (a *actionHandler) Execute(ctx context.Context, req map[string]interface{})
 
 	if err != nil {
 		res["error"] = err.Error()
+	} else {
+		res["count"] = count
 	}
 	return res, nil
 }
 
-func (a *actionHandler) execute(ctx context.Context, req map[string]interface{}) error {
+func (a *actionHandler) execute(ctx context.Context, req map[string]interface{}) (int, error) {
 	ac, err := action.FromMap(req)
 	if err != nil {
-		return fmt.Errorf("%v: %w", err, ErrQueryExecution)
+		return 0, fmt.Errorf("%v: %w", err, ErrQueryExecution)
 	}
-	return a.executeQuery(ctx, config.Datastream(config.DefaultNamespace), ac, "", req)
+
+	var namespace string
+	if a.np != nil {
+		namespace = a.np.GetNamespace()
+	}
+	if namespace == "" {
+		namespace = config.DefaultNamespace
+	}
+
+	return a.executeQuery(ctx, config.Datastream(namespace), ac, "", req)
 }
 
-func (a *actionHandler) executeQuery(ctx context.Context, index string, ac action.Action, responseID string, req map[string]interface{}) error {
+func (a *actionHandler) executeQuery(ctx context.Context, index string, ac action.Action, responseID string, req map[string]interface{}) (int, error) {
+
+	if a.queryExec == nil {
+		return 0, ErrNoQueryExecutor
+	}
+	if a.publisher == nil {
+		return 0, ErrNoPublisher
+	}
 
 	a.log.Debugf("Execute query: %s", ac.Query)
 
 	start := time.Now()
 
-	hits, err := a.cli.Query(ctx, ac.Query)
+	hits, err := a.queryExec.Query(ctx, ac.Query)
 
 	if err != nil {
 		a.log.Errorf("Failed to execute query, err: %v", err)
-		return err
+		return 0, err
 	}
 
 	a.log.Debugf("Completed query in: %v", time.Since(start))
 
-	a.bt.publishEvents(index, ac.ID, responseID, hits, ac.ECSMapping, req["data"])
-	return nil
+	a.publisher.Publish(index, ac.ID, responseID, hits, ac.ECSMapping, req["data"])
+
+	return len(hits), nil
 }

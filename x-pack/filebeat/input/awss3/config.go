@@ -5,6 +5,7 @@
 package awss3
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -27,11 +28,15 @@ type config struct {
 	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
 	QueueURL            string               `config:"queue_url"`
 	BucketARN           string               `config:"bucket_arn"`
+	NonAWSBucketName    string               `config:"non_aws_bucket_name"`
 	BucketListInterval  time.Duration        `config:"bucket_list_interval"`
+	BucketListPrefix    string               `config:"bucket_list_prefix"`
 	NumberOfWorkers     int                  `config:"number_of_workers"`
 	AWSConfig           awscommon.ConfigAWS  `config:",inline"`
 	FileSelectors       []fileSelectorConfig `config:"file_selectors"`
 	ReaderConfig        readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
+	PathStyle           bool                 `config:"path_style"`
+	ProviderOverride    string               `config:"provider"`
 }
 
 func defaultConfig() config {
@@ -39,30 +44,37 @@ func defaultConfig() config {
 		APITimeout:          120 * time.Second,
 		VisibilityTimeout:   300 * time.Second,
 		BucketListInterval:  120 * time.Second,
+		BucketListPrefix:    "",
 		SQSWaitTime:         20 * time.Second,
 		SQSMaxReceiveCount:  5,
 		FIPSEnabled:         false,
 		MaxNumberOfMessages: 5,
+		PathStyle:           false,
 	}
 	c.ReaderConfig.InitDefaults()
 	return c
 }
 
 func (c *config) Validate() error {
-	if c.QueueURL == "" && c.BucketARN == "" {
-		return fmt.Errorf("queue_url or bucket_arn must provided")
+	configs := []bool{c.QueueURL != "", c.BucketARN != "", c.NonAWSBucketName != ""}
+	enabled := []bool{}
+	for i := range configs {
+		if configs[i] {
+			enabled = append(enabled, configs[i])
+		}
+	}
+	if len(enabled) == 0 {
+		return errors.New("neither queue_url, bucket_arn nor non_aws_bucket_name were provided")
+	} else if len(enabled) > 1 {
+		return fmt.Errorf("queue_url <%v>, bucket_arn <%v>, non_aws_bucket_name <%v> "+
+			"cannot be set at the same time", c.QueueURL, c.BucketARN, c.NonAWSBucketName)
 	}
 
-	if c.QueueURL != "" && c.BucketARN != "" {
-		return fmt.Errorf("queue_url <%v> and bucket_arn <%v> "+
-			"cannot be set at the same time", c.QueueURL, c.BucketARN)
-	}
-
-	if c.BucketARN != "" && c.BucketListInterval <= 0 {
+	if (c.BucketARN != "" || c.NonAWSBucketName != "") && c.BucketListInterval <= 0 {
 		return fmt.Errorf("bucket_list_interval <%v> must be greater than 0", c.BucketListInterval)
 	}
 
-	if c.BucketARN != "" && c.NumberOfWorkers <= 0 {
+	if (c.BucketARN != "" || c.NonAWSBucketName != "") && c.NumberOfWorkers <= 0 {
 		return fmt.Errorf("number_of_workers <%v> must be greater than 0", c.NumberOfWorkers)
 	}
 
@@ -84,6 +96,16 @@ func (c *config) Validate() error {
 	if c.QueueURL != "" && c.APITimeout < c.SQSWaitTime {
 		return fmt.Errorf("api_timeout <%v> must be greater than the sqs.wait_time <%v",
 			c.APITimeout, c.SQSWaitTime)
+	}
+
+	if c.FIPSEnabled && c.NonAWSBucketName != "" {
+		return errors.New("fips_enabled cannot be used with a non-AWS S3 bucket.")
+	}
+	if c.PathStyle && c.NonAWSBucketName == "" {
+		return errors.New("path_style can only be used when polling non-AWS S3 services")
+	}
+	if c.ProviderOverride != "" && c.NonAWSBucketName == "" {
+		return errors.New("provider can only be overriden when polling non-AWS S3 services")
 	}
 
 	return nil

@@ -7,7 +7,6 @@ package awss3
 import (
 	"context"
 	"net/url"
-	"strings"
 	"sync"
 	"time"
 
@@ -41,7 +40,9 @@ type s3ObjectPayload struct {
 type s3Poller struct {
 	numberOfWorkers      int
 	bucket               string
+	listPrefix           string
 	region               string
+	provider             string
 	bucketPollInterval   time.Duration
 	workerSem            *sem
 	s3                   s3API
@@ -61,7 +62,9 @@ func newS3Poller(log *logp.Logger,
 	states *states,
 	store *statestore.Store,
 	bucket string,
+	listPrefix string,
 	awsRegion string,
+	provider string,
 	numberOfWorkers int,
 	bucketPollInterval time.Duration) *s3Poller {
 	if metrics == nil {
@@ -70,7 +73,9 @@ func newS3Poller(log *logp.Logger,
 	return &s3Poller{
 		numberOfWorkers:      numberOfWorkers,
 		bucket:               bucket,
+		listPrefix:           listPrefix,
 		region:               awsRegion,
+		provider:             provider,
 		bucketPollInterval:   bucketPollInterval,
 		workerSem:            newSem(numberOfWorkers),
 		s3:                   s3,
@@ -139,10 +144,9 @@ func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) er
 func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- *s3ObjectPayload) {
 	defer close(s3ObjectPayloadChan)
 
-	bucketMetadata := strings.Split(p.bucket, ":")
-	bucketName := bucketMetadata[len(bucketMetadata)-1]
+	bucketName := getBucketNameFromARN(p.bucket)
 
-	paginator := p.s3.ListObjectsPaginator(bucketName)
+	paginator := p.s3.ListObjectsPaginator(bucketName, p.listPrefix)
 	for paginator.Next(ctx) {
 		listingID, err := uuid.NewV4()
 		if err != nil {
@@ -182,6 +186,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 
 			event := s3EventV2{}
 			event.AWSRegion = p.region
+			event.Provider = p.provider
 			event.S3.Bucket.Name = bucketName
 			event.S3.Bucket.ARN = p.bucket
 			event.S3.Object.Key = filename

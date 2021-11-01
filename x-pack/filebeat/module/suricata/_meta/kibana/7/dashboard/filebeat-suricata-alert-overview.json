@@ -1,0 +1,215 @@
+{
+    "attributes": {
+        "description": "Overview of the Suricata Alerts dashboard.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "1",
+                    "w": 23,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.9.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 26,
+                    "i": "2",
+                    "w": 25,
+                    "x": 23,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "7.9.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "3",
+                    "w": 48,
+                    "x": 0,
+                    "y": 41
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "search",
+                "version": "7.9.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "mapCenter": [
+                        38.548165423046584,
+                        -6.328125000000001
+                    ],
+                    "mapZoom": 2
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4",
+                    "w": 23,
+                    "x": 0,
+                    "y": 26
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "7.9.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "mapCenter": [
+                        41.77131167976407,
+                        1.9335937500000002
+                    ],
+                    "mapZoom": 2
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "5",
+                    "w": 25,
+                    "x": 23,
+                    "y": 26
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.9.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "7",
+                    "w": 12,
+                    "x": 11,
+                    "y": 14
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "type": "visualization",
+                "version": "7.9.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "8",
+                    "w": 11,
+                    "x": 0,
+                    "y": 14
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "type": "visualization",
+                "version": "7.9.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "e86b7f30-96da-4f52-9ff0-cefcaadcc914",
+                    "w": 23,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "e86b7f30-96da-4f52-9ff0-cefcaadcc914",
+                "panelRefName": "panel_e86b7f30-96da-4f52-9ff0-cefcaadcc914",
+                "type": "visualization",
+                "version": "7.9.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Suricata] Alert Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "05268ee0-86d1-11e8-b59d-21efb914e65c-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "494fa290-86d2-11e8-b59d-21efb914e65c-ecs",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "16033310-86d3-11e8-b59d-21efb914e65c-ecs",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
+            "name": "3:panel_3",
+            "type": "search"
+        },
+        {
+            "id": "85fed080-86d7-11e8-b59d-21efb914e65c-ecs",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "a09ca070-86d7-11e8-b59d-21efb914e65c-ecs",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "2ccdc1a0-86d8-11e8-b59d-21efb914e65c-ecs",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "c7b8b8f0-86d8-11e8-b59d-21efb914e65c-ecs",
+            "name": "8:panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "908e8c90-d296-11ea-90e3-8767fe7ccf14",
+            "name": "e86b7f30-96da-4f52-9ff0-cefcaadcc914:panel_e86b7f30-96da-4f52-9ff0-cefcaadcc914",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:52.614Z",
+    "version": "WzQ5MDMsMV0="
+}

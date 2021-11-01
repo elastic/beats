@@ -134,7 +134,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				}
 
 				partitionEvent := common.MapStr{
-					"id":             partition.ID,
 					"leader":         partition.Leader,
 					"replica":        id,
 					"is_leader":      partition.Leader == id,
@@ -158,8 +157,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 					"topic_id":        partitionTopicID,
 					"topic_broker_id": partitionTopicBrokerID,
 
-					"topic":     evtTopic,
-					"broker":    evtBroker,
 					"partition": partitionEvent,
 					"offset": common.MapStr{
 						"newest": offNewest,
@@ -167,7 +164,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 					},
 				}
 
-				// TODO (deprecation): Remove fields from MetricSetFields moved to ModuleFields
 				sent := r.Event(mb.Event{
 					ModuleFields: common.MapStr{
 						"broker": evtBroker,

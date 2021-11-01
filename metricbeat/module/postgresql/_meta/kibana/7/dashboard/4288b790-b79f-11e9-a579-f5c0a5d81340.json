@@ -1,0 +1,254 @@
+{
+    "attributes": {
+        "description": "This PostgreSQL dashboard shows the most important database related metrics.\n\n",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "1",
+                    "w": 24,
+                    "x": 0,
+                    "y": 6
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "title": "Query Latency",
+                "type": "visualization",
+                "version": "7.3.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "2",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "title": "Database Transactions",
+                "type": "visualization",
+                "version": "7.3.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "3",
+                    "w": 24,
+                    "x": 0,
+                    "y": 19
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "Fileblock IO",
+                "type": "visualization",
+                "version": "7.3.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "4",
+                    "w": 14,
+                    "x": 10,
+                    "y": 0
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "title": "Rows Fetched/Returned",
+                "type": "visualization",
+                "version": "7.3.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "5",
+                    "w": 24,
+                    "x": 24,
+                    "y": 22
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "title": "Rows Inserted/Deleted/Updated",
+                "type": "visualization",
+                "version": "7.3.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "6",
+                    "w": 24,
+                    "x": 0,
+                    "y": 29
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "title": "Conflict/Deadlock Rates",
+                "type": "visualization",
+                "version": "7.3.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "7",
+                    "w": 10,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "title": "Database Filter",
+                "type": "visualization",
+                "version": "7.3.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "8",
+                    "w": 24,
+                    "x": 24,
+                    "y": 12
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "title": "Top Queries",
+                "type": "visualization",
+                "version": "7.3.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "9",
+                    "w": 12,
+                    "x": 24,
+                    "y": 31
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "title": "Local block cache stats",
+                "type": "visualization",
+                "version": "7.3.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "10",
+                    "w": 12,
+                    "x": 36,
+                    "y": 31
+                },
+                "panelIndex": "10",
+                "panelRefName": "panel_10",
+                "title": "Shared block cache stats",
+                "type": "visualization",
+                "version": "7.3.1"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat PostgreSQL] Database Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "4288b790-b79f-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "fbfa67e0-b796-11e9-a579-f5c0a5d81340",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "d733c630-b797-11e9-a579-f5c0a5d81340",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "570973a0-b798-11e9-a579-f5c0a5d81340",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "66d67200-b799-11e9-a579-f5c0a5d81340",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "20931ef0-b79a-11e9-a579-f5c0a5d81340",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "960ecdf0-b79a-11e9-a579-f5c0a5d81340",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "98e6b0a0-b79b-11e9-a579-f5c0a5d81340",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "147875b0-b903-11e9-a579-f5c0a5d81340",
+            "name": "8:panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "0cb65170-b909-11e9-a579-f5c0a5d81340",
+            "name": "9:panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "e2b28ce0-b908-11e9-a579-f5c0a5d81340",
+            "name": "10:panel_10",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:45.573Z",
+    "version": "WzQxMDEsMV0="
+}

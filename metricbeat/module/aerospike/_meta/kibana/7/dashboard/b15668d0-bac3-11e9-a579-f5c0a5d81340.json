@@ -1,0 +1,264 @@
+{
+    "attributes": {
+        "description": "This Aerospike dashboard visualizes the most important metrics for Aerospike namespaces.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "controlledBy": "1565367993423",
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "aerospike.namespace.name",
+                            "negate": false,
+                            "params": {
+                                "query": "metricbeat"
+                            },
+                            "type": "phrase",
+                            "value": "metricbeat"
+                        },
+                        "query": {
+                            "match": {
+                                "aerospike.namespace.name": {
+                                    "query": "metricbeat",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "1",
+                    "w": 9,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "title": "Namespace Filter",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "2",
+                    "w": 9,
+                    "x": 0,
+                    "y": 6
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "title": "Node Filter",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "3",
+                    "w": 25,
+                    "x": 23,
+                    "y": 12
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "Client Error Rates",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "4",
+                    "w": 25,
+                    "x": 23,
+                    "y": 0
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "title": "Client Success Rates",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "5",
+                    "w": 25,
+                    "x": 23,
+                    "y": 25
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "title": "Client Timeout Rates",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "6",
+                    "w": 23,
+                    "x": 0,
+                    "y": 25
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "title": "Disk Space",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "7",
+                    "w": 14,
+                    "x": 9,
+                    "y": 0
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "title": "Number of Objects",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "8",
+                    "w": 12,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "title": "Writes per second",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "9",
+                    "w": 11,
+                    "x": 12,
+                    "y": 12
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "title": "Reads per second",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Aerospike] Database Overview ",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b15668d0-bac3-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "72523510-bac3-11e9-a579-f5c0a5d81340",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "8c173130-bac3-11e9-a579-f5c0a5d81340",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "b5121f00-bac8-11e9-a579-f5c0a5d81340",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "5b9bf0d0-bac9-11e9-a579-f5c0a5d81340",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "23758d10-bac9-11e9-a579-f5c0a5d81340",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "bd767280-bac9-11e9-a579-f5c0a5d81340",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "9ce7ae20-baca-11e9-a579-f5c0a5d81340",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "3586e810-bac8-11e9-a579-f5c0a5d81340",
+            "name": "8:panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "eae846a0-bac7-11e9-a579-f5c0a5d81340",
+            "name": "9:panel_9",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:23.479Z",
+    "version": "WzMyOTQsMV0="
+}

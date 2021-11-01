@@ -1,0 +1,98 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Query Calls Count [Metricbeat PostgreSQL] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "d3cc2560-484b-11ea-a805-d7a3b4bc3300"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "6da7d6e0-b902-11e9-9f00-7b1f283b2282"
+                    }
+                ],
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "d22727f0-484b-11ea-a805-d7a3b4bc3300"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "2bc5fea0-b902-11e9-8b8c-f99be54b4271",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "isModelInvalid": false,
+                "pivot_id": "postgresql.statement.query.text",
+                "pivot_type": "string",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(22,165,165,1)",
+                        "fill": 0,
+                        "filter": {
+                            "language": "kuery",
+                            "query": "not postgresql.statement.query.text : (\"BEGIN;\" or \"begin\" or \"commit\" or \"end\" or \"END;\" or \"SELECT * FROM pg_stat_statements\" or \"SELECT * FROM pg_stat_database\" or \"SELECT * FROM pg_stat_bgwriter\" or \"SELECT * FROM pg_stat_activity\")"
+                        },
+                        "formatter": "'0a'",
+                        "id": "2bc5fea1-b902-11e9-8b8c-f99be54b4271",
+                        "label": "Number of times the query has been run",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "postgresql.statement.query.calls",
+                                "id": "2bc5fea2-b902-11e9-8b8c-f99be54b4271",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "postgresql.statement.query.text",
+                        "terms_order_by": "2bc5fea2-b902-11e9-8b8c-f99be54b4271",
+                        "terms_size": "20",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "time_range_mode": "entire_time_range",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "Query Calls Count [Metricbeat PostgreSQL] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "147875b0-b903-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:45.573Z",
+    "version": "WzQxMDksMV0="
+}

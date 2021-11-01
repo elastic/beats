@@ -20,6 +20,7 @@ package kibana
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -35,6 +36,8 @@ import (
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -45,10 +48,12 @@ var (
 )
 
 type Connection struct {
-	URL      string
-	Username string
-	Password string
-	Headers  http.Header
+	URL          string
+	Username     string
+	Password     string
+	APIKey       string
+	ServiceToken string
+	Headers      http.Header
 
 	HTTP    *http.Client
 	Version common.Version
@@ -92,23 +97,57 @@ func extractError(result []byte) error {
 	return nil
 }
 
+func extractMessage(result []byte) error {
+	var kibanaResult struct {
+		Success bool
+		Errors  []struct {
+			Id    string
+			Type  string
+			Error struct {
+				Type       string
+				References []struct {
+					Type string
+					Id   string
+				}
+			}
+		}
+	}
+	if err := json.Unmarshal(result, &kibanaResult); err != nil {
+		return nil
+	}
+
+	if !kibanaResult.Success {
+		var errs multierror.Errors
+		for _, err := range kibanaResult.Errors {
+			errs = append(errs, fmt.Errorf("error: %s, asset ID=%s; asset type=%s; references=%+v", err.Error.Type, err.Id, err.Type, err.Error.References))
+		}
+		return errs.Err()
+	}
+
+	return nil
+}
+
 // NewKibanaClient builds and returns a new Kibana client
-func NewKibanaClient(cfg *common.Config) (*Client, error) {
+func NewKibanaClient(cfg *common.Config, beatname string) (*Client, error) {
 	config := DefaultClientConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
-	return NewClientWithConfig(&config)
+	return NewClientWithConfig(&config, beatname)
 }
 
 // NewClientWithConfig creates and returns a kibana client using the given config
-func NewClientWithConfig(config *ClientConfig) (*Client, error) {
-	return NewClientWithConfigDefault(config, 5601)
+func NewClientWithConfig(config *ClientConfig, beatname string) (*Client, error) {
+	return NewClientWithConfigDefault(config, 5601, beatname)
 }
 
 // NewClientWithConfig creates and returns a kibana client using the given config
-func NewClientWithConfigDefault(config *ClientConfig, defaultPort int) (*Client, error) {
+func NewClientWithConfigDefault(config *ClientConfig, defaultPort int, beatname string) (*Client, error) {
+	if err := config.Validate(); err != nil {
+		return nil, err
+	}
+
 	p := config.Path
 	if config.SpaceID != "" {
 		p = path.Join(p, "s", config.SpaceID)
@@ -131,6 +170,10 @@ func NewClientWithConfigDefault(config *ClientConfig, defaultPort int) (*Client,
 		password, _ = u.User.Password()
 		u.User = nil
 
+		if config.APIKey != "" && (username != "" || password != "") {
+			return nil, fmt.Errorf("cannot set api_key with username/password in Kibana URL")
+		}
+
 		// Re-write URL without credentials.
 		kibanaURL = u.String()
 	}
@@ -143,18 +186,24 @@ func NewClientWithConfigDefault(config *ClientConfig, defaultPort int) (*Client,
 		headers.Set(k, v)
 	}
 
-	rt, err := config.Transport.Client()
+	if beatname == "" {
+		beatname = "Libbeat"
+	}
+	userAgent := useragent.UserAgent(beatname)
+	rt, err := config.Transport.Client(httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}))
 	if err != nil {
 		return nil, err
 	}
 
 	client := &Client{
 		Connection: Connection{
-			URL:      kibanaURL,
-			Username: username,
-			Password: password,
-			Headers:  headers,
-			HTTP:     rt,
+			URL:          kibanaURL,
+			Username:     username,
+			Password:     password,
+			APIKey:       config.APIKey,
+			ServiceToken: config.ServiceToken,
+			Headers:      headers,
+			HTTP:         rt,
 		},
 		log: log,
 	}
@@ -187,7 +236,11 @@ func (conn *Connection) Request(method, extraPath string,
 		return 0, nil, fmt.Errorf("fail to read response %s", err)
 	}
 
-	retError = extractError(result)
+	if resp.StatusCode >= 300 {
+		retError = extractError(result)
+	} else {
+		retError = extractMessage(result)
+	}
 	return resp.StatusCode, result, retError
 }
 
@@ -211,6 +264,14 @@ func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath s
 
 	if conn.Username != "" || conn.Password != "" {
 		req.SetBasicAuth(conn.Username, conn.Password)
+	}
+	if conn.APIKey != "" {
+		v := "ApiKey " + base64.StdEncoding.EncodeToString([]byte(conn.APIKey))
+		req.Header.Set("Authorization", v)
+	}
+	if conn.ServiceToken != "" {
+		v := "Bearer " + conn.ServiceToken
+		req.Header.Set("Authorization", v)
 	}
 
 	addHeaders(req.Header, conn.Headers)

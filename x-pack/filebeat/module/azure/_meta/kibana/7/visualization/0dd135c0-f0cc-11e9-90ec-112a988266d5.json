@@ -1,0 +1,96 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Authorization Activity User [Filebeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": "event.dataset :\"azure.activitylogs\" and azure.activitylogs.operation_name : *LISTKEYS* "
+                },
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "filebeat-*",
+                "interval": "",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(164,221,0,1)",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "kuery",
+                            "query": "azure.activitylogs.result_type : \"Success\" "
+                        },
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Success",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "filter",
+                        "stacked": "none",
+                        "terms_field": "azure.activitylogs.result_type"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(244,78,59,1)",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "kuery",
+                            "query": "azure.activitylogs.result_type : \"Fail\" "
+                        },
+                        "formatter": "number",
+                        "id": "78e85470-f0cb-11e9-bf79-0db2fc8554f1",
+                        "label": "Failure",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "78e85471-f0cb-11e9-bf79-0db2fc8554f1",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "filter",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 0,
+                "time_field": "",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Authorization Activity User [Filebeat Azure]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0dd135c0-f0cc-11e9-90ec-112a988266d5",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:03.514Z",
+    "version": "WzQ0MDUsMV0="
+}

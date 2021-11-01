@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"text/tabwriter"
 	"time"
 
 	"gopkg.in/yaml.v2"
@@ -21,10 +22,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 )
 
-type outputter func(io.Writer, *client.AgentStatus) error
+type outputter func(io.Writer, interface{}) error
 
-var outputs = map[string]outputter{
-	"human": humanOutput,
+var statusOutputs = map[string]outputter{
+	"human": humanStatusOutput,
 	"json":  jsonOutput,
 	"yaml":  yamlOutput,
 }
@@ -54,7 +55,7 @@ func statusCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error 
 	}
 
 	output, _ := cmd.Flags().GetString("output")
-	outputFunc, ok := outputs[output]
+	outputFunc, ok := statusOutputs[output]
 	if !ok {
 		return fmt.Errorf("unsupported output: %s", output)
 	}
@@ -85,7 +86,15 @@ func statusCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error 
 	return nil
 }
 
-func humanOutput(w io.Writer, status *client.AgentStatus) error {
+func humanStatusOutput(w io.Writer, obj interface{}) error {
+	status, ok := obj.(*client.AgentStatus)
+	if !ok {
+		return fmt.Errorf("unable to cast %T as *client.AgentStatus", obj)
+	}
+	return outputStatus(w, status)
+}
+
+func outputStatus(w io.Writer, status *client.AgentStatus) error {
 	fmt.Fprintf(w, "Status: %s\n", status.Status)
 	if status.Message == "" {
 		fmt.Fprint(w, "Message: (no message)\n")
@@ -96,20 +105,22 @@ func humanOutput(w io.Writer, status *client.AgentStatus) error {
 		fmt.Fprint(w, "Applications: (none)\n")
 	} else {
 		fmt.Fprint(w, "Applications:\n")
+		tw := tabwriter.NewWriter(w, 4, 1, 2, ' ', 0)
 		for _, app := range status.Applications {
-			fmt.Fprintf(w, "  * %s\t(%s)\n", app.Name, app.Status)
+			fmt.Fprintf(tw, "  * %s\t(%s)\n", app.Name, app.Status)
 			if app.Message == "" {
-				fmt.Fprint(w, "    (no message)\n")
+				fmt.Fprint(tw, "\t(no message)\n")
 			} else {
-				fmt.Fprintf(w, "    %s\n", app.Message)
+				fmt.Fprintf(tw, "\t%s\n", app.Message)
 			}
 		}
+		tw.Flush()
 	}
 	return nil
 }
 
-func jsonOutput(w io.Writer, status *client.AgentStatus) error {
-	bytes, err := json.MarshalIndent(status, "", "    ")
+func jsonOutput(w io.Writer, out interface{}) error {
+	bytes, err := json.MarshalIndent(out, "", "    ")
 	if err != nil {
 		return err
 	}
@@ -117,8 +128,8 @@ func jsonOutput(w io.Writer, status *client.AgentStatus) error {
 	return nil
 }
 
-func yamlOutput(w io.Writer, status *client.AgentStatus) error {
-	bytes, err := yaml.Marshal(status)
+func yamlOutput(w io.Writer, out interface{}) error {
+	bytes, err := yaml.Marshal(out)
 	if err != nil {
 		return err
 	}
