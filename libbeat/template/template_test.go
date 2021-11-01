@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package template
@@ -109,7 +110,9 @@ func TestTemplate(t *testing.T) {
 	currentVersion := getVersion("")
 
 	t.Run("for ES 6.x", func(t *testing.T) {
-		template := createTestTemplate(t, currentVersion, "6.4.0", DefaultConfig())
+		cfg := DefaultConfig()
+		cfg.Type = IndexTemplateLegacy
+		template := createTestTemplate(t, currentVersion, "6.4.0", cfg)
 		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
 		template.Assert("order", 1)
 		template.Assert("mappings.doc._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
@@ -119,17 +122,15 @@ func TestTemplate(t *testing.T) {
 	t.Run("for ES 7.x", func(t *testing.T) {
 		template := createTestTemplate(t, currentVersion, "7.2.0", DefaultConfig())
 		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
-		template.Assert("order", 1)
-		template.Assert("mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
-		template.Assert("settings.index.max_docvalue_fields_search", 200)
+		template.Assert("template.mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+		template.Assert("template.settings.index.max_docvalue_fields_search", 200)
 	})
 
 	t.Run("for ES 8.x", func(t *testing.T) {
 		template := createTestTemplate(t, currentVersion, "8.0.0", DefaultConfig())
 		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
-		template.Assert("order", 1)
-		template.Assert("mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
-		template.Assert("settings.index.max_docvalue_fields_search", 200)
+		template.Assert("template.mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
+		template.Assert("template.settings.index.max_docvalue_fields_search", 200)
 	})
 }
 

@@ -24,6 +24,9 @@
             - name: system.*
               type: object
               object_type: keyword
+            - name: resource.*
+              type: object
+              object_type: keyword
         - name: "metrics.*.*.*.*"
           type: object
           object_type: double

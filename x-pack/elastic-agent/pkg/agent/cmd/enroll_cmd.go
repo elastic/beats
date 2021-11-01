@@ -85,6 +85,7 @@ type enrollCmdFleetServerOption struct {
 	Insecure              bool
 	SpawnAgent            bool
 	Headers               map[string]string
+	Timeout               time.Duration
 }
 
 // enrollCmdOption define all the supported enrollment option.
@@ -98,6 +99,7 @@ type enrollCmdOption struct {
 	ProxyURL             string                     `yaml:"proxy_url,omitempty"`
 	ProxyDisabled        bool                       `yaml:"proxy_disabled,omitempty"`
 	ProxyHeaders         map[string]string          `yaml:"proxy_headers,omitempty"`
+	DaemonTimeout        time.Duration              `yaml:"daemon_timeout,omitempty"`
 	UserProvidedMetadata map[string]interface{}     `yaml:"-"`
 	FixPermissions       bool                       `yaml:"-"`
 	DelayEnroll          bool                       `yaml:"-"`
@@ -188,7 +190,7 @@ func (c *enrollCmd) Execute(ctx context.Context, streams *cli.IOStreams) error {
 	// Connection setup should disable proxies in that case.
 	localFleetServer := c.options.FleetServer.ConnStr != ""
 	if localFleetServer && !c.options.DelayEnroll {
-		token, err := c.fleetServerBootstrap(ctx)
+		token, err := c.fleetServerBootstrap(ctx, persistentConfig)
 		if err != nil {
 			return err
 		}
@@ -275,14 +277,14 @@ func (c *enrollCmd) writeDelayEnroll(streams *cli.IOStreams) error {
 	return nil
 }
 
-func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
+func (c *enrollCmd) fleetServerBootstrap(ctx context.Context, persistentConfig map[string]interface{}) (string, error) {
 	c.log.Debug("verifying communication with running Elastic Agent daemon")
 	agentRunning := true
 	_, err := getDaemonStatus(ctx)
 	if err != nil {
 		if !c.options.FleetServer.SpawnAgent {
 			// wait longer to try and communicate with the Elastic Agent
-			err = waitForAgent(ctx)
+			err = waitForAgent(ctx, c.options.DaemonTimeout)
 			if err != nil {
 				return "", errors.New("failed to communicate with elastic-agent daemon; is elastic-agent running?")
 			}
@@ -292,6 +294,11 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 	}
 
 	err = c.prepareFleetTLS()
+	if err != nil {
+		return "", err
+	}
+
+	agentConfig, err := c.createAgentConfig("", persistentConfig, c.options.FleetServer.Headers)
 	if err != nil {
 		return "", err
 	}
@@ -312,6 +319,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 	}
 
 	configToStore := map[string]interface{}{
+		"agent": agentConfig,
 		"fleet": fleetConfig,
 	}
 	reader, err := yamlToReader(configToStore)
@@ -338,9 +346,9 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 		}
 	}
 
-	token, err := waitForFleetServer(ctx, agentSubproc, c.log)
+	token, err := waitForFleetServer(ctx, agentSubproc, c.log, c.options.FleetServer.Timeout)
 	if err != nil {
-		return "", errors.New(err, "fleet-server never started by elastic-agent daemon", errors.TypeApplication)
+		return "", errors.New(err, "fleet-server failed", errors.TypeApplication)
 	}
 	return token, nil
 }
@@ -617,16 +625,28 @@ type waitResult struct {
 	err             error
 }
 
-func waitForAgent(ctx context.Context) error {
-	ctx, cancel := context.WithTimeout(ctx, 1*time.Minute)
-	defer cancel()
+func waitForAgent(ctx context.Context, timeout time.Duration) error {
+	if timeout == 0 {
+		timeout = 1 * time.Minute
+	}
+	if timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, timeout)
+		defer cancel()
+	}
+	maxBackoff := timeout
+	if maxBackoff <= 0 {
+		// indefinite timeout
+		maxBackoff = 10 * time.Minute
+	}
 
 	resChan := make(chan waitResult)
 	innerCtx, innerCancel := context.WithCancel(context.Background())
 	defer innerCancel()
 	go func() {
+		backOff := expBackoffWithContext(innerCtx, 1*time.Second, maxBackoff)
 		for {
-			<-time.After(1 * time.Second)
+			backOff.Wait()
 			_, err := getDaemonStatus(innerCtx)
 			if err == context.Canceled {
 				resChan <- waitResult{err: err}
@@ -653,9 +673,20 @@ func waitForAgent(ctx context.Context) error {
 	return nil
 }
 
-func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessState, log *logger.Logger) (string, error) {
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
-	defer cancel()
+func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessState, log *logger.Logger, timeout time.Duration) (string, error) {
+	if timeout == 0 {
+		timeout = 2 * time.Minute
+	}
+	if timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, timeout)
+		defer cancel()
+	}
+	maxBackoff := timeout
+	if maxBackoff <= 0 {
+		// indefinite timeout
+		maxBackoff = 10 * time.Minute
+	}
 
 	resChan := make(chan waitResult)
 	innerCtx, innerCancel := context.WithCancel(context.Background())
@@ -663,8 +694,9 @@ func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessStat
 	go func() {
 		msg := ""
 		msgCount := 0
+		backExp := expBackoffWithContext(innerCtx, 1*time.Second, maxBackoff)
 		for {
-			<-time.After(1 * time.Second)
+			backExp.Wait()
 			status, err := getDaemonStatus(innerCtx)
 			if err == context.Canceled {
 				resChan <- waitResult{err: err}
@@ -949,4 +981,14 @@ func getPersistentConfig(pathConfigFile string) (map[string]interface{}, error) 
 	}
 
 	return persistentMap, nil
+}
+
+func expBackoffWithContext(ctx context.Context, init, max time.Duration) backoff.Backoff {
+	signal := make(chan struct{})
+	bo := backoff.NewExpBackoff(signal, init, max)
+	go func() {
+		<-ctx.Done()
+		close(signal)
+	}()
+	return bo
 }

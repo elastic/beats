@@ -383,24 +383,25 @@ func EncodeJSONObjects(content []byte) []byte {
 		}
 	}
 
-	fieldsToStr := []string{"visState", "uiStateJSON", "optionsJSON"}
+	fieldsToStr := []string{
+		"layerListJSON",
+		"mapStateJSON",
+		"optionsJSON",
+		"panelsJSON",
+		"uiStateJSON",
+		"visState",
+	}
 	for _, field := range fieldsToStr {
-		if rootField, ok := attributes[field].(map[string]interface{}); ok {
+		switch rootField := attributes[field].(type) {
+		case map[string]interface{}, []interface{}:
 			b, err := json.Marshal(rootField)
 			if err != nil {
 				return content
 			}
 			attributes[field] = string(b)
+		default:
+			continue
 		}
-	}
-
-	if panelsJSON, ok := attributes["panelsJSON"].([]interface{}); ok {
-		b, err := json.Marshal(panelsJSON)
-		if err != nil {
-			return content
-		}
-		attributes["panelsJSON"] = string(b)
-
 	}
 
 	b, err := json.Marshal(objectMap)

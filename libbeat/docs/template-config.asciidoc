@@ -27,10 +27,12 @@ existing one.
 you must <<load-template-manually,load the template manually>>.
 
 ifndef::apm-server[]
-*`setup.template.type`*:: The type of template to use. Available options: `legacy` (default), index templates
-before Elasticsearch v7.8. Use this to avoid breaking existing deployments. New options are `component`
-and `index`. Selecting `component` loads a component template which can be included in new index templates.
-The option `index` loads the new index template.
+*`setup.template.type`*:: Deprecated in 7.16. The type of template to use. The default value is `index`,
+that loads {ref}/index-templates.html[index templates].
+Further options: `legacy`, {ref}/indices-templates-v1.html[legacy index templates] before Elasticsearch v7.8.
+Use this to avoid breaking existing deployments.
+And `component`, selecting it loads a component template which can be included in index templates.
+The option `index` loads the new composable index template.
 endif::[]
 
 *`setup.template.name`*:: The name of the template. The default is

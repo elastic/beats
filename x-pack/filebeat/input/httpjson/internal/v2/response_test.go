@@ -16,7 +16,7 @@ import (
 func TestTemplateValues(t *testing.T) {
 	resp := &response{
 		page: 1,
-		url:  newURL("http://test?p1=v1"),
+		url:  *(newURL("http://test?p1=v1")),
 		header: http.Header{
 			"Authorization": []string{"Bearer token"},
 		},
@@ -28,8 +28,10 @@ func TestTemplateValues(t *testing.T) {
 	vals := resp.templateValues()
 
 	assert.Equal(t, resp.page, vals["page"])
-	assert.Equal(t, resp.url.String(), vals["url.value"])
-	assert.EqualValues(t, resp.url.Query(), vals["url.params"])
+	v, _ := vals.GetValue("url.value")
+	assert.Equal(t, resp.url.String(), v)
+	v, _ = vals.GetValue("url.params")
+	assert.EqualValues(t, resp.url.Query(), v)
 	assert.EqualValues(t, resp.header, vals["header"])
 	assert.EqualValues(t, resp.body, vals["body"])
 

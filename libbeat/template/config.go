@@ -20,6 +20,7 @@ package template
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 )
 
@@ -69,7 +70,7 @@ func DefaultConfig() TemplateConfig {
 	return TemplateConfig{
 		Enabled:  true,
 		Fields:   "",
-		Type:     IndexTemplateLegacy,
+		Type:     IndexTemplateIndex,
 		Order:    1,
 		Priority: 150,
 	}
@@ -77,9 +78,11 @@ func DefaultConfig() TemplateConfig {
 
 func (t *IndexTemplateType) Unpack(v string) error {
 	if v == "" {
-		*t = IndexTemplateLegacy
+		*t = IndexTemplateIndex
 		return nil
 	}
+
+	cfgwarn.Deprecate("8.0.0", "do not use setup.template.type, it is deprecated, data streams will be loaded automatically")
 
 	var tt IndexTemplateType
 	var ok bool

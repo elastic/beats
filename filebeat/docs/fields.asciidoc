@@ -3278,17 +3278,11 @@ type: keyword
 
 --
 
-[float]
-=== properties
-
-The signin log properties
-
-
 
 *`azure.signinlogs.properties.id`*::
 +
 --
-ID
+Unique ID representing the sign-in activity.
 
 
 type: keyword
@@ -3298,7 +3292,7 @@ type: keyword
 *`azure.signinlogs.properties.created_at`*::
 +
 --
-Created date time
+Date and time (UTC) the sign-in was initiated.
 
 
 type: date
@@ -3365,13 +3359,12 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.ip_address`*::
+*`azure.signinlogs.properties.autonomous_system_number`*::
 +
 --
-Ip address
+Autonomous system number.
 
-
-type: keyword
+type: long
 
 --
 
@@ -3411,7 +3404,7 @@ type: keyword
 Is interactive
 
 
-type: keyword
+type: boolean
 
 --
 
@@ -3495,12 +3488,6 @@ type: keyword
 
 --
 
-[float]
-=== status
-
-Status
-
-
 
 *`azure.signinlogs.properties.status.error_code`*::
 +
@@ -3508,15 +3495,9 @@ Status
 Error code
 
 
-type: keyword
+type: long
 
 --
-
-[float]
-=== device_detail
-
-Status
-
 
 
 *`azure.signinlogs.properties.device_detail.device_id`*::
@@ -3569,12 +3550,159 @@ type: keyword
 
 --
 
+*`azure.signinlogs.properties.applied_conditional_access_policies`*::
++
+--
+A list of conditional access policies that are triggered by the corresponding sign-in activity.
+
+
+type: array
+
+--
+
+*`azure.signinlogs.properties.authentication_details`*::
++
+--
+The result of the authentication attempt and additional details on the authentication method.
+
+
+type: array
+
+--
+
+*`azure.signinlogs.properties.authentication_processing_details`*::
++
+--
+Additional authentication processing details, such as the agent name in case of PTA/PHS or Server/farm name in case of federated authentication.
+
+
+type: flattened
+
+--
+
+*`azure.signinlogs.properties.authentication_requirement`*::
++
+--
+This holds the highest level of authentication needed through all the sign-in steps, for sign-in to succeed.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.authentication_requirement_policies`*::
++
+--
+Set of CA policies that apply to this sign-in, each as CA: policy name, and/or MFA: Per-user
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.flagged_for_review`*::
++
+--
+type: boolean
+
+--
+
+*`azure.signinlogs.properties.home_tenant_id`*::
++
+--
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.network_location_details`*::
++
+--
+The network location details including the type of network used and its names.
+
+type: array
+
+--
+
+*`azure.signinlogs.properties.resource_id`*::
++
+--
+The identifier of the resource that the user signed in to.
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.resource_tenant_id`*::
++
+--
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.risk_event_types`*::
++
+--
+The list of risk event types associated with the sign-in. Possible values: unlikelyTravel, anonymizedIPAddress, maliciousIPAddress, unfamiliarFeatures, malwareInfectedIPAddress, suspiciousIPAddress, leakedCredentials, investigationsThreatIntelligence, generic, or unknownFutureValue.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.risk_event_types_v2`*::
++
+--
+The list of risk event types associated with the sign-in. Possible values: unlikelyTravel, anonymizedIPAddress, maliciousIPAddress, unfamiliarFeatures, malwareInfectedIPAddress, suspiciousIPAddress, leakedCredentials, investigationsThreatIntelligence, generic, or unknownFutureValue.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.service_principal_name`*::
++
+--
+The application name used for sign-in. This field is populated when you are signing in using an application.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.user_type`*::
++
+--
+type: keyword
+
+--
+
 *`azure.signinlogs.properties.service_principal_id`*::
 +
 --
-Status
+The application identifier used for sign-in. This field is populated when you are signing in using an application.
 
 
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.cross_tenant_access_type`*::
++
+--
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.is_tenant_restricted`*::
++
+--
+type: boolean
+
+--
+
+*`azure.signinlogs.properties.sso_extension_version`*::
++
+--
 type: keyword
 
 --

@@ -3203,6 +3203,10 @@ filebeat.inputs:
   # collection period.
   #api_sleep: 200ms
 
+  # This is used to shift collection start time and end time back in order to
+  # collect logs when there is a delay in CloudWatch.
+  #latency: 1m
+
 # =========================== Filebeat autodiscover ============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules
@@ -4355,8 +4359,8 @@ output.elasticsearch:
 
 # Select the kind of index template. From Elasticsearch 7.8, it is possible to
 # use component templates. Available options: legacy, component, index.
-# By default filebeat uses the legacy index templates.
-#setup.template.type: legacy
+# By default filebeat uses index templates.
+#setup.template.type: index
 
 # Template name. By default the template name is "filebeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
