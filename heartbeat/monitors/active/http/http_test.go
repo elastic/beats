@@ -18,6 +18,8 @@
 package http
 
 import (
+	"bytes"
+	"compress/gzip"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
@@ -412,7 +414,7 @@ func TestJsonBody(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			server := httptest.NewServer(hbtest.CustomResponseHandler([]byte(tc.responseBody), 200))
+			server := httptest.NewServer(hbtest.CustomResponseHandler([]byte(tc.responseBody), 200, map[string]string{}))
 			defer server.Close()
 
 			jsonCheck := common.MapStr{"description": tc.name}
@@ -806,6 +808,57 @@ func mustParseURL(t *testing.T, url string) *url.URL {
 		t.Fatal(err)
 	}
 	return parsed
+}
+
+// helper that compresses some content as gzip
+func gzipBuffer(t *testing.T, toZip string) *bytes.Buffer {
+	var gzipBuffer bytes.Buffer
+	gzipWriter := gzip.NewWriter(&gzipBuffer)
+	defer gzipWriter.Close()
+	_, err := gzipWriter.Write([]byte(toZip))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return &gzipBuffer
+}
+
+func TestDecodesGzip(t *testing.T) {
+	gzip := gzipBuffer(t, "TestEncodingAccept")
+
+	server := httptest.NewServer(hbtest.CustomResponseHandler(gzip.Bytes(), 200, map[string]string{
+		"Content-Encoding": "gzip",
+	}))
+	defer server.Close()
+
+	evt := sendTLSRequest(t, server.URL, false, map[string]interface{}{
+		"response.include_body": "always",
+		"check.request.headers": map[string]interface{}{"Accept-Encoding": "gzip"},
+	})
+
+	content, err := evt.Fields.GetValue("http.response.body.content")
+
+	// decode gzip content if 'Content-Encoding' header is present
+	assert.NoError(t, err)
+	assert.Exactly(t, content, "TestEncodingAccept")
+}
+
+func TestNoGzipDecodeWithoutHeader(t *testing.T) {
+	gzip := gzipBuffer(t, "TestEncodingAccept")
+
+	server := httptest.NewServer(hbtest.CustomResponseHandler(gzip.Bytes(), 200, map[string]string{}))
+	defer server.Close()
+
+	evt := sendTLSRequest(t, server.URL, false, map[string]interface{}{
+		"response.include_body": "always",
+		"check.request.headers": map[string]interface{}{"Accept-Encoding": "gzip"},
+	})
+
+	content, err := evt.Fields.GetValue("http.response.body.content")
+
+	assert.NoError(t, err)
+
+	// doesn't decode gzip text without content header
+	assert.Exactly(t, content, "\x1f\x8b\b\x00\x00\x00\x00\x00\x00\xff\nI-.q\xcdK\xceO\xc9\xccKwLNN-(\x01\x04\x00\x00\xff\xffW\xbeE\x0e\x12\x00\x00\x00")
 }
 
 func TestUserAgentInject(t *testing.T) {
