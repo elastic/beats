@@ -7,10 +7,34 @@ IF ERRORLEVEL 1 (
  choco install curl -y --no-progress --skipdownloadcache
 )
 mkdir %WORKSPACE%\bin
-where /q gvm
-IF ERRORLEVEL 1 (
- curl -sL -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.1/gvm-windows-amd64.exe
+IF EXIST "%PROGRAMFILES(X86)%" (
+    REM Force the gvm installation.
+    SET GVM_BIN=gvm.exe
+    curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.3.0/gvm-windows-amd64.exe
+    IF ERRORLEVEL 1 (
+        REM gvm installation has failed.
+        exit /b 1
+    )
+) ELSE (
+    REM Windows 7 workers got a broken gvm installation.
+    curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.3.0/gvm-windows-386.exe
+    IF ERRORLEVEL 1 (
+        REM gvm installation has failed.
+        exit /b 1
+    )
 )
+
+SET GVM_BIN=gvm.exe
+WHERE /q %GVM_BIN%
+%GVM_BIN% version
+
+REM Install the given go version
+%GVM_BIN% --debug install %GO_VERSION%
+
+REM Configure the given go version
+FOR /f "tokens=*" %%i IN ('"%GVM_BIN%" use %GO_VERSION% --format=batch') DO %%i
+
+go env
 FOR /f "tokens=*" %%i IN ('"gvm.exe" use %GO_VERSION% --format=batch') DO %%i
 
 go install github.com/elastic/beats/vendor/github.com/magefile/mage
