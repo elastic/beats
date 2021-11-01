@@ -16,10 +16,14 @@ when:
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     metricbeat-test:
-        make: "make -C generator/_templates/metricbeat test test-package"
+        # test-package skipped in: https://github.com/elastic/beats/pull/28723
+        #make: "make -C generator/_templates/metricbeat test test-package"
+        make: "make -C generator/_templates/metricbeat test"
         stage: mandatory
     beat-test:
-        make: "make -C generator/_templates/beat test test-package"
+        # test-package skipped in: https://github.com/elastic/beats/pull/28723
+        #make: "make -C generator/_templates/beat test test-package"
+        make: "make -C generator/_templates/beat test"
         stage: mandatory
     macos-metricbeat:
         make: "make -C generator/_templates/metricbeat test"
