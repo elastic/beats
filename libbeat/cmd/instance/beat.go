@@ -32,6 +32,7 @@ import (
 	"os/user"
 	"runtime"
 	"runtime/debug"
+	"strconv"
 	"strings"
 	"time"
 
@@ -191,13 +192,20 @@ func Run(settings Settings, bt beat.Creator) error {
 		monitoring.NewTimestamp(registry, "build_time").Set(version.BuildTime())
 		monitoring.NewBool(registry, "elastic_licensed").Set(b.Info.ElasticLicensed)
 
-		u, err := user.Current()
-		if err != nil {
-			return err
+		if u, err := user.Current(); err != nil {
+			if _, ok := err.(user.UnknownUserIdError); ok {
+				// This usually happens if the user UID does not exist in /etc/passwd. It might be the case on K8S
+				// if the user set securityContext.runAsUser to an arbitrary value.
+				monitoring.NewString(registry, "uid").Set(strconv.Itoa(os.Getuid()))
+				monitoring.NewString(registry, "gid").Set(strconv.Itoa(os.Getgid()))
+			} else {
+				return err
+			}
+		} else {
+			monitoring.NewString(registry, "username").Set(u.Username)
+			monitoring.NewString(registry, "uid").Set(u.Uid)
+			monitoring.NewString(registry, "gid").Set(u.Gid)
 		}
-		monitoring.NewString(registry, "username").Set(u.Username)
-		monitoring.NewString(registry, "uid").Set(u.Uid)
-		monitoring.NewString(registry, "gid").Set(u.Gid)
 
 		// Add additional info to state registry. This is also reported to monitoring
 		stateRegistry := monitoring.GetNamespace("state").GetRegistry()

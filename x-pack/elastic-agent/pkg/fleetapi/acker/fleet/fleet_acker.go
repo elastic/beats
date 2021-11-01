@@ -115,6 +115,7 @@ func constructEvent(action fleetapi.Action, agentID string) fleetapi.AckEvent {
 
 	if a, ok := action.(*fleetapi.ActionApp); ok {
 		ackev.ActionData = a.Data
+		ackev.ActionResponse = a.Response
 		ackev.StartedAt = a.StartedAt
 		ackev.CompletedAt = a.CompletedAt
 		ackev.Error = a.Error
