@@ -1,4 +1,4 @@
-Jul 30 09:03:52 localhost haproxy[32450]: 1.2.3.4:38862 [30/Jul/2018:09:03:52.726] incoming~ docs_microservice/docs 0/0/1/0/2 304 168 - - ---- 6/6/0/0/0 0/0 {docs.example.internal||} {|||} "GET /component---src-pages-index-js-4b15624544f97cf0bb8f.js HTTP/1.1"
+Jul 30 09:03:52 localhost haproxy[32450]: 1.128.3.4:38862 [30/Jul/2018:09:03:52.726] incoming~ docs_microservice/docs 0/0/1/0/2 304 168 - - ---- 6/6/0/0/0 0/0 {docs.example.internal||} {|||} "GET /component---src-pages-index-js-4b15624544f97cf0bb8f.js HTTP/1.1"
 May 22 02:22:22 server1 haproxy[5089]: -:22222 [22/May/2021:02:22:22.222] www-https~ myapp/node2 site.domain.com 0/0/0/18/18 200 200 - - ---- 222/222/2/0/0 0/0 "OPTIONS /api/v2/app/ HTTP/1.1"
 Jun 22 12:02:53 node2 haproxy[23034]: -:47625 [22/Jun/2021:12:02:53.473] www-https~ app/app-node2 app.domain.com 0/0/1/17/18 302 291 - - ---- 1/1/0/0/0 0/0 "GET / HTTP/1.1"
 Jun 22 12:03:01 node2 haproxy[23034]: -:47445 [22/Jun/2021:12:03:01.501] www-https~ app/node16 app.domain.com 0/0/1/55/56 200 3097 - - ---- 2/2/0/0/0 0/0 "GET /app/login/ HTTP/1.1"
