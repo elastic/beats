@@ -157,7 +157,7 @@ Example configuration:
 -------------------------------------------------------------------------------
 
 [float]
-[[monitor-browser-ignore-https-errors]]]]
+[[monitor-browser-ignore-https-errors]]
 ==== `ignore_https_errors`
 
 Set this option to `true` to disable TLS/SSL validation in the synthetics browser. This is useful for testing
