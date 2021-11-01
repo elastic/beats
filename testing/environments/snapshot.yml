@@ -20,6 +20,11 @@ services:
     # Disable geoip updates to prevent golden file test failures when the database
     # changes and prevent race conditions between tests and database updates.
     - "ingest.geoip.downloader.enabled=false"
+    volumes:
+    # Test files from https://github.com/maxmind/MaxMind-DB/tree/2bf1713b3b5adcb022cf4bb77eb0689beaadcfef/test-data
+    - "./GeoLite2-ASN.mmdb:/usr/share/elasticsearch/config/ingest-geoip/GeoLite2-ASN.mmdb:ro"
+    - "./GeoLite2-City.mmdb:/usr/share/elasticsearch/config/ingest-geoip/GeoLite2-City.mmdb:ro"
+    - "./GeoLite2-Country.mmdb:/usr/share/elasticsearch/config/ingest-geoip/GeoLite2-Country.mmdb:ro"
 
   logstash:
     image: docker.elastic.co/logstash/logstash@sha256:e01cf165142edf8d67485115b938c94deeda66153e9516aa2ce69ee417c5fc33
