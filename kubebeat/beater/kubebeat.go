@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/elastic/beats/v7/kubebeat/bundle"
 	"time"
 
 	"github.com/elastic/beats/v7/kubebeat/config"
@@ -54,17 +55,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	logp.Info("Watcher initiated.")
 
 	// create a mock HTTP bundle bundleServer
-	bundleServer, err := sdktest.NewServer(sdktest.MockBundle("/bundles/bundle.tar.gz", map[string]string{
-		"example.rego": `
-				package authz
-
-				default allow = false
-
-				allow {
-					input.open == "sesame"
-				}
-			`,
-	}))
+	bundleServer, err := sdktest.NewServer(sdktest.MockBundle("/bundles/bundle.tar.gz", bundle.Policies))
 	if err != nil {
 		return nil, fmt.Errorf("fail to init bundle server: %s", err.Error())
 	}
@@ -72,21 +63,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	// provide the OPA configuration which specifies
 	// fetching policy bundles from the mock bundleServer
 	// and logging decisions locally to the console
-	config := []byte(fmt.Sprintf(`{
-		"services": {
-			"test": {
-				"url": %q
-			}
-		},
-		"bundles": {
-			"test": {
-				"resource": "/bundles/bundle.tar.gz"
-			}
-		},
-		"decision_logs": {
-			"console": true
-		}
-	}`, bundleServer.URL()))
+	config := []byte(fmt.Sprintf(bundle.Config, bundleServer.URL()))
 
 	// create an instance of the OPA object
 	opa, err := sdk.New(context.Background(), sdk.Options{
