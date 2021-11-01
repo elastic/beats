@@ -168,12 +168,12 @@ func (c *Client) Send(
 	body io.Reader,
 ) (*http.Response, error) {
 	// Generate a request ID for tracking
-	var reqId string
+	var reqID string
 	if u, err := id.Generate(); err == nil {
-		reqId = u.String()
+		reqID = u.String()
 	}
 
-	c.log.Debugf("Request method: %s, path: %s, reqId: %s", method, path, reqId)
+	c.log.Debugf("Request method: %s, path: %s, reqID: %s", method, path, reqID)
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	requester := c.nextRequester()
@@ -191,8 +191,8 @@ func (c *Client) Send(
 	req.Header.Set("kbn-xsrf", "1") // Without this Kibana will refuse to answer the request.
 
 	// If available, add the request id as an HTTP header
-	if reqId != "" {
-		req.Header.Add("X-Request-ID", reqId)
+	if reqID != "" {
+		req.Header.Add("X-Request-ID", reqID)
 	}
 
 	// copy headers.
