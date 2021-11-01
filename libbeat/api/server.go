@@ -72,6 +72,25 @@ func (s *Server) Stop() error {
 	return s.l.Close()
 }
 
+// AttachHandler will attach a handler at the specified route and return an error instead of panicing.
+func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			switch r.(type) {
+			case error:
+				err = r.(error)
+			case string:
+				err = fmt.Errorf(r.(string))
+			default:
+				err = fmt.Errorf("handle attempted to panic with %v", r)
+			}
+		}
+	}()
+	s.log.Infof("Attempting to attach %q to server.", route)
+	s.mux.Handle(route, h)
+	return
+}
+
 func parse(host string, port int) (string, string, error) {
 	url, err := url.Parse(host)
 	if err != nil {

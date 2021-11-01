@@ -184,3 +184,39 @@ func simpleMux() *http.ServeMux {
 	})
 	return mux
 }
+
+func TestAttachHandler(t *testing.T) {
+	url := "http://localhost:0"
+
+	cfg := common.MustNewConfigFrom(map[string]interface{}{
+		"host": url,
+	})
+
+	s, err := New(nil, simpleMux(), cfg)
+	require.NoError(t, err)
+	go s.Start()
+	defer s.Stop()
+
+	h := &testHandler{}
+
+	err = s.AttachHandler("/test", h)
+	require.NoError(t, err)
+
+	r, err := http.Get("http://" + s.l.Addr().String() + "/test")
+	require.NoError(t, err)
+	defer r.Body.Close()
+
+	body, err := ioutil.ReadAll(r.Body)
+	require.NoError(t, err)
+
+	assert.Equal(t, "test!", string(body))
+
+	err = s.AttachHandler("/test", h)
+	assert.NotNil(t, err)
+}
+
+type testHandler struct{}
+
+func (t *testHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "test!")
+}
