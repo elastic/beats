@@ -2,7 +2,8 @@ projects:
     - "auditbeat"
     - "deploy/kubernetes"
     - "filebeat"
-    - "generator"
+    # Skipping because they are failing, see https://github.com/elastic/beats/pull/28723
+    #- "generator"
     - "heartbeat"
     - "journalbeat"
     - "libbeat"
