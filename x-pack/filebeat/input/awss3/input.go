@@ -138,7 +138,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		}
 	}
 
-	if in.config.BucketARN != "" {
+	if in.config.BucketARN != "" || in.config.NonAWSBucketName != "" {
 		// Create S3 receiver and S3 notification processor.
 		poller, err := in.createS3Lister(inputContext, ctx, client, persistentStore, states)
 		if err != nil {
@@ -198,23 +198,32 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 	if in.config.FIPSEnabled {
 		s3ServiceName = "s3-fips"
 	}
-
-	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig))
-	regionName, err := getRegionForBucketARN(cancelCtx, s3Client, in.config.BucketARN)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get AWS region for bucket_arn: %w", err)
+	var bucketName string
+	var bucketID string
+	if in.config.NonAWSBucketName != "" {
+		bucketName = in.config.NonAWSBucketName
+		bucketID = bucketName
+	} else if in.config.BucketARN != "" {
+		bucketName = getBucketNameFromARN(in.config.BucketARN)
+		bucketID = in.config.BucketARN
 	}
-
+	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig))
+	regionName, err := getRegionForBucket(cancelCtx, s3Client, bucketName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get AWS region for bucket: %w", err)
+	}
 	in.awsConfig.Region = regionName
 	s3Client = s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig))
+	s3Client.ForcePathStyle = in.config.PathStyle
 
 	s3API := &awsS3API{
 		client: s3Client,
 	}
 
-	log := ctx.Logger.With("bucket_arn", in.config.BucketARN)
+	log := ctx.Logger.With("bucket", bucketID)
 	log.Infof("number_of_workers is set to %v.", in.config.NumberOfWorkers)
 	log.Infof("bucket_list_interval is set to %v.", in.config.BucketListInterval)
+	log.Infof("bucket_list_prefix is set to %v.", in.config.BucketListPrefix)
 	log.Infof("AWS region is set to %v.", in.awsConfig.Region)
 	log.Debugf("AWS S3 service name is %v.", s3ServiceName)
 
@@ -232,8 +241,10 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 		s3EventHandlerFactory,
 		states,
 		persistentStore,
-		in.config.BucketARN,
+		bucketID,
+		in.config.BucketListPrefix,
 		in.awsConfig.Region,
+		getProviderFromDomain(in.config.AWSConfig.Endpoint, in.config.ProviderOverride),
 		in.config.NumberOfWorkers,
 		in.config.BucketListInterval)
 
@@ -256,10 +267,7 @@ func getRegionFromQueueURL(queueURL string, endpoint string) (string, error) {
 	return "", fmt.Errorf("QueueURL is not in format: https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
 }
 
-func getRegionForBucketARN(ctx context.Context, s3Client *s3.Client, bucketARN string) (string, error) {
-	bucketMetadata := strings.Split(bucketARN, ":")
-	bucketName := bucketMetadata[len(bucketMetadata)-1]
-
+func getRegionForBucket(ctx context.Context, s3Client *s3.Client, bucketName string) (string, error) {
 	req := s3Client.GetBucketLocationRequest(&s3.GetBucketLocationInput{
 		Bucket: awssdk.String(bucketName),
 	})
@@ -269,5 +277,52 @@ func getRegionForBucketARN(ctx context.Context, s3Client *s3.Client, bucketARN s
 		return "", err
 	}
 
-	return string(resp.LocationConstraint), nil
+	return string(s3.NormalizeBucketLocation(resp.LocationConstraint)), nil
+}
+
+func getBucketNameFromARN(bucketARN string) string {
+	bucketMetadata := strings.Split(bucketARN, ":")
+	bucketName := bucketMetadata[len(bucketMetadata)-1]
+	return bucketName
+}
+
+func getProviderFromDomain(endpoint string, ProviderOverride string) string {
+	if ProviderOverride != "" {
+		return ProviderOverride
+	}
+	if endpoint == "" {
+		return "aws"
+	}
+	// List of popular S3 SaaS providers
+	var providers = map[string]string{
+		"amazonaws.com":          "aws",
+		"c2s.sgov.gov":           "aws",
+		"c2s.ic.gov":             "aws",
+		"amazonaws.com.cn":       "aws",
+		"backblazeb2.com":        "backblaze",
+		"wasabisys.com":          "wasabi",
+		"digitaloceanspaces.com": "digitalocean",
+		"dream.io":               "dreamhost",
+		"scw.cloud":              "scaleway",
+		"googleapis.com":         "gcp",
+		"cloud.it":               "arubacloud",
+		"linodeobjects.com":      "linode",
+		"vultrobjects.com":       "vultr",
+		"appdomain.cloud":        "ibm",
+		"aliyuncs.com":           "alibaba",
+		"oraclecloud.com":        "oracle",
+		"exo.io":                 "exoscale",
+		"upcloudobjects.com":     "upcloud",
+		"ilandcloud.com":         "iland",
+		"zadarazios.com":         "zadara",
+	}
+
+	parsedEndpoint, _ := url.Parse(endpoint)
+	domain := parsedEndpoint.Hostname()
+	for key, provider := range providers {
+		if strings.HasSuffix(domain, key) {
+			return provider
+		}
+	}
+	return "unknown"
 }

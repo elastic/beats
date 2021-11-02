@@ -41,10 +41,21 @@ processors:
         - threatintel.misp.Galaxy
         - threatintel.misp.Attribute.Galaxy
         - threatintel.misp.Attribute.ShadowAttribute
-        - threatintel.misp.Object
         - threatintel.misp.EventReport
+        - threatintel.misp.Object.Attribute.Galaxy
+        - threatintel.misp.Object.Attribute.ShadowAttribute
         - message
       ignore_missing: true
+  - remove:
+      field:
+        - threatintel.misp.Attribute
+      ignore_missing: true
+      if: ctx?.threatintel?.misp?.Attribute.size() == 0
+  - remove:
+      field:
+        - threatintel.misp.Object
+      ignore_missing: true
+      if: ctx?.threatintel?.misp?.Object.size() == 0
   - date:
       field: threatintel.misp.timestamp
       formats:
@@ -55,6 +66,14 @@ processors:
       target_field: threatintel.misp.attribute
       ignore_missing: true
   - rename:
+      field: threatintel.misp.Object
+      target_field: threatintel.misp.object
+      ignore_missing: true
+  - rename:
+      field: threatintel.misp.object.Attribute
+      target_field: threatintel.misp.object.attribute
+      ignore_missing: true
+  - rename:
       field: threatintel.misp.Orgc
       target_field: threatintel.misp.orgc
       ignore_missing: true
@@ -63,13 +82,23 @@ processors:
       target_field: threatintel.misp.org
       ignore_missing: true
   - rename:
-      field: threatintel.misp.Attribute
-      target_field: threatintel.misp.attribute
-      ignore_missing: true
-  - rename:
       field: threatintel.misp.Tag
       target_field: threatintel.misp.tag
       ignore_missing: true
+
+  # # Dance around issue of not being able to split the document into two.
+  # # Make the Object.Attribute field primary if it exists, but keep the
+  # # outer Attribute as context.
+  - rename:
+      field: threatintel.misp.attribute
+      target_field: threatintel.misp.context.attribute
+      ignore_missing: true
+      if: ctx?.threatintel?.misp?.object != null
+  - rename:
+      field: threatintel.misp.object.attribute
+      target_field: threatintel.misp.attribute
+      ignore_missing: true
+      if: ctx?.threatintel?.misp?.object != null
 
   #####################
   # Threat ECS Fields #
@@ -96,7 +125,7 @@ processors:
   - set:
       field: threatintel.indicator.type
       value: file
-      if: "['md5', 'impfuzzy', 'imphash', 'pehash', 'sha1', 'sha224', 'sha256', 'sha3-224', 'sha3-256', 'sha3-384', 'sha3-512', 'sha384', 'sha512', 'sha512/224', 'sha512/256', 'ssdeep', 'tlsh', 'vhash'].contains(ctx.threatintel?.misp?.attribute?.type) || ctx.threatintel?.misp?.attribute?.type.startsWith('filename')"
+      if: "ctx?.threatintel?.misp?.attribute?.type != null && (['md5', 'impfuzzy', 'imphash', 'pehash', 'sha1', 'sha224', 'sha256', 'sha3-224', 'sha3-256', 'sha3-384', 'sha3-512', 'sha384', 'sha512', 'sha512/224', 'sha512/256', 'ssdeep', 'tlsh', 'vhash'].contains(ctx.threatintel?.misp?.attribute?.type) || ctx.threatintel?.misp?.attribute?.type.startsWith('filename'))"
   - rename:
       field: threatintel.misp.attribute.value
       target_field: "threatintel.indicator.file.hash.{{threatintel.misp.attribute.type}}"
@@ -112,17 +141,17 @@ processors:
       patterns:
         - "%{WORD}\\|%{WORD:_tmp.hashtype}"
       ignore_missing: true
-      if: ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
+      if: ctx?.threatintel?.misp?.attribute?.type != null && ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
   - grok:
       field: threatintel.misp.attribute.value
       patterns:
         - "%{DATA:threatintel.indicator.file.name}\\|%{GREEDYDATA:_tmp.hashvalue}"
       ignore_missing: true
-      if: ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
+      if: ctx?.threatintel?.misp?.attribute?.type != null && ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
   - set:
       field: threatintel.indicator.file.hash.{{_tmp.hashtype}}
       value: "{{_tmp.hashvalue}}"
-      if: "ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|') && ctx?._tmp?.hashvalue != null && ctx?._tmp?.hashtype != null"
+      if: "ctx?.threatintel?.misp?.attribute?.type != null && ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|') && ctx?._tmp?.hashvalue != null && ctx?._tmp?.hashtype != null"
 
   ## URL/URI indicator operations
   - set:
@@ -218,6 +247,14 @@ processors:
       target_field: threatintel.indicator.email.address
       ignore_missing: true
       if: ctx?.threatintel?.indicator?.type == 'email-addr'
+  - rename:
+      field: threatintel.misp.event_creator_email
+      target_field: user.email
+      ignore_missing: true
+  - append:
+      field: user.roles
+      value: "reporting_user"
+      if: ctx?.user?.email != null
 
   ## MAC Address indicator operations
   - set:
@@ -288,6 +325,14 @@ processors:
         - threatintel.misp.attribute.value
       ignore_missing: true
       if: ctx?.threatintel?.indicator?.type != 'unknown'
+  - remove:
+      field:
+        # This removes a number of fields that may be wanted in the future when
+        # threatintel.misp.attribute and threatintel.misp.object.attribute can
+        # be separated. At the root of .object are fields that mirror fields at
+        # the root of threatintel.misp.
+        - threatintel.misp.object
+      ignore_missing: true
   - remove:
       field:
         - threatintel.misp.Attribute.timestamp

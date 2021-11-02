@@ -2,29 +2,9 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "kube-system"
-		},
-		"MetricSetFields": {
-			"cluster_ip": "10.96.0.10",
-			"created": "2021-08-12T14:24:46.000Z",
-			"name": "kube-dns",
-			"type": "ClusterIP"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.service",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"namespace": "kube-system"
+			"namespace": {
+				"name": "kube-system"
+			}
 		},
 		"MetricSetFields": {
 			"cluster_ip": "None",
@@ -46,7 +26,33 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "default"
+			"namespace": {
+				"name": "kube-system"
+			}
+		},
+		"MetricSetFields": {
+			"cluster_ip": "10.96.0.10",
+			"created": "2021-08-12T14:24:46.000Z",
+			"name": "kube-dns",
+			"type": "ClusterIP"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.service",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": {
+				"name": "default"
+			}
 		},
 		"MetricSetFields": {
 			"cluster_ip": "10.96.0.1",

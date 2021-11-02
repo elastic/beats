@@ -26,7 +26,7 @@ pipeline {
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
   options {
-    timeout(time: 4, unit: 'HOURS')
+    timeout(time: 6, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '60', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
@@ -141,11 +141,9 @@ pipeline {
     stage('Packaging') {
       options { skipDefaultCheckout() }
       when {
-        // Always when running builds on branches/tags
         // On a PR basis, skip if changes are only related to docs.
         // Always when forcing the input parameter
         anyOf {
-          not { changeRequest() }                           // If no PR
           allOf {                                           // If PR and no docs changes
             expression { return env.ONLY_DOCS == "false" }
             changeRequest()
@@ -203,8 +201,22 @@ def runLinting() {
     }
   }
   mapParallelTasks['default'] = { cmd(label: 'make check-default', script: 'make check-default') }
-
+  mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)
+}
+
+def runPreCommit() {
+  return {
+    withNode(labels: 'ubuntu-18 && immutable', forceWorkspace: true){
+      withGithubNotify(context: 'Check pre-commit', tab: 'tests') {
+        deleteDir()
+        unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+        dir("${BASE_DIR}"){
+          preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
+        }
+      }
+    }
+  }
 }
 
 def runBuildAndTest(Map args = [:]) {
@@ -459,14 +471,16 @@ def tagAndPush(Map args = [:]) {
   // supported image flavours
   def variants = ["", "-oss", "-ubi8"]
 
-  // only add complete variant for the elastic-agent
   if(beatName == 'elastic-agent'){
-      variants.add("-complete")
+    variants.add("-complete")
+    variants.add("-cloud")
   }
 
   variants.each { variant ->
+    // cloud docker images are stored in the private docker namespace.
+    def sourceNamespace = variant.equals('-cloud') ? 'beats-ci' : 'beats'
     tags.each { tag ->
-      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}")
+      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}", sourceNamespace: sourceNamespace)
     }
   }
 }
@@ -482,7 +496,8 @@ def doTagAndPush(Map args = [:]) {
   def variant = args.variant
   def sourceTag = args.sourceTag
   def targetTag = args.targetTag
-  def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
+  def sourceNamespace = args.sourceNamespace
+  def sourceName = "${DOCKER_REGISTRY}/${sourceNamespace}/${beatName}${variant}:${sourceTag}"
   def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
 
   def iterations = 0
@@ -512,14 +527,33 @@ def getBeatsName(baseDir) {
 }
 
 /**
+* This method runs the end 2 end testing
+*/
+def e2e(Map args = [:]) {
+  if (!args.e2e?.get('enabled', false)) { return }
+  // Skip running the tests on branches or tags if configured.
+  if (!isPR() && args.e2e?.get('when', false)) {
+    if (isBranch() && !args.e2e.when.get('branches', true)) { return }
+    if (isTag() && !args.e2e.when.get('tags', true)) { return }
+  }
+  if (args.e2e.get('entrypoint', '')?.trim()) {
+    e2e_with_entrypoint(args)
+  } else {
+    runE2E(testMatrixFile: args.e2e?.get('testMatrixFile', ''),
+           beatVersion: "${env.VERSION}-SNAPSHOT",
+           gitHubCheckName: "e2e-${args.context}",
+           gitHubCheckRepo: env.REPO,
+           gitHubCheckSha1: env.GIT_BASE_COMMIT)
+  }
+}
+
+/**
 * This method runs the end 2 end testing in the same worker where the packages have been
 * generated, this should help to speed up the things
 */
-def e2e(Map args = [:]) {
-  def enabled = args.e2e?.get('enabled', false)
+def e2e_with_entrypoint(Map args = [:]) {
   def entrypoint = args.e2e?.get('entrypoint')
   def dockerLogFile = "docker_logs_${entrypoint}.log"
-  if (!enabled) { return }
   dir("${env.WORKSPACE}/src/github.com/elastic/e2e-testing") {
     // TBC with the target branch if running on a PR basis.
     git(branch: 'master', credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken', url: 'https://github.com/elastic/e2e-testing.git')
@@ -533,14 +567,12 @@ def e2e(Map args = [:]) {
               "LOG_LEVEL=TRACE"]) {
       def status = 0
       filebeat(output: dockerLogFile){
-        status = sh(script: ".ci/scripts/${entrypoint}",
-                    label: "Run functional tests ${entrypoint}",
-                    returnStatus: true)
-      }
-      junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
-      archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
-      if (status != 0) {
-        error("ERROR: functional tests for ${args?.directory?.trim()} has failed. See the test report and ${dockerLogFile}.")
+        try {
+          sh(script: ".ci/scripts/${entrypoint}", label: "Run functional tests ${entrypoint}")
+        } finally {
+          junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
+          archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
+        }
       }
     }
   }
@@ -578,18 +610,15 @@ def target(Map args = [:]) {
             cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
           }
         }
-        // TODO:
-        // Packaging should happen only after the e2e?
+        // Publish packages should happen always to easily consume those artifacts if the
+        // e2e were triggered and failed.
         if (isPackaging) {
           publishPackages("${directory}")
+          pushCIDockerImages(beatsFolder: "${directory}", arch: dockerArch)
         }
         if(isE2E) {
-          e2e(args)
-        }
-        // TODO:
-        // push docker images should happen only after the e2e?
-        if (isPackaging) {
-          pushCIDockerImages(beatsFolder: "${directory}", arch: dockerArch)
+          log(level: 'WARN', text: "E2E Tests for Beats are disabled until latest breaking changes in Kibana affecting Package Registry are resolved.")
+          //e2e(args)
         }
       }
     }

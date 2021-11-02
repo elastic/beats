@@ -2,7 +2,9 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "kube-system"
+			"namespace": {
+				"name": "kube-system"
+			}
 		},
 		"MetricSetFields": {
 			"name": "kube-proxy",
