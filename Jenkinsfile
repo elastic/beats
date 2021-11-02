@@ -619,7 +619,8 @@ def target(Map args = [:]) {
           pushCIDockerImages(beatsFolder: "${directory}", arch: dockerArch)
         }
         if(isE2E) {
-          e2e(args)
+          log(level: 'WARN', text: "E2E Tests for Beats are disabled until latest breaking changes in Kibana affecting Package Registry are resolved.")
+          //e2e(args)
         }
       }
     }
