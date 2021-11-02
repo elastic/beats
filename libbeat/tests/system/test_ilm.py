@@ -215,7 +215,7 @@ class TestCommandSetupILMPolicy(BaseTest):
 #        self.idxmgmt.assert_alias_created(self.custom_alias)
 #
 #
-#class TestCommandExportILMPolicy(BaseTest):
+# class TestCommandExportILMPolicy(BaseTest):
 #    """
 #    Test beat command `export ilm-policy`
 #    """

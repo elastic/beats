@@ -24,10 +24,10 @@ class IdxMgmt(unittest.TestCase):
             self.delete_policy(i)
 
     def delete_data_stream(self, data_stream):
-            try:
-                resp = self._client.transport.perform_request('DELETE', '/_data_stream/' + data_stream)
-            except NotFoundError:
-                pass
+        try:
+            resp = self._client.transport.perform_request('DELETE', '/_data_stream/' + data_stream)
+        except NotFoundError:
+            pass
 
     def delete_index_and_alias(self, index=""):
         if self.needs_init(index):
