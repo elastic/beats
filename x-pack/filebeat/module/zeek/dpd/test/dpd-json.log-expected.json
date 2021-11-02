@@ -1,8 +1,16 @@
 [
     {
         "@timestamp": "2017-10-09T16:45:00.423Z",
-        "destination.address": "192.168.10.10",
-        "destination.ip": "192.168.10.10",
+        "destination.address": "175.16.199.1",
+        "destination.geo.city_name": "Changchun",
+        "destination.geo.continent_name": "Asia",
+        "destination.geo.country_iso_code": "CN",
+        "destination.geo.country_name": "China",
+        "destination.geo.location.lat": 43.88,
+        "destination.geo.location.lon": 125.3228,
+        "destination.geo.region_iso_code": "CN-22",
+        "destination.geo.region_name": "Jilin Sheng",
+        "destination.ip": "175.16.199.1",
         "destination.port": 445,
         "event.category": [
             "network"
@@ -18,11 +26,11 @@
         "fileset.name": "dpd",
         "input.type": "log",
         "log.offset": 0,
-        "network.community_id": "1:b+Szw+ia464igf5e+MwW1WUzw9Y=",
-        "network.direction": "internal",
+        "network.community_id": "1:XUkl5nEW5zNKuQdXxIXv4T7Jtxg=",
+        "network.direction": "outbound",
         "network.transport": "tcp",
         "related.ip": [
-            "192.168.10.10",
+            "175.16.199.1",
             "192.168.10.31"
         ],
         "service.type": "zeek",

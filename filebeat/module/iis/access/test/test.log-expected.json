@@ -12,7 +12,7 @@
         "event.duration": 123000000,
         "event.kind": "event",
         "event.module": "iis",
-        "event.original": "2018-01-01 08:09:10 127.0.0.1 GET / q=100 80 - 85.181.35.98 Mozilla/5.0+(Windows+NT+6.1;+Win64;+x64;+rv:57.0)+Gecko/20100101+Firefox/57.0 - 200 0 0 123",
+        "event.original": "2018-01-01 08:09:10 127.0.0.1 GET / q=100 80 - 81.2.69.143 Mozilla/5.0+(Windows+NT+6.1;+Win64;+x64;+rv:57.0)+Gecko/20100101+Firefox/57.0 - 200 0 0 123",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -26,21 +26,19 @@
         "log.offset": 257,
         "related.ip": [
             "127.0.0.1",
-            "85.181.35.98"
+            "81.2.69.143"
         ],
         "service.type": "iis",
-        "source.address": "85.181.35.98",
-        "source.as.number": 6805,
-        "source.as.organization.name": "Telefonica Germany",
-        "source.geo.city_name": "Berlin",
+        "source.address": "81.2.69.143",
+        "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "DE",
-        "source.geo.country_name": "Germany",
-        "source.geo.location.lat": 52.4473,
-        "source.geo.location.lon": 13.4531,
-        "source.geo.region_iso_code": "DE-BE",
-        "source.geo.region_name": "Land Berlin",
-        "source.ip": "85.181.35.98",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5142,
+        "source.geo.location.lon": -0.0931,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "81.2.69.143",
         "url.original": "/",
         "url.path": "/",
         "url.query": "q=100",
@@ -74,7 +72,7 @@
         "iis.access.sub_status": 0,
         "iis.access.win32_status": 0,
         "input.type": "log",
-        "log.offset": 709,
+        "log.offset": 708,
         "related.ip": [
             "127.0.0.1"
         ],
@@ -106,7 +104,7 @@
         "event.duration": 789000000,
         "event.kind": "event",
         "event.module": "iis",
-        "event.original": "2018-01-01 10:11:12 W3SVC1 MACHINE-NAME 127.0.0.1 GET / - 80 - 85.181.35.98 HTTP/1.1 Mozilla/5.0+(Macintosh;+Intel+Mac+OS+X+10_14_0)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/70.0.3538.102+Safari/537.36 - - example.com 200 0 0 123 456 789",
+        "event.original": "2018-01-01 10:11:12 W3SVC1 MACHINE-NAME 127.0.0.1 GET / - 80 - 81.2.69.143 HTTP/1.1 Mozilla/5.0+(Macintosh;+Intel+Mac+OS+X+10_14_0)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/70.0.3538.102+Safari/537.36 - - example.com 200 0 0 123 456 789",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -122,24 +120,22 @@
         "iis.access.sub_status": 0,
         "iis.access.win32_status": 0,
         "input.type": "log",
-        "log.offset": 1204,
+        "log.offset": 1203,
         "related.ip": [
             "127.0.0.1",
-            "85.181.35.98"
+            "81.2.69.143"
         ],
         "service.type": "iis",
-        "source.address": "85.181.35.98",
-        "source.as.number": 6805,
-        "source.as.organization.name": "Telefonica Germany",
-        "source.geo.city_name": "Berlin",
+        "source.address": "81.2.69.143",
+        "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "DE",
-        "source.geo.country_name": "Germany",
-        "source.geo.location.lat": 52.4473,
-        "source.geo.location.lon": 13.4531,
-        "source.geo.region_iso_code": "DE-BE",
-        "source.geo.region_name": "Land Berlin",
-        "source.ip": "85.181.35.98",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5142,
+        "source.geo.location.lon": -0.0931,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "81.2.69.143",
         "url.domain": "example.com",
         "url.original": "/",
         "url.path": "/",
@@ -175,7 +171,7 @@
         "iis.access.sub_status": 0,
         "iis.access.win32_status": 0,
         "input.type": "log",
-        "log.offset": 1447,
+        "log.offset": 1445,
         "related.ip": [
             "10.44.0.136",
             "10.50.6.188"
@@ -218,7 +214,7 @@
         "iis.access.sub_status": 0,
         "iis.access.win32_status": 2,
         "input.type": "log",
-        "log.offset": 1802,
+        "log.offset": 1800,
         "related.ip": [
             "10.44.0.136",
             "10.50.6.188"
