@@ -270,6 +270,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add latency config option for aws-cloudwatch input. {pull}28509[28509]
 - Added proxy support to threatintel/malwarebazaar. {pull}28533[28533]
 - Sophos UTM: Support logs containing hostname in syslog header. {pull}28638[28638]
+- Moving Oracle Filebeat module to GA. {pull}28754[28754]
 
 *Heartbeat*
 
