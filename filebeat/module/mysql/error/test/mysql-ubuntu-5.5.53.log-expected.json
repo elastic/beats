@@ -88,7 +88,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.offset": 374,
-        "message": "InnoDB: Compressed tables use zlib 1.2.3.4",
+        "message": "InnoDB: Compressed tables use zlib 1.128.3.4",
         "service.type": "mysql"
     },
     {
@@ -105,7 +105,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 433,
+        "log.offset": 435,
         "message": "InnoDB: Initializing buffer pool, size = 128.0M",
         "service.type": "mysql"
     },
@@ -126,7 +126,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 497,
+        "log.offset": 499,
         "message": "InnoDB: Completed initialization of buffer pool\nInnoDB: The first specified data file ./ibdata1 did not exist:\nInnoDB: a new database to be created!",
         "service.type": "mysql"
     },
@@ -147,7 +147,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 662,
+        "log.offset": 664,
         "message": "InnoDB: Setting file ./ibdata1 size to 10 MB\nInnoDB: Database physically writes the file full: wait...",
         "service.type": "mysql"
     },
@@ -168,7 +168,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 782,
+        "log.offset": 784,
         "message": "InnoDB: Log file ./ib_logfile0 did not exist: new to be created\nInnoDB: Setting log file ./ib_logfile0 size to 5 MB\nInnoDB: Database physically writes the file full: wait...",
         "service.type": "mysql"
     },
@@ -189,7 +189,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 973,
+        "log.offset": 975,
         "message": "InnoDB: Log file ./ib_logfile1 did not exist: new to be created\nInnoDB: Setting log file ./ib_logfile1 size to 5 MB\nInnoDB: Database physically writes the file full: wait...\nInnoDB: Doublewrite buffer not found: creating new\nInnoDB: Doublewrite buffer created\nInnoDB: 127 rollback segment(s) active.\nInnoDB: Creating foreign key constraint system tables\nInnoDB: Foreign key constraint system tables created",
         "service.type": "mysql"
     },
@@ -207,7 +207,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 1397,
+        "log.offset": 1399,
         "message": "InnoDB: Waiting for the background threads to start",
         "service.type": "mysql"
     },
@@ -225,7 +225,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 1466,
+        "log.offset": 1468,
         "message": "InnoDB: 5.5.53 started; log sequence number 0",
         "service.type": "mysql"
     },
@@ -243,7 +243,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 1528,
+        "log.offset": 1530,
         "message": "InnoDB: Starting shutdown...",
         "service.type": "mysql"
     },
@@ -261,7 +261,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 1574,
+        "log.offset": 1576,
         "message": "InnoDB: Shutdown completed; log sequence number 1595675",
         "service.type": "mysql"
     },
@@ -280,7 +280,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
-        "log.offset": 1647,
+        "log.offset": 1649,
         "message": "Using unique option prefix myisam-recover instead of myisam-recover-options is deprecated and will be removed in a future release. Please use the full name instead.",
         "service.type": "mysql"
     },
@@ -299,7 +299,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
-        "log.offset": 1838,
+        "log.offset": 1840,
         "message": "Plugin 'FEDERATED' is disabled.",
         "service.type": "mysql"
     },
@@ -317,7 +317,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 1893,
+        "log.offset": 1895,
         "message": "InnoDB: The InnoDB memory heap is disabled",
         "service.type": "mysql"
     },
@@ -335,7 +335,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 1952,
+        "log.offset": 1954,
         "message": "InnoDB: Mutexes and rw_locks use GCC atomic builtins",
         "service.type": "mysql"
     },
@@ -353,8 +353,8 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 2021,
-        "message": "InnoDB: Compressed tables use zlib 1.2.3.4",
+        "log.offset": 2023,
+        "message": "InnoDB: Compressed tables use zlib 1.128.3.4",
         "service.type": "mysql"
     },
     {
@@ -371,7 +371,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 2080,
+        "log.offset": 2084,
         "message": "InnoDB: Initializing buffer pool, size = 128.0M",
         "service.type": "mysql"
     },
@@ -389,7 +389,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 2144,
+        "log.offset": 2148,
         "message": "InnoDB: Completed initialization of buffer pool",
         "service.type": "mysql"
     },
@@ -407,7 +407,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 2208,
+        "log.offset": 2212,
         "message": "InnoDB: highest supported file format is Barracuda.",
         "service.type": "mysql"
     },
@@ -425,7 +425,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 2276,
+        "log.offset": 2280,
         "message": "InnoDB: Waiting for the background threads to start",
         "service.type": "mysql"
     },
@@ -446,7 +446,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 2345,
+        "log.offset": 2349,
         "message": "InnoDB: 5.5.53 started; log sequence number 1595675\nERROR: 1064  You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ALTER TABLE user ADD column Show_view_priv enum('N','Y') CHARACTER SET utf8 NOT ' at line 1",
         "service.type": "mysql"
     },
@@ -469,7 +469,7 @@
             "multiline"
         ],
         "log.level": "ERROR",
-        "log.offset": 2653,
+        "log.offset": 2657,
         "message": "Aborting\n",
         "service.type": "mysql"
     },
@@ -487,7 +487,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 2687,
+        "log.offset": 2691,
         "message": "InnoDB: Starting shutdown...",
         "service.type": "mysql"
     },
@@ -505,7 +505,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 2733,
+        "log.offset": 2737,
         "message": "InnoDB: Shutdown completed; log sequence number 1595675",
         "service.type": "mysql"
     },
@@ -527,7 +527,7 @@
             "multiline"
         ],
         "log.level": "Note",
-        "log.offset": 2806,
+        "log.offset": 2810,
         "message": "/usr/sbin/mysqld: Shutdown complete\n",
         "service.type": "mysql"
     },
@@ -546,7 +546,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
-        "log.offset": 2866,
+        "log.offset": 2870,
         "message": "Using unique option prefix myisam-recover instead of myisam-recover-options is deprecated and will be removed in a future release. Please use the full name instead.",
         "service.type": "mysql"
     },
@@ -565,7 +565,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
-        "log.offset": 3057,
+        "log.offset": 3061,
         "message": "Plugin 'FEDERATED' is disabled.",
         "service.type": "mysql"
     },
@@ -583,7 +583,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 3112,
+        "log.offset": 3116,
         "message": "InnoDB: The InnoDB memory heap is disabled",
         "service.type": "mysql"
     },
@@ -601,7 +601,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 3171,
+        "log.offset": 3175,
         "message": "InnoDB: Mutexes and rw_locks use GCC atomic builtins",
         "service.type": "mysql"
     },
@@ -619,8 +619,8 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 3240,
-        "message": "InnoDB: Compressed tables use zlib 1.2.3.4",
+        "log.offset": 3244,
+        "message": "InnoDB: Compressed tables use zlib 1.128.3.4",
         "service.type": "mysql"
     },
     {
@@ -637,7 +637,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 3299,
+        "log.offset": 3305,
         "message": "InnoDB: Initializing buffer pool, size = 128.0M",
         "service.type": "mysql"
     },
@@ -655,7 +655,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 3363,
+        "log.offset": 3369,
         "message": "InnoDB: Completed initialization of buffer pool",
         "service.type": "mysql"
     },
@@ -673,7 +673,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 3427,
+        "log.offset": 3433,
         "message": "InnoDB: highest supported file format is Barracuda.",
         "service.type": "mysql"
     },
@@ -691,7 +691,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 3495,
+        "log.offset": 3501,
         "message": "InnoDB: Waiting for the background threads to start",
         "service.type": "mysql"
     },
@@ -709,7 +709,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 3564,
+        "log.offset": 3570,
         "message": "InnoDB: 5.5.53 started; log sequence number 1595675",
         "service.type": "mysql"
     },
@@ -727,7 +727,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 3632,
+        "log.offset": 3638,
         "message": "InnoDB: Starting shutdown...",
         "service.type": "mysql"
     },
@@ -750,7 +750,7 @@
             "multiline"
         ],
         "log.level": "ERROR",
-        "log.offset": 3678,
+        "log.offset": 3684,
         "message": "Aborting\n",
         "service.type": "mysql"
     },
@@ -768,7 +768,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 3712,
+        "log.offset": 3718,
         "message": "InnoDB: Starting shutdown...",
         "service.type": "mysql"
     },
@@ -786,7 +786,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 3758,
+        "log.offset": 3764,
         "message": "InnoDB: Shutdown completed; log sequence number 1595675",
         "service.type": "mysql"
     },
@@ -808,7 +808,7 @@
             "multiline"
         ],
         "log.level": "Note",
-        "log.offset": 3831,
+        "log.offset": 3837,
         "message": "/usr/sbin/mysqld: Shutdown complete\n",
         "service.type": "mysql"
     },
@@ -827,7 +827,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
-        "log.offset": 3891,
+        "log.offset": 3897,
         "message": "Using unique option prefix myisam-recover instead of myisam-recover-options is deprecated and will be removed in a future release. Please use the full name instead.",
         "service.type": "mysql"
     },
@@ -846,7 +846,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
-        "log.offset": 4082,
+        "log.offset": 4088,
         "message": "Plugin 'FEDERATED' is disabled.",
         "service.type": "mysql"
     },
@@ -864,7 +864,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 4137,
+        "log.offset": 4143,
         "message": "InnoDB: The InnoDB memory heap is disabled",
         "service.type": "mysql"
     },
@@ -882,7 +882,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 4196,
+        "log.offset": 4202,
         "message": "InnoDB: Mutexes and rw_locks use GCC atomic builtins",
         "service.type": "mysql"
     },
@@ -900,8 +900,8 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 4265,
-        "message": "InnoDB: Compressed tables use zlib 1.2.3.4",
+        "log.offset": 4271,
+        "message": "InnoDB: Compressed tables use zlib 1.128.3.4",
         "service.type": "mysql"
     },
     {
@@ -918,7 +918,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 4324,
+        "log.offset": 4332,
         "message": "InnoDB: Initializing buffer pool, size = 128.0M",
         "service.type": "mysql"
     },
@@ -936,7 +936,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 4388,
+        "log.offset": 4396,
         "message": "InnoDB: Completed initialization of buffer pool",
         "service.type": "mysql"
     },
@@ -954,7 +954,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 4452,
+        "log.offset": 4460,
         "message": "InnoDB: highest supported file format is Barracuda.",
         "service.type": "mysql"
     },
@@ -972,7 +972,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 4520,
+        "log.offset": 4528,
         "message": "InnoDB: Waiting for the background threads to start",
         "service.type": "mysql"
     },
@@ -990,7 +990,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 4589,
+        "log.offset": 4597,
         "message": "InnoDB: 5.5.53 started; log sequence number 1595675",
         "service.type": "mysql"
     },
@@ -1009,7 +1009,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
-        "log.offset": 4657,
+        "log.offset": 4665,
         "message": "Server hostname (bind-address): '127.0.0.1'; port: 3306",
         "service.type": "mysql"
     },
@@ -1028,7 +1028,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
-        "log.offset": 4736,
+        "log.offset": 4744,
         "message": "- '127.0.0.1' resolves to '127.0.0.1';",
         "service.type": "mysql"
     },
@@ -1047,7 +1047,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
-        "log.offset": 4800,
+        "log.offset": 4808,
         "message": "Server socket created on IP: '127.0.0.1'.",
         "service.type": "mysql"
     },
@@ -1066,7 +1066,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
-        "log.offset": 4865,
+        "log.offset": 4873,
         "message": "Event Scheduler: Loaded 0 events",
         "service.type": "mysql"
     },
@@ -1088,7 +1088,7 @@
             "multiline"
         ],
         "log.level": "Note",
-        "log.offset": 4921,
+        "log.offset": 4929,
         "message": "/usr/sbin/mysqld: ready for connections.\nVersion: '5.5.53-0ubuntu0.12.04.1'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  (Ubuntu)",
         "service.type": "mysql"
     },
@@ -1110,7 +1110,7 @@
             "multiline"
         ],
         "log.level": "Note",
-        "log.offset": 5081,
+        "log.offset": 5089,
         "message": "/usr/sbin/mysqld: Normal shutdown\n",
         "service.type": "mysql"
     },
@@ -1129,7 +1129,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
-        "log.offset": 5139,
+        "log.offset": 5147,
         "message": "Event Scheduler: Purging the queue. 0 events",
         "service.type": "mysql"
     },
@@ -1147,7 +1147,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 5207,
+        "log.offset": 5215,
         "message": "InnoDB: Starting shutdown...",
         "service.type": "mysql"
     },
@@ -1165,7 +1165,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 5253,
+        "log.offset": 5261,
         "message": "InnoDB: Shutdown completed; log sequence number 1595685",
         "service.type": "mysql"
     },
@@ -1187,7 +1187,7 @@
             "multiline"
         ],
         "log.level": "Note",
-        "log.offset": 5326,
+        "log.offset": 5334,
         "message": "/usr/sbin/mysqld: Shutdown complete\n",
         "service.type": "mysql"
     },
@@ -1206,7 +1206,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
-        "log.offset": 5386,
+        "log.offset": 5394,
         "message": "Using unique option prefix myisam-recover instead of myisam-recover-options is deprecated and will be removed in a future release. Please use the full name instead.",
         "service.type": "mysql"
     },
@@ -1225,7 +1225,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
-        "log.offset": 5577,
+        "log.offset": 5585,
         "message": "Plugin 'FEDERATED' is disabled.",
         "service.type": "mysql"
     },
@@ -1243,7 +1243,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 5632,
+        "log.offset": 5640,
         "message": "InnoDB: The InnoDB memory heap is disabled",
         "service.type": "mysql"
     },
@@ -1261,7 +1261,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 5691,
+        "log.offset": 5699,
         "message": "InnoDB: Mutexes and rw_locks use GCC atomic builtins",
         "service.type": "mysql"
     },
@@ -1279,8 +1279,8 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 5760,
-        "message": "InnoDB: Compressed tables use zlib 1.2.3.4",
+        "log.offset": 5768,
+        "message": "InnoDB: Compressed tables use zlib 1.128.3.4",
         "service.type": "mysql"
     },
     {
@@ -1297,7 +1297,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 5819,
+        "log.offset": 5829,
         "message": "InnoDB: Initializing buffer pool, size = 128.0M",
         "service.type": "mysql"
     },
@@ -1315,7 +1315,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 5883,
+        "log.offset": 5893,
         "message": "InnoDB: Completed initialization of buffer pool",
         "service.type": "mysql"
     },
@@ -1333,7 +1333,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 5947,
+        "log.offset": 5957,
         "message": "InnoDB: highest supported file format is Barracuda.",
         "service.type": "mysql"
     },
@@ -1351,7 +1351,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 6015,
+        "log.offset": 6025,
         "message": "InnoDB: Waiting for the background threads to start",
         "service.type": "mysql"
     },
@@ -1369,7 +1369,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 6084,
+        "log.offset": 6094,
         "message": "InnoDB: 5.5.53 started; log sequence number 1595685",
         "service.type": "mysql"
     },
@@ -1388,7 +1388,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
-        "log.offset": 6152,
+        "log.offset": 6162,
         "message": "Server hostname (bind-address): '127.0.0.1'; port: 3306",
         "service.type": "mysql"
     },
@@ -1407,7 +1407,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
-        "log.offset": 6231,
+        "log.offset": 6241,
         "message": "- '127.0.0.1' resolves to '127.0.0.1';",
         "service.type": "mysql"
     },
@@ -1426,7 +1426,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
-        "log.offset": 6295,
+        "log.offset": 6305,
         "message": "Server socket created on IP: '127.0.0.1'.",
         "service.type": "mysql"
     },
@@ -1445,7 +1445,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
-        "log.offset": 6360,
+        "log.offset": 6370,
         "message": "Event Scheduler: Loaded 0 events",
         "service.type": "mysql"
     },
@@ -1467,7 +1467,7 @@
             "multiline"
         ],
         "log.level": "Note",
-        "log.offset": 6416,
+        "log.offset": 6426,
         "message": "/usr/sbin/mysqld: ready for connections.\nVersion: '5.5.53-0ubuntu0.12.04.1-log'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  (Ubuntu)",
         "service.type": "mysql"
     },
@@ -1486,7 +1486,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
-        "log.offset": 6580,
+        "log.offset": 6590,
         "message": "Using unique option prefix myisam-recover instead of myisam-recover-options is deprecated and will be removed in a future release. Please use the full name instead.",
         "service.type": "mysql"
     },
@@ -1505,7 +1505,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
-        "log.offset": 6771,
+        "log.offset": 6781,
         "message": "Plugin 'FEDERATED' is disabled.",
         "service.type": "mysql"
     },
@@ -1523,7 +1523,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 6826,
+        "log.offset": 6836,
         "message": "InnoDB: The InnoDB memory heap is disabled",
         "service.type": "mysql"
     },
@@ -1541,7 +1541,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 6885,
+        "log.offset": 6895,
         "message": "InnoDB: Mutexes and rw_locks use GCC atomic builtins",
         "service.type": "mysql"
     },
@@ -1559,8 +1559,8 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 6954,
-        "message": "InnoDB: Compressed tables use zlib 1.2.3.4",
+        "log.offset": 6964,
+        "message": "InnoDB: Compressed tables use zlib 1.128.3.4",
         "service.type": "mysql"
     },
     {
@@ -1577,7 +1577,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 7013,
+        "log.offset": 7025,
         "message": "InnoDB: Initializing buffer pool, size = 128.0M",
         "service.type": "mysql"
     },
@@ -1598,7 +1598,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 7077,
+        "log.offset": 7089,
         "message": "InnoDB: Completed initialization of buffer pool\nInnoDB: The first specified data file ./ibdata1 did not exist:\nInnoDB: a new database to be created!",
         "service.type": "mysql"
     },
@@ -1619,7 +1619,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 7242,
+        "log.offset": 7254,
         "message": "InnoDB: Setting file ./ibdata1 size to 10 MB\nInnoDB: Database physically writes the file full: wait...",
         "service.type": "mysql"
     },
@@ -1640,7 +1640,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 7362,
+        "log.offset": 7374,
         "message": "InnoDB: Log file ./ib_logfile0 did not exist: new to be created\nInnoDB: Setting log file ./ib_logfile0 size to 5 MB\nInnoDB: Database physically writes the file full: wait...",
         "service.type": "mysql"
     },
@@ -1661,7 +1661,7 @@
         "log.flags": [
             "multiline"
         ],
-        "log.offset": 7553,
+        "log.offset": 7565,
         "message": "InnoDB: Log file ./ib_logfile1 did not exist: new to be created\nInnoDB: Setting log file ./ib_logfile1 size to 5 MB\nInnoDB: Database physically writes the file full: wait...\nInnoDB: Doublewrite buffer not found: creating new\nInnoDB: Doublewrite buffer created\nInnoDB: 127 rollback segment(s) active.\nInnoDB: Creating foreign key constraint system tables\nInnoDB: Foreign key constraint system tables created",
         "service.type": "mysql"
     },
@@ -1679,7 +1679,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 7977,
+        "log.offset": 7989,
         "message": "InnoDB: Waiting for the background threads to start",
         "service.type": "mysql"
     },
@@ -1697,7 +1697,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 8046,
+        "log.offset": 8058,
         "message": "InnoDB: 5.5.53 started; log sequence number 0",
         "service.type": "mysql"
     },
@@ -1715,7 +1715,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 8108,
+        "log.offset": 8120,
         "message": "InnoDB: Starting shutdown...",
         "service.type": "mysql"
     },
@@ -1733,7 +1733,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 8154,
+        "log.offset": 8166,
         "message": "InnoDB: Shutdown completed; log sequence number 1595675",
         "service.type": "mysql"
     },
@@ -1752,7 +1752,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Warning",
-        "log.offset": 8227,
+        "log.offset": 8239,
         "message": "Using unique option prefix myisam-recover instead of myisam-recover-options is deprecated and will be removed in a future release. Please use the full name instead.",
         "service.type": "mysql"
     },
@@ -1771,7 +1771,7 @@
         "fileset.name": "error",
         "input.type": "log",
         "log.level": "Note",
-        "log.offset": 8418,
+        "log.offset": 8430,
         "message": "Plugin 'FEDERATED' is disabled.",
         "service.type": "mysql"
     },
@@ -1789,7 +1789,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 8473,
+        "log.offset": 8485,
         "message": "InnoDB: The InnoDB memory heap is disabled",
         "service.type": "mysql"
     },
@@ -1807,7 +1807,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 8532,
+        "log.offset": 8544,
         "message": "InnoDB: Mutexes and rw_locks use GCC atomic builtins",
         "service.type": "mysql"
     },
@@ -1825,8 +1825,8 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 8601,
-        "message": "InnoDB: Compressed tables use zlib 1.2.3.4",
+        "log.offset": 8613,
+        "message": "InnoDB: Compressed tables use zlib 1.128.3.4",
         "service.type": "mysql"
     },
     {
@@ -1843,7 +1843,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 8660,
+        "log.offset": 8674,
         "message": "InnoDB: Initializing buffer pool, size = 128.0M",
         "service.type": "mysql"
     },
@@ -1861,7 +1861,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 8724,
+        "log.offset": 8738,
         "message": "InnoDB: Completed initialization of buffer pool",
         "service.type": "mysql"
     },
@@ -1879,7 +1879,7 @@
         ],
         "fileset.name": "error",
         "input.type": "log",
-        "log.offset": 8788,
+        "log.offset": 8802,
         "message": "InnoDB: highest supported file format is Barracuda.",
         "service.type": "mysql"
     }

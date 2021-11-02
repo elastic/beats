@@ -26,7 +26,7 @@ Example configuration:
 
 ["source","yaml",subs="attributes"]
 ----
-setup.ilm.enabled: auto
+setup.ilm.enabled: true
 setup.ilm.rollover_alias: "{beatname_lc}"
 setup.ilm.pattern: "{now/d}-000001" <1>
 ----
@@ -47,10 +47,7 @@ You can specify the following settings in the `setup.ilm` section of the
 ==== `setup.ilm.enabled`
 
 Enables or disables index lifecycle management on any new indices created by
-{beatname_uc}. Valid values are `true`, `false`, and `auto`. When `auto` (the
-default) is specified on version 7.0 and later, {beatname_uc} automatically uses
-index lifecycle management if the feature is enabled in {es} and has the
-required license; otherwise, {beatname_uc} creates daily indices.
+{beatname_uc}. Valid values are `true` and `false`.
 
 [float]
 [[setup-ilm-rollover_alias-option]]
