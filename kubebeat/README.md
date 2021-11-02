@@ -64,6 +64,27 @@ To stop this example and clean up the pod, run:
 2. How should we integrate this to the agent?
 3. ... many more
 
+### Remote Debugging
+
+Build binary:
+
+    GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -gcflags "all=-N -l"
+
+Build docker image:
+
+    docker build -f Dockerfile.debug -t kubebeat .
+
+After running the pod, expose the relevant ports:
+
+    kubectl port-forward kubebeat-demo 40000:40000 8080:8080
+
+The app will wait for the debugger to connect before starting
+
+    ❯ kubectl logs -f kubebeat-demo
+
+    API server listening at: [::]:40000
+Use your favorite IDE to connect to the debugger on `localhost:40000` (for example [Goland](https://www.jetbrains.com/help/go/attach-to-running-go-processes-with-debugger.html#step-3-create-the-remote-run-debug-configuration-on-the-client-computer))
+
 # {Beat}
 
 Welcome to {Beat}.

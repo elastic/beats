@@ -149,9 +149,8 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 func (bt *kubebeat) Decision(input interface{}) (interface{}, error) {
 	// get the named policy decision for the specified input
 	result, err := bt.opa.Decision(context.Background(), sdk.DecisionOptions{
-		Path:  "/authz/allow",
-		Input: map[string]interface{}{"open": "sesame"},
-		//Input: input,
+		Path:  "/compliance",
+		Input: input,
 	})
 	if err != nil {
 		return nil, err

@@ -1,0 +1,8 @@
+FROM golang
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
+EXPOSE 40000
+EXPOSE 8080
+COPY ./kubebeat /kubebeat
+COPY ./kubebeat.yml /kubebeat.yml
+ENTRYPOINT ["/go/bin/dlv", "--listen=:40000", "--headless=true", "--api-version=2", "--wd=/", "exec", "/kubebeat"]
+CMD ["--", "-e", "-d", "'*'"]
