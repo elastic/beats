@@ -5,6 +5,7 @@
 package aws
 
 import (
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"net/http"
 	"net/url"
 
@@ -34,14 +35,14 @@ type ConfigAWS struct {
 func InitializeAWSConfig(config ConfigAWS) (awssdk.Config, error) {
 	AWSConfig, _ := GetAWSCredentials(config)
 	if config.ProxyUrl != "" {
-		parsedUrl, err := url.Parse(config.ProxyUrl)
+		proxyUrl, err := httpcommon.NewProxyURIFromString(config.ProxyUrl)
 		if err != nil {
 			return AWSConfig, err
 		}
 
 		httpClient := &http.Client{
 			Transport: &http.Transport{
-				Proxy: http.ProxyURL(parsedUrl),
+				Proxy: http.ProxyURL(proxyUrl.URI()),
 			},
 		}
 		AWSConfig.HTTPClient = httpClient
