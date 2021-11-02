@@ -144,10 +144,15 @@ func CrossBuild(options ...CrossBuildOption) error {
 				} else {
 					// This is basically a short-out so we can attempt to build on AIX in a relatively generic way
 					log.Printf("Target is building for AIX, skipping normal crossbuild process")
-					return Build(DefaultBuildArgs())
+					args := DefaultBuildArgs()
+					args.OutputDir = filepath.Join("build", "golang-crossbuild")
+					args.Name += "-" + Platform.GOOS + "-" + Platform.Arch
+					return Build(args)
 				}
 			}
 		}
+		// If we're here, something isn't set.
+		return errors.New("Cannot crossbuild on AIX. Either run `mage build` or set PLATFORMS='aix/ppc64'")
 	}
 
 	// Docker is required for this target.
