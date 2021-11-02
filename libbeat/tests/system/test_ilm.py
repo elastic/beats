@@ -107,7 +107,7 @@ class TestCommandSetupILMPolicy(BaseTest):
 
         self.setupCmd = "--index-management"
 
-        self.data_stream = self.beat_name
+        self.data_stream = self.beat_name + "-9.9.9"
         self.policy_name = self.beat_name
         self.custom_policy = self.beat_name + "_bar"
         self.es = self.es_client()
@@ -133,182 +133,140 @@ class TestCommandSetupILMPolicy(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
-    def test_setup_ilm_policy_and_template(self):
+    def test_setup_ilm_default(self):
         """
-        Test combination of ilm policy and template setup
+        Test ilm policy setup with default config
         """
         self.render_config()
 
-        # NOTE: --template is deprecated for 8.0.0./
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-                                  extra_args=["setup", self.setupCmd, "--template"])
+                                  extra_args=["setup", self.setupCmd])
+
+        assert exit_code == 0
+        self.idxmgmt.assert_index_template_index_pattern(self.data_stream, [self.data_stream + "*"])
+        self.idxmgmt.assert_policy_created(self.policy_name)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @pytest.mark.tag('integration')
+    def test_setup_ilm_disabled(self):
+        """
+        Test ilm policy setup when ilm disabled
+        """
+        self.render_config()
+
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.setupCmd,
+                                              "-E", "setup.ilm.enabled=false"])
 
         assert exit_code == 0
         self.idxmgmt.assert_index_template_loaded(self.data_stream)
-        self.idxmgmt.assert_alias_created(self.alias_name)
-        self.idxmgmt.assert_policy_created(self.policy_name)
-#
-#    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-#    @pytest.mark.tag('integration')
-#    def test_setup_ilm_default(self):
-#        """
-#        Test ilm policy setup with default config
-#        """
-#        self.render_config()
-#
-#        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-#                                  extra_args=["setup", self.setupCmd])
-#
-#        assert exit_code == 0
-#        self.idxmgmt.assert_ilm_index_template_loaded(self.alias_name, self.policy_name, self.alias_name)
-#        self.idxmgmt.assert_index_template_index_pattern(self.alias_name, [self.alias_name + "-*"])
-#        self.idxmgmt.assert_alias_created(self.alias_name)
-#        self.idxmgmt.assert_policy_created(self.policy_name)
-#
-#    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-#    @pytest.mark.tag('integration')
-#    def test_setup_ilm_disabled(self):
-#        """
-#        Test ilm policy setup when ilm disabled
-#        """
-#        self.render_config()
-#
-#        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-#                                  extra_args=["setup", self.setupCmd,
-#                                              "-E", "setup.ilm.enabled=false"])
-#
-#        assert exit_code == 0
-#        self.idxmgmt.assert_index_template_loaded(self.data_stream)
-#        self.idxmgmt.assert_alias_not_created(self.alias_name)
-#        self.idxmgmt.assert_policy_not_created(self.policy_name)
-#
-#    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-#    @pytest.mark.tag('integration')
-#    def test_policy_name(self):
-#        """
-#        Test ilm policy setup when policy_name is configured
-#        """
-#        self.render_config()
-#
-#        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-#                                  extra_args=["setup", self.setupCmd,
-#                                              "-E", "setup.ilm.policy_name=" + self.custom_policy])
-#
-#        assert exit_code == 0
-#        self.idxmgmt.assert_ilm_index_template_loaded(self.alias_name, self.custom_policy, self.alias_name)
-#        self.idxmgmt.assert_policy_created(self.custom_policy)
-#
-#    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-#    @pytest.mark.tag('integration')
-#    def test_rollover_alias(self):
-#        """
-#        Test ilm policy setup when rollover_alias is configured
-#        """
-#        self.render_config()
-#
-#        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-#                                  extra_args=["setup", self.setupCmd,
-#                                              "-E", "setup.ilm.rollover_alias=" + self.custom_alias])
-#
-#        assert exit_code == 0
-#        self.idxmgmt.assert_ilm_index_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
-#        self.idxmgmt.assert_alias_created(self.custom_alias)
-#
-#
-# class TestCommandExportILMPolicy(BaseTest):
-#    """
-#    Test beat command `export ilm-policy`
-#    """
-#
-#    def setUp(self):
-#        super(TestCommandExportILMPolicy, self).setUp()
-#
-#        self.config = "libbeat.yml"
-#        self.output = os.path.join(self.working_dir, self.config)
-#        shutil.copy(os.path.join(self.beat_path, "fields.yml"), self.output)
-#        self.policy_name = self.beat_name
-#        self.cmd = "ilm-policy"
-#
-#    def assert_log_contains_policy(self):
-#        assert self.log_contains(MSG_ILM_POLICY_LOADED)
-#        assert self.log_contains('"max_age": "30d"')
-#        assert self.log_contains('"max_size": "50gb"')
-#
-#    def assert_log_contains_write_alias(self):
-#        assert self.log_contains(re.compile('Index Alias .* successfully created.'))
-#
-#    def test_default(self):
-#        """
-#        Test ilm-policy export with default config
-#        """
-#
-#        exit_code = self.run_beat(extra_args=["export", self.cmd],
-#                                  config=self.config)
-#
-#        assert exit_code == 0
-#        self.assert_log_contains_policy()
-#        self.assert_log_contains_write_alias()
-#
-#    def test_load_disabled(self):
-#        """
-#        Test ilm-policy export when ilm disabled in config
-#        """
-#
-#        exit_code = self.run_beat(extra_args=["export", self.cmd, "-E", "setup.ilm.enabled=false"],
-#                                  config=self.config)
-#
-#        assert exit_code == 0
-#        self.assert_log_contains_policy()
-#        self.assert_log_contains_write_alias()
-#
-#    def test_changed_policy_name(self):
-#        """
-#        Test ilm-policy export when policy name is changed
-#        """
-#        policy_name = "foo"
-#
-#        exit_code = self.run_beat(extra_args=["export", self.cmd, "-E", "setup.ilm.policy_name=" + policy_name],
-#                                  config=self.config)
-#
-#        assert exit_code == 0
-#        self.assert_log_contains_policy()
-#        self.assert_log_contains_write_alias()
-#
-#    def test_export_to_file_absolute_path(self):
-#        """
-#        Test export ilm policy to file with absolute file path
-#        """
-#        base_path = os.path.abspath(os.path.join(self.beat_path, os.path.dirname(__file__), "export"))
-#        exit_code = self.run_beat(
-#            extra_args=["export", self.cmd, "--dir=" + base_path],
-#            config=self.config)
-#
-#        assert exit_code == 0
-#
-#        file = os.path.join(base_path, "policy", self.policy_name + '.json')
-#        with open(file) as f:
-#            policy = json.load(f)
-#        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_size"] == "50gb", policy
-#        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_age"] == "30d", policy
-#
-#        os.remove(file)
-#
-#    def test_export_to_file_relative_path(self):
-#        """
-#        Test export ilm policy to file with relative file path
-#        """
-#        path = os.path.join(os.path.dirname(__file__), "export")
-#        exit_code = self.run_beat(
-#            extra_args=["export", self.cmd, "--dir=" + path],
-#            config=self.config)
-#
-#        assert exit_code == 0
-#
-#        base_path = os.path.abspath(os.path.join(self.beat_path, os.path.dirname(__file__), "export"))
-#        file = os.path.join(base_path, "policy", self.policy_name + '.json')
-#        with open(file) as f:
-#            policy = json.load(f)
-#        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_size"] == "50gb", policy
-#        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_age"] == "30d", policy
-#
-#        os.remove(file)
+        self.idxmgmt.assert_policy_not_created(self.policy_name)
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @pytest.mark.tag('integration')
+    def test_policy_name(self):
+        """
+        Test ilm policy setup when policy_name is configured
+        """
+        self.render_config()
+
+        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
+                                  extra_args=["setup", self.setupCmd,
+                                              "-E", "setup.ilm.policy_name=" + self.custom_policy])
+
+        assert exit_code == 0
+        self.idxmgmt.assert_index_template_loaded(self.data_stream)
+        self.idxmgmt.assert_policy_created(self.custom_policy)
+
+
+class TestCommandExportILMPolicy(BaseTest):
+    """
+    Test beat command `export ilm-policy`
+    """
+
+    def setUp(self):
+        super(TestCommandExportILMPolicy, self).setUp()
+
+        self.config = "libbeat.yml"
+        self.output = os.path.join(self.working_dir, self.config)
+        shutil.copy(os.path.join(self.beat_path, "fields.yml"), self.output)
+        self.policy_name = self.beat_name
+        self.cmd = "ilm-policy"
+
+    def assert_log_contains_policy(self):
+        assert self.log_contains(MSG_ILM_POLICY_LOADED)
+        assert self.log_contains('"max_age": "30d"')
+        assert self.log_contains('"max_size": "50gb"')
+
+    def test_default(self):
+        """
+        Test ilm-policy export with default config
+        """
+
+        exit_code = self.run_beat(extra_args=["export", self.cmd],
+                                  config=self.config)
+
+        assert exit_code == 0
+        self.assert_log_contains_policy()
+
+    def test_load_disabled(self):
+        """
+        Test ilm-policy export when ilm disabled in config
+        """
+
+        exit_code = self.run_beat(extra_args=["export", self.cmd, "-E", "setup.ilm.enabled=false"],
+                                  config=self.config)
+
+        assert exit_code == 0
+        self.assert_log_contains_policy()
+
+    def test_changed_policy_name(self):
+        """
+        Test ilm-policy export when policy name is changed
+        """
+        policy_name = "foo"
+
+        exit_code = self.run_beat(extra_args=["export", self.cmd, "-E", "setup.ilm.policy_name=" + policy_name],
+                                  config=self.config)
+
+        assert exit_code == 0
+        self.assert_log_contains_policy()
+
+    def test_export_to_file_absolute_path(self):
+        """
+        Test export ilm policy to file with absolute file path
+        """
+        base_path = os.path.abspath(os.path.join(self.beat_path, os.path.dirname(__file__), "export"))
+        exit_code = self.run_beat(
+            extra_args=["export", self.cmd, "--dir=" + base_path],
+            config=self.config)
+
+        assert exit_code == 0
+
+        file = os.path.join(base_path, "policy", self.policy_name + '.json')
+        with open(file) as f:
+            policy = json.load(f)
+        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_size"] == "50gb", policy
+        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_age"] == "30d", policy
+
+        os.remove(file)
+
+    def test_export_to_file_relative_path(self):
+        """
+        Test export ilm policy to file with relative file path
+        """
+        path = os.path.join(os.path.dirname(__file__), "export")
+        exit_code = self.run_beat(
+            extra_args=["export", self.cmd, "--dir=" + path],
+            config=self.config)
+
+        assert exit_code == 0
+
+        base_path = os.path.abspath(os.path.join(self.beat_path, os.path.dirname(__file__), "export"))
+        file = os.path.join(base_path, "policy", self.policy_name + '.json')
+        with open(file) as f:
+            policy = json.load(f)
+        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_size"] == "50gb", policy
+        assert policy["policy"]["phases"]["hot"]["actions"]["rollover"]["max_age"] == "30d", policy
+
+        os.remove(file)
