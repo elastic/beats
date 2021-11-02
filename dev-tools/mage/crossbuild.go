@@ -134,6 +134,22 @@ func CrossBuild(options ...CrossBuildOption) error {
 		opt(&params)
 	}
 
+	// AIX can't really be crossbuilt, due to cgo and various compiler shortcomings.
+	// If we have a singular AIX platform set, revert to a native build toolchain
+	if runtime.GOOS == "aix" {
+		for _, platform := range params.Platforms {
+			if platform.GOOS() == "aix" {
+				if len(params.Platforms) != 1 {
+					return errors.New("AIX cannot be crossbuilt with other platforms. Set PLATFORMS='aix/ppc64'")
+				} else {
+					// This is basically a short-out so we can attempt to build on AIX in a relatively generic way
+					log.Printf("Target is building for AIX, skipping normal crossbuild process")
+					return Build(DefaultBuildArgs())
+				}
+			}
+		}
+	}
+
 	// Docker is required for this target.
 	if err := HaveDocker(); err != nil {
 		return err
