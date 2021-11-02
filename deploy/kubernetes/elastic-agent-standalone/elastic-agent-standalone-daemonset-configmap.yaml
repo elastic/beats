@@ -345,6 +345,7 @@ data:
             hosts:
               - 'https://${kubernetes.pod.ip}:10257'
             period: 10s
+            ssl.verification_mode: none
             condition: ${kubernetes.labels.component} == 'kube-controller-manager'
           - data_stream:
               dataset: kubernetes.scheduler
@@ -355,6 +356,7 @@ data:
             hosts:
               - 'https://${kubernetes.pod.ip}:10259'
             period: 10s
+            ssl.verification_mode: none
             condition: ${kubernetes.labels.component} == 'kube-scheduler'
           - data_stream:
               dataset: kubernetes.proxy
