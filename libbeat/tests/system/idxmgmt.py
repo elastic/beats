@@ -2,7 +2,7 @@ import datetime
 import unittest
 import pytest
 import semver
-from elasticsearch import NotFoundError, RequestError
+from elasticsearch import NotFoundError
 
 
 class IdxMgmt(unittest.TestCase):
@@ -159,8 +159,7 @@ class IdxMgmt(unittest.TestCase):
         if pattern is None:
             pattern = self.default_pattern()
         name = alias + "-" + pattern
-        #data = self._client.transport.perform_request('GET', '/' + alias + '/_search')
-        data = self._client.transport.perform_request('GET', '/' + name + '/_search')
+        data = self._client.transport.perform_request('GET', '/' + alias + '/_search')
         self.assertGreater(data["hits"]["total"]["value"], 0)
 
     def default_pattern(self):
