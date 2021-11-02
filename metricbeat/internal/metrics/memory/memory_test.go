@@ -100,3 +100,24 @@ func TestActualMemPercentage(t *testing.T) {
 	assert.Equal(t, m.Actual.Used.Pct.ValueOr(0), 0.7143)
 
 }
+
+func TestMeminfoParse(t *testing.T) {
+	// Make sure we're manually calculating Actual correctly on linux
+	if runtime.GOOS == "linux" {
+		mem, err := Get("./oldkern")
+		assert.NoError(t, err)
+
+		assert.Equal(t, uint64(27307106304), mem.Cached.ValueOr(0))
+		assert.Equal(t, uint64(52983070720), mem.Actual.Free.ValueOr(0))
+		assert.Equal(t, uint64(10137726976), mem.Actual.Used.Bytes.ValueOr(0))
+	}
+}
+
+func TestMeminfoPct(t *testing.T) {
+	if runtime.GOOS == "linux" {
+		memRaw, err := Get("./oldkern")
+		assert.NoError(t, err)
+		assert.Equal(t, float64(0.1606), memRaw.Actual.Used.Pct.ValueOr(0))
+		assert.Equal(t, float64(0.5933), memRaw.Used.Pct.ValueOr(0))
+	}
+}
