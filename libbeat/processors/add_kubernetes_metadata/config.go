@@ -22,15 +22,17 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 )
 
 type kubeAnnotatorConfig struct {
-	KubeConfig string        `config:"kube_config"`
-	Host       string        `config:"host"`
-	Scope      string        `config:"scope"`
-	Namespace  string        `config:"namespace"`
-	SyncPeriod time.Duration `config:"sync_period"`
+	KubeConfig        string                       `config:"kube_config"`
+	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
+	Host              string                       `config:"host"`
+	Scope             string                       `config:"scope"`
+	Namespace         string                       `config:"namespace"`
+	SyncPeriod        time.Duration                `config:"sync_period"`
 	// Annotations are kept after pod is removed, until they haven't been accessed
 	// for a full `cleanup_timeout`:
 	CleanupTimeout  time.Duration `config:"cleanup_timeout"`
