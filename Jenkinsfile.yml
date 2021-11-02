@@ -2,9 +2,9 @@ projects:
     - "auditbeat"
     - "deploy/kubernetes"
     - "filebeat"
-    - "generator"
+    # Skipping because they are failing, see https://github.com/elastic/beats/pull/28723
+    #- "generator"
     - "heartbeat"
-    - "journalbeat"
     - "libbeat"
     - "metricbeat"
     - "packetbeat"
@@ -21,7 +21,6 @@ projects:
     - "x-pack/packetbeat"
     - "x-pack/winlogbeat"
     - "dev-tools"
-    ##- "x-pack/journalbeat"  It is not yet in the 1.0 pipeline.
 
 ## Changeset macros that are defined here and used in each specific 2.0 pipeline.
 changeset:
