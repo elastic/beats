@@ -825,9 +825,9 @@ func gzipBuffer(t *testing.T, toZip string) *bytes.Buffer {
 // This test ensures Heartbeat will decode the response body if the server specifies
 // that it is gzip encoded.
 func TestDecodesGzip(t *testing.T) {
-	gzip := gzipBuffer(t, "TestEncodingAccept")
+	gzBuffer := gzipBuffer(t, "TestEncodingAccept")
 
-	server := httptest.NewServer(hbtest.CustomResponseHandler(gzip.Bytes(), 200, map[string]string{
+	server := httptest.NewServer(hbtest.CustomResponseHandler(gzBuffer.Bytes(), 200, map[string]string{
 		"Content-Encoding": "gzip",
 	}))
 	defer server.Close()
@@ -847,9 +847,9 @@ func TestDecodesGzip(t *testing.T) {
 // This test verifies that, in the absence of the response header `Content-Encoding: gzip`, Heartbeat
 // will not decode the response body.
 func TestNoGzipDecodeWithoutHeader(t *testing.T) {
-	gzip := gzipBuffer(t, "TestEncodingAccept")
+	gzBuffer := gzipBuffer(t, "TestEncodingAccept")
 
-	server := httptest.NewServer(hbtest.CustomResponseHandler(gzip.Bytes(), 200, map[string]string{}))
+	server := httptest.NewServer(hbtest.CustomResponseHandler(gzBuffer.Bytes(), 200, map[string]string{}))
 	defer server.Close()
 
 	evt := sendTLSRequest(t, server.URL, false, map[string]interface{}{
