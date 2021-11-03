@@ -31,7 +31,7 @@ func NewNoopSupport(info beat.Info, config *common.Config) (Supporter, error) {
 	return (*noopSupport)(nil), nil
 }
 
-func (*noopSupport) Mode() Mode                      { return ModeDisabled }
+func (*noopSupport) Enabled() bool                   { return false }
 func (*noopSupport) Alias() Alias                    { return Alias{} }
 func (*noopSupport) Policy() Policy                  { return Policy{} }
 func (*noopSupport) Overwrite() bool                 { return false }
