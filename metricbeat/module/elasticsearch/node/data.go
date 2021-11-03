@@ -19,6 +19,7 @@ package node
 
 import (
 	"encoding/json"
+
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 
 	"github.com/joeshaw/multierror"
@@ -62,7 +63,7 @@ var (
 	}
 )
 
-func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
 	nodesStruct := struct {
 		ClusterName string                            `json:"cluster_name"`
 		Nodes       map[string]map[string]interface{} `json:"nodes"`
@@ -92,8 +93,12 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 		event.MetricSetFields["id"] = id
 
-		index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
-		event.Index = index
+		// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+		// When using Agent, the index name is overwritten anyways.
+		if isXpack {
+			index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+			event.Index = index
+		}
 
 		r.Event(event)
 	}

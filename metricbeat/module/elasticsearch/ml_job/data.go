@@ -53,7 +53,7 @@ type jobsStruct struct {
 	Jobs []map[string]interface{} `json:"jobs"`
 }
 
-func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
 
 	jobsData := &jobsStruct{}
 	err := json.Unmarshal(content, jobsData)
@@ -85,8 +85,12 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 		event.MetricSetFields, _ = schema.Apply(job)
 
-		index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
-		event.Index = index
+		// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+		// When using Agent, the index name is overwritten anyways.
+		if isXpack {
+			index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+			event.Index = index
+		}
 
 		r.Event(event)
 	}

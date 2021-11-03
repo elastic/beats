@@ -57,7 +57,7 @@ type stateStruct struct {
 	} `json:"routing_table"`
 }
 
-func eventsMapping(r mb.ReporterV2, content []byte) error {
+func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	stateData := &stateStruct{}
 	err := json.Unmarshal(content, stateData)
 	if err != nil {
@@ -131,8 +131,12 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 				event.MetricSetFields.Put("relocating_node.name", relocatingNode)
 				event.MetricSetFields.Put("relocating_node.id", relocatingNode)
 
-				index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
-				event.Index = index
+				// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+				// When using Agent, the index name is overwritten anyways.
+				if isXpack {
+					index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+					event.Index = index
+				}
 
 				r.Event(event)
 			}

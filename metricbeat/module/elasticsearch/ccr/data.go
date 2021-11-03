@@ -19,6 +19,7 @@ package ccr
 
 import (
 	"encoding/json"
+
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -134,7 +135,7 @@ type response struct {
 	} `json:"follow_stats"`
 }
 
-func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
 	var data response
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -157,8 +158,12 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 			autoFollow, _ := autoFollowSchema.Apply(data.AutoFollowStats)
 			event.MetricSetFields["auto_follow"] = autoFollow
 
-			index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
-			event.Index = index
+			// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+			// When using Agent, the index name is overwritten anyways.
+			if isXpack {
+				index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+				event.Index = index
+			}
 
 			r.Event(event)
 		}
