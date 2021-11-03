@@ -38,6 +38,7 @@ type RunnerList struct {
 	factory  RunnerFactory
 	pipeline beat.PipelineConnector
 	logger   *logp.Logger
+	syncStop bool
 }
 
 // NewRunnerList builds and returns a RunnerList
@@ -48,6 +49,15 @@ func NewRunnerList(name string, factory RunnerFactory, pipeline beat.PipelineCon
 		pipeline: pipeline,
 		logger:   logp.NewLogger(name),
 	}
+}
+
+// NewSyncRunnerList performs `stop` operations synchronously. This solves some race issues if you need
+// stops / starts to be more strictly sequenced, but can only be trusted in scenarios where stops
+// do not block excessively.
+func NewSyncRunnerList(name string, factory RunnerFactory, pipeline beat.PipelineConnector) *RunnerList {
+	rl := NewRunnerList(name, factory, pipeline)
+	rl.syncStop = true
+	return rl
 }
 
 // Reload the list of runners to match the given state
@@ -84,7 +94,11 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	for hash, runner := range stopList {
 		r.logger.Debugf("Stopping runner: %s", runner)
 		delete(r.runners, hash)
-		go runner.Stop()
+		if r.syncStop {
+			runner.Stop()
+		} else {
+			go runner.Stop()
+		}
 		moduleStops.Add(1)
 	}
 
