@@ -134,6 +134,11 @@ func CrossBuild(options ...CrossBuildOption) error {
 		opt(&params)
 	}
 
+	if len(params.Platforms) == 0 {
+		log.Printf("Skipping cross-build of target=%v because platforms list is empty.", params.Target)
+		return nil
+	}
+
 	// AIX can't really be crossbuilt, due to cgo and various compiler shortcomings.
 	// If we have a singular AIX platform set, revert to a native build toolchain
 	if runtime.GOOS == "aix" {
@@ -158,11 +163,6 @@ func CrossBuild(options ...CrossBuildOption) error {
 	// Docker is required for this target.
 	if err := HaveDocker(); err != nil {
 		return err
-	}
-
-	if len(params.Platforms) == 0 {
-		log.Printf("Skipping cross-build of target=%v because platforms list is empty.", params.Target)
-		return nil
 	}
 
 	if CrossBuildMountModcache {
