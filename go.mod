@@ -197,6 +197,7 @@ require (
 	github.com/elastic/elastic-agent-system-metrics v0.4.4
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/googleapis/gax-go/v2 v2.5.1
+	github.com/kortschak/toutoumomoma v0.0.0-20220212064956-c13235c1f719
 	github.com/pierrec/lz4/v4 v4.1.15
 	github.com/shirou/gopsutil/v3 v3.21.12
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
@@ -204,6 +205,7 @@ require (
 	go.elastic.co/apm/v2 v2.0.0
 	go.mongodb.org/mongo-driver v1.5.1
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
+	mvdan.cc/garble v0.7.1
 )
 
 require (
@@ -321,6 +323,7 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.elastic.co/fastjson v1.1.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
+	golang.org/x/exp v0.0.0-20220602145555-4a0574d9293f // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/appengine v1.6.7 // indirect

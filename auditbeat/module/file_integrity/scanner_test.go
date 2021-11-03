@@ -89,6 +89,49 @@ func TestScanner(t *testing.T) {
 		assert.True(t, foundRecursivePath, "expected subdir/c to be included")
 	})
 
+	t.Run("executable", func(t *testing.T) {
+		c := config
+
+		target := filepath.Join(dir, "executable")
+		cmd, err := build("windows", "go", "./testdata", target, nil)
+		if err != nil {
+			t.Errorf("failed to build test executable %s: %v", cmd, err)
+			return
+		}
+		c.FileParsers = []string{"file.elf.import_hash", "file.macho.import_hash", "file.pe.import_hash"}
+		defer os.Remove(target)
+
+		reader, err := NewFileSystemScanner(c, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		done := make(chan struct{})
+		defer close(done)
+
+		eventC, err := reader.Start(done)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		var (
+			foundExecutable bool
+			events          []Event
+		)
+		for event := range eventC {
+			events = append(events, event)
+			if filepath.Base(event.Path) == "executable" {
+				foundExecutable = true
+				h, err := event.ParserResults.GetValue("pe.import_hash")
+				assert.NoError(t, err, "no value for pe.import_hash")
+				assert.Len(t, h, 16, "wrong length for hash")
+			}
+		}
+
+		assert.Len(t, events, 8)
+		assert.True(t, foundExecutable, "expected executable to be included")
+	})
+
 	// This smoke tests the rate limit code path, but does not validate the rate.
 	t.Run("with rate limit", func(t *testing.T) {
 		c := config

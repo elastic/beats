@@ -77,4 +77,54 @@
 
   # Set to true to publish fields with null values in events.
   #keep_null: false
+
+  # Parse detailed information for the listed fields. Field paths in the list below
+  # that are a prefix of other field paths imply the longer field path.
+  # file_parsers:
+  # - file.elf.sections
+  # - file.elf.sections.name
+  # - file.elf.sections.virtual_size
+  # - file.elf.sections.entropy
+  # - file.elf.import_hash
+  # - file.elf.imports
+  # - file.elf.imports_names_entropy
+  # - file.elf.go_import_hash
+  # - file.elf.go_imports
+  # - file.elf.go_imports_names_entropy
+  # - file.elf.go_stripped
+  # - file.macho.sections
+  # - file.macho.sections.name
+  # - file.macho.sections.virtual_size
+  # - file.macho.sections.entropy
+  # - file.macho.import_hash
+  # - file.macho.symhash
+  # - file.macho.imports
+  # - file.macho.imports_names_entropy
+  # - file.macho.go_import_hash
+  # - file.macho.go_imports
+  # - file.macho.go_imports_names_entropy
+  # - file.macho.go_stripped
+  # - file.pe.sections
+  # - file.pe.sections.name
+  # - file.pe.sections.virtual_size
+  # - file.pe.sections.entropy
+  # - file.pe.import_hash
+  # - file.pe.imphash
+  # - file.pe.imports
+  # - file.pe.imports_names_entropy
+  # - file.pe.go_import_hash
+  # - file.pe.go_imports
+  # - file.pe.go_imports_names_entropy
+  # - file.pe.go_stripped
+  # - file.plan9.sections
+  # - file.plan9.sections.name
+  # - file.plan9.sections.virtual_size
+  # - file.plan9.sections.entropy
+  # - file.plan9.import_hash
+  # - file.plan9.imports
+  # - file.plan9.imports_names_entropy
+  # - file.plan9.go_import_hash
+  # - file.plan9.go_imports
+  # - file.plan9.go_imports_names_entropy
+  # - file.plan9.go_stripped
 {{ end }}

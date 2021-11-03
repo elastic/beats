@@ -110,13 +110,14 @@ func (d Digest) MarshalText() ([]byte, error) { return []byte(d.String()), nil }
 
 // Event describe the filesystem change and includes metadata about the file.
 type Event struct {
-	Timestamp  time.Time           `json:"timestamp"`             // Time of event.
-	Path       string              `json:"path"`                  // The path associated with the event.
-	TargetPath string              `json:"target_path,omitempty"` // Target path for symlinks.
-	Info       *Metadata           `json:"info"`                  // File metadata (if the file exists).
-	Source     Source              `json:"source"`                // Source of the event.
-	Action     Action              `json:"action"`                // Action (like created, updated).
-	Hashes     map[HashType]Digest `json:"hash,omitempty"`        // File hashes.
+	Timestamp     time.Time           `json:"timestamp"`             // Time of event.
+	Path          string              `json:"path"`                  // The path associated with the event.
+	TargetPath    string              `json:"target_path,omitempty"` // Target path for symlinks.
+	Info          *Metadata           `json:"info"`                  // File metadata (if the file exists).
+	Source        Source              `json:"source"`                // Source of the event.
+	Action        Action              `json:"action"`                // Action (like created, updated).
+	Hashes        map[HashType]Digest `json:"hash,omitempty"`        // File hashes.
+	ParserResults common.MapStr       `json:"file,omitempty"`        // Results from runnimg file parsers.
 
 	// Metadata
 	rtt        time.Duration // Time taken to collect the info.
@@ -153,6 +154,7 @@ func NewEventFromFileInfo(
 	source Source,
 	maxFileSize uint64,
 	hashTypes []HashType,
+	fileParsers []FileParser,
 ) Event {
 	event := Event{
 		Timestamp: time.Now().UTC(),
@@ -179,6 +181,16 @@ func NewEventFromFileInfo(
 	if event.Info == nil {
 		// This should never happen (only a change in Go could cause it).
 		return event
+	}
+
+	if len(fileParsers) != 0 && event.ParserResults == nil {
+		event.ParserResults = make(common.MapStr)
+	}
+	for _, p := range fileParsers {
+		err = p.Parse(event.ParserResults, path)
+		if err != nil {
+			event.errors = append(event.errors, err)
+		}
 	}
 
 	switch event.Info.Type {
@@ -211,6 +223,7 @@ func NewEvent(
 	source Source,
 	maxFileSize uint64,
 	hashTypes []HashType,
+	fileParsers []FileParser,
 ) Event {
 	info, err := os.Lstat(path)
 	if err != nil {
@@ -221,7 +234,7 @@ func NewEvent(
 			err = fmt.Errorf("failed to lstat: %w", err)
 		}
 	}
-	return NewEventFromFileInfo(path, info, err, action, source, maxFileSize, hashTypes)
+	return NewEventFromFileInfo(path, info, err, action, source, maxFileSize, hashTypes, fileParsers)
 }
 
 func isASCIILetter(letter byte) bool {
@@ -314,6 +327,9 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 			hashes[string(hashType)] = digest
 		}
 		file["hash"] = hashes
+	}
+	for k, v := range e.ParserResults {
+		file[k] = v
 	}
 
 	out.MetricSetFields.Put("event.kind", "event")

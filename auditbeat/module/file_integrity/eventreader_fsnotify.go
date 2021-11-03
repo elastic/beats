@@ -37,13 +37,16 @@ type reader struct {
 	config  Config
 	eventC  chan Event
 	log     *logp.Logger
+
+	parsers []FileParser
 }
 
 // NewEventReader creates a new EventProducer backed by fsnotify.
 func NewEventReader(c Config) (EventProducer, error) {
 	return &reader{
-		config: c,
-		log:    logp.NewLogger(moduleName),
+		config:  c,
+		log:     logp.NewLogger(moduleName),
+		parsers: FileParsers(c),
 	}, nil
 }
 
@@ -154,7 +157,7 @@ func (r *reader) nextEvent(done <-chan struct{}) *Event {
 
 			start := time.Now()
 			e := NewEvent(event.Name, opToAction(event.Op), SourceFSNotify,
-				r.config.MaxFileSizeBytes, r.config.HashTypes)
+				r.config.MaxFileSizeBytes, r.config.HashTypes, r.parsers)
 			e.rtt = time.Since(start)
 
 			return &e

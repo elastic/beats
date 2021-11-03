@@ -76,6 +76,7 @@ const (
 type Config struct {
 	Paths               []string        `config:"paths" validate:"required"`
 	HashTypes           []HashType      `config:"hash_types"`
+	FileParsers         []string        `config:"file_parsers"`
 	MaxFileSize         string          `config:"max_file_size"`
 	MaxFileSizeBytes    uint64          `config:",ignore"`
 	ScanAtStart         bool            `config:"scan_at_start"`
@@ -111,6 +112,12 @@ nextHash:
 			}
 		}
 		errs = append(errs, fmt.Errorf("invalid hash_types value '%v'", ht))
+	}
+
+	for _, p := range c.FileParsers {
+		if _, ok := fileParserFor[p]; !ok {
+			errs = append(errs, errors.Errorf("invalid file_parsers value '%v'", p))
+		}
 	}
 
 	c.MaxFileSizeBytes, err = humanize.ParseBytes(c.MaxFileSize)

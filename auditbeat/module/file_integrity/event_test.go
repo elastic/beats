@@ -296,7 +296,7 @@ func TestNewEventFromFileInfoHash(t *testing.T) {
 	}
 
 	t.Run("file stays the same", func(t *testing.T) {
-		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1})
+		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1}, nil)
 		if !assert.NotNil(t, ev) {
 			t.Fatal("nil event")
 		}
@@ -308,7 +308,7 @@ func TestNewEventFromFileInfoHash(t *testing.T) {
 	t.Run("file grows before hashing", func(t *testing.T) {
 		f.WriteString(data)
 		f.Sync()
-		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1})
+		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1}, nil)
 		if !assert.NotNil(t, ev) {
 			t.Fatal("nil event")
 		}
@@ -324,7 +324,7 @@ func TestNewEventFromFileInfoHash(t *testing.T) {
 		}
 		f.Sync()
 		assert.NoError(t, err)
-		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1})
+		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1}, nil)
 		if !assert.NotNil(t, ev) {
 			t.Fatal("nil event")
 		}
