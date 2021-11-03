@@ -414,7 +414,7 @@ func TestJsonBody(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			server := httptest.NewServer(hbtest.CustomResponseHandler([]byte(tc.responseBody), 200, map[string]string{}))
+			server := httptest.NewServer(hbtest.CustomResponseHandler([]byte(tc.responseBody), 200, nil))
 			defer server.Close()
 
 			jsonCheck := common.MapStr{"description": tc.name}
@@ -822,6 +822,8 @@ func gzipBuffer(t *testing.T, toZip string) *bytes.Buffer {
 	return &gzipBuffer
 }
 
+// This test ensures Heartbeat will decode the response body if the server specifies
+// that it is gzip encoded.
 func TestDecodesGzip(t *testing.T) {
 	gzip := gzipBuffer(t, "TestEncodingAccept")
 
@@ -842,6 +844,8 @@ func TestDecodesGzip(t *testing.T) {
 	assert.Exactly(t, content, "TestEncodingAccept")
 }
 
+// This test verifies that, in the absence of the response header `Content-Encoding: gzip`, Heartbeat
+// will not decode the response body.
 func TestNoGzipDecodeWithoutHeader(t *testing.T) {
 	gzip := gzipBuffer(t, "TestEncodingAccept")
 
