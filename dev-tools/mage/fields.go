@@ -118,6 +118,11 @@ func GenerateAllInOneFieldsGo() error {
 	return GenerateFieldsGo("fields.yml", "include/fields.go")
 }
 
+// GenerateMetricbeatAllInOneFieldsGo generates an all-in-one fields.go file for metricbeat.
+func GenerateMetricbeatAllInOneFieldsGo() error {
+	return GenerateFieldsGo("fields.yml", "include/fields/fields.go")
+}
+
 // GenerateFieldsGo generates a .go file containing the fields.yml data.
 func GenerateFieldsGo(fieldsYML, out string) error {
 	const assetCmdPath = "dev-tools/cmd/asset/asset.go"
