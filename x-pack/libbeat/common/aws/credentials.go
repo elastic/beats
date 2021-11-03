@@ -22,15 +22,15 @@ import (
 
 // ConfigAWS is a structure defined for AWS credentials
 type ConfigAWS struct {
-	AccessKeyID          string   `config:"access_key_id"`
-	SecretAccessKey      string   `config:"secret_access_key"`
-	SessionToken         string   `config:"session_token"`
-	ProfileName          string   `config:"credential_profile_name"`
-	SharedCredentialFile string   `config:"shared_credential_file"`
-	Endpoint             string   `config:"endpoint"`
-	RoleArn              string   `config:"role_arn"`
-	AWSPartition         string   `config:"aws_partition"` // Deprecated.
-	ProxyUrl             string   `config:"proxy_url"`
+	AccessKeyID          string `config:"access_key_id"`
+	SecretAccessKey      string `config:"secret_access_key"`
+	SessionToken         string `config:"session_token"`
+	ProfileName          string `config:"credential_profile_name"`
+	SharedCredentialFile string `config:"shared_credential_file"`
+	Endpoint             string `config:"endpoint"`
+	RoleArn              string `config:"role_arn"`
+	AWSPartition         string `config:"aws_partition"` // Deprecated.
+	ProxyUrl             string `config:"proxy_url"`
 }
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
