@@ -665,8 +665,9 @@ endif::[]
 *`-h, --help`*::
 Shows help for the `run` command.
 
-*`--httpprof [HOST]:PORT`*::
-Starts an http server for profiling. This option is useful for troubleshooting
+*`--httpprof BIND`*::
+Starts an http server for profiling. `BIND` can be specified as a `host:port`,
+unix socket, or Windows named pipe. This option is useful for troubleshooting
 and profiling {beatname_uc}.
 
 ifeval::["{beatname_lc}"=="packetbeat"]

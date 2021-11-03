@@ -49,7 +49,7 @@ func New(log *logp.Logger, mux *http.ServeMux, config *common.Config) (*Server, 
 		return nil, err
 	}
 
-	l, err := makeListener(cfg)
+	l, err := MakeListener(cfg)
 	if err != nil {
 		return nil, err
 	}

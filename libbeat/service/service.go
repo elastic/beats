@@ -22,7 +22,6 @@ import (
 	"expvar"
 	"flag"
 	"fmt"
-	"net"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -32,6 +31,7 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
@@ -119,7 +119,7 @@ func BeforeRun() {
 	mux.HandleFunc("/debug/vars", metricsHandler)
 
 	// Ensure we are listening before returning
-	listener, err := net.Listen("tcp", *httpprof)
+	listener, err := api.MakeListener(api.Config{Host: *httpprof})
 	if err != nil {
 		logger.Errorf("Failed to start pprof listener: %v", err)
 		os.Exit(1)
