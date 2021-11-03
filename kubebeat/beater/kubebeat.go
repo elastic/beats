@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/elastic/beats/v7/kubebeat/bundle"
+	"github.com/mitchellh/mapstructure"
 	"time"
 
 	"github.com/elastic/beats/v7/kubebeat/config"
@@ -83,6 +84,18 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	return bt, nil
 }
 
+type PolicyResult map[string]RuleResult
+
+type RuleResult struct {
+	Findings []Finding `json:"findings"`
+}
+
+type Finding struct {
+	Compliant bool        `json:"compliant""`
+	Message   string      `json:"message"`
+	Resource  interface{} `json:"resource"`
+}
+
 // Run starts kubebeat.
 func (bt *kubebeat) Run(b *beat.Beat) error {
 	logp.Info("kubebeat is running! Hit CTRL-C to stop it.")
@@ -106,39 +119,65 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 		}
 
 		pods := bt.watcher.Store().List()
-		events := make([]beat.Event, len(pods))
+		events := make([]beat.Event, 0)
 		timestamp := time.Now()
 
-		for i, p := range pods {
+		for _, p := range pods {
 			pod, ok := p.(*kubernetes.Pod)
 			if !ok {
 				logp.Info("could not convert to pod")
+				continue
 			}
-
 			pod.SetManagedFields(nil)
 			pod.Status.Reset()
+			pod.Kind = "Pod" // see https://github.com/kubernetes/kubernetes/issues/3030
 
 			result, err := bt.Decision(pod)
 			if err != nil {
-				result = map[string]interface{}{"err": err.Error()}
+				errEvent := beat.Event{
+					Timestamp: timestamp,
+					Fields: common.MapStr{
+						"type":     b.Info.Name,
+						"err":      fmt.Errorf("error running the policy: %v", err.Error()),
+						"resource": pod,
+					},
+				}
+				events = append(events, errEvent)
+				continue
 			}
 
-			event := beat.Event{
-				Timestamp: timestamp,
-				Fields: common.MapStr{
-					"type":             b.Info.Name,
-					"uid":              string(pod.UID), // UID is an alias to string
-					"name":             pod.Name,
-					"namespace":        pod.Namespace,
-					"ip":               pod.Status.PodIP,
-					"phase":            string(pod.Status.Phase),
-					"service_account":  pod.Spec.ServiceAccountName,
-					"node_name":        pod.Spec.NodeName,
-					"security_context": pod.Spec.SecurityContext,
-					"result":           result,
-				},
+			var decoded PolicyResult
+			err = mapstructure.Decode(result, &decoded)
+			if err != nil {
+				errEvent := beat.Event{
+					Timestamp: timestamp,
+					Fields: common.MapStr{
+						"type":       b.Info.Name,
+						"err":        fmt.Errorf("error parsing the policy result: %v", err.Error()),
+						"resource":   pod,
+						"raw_result": result,
+					},
+				}
+				events = append(events, errEvent)
+				continue
 			}
-			events[i] = event
+
+			for ruleName, ruleResult := range decoded {
+				for _, Finding := range ruleResult.Findings {
+					event := beat.Event{
+						Timestamp: timestamp,
+						Fields: common.MapStr{
+							"type":      b.Info.Name,
+							"rule_id":      ruleName,
+							"compliant": Finding.Compliant,
+							"resource":  Finding.Resource,
+							"message":   Finding.Message,
+						},
+					}
+					events = append(events, event)
+				}
+			}
+
 		}
 
 		bt.client.PublishAll(events)

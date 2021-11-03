@@ -1,43 +1,71 @@
 package bundle
 
 var Policies = map[string]string{
-	"compliance/CIS.1.2.1.rego": `
+    "compliance/CIS.1.2.1.rego": `
 package compliance.cis_1_2_1
 
 import data.lib.kubernetes
 
-default_parameters = {
-    "key": "--anonymous-auth",
-    "requiredValue": "false"
-}
+findings[result] {
+    default_parameters = {
+        "key": "--anonymous-auth",
+        "requiredValue": "false"
+    }
+    params = object.union(default_parameters, kubernetes.parameters)
 
-params = object.union(default_parameters, kubernetes.parameters)
-
-violation[msg] {
+    # check relevance. only produce result if relevant.
     kubernetes.apiserver[container]
-    not kubernetes.flag_contains_string(container.command, params.key, params.requiredValue)
-    msg = kubernetes.format(sprintf("%s in the %s %s does not have %s %s", [container.name, kubernetes.kind, kubernetes.name, params.key, params.requiredValue]))
+
+    # check compliance condition
+    compliant = is_compliant(container, params)
+
+    c_result = {"compliant": compliant, "resource": kubernetes.object}
+    result = object.union(c_result, get_message(compliant, container, params))
 }
+
+is_compliant(container, params) = true {
+    kubernetes.flag_contains_string(container.command, params.key, params.requiredValue)
+} else = false
+
+get_message(true, container, params) = { }
+get_message(false, container, params) = { "message": msg } {
+    msg = kubernetes.format(sprintf("%s in the %s %s does not have %s %s", [container.name, kubernetes.kind, kubernetes.name, params.key, params.requiredValue]))
+} else = { "message": "failed to create message" }
+
 `,
-	"compliance/CIS.1.2.10.rego": `
+    "compliance/CIS.1.2.10.rego": `
 package compliance.cis_1_2_10
 
 import data.lib.kubernetes
 
-default_parameters = {
-    "key": "--enable-admission-plugins",
-    "requiredValue": "EventRateLimit"
-}
+findings[result] {
+    default_parameters = {
+        "key": "--enable-admission-plugins",
+        "deniedValue": "AlwaysAdmit"
+    }
+    params = object.union(default_parameters, kubernetes.parameters)
 
-params = object.union(default_parameters, kubernetes.parameters)
-
-violation[msg] {
+    # check relevance. only produce result if relevant.
     kubernetes.apiserver[container]
-    not kubernetes.flag_contains_string(container.command, params.key, params.requiredValue)
-    msg = kubernetes.format(sprintf("%s in the %s %s does not have %s %s", [container.name, kubernetes.kind, kubernetes.name, params.key, params.requiredValue]))
+
+    # check compliance condition
+    compliant = is_compliant(container, params)
+
+    c_result = {"compliant": compliant, "resource": kubernetes.object}
+    result = object.union(c_result, get_message(compliant, container, params))
 }
+
+is_compliant(container, params) = false {
+    kubernetes.flag_contains_string(container.command, params.key, params.deniedValue)
+} else = true
+
+get_message(true, container, params) = { }
+get_message(false, container, params) = { "message": msg } {
+    msg = kubernetes.format(sprintf("%s in the %s %s should not have %s %s", [container.name, kubernetes.kind, kubernetes.name, params.key, params.deniedValue]))
+} else = { "message": "failed to create message" }
+
 `,
-	"lib/kubernetes.rego": `
+    "lib/kubernetes.rego": `
 package lib.kubernetes
 
 default name = ""
@@ -77,37 +105,37 @@ is_input_parameterised {
 default is_gatekeeper = false
 
 is_gatekeeper {
-	has_field(input, "review")
-	has_field(input.review, "object")
+    has_field(input, "review")
+    has_field(input.review, "object")
 }
 
 has_field(obj, field) {
-	obj[field]
+    obj[field]
 }
 
 object = input {
-	not is_gatekeeper
+    not is_gatekeeper
 }
 
 object = input.review.object {
-	is_gatekeeper
+    is_gatekeeper
 }
 
 format(msg) = gatekeeper_format {
-	is_gatekeeper
-	gatekeeper_format = {"msg": msg}
+    is_gatekeeper
+    gatekeeper_format = {"msg": msg}
 }
 
 format(msg) = msg {
-	not is_gatekeeper
+    not is_gatekeeper
 }
 
 is_service {
-	kind = "Service"
+    kind = "Service"
 }
 
 is_service {
-	kind = "Services"
+    kind = "Services"
 }
 
 services[service] {
@@ -116,29 +144,29 @@ services[service] {
 }
 
 is_deployment {
-	kind = "Deployment"
+    kind = "Deployment"
 }
 
 is_deployment {
-	kind = "Deployments"
+    kind = "Deployments"
 }
 
 is_pod {
-	kind = "Pod"
+    kind = "Pod"
 }
 
 is_pod {
-	kind = "Pods"
+    kind = "Pods"
 }
 
 pods[pod] {
-	is_deployment
-	pod = object.spec.template
+    is_deployment
+    pod = object.spec.template
 }
 
 pods[pod] {
-	is_pod
-	pod = object
+    is_pod
+    pod = object
 }
 
 is_service_account {
@@ -220,8 +248,8 @@ clusterrolebindings[clusterrolebinding] {
 }
 
 pod_containers(pod) = all_containers {
-	keys = {"containers", "initContainers"}
-	all_containers = [c | keys[k]; c = pod.spec[k][_]]
+    keys = {"containers", "initContainers"}
+    all_containers = [c | keys[k]; c = pod.spec[k][_]]
 }
 
 containers[container] {
@@ -283,17 +311,17 @@ value_by_key(array,key) = value {
 }
 
 var Config = `{
-		"services": {
-			"test": {
-				"url": %q
-			}
-		},
-		"bundles": {
-			"test": {
-				"resource": "/bundles/bundle.tar.gz"
-			}
-		},
-		"decision_logs": {
-			"console": true
-		}
-	}`
+        "services": {
+            "test": {
+                "url": %q
+            }
+        },
+        "bundles": {
+            "test": {
+                "resource": "/bundles/bundle.tar.gz"
+            }
+        },
+        "decision_logs": {
+            "console": true
+        }
+    }`
