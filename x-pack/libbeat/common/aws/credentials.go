@@ -15,12 +15,17 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/pkg/errors"
 
+<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+=======
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+>>>>>>> f025c96219 (Change proxy_url from url.URL to string (#28725))
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // ConfigAWS is a structure defined for AWS credentials
 type ConfigAWS struct {
+<<<<<<< HEAD
 	AccessKeyID          string   `config:"access_key_id"`
 	SecretAccessKey      string   `config:"secret_access_key"`
 	SessionToken         string   `config:"session_token"`
@@ -30,15 +35,30 @@ type ConfigAWS struct {
 	RoleArn              string   `config:"role_arn"`
 	AWSPartition         string   `config:"aws_partition"` // Deprecated.
 	ProxyUrl             *url.URL `config:"proxy_url"`
+=======
+	AccessKeyID          string `config:"access_key_id"`
+	SecretAccessKey      string `config:"secret_access_key"`
+	SessionToken         string `config:"session_token"`
+	ProfileName          string `config:"credential_profile_name"`
+	SharedCredentialFile string `config:"shared_credential_file"`
+	Endpoint             string `config:"endpoint"`
+	RoleArn              string `config:"role_arn"`
+	ProxyUrl             string `config:"proxy_url"`
+>>>>>>> f025c96219 (Change proxy_url from url.URL to string (#28725))
 }
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
 func InitializeAWSConfig(config ConfigAWS) (awssdk.Config, error) {
 	AWSConfig, _ := GetAWSCredentials(config)
-	if config.ProxyUrl != nil {
+	if config.ProxyUrl != "" {
+		proxyUrl, err := httpcommon.NewProxyURIFromString(config.ProxyUrl)
+		if err != nil {
+			return AWSConfig, err
+		}
+
 		httpClient := &http.Client{
 			Transport: &http.Transport{
-				Proxy: http.ProxyURL(config.ProxyUrl),
+				Proxy: http.ProxyURL(proxyUrl.URI()),
 			},
 		}
 		AWSConfig.HTTPClient = httpClient
