@@ -13,6 +13,7 @@
     "Zlib"
   ],
   "maybelist": [
-    "EPL-1.0"
+    "EPL-1.0",
+    "GPL-3.0"
   ]
 }
