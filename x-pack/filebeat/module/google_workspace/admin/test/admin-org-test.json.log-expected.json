@@ -8,7 +8,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"CHROME_LICENSES_ENABLED\",\"parameters\":[{\"name\":\"APPLICATION_NAME\",\"value\":\"app\"},{\"name\":\"CHROME_LICENSES_ENABLED\",\"value\":\"DISABLED\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"CHROME_LICENSES_ENABLED\",\"parameters\":[{\"name\":\"APPLICATION_NAME\",\"value\":\"app\"},{\"name\":\"CHROME_LICENSES_ENABLED\",\"value\":\"DISABLED\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -25,23 +25,19 @@
         "log.offset": 0,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -62,7 +58,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"CHROME_APPLICATION_LICENSE_RESERVATION_CREATED\",\"parameters\":[{\"name\":\"APPLICATION_NAME\",\"value\":\"app\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SKU_NAME\",\"value\":\"sku\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"CHROME_APPLICATION_LICENSE_RESERVATION_CREATED\",\"parameters\":[{\"name\":\"APPLICATION_NAME\",\"value\":\"app\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SKU_NAME\",\"value\":\"sku\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "creation"
@@ -77,26 +73,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 472,
+        "log.offset": 471,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -117,7 +109,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"CHROME_APPLICATION_LICENSE_RESERVATION_DELETED\",\"parameters\":[{\"name\":\"APPLICATION_NAME\",\"value\":\"app\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SKU_NAME\",\"value\":\"sku\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"CHROME_APPLICATION_LICENSE_RESERVATION_DELETED\",\"parameters\":[{\"name\":\"APPLICATION_NAME\",\"value\":\"app\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SKU_NAME\",\"value\":\"sku\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "deletion"
@@ -131,26 +123,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 982,
+        "log.offset": 980,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -171,7 +159,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"CHROME_APPLICATION_LICENSE_RESERVATION_UPDATED\",\"parameters\":[{\"name\":\"APPLICATION_NAME\",\"value\":\"app\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SKU_NAME\",\"value\":\"sku\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"CHROME_APPLICATION_LICENSE_RESERVATION_UPDATED\",\"parameters\":[{\"name\":\"APPLICATION_NAME\",\"value\":\"app\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SKU_NAME\",\"value\":\"sku\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -187,26 +175,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1457,
+        "log.offset": 1454,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -227,7 +211,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"CREATE_DEVICE_ENROLLMENT_TOKEN\",\"parameters\":[{\"name\":\"FULL_ORG_UNIT_PATH\",\"value\":\"full/org/path\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"CREATE_DEVICE_ENROLLMENT_TOKEN\",\"parameters\":[{\"name\":\"FULL_ORG_UNIT_PATH\",\"value\":\"full/org/path\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "creation"
@@ -239,26 +223,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2002,
+        "log.offset": 1998,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -279,7 +259,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"ASSIGN_CUSTOM_LOGO\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"ASSIGN_CUSTOM_LOGO\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -291,26 +271,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2400,
+        "log.offset": 2395,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -331,7 +307,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"UNASSIGN_CUSTOM_LOGO\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"UNASSIGN_CUSTOM_LOGO\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -343,26 +319,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2771,
+        "log.offset": 2765,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -383,7 +355,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"CREATE_ENROLLMENT_TOKEN\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"CREATE_ENROLLMENT_TOKEN\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "creation"
@@ -395,26 +367,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3144,
+        "log.offset": 3137,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -435,7 +403,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"REVOKE_ENROLLMENT_TOKEN\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"REVOKE_ENROLLMENT_TOKEN\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -447,26 +415,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3520,
+        "log.offset": 3512,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -487,7 +451,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"CHROME_LICENSES_ALLOWED\",\"parameters\":[{\"name\":\"APPLICATION_NAME\",\"value\":\"app\"},{\"name\":\"CHROME_LICENSES_ALLOWED\",\"value\":\"EMPTY\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"CHROME_LICENSES_ALLOWED\",\"parameters\":[{\"name\":\"APPLICATION_NAME\",\"value\":\"app\"},{\"name\":\"CHROME_LICENSES_ALLOWED\",\"value\":\"EMPTY\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -501,26 +465,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3896,
+        "log.offset": 3887,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -541,7 +501,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"CREATE_ORG_UNIT\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"CREATE_ORG_UNIT\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "creation"
@@ -553,26 +513,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 4365,
+        "log.offset": 4355,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -593,7 +549,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"REMOVE_ORG_UNIT\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"REMOVE_ORG_UNIT\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "deletion"
@@ -605,26 +561,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 4733,
+        "log.offset": 4722,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -645,7 +597,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"EDIT_ORG_UNIT_DESCRIPTION\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"EDIT_ORG_UNIT_DESCRIPTION\",\"parameters\":[{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -657,26 +609,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 5101,
+        "log.offset": 5089,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -697,7 +645,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"MOVE_ORG_UNIT\",\"parameters\":[{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"MOVE_ORG_UNIT\",\"parameters\":[{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -710,26 +658,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 5479,
+        "log.offset": 5466,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -750,7 +694,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"EDIT_ORG_UNIT_NAME\",\"parameters\":[{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"EDIT_ORG_UNIT_NAME\",\"parameters\":[{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -763,26 +707,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 5880,
+        "log.offset": 5866,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -803,7 +743,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"REVOKE_DEVICE_ENROLLMENT_TOKEN\",\"parameters\":[{\"name\":\"FULL_ORG_UNIT_PATH\",\"value\":\"full/org/path\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"REVOKE_DEVICE_ENROLLMENT_TOKEN\",\"parameters\":[{\"name\":\"FULL_ORG_UNIT_PATH\",\"value\":\"full/org/path\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -815,26 +755,22 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 6286,
+        "log.offset": 6271,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",
@@ -855,7 +791,7 @@
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"TOGGLE_SERVICE_ENABLED\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"GROUP_EMAIL\",\"value\":\"group@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SERVICE_NAME\",\"value\":\"new\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"ORG_SETTINGS\",\"name\":\"TOGGLE_SERVICE_ENABLED\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"GROUP_EMAIL\",\"value\":\"group@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SERVICE_NAME\",\"value\":\"new\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -873,26 +809,22 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 6684,
+        "log.offset": 6668,
         "organization.id": "1",
         "related.ip": [
-            "98.235.162.24"
+            "67.43.156.13"
         ],
         "related.user": [
             "foo"
         ],
         "service.type": "google_workspace",
-        "source.as.number": 7922,
-        "source.as.organization.name": "Comcast Cable Communications, LLC",
-        "source.geo.city_name": "State College",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 40.7957,
-        "source.geo.location.lon": -77.8618,
-        "source.geo.region_iso_code": "US-PA",
-        "source.geo.region_name": "Pennsylvania",
-        "source.ip": "98.235.162.24",
+        "source.as.number": 35908,
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.13",
         "source.user.domain": "bar.com",
         "source.user.email": "foo@bar.com",
         "source.user.id": "1",

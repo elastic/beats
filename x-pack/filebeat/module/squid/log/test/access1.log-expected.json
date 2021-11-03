@@ -1,13 +1,6 @@
 [
     {
         "@timestamp": "2006-09-08T04:21:52.000Z",
-        "destination.as.number": 36752,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "209.73.177.115"
         ],
@@ -69,16 +62,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:00.000Z",
-        "destination.as.number": 30633,
-        "destination.as.organization.name": "Leaseweb USA, Inc.",
-        "destination.geo.city_name": "Falls Church",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9307,
-        "destination.geo.location.lon": -77.1673,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
         "destination.ip": [
             "207.58.145.61"
         ],
@@ -143,16 +126,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:00.000Z",
-        "destination.as.number": 30633,
-        "destination.as.organization.name": "Leaseweb USA, Inc.",
-        "destination.geo.city_name": "Falls Church",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9307,
-        "destination.geo.location.lon": -77.1673,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
         "destination.ip": [
             "207.58.145.61"
         ],
@@ -343,16 +316,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:03.000Z",
-        "destination.as.number": 30633,
-        "destination.as.organization.name": "Leaseweb USA, Inc.",
-        "destination.geo.city_name": "Falls Church",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9307,
-        "destination.geo.location.lon": -77.1673,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
         "destination.ip": [
             "207.58.145.61"
         ],
@@ -417,13 +380,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:04.000Z",
-        "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "66.102.9.147"
         ],
@@ -491,16 +447,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:04.000Z",
-        "destination.as.number": 30633,
-        "destination.as.organization.name": "Leaseweb USA, Inc.",
-        "destination.geo.city_name": "Falls Church",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9307,
-        "destination.geo.location.lon": -77.1673,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
         "destination.ip": [
             "207.58.145.61"
         ],
@@ -567,16 +513,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:04.000Z",
-        "destination.as.number": 30633,
-        "destination.as.organization.name": "Leaseweb USA, Inc.",
-        "destination.geo.city_name": "Falls Church",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9307,
-        "destination.geo.location.lon": -77.1673,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
         "destination.ip": [
             "207.58.145.61"
         ],
@@ -643,16 +579,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:05.000Z",
-        "destination.as.number": 30633,
-        "destination.as.organization.name": "Leaseweb USA, Inc.",
-        "destination.geo.city_name": "Falls Church",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9307,
-        "destination.geo.location.lon": -77.1673,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
         "destination.ip": [
             "207.58.145.61"
         ],
@@ -781,16 +707,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:05.000Z",
-        "destination.as.number": 36351,
-        "destination.as.organization.name": "SoftLayer Technologies Inc.",
-        "destination.geo.city_name": "Dallas",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 32.9379,
-        "destination.geo.location.lon": -96.8384,
-        "destination.geo.region_iso_code": "US-TX",
-        "destination.geo.region_name": "Texas",
         "destination.ip": [
             "209.85.16.38"
         ],
@@ -857,11 +773,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:06.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.213.132"
         ],
@@ -923,13 +834,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:07.000Z",
-        "destination.as.number": 1299,
-        "destination.as.organization.name": "Telia Company AB",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "SE",
-        "destination.geo.country_name": "Sweden",
-        "destination.geo.location.lat": 59.3247,
-        "destination.geo.location.lon": 18.056,
         "destination.ip": [
             "217.212.240.172"
         ],
@@ -995,16 +899,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:07.000Z",
-        "destination.as.number": 3549,
-        "destination.as.organization.name": "Level 3 Parent, LLC",
-        "destination.geo.city_name": "Los Angeles",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 34.0675,
-        "destination.geo.location.lon": -118.3521,
-        "destination.geo.region_iso_code": "US-CA",
-        "destination.geo.region_name": "California",
         "destination.ip": [
             "206.169.136.22"
         ],
@@ -1134,16 +1028,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:09.000Z",
-        "destination.as.number": 30633,
-        "destination.as.organization.name": "Leaseweb USA, Inc.",
-        "destination.geo.city_name": "Falls Church",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9307,
-        "destination.geo.location.lon": -77.1673,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
         "destination.ip": [
             "207.58.145.61"
         ],
@@ -1210,16 +1094,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:09.000Z",
-        "destination.as.number": 30633,
-        "destination.as.organization.name": "Leaseweb USA, Inc.",
-        "destination.geo.city_name": "Falls Church",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9307,
-        "destination.geo.location.lon": -77.1673,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
         "destination.ip": [
             "207.58.145.61"
         ],
@@ -1286,11 +1160,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:10.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "64.127.126.178"
         ],
@@ -1358,16 +1227,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:11.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
         "destination.ip": [
             "213.160.98.161"
         ],
@@ -1434,16 +1293,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:15.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
         "destination.ip": [
             "213.160.98.160"
         ],
@@ -1568,13 +1417,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:22.000Z",
-        "destination.as.number": 36752,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "209.73.177.115"
         ],
@@ -1698,13 +1540,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:23.000Z",
-        "destination.as.number": 36646,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "216.155.194.239"
         ],
@@ -1768,16 +1603,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:24.000Z",
-        "destination.as.number": 36077,
-        "destination.as.organization.name": "Dynamic ASP Inc.",
-        "destination.geo.city_name": "Victoria",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "CA",
-        "destination.geo.country_name": "Canada",
-        "destination.geo.location.lat": 48.4267,
-        "destination.geo.location.lon": -123.3655,
-        "destination.geo.region_iso_code": "CA-BC",
-        "destination.geo.region_name": "British Columbia",
         "destination.ip": [
             "204.13.51.238"
         ],
@@ -1840,16 +1665,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:24.000Z",
-        "destination.as.number": 36077,
-        "destination.as.organization.name": "Dynamic ASP Inc.",
-        "destination.geo.city_name": "Victoria",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "CA",
-        "destination.geo.country_name": "Canada",
-        "destination.geo.location.lat": 48.4267,
-        "destination.geo.location.lon": -123.3655,
-        "destination.geo.region_iso_code": "CA-BC",
-        "destination.geo.region_name": "British Columbia",
         "destination.ip": [
             "204.13.51.238"
         ],
@@ -1914,13 +1729,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:25.000Z",
-        "destination.as.number": 36646,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "216.155.194.239"
         ],
@@ -2170,16 +1978,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:27.000Z",
-        "destination.as.number": 36077,
-        "destination.as.organization.name": "Dynamic ASP Inc.",
-        "destination.geo.city_name": "Victoria",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "CA",
-        "destination.geo.country_name": "Canada",
-        "destination.geo.location.lat": 48.4267,
-        "destination.geo.location.lon": -123.3655,
-        "destination.geo.region_iso_code": "CA-BC",
-        "destination.geo.region_name": "British Columbia",
         "destination.ip": [
             "204.13.51.238"
         ],
@@ -2242,16 +2040,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:29.000Z",
-        "destination.as.number": 36077,
-        "destination.as.organization.name": "Dynamic ASP Inc.",
-        "destination.geo.city_name": "Victoria",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "CA",
-        "destination.geo.country_name": "Canada",
-        "destination.geo.location.lat": 48.4267,
-        "destination.geo.location.lon": -123.3655,
-        "destination.geo.region_iso_code": "CA-BC",
-        "destination.geo.region_name": "British Columbia",
         "destination.ip": [
             "204.13.51.238"
         ],
@@ -2316,13 +2104,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:30.000Z",
-        "destination.as.number": 36646,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "216.155.194.239"
         ],
@@ -2386,11 +2167,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:33.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.194.14"
         ],
@@ -2456,13 +2232,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:33.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.219.132"
         ],
@@ -2529,13 +2298,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:34.000Z",
-        "destination.as.number": 36646,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "216.155.194.239"
         ],
@@ -2599,11 +2361,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:35.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "209.191.93.51"
         ],
@@ -2670,16 +2427,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:36.000Z",
-        "destination.as.number": 36856,
-        "destination.as.organization.name": "Mozilla Corporation",
-        "destination.geo.city_name": "Sacramento",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.6415,
-        "destination.geo.location.lon": -121.5114,
-        "destination.geo.region_iso_code": "US-CA",
-        "destination.geo.region_name": "California",
         "destination.ip": [
             "63.245.209.21"
         ],
@@ -2746,13 +2493,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:37.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.231.252"
         ],
@@ -2818,11 +2558,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:37.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.194.14"
         ],
@@ -3124,13 +2859,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:38.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.219.132"
         ],
@@ -3254,13 +2982,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:39.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.219.132"
         ],
@@ -3327,13 +3048,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:39.000Z",
-        "destination.as.number": 36646,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "216.155.194.239"
         ],
@@ -3397,13 +3111,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:39.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.219.132"
         ],
@@ -3470,13 +3177,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:40.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.219.132"
         ],
@@ -3665,13 +3365,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:41.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.219.132"
         ],
@@ -3738,13 +3431,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:41.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.219.132"
         ],
@@ -3811,13 +3497,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:42.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.219.132"
         ],
@@ -3884,13 +3563,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:42.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.219.132"
         ],
@@ -4143,13 +3815,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:43.000Z",
-        "destination.as.number": 2818,
-        "destination.as.organization.name": "BBC",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.4964,
-        "destination.geo.location.lon": -0.1224,
         "destination.ip": [
             "212.58.226.33"
         ],
@@ -4216,13 +3881,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:44.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.231.252"
         ],
@@ -4413,13 +4071,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:45.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.219.132"
         ],
@@ -4485,16 +4136,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:46.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
         "destination.ip": [
             "213.160.98.159"
         ],
@@ -4561,13 +4202,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:48.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.219.132"
         ],
@@ -4635,13 +4269,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:48.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.219.132"
         ],
@@ -4709,13 +4336,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:48.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.219.132"
         ],
@@ -4909,16 +4529,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:50.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
         "destination.ip": [
             "213.160.98.159"
         ],
@@ -4985,13 +4595,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:50.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.219.132"
         ],
@@ -5059,13 +4662,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:51.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.219.132"
         ],
@@ -5133,16 +4729,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:51.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
         "destination.ip": [
             "213.160.98.152"
         ],
@@ -5210,13 +4796,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:53.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.219.132"
         ],
@@ -5284,11 +4863,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:54.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.213.132"
         ],
@@ -5355,11 +4929,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:56.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "68.142.194.14"
         ],
@@ -5427,11 +4996,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:57.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "216.109.124.55"
         ],
@@ -5555,16 +5119,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:57.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
         "destination.ip": [
             "213.160.98.159"
         ],
@@ -5631,16 +5185,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:58.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
         "destination.ip": [
             "213.160.98.159"
         ],
@@ -5707,13 +5251,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:58.000Z",
-        "destination.as.number": 36752,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "209.73.177.115"
         ],
@@ -5775,16 +5312,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:58.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
         "destination.ip": [
             "213.160.98.167"
         ],
@@ -5851,16 +5378,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:58.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
         "destination.ip": [
             "213.160.98.159"
         ],
@@ -5989,16 +5506,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:59.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
         "destination.ip": [
             "213.160.98.167"
         ],
@@ -6065,16 +5572,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:59.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
         "destination.ip": [
             "213.160.98.159"
         ],
@@ -6141,16 +5638,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:23:00.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
         "destination.ip": [
             "213.160.98.167"
         ],
@@ -6341,11 +5828,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:23:01.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": [
             "216.109.125.112"
         ],
@@ -6412,13 +5894,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:23:02.000Z",
-        "destination.as.number": 34010,
-        "destination.as.organization.name": "Yahoo! UK Services Limited",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.4964,
-        "destination.geo.location.lon": -0.1224,
         "destination.ip": [
             "217.12.10.96"
         ],
@@ -6542,16 +6017,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:23:04.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
         "destination.ip": [
             "213.160.98.169"
         ],
@@ -6680,16 +6145,6 @@
     },
     {
         "@timestamp": "2006-09-08T04:23:07.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
         "destination.ip": [
             "213.160.98.169"
         ],
