@@ -14,16 +14,3 @@
 {"name": "kernel.org/pub/linux/libs/security/libcap/cap", "licenceType": "BSD-3-Clause", "note": "dual licensed as GPL-v2 and BSD"}
 {"name": "kernel.org/pub/linux/libs/security/libcap/psx", "licenceType": "BSD-3-Clause", "note": "dual licensed as GPL-v2 and BSD"}
 {"name": "github.com/awslabs/kinesis-aggregation/go", "licenceType": "Apache-2.0", "url": "https://github.com/awslabs/kinesis-aggregation/blob/master/LICENSE.txt"}
-{"name": "github.com/ajstarks/svgo", "licenceType": "CC-BY-4.0"}
-{"name": "github.com/bmizerany/pat", "licenceFile": "README.md"}
-{"name": "github.com/bmizerany/assert", "licenceType": "MIT"}
-{"name": "github.com/cactus/go-statsd-client/statsd", "licenceType": "MIT"}
-{"name": "github.com/dnaeon/go-vcr", "licenceType":  "BSD-2-Clause"}
-{"name": "github.com/garyburd/redigo", "licenceType": "Apache-2.0", "url": "https://github.com/garyburd/redigo/blob/master/LICENSE"}
-{"name": "github.com/golang/freetype", "licenceFile":  "licenses/gpl.txt"}
-{"name": "github.com/hudl/fargo", "licenceFile":  "README.md"}
-{"name": "github.com/influxdata/line-protocol", "licenceType":  "MIT"}
-{"name": "github.com/lightstep/lightstep-tracer-common/golang/gogo", "licenceType":  "MIT"}
-{"name": "github.com/pascaldekloe/goe", "licenceType":  "CC0-1.0"}
-{"name": "github.com/streadway/handy", "licenceFile": "README.md"}
-{"name": "gonum.org/v1/plot", "licenceType": "BSD-3-Clause"}

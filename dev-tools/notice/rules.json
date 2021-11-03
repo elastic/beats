@@ -10,13 +10,9 @@
     "MIT",
     "MPL-2.0",
     "Public Domain",
-    "Zlib",
-    "CC-BY-4.0",
-    "CC0-1.0"
+    "Zlib"
   ],
   "maybelist": [
-    "EPL-1.0",
-    "GPL-3.0",
-    "GPL-2.0"
+    "EPL-1.0"
   ]
 }
