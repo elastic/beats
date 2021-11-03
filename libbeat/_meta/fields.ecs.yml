@@ -3538,14 +3538,15 @@
       level: extended
       type: keyword
       ignore_above: 1024
-      description: 'A name given to an application level protocol. This can be arbitrarily
-        assigned for things like microservices, but also apply to things like skype,
-        icq, facebook, twitter. This would be used in situations where the vendor
-        or service can be decoded such as from the source/dest IP owners, ports, or
-        wire format.
+      description: 'When a specific application or service is identified from network
+        connection details (source/dest IPs, ports, certificates, or wire format),
+        this field captures the application''s or service''s name.
 
-        The field value must be normalized to lowercase for querying. See the documentation
-        section "Implementing ECS".'
+        For example, the original event identifies the network connection being from
+        a specific web service in a `https` network connection, like `facebook` or
+        `twitter`.
+
+        The field value must be normalized to lowercase for querying.'
       example: aim
     - name: bytes
       level: core
@@ -3637,10 +3638,10 @@
       level: core
       type: keyword
       ignore_above: 1024
-      description: 'L7 Network protocol name. ex. http, lumberjack, transport protocol.
+      description: 'In the OSI Model this would be the Application Layer protocol.
+        For example, `http`, `dns`, or `ssh`.
 
-        The field value must be normalized to lowercase for querying. See the documentation
-        section "Implementing ECS".'
+        The field value must be normalized to lowercase for querying.'
       example: http
     - name: transport
       level: core
@@ -3649,8 +3650,7 @@
       description: 'Same as network.iana_number, but instead using the Keyword name
         of the transport layer (udp, tcp, ipv6-icmp, etc.)
 
-        The field value must be normalized to lowercase for querying. See the documentation
-        section "Implementing ECS".'
+        The field value must be normalized to lowercase for querying.'
       example: tcp
     - name: type
       level: core
@@ -3659,8 +3659,7 @@
       description: 'In the OSI Model this would be the Network Layer. ipv4, ipv6,
         ipsec, pim, etc
 
-        The field value must be normalized to lowercase for querying. See the documentation
-        section "Implementing ECS".'
+        The field value must be normalized to lowercase for querying.'
       example: ipv4
     - name: vlan.id
       level: extended
