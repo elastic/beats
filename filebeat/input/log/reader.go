@@ -108,6 +108,8 @@ func (r *ReuseHarvester) Next() (reader.Message, error) {
 	select {
 	case <-r.done:
 		return reader.Message{}, ErrHarvesterDone
+	case <-r.fileReader.done:
+		return reader.Message{}, ErrHarvesterDone
 	case msg := <-r.message:
 		return msg.message, msg.error
 	}
@@ -117,6 +119,8 @@ func (r *ReuseHarvester) Next() (reader.Message, error) {
 func (r *ReuseHarvester) OnMessage(message ReuseMessage) error {
 	select {
 	case <-r.done:
+		return ErrHarvesterDone
+	case <-r.fileReader.done:
 		return ErrHarvesterDone
 	case r.message <- message:
 		return nil
@@ -289,7 +293,15 @@ func (h *FileHarvester) AddForwarder(reuseReader *ReuseHarvester) error {
 	}
 
 	//add forwarder
-	go func() { h.forwarder <- reuseReader }()
+	go func() {
+		select {
+		case <-h.done:
+			logp.Err("add forwarder failed, because FileHarvester is quit")
+			return
+		case h.forwarder <- reuseReader:
+			return
+		}
+	}()
 
 	// start to read file
 	h.runOnce.Do(func() {
