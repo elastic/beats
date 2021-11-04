@@ -17155,11 +17155,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/time
-Version: v0.0.0-20210220033141-f8bda1e9f3ba
+Version: v0.0.0-20210611083556-38a9dc6acbc6
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/time@v0.0.0-20210220033141-f8bda1e9f3ba/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/time@v0.0.0-20210611083556-38a9dc6acbc6/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -17229,11 +17229,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/api
-Version: v0.47.0
+Version: v0.48.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/api@v0.47.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/api@v0.48.0/LICENSE:
 
 Copyright (c) 2011 Google Inc. All rights reserved.
 
