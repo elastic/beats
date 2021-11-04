@@ -2556,12 +2556,7 @@
         "event.original": "2018:9:12-22:02:15 pluto[7138]: | sent accept notification olore with seqno = urEx",
         "fileset.name": "utm",
         "input.type": "log",
-<<<<<<< HEAD
         "log.offset": 18090,
-        "log.original": "olore",
-=======
-        "log.offset": 18122,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "observer.product": "UTM",
         "observer.type": "Firewall",
         "observer.vendor": "Sophos",

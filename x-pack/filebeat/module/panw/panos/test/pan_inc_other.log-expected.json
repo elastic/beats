@@ -757,7 +757,7 @@
         "event.end": "2012-04-10T04:39:56.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
-        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:56,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,25149,1,59309,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:56,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:56,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,25149,1,59309,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:56,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:56.000-02:00",
         "event.timezone": "-02:00",
@@ -770,10 +770,6 @@
         "input.type": "log",
         "labels.captive_portal": true,
         "log.offset": 5853,
-<<<<<<< HEAD
-        "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:56,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,25149,1,59309,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:56,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
-=======
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:mY2EPMYo0US42k87/2uTzjo/rGA=",

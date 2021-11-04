@@ -122,7 +122,7 @@
         "event.dataset": "panw.panos",
         "event.duration": 0,
         "event.module": "panw",
-        "event.original": "1,2021/04/07 17:41:30,013101305,GLOBALPROTECT,0,2305,2021/04/07 17:41:30,vsys1,gateway-hip-check,host-info,,,domain\\user1,,HOST82878,7.2.2.193,0.0.0.0,67.43.156.14,0.0.0.0,523e8b-7efa-4397-a4d5-824dfa4d8a,F1SM2,5.2.4,,\"\",1,,,\"HIP report is not needed\",success,,0,,0,GlobalProtect_GW,6920071768563516860,0x0",
+        "event.original": "1,2021/04/07 17:41:30,013101305,GLOBALPROTECT,0,2305,2021/04/07 17:41:30,vsys1,gateway-hip-check,host-info,,,domain\\user1,,HOST82878,7.2.2.193,0.0.0.0,12.30.0.210,0.0.0.0,523e8b-7efa-4397-a4d5-824dfa4d8a,F1SM2,5.2.4,,\"\",1,,,\"HIP report is not needed\",success,,0,,0,GlobalProtect_GW,6920071768563516860,0x0",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "panos",
@@ -131,10 +131,6 @@
         "host.name": "HOST82878",
         "input.type": "log",
         "log.offset": 640,
-<<<<<<< HEAD
-        "log.original": "1,2021/04/07 17:41:30,013101305,GLOBALPROTECT,0,2305,2021/04/07 17:41:30,vsys1,gateway-hip-check,host-info,,,domain\\user1,,HOST82878,7.2.2.193,0.0.0.0,12.30.0.210,0.0.0.0,523e8b-7efa-4397-a4d5-824dfa4d8a,F1SM2,5.2.4,,\"\",1,,,\"HIP report is not needed\",success,,0,,0,GlobalProtect_GW,6920071768563516860,0x0",
-=======
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.type": "ipv4",
         "observer.hostname": "GlobalProtect_GW",
         "observer.product": "PAN-OS",
@@ -196,7 +192,7 @@
         "event.dataset": "panw.panos",
         "event.duration": 0,
         "event.module": "panw",
-        "event.original": "1,2021/04/07 17:41:29,013101308,GLOBALPROTECT,0,2305,2021/04/07 17:41:29,vsys1,gateway-getconfig,configuration,,IPSec,pre-logon,BE,HOST73486,7.2.2.171,0.0.0.0,81.2.69.193,0.0.0.0,7d01b5-f538-4fa3-a2a2-83980d1325,5C261FNR,5.2.4,Windows,\"Microsoft Windows 10 Pro , 64-bit\",1,,,\"Config name: , Client region: BE.\",success,,0,,0,GlobalProtect_GW,6944137135219737,0x0",
+        "event.original": "1,2021/04/07 17:41:29,013101308,GLOBALPROTECT,0,2305,2021/04/07 17:41:29,vsys1,gateway-getconfig,configuration,,IPSec,pre-logon,BE,HOST73486,7.2.2.171,0.0.0.0,1.40.2.67,0.0.0.0,7d01b5-f538-4fa3-a2a2-83980d1325,5C261FNR,5.2.4,Windows,\"Microsoft Windows 10 Pro , 64-bit\",1,,,\"Config name: , Client region: BE.\",success,,0,,0,GlobalProtect_GW,6944137135219737,0x0",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "panos",
@@ -206,12 +202,7 @@
         "host.os.family": "Windows",
         "host.os.full": "Microsoft Windows 10 Pro , 64-bit",
         "input.type": "log",
-<<<<<<< HEAD
         "log.offset": 946,
-        "log.original": "1,2021/04/07 17:41:29,013101308,GLOBALPROTECT,0,2305,2021/04/07 17:41:29,vsys1,gateway-getconfig,configuration,,IPSec,pre-logon,BE,HOST73486,7.2.2.171,0.0.0.0,1.40.2.67,0.0.0.0,7d01b5-f538-4fa3-a2a2-83980d1325,5C261FNR,5.2.4,Windows,\"Microsoft Windows 10 Pro , 64-bit\",1,,,\"Config name: , Client region: BE.\",success,,0,,0,GlobalProtect_GW,6944137135219737,0x0",
-=======
-        "log.offset": 947,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.type": "ipv4",
         "observer.hostname": "GlobalProtect_GW",
         "observer.product": "PAN-OS",
@@ -281,12 +272,7 @@
         "host.ip": "0.0.0.0",
         "host.name": "HOSTP92413",
         "input.type": "log",
-<<<<<<< HEAD
         "log.offset": 1307,
-        "log.original": "1,2021/04/07 17:41:28,0131001309,GLOBALPROTECT,0,2305,2021/04/07 17:41:28,vsys1,gateway-tunnel-latency,tunnel,,,,userlterso,HOSTP92413,7.2.17.120,0.0.0.0,0.0.0.0,0.0.0.0,2ba9f01-b83b-4902-a1fb-1748c0365,GJG98Y2,5.2.4,,\"\",1,,,\"Pre-tunnel latency: 67ms, Post-tunnel latency: 47ms\",success,,0,,0,GlobalProtect_GW,6920071768563516847,0x0",
-=======
-        "log.offset": 1310,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.type": "ipv4",
         "observer.hostname": "GlobalProtect_GW",
         "observer.product": "PAN-OS",
@@ -342,12 +328,7 @@
         "host.os.family": "Windows",
         "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
         "input.type": "log",
-<<<<<<< HEAD
         "log.offset": 1642,
-        "log.original": "1,2021/03/02 09:55:42,12345678999,GLOBALPROTECT,0,2305,2021/03/02 09:55:39,vsys1,gateway-auth,login,Other,,maxmustermann,10.0.0.0-10.255.255.255,PC1234,10.20.30.40,0.0.0.0,0.0.0.0,0.0.0.0,985e865f-7da3-43b4-89a9-299b1bb0c975,SERIALNR,5.1.1,Windows,\"Microsoft Windows 10 Enterprise, 64-bit\",1,,,,success,,0,pre-logon,0,GP GW intern,6894571632887748064,0x8000000000000000,1970-01-01T01:00:00.000+01:00,,0,manual only,,",
-=======
-        "log.offset": 1645,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.type": "ipv4",
         "observer.hostname": "GP GW intern",
         "observer.product": "PAN-OS",
@@ -401,6 +382,7 @@
         "event.dataset": "panw.panos",
         "event.duration": 0,
         "event.module": "panw",
+        "event.original": "1,2021/03/02 11:01:03,123456789999,GLOBALPROTECT,0,2305,2021/03/02 11:01:02,vsys1,gateway-setup-ipsec,tunnel,,IPSec,domain\\musterman,DE,Rechner123,123.123.123.123,0.0.0.0,10.20.30.40,0.0.0.0,96c43d47-8bb5-4f78-8dfc-413a189a29e0,SERIALNR,5.1.1,Windows,\"Microsoft Windows 10 Enterprise, 64-bit\",1,,,,success,,0,,0,GPGateway,6894571632887761989,0x8000000000000000,1970-01-01T01:00:00.000+01:00,,0,manual only,,",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "panos",
@@ -411,7 +393,6 @@
         "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
         "input.type": "log",
         "log.offset": 2059,
-        "log.original": "1,2021/03/02 11:01:03,123456789999,GLOBALPROTECT,0,2305,2021/03/02 11:01:02,vsys1,gateway-setup-ipsec,tunnel,,IPSec,domain\\musterman,DE,Rechner123,123.123.123.123,0.0.0.0,10.20.30.40,0.0.0.0,96c43d47-8bb5-4f78-8dfc-413a189a29e0,SERIALNR,5.1.1,Windows,\"Microsoft Windows 10 Enterprise, 64-bit\",1,,,,success,,0,,0,GPGateway,6894571632887761989,0x8000000000000000,1970-01-01T01:00:00.000+01:00,,0,manual only,,",
         "network.type": "ipv4",
         "observer.hostname": "GPGateway",
         "observer.product": "PAN-OS",

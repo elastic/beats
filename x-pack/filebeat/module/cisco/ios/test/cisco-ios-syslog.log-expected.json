@@ -1138,7 +1138,7 @@
         "event.dataset": "cisco.ios",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "Jun 20 02:43:20 198.51.100.2 1663323: Jun 20 02:43:20.346: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(59415) -> 175.16.199.1(53), 1 packet",
+        "event.original": "Jun 20 02:43:20 198.51.100.2 1663323: Jun 20 02:43:20.346: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(59415) -> 8.8.8.8(53), 1 packet",
         "event.outcome": "deny",
         "event.sequence": 1663323,
         "event.severity": 6,
@@ -1151,10 +1151,6 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 3696,
-<<<<<<< HEAD
-        "log.original": "Jun 20 02:43:20 198.51.100.2 1663323: Jun 20 02:43:20.346: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(59415) -> 8.8.8.8(53), 1 packet",
-=======
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "log.source.address": "198.51.100.2",
         "message": "list 177 denied udp 198.51.100.195(59415) -> 8.8.8.8(53), 1 packet",
         "network.community_id": "1:h/uFabgjBwU5mrrtpdTxxrh73yI=",
@@ -1189,7 +1185,7 @@
         "event.dataset": "cisco.ios",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "Jun 20 02:43:22 198.51.100.2 1663324: Jun 20 02:43:21.348: %SEC-6-IPACCESSLOGP: list 177 denied udp 175.16.199.1(53) -> 198.51.100.195(59415), 1 packet",
+        "event.original": "Jun 20 02:43:22 198.51.100.2 1663324: Jun 20 02:43:21.348: %SEC-6-IPACCESSLOGP: list 177 denied udp 8.8.8.8(53) -> 198.51.100.195(59415), 1 packet",
         "event.outcome": "deny",
         "event.sequence": 1663324,
         "event.severity": 6,
@@ -1201,12 +1197,7 @@
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
-<<<<<<< HEAD
         "log.offset": 3843,
-        "log.original": "Jun 20 02:43:22 198.51.100.2 1663324: Jun 20 02:43:21.348: %SEC-6-IPACCESSLOGP: list 177 denied udp 8.8.8.8(53) -> 198.51.100.195(59415), 1 packet",
-=======
-        "log.offset": 3848,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "log.source.address": "198.51.100.2",
         "message": "list 177 denied udp 8.8.8.8(53) -> 198.51.100.195(59415), 1 packet",
         "network.community_id": "1:h/uFabgjBwU5mrrtpdTxxrh73yI=",
@@ -1246,12 +1237,7 @@
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
-<<<<<<< HEAD
         "log.offset": 3990,
-        "log.original": "Jun 20 02:43:29 198.51.100.2 1663325: Jun 20 02:43:28.403: %SEC-6-IPACCESSLOGRL: access-list logging rate-limited or missed 23 packets",
-=======
-        "log.offset": 4000,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "log.source.address": "198.51.100.2",
         "message": "access-list logging rate-limited or missed 23 packets",
         "service.type": "cisco",
@@ -1287,12 +1273,7 @@
         "icmp.type": "3",
         "input.type": "log",
         "log.level": "informational",
-<<<<<<< HEAD
         "log.offset": 4125,
-        "log.original": "Jun 20 02:43:29 198.51.100.2 1663326: Jun 20 02:43:28.403: %SEC-6-IPACCESSLOGDP: list 150 denied icmp 198.51.100.12 -> 198.51.100.1 (3/3), 32 packets",
-=======
-        "log.offset": 4135,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "log.source.address": "198.51.100.2",
         "message": "list 150 denied icmp 198.51.100.12 -> 198.51.100.1 (3/3), 32 packets",
         "network.community_id": "1:huj4hjTG/rbN+R5GhpV6YHP1sYM=",
@@ -1345,12 +1326,7 @@
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
-<<<<<<< HEAD
         "log.offset": 4275,
-        "log.original": "Jun 20 02:43:30 198.51.100.2 1663327: Jun 20 02:43:29.451: %SEC-6-IPACCESSLOGP: list 150 denied tcp 198.51.100.12(59834) -> 172.217.10.46(80), 1 packet",
-=======
-        "log.offset": 4285,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "log.source.address": "198.51.100.2",
         "message": "list 150 denied tcp 198.51.100.12(59834) -> 172.217.10.46(80), 1 packet",
         "network.community_id": "1:5enMmUgQViWG28IC5W6/9cYJ6EA=",
@@ -1397,12 +1373,7 @@
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
-<<<<<<< HEAD
         "log.offset": 4427,
-        "log.original": "Jun 20 02:43:34 198.51.100.2 1663328: Jun 20 02:43:33.352: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(54532) -> 198.51.100.255(15600), 1 packet",
-=======
-        "log.offset": 4437,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "log.source.address": "198.51.100.2",
         "message": "list 177 denied udp 198.51.100.195(54532) -> 198.51.100.255(15600), 1 packet",
         "network.community_id": "1:HW2UVF4QjZyP0WvOCPDC/SaLeM4=",
@@ -1449,12 +1420,7 @@
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
-<<<<<<< HEAD
         "log.offset": 4584,
-        "log.original": "Jun 20 02:43:40 198.51.100.2 1663329: Jun 20 02:43:39.350: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(57831) -> 198.51.100.255(15600), 1 packet",
-=======
-        "log.offset": 4594,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "log.source.address": "198.51.100.2",
         "message": "list 177 denied udp 198.51.100.195(57831) -> 198.51.100.255(15600), 1 packet",
         "network.community_id": "1:wnyoad/xLJtzSkYMtkPdjPFtcbY=",
@@ -1501,12 +1467,7 @@
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
-<<<<<<< HEAD
         "log.offset": 4741,
-        "log.original": "Jun 20 02:43:45 198.51.100.2 1663330: Jun 20 02:43:44.173: %SEC-6-IPACCESSLOGP: list 150 denied udp 198.51.100.20(138) -> 198.51.100.255(138), 1 packet",
-=======
-        "log.offset": 4751,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "log.source.address": "198.51.100.2",
         "message": "list 150 denied udp 198.51.100.20(138) -> 198.51.100.255(138), 1 packet",
         "network.community_id": "1:20RnUEbnGL+QfL5tp+byZIdFKiE=",
@@ -1553,12 +1514,7 @@
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
-<<<<<<< HEAD
         "log.offset": 4893,
-        "log.original": "Jun 20 02:43:46 198.51.100.2 1663331: Jun 20 02:43:45.356: %SEC-6-IPACCESSLOGP: list 177 denied udp 198.51.100.195(42988) -> 198.51.100.255(15600), 1 packet",
-=======
-        "log.offset": 4903,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "log.source.address": "198.51.100.2",
         "message": "list 177 denied udp 198.51.100.195(42988) -> 198.51.100.255(15600), 1 packet",
         "network.community_id": "1:+vR7H9Spa/zExAcx4hOFskroCOY=",
@@ -1612,12 +1568,7 @@
         "fileset.name": "ios",
         "input.type": "log",
         "log.level": "informational",
-<<<<<<< HEAD
         "log.offset": 5050,
-        "log.original": "Jun 20 02:43:51 198.51.100.2 1663332: Jun 20 02:43:50.473: %SEC-6-IPACCESSLOGP: list 150 denied tcp 198.51.100.12(59836) -> 172.217.10.46(80), 1 packet",
-=======
-        "log.offset": 5060,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "log.source.address": "198.51.100.2",
         "message": "list 150 denied tcp 198.51.100.12(59836) -> 172.217.10.46(80), 1 packet",
         "network.community_id": "1:cfXjAByFKHEuSoPPIRx01/7LC0Q=",

@@ -59,7 +59,7 @@
         "client.ip": "67.240.185.235",
         "event.dataset": "panw.panos",
         "event.module": "panw",
-        "event.original": "1,2019/10/09 10:20:15,001234567890002,HIPMATCH,0,2304,2019/10/09 10:20:15,ira,vsys1,oh-C02ABCDEFGH4,Mac,89.160.20.112,GP-HIP-PROFILE,1,profile,0,0,0123456789,0x0,0,0,0,0,,SumoRedfw01a,1,0.0.0.0,gh:85:90:99:5a:40,C02ABCDEFGH",
+        "event.original": "1,2019/10/09 10:20:15,001234567890002,HIPMATCH,0,2304,2019/10/09 10:20:15,ira,vsys1,oh-C02ABCDEFGH4,Mac,67.240.185.235,GP-HIP-PROFILE,1,profile,0,0,0123456789,0x0,0,0,0,0,,SumoRedfw01a,1,0.0.0.0,gh:85:90:99:5a:40,C02ABCDEFGH",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "panos",
@@ -68,10 +68,6 @@
         "host.os.full": "Mac",
         "input.type": "log",
         "log.offset": 298,
-<<<<<<< HEAD
-        "log.original": "1,2019/10/09 10:20:15,001234567890002,HIPMATCH,0,2304,2019/10/09 10:20:15,ira,vsys1,oh-C02ABCDEFGH4,Mac,67.240.185.235,GP-HIP-PROFILE,1,profile,0,0,0123456789,0x0,0,0,0,0,,SumoRedfw01a,1,0.0.0.0,gh:85:90:99:5a:40,C02ABCDEFGH",
-=======
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.type": "ipv4",
         "observer.hostname": "SumoRedfw01a",
         "observer.product": "PAN-OS",

@@ -8,12 +8,7 @@
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 0,
-<<<<<<< HEAD
-        "log.original": "Connection Opened",
         "observer.ingress.interface.name": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
-=======
-        "observer.ingress.interface.name": "WAN dst=89.160.20.156:50000:WAN proto=tcp/50000",
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
@@ -26,7 +21,6 @@
         "rsa.network.sinterface": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "rsa.time.event_time": "2007-01-03T16:48:06.000Z",
         "service.type": "sonicwall",
-<<<<<<< HEAD
         "source.as.number": 3215,
         "source.as.organization.name": "Orange",
         "source.geo.continent_name": "Europe",
@@ -34,12 +28,7 @@
         "source.geo.country_name": "France",
         "source.geo.location.lat": 48.8582,
         "source.geo.location.lon": 2.3387,
-        "source.ip": [
-            "2.2.2.2"
-        ],
-=======
         "source.ip": "2.2.2.2",
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "source.port": 36701,
         "tags": [
             "forwarded",
@@ -81,14 +70,8 @@
         "event.original": "Jan  3 13:45:36 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:07\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23420 src=2.2.2.2:36702:WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "fileset.name": "firewall",
         "input.type": "log",
-<<<<<<< HEAD
         "log.offset": 414,
-        "log.original": "Connection Opened",
         "observer.ingress.interface.name": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
-=======
-        "log.offset": 438,
-        "observer.ingress.interface.name": "WAN dst=89.160.20.156:50000:WAN proto=tcp/50000",
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
@@ -101,7 +84,6 @@
         "rsa.network.sinterface": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "rsa.time.event_time": "2007-01-03T16:48:07.000Z",
         "service.type": "sonicwall",
-<<<<<<< HEAD
         "source.as.number": 3215,
         "source.as.organization.name": "Orange",
         "source.geo.continent_name": "Europe",
@@ -109,12 +91,7 @@
         "source.geo.country_name": "France",
         "source.geo.location.lat": 48.8582,
         "source.geo.location.lon": 2.3387,
-        "source.ip": [
-            "2.2.2.2"
-        ],
-=======
         "source.ip": "2.2.2.2",
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "source.port": 36702,
         "tags": [
             "forwarded",
@@ -241,14 +218,8 @@
         "event.original": "Jan  3 13:45:40 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:10\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23421 src=2.2.2.2:36703:WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "fileset.name": "firewall",
         "input.type": "log",
-<<<<<<< HEAD
         "log.offset": 1560,
-        "log.original": "Connection Opened",
         "observer.ingress.interface.name": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
-=======
-        "log.offset": 1626,
-        "observer.ingress.interface.name": "WAN dst=89.160.20.156:50000:WAN proto=tcp/50000",
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
@@ -261,7 +232,6 @@
         "rsa.network.sinterface": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "rsa.time.event_time": "2007-01-03T16:48:10.000Z",
         "service.type": "sonicwall",
-<<<<<<< HEAD
         "source.as.number": 3215,
         "source.as.organization.name": "Orange",
         "source.geo.continent_name": "Europe",
@@ -269,12 +239,7 @@
         "source.geo.country_name": "France",
         "source.geo.location.lat": 48.8582,
         "source.geo.location.lon": 2.3387,
-        "source.ip": [
-            "2.2.2.2"
-        ],
-=======
         "source.ip": "2.2.2.2",
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "source.port": 36703,
         "tags": [
             "forwarded",
@@ -316,14 +281,8 @@
         "event.original": "Jan  3 13:45:40 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:11\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23422 src=2.2.2.2:36704:WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "fileset.name": "firewall",
         "input.type": "log",
-<<<<<<< HEAD
         "log.offset": 1974,
-        "log.original": "Connection Opened",
         "observer.ingress.interface.name": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
-=======
-        "log.offset": 2064,
-        "observer.ingress.interface.name": "WAN dst=89.160.20.156:50000:WAN proto=tcp/50000",
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
@@ -336,7 +295,6 @@
         "rsa.network.sinterface": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "rsa.time.event_time": "2007-01-03T16:48:11.000Z",
         "service.type": "sonicwall",
-<<<<<<< HEAD
         "source.as.number": 3215,
         "source.as.organization.name": "Orange",
         "source.geo.continent_name": "Europe",
@@ -344,12 +302,7 @@
         "source.geo.country_name": "France",
         "source.geo.location.lat": 48.8582,
         "source.geo.location.lon": 2.3387,
-        "source.ip": [
-            "2.2.2.2"
-        ],
-=======
         "source.ip": "2.2.2.2",
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "source.port": 36704,
         "tags": [
             "forwarded",
@@ -380,18 +333,12 @@
         "rsa.network.sinterface": "WAN",
         "rsa.time.event_time": "2007-01-03T16:48:14.000Z",
         "service.type": "sonicwall",
-<<<<<<< HEAD
         "source.geo.continent_name": "Oceania",
         "source.geo.country_iso_code": "NZ",
         "source.geo.country_name": "New Zealand",
         "source.geo.location.lat": -41.0,
         "source.geo.location.lon": 174.0,
-        "source.ip": [
-            "219.89.19.223"
-        ],
-=======
         "source.ip": "219.89.19.223",
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "source.port": 1026,
         "tags": [
             "forwarded",
@@ -434,12 +381,7 @@
         "event.original": "Jan  3 13:45:44 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:15\" fw=1.1.1.1 pri=6 c=16 m=346 msg=\"IKE Initiator: Start Quick Mode (Phase 2).\" n=171872 src=2.2.2.2:500 dst=1.1.1.1:500",
         "fileset.name": "firewall",
         "input.type": "log",
-<<<<<<< HEAD
         "log.offset": 2582,
-        "log.original": "IKE Initiator: Start Quick Mode (Phase 2).",
-=======
-        "log.offset": 2708,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
@@ -460,12 +402,7 @@
         "event.original": "Jan  3 13:45:44 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:15\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23423 src=1.1.1.1:500:WAN dst=2.2.2.2:500:WAN proto=udp/500",
         "fileset.name": "firewall",
         "input.type": "log",
-<<<<<<< HEAD
         "log.offset": 2780,
-        "log.original": "Connection Opened",
-=======
-        "log.offset": 2918,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "observer.ingress.interface.name": "WAN dst=2.2.2.2:500:WAN proto=udp/500",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
@@ -479,7 +416,6 @@
         "rsa.network.sinterface": "WAN dst=2.2.2.2:500:WAN proto=udp/500",
         "rsa.time.event_time": "2007-01-03T16:48:15.000Z",
         "service.type": "sonicwall",
-<<<<<<< HEAD
         "source.as.number": 13335,
         "source.as.organization.name": "Cloudflare, Inc.",
         "source.geo.continent_name": "Oceania",
@@ -487,22 +423,7 @@
         "source.geo.country_name": "Australia",
         "source.geo.location.lat": -33.494,
         "source.geo.location.lon": 143.2104,
-        "source.ip": [
-            "1.1.1.1"
-        ],
-=======
-        "source.as.number": 29518,
-        "source.as.organization.name": "Bredband2 AB",
-        "source.geo.city_name": "Link\u00f6ping",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "SE",
-        "source.geo.country_name": "Sweden",
-        "source.geo.location.lat": 58.4167,
-        "source.geo.location.lon": 15.6167,
-        "source.geo.region_iso_code": "SE-E",
-        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
-        "source.ip": "89.160.20.156",
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
+        "source.ip": "1.1.1.1",
         "source.port": 500,
         "tags": [
             "forwarded",
@@ -537,12 +458,7 @@
         "event.original": "Jan  3 13:45:45 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:15\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23424 src=192.168.115.10:11549:WAN dst=192.168.5.10:53:LAN proto=tcp/dns",
         "fileset.name": "firewall",
         "input.type": "log",
-<<<<<<< HEAD
         "log.offset": 3165,
-        "log.original": "Connection Opened",
-=======
-        "log.offset": 3327,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "observer.ingress.interface.name": "WAN dst=192.168.5.10:53:LAN proto=tcp/dns",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
@@ -571,12 +487,7 @@
         "event.original": "Jan  3 13:45:46 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:17\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23425 src=192.168.5.64:3182:LAN dst=192.168.1.100:445:WAN proto=tcp/445",
         "fileset.name": "firewall",
         "input.type": "log",
-<<<<<<< HEAD
         "log.offset": 3375,
-        "log.original": "Connection Opened",
-=======
-        "log.offset": 3543,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "observer.ingress.interface.name": "LAN dst=192.168.1.100:445:WAN proto=tcp/445",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
@@ -661,12 +572,7 @@
         "event.original": "Jan  3 13:45:50 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:20\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23426 src=192.168.125.75:524:WAN dst=192.168.5.10:3582:LAN proto=udp/3582",
         "fileset.name": "firewall",
         "input.type": "log",
-<<<<<<< HEAD
         "log.offset": 4049,
-        "log.original": "Connection Opened",
-=======
-        "log.offset": 4241,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "observer.ingress.interface.name": "WAN dst=192.168.5.10:3582:LAN proto=udp/3582",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
@@ -695,12 +601,7 @@
         "event.original": "Jan  3 13:45:50 192.168.5.1 id=firewall sn=000SERIAL time=\"2007-01-03 14:48:21\" fw=1.1.1.1 pri=6 c=262144 m=98 msg=\"Connection Opened\" n=23427 src=192.168.6.10:28503:WAN dst=192.168.5.10:53:LAN proto=tcp/dns",
         "fileset.name": "firewall",
         "input.type": "log",
-<<<<<<< HEAD
         "log.offset": 4260,
-        "log.original": "Connection Opened",
-=======
-        "log.offset": 4458,
->>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "observer.ingress.interface.name": "WAN dst=192.168.5.10:53:LAN proto=tcp/dns",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
