@@ -74,7 +74,12 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 	}
 	defer locker.Unlock()
 
-	service.BeforeRun()
+	cfg, err := loadConfig(override)
+	if err != nil {
+		return err
+	}
+
+	service.BeforeRunWithPprof(beats.AgentDebugEndpoint(cfg.Settings.DownloadConfig.OS()))
 	defer service.Cleanup()
 
 	// register as a service
@@ -84,11 +89,6 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 		close(stop)
 	}
 	service.HandleSignals(stopBeat, cancel)
-
-	cfg, err := loadConfig(override)
-	if err != nil {
-		return err
-	}
 
 	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig, true)
 	if err != nil {

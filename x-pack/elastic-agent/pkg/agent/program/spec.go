@@ -35,6 +35,7 @@ type Spec struct {
 	ActionInputTypes      []string             `yaml:"action_input_types,omitempty"`
 	LogPaths              map[string]string    `yaml:"log_paths,omitempty"`
 	MetricEndpoints       map[string]string    `yaml:"metric_endpoints,omitempty"`
+	DebugEndpoints        map[string]string    `yaml:"debug_endpoints,omitempty"`
 	Rules                 *transpiler.RuleList `yaml:"rules"`
 	CheckInstallSteps     *transpiler.StepList `yaml:"check_install"`
 	PostInstallSteps      *transpiler.StepList `yaml:"post_install"`

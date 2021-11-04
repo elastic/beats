@@ -25,6 +25,8 @@ const (
 
 	// args: pipeline name, application name
 	agentMbEndpointFileFormatWin = `npipe:///elastic-agent`
+	// args: pipeline name, application name debug
+	agentDebugEndpointFileFormatWin = `npipe:///elastic-agent-debug`
 	// agentMbEndpointHTTP is used with cloud and exposes metrics on http endpoint
 	agentMbEndpointHTTP = "http://%s:%d"
 )
@@ -45,6 +47,24 @@ func MonitoringEndpoint(spec program.Spec, operatingSystem, pipelineID string) s
 	// place in global /tmp (or /var/tmp on Darwin) to ensure that its small enough to fit; current path is way to long
 	// for it to be used, but needs to be unique per Agent (in the case that multiple are running)
 	return fmt.Sprintf(`unix:///tmp/elastic-agent/%x.sock`, sha256.Sum256([]byte(path)))
+}
+
+// DebugEndpoint is an endpoint where process is exposing its pprof endpoints
+func DebugEndpoint(spec program.Spec, operatingSystem, pipelineID string) string {
+	if endpoint, ok := spec.DebugEndpoints[operatingSystem]; ok {
+		return endpoint
+	}
+	if operatingSystem == "windows" {
+		return fmt.Sprintf(mbEndpointFileFormatWin, pipelineID, spec.Cmd+"-debug")
+	}
+	// unix socket path must be less than 104 characters
+	path := fmt.Sprintf("unix://%s-debug.sock", filepath.Join(paths.TempDir(), pipelineID, spec.Cmd, spec.Cmd))
+	if len(path) < 104 {
+		return path
+	}
+	// place in global /tmp (or /var/tmp on Darwin) to ensure that its small enough to fit; current path is way to long
+	// for it to be used, but needs to be unique per Agent (in the case that multiple are running)
+	return fmt.Sprintf(`unix:///tmp/elastic-agent/%x-debug.sock`, sha256.Sum256([]byte(path)))
 }
 
 func getLoggingFile(spec program.Spec, operatingSystem, installPath, pipelineID string) string {
@@ -74,6 +94,21 @@ func AgentMonitoringEndpoint(operatingSystem string, cfg *monitoringConfig.Monit
 	// place in global /tmp to ensure that its small enough to fit; current path is way to long
 	// for it to be used, but needs to be unique per Agent (in the case that multiple are running)
 	return fmt.Sprintf(`unix:///tmp/elastic-agent/%x.sock`, sha256.Sum256([]byte(path)))
+}
+
+// AgentDebugEndpoint returns endpoint with exposed http/pprof endpoints for agent.
+func AgentDebugEndpoint(operatingSystem string) string {
+	if operatingSystem == "windows" {
+		return agentDebugEndpointFileFormatWin
+	}
+	// unix socket path must be less than 104 characters
+	path := fmt.Sprintf("unix://%s-debug.sock", filepath.Join(paths.TempDir(), "elastic-agent"))
+	if len(path) < 104 {
+		return path
+	}
+	// place in global /tmp to ensure that its small enough to fit; current path is way to long
+	// for it to be used, but needs to be unique per Agent (in the case that multiple are running)
+	return fmt.Sprintf(`unix:///tmp/elastic-agent/%x-debug.sock`, sha256.Sum256([]byte(path)))
 }
 
 // AgentPrefixedMonitoringEndpoint returns endpoint with exposed metrics for agent.
