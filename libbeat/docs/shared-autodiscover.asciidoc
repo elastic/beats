@@ -234,6 +234,17 @@ endif::[]
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
   client. If kube_config is not set, KUBECONFIG environment variable will be
   checked and if not present it will fall back to InCluster.
+`kube_client_options`:: (Optional) Additional options can be configured for Kubernetes
+  client. Currently client QPS and burst are supported, if not set Kubernetes client's
+  https://pkg.go.dev/k8s.io/client-go/rest#pkg-constants[default QPS and burst] will be used.
+  Example:
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+      kube_client_options:
+        qps: 5
+        burst: 10
+-------------------------------------------------------------------------------------
+
 `resource`:: (Optional) Select the resource to do discovery on. Currently supported
   Kubernetes resources are `pod`, `service` and `node`. If not configured `resource`
   defaults to `pod`.

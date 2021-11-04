@@ -54,6 +54,15 @@ func TestWithConfig(t *testing.T) {
 			},
 			want: "14a0364b79acbe4c78dd5e77db2c93ae8c750518b32581927d50b3eef407184e",
 		},
+		"with @timestamp": {
+			config: common.MapStr{
+				"fields": []string{"@timestamp", "message"},
+			},
+			input: common.MapStr{
+				"message": `test message "hello world"`,
+			},
+			want: "081da76e049554943843b83948ac83ab7aa79fd2849331813e02042586021c26",
+		},
 	}
 
 	for name, test := range cases {
@@ -63,7 +72,7 @@ func TestWithConfig(t *testing.T) {
 			require.NoError(t, err)
 
 			testEvent := &beat.Event{
-				Timestamp: time.Now(),
+				Timestamp: time.Unix(1635443183, 0),
 				Fields:    test.input.Clone(),
 			}
 			newEvent, err := p.Run(testEvent)

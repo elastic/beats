@@ -51,10 +51,10 @@ func (c onCall) Return(values ...interface{}) onCall {
 	return c
 }
 
-func onMode() onCall { return makeOnCall("Mode") }
-func (m *mockILMSupport) Mode() ilm.Mode {
+func onEnabled() onCall { return makeOnCall("Enabled") }
+func (m *mockILMSupport) Enabled() bool {
 	args := m.Called()
-	return args.Get(0).(ilm.Mode)
+	return args.Get(0).(bool)
 }
 
 func onAlias() onCall { return makeOnCall("Alias") }

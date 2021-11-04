@@ -279,6 +279,33 @@ func TestHTTPClient(t *testing.T) {
 			assert.Equal(t, 1, len(debugger.messages))
 		},
 	))
+
+	t.Run("RequestId", withServer(
+		func(t *testing.T) *http.ServeMux {
+			msg := `{ message: "hello" }`
+			mux := http.NewServeMux()
+			mux.HandleFunc("/echo-hello", func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				fmt.Fprint(w, msg)
+				require.NotEmpty(t, r.Header.Get("X-Request-ID"))
+			})
+			return mux
+		}, func(t *testing.T, host string) {
+			cfg := config.MustNewConfigFrom(map[string]interface{}{
+				"host": host,
+			})
+
+			client, err := NewWithRawConfig(nil, cfg, nil)
+			require.NoError(t, err)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
+			require.NoError(t, err)
+
+			body, err := ioutil.ReadAll(resp.Body)
+			require.NoError(t, err)
+			defer resp.Body.Close()
+			assert.Equal(t, `{ message: "hello" }`, string(body))
+		},
+	))
 }
 
 func TestNextRequester(t *testing.T) {

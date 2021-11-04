@@ -1,4 +1,4 @@
-CEF:0|Elastic|Vaporware|1.0.0-alpha|18|Web request|low|eventId=3457 requestMethod=POST slat=38.915 slong=-77.511 proto=TCP sourceServiceName=httpd requestContext=https://www.google.com src=6.7.8.9 spt=33876 dst=192.168.10.1 dpt=443 request=https://www.example.com/cart
-CEF:0|Elastic|Vaporware|1.0.0-alpha|18|Authentication|low|eventId=123 src=6.7.8.9 spt=33876 dst=1.2.3.4 dpt=443 duser=alice suser=bob destinationTranslatedAddress=10.10.10.10 fileHash=bc8bbe52f041fd17318f08a0f73762ce oldFileHash=a9796280592f86b74b27e370662d41eb
+CEF:0|Elastic|Vaporware|1.0.0-alpha|18|Web request|low|eventId=3457 requestMethod=POST slat=38.915 slong=-77.511 proto=TCP sourceServiceName=httpd requestContext=https://www.google.com src=1.128.3.4 spt=33876 dst=192.168.10.1 dpt=443 request=https://www.example.com/cart
+CEF:0|Elastic|Vaporware|1.0.0-alpha|18|Authentication|low|eventId=123 src=1.128.3.4 spt=33876 dst=81.2.69.143 dpt=443 duser=alice suser=bob destinationTranslatedAddress=10.10.10.10 fileHash=bc8bbe52f041fd17318f08a0f73762ce oldFileHash=a9796280592f86b74b27e370662d41eb
 CEF:0|Elastic|Vaporware|1.0.0-alpha|18|Authentication|low|spriv=user dpriv=root
 CEF:0|Elastic|Vaporware|1.0.0-alpha|18|Authentication|low|message=This event is padded with whitespace dst=192.168.1.2 src=192.168.3.4     
