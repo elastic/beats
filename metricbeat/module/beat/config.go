@@ -15,42 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !integration
-// +build !integration
+package beat
 
-package state
+// Config defines the structure for the Beat module configuration options
+type Config struct {
+	XPackEnabled bool `config:"xpack.enabled"`
+}
 
-import (
-	"io/ioutil"
-	"path/filepath"
-	"testing"
-
-	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/v7/metricbeat/module/beat"
-
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-)
-
-func TestEventMapping(t *testing.T) {
-
-	files, err := filepath.Glob("./_meta/test/state.*.json")
-	require.NoError(t, err)
-
-	info := beat.Info{
-		UUID: "1234",
-		Beat: "helloworld",
-	}
-
-	for _, f := range files {
-		input, err := ioutil.ReadFile(f)
-		require.NoError(t, err)
-
-		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, info, input, true)
-
-		require.NoError(t, err, f)
-		require.True(t, len(reporter.GetEvents()) >= 1, f)
-		require.Equal(t, 0, len(reporter.GetErrors()), f)
+// DefaultConfig returns the default configuration for the Beat module
+func DefaultConfig() Config {
+	return Config{
+		XPackEnabled: false,
 	}
 }
