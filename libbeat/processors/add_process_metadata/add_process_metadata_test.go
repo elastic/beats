@@ -147,7 +147,9 @@ func TestAddProcessMetadata(t *testing.T) {
 					"executable": "/usr/lib/systemd/systemd",
 					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 					"pid":        1,
-					"ppid":       0,
+					"parent": common.MapStr{
+						"pid": 0,
+					},
 					"start_time": startTime,
 					"owner": common.MapStr{
 						"name": "root",
@@ -232,7 +234,9 @@ func TestAddProcessMetadata(t *testing.T) {
 						"executable": "/usr/lib/systemd/systemd",
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 						"pid":        1,
-						"ppid":       0,
+						"parent": common.MapStr{
+							"pid": 0,
+						},
 						"start_time": startTime,
 						"owner": common.MapStr{
 							"name": "root",
@@ -264,7 +268,9 @@ func TestAddProcessMetadata(t *testing.T) {
 						"executable": "/usr/lib/systemd/systemd",
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 						"pid":        1,
-						"ppid":       0,
+						"parent": common.MapStr{
+							"pid": 0,
+						},
 						"start_time": startTime,
 						"env": map[string]string{
 							"HOME":       "/",
@@ -303,7 +309,9 @@ func TestAddProcessMetadata(t *testing.T) {
 						"executable": "/usr/lib/systemd/systemd",
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 						"pid":        1,
-						"ppid":       0,
+						"parent": common.MapStr{
+							"pid": 0,
+						},
 						"start_time": startTime,
 						"env": map[string]string{
 							"HOME":       "/",
@@ -501,7 +509,9 @@ func TestAddProcessMetadata(t *testing.T) {
 					"executable": "/usr/lib/systemd/systemd",
 					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 					"pid":        1,
-					"ppid":       0,
+					"parent": common.MapStr{
+						"pid": 0,
+					},
 					"start_time": startTime,
 					"owner": common.MapStr{
 						"name": "root",
@@ -624,7 +634,9 @@ func TestAddProcessMetadata(t *testing.T) {
 					"executable": "/usr/lib/systemd/systemd",
 					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 					"pid":        1,
-					"ppid":       0,
+					"parent": common.MapStr{
+						"pid": 0,
+					},
 					"start_time": startTime,
 					"owner": common.MapStr{
 						"name": "user",
