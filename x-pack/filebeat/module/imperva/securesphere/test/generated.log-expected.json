@@ -1,8 +1,6 @@
 [
     {
-        "destination.ip": [
-            "10.70.155.35"
-        ],
+        "destination.ip": "10.70.155.35",
         "destination.port": 892,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -51,9 +49,7 @@
         "rsa.time.starttime": "2016-01-29T08:09:59.000Z",
         "service.type": "imperva",
         "source.address": "radipis5408.mail.local",
-        "source.ip": [
-            "10.81.122.126"
-        ],
+        "source.ip": "10.81.122.126",
         "source.port": 4141,
         "tags": [
             "forwarded",
@@ -90,9 +86,7 @@
         "user.name": "temq"
     },
     {
-        "destination.ip": [
-            "10.58.116.231"
-        ],
+        "destination.ip": "10.58.116.231",
         "destination.port": 996,
         "event.action": "accept",
         "event.code": "Imperva",
@@ -136,9 +130,7 @@
         "rsa.time.starttime": "2016-02-26T22:15:08.000Z",
         "service.type": "imperva",
         "source.address": "ccusan7572.api.home",
-        "source.ip": [
-            "10.159.182.171"
-        ],
+        "source.ip": "10.159.182.171",
         "source.port": 3947,
         "tags": [
             "forwarded",
@@ -147,9 +139,7 @@
         "user.name": "qua"
     },
     {
-        "destination.ip": [
-            "10.232.27.250"
-        ],
+        "destination.ip": "10.232.27.250",
         "destination.port": 7838,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -198,9 +188,7 @@
         "rsa.time.starttime": "2016-03-12T05:17:42.000Z",
         "service.type": "imperva",
         "source.address": "elaudant5931.internal.invalid",
-        "source.ip": [
-            "10.18.124.28"
-        ],
+        "source.ip": "10.18.124.28",
         "source.port": 7668,
         "tags": [
             "forwarded",
@@ -209,9 +197,7 @@
         "user.name": "mquidol"
     },
     {
-        "destination.ip": [
-            "10.197.250.10"
-        ],
+        "destination.ip": "10.197.250.10",
         "destination.port": 5697,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -265,9 +251,7 @@
         "rule.name": "tionof",
         "service.type": "imperva",
         "source.address": "amest4147.mail.host",
-        "source.ip": [
-            "10.6.137.200"
-        ],
+        "source.ip": "10.6.137.200",
         "source.port": 2707,
         "tags": [
             "forwarded",
@@ -286,9 +270,7 @@
         "user.name": "occae"
     },
     {
-        "destination.ip": [
-            "10.36.194.106"
-        ],
+        "destination.ip": "10.36.194.106",
         "destination.port": 5473,
         "event.action": "accept",
         "event.code": "Imperva",
@@ -342,9 +324,7 @@
         "rule.name": "volupt",
         "service.type": "imperva",
         "source.address": "eratv6205.internal.lan",
-        "source.ip": [
-            "10.179.124.125"
-        ],
+        "source.ip": "10.179.124.125",
         "source.port": 1696,
         "tags": [
             "forwarded",
@@ -363,9 +343,7 @@
         "user.name": "ncidid"
     },
     {
-        "destination.ip": [
-            "10.129.149.43"
-        ],
+        "destination.ip": "10.129.149.43",
         "destination.port": 3304,
         "event.action": "accept",
         "event.code": "Imperva",
@@ -414,9 +392,7 @@
         "rsa.time.starttime": "2016-04-24T02:25:25.000Z",
         "service.type": "imperva",
         "source.address": "didunt1355.corp",
-        "source.ip": [
-            "10.211.105.204"
-        ],
+        "source.ip": "10.211.105.204",
         "source.port": 2742,
         "tags": [
             "forwarded",
@@ -425,9 +401,7 @@
         "user.name": "eveli"
     },
     {
-        "destination.ip": [
-            "10.214.191.180"
-        ],
+        "destination.ip": "10.214.191.180",
         "destination.port": 5848,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -476,9 +450,7 @@
         "rsa.time.starttime": "2016-05-08T09:27:59.000Z",
         "service.type": "imperva",
         "source.address": "pora6854.www5.home",
-        "source.ip": [
-            "10.112.250.193"
-        ],
+        "source.ip": "10.112.250.193",
         "source.port": 5705,
         "tags": [
             "forwarded",
@@ -487,9 +459,7 @@
         "user.name": "ipsumdol"
     },
     {
-        "destination.ip": [
-            "10.251.20.13"
-        ],
+        "destination.ip": "10.251.20.13",
         "destination.port": 264,
         "event.action": "deny",
         "event.code": "Imperva",
@@ -533,9 +503,7 @@
         "rsa.time.starttime": "2016-05-22T16:30:33.000Z",
         "service.type": "imperva",
         "source.address": "ptasn6599.www.localhost",
-        "source.ip": [
-            "10.192.34.76"
-        ],
+        "source.ip": "10.192.34.76",
         "source.port": 1450,
         "tags": [
             "forwarded",
@@ -544,9 +512,7 @@
         "user.name": "iquipe"
     },
     {
-        "destination.ip": [
-            "10.74.105.218"
-        ],
+        "destination.ip": "10.74.105.218",
         "destination.port": 2438,
         "event.action": "block",
         "event.code": "Imperva",
@@ -595,9 +561,7 @@
         "rsa.time.starttime": "2016-06-05T23:33:08.000Z",
         "service.type": "imperva",
         "source.address": "ptasnu6684.mail.lan",
-        "source.ip": [
-            "10.59.138.212"
-        ],
+        "source.ip": "10.59.138.212",
         "source.port": 7829,
         "tags": [
             "forwarded",
@@ -606,9 +570,7 @@
         "user.name": "archite"
     },
     {
-        "destination.ip": [
-            "10.168.159.13"
-        ],
+        "destination.ip": "10.168.159.13",
         "destination.port": 3319,
         "event.action": "accept",
         "event.code": "Imperva",
@@ -657,9 +619,7 @@
         "rsa.time.starttime": "2016-06-20T06:35:42.000Z",
         "service.type": "imperva",
         "source.address": "rinre2977.api.corp",
-        "source.ip": [
-            "10.230.173.4"
-        ],
+        "source.ip": "10.230.173.4",
         "source.port": 2631,
         "tags": [
             "forwarded",
@@ -668,9 +628,7 @@
         "user.name": "inci"
     },
     {
-        "destination.ip": [
-            "10.49.167.57"
-        ],
+        "destination.ip": "10.49.167.57",
         "destination.port": 2119,
         "event.action": "block",
         "event.code": "Imperva",
@@ -719,9 +677,7 @@
         "rsa.time.starttime": "2016-07-04T13:38:16.000Z",
         "service.type": "imperva",
         "source.address": "atevelit2450.local",
-        "source.ip": [
-            "10.41.21.204"
-        ],
+        "source.ip": "10.41.21.204",
         "source.port": 3540,
         "tags": [
             "forwarded",
@@ -730,9 +686,7 @@
         "user.name": "tali"
     },
     {
-        "destination.ip": [
-            "10.62.147.186"
-        ],
+        "destination.ip": "10.62.147.186",
         "destination.port": 5592,
         "event.action": "accept",
         "event.code": "Imperva",
@@ -787,9 +741,7 @@
         "rule.name": "tconsect",
         "service.type": "imperva",
         "source.address": "itla658.api.localhost",
-        "source.ip": [
-            "10.216.125.252"
-        ],
+        "source.ip": "10.216.125.252",
         "source.port": 3406,
         "tags": [
             "forwarded",
@@ -808,9 +760,7 @@
         "user.name": "llamco"
     },
     {
-        "destination.ip": [
-            "10.204.128.215"
-        ],
+        "destination.ip": "10.204.128.215",
         "destination.port": 2538,
         "event.action": "deny",
         "event.code": "Imperva",
@@ -864,9 +814,7 @@
         "rule.name": "tenim",
         "service.type": "imperva",
         "source.address": "umdolor4389.api.home",
-        "source.ip": [
-            "10.52.125.9"
-        ],
+        "source.ip": "10.52.125.9",
         "source.port": 3689,
         "tags": [
             "forwarded",
@@ -885,9 +833,7 @@
         "user.name": "rum"
     },
     {
-        "destination.ip": [
-            "10.200.68.129"
-        ],
+        "destination.ip": "10.200.68.129",
         "destination.port": 2558,
         "event.action": "block",
         "event.code": "Imperva",
@@ -931,9 +877,7 @@
         "rsa.time.starttime": "2016-08-16T10:45:59.000Z",
         "service.type": "imperva",
         "source.address": "rationev6444.localhost",
-        "source.ip": [
-            "10.34.148.166"
-        ],
+        "source.ip": "10.34.148.166",
         "source.port": 3022,
         "tags": [
             "forwarded",
@@ -942,9 +886,7 @@
         "user.name": "icabo"
     },
     {
-        "destination.ip": [
-            "10.226.101.180"
-        ],
+        "destination.ip": "10.226.101.180",
         "destination.port": 1000,
         "event.action": "deny",
         "event.code": "Imperva",
@@ -993,9 +935,7 @@
         "rsa.time.starttime": "2016-08-30T17:48:33.000Z",
         "service.type": "imperva",
         "source.address": "ipi7727.www5.domain",
-        "source.ip": [
-            "10.134.5.40"
-        ],
+        "source.ip": "10.134.5.40",
         "source.port": 7284,
         "tags": [
             "forwarded",
@@ -1004,9 +944,7 @@
         "user.name": "siu"
     },
     {
-        "destination.ip": [
-            "10.126.26.131"
-        ],
+        "destination.ip": "10.126.26.131",
         "destination.port": 2595,
         "event.action": "accept",
         "event.code": "Imperva",
@@ -1055,9 +993,7 @@
         "rsa.time.starttime": "2016-09-14T00:51:07.000Z",
         "service.type": "imperva",
         "source.address": "spernatu5539.domain",
-        "source.ip": [
-            "10.30.98.10"
-        ],
+        "source.ip": "10.30.98.10",
         "source.port": 7576,
         "tags": [
             "forwarded",
@@ -1066,9 +1002,7 @@
         "user.name": "velite"
     },
     {
-        "destination.ip": [
-            "10.190.10.219"
-        ],
+        "destination.ip": "10.190.10.219",
         "destination.port": 5530,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -1117,9 +1051,7 @@
         "rsa.time.starttime": "2016-09-28T07:53:42.000Z",
         "service.type": "imperva",
         "source.address": "nimid372.api.corp",
-        "source.ip": [
-            "10.233.120.207"
-        ],
+        "source.ip": "10.233.120.207",
         "source.port": 136,
         "tags": [
             "forwarded",
@@ -1156,9 +1088,7 @@
         "user.name": "sequa"
     },
     {
-        "destination.ip": [
-            "10.100.98.56"
-        ],
+        "destination.ip": "10.100.98.56",
         "destination.port": 1089,
         "event.action": "deny",
         "event.code": "Imperva",
@@ -1207,9 +1137,7 @@
         "rsa.time.starttime": "2016-10-26T21:58:50.000Z",
         "service.type": "imperva",
         "source.address": "maliquam2147.internal.home",
-        "source.ip": [
-            "10.248.184.200"
-        ],
+        "source.ip": "10.248.184.200",
         "source.port": 5315,
         "tags": [
             "forwarded",
@@ -1218,9 +1146,7 @@
         "user.name": "boru"
     },
     {
-        "destination.ip": [
-            "10.197.6.245"
-        ],
+        "destination.ip": "10.197.6.245",
         "destination.port": 27,
         "event.action": "allow",
         "event.code": "Imperva",
@@ -1269,9 +1195,7 @@
         "rsa.time.starttime": "2016-11-10T05:01:24.000Z",
         "service.type": "imperva",
         "source.address": "olabor2983.internal.localhost",
-        "source.ip": [
-            "10.82.28.220"
-        ],
+        "source.ip": "10.82.28.220",
         "source.port": 3570,
         "tags": [
             "forwarded",
@@ -1280,9 +1204,7 @@
         "user.name": "dtempo"
     },
     {
-        "destination.ip": [
-            "10.6.27.103"
-        ],
+        "destination.ip": "10.6.27.103",
         "destination.port": 3179,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -1331,9 +1253,7 @@
         "rsa.time.starttime": "2016-11-24T12:03:59.000Z",
         "service.type": "imperva",
         "source.address": "hitec2111.mail.corp",
-        "source.ip": [
-            "10.167.252.183"
-        ],
+        "source.ip": "10.167.252.183",
         "source.port": 2003,
         "tags": [
             "forwarded",
@@ -1342,9 +1262,7 @@
         "user.name": "redol"
     },
     {
-        "destination.ip": [
-            "10.81.184.7"
-        ],
+        "destination.ip": "10.81.184.7",
         "destination.port": 6735,
         "event.action": "deny",
         "event.code": "Imperva",
@@ -1399,9 +1317,7 @@
         "rule.name": "tatem",
         "service.type": "imperva",
         "source.address": "adminim2559.www5.invalid",
-        "source.ip": [
-            "10.88.45.111"
-        ],
+        "source.ip": "10.88.45.111",
         "source.port": 6165,
         "tags": [
             "forwarded",
@@ -1420,9 +1336,7 @@
         "user.name": "undeomni"
     },
     {
-        "destination.ip": [
-            "10.214.3.140"
-        ],
+        "destination.ip": "10.214.3.140",
         "destination.port": 6127,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -1471,9 +1385,7 @@
         "rsa.time.starttime": "2016-12-23T02:09:07.000Z",
         "service.type": "imperva",
         "source.address": "dolorem6882.api.local",
-        "source.ip": [
-            "10.29.119.245"
-        ],
+        "source.ip": "10.29.119.245",
         "source.port": 1179,
         "tags": [
             "forwarded",
@@ -1482,9 +1394,7 @@
         "user.name": "scipitl"
     },
     {
-        "destination.ip": [
-            "10.110.133.7"
-        ],
+        "destination.ip": "10.110.133.7",
         "destination.port": 57,
         "event.action": "allow",
         "event.code": "Imperva",
@@ -1539,9 +1449,7 @@
         "rule.name": "natu",
         "service.type": "imperva",
         "source.address": "temaccu5302.test",
-        "source.ip": [
-            "10.218.123.234"
-        ],
+        "source.ip": "10.218.123.234",
         "source.port": 2064,
         "tags": [
             "forwarded",
@@ -1560,9 +1468,7 @@
         "user.name": "pta"
     },
     {
-        "destination.ip": [
-            "10.105.190.170"
-        ],
+        "destination.ip": "10.105.190.170",
         "destination.port": 2519,
         "event.action": "block",
         "event.code": "Imperva",
@@ -1611,9 +1517,7 @@
         "rsa.time.starttime": "2017-01-20T16:14:16.000Z",
         "service.type": "imperva",
         "source.address": "nder347.www.corp",
-        "source.ip": [
-            "10.182.152.242"
-        ],
+        "source.ip": "10.182.152.242",
         "source.port": 1877,
         "tags": [
             "forwarded",
@@ -1622,9 +1526,7 @@
         "user.name": "doeiu"
     },
     {
-        "destination.ip": [
-            "10.123.166.197"
-        ],
+        "destination.ip": "10.123.166.197",
         "destination.port": 7082,
         "event.action": "block",
         "event.code": "Imperva",
@@ -1678,9 +1580,7 @@
         "rule.name": "licaboNe",
         "service.type": "imperva",
         "source.address": "idunt4633.internal.host",
-        "source.ip": [
-            "10.59.188.188"
-        ],
+        "source.ip": "10.59.188.188",
         "source.port": 7647,
         "tags": [
             "forwarded",
@@ -1699,9 +1599,7 @@
         "user.name": "emUte"
     },
     {
-        "destination.ip": [
-            "10.72.75.207"
-        ],
+        "destination.ip": "10.72.75.207",
         "destination.port": 6336,
         "event.action": "accept",
         "event.code": "Imperva",
@@ -1750,9 +1648,7 @@
         "rsa.time.starttime": "2017-02-18T06:19:24.000Z",
         "service.type": "imperva",
         "source.address": "ectob4634.mail.localhost",
-        "source.ip": [
-            "10.201.168.116"
-        ],
+        "source.ip": "10.201.168.116",
         "source.port": 2037,
         "tags": [
             "forwarded",
@@ -1761,9 +1657,7 @@
         "user.name": "urau"
     },
     {
-        "destination.ip": [
-            "10.9.46.123"
-        ],
+        "destination.ip": "10.9.46.123",
         "destination.port": 586,
         "event.action": "block",
         "event.code": "Imperva",
@@ -1812,9 +1706,7 @@
         "rsa.time.starttime": "2017-03-04T13:21:59.000Z",
         "service.type": "imperva",
         "source.address": "snu6436.www.local",
-        "source.ip": [
-            "10.58.133.175"
-        ],
+        "source.ip": "10.58.133.175",
         "source.port": 1634,
         "tags": [
             "forwarded",
@@ -1823,9 +1715,7 @@
         "user.name": "mfu"
     },
     {
-        "destination.ip": [
-            "10.169.50.59"
-        ],
+        "destination.ip": "10.169.50.59",
         "destination.port": 7693,
         "event.action": "block",
         "event.code": "Imperva",
@@ -1874,9 +1764,7 @@
         "rsa.time.starttime": "2017-03-18T20:24:33.000Z",
         "service.type": "imperva",
         "source.address": "lore7099.www.host",
-        "source.ip": [
-            "10.70.29.203"
-        ],
+        "source.ip": "10.70.29.203",
         "source.port": 5994,
         "tags": [
             "forwarded",
@@ -1885,9 +1773,7 @@
         "user.name": "pta"
     },
     {
-        "destination.ip": [
-            "10.165.182.111"
-        ],
+        "destination.ip": "10.165.182.111",
         "destination.port": 5525,
         "event.action": "block",
         "event.code": "Imperva",
@@ -1936,9 +1822,7 @@
         "rsa.time.starttime": "2017-04-02T03:27:07.000Z",
         "service.type": "imperva",
         "source.address": "lesti6939.api.local",
-        "source.ip": [
-            "10.137.85.123"
-        ],
+        "source.ip": "10.137.85.123",
         "source.port": 218,
         "tags": [
             "forwarded",
@@ -1975,9 +1859,7 @@
         "user.name": "sumdolo"
     },
     {
-        "destination.ip": [
-            "10.173.178.109"
-        ],
+        "destination.ip": "10.173.178.109",
         "destination.port": 6659,
         "event.action": "block",
         "event.code": "Imperva",
@@ -2032,9 +1914,7 @@
         "rule.name": "ibusBo",
         "service.type": "imperva",
         "source.address": "upt6017.api.localdomain",
-        "source.ip": [
-            "10.64.184.196"
-        ],
+        "source.ip": "10.64.184.196",
         "source.port": 3327,
         "tags": [
             "forwarded",
@@ -2053,9 +1933,7 @@
         "user.name": "uian"
     },
     {
-        "destination.ip": [
-            "10.90.50.149"
-        ],
+        "destination.ip": "10.90.50.149",
         "destination.port": 1936,
         "event.action": "block",
         "event.code": "Imperva",
@@ -2104,9 +1982,7 @@
         "rsa.time.starttime": "2017-05-15T00:34:50.000Z",
         "service.type": "imperva",
         "source.address": "turQuis4046.api.test",
-        "source.ip": [
-            "10.168.225.209"
-        ],
+        "source.ip": "10.168.225.209",
         "source.port": 6,
         "tags": [
             "forwarded",
@@ -2115,9 +1991,7 @@
         "user.name": "olu"
     },
     {
-        "destination.ip": [
-            "10.59.182.36"
-        ],
+        "destination.ip": "10.59.182.36",
         "destination.port": 5792,
         "event.action": "allow",
         "event.code": "Imperva",
@@ -2166,9 +2040,7 @@
         "rsa.time.starttime": "2017-05-29T07:37:24.000Z",
         "service.type": "imperva",
         "source.address": "con6049.internal.lan",
-        "source.ip": [
-            "10.18.150.82"
-        ],
+        "source.ip": "10.18.150.82",
         "source.port": 6648,
         "tags": [
             "forwarded",
@@ -2205,9 +2077,7 @@
         "user.name": "llita"
     },
     {
-        "destination.ip": [
-            "10.228.229.144"
-        ],
+        "destination.ip": "10.228.229.144",
         "destination.port": 3236,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -2251,9 +2121,7 @@
         "rsa.time.starttime": "2017-06-26T21:42:33.000Z",
         "service.type": "imperva",
         "source.address": "tatnonp1371.www.invalid",
-        "source.ip": [
-            "10.151.240.35"
-        ],
+        "source.ip": "10.151.240.35",
         "source.port": 3197,
         "tags": [
             "forwarded",
@@ -2262,9 +2130,7 @@
         "user.name": "ametcons"
     },
     {
-        "destination.ip": [
-            "10.242.48.203"
-        ],
+        "destination.ip": "10.242.48.203",
         "destination.port": 1102,
         "event.action": "block",
         "event.code": "Imperva",
@@ -2313,9 +2179,7 @@
         "rsa.time.starttime": "2017-07-11T04:45:07.000Z",
         "service.type": "imperva",
         "source.address": "tium3542.internal.invalid",
-        "source.ip": [
-            "10.147.142.242"
-        ],
+        "source.ip": "10.147.142.242",
         "source.port": 2586,
         "tags": [
             "forwarded",
@@ -2324,9 +2188,7 @@
         "user.name": "ese"
     },
     {
-        "destination.ip": [
-            "10.254.10.98"
-        ],
+        "destination.ip": "10.254.10.98",
         "destination.port": 3787,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -2381,9 +2243,7 @@
         "rule.name": "emipsumq",
         "service.type": "imperva",
         "source.address": "radipis3991.mail.invalid",
-        "source.ip": [
-            "10.213.165.165"
-        ],
+        "source.ip": "10.213.165.165",
         "source.port": 4723,
         "tags": [
             "forwarded",
@@ -2430,9 +2290,7 @@
         "user.name": "ura"
     },
     {
-        "destination.ip": [
-            "10.169.28.157"
-        ],
+        "destination.ip": "10.169.28.157",
         "destination.port": 3402,
         "event.action": "accept",
         "event.code": "Imperva",
@@ -2487,9 +2345,7 @@
         "rule.name": "iuntN",
         "service.type": "imperva",
         "source.address": "ihi7294.www5.localhost",
-        "source.ip": [
-            "10.116.1.130"
-        ],
+        "source.ip": "10.116.1.130",
         "source.port": 5439,
         "tags": [
             "forwarded",
@@ -2508,9 +2364,7 @@
         "user.name": "eturadip"
     },
     {
-        "destination.ip": [
-            "10.29.138.31"
-        ],
+        "destination.ip": "10.29.138.31",
         "destination.port": 5871,
         "event.action": "deny",
         "event.code": "Imperva",
@@ -2559,9 +2413,7 @@
         "rsa.time.starttime": "2017-09-06T08:55:24.000Z",
         "service.type": "imperva",
         "source.address": "caecat4920.api.host",
-        "source.ip": [
-            "10.45.69.152"
-        ],
+        "source.ip": "10.45.69.152",
         "source.port": 4083,
         "tags": [
             "forwarded",
@@ -2570,9 +2422,7 @@
         "user.name": "volupta"
     },
     {
-        "destination.ip": [
-            "10.152.213.228"
-        ],
+        "destination.ip": "10.152.213.228",
         "destination.port": 3387,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -2621,9 +2471,7 @@
         "rsa.time.starttime": "2017-09-20T15:57:58.000Z",
         "service.type": "imperva",
         "source.address": "setquas6188.internal.local",
-        "source.ip": [
-            "10.100.113.11"
-        ],
+        "source.ip": "10.100.113.11",
         "source.port": 6971,
         "tags": [
             "forwarded",
@@ -2660,9 +2508,7 @@
         "user.name": "reme"
     },
     {
-        "destination.ip": [
-            "10.208.33.55"
-        ],
+        "destination.ip": "10.208.33.55",
         "destination.port": 1849,
         "event.action": "accept",
         "event.code": "Imperva",
@@ -2711,9 +2557,7 @@
         "rsa.time.starttime": "2017-10-19T06:03:07.000Z",
         "service.type": "imperva",
         "source.address": "nibusBo3674.www5.localhost",
-        "source.ip": [
-            "10.248.102.129"
-        ],
+        "source.ip": "10.248.102.129",
         "source.port": 3510,
         "tags": [
             "forwarded",
@@ -2722,9 +2566,7 @@
         "user.name": "ulapari"
     },
     {
-        "destination.ip": [
-            "10.203.164.132"
-        ],
+        "destination.ip": "10.203.164.132",
         "destination.port": 6213,
         "event.action": "block",
         "event.code": "Imperva",
@@ -2773,9 +2615,7 @@
         "rsa.time.starttime": "2017-11-02T13:05:41.000Z",
         "service.type": "imperva",
         "source.address": "totamr7676.www5.home",
-        "source.ip": [
-            "10.109.230.216"
-        ],
+        "source.ip": "10.109.230.216",
         "source.port": 4447,
         "tags": [
             "forwarded",
@@ -2784,9 +2624,7 @@
         "user.name": "mporin"
     },
     {
-        "destination.ip": [
-            "10.151.203.60"
-        ],
+        "destination.ip": "10.151.203.60",
         "destination.port": 482,
         "event.action": "block",
         "event.code": "Imperva",
@@ -2835,9 +2673,7 @@
         "rsa.time.starttime": "2017-11-16T20:08:15.000Z",
         "service.type": "imperva",
         "source.address": "idents7231.mail.home",
-        "source.ip": [
-            "10.117.81.75"
-        ],
+        "source.ip": "10.117.81.75",
         "source.port": 3365,
         "tags": [
             "forwarded",
@@ -2846,9 +2682,7 @@
         "user.name": "dol"
     },
     {
-        "destination.ip": [
-            "10.224.217.153"
-        ],
+        "destination.ip": "10.224.217.153",
         "destination.port": 6339,
         "event.action": "allow",
         "event.code": "Imperva",
@@ -2896,9 +2730,7 @@
         "rsa.time.duration_time": 17.709,
         "service.type": "imperva",
         "source.address": "tat50.mail.host",
-        "source.ip": [
-            "10.45.152.205"
-        ],
+        "source.ip": "10.45.152.205",
         "source.port": 6907,
         "tags": [
             "forwarded",
@@ -2907,9 +2739,7 @@
         "user.name": "eriti"
     },
     {
-        "destination.ip": [
-            "10.1.193.187"
-        ],
+        "destination.ip": "10.1.193.187",
         "destination.port": 5119,
         "event.action": "allow",
         "event.code": "Imperva",
@@ -2964,9 +2794,7 @@
         "rule.name": "vol",
         "service.type": "imperva",
         "source.address": "mips3283.corp",
-        "source.ip": [
-            "10.60.164.100"
-        ],
+        "source.ip": "10.60.164.100",
         "source.port": 2652,
         "tags": [
             "forwarded",
@@ -2985,9 +2813,7 @@
         "user.name": "ugi"
     },
     {
-        "destination.ip": [
-            "10.248.244.203"
-        ],
+        "destination.ip": "10.248.244.203",
         "destination.port": 806,
         "event.action": "allow",
         "event.code": "Imperva",
@@ -3031,9 +2857,7 @@
         "rsa.time.starttime": "2017-12-29T17:15:58.000Z",
         "service.type": "imperva",
         "source.address": "aliquip7229.mail.domain",
-        "source.ip": [
-            "10.146.228.234"
-        ],
+        "source.ip": "10.146.228.234",
         "source.port": 4346,
         "tags": [
             "forwarded",
@@ -3042,9 +2866,7 @@
         "user.name": "mquamei"
     },
     {
-        "destination.ip": [
-            "10.122.127.237"
-        ],
+        "destination.ip": "10.122.127.237",
         "destination.port": 1138,
         "event.action": "block",
         "event.code": "Imperva",
@@ -3093,9 +2915,7 @@
         "rsa.time.starttime": "2018-01-13T00:18:32.000Z",
         "service.type": "imperva",
         "source.address": "fde7756.mail.corp",
-        "source.ip": [
-            "10.86.121.152"
-        ],
+        "source.ip": "10.86.121.152",
         "source.port": 3971,
         "tags": [
             "forwarded",
@@ -3104,9 +2924,7 @@
         "user.name": "consecte"
     },
     {
-        "destination.ip": [
-            "10.201.223.119"
-        ],
+        "destination.ip": "10.201.223.119",
         "destination.port": 3614,
         "event.action": "block",
         "event.code": "Imperva",
@@ -3155,9 +2973,7 @@
         "rsa.time.starttime": "2018-01-27T07:21:06.000Z",
         "service.type": "imperva",
         "source.address": "agnama5013.internal.example",
-        "source.ip": [
-            "10.204.223.184"
-        ],
+        "source.ip": "10.204.223.184",
         "source.port": 6092,
         "tags": [
             "forwarded",
@@ -3166,9 +2982,7 @@
         "user.name": "rcit"
     },
     {
-        "destination.ip": [
-            "10.200.12.126"
-        ],
+        "destination.ip": "10.200.12.126",
         "destination.port": 2347,
         "event.action": "block",
         "event.code": "Imperva",
@@ -3217,9 +3031,7 @@
         "rsa.time.starttime": "2018-02-10T14:23:41.000Z",
         "service.type": "imperva",
         "source.address": "edictas4693.home",
-        "source.ip": [
-            "10.223.56.33"
-        ],
+        "source.ip": "10.223.56.33",
         "source.port": 5899,
         "tags": [
             "forwarded",
@@ -3228,9 +3040,7 @@
         "user.name": "magnido"
     },
     {
-        "destination.ip": [
-            "10.65.225.101"
-        ],
+        "destination.ip": "10.65.225.101",
         "destination.port": 1752,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -3285,9 +3095,7 @@
         "rule.name": "tiumd",
         "service.type": "imperva",
         "source.address": "nibu2565.api.local",
-        "source.ip": [
-            "10.94.89.177"
-        ],
+        "source.ip": "10.94.89.177",
         "source.port": 428,
         "tags": [
             "forwarded",
@@ -3306,9 +3114,7 @@
         "user.name": "tuserror"
     },
     {
-        "destination.ip": [
-            "10.65.174.196"
-        ],
+        "destination.ip": "10.65.174.196",
         "destination.port": 472,
         "event.action": "deny",
         "event.code": "Imperva",
@@ -3352,9 +3158,7 @@
         "rsa.time.starttime": "2018-03-11T04:28:49.000Z",
         "service.type": "imperva",
         "source.address": "tsun7120.home",
-        "source.ip": [
-            "10.191.184.105"
-        ],
+        "source.ip": "10.191.184.105",
         "source.port": 6821,
         "tags": [
             "forwarded",
@@ -3363,9 +3167,7 @@
         "user.name": "iin"
     },
     {
-        "destination.ip": [
-            "10.41.181.179"
-        ],
+        "destination.ip": "10.41.181.179",
         "destination.port": 2803,
         "event.action": "deny",
         "event.code": "Imperva",
@@ -3420,9 +3222,7 @@
         "rule.name": "eabil",
         "service.type": "imperva",
         "source.address": "lumquid6940.mail.localdomain",
-        "source.ip": [
-            "10.224.148.48"
-        ],
+        "source.ip": "10.224.148.48",
         "source.port": 6078,
         "tags": [
             "forwarded",
@@ -3441,9 +3241,7 @@
         "user.name": "niam"
     },
     {
-        "destination.ip": [
-            "10.21.208.103"
-        ],
+        "destination.ip": "10.21.208.103",
         "destination.port": 5543,
         "event.action": "deny",
         "event.code": "Imperva",
@@ -3492,9 +3290,7 @@
         "rsa.time.starttime": "2018-04-08T18:33:58.000Z",
         "service.type": "imperva",
         "source.address": "amcorp7299.api.example",
-        "source.ip": [
-            "10.21.61.134"
-        ],
+        "source.ip": "10.21.61.134",
         "source.port": 6124,
         "tags": [
             "forwarded",
@@ -3503,9 +3299,7 @@
         "user.name": "imidest"
     },
     {
-        "destination.ip": [
-            "10.23.6.216"
-        ],
+        "destination.ip": "10.23.6.216",
         "destination.port": 4578,
         "event.action": "accept",
         "event.code": "Imperva",
@@ -3554,9 +3348,7 @@
         "rsa.time.starttime": "2018-04-23T01:36:32.000Z",
         "service.type": "imperva",
         "source.address": "magnama868.api.local",
-        "source.ip": [
-            "10.221.192.116"
-        ],
+        "source.ip": "10.221.192.116",
         "source.port": 4688,
         "tags": [
             "forwarded",
@@ -3565,9 +3357,7 @@
         "user.name": "iarchit"
     },
     {
-        "destination.ip": [
-            "10.240.62.238"
-        ],
+        "destination.ip": "10.240.62.238",
         "destination.port": 5850,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -3621,9 +3411,7 @@
         "rule.name": "tutlabo",
         "service.type": "imperva",
         "source.address": "tionevol3157.mail.invalid",
-        "source.ip": [
-            "10.191.142.143"
-        ],
+        "source.ip": "10.191.142.143",
         "source.port": 2976,
         "tags": [
             "forwarded",
@@ -3642,9 +3430,7 @@
         "user.name": "modtempo"
     },
     {
-        "destination.ip": [
-            "10.111.22.134"
-        ],
+        "destination.ip": "10.111.22.134",
         "destination.port": 7499,
         "event.action": "deny",
         "event.code": "Imperva",
@@ -3698,9 +3484,7 @@
         "rule.name": "atu",
         "service.type": "imperva",
         "source.address": "mquis319.api.local",
-        "source.ip": [
-            "10.178.79.217"
-        ],
+        "source.ip": "10.178.79.217",
         "source.port": 3124,
         "tags": [
             "forwarded",
@@ -3719,9 +3503,7 @@
         "user.name": "ccusan"
     },
     {
-        "destination.ip": [
-            "10.161.225.172"
-        ],
+        "destination.ip": "10.161.225.172",
         "destination.port": 3708,
         "event.action": "block",
         "event.code": "Imperva",
@@ -3770,9 +3552,7 @@
         "rsa.time.starttime": "2018-06-04T22:44:15.000Z",
         "service.type": "imperva",
         "source.address": "urad5712.api.host",
-        "source.ip": [
-            "10.77.86.215"
-        ],
+        "source.ip": "10.77.86.215",
         "source.port": 6390,
         "tags": [
             "forwarded",
@@ -3781,9 +3561,7 @@
         "user.name": "meaqu"
     },
     {
-        "destination.ip": [
-            "10.186.133.184"
-        ],
+        "destination.ip": "10.186.133.184",
         "destination.port": 7864,
         "event.action": "deny",
         "event.code": "Imperva",
@@ -3827,9 +3605,7 @@
         "rsa.time.starttime": "2018-06-19T05:46:49.000Z",
         "service.type": "imperva",
         "source.address": "enbyCic4659.www5.example",
-        "source.ip": [
-            "10.211.161.187"
-        ],
+        "source.ip": "10.211.161.187",
         "source.port": 843,
         "tags": [
             "forwarded",
@@ -3838,9 +3614,7 @@
         "user.name": "boriosa"
     },
     {
-        "destination.ip": [
-            "10.160.147.230"
-        ],
+        "destination.ip": "10.160.147.230",
         "destination.port": 2126,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -3884,9 +3658,7 @@
         "rsa.time.starttime": "2018-07-03T12:49:23.000Z",
         "service.type": "imperva",
         "source.address": "inBCSed5308.api.corp",
-        "source.ip": [
-            "10.254.198.47"
-        ],
+        "source.ip": "10.254.198.47",
         "source.port": 3925,
         "tags": [
             "forwarded",
@@ -3895,9 +3667,7 @@
         "user.name": "nimvenia"
     },
     {
-        "destination.ip": [
-            "10.40.24.93"
-        ],
+        "destination.ip": "10.40.24.93",
         "destination.port": 7487,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -3946,9 +3716,7 @@
         "rsa.time.starttime": "2018-07-17T19:51:58.000Z",
         "service.type": "imperva",
         "source.address": "reseo2067.api.localdomain",
-        "source.ip": [
-            "10.182.197.243"
-        ],
+        "source.ip": "10.182.197.243",
         "source.port": 3687,
         "tags": [
             "forwarded",
@@ -3957,9 +3725,7 @@
         "user.name": "mSecti"
     },
     {
-        "destination.ip": [
-            "10.249.13.159"
-        ],
+        "destination.ip": "10.249.13.159",
         "destination.port": 3023,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -4008,9 +3774,7 @@
         "rsa.time.starttime": "2018-08-01T02:54:32.000Z",
         "service.type": "imperva",
         "source.address": "itte6905.mail.invalid",
-        "source.ip": [
-            "10.108.130.106"
-        ],
+        "source.ip": "10.108.130.106",
         "source.port": 7601,
         "tags": [
             "forwarded",
@@ -4019,9 +3783,7 @@
         "user.name": "uisautei"
     },
     {
-        "destination.ip": [
-            "10.39.244.49"
-        ],
+        "destination.ip": "10.39.244.49",
         "destination.port": 3852,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -4075,9 +3837,7 @@
         "rule.name": "ptate",
         "service.type": "imperva",
         "source.address": "caboNemo274.www.host",
-        "source.ip": [
-            "10.64.94.174"
-        ],
+        "source.ip": "10.64.94.174",
         "source.port": 4082,
         "tags": [
             "forwarded",
@@ -4152,9 +3912,7 @@
         "user.name": "apari"
     },
     {
-        "destination.ip": [
-            "10.115.203.143"
-        ],
+        "destination.ip": "10.115.203.143",
         "destination.port": 6889,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -4203,9 +3961,7 @@
         "rsa.time.starttime": "2018-09-27T07:04:49.000Z",
         "service.type": "imperva",
         "source.address": "qui5978.api.test",
-        "source.ip": [
-            "10.134.135.22"
-        ],
+        "source.ip": "10.134.135.22",
         "source.port": 1809,
         "tags": [
             "forwarded",
@@ -4214,9 +3970,7 @@
         "user.name": "utoditau"
     },
     {
-        "destination.ip": [
-            "10.43.244.252"
-        ],
+        "destination.ip": "10.43.244.252",
         "destination.port": 1752,
         "event.action": "accept",
         "event.code": "Imperva",
@@ -4265,9 +4019,7 @@
         "rsa.time.starttime": "2018-10-11T14:07:23.000Z",
         "service.type": "imperva",
         "source.address": "iamq2577.internal.corp",
-        "source.ip": [
-            "10.251.212.166"
-        ],
+        "source.ip": "10.251.212.166",
         "source.port": 3925,
         "tags": [
             "forwarded",
@@ -4304,9 +4056,7 @@
         "user.name": "isunde"
     },
     {
-        "destination.ip": [
-            "10.20.231.188"
-        ],
+        "destination.ip": "10.20.231.188",
         "destination.port": 1200,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -4355,9 +4105,7 @@
         "rsa.time.starttime": "2018-11-09T04:12:32.000Z",
         "service.type": "imperva",
         "source.address": "usB4127.localhost",
-        "source.ip": [
-            "10.88.189.164"
-        ],
+        "source.ip": "10.88.189.164",
         "source.port": 1373,
         "tags": [
             "forwarded",
@@ -4394,9 +4142,7 @@
         "user.name": "quamquae"
     },
     {
-        "destination.ip": [
-            "10.231.77.26"
-        ],
+        "destination.ip": "10.231.77.26",
         "destination.port": 7082,
         "event.action": "allow",
         "event.code": "Imperva",
@@ -4444,9 +4190,7 @@
         "rsa.time.duration_time": 61.96,
         "service.type": "imperva",
         "source.address": "abor3266.mail.home",
-        "source.ip": [
-            "10.225.11.197"
-        ],
+        "source.ip": "10.225.11.197",
         "source.port": 3513,
         "tags": [
             "forwarded",
@@ -4455,9 +4199,7 @@
         "user.name": "rehe"
     },
     {
-        "destination.ip": [
-            "10.148.3.197"
-        ],
+        "destination.ip": "10.148.3.197",
         "destination.port": 979,
         "event.action": "allow",
         "event.code": "Imperva",
@@ -4501,9 +4243,7 @@
         "rsa.time.starttime": "2018-12-22T01:20:14.000Z",
         "service.type": "imperva",
         "source.address": "eprehe2455.www.home",
-        "source.ip": [
-            "10.106.166.105"
-        ],
+        "source.ip": "10.106.166.105",
         "source.port": 4567,
         "tags": [
             "forwarded",
@@ -4512,9 +4252,7 @@
         "user.name": "usa"
     },
     {
-        "destination.ip": [
-            "10.172.121.239"
-        ],
+        "destination.ip": "10.172.121.239",
         "destination.port": 5339,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -4563,9 +4301,7 @@
         "rsa.time.starttime": "2019-01-05T08:22:49.000Z",
         "service.type": "imperva",
         "source.address": "destla2110.www5.localdomain",
-        "source.ip": [
-            "10.57.169.205"
-        ],
+        "source.ip": "10.57.169.205",
         "source.port": 3093,
         "tags": [
             "forwarded",
@@ -4574,9 +4310,7 @@
         "user.name": "iuta"
     },
     {
-        "destination.ip": [
-            "10.129.234.200"
-        ],
+        "destination.ip": "10.129.234.200",
         "destination.port": 3833,
         "event.action": "allow",
         "event.code": "Imperva",
@@ -4625,9 +4359,7 @@
         "rsa.time.starttime": "2019-01-19T15:25:23.000Z",
         "service.type": "imperva",
         "source.address": "exerc3694.api.home",
-        "source.ip": [
-            "10.42.218.103"
-        ],
+        "source.ip": "10.42.218.103",
         "source.port": 3315,
         "tags": [
             "forwarded",
@@ -4636,9 +4368,7 @@
         "user.name": "tisundeo"
     },
     {
-        "destination.ip": [
-            "10.111.132.221"
-        ],
+        "destination.ip": "10.111.132.221",
         "destination.port": 2262,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -4687,9 +4417,7 @@
         "rsa.time.starttime": "2019-02-02T22:27:57.000Z",
         "service.type": "imperva",
         "source.address": "ididu5928.www5.local",
-        "source.ip": [
-            "10.76.121.224"
-        ],
+        "source.ip": "10.76.121.224",
         "source.port": 4305,
         "tags": [
             "forwarded",
@@ -4698,9 +4426,7 @@
         "user.name": "ali"
     },
     {
-        "destination.ip": [
-            "10.195.8.141"
-        ],
+        "destination.ip": "10.195.8.141",
         "destination.port": 4342,
         "event.action": "accept",
         "event.code": "Imperva",
@@ -4749,9 +4475,7 @@
         "rsa.time.starttime": "2019-02-17T05:30:32.000Z",
         "service.type": "imperva",
         "source.address": "boriosa7066.www.corp",
-        "source.ip": [
-            "10.17.214.21"
-        ],
+        "source.ip": "10.17.214.21",
         "source.port": 4821,
         "tags": [
             "forwarded",
@@ -4760,9 +4484,7 @@
         "user.name": "enimip"
     },
     {
-        "destination.ip": [
-            "10.173.13.179"
-        ],
+        "destination.ip": "10.173.13.179",
         "destination.port": 1211,
         "event.action": "block",
         "event.code": "Imperva",
@@ -4811,9 +4533,7 @@
         "rsa.time.starttime": "2019-03-03T12:33:06.000Z",
         "service.type": "imperva",
         "source.address": "ssusc1892.internal.host",
-        "source.ip": [
-            "10.179.60.167"
-        ],
+        "source.ip": "10.179.60.167",
         "source.port": 1124,
         "tags": [
             "forwarded",
@@ -4822,9 +4542,7 @@
         "user.name": "ptasn"
     },
     {
-        "destination.ip": [
-            "10.42.135.34"
-        ],
+        "destination.ip": "10.42.135.34",
         "destination.port": 4361,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -4873,9 +4591,7 @@
         "rsa.time.starttime": "2019-03-17T19:35:40.000Z",
         "service.type": "imperva",
         "source.address": "iatisund424.mail.localdomain",
-        "source.ip": [
-            "10.178.190.123"
-        ],
+        "source.ip": "10.178.190.123",
         "source.port": 3288,
         "tags": [
             "forwarded",
@@ -4912,9 +4628,7 @@
         "user.name": "fugit"
     },
     {
-        "destination.ip": [
-            "10.207.198.239"
-        ],
+        "destination.ip": "10.207.198.239",
         "destination.port": 4735,
         "event.action": "accept",
         "event.code": "Imperva",
@@ -4963,9 +4677,7 @@
         "rsa.time.starttime": "2019-04-15T09:40:49.000Z",
         "service.type": "imperva",
         "source.address": "uidolo7626.local",
-        "source.ip": [
-            "10.8.147.176"
-        ],
+        "source.ip": "10.8.147.176",
         "source.port": 5920,
         "tags": [
             "forwarded",
@@ -4974,9 +4686,7 @@
         "user.name": "Loremips"
     },
     {
-        "destination.ip": [
-            "10.116.26.185"
-        ],
+        "destination.ip": "10.116.26.185",
         "destination.port": 595,
         "event.action": "block",
         "event.code": "Imperva",
@@ -5020,9 +4730,7 @@
         "rsa.time.starttime": "2019-04-29T16:43:23.000Z",
         "service.type": "imperva",
         "source.address": "dmini3435.internal.domain",
-        "source.ip": [
-            "10.206.221.180"
-        ],
+        "source.ip": "10.206.221.180",
         "source.port": 6818,
         "tags": [
             "forwarded",
@@ -5031,9 +4739,7 @@
         "user.name": "oNe"
     },
     {
-        "destination.ip": [
-            "10.86.180.150"
-        ],
+        "destination.ip": "10.86.180.150",
         "destination.port": 5495,
         "event.action": "allow",
         "event.code": "Imperva",
@@ -5082,9 +4788,7 @@
         "rsa.time.starttime": "2019-05-13T23:45:57.000Z",
         "service.type": "imperva",
         "source.address": "nibusBo1864.domain",
-        "source.ip": [
-            "10.253.127.130"
-        ],
+        "source.ip": "10.253.127.130",
         "source.port": 5339,
         "tags": [
             "forwarded",
@@ -5093,9 +4797,7 @@
         "user.name": "mnisis"
     },
     {
-        "destination.ip": [
-            "10.158.161.5"
-        ],
+        "destination.ip": "10.158.161.5",
         "destination.port": 579,
         "event.action": "allow",
         "event.code": "Imperva",
@@ -5148,9 +4850,7 @@
         "rule.name": "busBonor",
         "service.type": "imperva",
         "source.address": "inv6528.www5.example",
-        "source.ip": [
-            "10.220.175.201"
-        ],
+        "source.ip": "10.220.175.201",
         "source.port": 4469,
         "tags": [
             "forwarded",
@@ -5197,9 +4897,7 @@
         "user.name": "mpo"
     },
     {
-        "destination.ip": [
-            "10.150.27.144"
-        ],
+        "destination.ip": "10.150.27.144",
         "destination.port": 5627,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -5248,9 +4946,7 @@
         "rsa.time.starttime": "2019-06-25T20:53:40.000Z",
         "service.type": "imperva",
         "source.address": "nisiutal4437.www.example",
-        "source.ip": [
-            "10.248.16.82"
-        ],
+        "source.ip": "10.248.16.82",
         "source.port": 6834,
         "tags": [
             "forwarded",
@@ -5259,9 +4955,7 @@
         "user.name": "res"
     },
     {
-        "destination.ip": [
-            "10.146.131.76"
-        ],
+        "destination.ip": "10.146.131.76",
         "destination.port": 2281,
         "event.action": "allow",
         "event.code": "Imperva",
@@ -5310,9 +5004,7 @@
         "rsa.time.starttime": "2019-07-10T03:56:14.000Z",
         "service.type": "imperva",
         "source.address": "tqui5172.www.local",
-        "source.ip": [
-            "10.173.19.140"
-        ],
+        "source.ip": "10.173.19.140",
         "source.port": 7780,
         "tags": [
             "forwarded",
@@ -5321,9 +5013,7 @@
         "user.name": "orsi"
     },
     {
-        "destination.ip": [
-            "10.69.5.227"
-        ],
+        "destination.ip": "10.69.5.227",
         "destination.port": 5845,
         "event.action": "deny",
         "event.code": "Imperva",
@@ -5367,9 +5057,7 @@
         "rsa.time.starttime": "2019-07-24T10:58:48.000Z",
         "service.type": "imperva",
         "source.address": "intocca6708.mail.corp",
-        "source.ip": [
-            "10.171.175.165"
-        ],
+        "source.ip": "10.171.175.165",
         "source.port": 5776,
         "tags": [
             "forwarded",
@@ -5378,9 +5066,7 @@
         "user.name": "doloreme"
     },
     {
-        "destination.ip": [
-            "10.213.214.118"
-        ],
+        "destination.ip": "10.213.214.118",
         "destination.port": 7851,
         "event.action": "deny",
         "event.code": "Imperva",
@@ -5429,9 +5115,7 @@
         "rsa.time.starttime": "2019-08-07T18:01:23.000Z",
         "service.type": "imperva",
         "source.address": "isetqu2843.www.invalid",
-        "source.ip": [
-            "10.253.175.129"
-        ],
+        "source.ip": "10.253.175.129",
         "source.port": 5547,
         "tags": [
             "forwarded",
@@ -5440,9 +5124,7 @@
         "user.name": "ate"
     },
     {
-        "destination.ip": [
-            "10.89.26.170"
-        ],
+        "destination.ip": "10.89.26.170",
         "destination.port": 3548,
         "event.action": "block",
         "event.code": "Imperva",
@@ -5496,9 +5178,7 @@
         "rule.name": "uisnos",
         "service.type": "imperva",
         "source.address": "commodo6041.mail.localhost",
-        "source.ip": [
-            "10.149.91.130"
-        ],
+        "source.ip": "10.149.91.130",
         "source.port": 7756,
         "tags": [
             "forwarded",
@@ -5517,9 +5197,7 @@
         "user.name": "aboris"
     },
     {
-        "destination.ip": [
-            "10.81.108.232"
-        ],
+        "destination.ip": "10.81.108.232",
         "destination.port": 856,
         "event.action": "allow",
         "event.code": "Imperva",
@@ -5574,9 +5252,7 @@
         "rule.name": "alorumwr",
         "service.type": "imperva",
         "source.address": "gitse6744.api.local",
-        "source.ip": [
-            "10.52.106.68"
-        ],
+        "source.ip": "10.52.106.68",
         "source.port": 5818,
         "tags": [
             "forwarded",
@@ -5595,9 +5271,7 @@
         "user.name": "aco"
     },
     {
-        "destination.ip": [
-            "10.223.10.28"
-        ],
+        "destination.ip": "10.223.10.28",
         "destination.port": 1991,
         "event.action": "deny",
         "event.code": "Imperva",
@@ -5652,9 +5326,7 @@
         "rule.name": "eabill",
         "service.type": "imperva",
         "source.address": "par3605.internal.localdomain",
-        "source.ip": [
-            "10.230.48.97"
-        ],
+        "source.ip": "10.230.48.97",
         "source.port": 2572,
         "tags": [
             "forwarded",
@@ -5673,9 +5345,7 @@
         "user.name": "erit"
     },
     {
-        "destination.ip": [
-            "10.115.42.231"
-        ],
+        "destination.ip": "10.115.42.231",
         "destination.port": 2143,
         "event.action": "deny",
         "event.code": "Imperva",
@@ -5724,9 +5394,7 @@
         "rsa.time.starttime": "2019-10-03T22:11:40.000Z",
         "service.type": "imperva",
         "source.address": "isau4356.www.home",
-        "source.ip": [
-            "10.161.212.150"
-        ],
+        "source.ip": "10.161.212.150",
         "source.port": 2748,
         "tags": [
             "forwarded",
@@ -5735,9 +5403,7 @@
         "user.name": "res"
     },
     {
-        "destination.ip": [
-            "10.247.108.144"
-        ],
+        "destination.ip": "10.247.108.144",
         "destination.port": 3896,
         "event.action": "block",
         "event.code": "Imperva",
@@ -5792,9 +5458,7 @@
         "rule.name": "nevo",
         "service.type": "imperva",
         "source.address": "labo3477.www5.domain",
-        "source.ip": [
-            "10.226.75.20"
-        ],
+        "source.ip": "10.226.75.20",
         "source.port": 5677,
         "tags": [
             "forwarded",
@@ -5813,9 +5477,7 @@
         "user.name": "tema"
     },
     {
-        "destination.ip": [
-            "10.192.15.65"
-        ],
+        "destination.ip": "10.192.15.65",
         "destination.port": 3328,
         "event.action": "block",
         "event.code": "Imperva",
@@ -5859,9 +5521,7 @@
         "rsa.time.starttime": "2019-11-01T12:16:48.000Z",
         "service.type": "imperva",
         "source.address": "itseddo2209.mail.domain",
-        "source.ip": [
-            "10.97.22.61"
-        ],
+        "source.ip": "10.97.22.61",
         "source.port": 6420,
         "tags": [
             "forwarded",
@@ -5870,9 +5530,7 @@
         "user.name": "nimides"
     },
     {
-        "destination.ip": [
-            "10.116.76.161"
-        ],
+        "destination.ip": "10.116.76.161",
         "destination.port": 2009,
         "event.action": "cancel",
         "event.code": "Imperva",
@@ -5926,9 +5584,7 @@
         "rule.name": "ommodi",
         "service.type": "imperva",
         "source.address": "duntutl3396.api.host",
-        "source.ip": [
-            "10.197.254.133"
-        ],
+        "source.ip": "10.197.254.133",
         "source.port": 7469,
         "tags": [
             "forwarded",
@@ -5947,9 +5603,7 @@
         "user.name": "ide"
     },
     {
-        "destination.ip": [
-            "10.28.77.79"
-        ],
+        "destination.ip": "10.28.77.79",
         "destination.port": 3615,
         "event.action": "deny",
         "event.code": "Imperva",
@@ -5998,9 +5652,7 @@
         "rsa.time.starttime": "2019-11-30T02:21:57.000Z",
         "service.type": "imperva",
         "source.address": "colabo6686.internal.invalid",
-        "source.ip": [
-            "10.144.14.15"
-        ],
+        "source.ip": "10.144.14.15",
         "source.port": 1150,
         "tags": [
             "forwarded",
@@ -6009,9 +5661,7 @@
         "user.name": "upta"
     },
     {
-        "destination.ip": [
-            "10.248.177.182"
-        ],
+        "destination.ip": "10.248.177.182",
         "destination.port": 317,
         "event.action": "accept",
         "event.code": "Imperva",
@@ -6055,9 +5705,7 @@
         "rsa.time.starttime": "2019-12-14T09:24:31.000Z",
         "service.type": "imperva",
         "source.address": "tsunti1164.www.example",
-        "source.ip": [
-            "10.18.15.43"
-        ],
+        "source.ip": "10.18.15.43",
         "source.port": 2224,
         "tags": [
             "forwarded",

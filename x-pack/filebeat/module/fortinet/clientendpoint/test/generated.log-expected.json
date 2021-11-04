@@ -1,8 +1,6 @@
 [
     {
-        "destination.ip": [
-            "10.102.123.34"
-        ],
+        "destination.ip": "10.102.123.34",
         "destination.port": 3994,
         "event.action": "deny",
         "event.code": "http",
@@ -51,9 +49,7 @@
         "server.subdomain": "litesse6379",
         "server.top_level_domain": "domain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.150.92.220"
-        ],
+        "source.ip": "10.150.92.220",
         "source.port": 7178,
         "tags": [
             "fortinet.clientendpoint",
@@ -62,9 +58,7 @@
         "user.name": "sumdo"
     },
     {
-        "destination.ip": [
-            "10.149.203.46"
-        ],
+        "destination.ip": "10.149.203.46",
         "destination.port": 5861,
         "event.action": "deny",
         "event.code": "https",
@@ -113,9 +107,7 @@
         "server.subdomain": "gnaali6189",
         "server.top_level_domain": "localhost",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.33.212.159"
-        ],
+        "source.ip": "10.33.212.159",
         "source.port": 2789,
         "tags": [
             "fortinet.clientendpoint",
@@ -124,9 +116,7 @@
         "user.name": "mipsumq"
     },
     {
-        "destination.ip": [
-            "10.118.175.9"
-        ],
+        "destination.ip": "10.118.175.9",
         "destination.port": 2802,
         "event.action": "deny",
         "event.code": "smtp",
@@ -175,9 +165,7 @@
         "server.subdomain": "quis1130",
         "server.top_level_domain": "corp",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.173.116.41"
-        ],
+        "source.ip": "10.173.116.41",
         "source.port": 3710,
         "tags": [
             "fortinet.clientendpoint",
@@ -186,9 +174,7 @@
         "user.name": "uame"
     },
     {
-        "destination.ip": [
-            "10.202.204.154"
-        ],
+        "destination.ip": "10.202.204.154",
         "destination.port": 3587,
         "event.action": "deny",
         "event.code": "https",
@@ -237,9 +223,7 @@
         "server.subdomain": "reprehe189",
         "server.top_level_domain": "home",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.134.137.177"
-        ],
+        "source.ip": "10.134.137.177",
         "source.port": 7868,
         "tags": [
             "fortinet.clientendpoint",
@@ -248,9 +232,7 @@
         "user.name": "orsitame"
     },
     {
-        "destination.ip": [
-            "10.70.0.60"
-        ],
+        "destination.ip": "10.70.0.60",
         "destination.port": 4982,
         "event.action": "deny",
         "event.code": "pop3",
@@ -299,9 +281,7 @@
         "server.subdomain": "enimad2283",
         "server.top_level_domain": "domain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.245.142.250"
-        ],
+        "source.ip": "10.245.142.250",
         "source.port": 5408,
         "tags": [
             "fortinet.clientendpoint",
@@ -310,9 +290,7 @@
         "user.name": "eos"
     },
     {
-        "destination.ip": [
-            "10.200.188.142"
-        ],
+        "destination.ip": "10.200.188.142",
         "destination.port": 7143,
         "event.action": "deny",
         "event.code": "smtp",
@@ -361,9 +339,7 @@
         "server.subdomain": "doloreeu3553",
         "server.top_level_domain": "home",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.202.72.124"
-        ],
+        "source.ip": "10.202.72.124",
         "source.port": 4665,
         "tags": [
             "fortinet.clientendpoint",
@@ -372,9 +348,7 @@
         "user.name": "iusmodt"
     },
     {
-        "destination.ip": [
-            "10.214.225.125"
-        ],
+        "destination.ip": "10.214.225.125",
         "destination.port": 2121,
         "event.action": "deny",
         "event.code": "pop3",
@@ -423,9 +397,7 @@
         "server.subdomain": "iutal13",
         "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.12.44.169"
-        ],
+        "source.ip": "10.12.44.169",
         "source.port": 5710,
         "tags": [
             "fortinet.clientendpoint",
@@ -434,9 +406,7 @@
         "user.name": "erep"
     },
     {
-        "destination.ip": [
-            "10.198.136.50"
-        ],
+        "destination.ip": "10.198.136.50",
         "destination.port": 2089,
         "event.action": "deny",
         "event.code": "http",
@@ -485,9 +455,7 @@
         "server.subdomain": "uovol492",
         "server.top_level_domain": "localhost",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.66.108.11"
-        ],
+        "source.ip": "10.66.108.11",
         "source.port": 6875,
         "tags": [
             "fortinet.clientendpoint",
@@ -496,9 +464,7 @@
         "user.name": "uptatev"
     },
     {
-        "destination.ip": [
-            "10.69.20.77"
-        ],
+        "destination.ip": "10.69.20.77",
         "destination.port": 7579,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -546,9 +512,7 @@
         "server.registered_domain": "osquir6997.corp",
         "server.top_level_domain": "corp",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.178.244.31"
-        ],
+        "source.ip": "10.178.244.31",
         "source.port": 3857,
         "tags": [
             "fortinet.clientendpoint",
@@ -557,9 +521,7 @@
         "user.name": "umdolor"
     },
     {
-        "destination.ip": [
-            "10.203.5.162"
-        ],
+        "destination.ip": "10.203.5.162",
         "destination.port": 7290,
         "event.action": "deny",
         "event.code": "pop3",
@@ -608,9 +570,7 @@
         "server.subdomain": "eniam7007",
         "server.top_level_domain": "invalid",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.54.231.100"
-        ],
+        "source.ip": "10.54.231.100",
         "source.port": 5616,
         "tags": [
             "fortinet.clientendpoint",
@@ -619,9 +579,7 @@
         "user.name": "umdolore"
     },
     {
-        "destination.ip": [
-            "10.136.252.240"
-        ],
+        "destination.ip": "10.136.252.240",
         "destination.port": 4105,
         "event.action": "deny",
         "event.code": "pop3",
@@ -670,9 +628,7 @@
         "server.subdomain": "snulapar3794",
         "server.top_level_domain": "domain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.65.83.160"
-        ],
+        "source.ip": "10.65.83.160",
         "source.port": 3592,
         "tags": [
             "fortinet.clientendpoint",
@@ -681,9 +637,7 @@
         "user.name": "ender"
     },
     {
-        "destination.ip": [
-            "10.210.213.18"
-        ],
+        "destination.ip": "10.210.213.18",
         "destination.port": 3970,
         "event.action": "deny",
         "event.code": "http",
@@ -731,9 +685,7 @@
         "server.registered_domain": "liq5883.localdomain",
         "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.57.40.29"
-        ],
+        "source.ip": "10.57.40.29",
         "source.port": 7616,
         "tags": [
             "fortinet.clientendpoint",
@@ -742,9 +694,7 @@
         "user.name": "onse"
     },
     {
-        "destination.ip": [
-            "10.200.156.102"
-        ],
+        "destination.ip": "10.200.156.102",
         "destination.port": 6061,
         "event.action": "deny",
         "event.code": "smtp",
@@ -792,9 +742,7 @@
         "server.registered_domain": "rsint7026.test",
         "server.top_level_domain": "test",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.144.82.69"
-        ],
+        "source.ip": "10.144.82.69",
         "source.port": 2896,
         "tags": [
             "fortinet.clientendpoint",
@@ -803,9 +751,7 @@
         "user.name": "rveli"
     },
     {
-        "destination.ip": [
-            "10.72.58.135"
-        ],
+        "destination.ip": "10.72.58.135",
         "destination.port": 2382,
         "event.action": "deny",
         "event.code": "smtp",
@@ -854,9 +800,7 @@
         "server.subdomain": "qua2945",
         "server.top_level_domain": "local",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.109.232.112"
-        ],
+        "source.ip": "10.109.232.112",
         "source.port": 5160,
         "tags": [
             "fortinet.clientendpoint",
@@ -865,9 +809,7 @@
         "user.name": "xea"
     },
     {
-        "destination.ip": [
-            "10.72.29.73"
-        ],
+        "destination.ip": "10.72.29.73",
         "destination.port": 203,
         "event.action": "deny",
         "event.code": "http",
@@ -916,9 +858,7 @@
         "server.subdomain": "luptat6494",
         "server.top_level_domain": "example",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.38.22.45"
-        ],
+        "source.ip": "10.38.22.45",
         "source.port": 1493,
         "tags": [
             "fortinet.clientendpoint",
@@ -927,9 +867,7 @@
         "user.name": "onproide"
     },
     {
-        "destination.ip": [
-            "10.76.72.111"
-        ],
+        "destination.ip": "10.76.72.111",
         "destination.port": 7388,
         "event.action": "deny",
         "event.code": "smtp",
@@ -978,9 +916,7 @@
         "server.subdomain": "moenimi6317",
         "server.top_level_domain": "invalid",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.70.95.74"
-        ],
+        "source.ip": "10.70.95.74",
         "source.port": 6119,
         "tags": [
             "fortinet.clientendpoint",
@@ -989,9 +925,7 @@
         "user.name": "ivelits"
     },
     {
-        "destination.ip": [
-            "10.73.69.75"
-        ],
+        "destination.ip": "10.73.69.75",
         "destination.port": 6218,
         "event.action": "deny",
         "event.code": "https",
@@ -1039,9 +973,7 @@
         "server.registered_domain": "tion1761.home",
         "server.top_level_domain": "home",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.19.201.13"
-        ],
+        "source.ip": "10.19.201.13",
         "source.port": 5006,
         "tags": [
             "fortinet.clientendpoint",
@@ -1050,9 +982,7 @@
         "user.name": "tat"
     },
     {
-        "destination.ip": [
-            "10.84.105.75"
-        ],
+        "destination.ip": "10.84.105.75",
         "destination.port": 98,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -1101,9 +1031,7 @@
         "server.subdomain": "santium4235",
         "server.top_level_domain": "local",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.78.151.178"
-        ],
+        "source.ip": "10.78.151.178",
         "source.port": 1846,
         "tags": [
             "fortinet.clientendpoint",
@@ -1112,9 +1040,7 @@
         "user.name": "iquaUten"
     },
     {
-        "destination.ip": [
-            "10.25.192.202"
-        ],
+        "destination.ip": "10.25.192.202",
         "destination.port": 6462,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -1163,9 +1089,7 @@
         "server.subdomain": "CSed2857",
         "server.top_level_domain": "example",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.135.233.146"
-        ],
+        "source.ip": "10.135.233.146",
         "source.port": 4181,
         "tags": [
             "fortinet.clientendpoint",
@@ -1174,9 +1098,7 @@
         "user.name": "emeumfu"
     },
     {
-        "destination.ip": [
-            "10.104.134.200"
-        ],
+        "destination.ip": "10.104.134.200",
         "destination.port": 2508,
         "event.action": "deny",
         "event.code": "https",
@@ -1225,9 +1147,7 @@
         "server.subdomain": "equep5085",
         "server.top_level_domain": "domain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.121.219.204"
-        ],
+        "source.ip": "10.121.219.204",
         "source.port": 3611,
         "tags": [
             "fortinet.clientendpoint",
@@ -1236,9 +1156,7 @@
         "user.name": "uptat"
     },
     {
-        "destination.ip": [
-            "10.225.160.182"
-        ],
+        "destination.ip": "10.225.160.182",
         "destination.port": 4810,
         "event.action": "deny",
         "event.code": "https",
@@ -1287,9 +1205,7 @@
         "server.subdomain": "conseq557",
         "server.top_level_domain": "lan",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.191.105.82"
-        ],
+        "source.ip": "10.191.105.82",
         "source.port": 3361,
         "tags": [
             "fortinet.clientendpoint",
@@ -1298,9 +1214,7 @@
         "user.name": "eirure"
     },
     {
-        "destination.ip": [
-            "10.161.57.8"
-        ],
+        "destination.ip": "10.161.57.8",
         "destination.port": 2716,
         "event.action": "deny",
         "event.code": "smtp",
@@ -1349,9 +1263,7 @@
         "server.subdomain": "ite2026",
         "server.top_level_domain": "invalid",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.141.44.153"
-        ],
+        "source.ip": "10.141.44.153",
         "source.port": 3750,
         "tags": [
             "fortinet.clientendpoint",
@@ -1360,9 +1272,7 @@
         "user.name": "quisnos"
     },
     {
-        "destination.ip": [
-            "10.6.167.7"
-        ],
+        "destination.ip": "10.6.167.7",
         "destination.port": 2022,
         "event.action": "deny",
         "event.code": "https",
@@ -1410,9 +1320,7 @@
         "server.registered_domain": "lit5929.test",
         "server.top_level_domain": "test",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.153.111.103"
-        ],
+        "source.ip": "10.153.111.103",
         "source.port": 4977,
         "tags": [
             "fortinet.clientendpoint",
@@ -1421,9 +1329,7 @@
         "user.name": "eumfug"
     },
     {
-        "destination.ip": [
-            "10.134.148.219"
-        ],
+        "destination.ip": "10.134.148.219",
         "destination.port": 4430,
         "event.action": "deny",
         "event.code": "pop3",
@@ -1471,9 +1377,7 @@
         "server.registered_domain": "oru6938.invalid",
         "server.top_level_domain": "invalid",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.248.204.182"
-        ],
+        "source.ip": "10.248.204.182",
         "source.port": 1331,
         "tags": [
             "fortinet.clientendpoint",
@@ -1482,9 +1386,7 @@
         "user.name": "uioffi"
     },
     {
-        "destination.ip": [
-            "10.163.5.243"
-        ],
+        "destination.ip": "10.163.5.243",
         "destination.port": 4129,
         "event.action": "deny",
         "event.code": "smtp",
@@ -1532,9 +1434,7 @@
         "server.registered_domain": "etdol5473.local",
         "server.top_level_domain": "local",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.178.77.231"
-        ],
+        "source.ip": "10.178.77.231",
         "source.port": 5294,
         "tags": [
             "fortinet.clientendpoint",
@@ -1543,9 +1443,7 @@
         "user.name": "liquide"
     },
     {
-        "destination.ip": [
-            "10.221.89.228"
-        ],
+        "destination.ip": "10.221.89.228",
         "destination.port": 2447,
         "event.action": "deny",
         "event.code": "smtp",
@@ -1594,9 +1492,7 @@
         "server.subdomain": "nimid893",
         "server.top_level_domain": "corp",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.177.194.18"
-        ],
+        "source.ip": "10.177.194.18",
         "source.port": 766,
         "tags": [
             "fortinet.clientendpoint",
@@ -1605,9 +1501,7 @@
         "user.name": "aliquam"
     },
     {
-        "destination.ip": [
-            "10.32.239.1"
-        ],
+        "destination.ip": "10.32.239.1",
         "destination.port": 3128,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -1655,9 +1549,7 @@
         "server.registered_domain": "rumwritt6003.host",
         "server.top_level_domain": "host",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.241.65.49"
-        ],
+        "source.ip": "10.241.65.49",
         "source.port": 3027,
         "tags": [
             "fortinet.clientendpoint",
@@ -1666,9 +1558,7 @@
         "user.name": "idata"
     },
     {
-        "destination.ip": [
-            "10.101.57.120"
-        ],
+        "destination.ip": "10.101.57.120",
         "destination.port": 6501,
         "event.action": "deny",
         "event.code": "http",
@@ -1717,9 +1607,7 @@
         "server.subdomain": "xeacomm6855",
         "server.top_level_domain": "corp",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.168.90.81"
-        ],
+        "source.ip": "10.168.90.81",
         "source.port": 6866,
         "tags": [
             "fortinet.clientendpoint",
@@ -1728,9 +1616,7 @@
         "user.name": "eporr"
     },
     {
-        "destination.ip": [
-            "10.130.14.60"
-        ],
+        "destination.ip": "10.130.14.60",
         "destination.port": 2051,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -1779,9 +1665,7 @@
         "server.subdomain": "icabo4125",
         "server.top_level_domain": "domain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.14.211.43"
-        ],
+        "source.ip": "10.14.211.43",
         "source.port": 4456,
         "tags": [
             "fortinet.clientendpoint",
@@ -1790,9 +1674,7 @@
         "user.name": "litse"
     },
     {
-        "destination.ip": [
-            "10.248.101.25"
-        ],
+        "destination.ip": "10.248.101.25",
         "destination.port": 5740,
         "event.action": "deny",
         "event.code": "http",
@@ -1841,9 +1723,7 @@
         "server.subdomain": "ionofdeF5643",
         "server.top_level_domain": "localhost",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.60.129.15"
-        ],
+        "source.ip": "10.60.129.15",
         "source.port": 106,
         "tags": [
             "fortinet.clientendpoint",
@@ -1852,9 +1732,7 @@
         "user.name": "evolup"
     },
     {
-        "destination.ip": [
-            "10.111.187.12"
-        ],
+        "destination.ip": "10.111.187.12",
         "destination.port": 3994,
         "event.action": "deny",
         "event.code": "https",
@@ -1902,9 +1780,7 @@
         "server.registered_domain": "orem6702.invalid",
         "server.top_level_domain": "invalid",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.72.93.28"
-        ],
+        "source.ip": "10.72.93.28",
         "source.port": 3577,
         "tags": [
             "fortinet.clientendpoint",
@@ -1913,9 +1789,7 @@
         "user.name": "niamqui"
     },
     {
-        "destination.ip": [
-            "10.66.2.232"
-        ],
+        "destination.ip": "10.66.2.232",
         "destination.port": 5764,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -1964,9 +1838,7 @@
         "server.subdomain": "oin6780",
         "server.top_level_domain": "domain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.27.14.168"
-        ],
+        "source.ip": "10.27.14.168",
         "source.port": 2224,
         "tags": [
             "fortinet.clientendpoint",
@@ -1975,9 +1847,7 @@
         "user.name": "uirati"
     },
     {
-        "destination.ip": [
-            "10.195.2.130"
-        ],
+        "destination.ip": "10.195.2.130",
         "destination.port": 202,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -2026,9 +1896,7 @@
         "server.subdomain": "eprehen3224",
         "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.75.99.127"
-        ],
+        "source.ip": "10.75.99.127",
         "source.port": 1766,
         "tags": [
             "fortinet.clientendpoint",
@@ -2037,9 +1905,7 @@
         "user.name": "inibusB"
     },
     {
-        "destination.ip": [
-            "10.245.104.182"
-        ],
+        "destination.ip": "10.245.104.182",
         "destination.port": 55,
         "event.action": "deny",
         "event.code": "pop3",
@@ -2088,9 +1954,7 @@
         "server.subdomain": "ptasn6599",
         "server.top_level_domain": "localhost",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.201.238.90"
-        ],
+        "source.ip": "10.201.238.90",
         "source.port": 3759,
         "tags": [
             "fortinet.clientendpoint",
@@ -2099,9 +1963,7 @@
         "user.name": "ovol"
     },
     {
-        "destination.ip": [
-            "10.105.91.31"
-        ],
+        "destination.ip": "10.105.91.31",
         "destination.port": 5987,
         "event.action": "deny",
         "event.code": "http",
@@ -2149,9 +2011,7 @@
         "server.registered_domain": "nisist2752.home",
         "server.top_level_domain": "home",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.217.150.196"
-        ],
+        "source.ip": "10.217.150.196",
         "source.port": 2056,
         "tags": [
             "fortinet.clientendpoint",
@@ -2160,9 +2020,7 @@
         "user.name": "con"
     },
     {
-        "destination.ip": [
-            "10.184.18.202"
-        ],
+        "destination.ip": "10.184.18.202",
         "destination.port": 205,
         "event.action": "deny",
         "event.code": "https",
@@ -2211,9 +2069,7 @@
         "server.subdomain": "gitsedqu2649",
         "server.top_level_domain": "lan",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.4.157.1"
-        ],
+        "source.ip": "10.4.157.1",
         "source.port": 52,
         "tags": [
             "fortinet.clientendpoint",
@@ -2222,9 +2078,7 @@
         "user.name": "oditem"
     },
     {
-        "destination.ip": [
-            "10.113.95.59"
-        ],
+        "destination.ip": "10.113.95.59",
         "destination.port": 4367,
         "event.action": "deny",
         "event.code": "https",
@@ -2273,9 +2127,7 @@
         "server.subdomain": "entsunt3962",
         "server.top_level_domain": "example",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.255.39.252"
-        ],
+        "source.ip": "10.255.39.252",
         "source.port": 863,
         "tags": [
             "fortinet.clientendpoint",
@@ -2284,9 +2136,7 @@
         "user.name": "persp"
     },
     {
-        "destination.ip": [
-            "10.83.177.2"
-        ],
+        "destination.ip": "10.83.177.2",
         "destination.port": 1827,
         "event.action": "deny",
         "event.code": "http",
@@ -2335,9 +2185,7 @@
         "server.subdomain": "tut2703",
         "server.top_level_domain": "host",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.27.16.118"
-        ],
+        "source.ip": "10.27.16.118",
         "source.port": 18,
         "tags": [
             "fortinet.clientendpoint",
@@ -2346,9 +2194,7 @@
         "user.name": "borios"
     },
     {
-        "destination.ip": [
-            "10.167.227.44"
-        ],
+        "destination.ip": "10.167.227.44",
         "destination.port": 5736,
         "event.action": "deny",
         "event.code": "http",
@@ -2396,9 +2242,7 @@
         "server.registered_domain": "entorev160.test",
         "server.top_level_domain": "test",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.38.54.72"
-        ],
+        "source.ip": "10.38.54.72",
         "source.port": 6595,
         "tags": [
             "fortinet.clientendpoint",
@@ -2407,9 +2251,7 @@
         "user.name": "riamea"
     },
     {
-        "destination.ip": [
-            "10.215.205.216"
-        ],
+        "destination.ip": "10.215.205.216",
         "destination.port": 647,
         "event.action": "deny",
         "event.code": "http",
@@ -2458,9 +2300,7 @@
         "server.subdomain": "proide3714",
         "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.216.54.184"
-        ],
+        "source.ip": "10.216.54.184",
         "source.port": 1495,
         "tags": [
             "fortinet.clientendpoint",
@@ -2469,9 +2309,7 @@
         "user.name": "ameiusm"
     },
     {
-        "destination.ip": [
-            "10.9.18.237"
-        ],
+        "destination.ip": "10.9.18.237",
         "destination.port": 2486,
         "event.action": "deny",
         "event.code": "smtp",
@@ -2520,9 +2358,7 @@
         "server.subdomain": "tot5313",
         "server.top_level_domain": "invalid",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.9.12.248"
-        ],
+        "source.ip": "10.9.12.248",
         "source.port": 765,
         "tags": [
             "fortinet.clientendpoint",
@@ -2531,9 +2367,7 @@
         "user.name": "uradi"
     },
     {
-        "destination.ip": [
-            "10.41.123.102"
-        ],
+        "destination.ip": "10.41.123.102",
         "destination.port": 2300,
         "event.action": "deny",
         "event.code": "https",
@@ -2582,9 +2416,7 @@
         "server.subdomain": "rumet3801",
         "server.top_level_domain": "domain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.83.130.226"
-        ],
+        "source.ip": "10.83.130.226",
         "source.port": 1542,
         "tags": [
             "fortinet.clientendpoint",
@@ -2593,9 +2425,7 @@
         "user.name": "tenim"
     },
     {
-        "destination.ip": [
-            "10.80.152.108"
-        ],
+        "destination.ip": "10.80.152.108",
         "destination.port": 2742,
         "event.action": "deny",
         "event.code": "pop3",
@@ -2644,9 +2474,7 @@
         "server.subdomain": "liqua2834",
         "server.top_level_domain": "lan",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.175.112.197"
-        ],
+        "source.ip": "10.175.112.197",
         "source.port": 1749,
         "tags": [
             "fortinet.clientendpoint",
@@ -2655,9 +2483,7 @@
         "user.name": "tametcon"
     },
     {
-        "destination.ip": [
-            "10.142.25.100"
-        ],
+        "destination.ip": "10.142.25.100",
         "destination.port": 5770,
         "event.action": "deny",
         "event.code": "smtp",
@@ -2706,9 +2532,7 @@
         "server.subdomain": "sequat7273",
         "server.top_level_domain": "host",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.134.18.114"
-        ],
+        "source.ip": "10.134.18.114",
         "source.port": 2761,
         "tags": [
             "fortinet.clientendpoint",
@@ -2717,9 +2541,7 @@
         "user.name": "osqui"
     },
     {
-        "destination.ip": [
-            "10.223.119.218"
-        ],
+        "destination.ip": "10.223.119.218",
         "destination.port": 300,
         "event.action": "deny",
         "event.code": "http",
@@ -2767,9 +2589,7 @@
         "server.registered_domain": "uidol4575.localhost",
         "server.top_level_domain": "localhost",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.28.118.160"
-        ],
+        "source.ip": "10.28.118.160",
         "source.port": 6247,
         "tags": [
             "fortinet.clientendpoint",
@@ -2778,9 +2598,7 @@
         "user.name": "ntsunt"
     },
     {
-        "destination.ip": [
-            "10.47.28.48"
-        ],
+        "destination.ip": "10.47.28.48",
         "destination.port": 3032,
         "event.action": "deny",
         "event.code": "https",
@@ -2829,9 +2647,7 @@
         "server.subdomain": "oremq2000",
         "server.top_level_domain": "corp",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.110.114.175"
-        ],
+        "source.ip": "10.110.114.175",
         "source.port": 4986,
         "tags": [
             "fortinet.clientendpoint",
@@ -2840,9 +2656,7 @@
         "user.name": "plicab"
     },
     {
-        "destination.ip": [
-            "10.90.33.138"
-        ],
+        "destination.ip": "10.90.33.138",
         "destination.port": 7876,
         "event.action": "deny",
         "event.code": "pop3",
@@ -2891,9 +2705,7 @@
         "server.subdomain": "oremi1485",
         "server.top_level_domain": "localhost",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.40.251.202"
-        ],
+        "source.ip": "10.40.251.202",
         "source.port": 5733,
         "tags": [
             "fortinet.clientendpoint",
@@ -2902,9 +2714,7 @@
         "user.name": "nvolupt"
     },
     {
-        "destination.ip": [
-            "10.227.173.252"
-        ],
+        "destination.ip": "10.227.173.252",
         "destination.port": 5337,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -2953,9 +2763,7 @@
         "server.subdomain": "sequatD5469",
         "server.top_level_domain": "lan",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.65.2.106"
-        ],
+        "source.ip": "10.65.2.106",
         "source.port": 5410,
         "tags": [
             "fortinet.clientendpoint",
@@ -2964,9 +2772,7 @@
         "user.name": "itation"
     },
     {
-        "destination.ip": [
-            "10.28.84.106"
-        ],
+        "destination.ip": "10.28.84.106",
         "destination.port": 4844,
         "event.action": "deny",
         "event.code": "https",
@@ -3014,9 +2820,7 @@
         "server.registered_domain": "item2738.test",
         "server.top_level_domain": "test",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.193.233.229"
-        ],
+        "source.ip": "10.193.233.229",
         "source.port": 2859,
         "tags": [
             "fortinet.clientendpoint",
@@ -3025,9 +2829,7 @@
         "user.name": "tla"
     },
     {
-        "destination.ip": [
-            "10.210.89.183"
-        ],
+        "destination.ip": "10.210.89.183",
         "destination.port": 2589,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -3076,9 +2878,7 @@
         "server.subdomain": "iosamnis1047",
         "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.150.245.88"
-        ],
+        "source.ip": "10.150.245.88",
         "source.port": 3642,
         "tags": [
             "fortinet.clientendpoint",
@@ -3087,9 +2887,7 @@
         "user.name": "sequa"
     },
     {
-        "destination.ip": [
-            "10.85.185.13"
-        ],
+        "destination.ip": "10.85.185.13",
         "destination.port": 7793,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -3138,9 +2936,7 @@
         "server.subdomain": "orroq6677",
         "server.top_level_domain": "example",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.180.195.43"
-        ],
+        "source.ip": "10.180.195.43",
         "source.port": 4540,
         "tags": [
             "fortinet.clientendpoint",
@@ -3149,9 +2945,7 @@
         "user.name": "voluptas"
     },
     {
-        "destination.ip": [
-            "10.210.28.247"
-        ],
+        "destination.ip": "10.210.28.247",
         "destination.port": 7257,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -3200,9 +2994,7 @@
         "server.subdomain": "onevo4326",
         "server.top_level_domain": "local",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.207.211.230"
-        ],
+        "source.ip": "10.207.211.230",
         "source.port": 3449,
         "tags": [
             "fortinet.clientendpoint",
@@ -3211,9 +3003,7 @@
         "user.name": "tate"
     },
     {
-        "destination.ip": [
-            "10.248.165.185"
-        ],
+        "destination.ip": "10.248.165.185",
         "destination.port": 5460,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -3262,9 +3052,7 @@
         "server.subdomain": "itaedict7233",
         "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.86.11.48"
-        ],
+        "source.ip": "10.86.11.48",
         "source.port": 3436,
         "tags": [
             "fortinet.clientendpoint",
@@ -3273,9 +3061,7 @@
         "user.name": "dquiac"
     },
     {
-        "destination.ip": [
-            "10.47.125.38"
-        ],
+        "destination.ip": "10.47.125.38",
         "destination.port": 3896,
         "event.action": "deny",
         "event.code": "http",
@@ -3324,9 +3110,7 @@
         "server.subdomain": "numquam5869",
         "server.top_level_domain": "example",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.118.6.177"
-        ],
+        "source.ip": "10.118.6.177",
         "source.port": 6977,
         "tags": [
             "fortinet.clientendpoint",
@@ -3335,9 +3119,7 @@
         "user.name": "quunt"
     },
     {
-        "destination.ip": [
-            "10.60.142.127"
-        ],
+        "destination.ip": "10.60.142.127",
         "destination.port": 5112,
         "event.action": "deny",
         "event.code": "pop3",
@@ -3386,9 +3168,7 @@
         "server.subdomain": "onu6137",
         "server.top_level_domain": "home",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.50.233.155"
-        ],
+        "source.ip": "10.50.233.155",
         "source.port": 1081,
         "tags": [
             "fortinet.clientendpoint",
@@ -3397,9 +3177,7 @@
         "user.name": "atv"
     },
     {
-        "destination.ip": [
-            "10.120.10.211"
-        ],
+        "destination.ip": "10.120.10.211",
         "destination.port": 7661,
         "event.action": "deny",
         "event.code": "http",
@@ -3448,9 +3226,7 @@
         "server.subdomain": "aecatcup2241",
         "server.top_level_domain": "test",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.28.82.189"
-        ],
+        "source.ip": "10.28.82.189",
         "source.port": 3916,
         "tags": [
             "fortinet.clientendpoint",
@@ -3459,9 +3235,7 @@
         "user.name": "rcit"
     },
     {
-        "destination.ip": [
-            "10.6.38.163"
-        ],
+        "destination.ip": "10.6.38.163",
         "destination.port": 4059,
         "event.action": "deny",
         "event.code": "pop3",
@@ -3510,9 +3284,7 @@
         "server.subdomain": "labor6360",
         "server.top_level_domain": "local",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.31.237.225"
-        ],
+        "source.ip": "10.31.237.225",
         "source.port": 6153,
         "tags": [
             "fortinet.clientendpoint",
@@ -3521,9 +3293,7 @@
         "user.name": "olup"
     },
     {
-        "destination.ip": [
-            "10.125.165.144"
-        ],
+        "destination.ip": "10.125.165.144",
         "destination.port": 7889,
         "event.action": "deny",
         "event.code": "https",
@@ -3572,9 +3342,7 @@
         "server.subdomain": "mveleum4322",
         "server.top_level_domain": "host",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.226.5.189"
-        ],
+        "source.ip": "10.226.5.189",
         "source.port": 3371,
         "tags": [
             "fortinet.clientendpoint",
@@ -3583,9 +3351,7 @@
         "user.name": "mvolu"
     },
     {
-        "destination.ip": [
-            "10.46.56.204"
-        ],
+        "destination.ip": "10.46.56.204",
         "destination.port": 5070,
         "event.action": "deny",
         "event.code": "smtp",
@@ -3634,9 +3400,7 @@
         "server.subdomain": "archite1843",
         "server.top_level_domain": "home",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.97.149.97"
-        ],
+        "source.ip": "10.97.149.97",
         "source.port": 2463,
         "tags": [
             "fortinet.clientendpoint",
@@ -3645,9 +3409,7 @@
         "user.name": "dolorsit"
     },
     {
-        "destination.ip": [
-            "10.28.105.124"
-        ],
+        "destination.ip": "10.28.105.124",
         "destination.port": 4797,
         "event.action": "deny",
         "event.code": "https",
@@ -3696,9 +3458,7 @@
         "server.subdomain": "itanim4024",
         "server.top_level_domain": "example",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.218.0.197"
-        ],
+        "source.ip": "10.218.0.197",
         "source.port": 7581,
         "tags": [
             "fortinet.clientendpoint",
@@ -3707,9 +3467,7 @@
         "user.name": "ntNe"
     },
     {
-        "destination.ip": [
-            "10.17.87.79"
-        ],
+        "destination.ip": "10.17.87.79",
         "destination.port": 3414,
         "event.action": "deny",
         "event.code": "https",
@@ -3758,9 +3516,7 @@
         "server.subdomain": "nreprehe715",
         "server.top_level_domain": "home",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.123.199.198"
-        ],
+        "source.ip": "10.123.199.198",
         "source.port": 6332,
         "tags": [
             "fortinet.clientendpoint",
@@ -3769,9 +3525,7 @@
         "user.name": "ratvolu"
     },
     {
-        "destination.ip": [
-            "10.115.68.40"
-        ],
+        "destination.ip": "10.115.68.40",
         "destination.port": 5483,
         "event.action": "deny",
         "event.code": "https",
@@ -3820,9 +3574,7 @@
         "server.subdomain": "unte893",
         "server.top_level_domain": "host",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.38.86.177"
-        ],
+        "source.ip": "10.38.86.177",
         "source.port": 5768,
         "tags": [
             "fortinet.clientendpoint",
@@ -3831,9 +3583,7 @@
         "user.name": "mpo"
     },
     {
-        "destination.ip": [
-            "10.115.174.107"
-        ],
+        "destination.ip": "10.115.174.107",
         "destination.port": 5597,
         "event.action": "deny",
         "event.code": "https",
@@ -3882,9 +3632,7 @@
         "server.subdomain": "aspe951",
         "server.top_level_domain": "domain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.193.118.163"
-        ],
+        "source.ip": "10.193.118.163",
         "source.port": 548,
         "tags": [
             "fortinet.clientendpoint",
@@ -3893,9 +3641,7 @@
         "user.name": "exeacomm"
     },
     {
-        "destination.ip": [
-            "10.77.77.208"
-        ],
+        "destination.ip": "10.77.77.208",
         "destination.port": 1101,
         "event.action": "deny",
         "event.code": "http",
@@ -3944,9 +3690,7 @@
         "server.subdomain": "dipiscin4957",
         "server.top_level_domain": "home",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.37.128.49"
-        ],
+        "source.ip": "10.37.128.49",
         "source.port": 625,
         "tags": [
             "fortinet.clientendpoint",
@@ -3955,9 +3699,7 @@
         "user.name": "moles"
     },
     {
-        "destination.ip": [
-            "10.1.96.93"
-        ],
+        "destination.ip": "10.1.96.93",
         "destination.port": 428,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -4006,9 +3748,7 @@
         "server.subdomain": "econs2687",
         "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.54.73.158"
-        ],
+        "source.ip": "10.54.73.158",
         "source.port": 5752,
         "tags": [
             "fortinet.clientendpoint",
@@ -4017,9 +3757,7 @@
         "user.name": "lloinven"
     },
     {
-        "destination.ip": [
-            "10.182.152.242"
-        ],
+        "destination.ip": "10.182.152.242",
         "destination.port": 6998,
         "event.action": "deny",
         "event.code": "smtp",
@@ -4068,9 +3806,7 @@
         "server.subdomain": "tiumto5834",
         "server.top_level_domain": "lan",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.131.126.109"
-        ],
+        "source.ip": "10.131.126.109",
         "source.port": 1877,
         "tags": [
             "fortinet.clientendpoint",
@@ -4079,9 +3815,7 @@
         "user.name": "dolor"
     },
     {
-        "destination.ip": [
-            "10.77.229.168"
-        ],
+        "destination.ip": "10.77.229.168",
         "destination.port": 3777,
         "event.action": "deny",
         "event.code": "http",
@@ -4130,9 +3864,7 @@
         "server.subdomain": "iutal6032",
         "server.top_level_domain": "test",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.181.247.224"
-        ],
+        "source.ip": "10.181.247.224",
         "source.port": 260,
         "tags": [
             "fortinet.clientendpoint",
@@ -4141,9 +3873,7 @@
         "user.name": "adol"
     },
     {
-        "destination.ip": [
-            "10.72.162.6"
-        ],
+        "destination.ip": "10.72.162.6",
         "destination.port": 5516,
         "event.action": "deny",
         "event.code": "http",
@@ -4191,9 +3921,7 @@
         "server.registered_domain": "inculp2078.host",
         "server.top_level_domain": "host",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.235.116.121"
-        ],
+        "source.ip": "10.235.116.121",
         "source.port": 1,
         "tags": [
             "fortinet.clientendpoint",
@@ -4202,9 +3930,7 @@
         "user.name": "oinv"
     },
     {
-        "destination.ip": [
-            "10.28.124.236"
-        ],
+        "destination.ip": "10.28.124.236",
         "destination.port": 3434,
         "event.action": "deny",
         "event.code": "https",
@@ -4253,9 +3979,7 @@
         "server.subdomain": "mexerc2757",
         "server.top_level_domain": "home",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.149.193.117"
-        ],
+        "source.ip": "10.149.193.117",
         "source.port": 5343,
         "tags": [
             "fortinet.clientendpoint",
@@ -4264,9 +3988,7 @@
         "user.name": "mullam"
     },
     {
-        "destination.ip": [
-            "10.196.96.162"
-        ],
+        "destination.ip": "10.196.96.162",
         "destination.port": 6378,
         "event.action": "deny",
         "event.code": "http",
@@ -4315,9 +4037,7 @@
         "server.subdomain": "squira4455",
         "server.top_level_domain": "domain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.34.131.224"
-        ],
+        "source.ip": "10.34.131.224",
         "source.port": 649,
         "tags": [
             "fortinet.clientendpoint",
@@ -4326,9 +4046,7 @@
         "user.name": "tnonproi"
     },
     {
-        "destination.ip": [
-            "10.77.78.180"
-        ],
+        "destination.ip": "10.77.78.180",
         "destination.port": 5380,
         "event.action": "deny",
         "event.code": "https",
@@ -4376,9 +4094,7 @@
         "server.registered_domain": "emveleum3661.localhost",
         "server.top_level_domain": "localhost",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.97.236.123"
-        ],
+        "source.ip": "10.97.236.123",
         "source.port": 5159,
         "tags": [
             "fortinet.clientendpoint",
@@ -4387,9 +4103,7 @@
         "user.name": "nisi"
     },
     {
-        "destination.ip": [
-            "10.45.54.107"
-        ],
+        "destination.ip": "10.45.54.107",
         "destination.port": 3593,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -4438,9 +4152,7 @@
         "server.subdomain": "sedquiac6517",
         "server.top_level_domain": "localhost",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.82.133.66"
-        ],
+        "source.ip": "10.82.133.66",
         "source.port": 7229,
         "tags": [
             "fortinet.clientendpoint",
@@ -4449,9 +4161,7 @@
         "user.name": "olorem"
     },
     {
-        "destination.ip": [
-            "10.170.252.219"
-        ],
+        "destination.ip": "10.170.252.219",
         "destination.port": 2454,
         "event.action": "deny",
         "event.code": "pop3",
@@ -4500,9 +4210,7 @@
         "server.subdomain": "veniam3148",
         "server.top_level_domain": "home",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.180.180.230"
-        ],
+        "source.ip": "10.180.180.230",
         "source.port": 4147,
         "tags": [
             "fortinet.clientendpoint",
@@ -4511,9 +4219,7 @@
         "user.name": "nse"
     },
     {
-        "destination.ip": [
-            "10.65.144.51"
-        ],
+        "destination.ip": "10.65.144.51",
         "destination.port": 2283,
         "event.action": "deny",
         "event.code": "http",
@@ -4562,9 +4268,7 @@
         "server.subdomain": "unt3559",
         "server.top_level_domain": "home",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.5.11.205"
-        ],
+        "source.ip": "10.5.11.205",
         "source.port": 4901,
         "tags": [
             "fortinet.clientendpoint",
@@ -4573,9 +4277,7 @@
         "user.name": "uptat"
     },
     {
-        "destination.ip": [
-            "10.76.122.196"
-        ],
+        "destination.ip": "10.76.122.196",
         "destination.port": 5325,
         "event.action": "deny",
         "event.code": "smtp",
@@ -4624,9 +4326,7 @@
         "server.subdomain": "rere5274",
         "server.top_level_domain": "domain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.195.223.82"
-        ],
+        "source.ip": "10.195.223.82",
         "source.port": 3128,
         "tags": [
             "fortinet.clientendpoint",
@@ -4635,9 +4335,7 @@
         "user.name": "umiurer"
     },
     {
-        "destination.ip": [
-            "10.225.255.211"
-        ],
+        "destination.ip": "10.225.255.211",
         "destination.port": 3369,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -4686,9 +4384,7 @@
         "server.subdomain": "uaeabi3728",
         "server.top_level_domain": "invalid",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.138.210.116"
-        ],
+        "source.ip": "10.138.210.116",
         "source.port": 5595,
         "tags": [
             "fortinet.clientendpoint",
@@ -4697,9 +4393,7 @@
         "user.name": "fugiatn"
     },
     {
-        "destination.ip": [
-            "10.219.1.151"
-        ],
+        "destination.ip": "10.219.1.151",
         "destination.port": 4323,
         "event.action": "deny",
         "event.code": "smtp",
@@ -4747,9 +4441,7 @@
         "server.registered_domain": "uamqu2804.test",
         "server.top_level_domain": "test",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.250.81.189"
-        ],
+        "source.ip": "10.250.81.189",
         "source.port": 5404,
         "tags": [
             "fortinet.clientendpoint",
@@ -4758,9 +4450,7 @@
         "user.name": "ori"
     },
     {
-        "destination.ip": [
-            "10.76.125.70"
-        ],
+        "destination.ip": "10.76.125.70",
         "destination.port": 756,
         "event.action": "deny",
         "event.code": "https",
@@ -4808,9 +4498,7 @@
         "server.registered_domain": "olor5201.host",
         "server.top_level_domain": "host",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.54.23.133"
-        ],
+        "source.ip": "10.54.23.133",
         "source.port": 3258,
         "tags": [
             "fortinet.clientendpoint",
@@ -4819,9 +4507,7 @@
         "user.name": "oloreeu"
     },
     {
-        "destination.ip": [
-            "10.189.42.62"
-        ],
+        "destination.ip": "10.189.42.62",
         "destination.port": 4262,
         "event.action": "deny",
         "event.code": "http",
@@ -4870,9 +4556,7 @@
         "server.subdomain": "eufug3348",
         "server.top_level_domain": "lan",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.36.110.69"
-        ],
+        "source.ip": "10.36.110.69",
         "source.port": 4187,
         "tags": [
             "fortinet.clientendpoint",
@@ -4881,9 +4565,7 @@
         "user.name": "eque"
     },
     {
-        "destination.ip": [
-            "10.183.202.82"
-        ],
+        "destination.ip": "10.183.202.82",
         "destination.port": 2208,
         "event.action": "deny",
         "event.code": "https",
@@ -4932,9 +4614,7 @@
         "server.subdomain": "stquidol239",
         "server.top_level_domain": "invalid",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.47.179.68"
-        ],
+        "source.ip": "10.47.179.68",
         "source.port": 5107,
         "tags": [
             "fortinet.clientendpoint",
@@ -4943,9 +4623,7 @@
         "user.name": "umfugi"
     },
     {
-        "destination.ip": [
-            "10.221.206.74"
-        ],
+        "destination.ip": "10.221.206.74",
         "destination.port": 1480,
         "event.action": "deny",
         "event.code": "pop3",
@@ -4994,9 +4672,7 @@
         "server.subdomain": "gia6531",
         "server.top_level_domain": "invalid",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.73.28.165"
-        ],
+        "source.ip": "10.73.28.165",
         "source.port": 3668,
         "tags": [
             "fortinet.clientendpoint",
@@ -5005,9 +4681,7 @@
         "user.name": "quas"
     },
     {
-        "destination.ip": [
-            "10.14.204.36"
-        ],
+        "destination.ip": "10.14.204.36",
         "destination.port": 4887,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -5056,9 +4730,7 @@
         "server.subdomain": "lamcola4879",
         "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.85.104.146"
-        ],
+        "source.ip": "10.85.104.146",
         "source.port": 3442,
         "tags": [
             "fortinet.clientendpoint",
@@ -5067,9 +4739,7 @@
         "user.name": "emp"
     },
     {
-        "destination.ip": [
-            "10.30.246.132"
-        ],
+        "destination.ip": "10.30.246.132",
         "destination.port": 388,
         "event.action": "deny",
         "event.code": "https",
@@ -5118,9 +4788,7 @@
         "server.subdomain": "edquian330",
         "server.top_level_domain": "local",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.208.18.210"
-        ],
+        "source.ip": "10.208.18.210",
         "source.port": 3601,
         "tags": [
             "fortinet.clientendpoint",
@@ -5129,9 +4797,7 @@
         "user.name": "veniam"
     },
     {
-        "destination.ip": [
-            "10.19.119.17"
-        ],
+        "destination.ip": "10.19.119.17",
         "destination.port": 3822,
         "event.action": "deny",
         "event.code": "pop3",
@@ -5180,9 +4846,7 @@
         "server.subdomain": "santi837",
         "server.top_level_domain": "domain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.106.249.91"
-        ],
+        "source.ip": "10.106.249.91",
         "source.port": 1732,
         "tags": [
             "fortinet.clientendpoint",
@@ -5191,9 +4855,7 @@
         "user.name": "lit"
     },
     {
-        "destination.ip": [
-            "10.181.41.154"
-        ],
+        "destination.ip": "10.181.41.154",
         "destination.port": 866,
         "event.action": "deny",
         "event.code": "http",
@@ -5242,9 +4904,7 @@
         "server.subdomain": "lpaquiof804",
         "server.top_level_domain": "invalid",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.29.109.126"
-        ],
+        "source.ip": "10.29.109.126",
         "source.port": 6261,
         "tags": [
             "fortinet.clientendpoint",
@@ -5253,9 +4913,7 @@
         "user.name": "labo"
     },
     {
-        "destination.ip": [
-            "10.164.120.197"
-        ],
+        "destination.ip": "10.164.120.197",
         "destination.port": 2304,
         "event.action": "deny",
         "event.code": "https",
@@ -5303,9 +4961,7 @@
         "server.registered_domain": "nonn4478.host",
         "server.top_level_domain": "host",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.164.207.42"
-        ],
+        "source.ip": "10.164.207.42",
         "source.port": 1901,
         "tags": [
             "fortinet.clientendpoint",
@@ -5314,9 +4970,7 @@
         "user.name": "pta"
     },
     {
-        "destination.ip": [
-            "10.154.191.225"
-        ],
+        "destination.ip": "10.154.191.225",
         "destination.port": 7856,
         "event.action": "deny",
         "event.code": "smtp",
@@ -5365,9 +5019,7 @@
         "server.subdomain": "amquaer3985",
         "server.top_level_domain": "example",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.183.189.133"
-        ],
+        "source.ip": "10.183.189.133",
         "source.port": 5347,
         "tags": [
             "fortinet.clientendpoint",
@@ -5376,9 +5028,7 @@
         "user.name": "ita"
     },
     {
-        "destination.ip": [
-            "10.103.189.199"
-        ],
+        "destination.ip": "10.103.189.199",
         "destination.port": 767,
         "event.action": "deny",
         "event.code": "smtp",
@@ -5426,9 +5076,7 @@
         "server.registered_domain": "orem6317.local",
         "server.top_level_domain": "local",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.29.120.226"
-        ],
+        "source.ip": "10.29.120.226",
         "source.port": 1296,
         "tags": [
             "fortinet.clientendpoint",
@@ -5437,9 +5085,7 @@
         "user.name": "emu"
     },
     {
-        "destination.ip": [
-            "10.210.153.7"
-        ],
+        "destination.ip": "10.210.153.7",
         "destination.port": 7030,
         "event.action": "deny",
         "event.code": "https",
@@ -5488,9 +5134,7 @@
         "server.subdomain": "velill3230",
         "server.top_level_domain": "corp",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.133.254.23"
-        ],
+        "source.ip": "10.133.254.23",
         "source.port": 6251,
         "tags": [
             "fortinet.clientendpoint",
@@ -5499,9 +5143,7 @@
         "user.name": "voluptas"
     },
     {
-        "destination.ip": [
-            "10.91.2.135"
-        ],
+        "destination.ip": "10.91.2.135",
         "destination.port": 2141,
         "event.action": "deny",
         "event.code": "pop3",
@@ -5550,9 +5192,7 @@
         "server.subdomain": "orumS757",
         "server.top_level_domain": "corp",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.126.245.73"
-        ],
+        "source.ip": "10.126.245.73",
         "source.port": 180,
         "tags": [
             "fortinet.clientendpoint",
@@ -5561,9 +5201,7 @@
         "user.name": "olore"
     },
     {
-        "destination.ip": [
-            "10.137.85.123"
-        ],
+        "destination.ip": "10.137.85.123",
         "destination.port": 7073,
         "event.action": "deny",
         "event.code": "https",
@@ -5612,9 +5250,7 @@
         "server.subdomain": "emi4534",
         "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.183.243.246"
-        ],
+        "source.ip": "10.183.243.246",
         "source.port": 218,
         "tags": [
             "fortinet.clientendpoint",
@@ -5623,9 +5259,7 @@
         "user.name": "cid"
     },
     {
-        "destination.ip": [
-            "10.10.86.55"
-        ],
+        "destination.ip": "10.10.86.55",
         "destination.port": 5132,
         "event.action": "deny",
         "event.code": "smtp",
@@ -5674,9 +5308,7 @@
         "server.subdomain": "inimav1576",
         "server.top_level_domain": "example",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.61.225.196"
-        ],
+        "source.ip": "10.61.225.196",
         "source.port": 4720,
         "tags": [
             "fortinet.clientendpoint",
@@ -5685,9 +5317,7 @@
         "user.name": "eniamqu"
     },
     {
-        "destination.ip": [
-            "10.79.73.195"
-        ],
+        "destination.ip": "10.79.73.195",
         "destination.port": 457,
         "event.action": "deny",
         "event.code": "http",
@@ -5736,9 +5366,7 @@
         "server.subdomain": "aturQu7083",
         "server.top_level_domain": "host",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.125.143.153"
-        ],
+        "source.ip": "10.125.143.153",
         "source.port": 2657,
         "tags": [
             "fortinet.clientendpoint",
@@ -5747,9 +5375,7 @@
         "user.name": "emip"
     },
     {
-        "destination.ip": [
-            "10.64.139.17"
-        ],
+        "destination.ip": "10.64.139.17",
         "destination.port": 2438,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -5798,9 +5424,7 @@
         "server.subdomain": "lumqui7769",
         "server.top_level_domain": "local",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.240.216.85"
-        ],
+        "source.ip": "10.240.216.85",
         "source.port": 2046,
         "tags": [
             "fortinet.clientendpoint",
@@ -5809,9 +5433,7 @@
         "user.name": "nimadmin"
     },
     {
-        "destination.ip": [
-            "10.222.245.80"
-        ],
+        "destination.ip": "10.222.245.80",
         "destination.port": 4017,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -5860,9 +5482,7 @@
         "server.subdomain": "siarc6339",
         "server.top_level_domain": "corp",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.87.90.49"
-        ],
+        "source.ip": "10.87.90.49",
         "source.port": 1486,
         "tags": [
             "fortinet.clientendpoint",
@@ -5871,9 +5491,7 @@
         "user.name": "ptatemse"
     },
     {
-        "destination.ip": [
-            "10.87.144.208"
-        ],
+        "destination.ip": "10.87.144.208",
         "destination.port": 2440,
         "event.action": "deny",
         "event.code": "pop3",
@@ -5922,9 +5540,7 @@
         "server.subdomain": "ptatev6552",
         "server.top_level_domain": "test",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.143.53.214"
-        ],
+        "source.ip": "10.143.53.214",
         "source.port": 3310,
         "tags": [
             "fortinet.clientendpoint",
@@ -5933,9 +5549,7 @@
         "user.name": "psumq"
     },
     {
-        "destination.ip": [
-            "10.105.97.134"
-        ],
+        "destination.ip": "10.105.97.134",
         "destination.port": 1935,
         "event.action": "deny",
         "event.code": "pop3",
@@ -5984,9 +5598,7 @@
         "server.subdomain": "byC5766",
         "server.top_level_domain": "home",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.204.178.19"
-        ],
+        "source.ip": "10.204.178.19",
         "source.port": 616,
         "tags": [
             "fortinet.clientendpoint",
@@ -5995,9 +5607,7 @@
         "user.name": "mexercit"
     },
     {
-        "destination.ip": [
-            "10.194.67.223"
-        ],
+        "destination.ip": "10.194.67.223",
         "destination.port": 5767,
         "event.action": "deny",
         "event.code": "smtp",
@@ -6045,9 +5655,7 @@
         "server.registered_domain": "hender6628.local",
         "server.top_level_domain": "local",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.161.64.168"
-        ],
+        "source.ip": "10.161.64.168",
         "source.port": 7154,
         "tags": [
             "fortinet.clientendpoint",
@@ -6056,9 +5664,7 @@
         "user.name": "tion"
     },
     {
-        "destination.ip": [
-            "10.120.148.241"
-        ],
+        "destination.ip": "10.120.148.241",
         "destination.port": 1655,
         "event.action": "deny",
         "event.code": "smtp",
@@ -6107,9 +5713,7 @@
         "server.subdomain": "xercit7649",
         "server.top_level_domain": "home",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.100.154.220"
-        ],
+        "source.ip": "10.100.154.220",
         "source.port": 5535,
         "tags": [
             "fortinet.clientendpoint",
@@ -6118,9 +5722,7 @@
         "user.name": "rsitam"
     },
     {
-        "destination.ip": [
-            "10.180.90.112"
-        ],
+        "destination.ip": "10.180.90.112",
         "destination.port": 1936,
         "event.action": "deny",
         "event.code": "ms-wbt-server",
@@ -6168,9 +5770,7 @@
         "server.registered_domain": "porissu1470.domain",
         "server.top_level_domain": "domain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.116.153.19"
-        ],
+        "source.ip": "10.116.153.19",
         "source.port": 6610,
         "tags": [
             "fortinet.clientendpoint",
