@@ -126,13 +126,6 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 			cfg:     map[string]interface{}{"enabled": true},
 			enabled: true,
 		},
-		"fail enabled": {
-			calls: []onCall{
-				onCheckILMEnabled(true).Return(false, nil),
-			},
-			cfg:  map[string]interface{}{"enabled": true},
-			fail: ErrESILMDisabled,
-		},
 		"io error": {
 			calls: []onCall{
 				onCheckILMEnabled(true).Return(false, errors.New("ups")),
