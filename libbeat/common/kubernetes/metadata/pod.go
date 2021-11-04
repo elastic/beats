@@ -44,11 +44,7 @@ func NewPodMetadataGenerator(
 	client k8s.Interface,
 	node MetaGen,
 	namespace MetaGen,
-	metaCfg *AddResourceMetadataConfig) MetaGen {
-	addDeploymentMeta := true
-	if metaCfg != nil {
-		addDeploymentMeta = metaCfg.Deployment
-	}
+	addDeploymentMeta bool) MetaGen {
 	return &pod{
 		resource:      NewResourceMetadataGenerator(cfg, client),
 		store:         pods,
