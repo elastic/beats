@@ -62,7 +62,6 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.idxmgmt.assert_index_template_index_pattern(self.data_stream, [self.data_stream + "*"])
         self.idxmgmt.assert_policy_created(self.policy_name)
 
-
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
     def test_setup_template_disabled(self):
