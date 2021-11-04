@@ -34,7 +34,6 @@ class IdxMgmt(unittest.TestCase):
             for pattern in self.patterns:
                 index_with_pattern = index+"-"+pattern
                 try:
-                    print(index_with_pattern)
                     self._client.indices.delete(index_with_pattern)
                     self._client.indices.delete_alias(index, index_with_pattern)
                 except NotFoundError:
@@ -70,7 +69,7 @@ class IdxMgmt(unittest.TestCase):
     def _index_name_to_delete(self, index):
         es_version = self.get_es_version()
         if es_version["major"] < 8:
-            return index_name+"*"
+            return index+"*"
         return index
 
     def get_es_version(self):
