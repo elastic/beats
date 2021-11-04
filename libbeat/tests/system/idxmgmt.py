@@ -74,7 +74,6 @@ class IdxMgmt(unittest.TestCase):
         resp = self._client.transport.perform_request('GET', '/_index_template/' + template)
         found = False
         for index_template in resp['index_templates']:
-            print(index_template)
             if index_template['name'] == template:
                 found = True
         assert found

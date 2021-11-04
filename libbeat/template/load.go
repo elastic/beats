@@ -144,12 +144,12 @@ func (l *ESLoader) loadTemplate(templateName string, template map[string]interfa
 }
 
 // existsTemplate checks if a given template already exist, using the
-// `_cat/templates/<name>` API.
+// `/_index_template/<name>` API.
 //
 // An error is returned if the loader failed to execute the request, or a
 // status code indicating some problems is encountered.
 func (l *ESLoader) checkExistsTemplate(name string) (bool, error) {
-	status, _, err := l.client.Request("GET", "/_index_template/"+name, "", nil, nil)
+	status, _, err := l.client.Request("HEAD", "/_index_template/"+name, "", nil, nil)
 	if status == http.StatusNotFound {
 		return false, nil
 	}
