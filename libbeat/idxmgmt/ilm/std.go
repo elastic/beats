@@ -26,7 +26,7 @@ import (
 type stdSupport struct {
 	log *logp.Logger
 
-	mode        Mode
+	enabled     bool
 	overwrite   bool
 	checkExists bool
 
@@ -52,14 +52,14 @@ var defaultCacheDuration = 5 * time.Minute
 // NewStdSupport creates an instance of default ILM support implementation.
 func NewStdSupport(
 	log *logp.Logger,
-	mode Mode,
+	enabled bool,
 	alias Alias,
 	policy Policy,
 	overwrite, checkExists bool,
 ) Supporter {
 	return &stdSupport{
 		log:         log,
-		mode:        mode,
+		enabled:     enabled,
 		overwrite:   overwrite,
 		checkExists: checkExists,
 		alias:       alias,
@@ -67,7 +67,7 @@ func NewStdSupport(
 	}
 }
 
-func (s *stdSupport) Mode() Mode      { return s.mode }
+func (s *stdSupport) Enabled() bool   { return s.enabled }
 func (s *stdSupport) Alias() Alias    { return s.alias }
 func (s *stdSupport) Policy() Policy  { return s.policy }
 func (s *stdSupport) Overwrite() bool { return s.overwrite }
@@ -80,7 +80,7 @@ func (s *stdSupport) Manager(h ClientHandler) Manager {
 }
 
 func (m *stdManager) CheckEnabled() (bool, error) {
-	if m.mode == ModeDisabled {
+	if !m.enabled {
 		return false, nil
 	}
 
@@ -88,18 +88,18 @@ func (m *stdManager) CheckEnabled() (bool, error) {
 		return m.cache.Enabled, nil
 	}
 
-	enabled, err := m.client.CheckILMEnabled(m.mode)
+	ilmEnabled, err := m.client.CheckILMEnabled(m.enabled)
 	if err != nil {
-		return enabled, err
+		return ilmEnabled, err
 	}
 
-	if !enabled && m.mode == ModeEnabled {
+	if !ilmEnabled && m.enabled {
 		return false, errOf(ErrESILMDisabled)
 	}
 
-	m.cache.Enabled = enabled
+	m.cache.Enabled = ilmEnabled
 	m.cache.LastUpdate = time.Now()
-	return enabled, nil
+	return ilmEnabled, nil
 }
 
 func (m *stdManager) EnsureAlias() error {

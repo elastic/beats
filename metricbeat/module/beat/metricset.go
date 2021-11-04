@@ -26,11 +26,17 @@ import (
 type MetricSet struct {
 	mb.BaseMetricSet
 	*helper.HTTP
+	XPackEnabled bool
 }
 
 // NewMetricSet creates a metricset that can be used to build other metricsets
 // within the Beat module.
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
+	config := DefaultConfig()
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
@@ -39,6 +45,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	ms := &MetricSet{
 		base,
 		http,
+		config.XPackEnabled,
 	}
 
 	return ms, nil

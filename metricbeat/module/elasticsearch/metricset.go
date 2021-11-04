@@ -78,7 +78,8 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	servicePath string
 	*helper.HTTP
-	Scope Scope
+	Scope        Scope
+	XPackEnabled bool
 }
 
 // NewMetricSet creates an metric set that can be used to build other metric
@@ -90,9 +91,11 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 	}
 
 	config := struct {
-		Scope Scope `config:"scope"`
+		Scope        Scope `config:"scope"`
+		XPackEnabled bool  `config:"xpack.enabled"`
 	}{
-		Scope: ScopeNode,
+		Scope:        ScopeNode,
+		XPackEnabled: false,
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -103,6 +106,7 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		servicePath,
 		http,
 		config.Scope,
+		config.XPackEnabled,
 	}
 
 	ms.SetServiceURI(servicePath)
