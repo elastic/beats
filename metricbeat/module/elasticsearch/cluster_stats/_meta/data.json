@@ -1,14 +1,14 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "cluster_settings": {},
     "elasticsearch": {
         "cluster": {
-            "id": "8l_zoGznQRmtoX9iSC-goA",
+            "id": "WocBBA0QRma0sGpdQ7vLfQ",
             "name": "docker-cluster",
             "stats": {
+                "expiry_date_in_millis": 1638548539004,
                 "indices": {
                     "docs": {
-                        "total": 223
+                        "total": 81
                     },
                     "fielddata": {
                         "memory": {
@@ -16,81 +16,95 @@
                         }
                     },
                     "shards": {
-                        "count": 8,
-                        "primaries": 8
+                        "count": 17,
+                        "primaries": 17
                     },
                     "store": {
                         "size": {
-                            "bytes": 11701629
+                            "bytes": 44156720
                         }
                     },
-                    "total": 8
+                    "total": 17
                 },
                 "license": {
-                    "status": "",
-                    "type": "platinum",
-                    "expiry_date_in_millis": 0
+                    "status": "active",
+                    "type": "trial",
+                    "expiry_date_in_millis": 1638548539004
                 },
                 "nodes": {
                     "count": 1,
                     "fs": {
                         "available": {
-                            "bytes": 182713794560
+                            "bytes": 126640869376
                         },
                         "total": {
-                            "bytes": 958613114880
+                            "bytes": 330994548736
                         }
                     },
                     "jvm": {
                         "max_uptime": {
-                            "ms": 17857098
+                            "ms": 795905
                         },
                         "memory": {
                             "heap": {
                                 "max": {
-                                    "bytes": 1073741824
+                                    "bytes": 268435456
                                 },
                                 "used": {
-                                    "bytes": 615251232
+                                    "bytes": 166911488
                                 }
                             }
                         }
                     },
                     "master": 1,
                     "versions": [
-                        "8.0.0"
+                        "7.14.0"
                     ]
                 },
                 "stack": {
                     "xpack": {
                         "ccr": {
-                            "available": false,
+                            "available": true,
                             "enabled": true
                         }
                     }
                 },
                 "state": {
-                    "master_node": "0sZBDd6VQ4ObLacVSh65jw",
+                    "master_node": "f5i3v9hMT_q__q6B9WOo5A",
                     "nodes": {
-                        "0sZBDd6VQ4ObLacVSh65jw": {
+                        "f5i3v9hMT_q__q6B9WOo5A": {
                             "attributes": {
-                                "ml.machine_memory": "33300463616",
-                                "ml.max_open_jobs": "20",
+                                "ml.machine_memory": "33295835136",
+                                "ml.max_jvm_size": "268435456",
+                                "ml.max_open_jobs": "512",
                                 "transform.node": "true",
                                 "xpack.installed": "true"
                             },
-                            "ephemeral_id": "nqDXltxJTly70OWy95QfBw",
-                            "name": "7d86b192e7ce",
+                            "ephemeral_id": "aQVRUnEIQ5GA3Qe4uBDqLA",
+                            "name": "27fb1c2fd783",
+                            "roles": [
+                                "data",
+                                "data_cold",
+                                "data_content",
+                                "data_frozen",
+                                "data_hot",
+                                "data_warm",
+                                "ingest",
+                                "master",
+                                "ml",
+                                "remote_cluster_client",
+                                "transform"
+                            ],
                             "transport_address": "127.0.0.1:9300"
                         }
                     },
-                    "nodes_hash": -575310727,
-                    "state_uuid": "N0SOO0GZQICpIp19KZ27dg"
+                    "nodes_hash": -19752840,
+                    "state_uuid": "XNIdeSZxQwyItvGfR5fHSw"
                 },
                 "status": "yellow"
             }
         },
-        "version": 65
+        "version": 106
     },
     "event": {
         "dataset": "elasticsearch.cluster.stats",
@@ -102,7 +116,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:39279",
+        "address": "172.19.0.2:9200",
         "type": "elasticsearch"
     }
 }

@@ -308,7 +308,9 @@ func (p *processMetadata) toMap() common.MapStr {
 		"args":       p.args,
 		"env":        p.env,
 		"pid":        p.pid,
-		"ppid":       p.ppid,
+		"parent": common.MapStr{
+			"pid": p.ppid,
+		},
 		"start_time": p.startTime,
 	}
 	if p.username != "" || p.userid != "" {

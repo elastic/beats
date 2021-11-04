@@ -40,7 +40,7 @@ var (
 	}
 )
 
-func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
 	tasksStruct := struct {
 		Tasks []map[string]interface{} `json:"tasks"`
 	}{}
@@ -69,6 +69,13 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 		if err != nil {
 			errs = append(errs, errors.Wrap(err, "failure applying task schema"))
 			continue
+		}
+
+		// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+		// When using Agent, the index name is overwritten anyways.
+		if isXpack {
+			index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+			event.Index = index
 		}
 
 		r.Event(event)

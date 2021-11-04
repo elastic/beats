@@ -31,9 +31,7 @@
     {
         "@timestamp": "2016-02-12T15:12:33.000Z",
         "destination.address": "ercit2385.internal.home",
-        "destination.ip": [
-            "10.47.202.102"
-        ],
+        "destination.ip": "10.47.202.102",
         "destination.mac": "01:00:5e:de:94:f6",
         "destination.port": 3920,
         "event.action": "block",
@@ -101,9 +99,7 @@
         "rsa.web.web_cookie": "quirat",
         "service.name": "tlabo",
         "service.type": "sophos",
-        "source.ip": [
-            "10.57.170.140"
-        ],
+        "source.ip": "10.57.170.140",
         "source.mac": "01:00:5e:1d:c1:c0",
         "source.port": 2289,
         "tags": [
@@ -194,9 +190,7 @@
         "rsa.time.event_time": "2016-03-12T05:17:42.000Z",
         "service.name": "wri",
         "service.type": "sophos",
-        "source.ip": [
-            "10.106.239.55"
-        ],
+        "source.ip": "10.106.239.55",
         "tags": [
             "forwarded",
             "sophos.utm"
@@ -290,9 +284,7 @@
     },
     {
         "@timestamp": "2016-05-08T09:27:59.000Z",
-        "destination.ip": [
-            "10.18.13.211"
-        ],
+        "destination.ip": "10.18.13.211",
         "destination.port": 205,
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
@@ -538,9 +530,7 @@
         ],
         "rsa.time.event_time": "2016-08-16T10:45:59.000Z",
         "service.type": "sophos",
-        "source.ip": [
-            "10.169.5.162"
-        ],
+        "source.ip": "10.169.5.162",
         "source.port": 6676,
         "tags": [
             "forwarded",
@@ -676,9 +666,7 @@
         "rsa.time.event_time": "2016-10-12T14:56:16.000Z",
         "service.name": "lica",
         "service.type": "sophos",
-        "source.ip": [
-            "10.54.169.175"
-        ],
+        "source.ip": "10.54.169.175",
         "tags": [
             "forwarded",
             "sophos.utm"
@@ -736,9 +724,7 @@
         "rsa.internal.messageid": "sshd",
         "rsa.time.event_time": "2016-11-10T05:01:24.000Z",
         "service.type": "sophos",
-        "source.ip": [
-            "10.59.215.207"
-        ],
+        "source.ip": "10.59.215.207",
         "source.port": 6195,
         "tags": [
             "forwarded",
@@ -781,9 +767,7 @@
     },
     {
         "@timestamp": "2016-12-08T19:06:33.000Z",
-        "destination.ip": [
-            "10.144.21.112"
-        ],
+        "destination.ip": "10.144.21.112",
         "destination.port": 90,
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
@@ -873,9 +857,7 @@
         ],
         "rsa.time.event_time": "2017-01-06T09:11:41.000Z",
         "service.type": "sophos",
-        "source.ip": [
-            "10.103.2.48"
-        ],
+        "source.ip": "10.103.2.48",
         "source.port": 4713,
         "tags": [
             "forwarded",
@@ -884,9 +866,7 @@
     },
     {
         "@timestamp": "2017-01-20T16:14:16.000Z",
-        "destination.ip": [
-            "10.52.190.18"
-        ],
+        "destination.ip": "10.52.190.18",
         "destination.mac": "01:00:5e:51:b9:4d",
         "destination.port": 165,
         "event.code": "ulogd",
@@ -930,9 +910,7 @@
         "rsa.network.sinterface": "lo6086",
         "rsa.time.event_time": "2017-01-20T16:14:16.000Z",
         "service.type": "sophos",
-        "source.ip": [
-            "10.161.51.135"
-        ],
+        "source.ip": "10.161.51.135",
         "source.mac": "01:00:5e:15:3a:74",
         "source.port": 7807,
         "tags": [
@@ -1009,9 +987,7 @@
         "rsa.time.event_time": "2017-02-18T06:19:24.000Z",
         "service.name": "ugits",
         "service.type": "sophos",
-        "source.ip": [
-            "10.232.108.32"
-        ],
+        "source.ip": "10.232.108.32",
         "tags": [
             "forwarded",
             "sophos.utm"
@@ -1021,9 +997,7 @@
     {
         "@timestamp": "2017-03-04T13:21:59.000Z",
         "destination.address": "Duis583.api.local",
-        "destination.ip": [
-            "10.17.51.153"
-        ],
+        "destination.ip": "10.17.51.153",
         "destination.mac": "01:00:5e:8c:f2:06",
         "destination.port": 1525,
         "event.action": "deny",
@@ -1095,9 +1069,7 @@
         "rsa.web.web_cookie": "aperiame",
         "service.name": "etcons",
         "service.type": "sophos",
-        "source.ip": [
-            "10.89.41.97"
-        ],
+        "source.ip": "10.89.41.97",
         "source.mac": "01:00:5e:6f:71:02",
         "source.port": 5334,
         "tags": [
@@ -1329,9 +1301,7 @@
     },
     {
         "@timestamp": "2017-06-26T21:42:33.000Z",
-        "destination.ip": [
-            "10.148.21.7"
-        ],
+        "destination.ip": "10.148.21.7",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -1430,9 +1400,7 @@
         ],
         "rsa.time.event_time": "2017-07-25T11:47:41.000Z",
         "service.type": "sophos",
-        "source.ip": [
-            "10.151.206.38"
-        ],
+        "source.ip": "10.151.206.38",
         "source.port": 5794,
         "tags": [
             "forwarded",
@@ -1465,9 +1433,7 @@
         ],
         "rsa.time.event_time": "2017-08-08T18:50:15.000Z",
         "service.type": "sophos",
-        "source.ip": [
-            "10.230.4.70"
-        ],
+        "source.ip": "10.230.4.70",
         "tags": [
             "forwarded",
             "sophos.utm"
@@ -1657,9 +1623,7 @@
         "rsa.time.event_time": "2017-11-02T13:05:41.000Z",
         "service.name": "omnisist",
         "service.type": "sophos",
-        "source.ip": [
-            "10.244.96.61"
-        ],
+        "source.ip": "10.244.96.61",
         "tags": [
             "forwarded",
             "sophos.utm"
@@ -1852,9 +1816,7 @@
     {
         "@timestamp": "2018-02-10T14:23:41.000Z",
         "destination.address": "tenbyCi4371.www5.localdomain",
-        "destination.ip": [
-            "10.98.126.206"
-        ],
+        "destination.ip": "10.98.126.206",
         "destination.mac": "01:00:5e:2f:c3:3e",
         "destination.port": 2390,
         "event.action": "block",
@@ -1922,9 +1884,7 @@
         "rsa.web.web_cookie": "tion",
         "service.name": "animi",
         "service.type": "sophos",
-        "source.ip": [
-            "10.214.167.164"
-        ],
+        "source.ip": "10.214.167.164",
         "source.mac": "01:00:5e:65:2d:fe",
         "source.port": 4562,
         "tags": [
@@ -1942,9 +1902,7 @@
     },
     {
         "@timestamp": "2018-02-24T21:26:15.000Z",
-        "destination.ip": [
-            "10.32.236.117"
-        ],
+        "destination.ip": "10.32.236.117",
         "destination.mac": "01:00:5e:9a:fe:91",
         "destination.port": 5550,
         "event.code": "ulogd",
@@ -1982,9 +1940,7 @@
         "rsa.network.sinterface": "lo7088",
         "rsa.time.event_time": "2018-02-24T21:26:15.000Z",
         "service.type": "sophos",
-        "source.ip": [
-            "10.203.157.250"
-        ],
+        "source.ip": "10.203.157.250",
         "source.mac": "01:00:5e:78:1a:5a",
         "source.port": 6585,
         "tags": [
@@ -1994,9 +1950,7 @@
     },
     {
         "@timestamp": "2018-03-11T04:28:49.000Z",
-        "destination.ip": [
-            "10.231.77.26"
-        ],
+        "destination.ip": "10.231.77.26",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -2035,9 +1989,7 @@
     {
         "@timestamp": "2018-03-25T11:31:24.000Z",
         "destination.address": "tenima5715.api.example",
-        "destination.ip": [
-            "10.92.93.236"
-        ],
+        "destination.ip": "10.92.93.236",
         "destination.mac": "01:00:5e:0a:8f:6c",
         "destination.port": 6939,
         "event.action": "block",
@@ -2111,9 +2063,7 @@
         "rsa.web.web_cookie": "amr",
         "service.name": "siu",
         "service.type": "sophos",
-        "source.ip": [
-            "10.2.24.156"
-        ],
+        "source.ip": "10.2.24.156",
         "source.mac": "01:00:5e:34:8c:d2",
         "source.port": 6938,
         "tags": [
@@ -2135,9 +2085,7 @@
     {
         "@timestamp": "2018-04-08T18:33:58.000Z",
         "destination.address": "mni4032.lan",
-        "destination.ip": [
-            "10.202.65.2"
-        ],
+        "destination.ip": "10.202.65.2",
         "destination.mac": "01:00:5e:2c:9d:65",
         "destination.port": 1402,
         "event.action": "cancel",
@@ -2205,9 +2153,7 @@
         "rsa.web.web_cookie": "queporr",
         "service.name": "adeseru",
         "service.type": "sophos",
-        "source.ip": [
-            "10.180.169.49"
-        ],
+        "source.ip": "10.180.169.49",
         "source.mac": "01:00:5e:1a:03:f5",
         "source.port": 3308,
         "tags": [
@@ -2324,9 +2270,7 @@
         ],
         "rsa.time.event_time": "2018-05-21T15:41:41.000Z",
         "service.type": "sophos",
-        "source.ip": [
-            "10.194.12.83"
-        ],
+        "source.ip": "10.194.12.83",
         "tags": [
             "forwarded",
             "sophos.utm"
@@ -2335,9 +2279,7 @@
     {
         "@timestamp": "2018-06-04T22:44:15.000Z",
         "destination.address": "obea2960.mail.corp",
-        "destination.ip": [
-            "10.45.12.53"
-        ],
+        "destination.ip": "10.45.12.53",
         "destination.mac": "01:00:5e:24:b8:9f",
         "destination.port": 6937,
         "event.action": "cancel",
@@ -2405,9 +2347,7 @@
         "rsa.web.web_cookie": "etdo",
         "service.name": "mavenia",
         "service.type": "sophos",
-        "source.ip": [
-            "10.33.138.154"
-        ],
+        "source.ip": "10.33.138.154",
         "source.mac": "01:00:5e:a1:a3:9f",
         "source.port": 1455,
         "tags": [
@@ -2443,9 +2383,7 @@
         "rsa.internal.messageid": "frox",
         "rsa.time.event_time": "2018-06-19T05:46:49.000Z",
         "service.type": "sophos",
-        "source.ip": [
-            "10.99.134.49"
-        ],
+        "source.ip": "10.99.134.49",
         "source.port": 2274,
         "tags": [
             "forwarded",
@@ -2554,9 +2492,7 @@
         "rsa.time.event_time": "2018-08-01T02:54:32.000Z",
         "service.name": "aliqu",
         "service.type": "sophos",
-        "source.ip": [
-            "10.32.85.21"
-        ],
+        "source.ip": "10.32.85.21",
         "tags": [
             "forwarded",
             "sophos.utm"
@@ -2635,7 +2571,6 @@
         "fileset.name": "utm",
         "input.type": "log",
         "log.offset": 18122,
-        "log.original": "olore",
         "observer.product": "UTM",
         "observer.type": "Firewall",
         "observer.vendor": "Sophos",
@@ -2655,9 +2590,7 @@
     {
         "@timestamp": "2018-09-27T07:04:49.000Z",
         "destination.address": "nisiuta4810.api.test",
-        "destination.ip": [
-            "10.85.200.58"
-        ],
+        "destination.ip": "10.85.200.58",
         "destination.mac": "01:00:5e:b3:e3:90",
         "destination.port": 605,
         "event.action": "cancel",
@@ -2727,9 +2660,7 @@
         "rsa.web.web_cookie": "esse",
         "service.name": "atu",
         "service.type": "sophos",
-        "source.ip": [
-            "10.210.175.52"
-        ],
+        "source.ip": "10.210.175.52",
         "source.mac": "01:00:5e:0e:b3:8e",
         "source.port": 1125,
         "tags": [
@@ -2750,9 +2681,7 @@
     },
     {
         "@timestamp": "2018-10-11T14:07:23.000Z",
-        "destination.ip": [
-            "10.115.166.48"
-        ],
+        "destination.ip": "10.115.166.48",
         "destination.mac": "01:00:5e:c3:8a:24",
         "destination.port": 4884,
         "event.code": "ulogd",
@@ -2796,9 +2725,7 @@
         "rsa.network.sinterface": "eth2679",
         "rsa.time.event_time": "2018-10-11T14:07:23.000Z",
         "service.type": "sophos",
-        "source.ip": [
-            "10.133.45.45"
-        ],
+        "source.ip": "10.133.45.45",
         "source.mac": "01:00:5e:5a:9d:a9",
         "source.port": 4180,
         "tags": [
@@ -2860,9 +2787,7 @@
         ],
         "rsa.time.event_time": "2018-11-09T04:12:32.000Z",
         "service.type": "sophos",
-        "source.ip": [
-            "10.71.184.162"
-        ],
+        "source.ip": "10.71.184.162",
         "source.port": 3506,
         "tags": [
             "forwarded",
@@ -3087,9 +3012,7 @@
     },
     {
         "@timestamp": "2019-03-03T12:33:06.000Z",
-        "destination.ip": [
-            "10.177.35.133"
-        ],
+        "destination.ip": "10.177.35.133",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -3359,9 +3282,7 @@
         "rsa.misc.event_type": "ips",
         "rsa.time.event_time": "2019-06-25T20:53:40.000Z",
         "service.type": "sophos",
-        "source.ip": [
-            "10.165.217.56"
-        ],
+        "source.ip": "10.165.217.56",
         "tags": [
             "forwarded",
             "sophos.utm"
@@ -3506,9 +3427,7 @@
     },
     {
         "@timestamp": "2019-09-05T08:06:31.000Z",
-        "destination.ip": [
-            "10.248.62.55"
-        ],
+        "destination.ip": "10.248.62.55",
         "destination.mac": "01:00:5e:d6:f3:bc",
         "destination.port": 4206,
         "event.code": "ulogd",
@@ -3552,9 +3471,7 @@
         "rsa.network.sinterface": "lo4665",
         "rsa.time.event_time": "2019-09-05T08:06:31.000Z",
         "service.type": "sophos",
-        "source.ip": [
-            "10.96.243.231"
-        ],
+        "source.ip": "10.96.243.231",
         "source.mac": "01:00:5e:87:02:08",
         "source.port": 5632,
         "tags": [
@@ -3564,9 +3481,7 @@
     },
     {
         "@timestamp": "2019-09-19T15:09:05.000Z",
-        "destination.ip": [
-            "10.132.101.158"
-        ],
+        "destination.ip": "10.132.101.158",
         "event.code": "reverseproxy",
         "event.dataset": "sophos.utm",
         "event.module": "sophos",
@@ -3656,9 +3571,7 @@
         "rsa.network.gateway": "vol",
         "rsa.time.event_time": "2019-10-18T05:14:14.000Z",
         "service.type": "sophos",
-        "source.ip": [
-            "10.96.193.132"
-        ],
+        "source.ip": "10.96.193.132",
         "source.port": 5342,
         "tags": [
             "forwarded",
@@ -3700,9 +3613,7 @@
         "rsa.time.event_time": "2019-11-01T12:16:48.000Z",
         "service.name": "quamni",
         "service.type": "sophos",
-        "source.ip": [
-            "10.96.200.83"
-        ],
+        "source.ip": "10.96.200.83",
         "tags": [
             "forwarded",
             "sophos.utm"

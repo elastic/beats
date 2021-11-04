@@ -54,6 +54,7 @@ var PipelineGraphAPIsAvailableVersion = common.MustNewVersion("7.3.0")
 type MetricSet struct {
 	mb.BaseMetricSet
 	*helper.HTTP
+	XPackEnabled bool
 }
 
 type Graph struct {
@@ -87,9 +88,19 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, err
 	}
 
+	config := struct {
+		XPackEnabled bool `config:"xpack.enabled"`
+	}{
+		XPackEnabled: false,
+	}
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		base,
 		http,
+		config.XPackEnabled,
 	}, nil
 }
 

@@ -48,7 +48,7 @@ func defaultConfig() Config {
 		Host:        "unix:///var/run/docker.sock",
 		MatchSource: true,
 		SourceIndex: 4, // Use 4 to match the CID in /var/lib/docker/containers/<container_id>/*.log.
-		MatchPIDs:   []string{"process.pid", "process.ppid"},
+		MatchPIDs:   []string{"process.pid", "process.parent.pid"},
 		DeDot:       true,
 	}
 }

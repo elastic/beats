@@ -131,6 +131,8 @@ func AddLicenseHeaders() error {
 		license = "ASL2"
 	case "Elastic", "Elastic License":
 		license = "Elastic"
+	case "Elasticv2", "Elastic License 2.0":
+		license = "Elasticv2"
 	default:
 		return errors.Errorf("unknown license type %v", BeatLicense)
 	}
