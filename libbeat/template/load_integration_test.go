@@ -235,6 +235,7 @@ func TestESLoader_Load(t *testing.T) {
 					}
 					assert.ElementsMatch(t, properties, data.properties)
 				}
+				setup.cleanupTemplate(setup.config.Name)
 			})
 		}
 	})
