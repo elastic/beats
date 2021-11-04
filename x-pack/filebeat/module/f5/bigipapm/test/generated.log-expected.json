@@ -132,9 +132,7 @@
         "rsa.misc.severity": "very-high",
         "rsa.time.event_time": "2016-03-26T12:20:16.000Z",
         "service.type": "f5",
-        "source.ip": [
-            "10.134.175.248"
-        ],
+        "source.ip": "10.134.175.248",
         "tags": [
             "f5.bigipapm",
             "forwarded"
@@ -348,9 +346,7 @@
     },
     {
         "@timestamp": "2016-08-02T03:43:25.000Z",
-        "destination.ip": [
-            "10.225.160.182"
-        ],
+        "destination.ip": "10.225.160.182",
         "event.code": "01490500",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -375,9 +371,7 @@
         "rsa.misc.severity": "very-high",
         "rsa.time.event_time": "2016-08-02T03:43:25.000Z",
         "service.type": "f5",
-        "source.ip": [
-            "10.204.123.107"
-        ],
+        "source.ip": "10.204.123.107",
         "tags": [
             "f5.bigipapm",
             "forwarded"
@@ -764,9 +758,7 @@
         "rsa.misc.severity": "very-high",
         "rsa.time.event_time": "2017-03-04T13:21:59.000Z",
         "service.type": "f5",
-        "source.ip": [
-            "10.104.110.134"
-        ],
+        "source.ip": "10.104.110.134",
         "tags": [
             "f5.bigipapm",
             "forwarded"
@@ -970,9 +962,7 @@
     },
     {
         "@timestamp": "2017-06-26T21:42:33.000Z",
-        "destination.ip": [
-            "10.169.101.161"
-        ],
+        "destination.ip": "10.169.101.161",
         "event.code": "01490500",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -997,9 +987,7 @@
         "rsa.misc.severity": "low",
         "rsa.time.event_time": "2017-06-26T21:42:33.000Z",
         "service.type": "f5",
-        "source.ip": [
-            "10.122.204.151"
-        ],
+        "source.ip": "10.122.204.151",
         "tags": [
             "f5.bigipapm",
             "forwarded"
@@ -1093,8 +1081,8 @@
         "observer.product": "Big-IP",
         "observer.type": "Access",
         "observer.vendor": "F5",
+        "process.parent.pid": 2037,
         "process.pid": 1580,
-        "process.ppid": 2037,
         "related.user": [
             "ptate"
         ],
@@ -1138,9 +1126,7 @@
         "rsa.time.event_time": "2017-09-06T08:55:24.000Z",
         "rule.name": "quid",
         "service.type": "f5",
-        "source.ip": [
-            "10.198.70.58"
-        ],
+        "source.ip": "10.198.70.58",
         "source.nat.ip": "10.6.32.7",
         "tags": [
             "f5.bigipapm",
@@ -1426,8 +1412,8 @@
         "observer.product": "Big-IP",
         "observer.type": "Access",
         "observer.vendor": "F5",
+        "process.parent.pid": 4996,
         "process.pid": 5019,
-        "process.ppid": 4996,
         "related.user": [
             "rem"
         ],
@@ -1493,9 +1479,7 @@
         "rsa.time.event_time": "2018-03-25T11:31:24.000Z",
         "rule.name": "olore",
         "service.type": "f5",
-        "source.ip": [
-            "10.16.181.60"
-        ],
+        "source.ip": "10.16.181.60",
         "source.nat.ip": "10.142.213.80",
         "tags": [
             "f5.bigipapm",
@@ -1554,9 +1538,7 @@
     },
     {
         "@timestamp": "2018-05-07T08:39:06.000Z",
-        "destination.ip": [
-            "10.47.99.72"
-        ],
+        "destination.ip": "10.47.99.72",
         "event.code": "01490500",
         "event.dataset": "f5.bigipapm",
         "event.module": "f5",
@@ -1582,9 +1564,7 @@
         "rsa.misc.severity": "medium",
         "rsa.time.event_time": "2018-05-07T08:39:06.000Z",
         "service.type": "f5",
-        "source.ip": [
-            "10.187.64.126"
-        ],
+        "source.ip": "10.187.64.126",
         "tags": [
             "f5.bigipapm",
             "forwarded"
@@ -2130,9 +2110,7 @@
         "rsa.misc.severity": "low",
         "rsa.time.event_time": "2019-03-17T19:35:40.000Z",
         "service.type": "f5",
-        "source.ip": [
-            "10.24.113.101"
-        ],
+        "source.ip": "10.24.113.101",
         "tags": [
             "f5.bigipapm",
             "forwarded"
