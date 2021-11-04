@@ -500,6 +500,10 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  # Kubernetes client QPS and burst can be configured additionally
+  #kube_client_options:
+  #  qps: 5
+  #  burst: 10
 
 # State metrics from kube-state-metrics service:
 - module: kubernetes
@@ -530,6 +534,10 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  # Kubernetes client QPS and burst can be configured additionally
+  #kube_client_options:
+  #  qps: 5
+  #  burst: 10
 
 # Kubernetes API server
 # (when running metricbeat as a deployment)
@@ -595,8 +603,10 @@ metricbeat.modules:
     # - conntrack
     # - iostat
     # - pressure
+    # - rapl
   enabled: true
   #hostfs: /hostfs
+  #rapl.use_msr_safe: false
 
 
 #------------------------------- Logstash Module -------------------------------

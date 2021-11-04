@@ -2,14 +2,12 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// TODO review the need for this
-// +build linux darwin windows
-
 package kubernetes
 
 import (
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -19,7 +17,9 @@ type Config struct {
 	Scope     string    `config:"scope"`
 	Resources Resources `config:"resources"`
 
-	KubeConfig     string        `config:"kube_config"`
+	KubeConfig        string                       `config:"kube_config"`
+	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
+
 	Namespace      string        `config:"namespace"`
 	SyncPeriod     time.Duration `config:"sync_period"`
 	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`

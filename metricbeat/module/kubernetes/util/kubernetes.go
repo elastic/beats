@@ -49,10 +49,11 @@ type Enricher interface {
 
 type kubernetesConfig struct {
 	// AddMetadata enables enriching metricset events with metadata from the API server
-	AddMetadata bool          `config:"add_metadata"`
-	KubeConfig  string        `config:"kube_config"`
-	Host        string        `config:"host"`
-	SyncPeriod  time.Duration `config:"sync_period"`
+	AddMetadata       bool                         `config:"add_metadata"`
+	KubeConfig        string                       `config:"kube_config"`
+	Host              string                       `config:"host"`
+	SyncPeriod        time.Duration                `config:"sync_period"`
+	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
 }
 
 type enricher struct {
@@ -83,7 +84,7 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 		return nil, nil
 	}
 
-	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +192,7 @@ func NewResourceMetadataEnricher(
 		},
 		// index
 		func(e common.MapStr) string {
-			return join(getString(e, mb.ModuleDataKey+".namespace"), getString(e, "name"))
+			return join(getString(e, mb.ModuleDataKey+".namespace.name"), getString(e, "name"))
 		},
 	)
 

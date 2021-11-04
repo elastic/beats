@@ -4943,16 +4943,6 @@
                   description: >
                     Number of client connections (excluding connections from slaves).
 
-                - name: longest_output_list
-                  type: long
-                  description: >
-                    Longest output list among current client connections.
-
-                - name: biggest_input_buf
-                  type: long
-                  description: >
-                    Biggest input buffer among current client connections.
-
                 - name: blocked
                   type: long
                   description: >
@@ -5106,10 +5096,6 @@
                   description:
 
                 - name: connected_slaves
-                  type: long
-                  description:
-
-                - name: master_offset
                   type: long
                   description:
 

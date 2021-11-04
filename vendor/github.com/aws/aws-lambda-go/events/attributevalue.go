@@ -18,6 +18,10 @@ type DynamoDBAttributeValue struct {
 	dataType DynamoDBDataType
 }
 
+// This struct represents DynamoDBAttributeValue which doesn't
+// implement fmt.Stringer interface and safely `fmt.Sprintf`able
+type dynamoDbAttributeValue DynamoDBAttributeValue
+
 // Binary provides access to an attribute of type Binary.
 // Method panics if the attribute is not of type Binary.
 func (av DynamoDBAttributeValue) Binary() []byte {
@@ -71,7 +75,12 @@ func (av DynamoDBAttributeValue) Number() string {
 // of an int64 of the appropriate sign.
 // Method panics if the attribute is not of type Number.
 func (av DynamoDBAttributeValue) Integer() (int64, error) {
-	s, err := strconv.ParseFloat(av.Number(), 64)
+	number := av.Number()
+	value, err := strconv.ParseInt(number, 10, 64)
+	if err == nil {
+		return value, nil
+	}
+	s, err := strconv.ParseFloat(number, 64)
 	return int64(s), err
 }
 
@@ -98,8 +107,13 @@ func (av DynamoDBAttributeValue) NumberSet() []string {
 // String provides access to an attribute of type String.
 // Method panics if the attribute is not of type String.
 func (av DynamoDBAttributeValue) String() string {
-	av.ensureType(DataTypeString)
-	return av.value.(string)
+	if av.dataType == DataTypeString {
+		return av.value.(string)
+	}
+	// If dataType is not DataTypeString during fmt.Sprintf("%#v", ...)
+	// compiler confuses with fmt.Stringer interface and panics
+	// instead of printing the struct.
+	return fmt.Sprintf("%v", dynamoDbAttributeValue(av))
 }
 
 // StringSet provides access to an attribute of type String Set.
@@ -164,6 +178,14 @@ func NewNumberAttribute(value string) DynamoDBAttributeValue {
 	var av DynamoDBAttributeValue
 	av.value = value
 	av.dataType = DataTypeNumber
+	return av
+}
+
+// NewNumberSetAttribute creates an DynamoDBAttributeValue containing a NumberSet
+func NewNumberSetAttribute(value []string) DynamoDBAttributeValue {
+	var av DynamoDBAttributeValue
+	av.value = value
+	av.dataType = DataTypeNumberSet
 	return av
 }
 

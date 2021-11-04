@@ -31,7 +31,7 @@ stages:
             parameters:
                 - "armTest"
     unitTest:
-        mage: "mage build unitTest && GO_VERSION=1.13.1 mage testGCPFunctions"
+        mage: "mage build unitTest"
         stage: mandatory
     goIntegTest:
         mage: "mage goIntegTest"
@@ -47,7 +47,6 @@ stages:
                 - "macOS"
             parameters:
                 - "macosTest"
-            branches: true     ## for all the branches
             tags: true         ## for all the tags
         stage: extended
     windows:
@@ -95,3 +94,9 @@ stages:
         e2e:
             enabled: false
         stage: packaging
+        when:
+            branches: false    ## Only on a PR basis for the time being
+            tags: false        ## packaging on branches/tags is already in place with the downstream build.
+            changeset:         ## when PR contains any of those entries in the changeset
+              - "^x-pack/functionbeat/.*"
+              - "@xpack"             ## special token regarding the changeset for the xpack

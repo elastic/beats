@@ -126,6 +126,16 @@ func Generate() error {
 		return errors.Wrap(err, "error while getting required beats version")
 	}
 
+	// After fully populating go.mod download the deps to set the hashes
+	// within the go.sum.
+	if err = gotool.Mod.Download(); err != nil {
+		return errors.Wrap(err, "failed to download go.mod deps")
+	}
+	// Finally, cleanup any formatting issues in the go.mod/go.sum.
+	if err = gotool.Mod.Tidy(); err != nil {
+		return errors.Wrap(err, "error running 'go mod tidy'")
+	}
+
 	mg.Deps(setup.GitInit)
 
 	if cfg["type"] == "metricbeat" {

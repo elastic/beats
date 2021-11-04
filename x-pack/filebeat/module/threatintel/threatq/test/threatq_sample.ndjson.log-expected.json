@@ -1,0 +1,428 @@
+[
+    {
+        "@timestamp": "2020-11-15T00:00:02.000Z",
+        "event.category": "threat",
+        "event.dataset": "threatintel.threatq",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.type": "indicator",
+        "fileset.name": "threatq",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-threatq"
+        ],
+        "threatintel.indicator.confidence": 4,
+        "threatintel.indicator.ip": "69.44.202.220",
+        "threatintel.indicator.marking.tlp": [
+            ""
+        ],
+        "threatintel.indicator.provider": [
+            "AlienVault OTX"
+        ],
+        "threatintel.indicator.type": "ipv4-addr",
+        "threatintel.threatq.attributes.alienvault_reliability": [
+            "4"
+        ],
+        "threatintel.threatq.attributes.alienvault_revision": [
+            "3"
+        ],
+        "threatintel.threatq.attributes.alienvault_threat_level": [
+            "3"
+        ],
+        "threatintel.threatq.attributes.city": [
+            "Saipan"
+        ],
+        "threatintel.threatq.attributes.country": [
+            "MP"
+        ],
+        "threatintel.threatq.attributes.description": [
+            "Malicious Host"
+        ],
+        "threatintel.threatq.created_at": "2020-09-11T14:35:51.000Z",
+        "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:03.000Z",
+        "threatintel.threatq.indicator_value": "69.44.202.220",
+        "threatintel.threatq.published_at": "2020-09-11T14:35:51.000Z",
+        "threatintel.threatq.status": "Expired"
+    },
+    {
+        "@timestamp": "2020-11-15T00:00:02.000Z",
+        "event.category": "threat",
+        "event.dataset": "threatintel.threatq",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.type": "indicator",
+        "fileset.name": "threatq",
+        "input.type": "log",
+        "log.offset": 2027,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-threatq"
+        ],
+        "threatintel.indicator.confidence": 4,
+        "threatintel.indicator.ip": "69.94.155.176",
+        "threatintel.indicator.marking.tlp": [
+            ""
+        ],
+        "threatintel.indicator.provider": [
+            "AlienVault OTX"
+        ],
+        "threatintel.indicator.type": "ipv4-addr",
+        "threatintel.threatq.attributes.alienvault_reliability": [
+            "4"
+        ],
+        "threatintel.threatq.attributes.alienvault_revision": [
+            "3"
+        ],
+        "threatintel.threatq.attributes.alienvault_threat_level": [
+            "2"
+        ],
+        "threatintel.threatq.attributes.city": [
+            "Sacramento"
+        ],
+        "threatintel.threatq.attributes.country": [
+            "US"
+        ],
+        "threatintel.threatq.attributes.description": [
+            "Malicious Host"
+        ],
+        "threatintel.threatq.created_at": "2020-09-11T14:35:51.000Z",
+        "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:03.000Z",
+        "threatintel.threatq.indicator_value": "69.94.155.176",
+        "threatintel.threatq.published_at": "2020-09-11T14:35:51.000Z",
+        "threatintel.threatq.status": "Expired"
+    },
+    {
+        "@timestamp": "2020-11-15T00:00:02.000Z",
+        "event.category": "threat",
+        "event.dataset": "threatintel.threatq",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.type": "indicator",
+        "fileset.name": "threatq",
+        "input.type": "log",
+        "log.offset": 4058,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-threatq"
+        ],
+        "threatintel.indicator.confidence": 4,
+        "threatintel.indicator.ip": "69.42.81.68",
+        "threatintel.indicator.marking.tlp": [
+            ""
+        ],
+        "threatintel.indicator.provider": [
+            "AlienVault OTX"
+        ],
+        "threatintel.indicator.type": "ipv4-addr",
+        "threatintel.threatq.attributes.alienvault_reliability": [
+            "4"
+        ],
+        "threatintel.threatq.attributes.alienvault_revision": [
+            "3"
+        ],
+        "threatintel.threatq.attributes.alienvault_threat_level": [
+            "2"
+        ],
+        "threatintel.threatq.attributes.city": [
+            "New York"
+        ],
+        "threatintel.threatq.attributes.country": [
+            "US"
+        ],
+        "threatintel.threatq.attributes.description": [
+            "Malicious Host"
+        ],
+        "threatintel.threatq.created_at": "2020-09-11T14:35:51.000Z",
+        "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:03.000Z",
+        "threatintel.threatq.indicator_value": "69.42.81.68",
+        "threatintel.threatq.published_at": "2020-09-11T14:35:51.000Z",
+        "threatintel.threatq.status": "Expired"
+    },
+    {
+        "@timestamp": "2020-11-15T00:00:02.000Z",
+        "event.category": "threat",
+        "event.dataset": "threatintel.threatq",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.type": "indicator",
+        "fileset.name": "threatq",
+        "input.type": "log",
+        "log.offset": 6085,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-threatq"
+        ],
+        "threatintel.indicator.confidence": 4,
+        "threatintel.indicator.ip": "37.17.250.101",
+        "threatintel.indicator.marking.tlp": [
+            ""
+        ],
+        "threatintel.indicator.provider": [
+            "AlienVault OTX"
+        ],
+        "threatintel.indicator.type": "ipv4-addr",
+        "threatintel.threatq.attributes.alienvault_reliability": [
+            "4"
+        ],
+        "threatintel.threatq.attributes.alienvault_revision": [
+            "3"
+        ],
+        "threatintel.threatq.attributes.alienvault_threat_level": [
+            "2"
+        ],
+        "threatintel.threatq.attributes.description": [
+            "Malicious Host"
+        ],
+        "threatintel.threatq.created_at": "2020-09-11T14:35:41.000Z",
+        "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:02.000Z",
+        "threatintel.threatq.indicator_value": "37.17.250.101",
+        "threatintel.threatq.published_at": "2020-09-11T14:35:41.000Z",
+        "threatintel.threatq.status": "Expired"
+    },
+    {
+        "@timestamp": "2020-11-15T00:00:02.000Z",
+        "event.category": "threat",
+        "event.dataset": "threatintel.threatq",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.type": "indicator",
+        "fileset.name": "threatq",
+        "input.type": "log",
+        "log.offset": 7734,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-threatq"
+        ],
+        "threatintel.indicator.confidence": 4,
+        "threatintel.indicator.ip": "69.94.129.203",
+        "threatintel.indicator.marking.tlp": [
+            ""
+        ],
+        "threatintel.indicator.provider": [
+            "AlienVault OTX"
+        ],
+        "threatintel.indicator.type": "ipv4-addr",
+        "threatintel.threatq.attributes.alienvault_reliability": [
+            "4"
+        ],
+        "threatintel.threatq.attributes.alienvault_revision": [
+            "3"
+        ],
+        "threatintel.threatq.attributes.alienvault_threat_level": [
+            "2"
+        ],
+        "threatintel.threatq.attributes.city": [
+            "Sacramento"
+        ],
+        "threatintel.threatq.attributes.country": [
+            "US"
+        ],
+        "threatintel.threatq.attributes.description": [
+            "Malicious Host"
+        ],
+        "threatintel.threatq.created_at": "2020-09-11T14:35:51.000Z",
+        "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:03.000Z",
+        "threatintel.threatq.indicator_value": "69.94.129.203",
+        "threatintel.threatq.published_at": "2020-09-11T14:35:51.000Z",
+        "threatintel.threatq.status": "Expired"
+    },
+    {
+        "@timestamp": "2020-11-15T00:00:02.000Z",
+        "event.category": "threat",
+        "event.dataset": "threatintel.threatq",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.type": "indicator",
+        "fileset.name": "threatq",
+        "input.type": "log",
+        "log.offset": 9765,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-threatq"
+        ],
+        "threatintel.indicator.confidence": 4,
+        "threatintel.indicator.ip": "69.216.117.22",
+        "threatintel.indicator.marking.tlp": [
+            ""
+        ],
+        "threatintel.indicator.provider": [
+            "AlienVault OTX"
+        ],
+        "threatintel.indicator.type": "ipv4-addr",
+        "threatintel.threatq.attributes.alienvault_reliability": [
+            "4"
+        ],
+        "threatintel.threatq.attributes.alienvault_revision": [
+            "3"
+        ],
+        "threatintel.threatq.attributes.alienvault_threat_level": [
+            "3"
+        ],
+        "threatintel.threatq.attributes.city": [
+            "Houston"
+        ],
+        "threatintel.threatq.attributes.country": [
+            "US"
+        ],
+        "threatintel.threatq.attributes.description": [
+            "Malicious Host"
+        ],
+        "threatintel.threatq.created_at": "2020-09-11T14:35:51.000Z",
+        "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:03.000Z",
+        "threatintel.threatq.indicator_value": "69.216.117.22",
+        "threatintel.threatq.published_at": "2020-09-11T14:35:51.000Z",
+        "threatintel.threatq.status": "Expired"
+    },
+    {
+        "@timestamp": "2020-11-15T00:00:02.000Z",
+        "event.category": "threat",
+        "event.dataset": "threatintel.threatq",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.type": "indicator",
+        "fileset.name": "threatq",
+        "input.type": "log",
+        "log.offset": 11793,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-threatq"
+        ],
+        "threatintel.indicator.confidence": 4,
+        "threatintel.indicator.ip": "69.80.70.115",
+        "threatintel.indicator.marking.tlp": [
+            ""
+        ],
+        "threatintel.indicator.provider": [
+            "AlienVault OTX"
+        ],
+        "threatintel.indicator.type": "ipv4-addr",
+        "threatintel.threatq.attributes.alienvault_reliability": [
+            "4"
+        ],
+        "threatintel.threatq.attributes.alienvault_revision": [
+            "3"
+        ],
+        "threatintel.threatq.attributes.alienvault_threat_level": [
+            "2"
+        ],
+        "threatintel.threatq.attributes.city": [
+            "Fort Lauderdale"
+        ],
+        "threatintel.threatq.attributes.country": [
+            "US"
+        ],
+        "threatintel.threatq.attributes.description": [
+            "Malicious Host"
+        ],
+        "threatintel.threatq.created_at": "2020-09-11T14:35:51.000Z",
+        "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:03.000Z",
+        "threatintel.threatq.indicator_value": "69.80.70.115",
+        "threatintel.threatq.published_at": "2020-09-11T14:35:51.000Z",
+        "threatintel.threatq.status": "Expired"
+    },
+    {
+        "@timestamp": "2020-11-15T00:00:02.000Z",
+        "event.category": "threat",
+        "event.dataset": "threatintel.threatq",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.type": "indicator",
+        "fileset.name": "threatq",
+        "input.type": "log",
+        "log.offset": 13828,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-threatq"
+        ],
+        "threatintel.indicator.confidence": 4,
+        "threatintel.indicator.ip": "69.65.79.99",
+        "threatintel.indicator.marking.tlp": [
+            ""
+        ],
+        "threatintel.indicator.provider": [
+            "AlienVault OTX"
+        ],
+        "threatintel.indicator.type": "ipv4-addr",
+        "threatintel.threatq.attributes.alienvault_reliability": [
+            "4"
+        ],
+        "threatintel.threatq.attributes.alienvault_revision": [
+            "3"
+        ],
+        "threatintel.threatq.attributes.alienvault_threat_level": [
+            "2"
+        ],
+        "threatintel.threatq.attributes.city": [
+            "Pompano Beach"
+        ],
+        "threatintel.threatq.attributes.country": [
+            "US"
+        ],
+        "threatintel.threatq.attributes.description": [
+            "Malicious Host"
+        ],
+        "threatintel.threatq.created_at": "2020-09-11T14:35:51.000Z",
+        "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:03.000Z",
+        "threatintel.threatq.indicator_value": "69.65.79.99",
+        "threatintel.threatq.published_at": "2020-09-11T14:35:51.000Z",
+        "threatintel.threatq.status": "Expired"
+    },
+    {
+        "@timestamp": "2020-11-15T00:00:02.000Z",
+        "event.category": "threat",
+        "event.dataset": "threatintel.threatq",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.type": "indicator",
+        "fileset.name": "threatq",
+        "input.type": "log",
+        "log.offset": 15860,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-threatq"
+        ],
+        "threatintel.indicator.confidence": 4,
+        "threatintel.indicator.ip": "69.199.22.46",
+        "threatintel.indicator.marking.tlp": [
+            ""
+        ],
+        "threatintel.indicator.provider": [
+            "AlienVault OTX"
+        ],
+        "threatintel.indicator.type": "ipv4-addr",
+        "threatintel.threatq.attributes.alienvault_reliability": [
+            "4"
+        ],
+        "threatintel.threatq.attributes.alienvault_revision": [
+            "3"
+        ],
+        "threatintel.threatq.attributes.alienvault_threat_level": [
+            "2"
+        ],
+        "threatintel.threatq.attributes.city": [
+            "Little Elm"
+        ],
+        "threatintel.threatq.attributes.country": [
+            "US"
+        ],
+        "threatintel.threatq.attributes.description": [
+            "Malicious Host"
+        ],
+        "threatintel.threatq.created_at": "2020-09-11T14:35:51.000Z",
+        "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:03.000Z",
+        "threatintel.threatq.indicator_value": "69.199.22.46",
+        "threatintel.threatq.published_at": "2020-09-11T14:35:51.000Z",
+        "threatintel.threatq.status": "Expired"
+    }
+]

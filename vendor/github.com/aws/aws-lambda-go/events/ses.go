@@ -34,7 +34,7 @@ type SimpleEmailReceipt struct {
 	SpamVerdict          SimpleEmailVerdict       `json:"spamVerdict"`
 	DKIMVerdict          SimpleEmailVerdict       `json:"dkimVerdict"`
 	DMARCVerdict         SimpleEmailVerdict       `json:"dmarcVerdict"`
-	DMARCPolicy          SimpleEmailVerdict       `json:"dmarcPolicy"`
+	DMARCPolicy          string                   `json:"dmarcPolicy"`
 	SPFVerdict           SimpleEmailVerdict       `json:"spfVerdict"`
 	VirusVerdict         SimpleEmailVerdict       `json:"virusVerdict"`
 	Action               SimpleEmailReceiptAction `json:"action"`
@@ -55,10 +55,22 @@ type SimpleEmailCommonHeaders struct {
 	Subject    string   `json:"subject"`
 }
 
+// SimpleEmailReceiptAction is a logical union of fields present in all action
+// Types. For example, the FunctionARN and InvocationType fields are only
+// present for the Lambda Type, and the BucketName and ObjectKey fields are only
+// present for the S3 Type.
 type SimpleEmailReceiptAction struct {
-	Type           string `json:"type"`
-	InvocationType string `json:"invocationType"`
-	FunctionArn    string `json:"functionArn"`
+	Type            string `json:"type"`
+	TopicARN        string `json:"topicArn,omitempty"`
+	BucketName      string `json:"bucketName,omitempty"`
+	ObjectKey       string `json:"objectKey,omitempty"`
+	SMTPReplyCode   string `json:"smtpReplyCode,omitempty"`
+	StatusCode      string `json:"statusCode,omitempty"`
+	Message         string `json:"message,omitempty"`
+	Sender          string `json:"sender,omitempty"`
+	InvocationType  string `json:"invocationType,omitempty"`
+	FunctionARN     string `json:"functionArn,omitempty"`
+	OrganizationARN string `json:"organizationArn,omitempty"`
 }
 
 type SimpleEmailVerdict struct {

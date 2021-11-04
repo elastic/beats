@@ -4,16 +4,18 @@ package events
 
 // KinesisFirehoseEvent represents the input event from Amazon Kinesis Firehose. It is used as the input parameter.
 type KinesisFirehoseEvent struct {
-	InvocationID      string                       `json:"invocationId"`
-	DeliveryStreamArn string                       `json:"deliveryStreamArn"`
-	Region            string                       `json:"region"`
-	Records           []KinesisFirehoseEventRecord `json:"records"`
+	InvocationID           string                       `json:"invocationId"`
+	DeliveryStreamArn      string                       `json:"deliveryStreamArn"`
+	SourceKinesisStreamArn string                       `json:"sourceKinesisStreamArn"`
+	Region                 string                       `json:"region"`
+	Records                []KinesisFirehoseEventRecord `json:"records"`
 }
 
 type KinesisFirehoseEventRecord struct {
-	RecordID                    string                `json:"recordId"`
-	ApproximateArrivalTimestamp MilliSecondsEpochTime `json:"approximateArrivalTimestamp"`
-	Data                        []byte                `json:"data"`
+	RecordID                      string                        `json:"recordId"`
+	ApproximateArrivalTimestamp   MilliSecondsEpochTime         `json:"approximateArrivalTimestamp"`
+	Data                          []byte                        `json:"data"`
+	KinesisFirehoseRecordMetadata KinesisFirehoseRecordMetadata `json:"kinesisRecordMetadata"`
 }
 
 // Constants used for describing the transformation result
@@ -31,4 +33,11 @@ type KinesisFirehoseResponseRecord struct {
 	RecordID string `json:"recordId"`
 	Result   string `json:"result"` // The status of the transformation. May be TransformedStateOk, TransformedStateDropped or TransformedStateProcessingFailed
 	Data     []byte `json:"data"`
+}
+
+type KinesisFirehoseRecordMetadata struct {
+	ShardID                     string                `json:"shardId"`
+	PartitionKey                string                `json:"partitionKey"`
+	SequenceNumber              string                `json:"sequenceNumber"`
+	ApproximateArrivalTimestamp MilliSecondsEpochTime `json:"approximateArrivalTimestamp"`
 }

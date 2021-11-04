@@ -15,12 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration && ((darwin && cgo) || freebsd || linux || windows)
 // +build integration
 // +build darwin,cgo freebsd linux windows
 
 package diskio
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -31,6 +34,7 @@ import (
 )
 
 func setHostfs(pathString string) {
+	os.Setenv("HOST_PROC", filepath.Join(pathString, "proc"))
 	path := paths.Path{
 		Hostfs: pathString,
 	}

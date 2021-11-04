@@ -3022,17 +3022,11 @@ type: keyword
 
 --
 
-[float]
-=== properties
-
-The signin log properties
-
-
 
 *`azure.signinlogs.properties.id`*::
 +
 --
-ID
+Unique ID representing the sign-in activity.
 
 
 type: keyword
@@ -3042,7 +3036,7 @@ type: keyword
 *`azure.signinlogs.properties.created_at`*::
 +
 --
-Created date time
+Date and time (UTC) the sign-in was initiated.
 
 
 type: date
@@ -3109,13 +3103,12 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.ip_address`*::
+*`azure.signinlogs.properties.autonomous_system_number`*::
 +
 --
-Ip address
+Autonomous system number.
 
-
-type: keyword
+type: long
 
 --
 
@@ -3155,7 +3148,7 @@ type: keyword
 Is interactive
 
 
-type: keyword
+type: boolean
 
 --
 
@@ -3239,12 +3232,6 @@ type: keyword
 
 --
 
-[float]
-=== status
-
-Status
-
-
 
 *`azure.signinlogs.properties.status.error_code`*::
 +
@@ -3252,15 +3239,9 @@ Status
 Error code
 
 
-type: keyword
+type: long
 
 --
-
-[float]
-=== device_detail
-
-Status
-
 
 
 *`azure.signinlogs.properties.device_detail.device_id`*::
@@ -3313,10 +3294,40 @@ type: keyword
 
 --
 
-*`azure.signinlogs.properties.service_principal_id`*::
+*`azure.signinlogs.properties.applied_conditional_access_policies`*::
 +
 --
-Status
+A list of conditional access policies that are triggered by the corresponding sign-in activity.
+
+
+type: array
+
+--
+
+*`azure.signinlogs.properties.authentication_details`*::
++
+--
+The result of the authentication attempt and additional details on the authentication method.
+
+
+type: array
+
+--
+
+*`azure.signinlogs.properties.authentication_processing_details`*::
++
+--
+Additional authentication processing details, such as the agent name in case of PTA/PHS or Server/farm name in case of federated authentication.
+
+
+type: flattened
+
+--
+
+*`azure.signinlogs.properties.authentication_requirement`*::
++
+--
+This holds the highest level of authentication needed through all the sign-in steps, for sign-in to succeed.
 
 
 type: keyword
@@ -3326,68 +3337,48 @@ type: keyword
 *`azure.signinlogs.properties.authentication_requirement_policies`*::
 +
 --
-Set of CA policies that apply to this sign-in, each as CA: policy name, and/or MFA: Per-user.
+Set of CA policies that apply to this sign-in, each as CA: policy name, and/or MFA: Per-user
 
 
 type: keyword
-
---
-
-*`azure.signinlogs.properties.applied_conditional_access_policies`*::
-+
---
-Details of the conditional access policies being applied for the sign-in.
-
-
-type: nested
-
---
-
-*`azure.signinlogs.properties.resource_tenant_id`*::
-+
---
-The resource tenantId for B2B(business-to-business) scenarios.
-
-
-type: keyword
-
---
-
-*`azure.signinlogs.properties.authentication_details`*::
-+
---
-A record of each step of authentication undertaken in the sign-in.
-
-
-type: nested
-
---
-
-*`azure.signinlogs.properties.authentication_processing_details`*::
-+
---
-Provides the details associated with authentication processor.
-
-
-type: flattened
 
 --
 
 *`azure.signinlogs.properties.flagged_for_review`*::
 +
 --
-Event was flagged for review.
-
 type: boolean
+
+--
+
+*`azure.signinlogs.properties.home_tenant_id`*::
++
+--
+type: keyword
 
 --
 
 *`azure.signinlogs.properties.network_location_details`*::
 +
 --
-Provides the details associated with authentication processor.
+The network location details including the type of network used and its names.
 
+type: array
 
+--
+
+*`azure.signinlogs.properties.resource_id`*::
++
+--
+The identifier of the resource that the user signed in to.
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.resource_tenant_id`*::
++
+--
 type: keyword
 
 --
@@ -3395,7 +3386,7 @@ type: keyword
 *`azure.signinlogs.properties.risk_event_types`*::
 +
 --
-The list of risk event types associated with the sign-in.
+The list of risk event types associated with the sign-in. Possible values: unlikelyTravel, anonymizedIPAddress, maliciousIPAddress, unfamiliarFeatures, malwareInfectedIPAddress, suspiciousIPAddress, leakedCredentials, investigationsThreatIntelligence, generic, or unknownFutureValue.
 
 
 type: keyword
@@ -3405,27 +3396,17 @@ type: keyword
 *`azure.signinlogs.properties.risk_event_types_v2`*::
 +
 --
-The list of risk event types associated with the sign-in.
+The list of risk event types associated with the sign-in. Possible values: unlikelyTravel, anonymizedIPAddress, maliciousIPAddress, unfamiliarFeatures, malwareInfectedIPAddress, suspiciousIPAddress, leakedCredentials, investigationsThreatIntelligence, generic, or unknownFutureValue.
 
 
 type: keyword
 
 --
 
-*`azure.signinlogs.properties.authentication_requirement`*::
+*`azure.signinlogs.properties.service_principal_name`*::
 +
 --
-Type of authentication required for the sign-in. If set to multiFactorAuthentication, an MFA step was required. If set to singleFactorAuthentication, no MFA was required
-
-
-type: keyword
-
---
-
-*`azure.signinlogs.properties.resource_id`*::
-+
---
-ID of the resource that the user signed into.
+The application name used for sign-in. This field is populated when you are signing in using an application.
 
 
 type: keyword
@@ -3435,8 +3416,37 @@ type: keyword
 *`azure.signinlogs.properties.user_type`*::
 +
 --
-User type.
+type: keyword
 
+--
+
+*`azure.signinlogs.properties.service_principal_id`*::
++
+--
+The application identifier used for sign-in. This field is populated when you are signing in using an application.
+
+
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.cross_tenant_access_type`*::
++
+--
+type: keyword
+
+--
+
+*`azure.signinlogs.properties.is_tenant_restricted`*::
++
+--
+type: boolean
+
+--
+
+*`azure.signinlogs.properties.sso_extension_version`*::
++
+--
 type: keyword
 
 --
@@ -21571,6 +21581,16 @@ type: keyword
 +
 --
 SA type (remote access or L2L)
+
+
+type: keyword
+
+--
+
+*`cisco.asa.session_type`*::
++
+--
+Session type (for example, IPsec or UDP)
 
 
 type: keyword
@@ -85721,13 +85741,44 @@ type: ip
 
 --
 
-*`kubernetes.namespace`*::
+
+*`kubernetes.namespace.name`*::
 +
 --
-Kubernetes namespace
+Kubernetes namespace name
 
 
 type: keyword
+
+--
+
+*`kubernetes.namespace.uuid`*::
++
+--
+Kubernetes namespace uuid
+
+
+type: keyword
+
+--
+
+*`kubernetes.namespace.labels.*`*::
++
+--
+Kubernetes namespace labels map
+
+
+type: object
+
+--
+
+*`kubernetes.namespace.annotations.*`*::
++
+--
+Kubernetes namespace annotations map
+
+
+type: object
 
 --
 
@@ -151368,6 +151419,156 @@ type: keyword
 
 --
 
+*`threatintel.misp.context.attribute.id`*::
++
+--
+The ID of the secondary attribute related to the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.type`*::
++
+--
+The type of the secondary attribute related to the event object. For example email, ipv4, sha1 and such.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.category`*::
++
+--
+The category of the secondary attribute related to the event object. For example "Network Activity".
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.to_ids`*::
++
+--
+If the secondary attribute should be automatically synced with an IDS.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.context.attribute.uuid`*::
++
+--
+The UUID of the secondary attribute related to the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.event_id`*::
++
+--
+The local event ID of the secondary attribute related to the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.distribution`*::
++
+--
+How the secondary attribute has been distributed, represented by integer numbers.
+
+
+type: long
+
+--
+
+*`threatintel.misp.context.attribute.timestamp`*::
++
+--
+The timestamp in which the secondary attribute was attached to the event object.
+
+
+type: date
+
+--
+
+*`threatintel.misp.context.attribute.comment`*::
++
+--
+Comments made to the secondary attribute itself.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.sharing_group_id`*::
++
+--
+The group ID of the sharing group related to the specific secondary attribute.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.deleted`*::
++
+--
+If the secondary attribute has been removed from the event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.context.attribute.disable_correlation`*::
++
+--
+If correlation has been enabled on the secondary attribute related to the event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.context.attribute.object_id`*::
++
+--
+The ID of the Object in which the secondary attribute is attached.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.object_relation`*::
++
+--
+The type of relation the secondary attribute has with the event object itself.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.value`*::
++
+--
+The value of the attribute, depending on the type like "url, sha1, email-src".
+
+
+type: keyword
+
+--
+
 [float]
 === otx
 
@@ -151592,6 +151793,103 @@ Number of rules observed.
 
 
 type: long
+
+--
+
+[float]
+=== threatq
+
+Fields for ThreatQ Threat Library
+
+
+
+*`threatintel.threatq.updated_at`*::
++
+--
+Last modification time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.created_at`*::
++
+--
+Object creation time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.expires_at`*::
++
+--
+Expiration time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.expires_calculated_at`*::
++
+--
+Expiration calculation time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.published_at`*::
++
+--
+Object publication time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.status`*::
++
+--
+Object status within the Threat Library
+
+
+type: keyword
+
+--
+
+*`threatintel.threatq.indicator_value`*::
++
+--
+Original indicator value
+
+
+type: keyword
+
+--
+
+*`threatintel.threatq.adversaries`*::
++
+--
+Adversaries that are linked to the object
+
+
+type: keyword
+
+--
+
+*`threatintel.threatq.attributes`*::
++
+--
+These provide additional context about an object
+
+
+type: flattened
 
 --
 

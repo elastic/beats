@@ -36,7 +36,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 
 	logp.Info("Config initiated.")
 
-	client, err := kubernetes.GetKubernetesClient(c.KubeConfig)
+	client, err := kubernetes.GetKubernetesClient(c.KubeConfig, kubernetes.KubeClientOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("fail to get k8sclient client: %s", err.Error())
 	}

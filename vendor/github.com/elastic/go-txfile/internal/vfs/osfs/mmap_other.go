@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build darwin dragonfly freebsd linux netbsd openbsd solaris
+// +build !windows
 
 package osfs
 

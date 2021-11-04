@@ -312,8 +312,6 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 			hashes[string(hashType)] = digest
 		}
 		file["hash"] = hashes
-		// Remove this for 8.x
-		out.MetricSetFields.Put("hash", hashes)
 	}
 
 	out.MetricSetFields.Put("event.kind", "event")

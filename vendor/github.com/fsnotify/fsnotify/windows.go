@@ -461,8 +461,8 @@ func (w *Watcher) readEvents() {
 
 			// Point "raw" to the event in the buffer
 			raw := (*syscall.FileNotifyInformation)(unsafe.Pointer(&watch.buf[offset]))
-			buf := (*[syscall.MAX_PATH]uint16)(unsafe.Pointer(&raw.FileName))
-			name := syscall.UTF16ToString(buf[:raw.FileNameLength/2])
+			buf := unsafe.Slice(&raw.FileName, raw.FileNameLength/2)
+			name := syscall.UTF16ToString(buf)
 			fullname := filepath.Join(watch.path, name)
 
 			var mask uint64

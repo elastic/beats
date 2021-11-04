@@ -63,7 +63,7 @@ type DynamoDBUserIdentity struct {
 	PrincipalID string `json:"principalId"`
 }
 
-// A description of a single data modification that was performed on an item
+// DynamoDBStreamRecord represents a description of a single data modification that was performed on an item
 // in a DynamoDB table.
 type DynamoDBStreamRecord struct {
 

@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
 // +build linux darwin windows
 
 package add_kubernetes_metadata
@@ -125,12 +126,12 @@ func newProcessorConfig(cfg *common.Config, register *Register) (kubeAnnotatorCo
 		return config, fmt.Errorf("fail to unpack the kubernetes configuration: %s", err)
 	}
 
-	//Load and append default indexer configs
+	// Load and append default indexer configs
 	if config.DefaultIndexers.Enabled {
 		config.Indexers = append(config.Indexers, register.GetDefaultIndexerConfigs()...)
 	}
 
-	//Load and append default matcher configs
+	// Load and append default matcher configs
 	if config.DefaultMatchers.Enabled {
 		config.Matchers = append(config.Matchers, register.GetDefaultMatcherConfigs()...)
 	}
@@ -140,7 +141,7 @@ func newProcessorConfig(cfg *common.Config, register *Register) (kubeAnnotatorCo
 
 func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Config) {
 	k.initOnce.Do(func() {
-		client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
+		client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 		if err != nil {
 			if kubernetes.IsInCluster(config.KubeConfig) {
 				k.log.Debugf("Could not create kubernetes client using in_cluster config: %+v", err)

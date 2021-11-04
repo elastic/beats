@@ -14,6 +14,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.0.8]
+
+### Changed
+
+- Relax build tags to compile on other platforms out of the box, if supported by our dependencies. PR #44
+
 ## [0.0.7]
 
 ### Added
@@ -73,7 +79,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Windows Fix: Max mmaped area must not exceed actual file size on windows. PR #11
 
 
-[Unreleased]: https://github.com/elastic/go-txfile/compare/v0.0.7...HEAD
+[Unreleased]: https://github.com/elastic/go-txfile/compare/v0.0.8...HEAD
+[0.0.8]: https://github.com/elastic/go-txfile/compare/v0.0.7...0.0.8
 [0.0.7]: https://github.com/elastic/go-txfile/compare/v0.0.6...v0.0.7
 [0.0.6]: https://github.com/elastic/go-txfile/compare/v0.0.5...v0.0.6
 [0.0.5]: https://github.com/elastic/go-txfile/compare/v0.0.4...v0.0.5
