@@ -86,7 +86,7 @@ func NewInput(
 	context input.Context,
 ) (input.Input, error) {
 	deprecatedNotificationOnce.Do(func() {
-		cfgwarn.Deprecate("8.0.0", "Log input. Use Filestream input instead.")
+		cfgwarn.Deprecate("", "Log input. Use Filestream input instead.")
 	})
 
 	cleanupNeeded := true
