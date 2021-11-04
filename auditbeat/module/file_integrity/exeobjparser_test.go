@@ -24,48 +24,23 @@ import (
 	"os/exec"
 	"reflect"
 	"strconv"
-	"strings"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestExeObjParser(t *testing.T) {
-	const (
-		pkg    = "./testdata"
-		target = "./testdata/executable"
-	)
-
-	flagSets := map[string][]string{
-		"go":     nil,
-		"garble": {"-literals", "-tiny"},
-	}
-
-	for _, platform := range []struct {
-		goos, format string
-	}{
-		{"linux", "elf"},
-		{"darwin", "macho"},
-		{"plan9", "plan9"},
-		{"windows", "pe"},
+	for _, format := range []string{
+		"elf", "macho", "plan9", "pe",
 	} {
 		for _, builder := range []string{
 			"go",
 			"garble",
 		} {
-			flags := flagSets[builder]
-			cmd, err := build(platform.goos, builder, pkg, target, flags)
-			if err != nil {
-				t.Errorf("failed to build test for GOOS=%s %s: %v",
-					platform.goos, cmd, err)
-				continue
-			}
+			target := fmt.Sprintf("./testdata/%s_%s_executable", builder, format)
 
-			key := fmt.Sprintf("GOOS=%s %s build", platform.goos, builder)
-			if flags != nil {
-				key += " " + strings.Join(flags, " ")
-			}
-			t.Run(fmt.Sprintf("executableObject_%s_%s_%v", platform.goos, builder, strings.Join(flags, "_")), func(t *testing.T) {
+			key := fmt.Sprintf("%s_%s", builder, format)
+			t.Run(fmt.Sprintf("executableObject_%s_%s", format, builder), func(t *testing.T) {
 				got := make(common.MapStr)
 				err := exeObjParser(nil).Parse(got, target)
 				if err != nil {
@@ -79,17 +54,17 @@ func TestExeObjParser(t *testing.T) {
 					{path: "import_hash", cmp: func(a, b interface{}) bool { return fmt.Sprint(a) == fmt.Sprint(b) }},
 					{path: "imphash", cmp: func(a, b interface{}) bool { return fmt.Sprint(a) == fmt.Sprint(b) }},
 					{path: "symhash", cmp: func(a, b interface{}) bool { return fmt.Sprint(a) == fmt.Sprint(b) }},
-					{path: "imports", cmp: approxImports(platform.goos, builder)},
-					{path: "imports_names_entropy", cmp: approxFloat64(1)},
-					{path: "go_import_hash", cmp: approxHash(platform.goos, builder)},
-					{path: "go_imports", cmp: approxImports(platform.goos, builder)},
-					{path: "go_imports_names_entropy", cmp: approxFloat64(1)},
+					{path: "imports", cmp: approxImports(format, builder)},
+					{path: "imports_names_entropy", cmp: approxFloat64(0.1)},
+					{path: "go_import_hash", cmp: approxHash(format, builder)},
+					{path: "go_imports", cmp: approxImports(format, builder)},
+					{path: "go_imports_names_entropy", cmp: approxFloat64(0.1)},
 					{path: "go_stripped", cmp: func(a, b interface{}) bool { return a == b }},
-					{path: "sections", cmp: approxSections(0.5)},
+					{path: "sections", cmp: approxSections(0.1)},
 				}
 
 				for _, f := range fields {
-					path := platform.format + "." + f.path
+					path := format + "." + f.path
 					wantV, wantErr := want[key].GetValue(path)
 					gotV, gotErr := got.GetValue(path)
 					if gotErr != wantErr {
@@ -105,7 +80,6 @@ func TestExeObjParser(t *testing.T) {
 			})
 		}
 	}
-	os.Remove(target)
 }
 
 func build(goos, builder, path, target string, flags []string) (*exec.Cmd, error) {
@@ -115,14 +89,14 @@ func build(goos, builder, path, target string, flags []string) (*exec.Cmd, error
 	return cmd, cmd.Run()
 }
 
-func approxHash(goos, builder string) func(a, b interface{}) bool {
+func approxHash(format, builder string) func(a, b interface{}) bool {
 	return func(a, b interface{}) bool {
 		as := fmt.Sprint(a)
 		bs := fmt.Sprint(b)
 		if len(as) != len(bs) {
 			return false
 		}
-		if goos == "darwin" && builder == "garble" {
+		if format == "macho" && builder == "garble" {
 			// We can't know more since the hash depends on Go version.
 			return true
 		}
@@ -130,7 +104,7 @@ func approxHash(goos, builder string) func(a, b interface{}) bool {
 	}
 }
 
-func approxImports(goos, builder string) func(a, b interface{}) bool {
+func approxImports(format, builder string) func(a, b interface{}) bool {
 	return func(a, b interface{}) bool {
 		as, ok := a.([]string)
 		if !ok {
@@ -140,7 +114,7 @@ func approxImports(goos, builder string) func(a, b interface{}) bool {
 		if !ok {
 			return false
 		}
-		if goos == "darwin" && builder == "garble" {
+		if format == "macho" && builder == "garble" {
 			// We can't know more since the symbols depend on Go version.
 			return true
 		}
@@ -214,39 +188,39 @@ func (o objSection) String() string {
 }
 
 var want = map[string]common.MapStr{
-	"GOOS=plan9 garble build -literals -tiny": {
+	"garble_plan9": {
 		"plan9": common.MapStr{
 			"go_import_hash": "d41d8cd98f00b204e9800998ecf8427e",
 			"go_stripped":    true,
 			"sections": []objSection{
-				{Name: strPtr("text"), Size: uint64Ptr(0xfcd30), Entropy: float64Ptr(5.864881580649509)},
-				{Name: strPtr("data"), Size: uint64Ptr(0x16d80), Entropy: float64Ptr(4.651998848388147)},
+				{Name: strPtr("text"), Size: uint64Ptr(0xfcd30), Entropy: float64Ptr(5.86)},
+				{Name: strPtr("data"), Size: uint64Ptr(0x16d80), Entropy: float64Ptr(4.65)},
 				{Name: strPtr("syms"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0)},
 				{Name: strPtr("spsz"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0)},
 				{Name: strPtr("pcsz"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0)},
 			},
 		},
 	},
-	"GOOS=windows go build": {
+	"go_pe": {
 		"pe": common.MapStr{
 			"imphash":                  "c7269d59926fa4252270f407e4dab043",
 			"go_import_hash":           "10bddcb4cee42080f76c88d9ff964491",
 			"go_imports_names_entropy": 4.156563879566413,
 			"go_stripped":              false,
 			"sections": []objSection{
-				{Name: strPtr(".text"), Size: uint64Ptr(0x8e400), Entropy: float64Ptr(6.1762021221116195)},
-				{Name: strPtr(".rdata"), Size: uint64Ptr(0x9ea00), Entropy: float64Ptr(5.139459498570865)},
-				{Name: strPtr(".data"), Size: uint64Ptr(0x17a00), Entropy: float64Ptr(4.60076261878884)},
-				{Name: strPtr(".zdebug_abbrev"), Size: uint64Ptr(0x200), Entropy: float64Ptr(4.8292159200679565)},
-				{Name: strPtr(".zdebug_line"), Size: uint64Ptr(0x1cc00), Entropy: float64Ptr(7.992389830575166)},
-				{Name: strPtr(".zdebug_frame"), Size: uint64Ptr(0x5800), Entropy: float64Ptr(7.926764090429505)},
-				{Name: strPtr(".debug_gdb_scripts"), Size: uint64Ptr(0x200), Entropy: float64Ptr(0.8418026665453624)},
-				{Name: strPtr(".zdebug_info"), Size: uint64Ptr(0x32a00), Entropy: float64Ptr(7.996530718084179)},
-				{Name: strPtr(".zdebug_loc"), Size: uint64Ptr(0x1ba00), Entropy: float64Ptr(7.989774523689841)},
-				{Name: strPtr(".zdebug_ranges"), Size: uint64Ptr(0x9600), Entropy: float64Ptr(7.783964713570338)},
-				{Name: strPtr(".idata"), Size: uint64Ptr(0x600), Entropy: float64Ptr(3.61484457240618)},
-				{Name: strPtr(".reloc"), Size: uint64Ptr(0x6a00), Entropy: float64Ptr(5.441393317161353)},
-				{Name: strPtr(".symtab"), Size: uint64Ptr(0x17a00), Entropy: float64Ptr(5.120436252433234)},
+				{Name: strPtr(".text"), Size: uint64Ptr(0x8e400), Entropy: float64Ptr(6.17)},
+				{Name: strPtr(".rdata"), Size: uint64Ptr(0x9ea00), Entropy: float64Ptr(5.13)},
+				{Name: strPtr(".data"), Size: uint64Ptr(0x17a00), Entropy: float64Ptr(4.60)},
+				{Name: strPtr(".zdebug_abbrev"), Size: uint64Ptr(0x200), Entropy: float64Ptr(4.82)},
+				{Name: strPtr(".zdebug_line"), Size: uint64Ptr(0x1cc00), Entropy: float64Ptr(7.99)},
+				{Name: strPtr(".zdebug_frame"), Size: uint64Ptr(0x5800), Entropy: float64Ptr(7.92)},
+				{Name: strPtr(".debug_gdb_scripts"), Size: uint64Ptr(0x200), Entropy: float64Ptr(0.84)},
+				{Name: strPtr(".zdebug_info"), Size: uint64Ptr(0x32a00), Entropy: float64Ptr(7.99)},
+				{Name: strPtr(".zdebug_loc"), Size: uint64Ptr(0x1ba00), Entropy: float64Ptr(7.98)},
+				{Name: strPtr(".zdebug_ranges"), Size: uint64Ptr(0x9600), Entropy: float64Ptr(7.78)},
+				{Name: strPtr(".idata"), Size: uint64Ptr(0x600), Entropy: float64Ptr(3.61)},
+				{Name: strPtr(".reloc"), Size: uint64Ptr(0x6a00), Entropy: float64Ptr(5.44)},
+				{Name: strPtr(".symtab"), Size: uint64Ptr(0x17a00), Entropy: float64Ptr(5.12)},
 			},
 			"import_hash": "c7269d59926fa4252270f407e4dab043",
 			"imports": []string{
@@ -298,7 +272,7 @@ var want = map[string]common.MapStr{
 			},
 		},
 	},
-	"GOOS=windows garble build -literals -tiny": {
+	"garble_pe": {
 		"pe": common.MapStr{
 			"import_hash": "c7269d59926fa4252270f407e4dab043",
 			"imphash":     "c7269d59926fa4252270f407e4dab043",
@@ -348,43 +322,43 @@ var want = map[string]common.MapStr{
 			"go_import_hash":        "d41d8cd98f00b204e9800998ecf8427e",
 			"go_stripped":           true,
 			"sections": []objSection{
-				{Name: strPtr(".text"), Size: uint64Ptr(0x83000), Entropy: float64Ptr(6.1836267499241755)},
-				{Name: strPtr(".rdata"), Size: uint64Ptr(0x97a00), Entropy: float64Ptr(5.103956377519968)},
-				{Name: strPtr(".data"), Size: uint64Ptr(0x17800), Entropy: float64Ptr(4.609734714924862)},
-				{Name: strPtr(".idata"), Size: uint64Ptr(0x600), Entropy: float64Ptr(3.6082349091764896)},
-				{Name: strPtr(".reloc"), Size: uint64Ptr(0x6800), Entropy: float64Ptr(5.428635483932532)},
-				{Name: strPtr(".symtab"), Size: uint64Ptr(0x200), Entropy: float64Ptr(0.020393135236084953)},
+				{Name: strPtr(".text"), Size: uint64Ptr(0x83000), Entropy: float64Ptr(6.18)},
+				{Name: strPtr(".rdata"), Size: uint64Ptr(0x97a00), Entropy: float64Ptr(5.10)},
+				{Name: strPtr(".data"), Size: uint64Ptr(0x17800), Entropy: float64Ptr(4.60)},
+				{Name: strPtr(".idata"), Size: uint64Ptr(0x600), Entropy: float64Ptr(3.60)},
+				{Name: strPtr(".reloc"), Size: uint64Ptr(0x6800), Entropy: float64Ptr(5.42)},
+				{Name: strPtr(".symtab"), Size: uint64Ptr(0x200), Entropy: float64Ptr(0.02)},
 			},
 		},
 	},
-	"GOOS=linux go build": {
+	"go_elf": {
 		"elf": common.MapStr{
 			"go_imports_names_entropy": 4.156563879566413,
 			"go_stripped":              false,
 			"sections": []objSection{
 				{Name: strPtr(""), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0)},
-				{Name: strPtr(".text"), Size: uint64Ptr(0x7ffd6), Entropy: float64Ptr(6.171439471921469)},
-				{Name: strPtr(".rodata"), Size: uint64Ptr(0x35940), Entropy: float64Ptr(4.355815364247477)},
-				{Name: strPtr(".shstrtab"), Size: uint64Ptr(0x17a), Entropy: float64Ptr(4.332514286812164)},
-				{Name: strPtr(".typelink"), Size: uint64Ptr(0x4f0), Entropy: float64Ptr(3.7700952245237285)},
-				{Name: strPtr(".itablink"), Size: uint64Ptr(0x60), Entropy: float64Ptr(2.149135857994785)},
+				{Name: strPtr(".text"), Size: uint64Ptr(0x7ffd6), Entropy: float64Ptr(6.17)},
+				{Name: strPtr(".rodata"), Size: uint64Ptr(0x35940), Entropy: float64Ptr(4.35)},
+				{Name: strPtr(".shstrtab"), Size: uint64Ptr(0x17a), Entropy: float64Ptr(4.33)},
+				{Name: strPtr(".typelink"), Size: uint64Ptr(0x4f0), Entropy: float64Ptr(3.77)},
+				{Name: strPtr(".itablink"), Size: uint64Ptr(0x60), Entropy: float64Ptr(2.14)},
 				{Name: strPtr(".gosymtab"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0)},
-				{Name: strPtr(".gopclntab"), Size: uint64Ptr(0x5a5c8), Entropy: float64Ptr(5.486008546433886)},
-				{Name: strPtr(".go.buildinfo"), Size: uint64Ptr(0x20), Entropy: float64Ptr(3.560820381093429)},
-				{Name: strPtr(".noptrdata"), Size: uint64Ptr(0x10720), Entropy: float64Ptr(5.6078976935228955)},
-				{Name: strPtr(".data"), Size: uint64Ptr(0x7810), Entropy: float64Ptr(1.6046396762408546)},
-				{Name: strPtr(".bss"), Size: uint64Ptr(0x2ef48), Entropy: float64Ptr(7.994394841911349)},
-				{Name: strPtr(".noptrbss"), Size: uint64Ptr(0x5360), Entropy: float64Ptr(7.975914457802507)},
-				{Name: strPtr(".zdebug_abbrev"), Size: uint64Ptr(0x119), Entropy: float64Ptr(7.186678878967747)},
-				{Name: strPtr(".zdebug_line"), Size: uint64Ptr(0x1b90f), Entropy: float64Ptr(7.991063018317068)},
-				{Name: strPtr(".zdebug_frame"), Size: uint64Ptr(0x551b), Entropy: float64Ptr(7.925008509003898)},
-				{Name: strPtr(".debug_gdb_scripts"), Size: uint64Ptr(0x31), Entropy: float64Ptr(4.249529170858451)},
-				{Name: strPtr(".zdebug_info"), Size: uint64Ptr(0x31a2a), Entropy: float64Ptr(7.995374455849462)},
-				{Name: strPtr(".zdebug_loc"), Size: uint64Ptr(0x198d9), Entropy: float64Ptr(7.988800696836627)},
-				{Name: strPtr(".zdebug_ranges"), Size: uint64Ptr(0x8fbc), Entropy: float64Ptr(7.7864300204494885)},
-				{Name: strPtr(".note.go.buildid"), Size: uint64Ptr(0x64), Entropy: float64Ptr(5.3883674395583805)},
-				{Name: strPtr(".symtab"), Size: uint64Ptr(0xc5e8), Entropy: float64Ptr(3.2101068454851)},
-				{Name: strPtr(".strtab"), Size: uint64Ptr(0xb2d6), Entropy: float64Ptr(4.811971045761911)},
+				{Name: strPtr(".gopclntab"), Size: uint64Ptr(0x5a5c8), Entropy: float64Ptr(5.48)},
+				{Name: strPtr(".go.buildinfo"), Size: uint64Ptr(0x20), Entropy: float64Ptr(3.56)},
+				{Name: strPtr(".noptrdata"), Size: uint64Ptr(0x10720), Entropy: float64Ptr(5.60)},
+				{Name: strPtr(".data"), Size: uint64Ptr(0x7810), Entropy: float64Ptr(1.60)},
+				{Name: strPtr(".bss"), Size: uint64Ptr(0x2ef48), Entropy: float64Ptr(7.99)},
+				{Name: strPtr(".noptrbss"), Size: uint64Ptr(0x5360), Entropy: float64Ptr(7.97)},
+				{Name: strPtr(".zdebug_abbrev"), Size: uint64Ptr(0x119), Entropy: float64Ptr(7.18)},
+				{Name: strPtr(".zdebug_line"), Size: uint64Ptr(0x1b90f), Entropy: float64Ptr(7.99)},
+				{Name: strPtr(".zdebug_frame"), Size: uint64Ptr(0x551b), Entropy: float64Ptr(7.92)},
+				{Name: strPtr(".debug_gdb_scripts"), Size: uint64Ptr(0x31), Entropy: float64Ptr(4.24)},
+				{Name: strPtr(".zdebug_info"), Size: uint64Ptr(0x31a2a), Entropy: float64Ptr(7.99)},
+				{Name: strPtr(".zdebug_loc"), Size: uint64Ptr(0x198d9), Entropy: float64Ptr(7.98)},
+				{Name: strPtr(".zdebug_ranges"), Size: uint64Ptr(0x8fbc), Entropy: float64Ptr(7.78)},
+				{Name: strPtr(".note.go.buildid"), Size: uint64Ptr(0x64), Entropy: float64Ptr(5.38)},
+				{Name: strPtr(".symtab"), Size: uint64Ptr(0xc5e8), Entropy: float64Ptr(3.21)},
+				{Name: strPtr(".strtab"), Size: uint64Ptr(0xb2d6), Entropy: float64Ptr(4.81)},
 			},
 			"import_hash":    "d41d8cd98f00b204e9800998ecf8427e",
 			"go_import_hash": "10bddcb4cee42080f76c88d9ff964491",
@@ -394,29 +368,29 @@ var want = map[string]common.MapStr{
 			},
 		},
 	},
-	"GOOS=linux garble build -literals -tiny": {
+	"garble_elf": {
 		"elf": common.MapStr{
 			"import_hash":    "d41d8cd98f00b204e9800998ecf8427e",
 			"go_import_hash": "d41d8cd98f00b204e9800998ecf8427e",
 			"go_stripped":    true,
 			"sections": []objSection{
 				{Name: strPtr(""), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0)},
-				{Name: strPtr(".text"), Size: uint64Ptr(0x74f85), Entropy: float64Ptr(6.180689292506103)},
-				{Name: strPtr(".rodata"), Size: uint64Ptr(0x331e4), Entropy: float64Ptr(4.256094583892582)},
-				{Name: strPtr(".shstrtab"), Size: uint64Ptr(0x94), Entropy: float64Ptr(4.278922006970282)},
-				{Name: strPtr(".typelink"), Size: uint64Ptr(0x4ec), Entropy: float64Ptr(3.6948502589031187)},
-				{Name: strPtr(".itablink"), Size: uint64Ptr(0x60), Entropy: float64Ptr(2.142816541821228)},
+				{Name: strPtr(".text"), Size: uint64Ptr(0x74f85), Entropy: float64Ptr(6.18)},
+				{Name: strPtr(".rodata"), Size: uint64Ptr(0x331e4), Entropy: float64Ptr(4.25)},
+				{Name: strPtr(".shstrtab"), Size: uint64Ptr(0x94), Entropy: float64Ptr(4.27)},
+				{Name: strPtr(".typelink"), Size: uint64Ptr(0x4ec), Entropy: float64Ptr(3.69)},
+				{Name: strPtr(".itablink"), Size: uint64Ptr(0x60), Entropy: float64Ptr(2.14)},
 				{Name: strPtr(".gosymtab"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0)},
-				{Name: strPtr(".gopclntab"), Size: uint64Ptr(0x56370), Entropy: float64Ptr(5.428192633737662)},
-				{Name: strPtr(".go.buildinfo"), Size: uint64Ptr(0x20), Entropy: float64Ptr(3.560820381093429)},
-				{Name: strPtr(".noptrdata"), Size: uint64Ptr(0x10720), Entropy: float64Ptr(5.606503969275871)},
-				{Name: strPtr(".data"), Size: uint64Ptr(0x7570), Entropy: float64Ptr(1.5492706480530087)},
+				{Name: strPtr(".gopclntab"), Size: uint64Ptr(0x56370), Entropy: float64Ptr(5.42)},
+				{Name: strPtr(".go.buildinfo"), Size: uint64Ptr(0x20), Entropy: float64Ptr(3.56)},
+				{Name: strPtr(".noptrdata"), Size: uint64Ptr(0x10720), Entropy: float64Ptr(5.60)},
+				{Name: strPtr(".data"), Size: uint64Ptr(0x7570), Entropy: float64Ptr(1.54)},
 				{Name: strPtr(".bss"), Size: uint64Ptr(0x2ef48), Entropy: float64Ptr(0.0)},
 				{Name: strPtr(".noptrbss"), Size: uint64Ptr(0x5340), Entropy: float64Ptr(0.0)},
 			},
 		},
 	},
-	"GOOS=darwin go build": {
+	"go_macho": {
 		"macho": common.MapStr{
 			"symhash": "d3ccf195b62a9279c3c19af1080497ec",
 			"imports": []string{
@@ -469,26 +443,26 @@ var want = map[string]common.MapStr{
 				"github.com/elastic/beats/v7/auditbeat/module/file_integrity/testdata/b.hash",
 			},
 			"sections": []objSection{
-				{Name: strPtr("__text"), Size: uint64Ptr(0x8be36), Entropy: float64Ptr(6.165891284878783)},
-				{Name: strPtr("__symbol_stub1"), Size: uint64Ptr(0x102), Entropy: float64Ptr(3.6276890098831442)},
-				{Name: strPtr("__rodata"), Size: uint64Ptr(0x38b4f), Entropy: float64Ptr(4.379438168970728)},
-				{Name: strPtr("__typelink"), Size: uint64Ptr(0x550), Entropy: float64Ptr(3.6495169670279197)},
-				{Name: strPtr("__itablink"), Size: uint64Ptr(0x78), Entropy: float64Ptr(2.6320431334452543)},
+				{Name: strPtr("__text"), Size: uint64Ptr(0x8be36), Entropy: float64Ptr(6.16)},
+				{Name: strPtr("__symbol_stub1"), Size: uint64Ptr(0x102), Entropy: float64Ptr(3.62)},
+				{Name: strPtr("__rodata"), Size: uint64Ptr(0x38b4f), Entropy: float64Ptr(4.37)},
+				{Name: strPtr("__typelink"), Size: uint64Ptr(0x550), Entropy: float64Ptr(3.64)},
+				{Name: strPtr("__itablink"), Size: uint64Ptr(0x78), Entropy: float64Ptr(2.63)},
 				{Name: strPtr("__gosymtab"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0)},
-				{Name: strPtr("__gopclntab"), Size: uint64Ptr(0x614a0), Entropy: float64Ptr(5.469825725243185)},
-				{Name: strPtr("__go_buildinfo"), Size: uint64Ptr(0x20), Entropy: float64Ptr(3.7959585933443494)},
+				{Name: strPtr("__gopclntab"), Size: uint64Ptr(0x614a0), Entropy: float64Ptr(5.46)},
+				{Name: strPtr("__go_buildinfo"), Size: uint64Ptr(0x20), Entropy: float64Ptr(3.79)},
 				{Name: strPtr("__nl_symbol_ptr"), Size: uint64Ptr(0x158), Entropy: float64Ptr(0.0)},
-				{Name: strPtr("__noptrdata"), Size: uint64Ptr(0x10780), Entropy: float64Ptr(5.599986219664661)},
-				{Name: strPtr("__data"), Size: uint64Ptr(0x7470), Entropy: float64Ptr(1.743720912770626)},
-				{Name: strPtr("__bss"), Size: uint64Ptr(0x2f068), Entropy: float64Ptr(6.139244424626403)},
-				{Name: strPtr("__noptrbss"), Size: uint64Ptr(0x51c0), Entropy: float64Ptr(5.658961220743402)},
-				{Name: strPtr("__zdebug_abbrev"), Size: uint64Ptr(0x117), Entropy: float64Ptr(7.166065824433164)},
-				{Name: strPtr("__zdebug_line"), Size: uint64Ptr(0x1d615), Entropy: float64Ptr(7.991223121221244)},
-				{Name: strPtr("__zdebug_frame"), Size: uint64Ptr(0x5b82), Entropy: float64Ptr(7.928371655053322)},
-				{Name: strPtr("__debug_gdb_scri"), Size: uint64Ptr(0x31), Entropy: float64Ptr(4.249529170858451)},
-				{Name: strPtr("__zdebug_info"), Size: uint64Ptr(0x33a7b), Entropy: float64Ptr(7.996688904672549)},
-				{Name: strPtr("__zdebug_loc"), Size: uint64Ptr(0x1a57f), Entropy: float64Ptr(7.983862888050245)},
-				{Name: strPtr("__zdebug_ranges"), Size: uint64Ptr(0x8371), Entropy: float64Ptr(7.891741786242217)},
+				{Name: strPtr("__noptrdata"), Size: uint64Ptr(0x10780), Entropy: float64Ptr(5.59)},
+				{Name: strPtr("__data"), Size: uint64Ptr(0x7470), Entropy: float64Ptr(1.74)},
+				{Name: strPtr("__bss"), Size: uint64Ptr(0x2f068), Entropy: float64Ptr(6.13)},
+				{Name: strPtr("__noptrbss"), Size: uint64Ptr(0x51c0), Entropy: float64Ptr(5.65)},
+				{Name: strPtr("__zdebug_abbrev"), Size: uint64Ptr(0x117), Entropy: float64Ptr(7.16)},
+				{Name: strPtr("__zdebug_line"), Size: uint64Ptr(0x1d615), Entropy: float64Ptr(7.99)},
+				{Name: strPtr("__zdebug_frame"), Size: uint64Ptr(0x5b82), Entropy: float64Ptr(7.92)},
+				{Name: strPtr("__debug_gdb_scri"), Size: uint64Ptr(0x31), Entropy: float64Ptr(4.24)},
+				{Name: strPtr("__zdebug_info"), Size: uint64Ptr(0x33a7b), Entropy: float64Ptr(7.99)},
+				{Name: strPtr("__zdebug_loc"), Size: uint64Ptr(0x1a57f), Entropy: float64Ptr(7.98)},
+				{Name: strPtr("__zdebug_ranges"), Size: uint64Ptr(0x8371), Entropy: float64Ptr(7.89)},
 			},
 			"import_hash":              "d3ccf195b62a9279c3c19af1080497ec",
 			"imports_names_entropy":    4.132925542571368,
@@ -497,22 +471,22 @@ var want = map[string]common.MapStr{
 			"go_stripped":              false,
 		},
 	},
-	"GOOS=darwin garble build -literals -tiny": {
+	"garble_macho": {
 		"macho": common.MapStr{
 			"sections": []objSection{
-				{Name: strPtr("__text"), Size: uint64Ptr(0x80e52), Entropy: float64Ptr(6.170434297924308)},
-				{Name: strPtr("__symbol_stub1"), Size: uint64Ptr(0x102), Entropy: float64Ptr(3.5781727974012107)},
-				{Name: strPtr("__rodata"), Size: uint64Ptr(0x367b3), Entropy: float64Ptr(4.266589957262039)},
-				{Name: strPtr("__typelink"), Size: uint64Ptr(0x554), Entropy: float64Ptr(3.72866886425051)},
-				{Name: strPtr("__itablink"), Size: uint64Ptr(0x78), Entropy: float64Ptr(2.6182943321190826)},
+				{Name: strPtr("__text"), Size: uint64Ptr(0x80e52), Entropy: float64Ptr(6.17)},
+				{Name: strPtr("__symbol_stub1"), Size: uint64Ptr(0x102), Entropy: float64Ptr(3.62)},
+				{Name: strPtr("__rodata"), Size: uint64Ptr(0x367b3), Entropy: float64Ptr(4.28)},
+				{Name: strPtr("__typelink"), Size: uint64Ptr(0x554), Entropy: float64Ptr(3.85)},
+				{Name: strPtr("__itablink"), Size: uint64Ptr(0x78), Entropy: float64Ptr(2.61)},
 				{Name: strPtr("__gosymtab"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0)},
-				{Name: strPtr("__gopclntab"), Size: uint64Ptr(0x5cf68), Entropy: float64Ptr(5.416616743010021)},
-				{Name: strPtr("__go_buildinfo"), Size: uint64Ptr(0x20), Entropy: float64Ptr(3.8584585933443494)},
+				{Name: strPtr("__gopclntab"), Size: uint64Ptr(0x5cf68), Entropy: float64Ptr(5.41)},
+				{Name: strPtr("__go_buildinfo"), Size: uint64Ptr(0x20), Entropy: float64Ptr(3.85)},
 				{Name: strPtr("__nl_symbol_ptr"), Size: uint64Ptr(0x158), Entropy: float64Ptr(0.0)},
-				{Name: strPtr("__noptrdata"), Size: uint64Ptr(0x10780), Entropy: float64Ptr(5.599921142740692)},
-				{Name: strPtr("__data"), Size: uint64Ptr(0x71f0), Entropy: float64Ptr(1.7218753759505945)},
-				{Name: strPtr("__bss"), Size: uint64Ptr(0x2f088), Entropy: float64Ptr(6.135077333312854)},
-				{Name: strPtr("__noptrbss"), Size: uint64Ptr(0x51a0), Entropy: float64Ptr(5.558987105806822)},
+				{Name: strPtr("__noptrdata"), Size: uint64Ptr(0x10780), Entropy: float64Ptr(5.59)},
+				{Name: strPtr("__data"), Size: uint64Ptr(0x71f0), Entropy: float64Ptr(1.72)},
+				{Name: strPtr("__bss"), Size: uint64Ptr(0x2f088), Entropy: float64Ptr(6.13)},
+				{Name: strPtr("__noptrbss"), Size: uint64Ptr(0x51a0), Entropy: float64Ptr(5.55)},
 			},
 			"import_hash": "d3ccf195b62a9279c3c19af1080497ec",
 			"imports": []string{
@@ -572,11 +546,11 @@ var want = map[string]common.MapStr{
 			},
 			"symhash":                  "d3ccf195b62a9279c3c19af1080497ec",
 			"go_import_hash":           "ea0346ba1d3c7c7e762864b7abd53399",
-			"go_imports_names_entropy": 4.416263999653068,
+			"go_imports_names_entropy": 4.527763863520965,
 			"go_stripped":              true,
 		},
 	},
-	"GOOS=plan9 go build": {
+	"go_plan9": {
 		"plan9": common.MapStr{
 			"go_import_hash": "10bddcb4cee42080f76c88d9ff964491",
 			"go_imports": []string{
@@ -586,9 +560,9 @@ var want = map[string]common.MapStr{
 			"go_imports_names_entropy": 4.156563879566413,
 			"go_stripped":              false,
 			"sections": []objSection{
-				{Name: strPtr("text"), Size: uint64Ptr(0x110c88), Entropy: float64Ptr(5.879890481716839)},
-				{Name: strPtr("data"), Size: uint64Ptr(0x17000), Entropy: float64Ptr(4.6411984855995065)},
-				{Name: strPtr("syms"), Size: uint64Ptr(0xe9fa), Entropy: float64Ptr(5.0968023490458245)},
+				{Name: strPtr("text"), Size: uint64Ptr(0x110c88), Entropy: float64Ptr(5.87)},
+				{Name: strPtr("data"), Size: uint64Ptr(0x17000), Entropy: float64Ptr(4.64)},
+				{Name: strPtr("syms"), Size: uint64Ptr(0xe9fa), Entropy: float64Ptr(5.09)},
 				{Name: strPtr("spsz"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0)},
 				{Name: strPtr("pcsz"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0)},
 			},

@@ -18,6 +18,7 @@
 package file_integrity
 
 import (
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -91,14 +92,13 @@ func TestScanner(t *testing.T) {
 
 	t.Run("executable", func(t *testing.T) {
 		c := config
+		c.FileParsers = []string{"file.elf.import_hash", "file.macho.import_hash", "file.pe.import_hash"}
 
 		target := filepath.Join(dir, "executable")
-		cmd, err := build("windows", "go", "./testdata", target, nil)
+		err := copyFile(filepath.Join("testdata", "go_pe_executable"), target)
 		if err != nil {
-			t.Errorf("failed to build test executable %s: %v", cmd, err)
-			return
+			t.Fatal(err)
 		}
-		c.FileParsers = []string{"file.elf.import_hash", "file.macho.import_hash", "file.pe.import_hash"}
 		defer os.Remove(target)
 
 		reader, err := NewFileSystemScanner(c, nil)
@@ -194,4 +194,19 @@ func setupTestDir(t *testing.T) string {
 	}
 
 	return dir
+}
+
+func copyFile(old, new string) error {
+	o, err := os.Open(old)
+	if err != nil {
+		return err
+	}
+	defer o.Close()
+	n, err := os.Create(new)
+	if err != nil {
+		return err
+	}
+	defer n.Close()
+	_, err = io.Copy(n, o)
+	return err
 }
