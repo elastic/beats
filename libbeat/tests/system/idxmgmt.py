@@ -66,11 +66,6 @@ class IdxMgmt(unittest.TestCase):
         with pytest.raises(NotFoundError):
             self._client.transport.perform_request('GET', '/_index_template/' + template)
 
-    def assert_legacy_index_template_loaded(self, template):
-        resp = self._client.transport.perform_request('GET', '/_template/' + template)
-        assert template in resp
-        assert "lifecycle" not in resp[template]["settings"]["index"]
-
     def assert_index_template_loaded(self, template):
         resp = self._client.transport.perform_request('GET', '/_index_template/' + template)
         found = False
@@ -85,29 +80,6 @@ class IdxMgmt(unittest.TestCase):
         except NotFoundError:
             assert False
 
-    def assert_ilm_index_template_loaded(self, template, policy, alias):
-        resp = self._client.transport.perform_request('GET', '/_index_template/' + template)
-        found = False
-        for index_template in resp['index_templates']:
-            if index_template['name'] == template:
-                found = True
-                assert index_template['index_template']['template']['settings']["index"]["lifecycle"]["name"] == policy
-                assert index_template['index_template']['template']['settings']["index"]["lifecycle"]["rollover_alias"] == alias
-        assert found
-
-    def assert_component_template_loaded(self, template):
-        resp = self._client.transport.perform_request('GET', '/_component_template/' + template)
-        found = False
-        for index_template in resp['component_templates']:
-            if index_template['name'] == template:
-                found = True
-        assert found
-
-    def assert_ilm_template_loaded(self, template, policy, alias):
-        resp = self._client.transport.perform_request('GET', '/_template/' + template)
-        assert resp[template]["settings"]["index"]["lifecycle"]["name"] == policy
-        assert resp[template]["settings"]["index"]["lifecycle"]["rollover_alias"] == alias
-
     def assert_index_template_index_pattern(self, template, index_pattern):
         resp = self._client.transport.perform_request('GET', '/_index_template/' + template)
         for index_template in resp['index_templates']:
@@ -115,21 +87,6 @@ class IdxMgmt(unittest.TestCase):
                 assert index_pattern == index_template['index_template']['index_patterns']
                 found = True
         assert found
-
-    def assert_alias_not_created(self, alias):
-        resp = self._client.transport.perform_request('GET', '/_alias')
-        for name, entry in resp.items():
-            if alias not in name:
-                continue
-            assert entry["aliases"] == {}, entry["aliases"]
-
-    def assert_alias_created(self, alias, pattern=None):
-        if pattern is None:
-            pattern = self.default_pattern()
-        name = alias + "-" + pattern
-        resp = self._client.transport.perform_request('GET', '/_alias/' + alias)
-        assert name in resp
-        assert resp[name]["aliases"][alias]["is_write_index"] == True
 
     def assert_policy_not_created(self, policy):
         with pytest.raises(NotFoundError):
@@ -149,22 +106,6 @@ class IdxMgmt(unittest.TestCase):
         data = self._client.transport.perform_request('GET', '/' + data_stream + '/_search')
         self.assertGreater(data["hits"]["total"]["value"], 0)
 
-    def assert_docs_written_to_alias(self, alias, pattern=None):
-        # Refresh the indices to guarantee all documents are available
-        # through the _search API.
-        self._client.transport.perform_request('POST', '/_refresh')
-
-        if pattern is None:
-            pattern = self.default_pattern()
-        name = alias + "-" + pattern
-        data = self._client.transport.perform_request('GET', '/' + name + '/_search')
-        self.assertGreater(data["hits"]["total"]["value"], 0)
-
     def default_pattern(self):
         d = datetime.datetime.now().strftime("%Y.%m.%d")
         return d + "-000001"
-
-    def index_for(self, alias, pattern=None):
-        if pattern is None:
-            pattern = self.default_pattern()
-        return "{}-{}".format(alias, pattern)

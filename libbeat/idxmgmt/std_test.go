@@ -360,22 +360,19 @@ func TestIndexManager_Setup(t *testing.T) {
 				"name":                          "test-9.9.9",
 				"pattern":                       "test-9.9.9*",
 				"settings.index.lifecycle.name": "test",
-				"settings.index.lifecycle.rollover_alias": "test-9.9.9",
 			}),
 			alias:  "test-9.9.9",
 			policy: "test",
 		},
 		"template default ilm default with alias and policy changed": {
 			cfg: common.MapStr{
-				"setup.ilm.rollover_alias": "mocktest",
-				"setup.ilm.policy_name":    "policy-keep",
+				"setup.ilm.policy_name": "policy-keep",
 			},
 			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
 				"overwrite":                     "true",
 				"name":                          "mocktest",
 				"pattern":                       "mocktest*",
 				"settings.index.lifecycle.name": "policy-keep",
-				"settings.index.lifecycle.rollover_alias": "mocktest",
 			}),
 			alias:  "mocktest",
 			policy: "policy-keep",
@@ -446,7 +443,6 @@ func TestIndexManager_Setup(t *testing.T) {
 				"name":                          "test-9.9.9",
 				"pattern":                       "test-9.9.9*",
 				"settings.index.lifecycle.name": "test",
-				"settings.index.lifecycle.rollover_alias": "test-9.9.9",
 			}),
 		},
 		"template loadmode disabled ilm loadmode disabled": {

@@ -1187,13 +1187,6 @@ setup.template.settings:
 # cluster that supports ILM; otherwise, it creates daily indices.
 #setup.ilm.enabled: auto
 
-# Set the prefix used in the index lifecycle write alias name. The default alias
-# name is 'winlogbeat-%{[agent.version]}'.
-#setup.ilm.rollover_alias: 'winlogbeat'
-
-# Set the rollover index pattern. The default is "%{now/d}-000001".
-#setup.ilm.pattern: "{now/d}-000001"
-
 # Set the lifecycle policy name. The default policy name is
 # 'beatname'.
 #setup.ilm.policy_name: "mypolicy"
