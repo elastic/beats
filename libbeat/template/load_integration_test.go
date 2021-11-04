@@ -214,6 +214,9 @@ func TestESLoader_Load(t *testing.T) {
 			},
 		} {
 			t.Run(run, func(t *testing.T) {
+				if data.cfg.JSON.Enabled {
+					data.cfg.Name = data.cfg.JSON.Name
+				}
 				setup := newTestSetup(t, data.cfg)
 				setup.mustLoad(data.fields)
 
