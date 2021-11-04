@@ -1,6 +1,7 @@
 import datetime
 import unittest
 import pytest
+import semver
 from elasticsearch import NotFoundError
 
 
@@ -9,6 +10,7 @@ class IdxMgmt(unittest.TestCase):
     def __init__(self, client, index):
         self._client = client
         self._index = index if index != '' and index != '*' else 'mockbeat'
+        self.patterns = [self.default_pattern(), "1", datetime.datetime.now().strftime("%Y.%m.%d")]
 
     def needs_init(self, s):
         return s == '' or s == '*'
@@ -27,8 +29,19 @@ class IdxMgmt(unittest.TestCase):
         if self.needs_init(index):
             index = self._index
 
+        es_version = self.get_es_version()
+        if es_version["major"] <= 8:
+            for pattern in self.patterns:
+                index_with_pattern = index+"-"+pattern
+                try:
+                    self._client.indices.delete(index_with_pattern)
+                    self._client.indices.delete_alias(index, index_with_pattern)
+                except NotFoundError:
+                    continue
+            return
+
         try:
-            self._client.transport.perform_request('DELETE', "/" + index + "*")
+            self._client.transport.perform_request('DELETE', "/" + self._index_name_to_delete(index))
         except NotFoundError:
             pass
 
@@ -37,7 +50,7 @@ class IdxMgmt(unittest.TestCase):
             template = self._index
 
         try:
-            self._client.transport.perform_request('DELETE', "/_index_template/" + template + "*")
+            self._client.transport.perform_request('DELETE', "/_index_template/" + self._index_name_to_delete(template))
         except NotFoundError:
             pass
 
@@ -51,6 +64,17 @@ class IdxMgmt(unittest.TestCase):
                 self._client.transport.perform_request('DELETE', "/_ilm/policy/" + p)
             except NotFoundError:
                 pass
+
+    # from ES 8.0 users should write the full name of the index to delete
+    def _index_name_to_delete(self, index):
+        es_version = self.get_es_version()
+        if es_version["major"] < 8:
+            return index+"*"
+        return index
+
+    def get_es_version(self):
+        es_info = self._client.info()
+        return semver.parse(es_info["version"]["number"])
 
     def assert_index_template_not_loaded(self, template):
         with pytest.raises(NotFoundError):
@@ -134,7 +158,7 @@ class IdxMgmt(unittest.TestCase):
         if pattern is None:
             pattern = self.default_pattern()
         name = alias + "-" + pattern
-        data = self._client.transport.perform_request('GET', '/' + name + '/_search')
+        data = self._client.transport.perform_request('GET', '/' + alias + '/_search')
         self.assertGreater(data["hits"]["total"]["value"], 0)
 
     def default_pattern(self):

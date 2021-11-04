@@ -41,6 +41,12 @@ stages:
     crosscompile:
         make: "make -C auditbeat crosscompile"
         stage: mandatory
+    shipping-to-next-major:
+      mage: >-                 ## Run module integration tests under next major of Elastic stack.
+        STACK_ENVIRONMENT=next-major
+        mage pythonIntegTest
+      withModule: true
+      stage: mandatory
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
