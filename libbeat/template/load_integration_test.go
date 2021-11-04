@@ -105,7 +105,12 @@ func (ts *testSetup) requireTemplateExists(name string) {
 	}
 	exists, err := ts.loader.checkExistsTemplate(name)
 	require.NoError(ts.t, err, "failed to query template status")
-	require.True(ts.t, exists, "template must exist")
+	require.True(ts.t, exists, "template must exist: %s", name)
+}
+
+func (ts *testSetup) cleanupTemplate(name string) {
+	ts.client.Request("DELETE", "/_index_template/"+name, "", nil, nil)
+	ts.requireTemplateDoesNotExist(name)
 }
 
 func (ts *testSetup) requireTemplateDoesNotExist(name string) {
@@ -172,6 +177,7 @@ func TestESLoader_Load(t *testing.T) {
 		}{Enabled: true, Path: path(t, []string{"testdata", "fields.json"}), Name: nameJSON}
 		setup.load(nil)
 		setup.requireTemplateExists(nameJSON)
+		setup.cleanupTemplate(nameJSON)
 	})
 
 	t.Run("load template successful", func(t *testing.T) {
