@@ -10,7 +10,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -30,7 +29,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -43,7 +43,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -63,7 +62,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -76,7 +76,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -96,7 +95,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -109,7 +109,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -129,7 +128,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -142,7 +142,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -162,7 +161,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -175,7 +175,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -195,7 +194,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -208,7 +208,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -228,7 +227,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -241,7 +241,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -261,7 +260,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -274,7 +274,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -294,7 +293,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -307,7 +307,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -327,7 +326,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -340,7 +340,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -360,7 +359,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -373,7 +373,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -393,7 +392,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -406,7 +406,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -426,7 +425,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -439,7 +439,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -459,7 +458,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -472,7 +472,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -492,7 +491,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -505,7 +505,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -525,7 +524,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -538,7 +538,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -558,7 +557,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -571,7 +571,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -591,7 +590,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -604,7 +604,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -624,7 +623,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -637,7 +637,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -657,7 +656,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -670,7 +670,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -690,7 +689,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -703,7 +703,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -723,7 +722,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -736,7 +736,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -756,7 +755,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -769,7 +769,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -789,7 +788,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -802,7 +802,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -822,7 +821,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -835,7 +835,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -855,7 +854,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -868,7 +868,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -888,7 +887,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -901,7 +901,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -921,7 +920,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -934,7 +934,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -954,7 +953,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -967,7 +967,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -987,7 +986,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1000,7 +1000,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1020,7 +1019,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1033,7 +1033,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1053,7 +1052,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1066,7 +1066,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1086,7 +1085,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1099,7 +1099,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1119,7 +1118,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1132,7 +1132,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1152,7 +1151,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1165,7 +1165,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1185,7 +1184,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1198,7 +1198,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1218,7 +1217,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1231,7 +1231,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1251,7 +1250,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1264,7 +1264,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1284,7 +1283,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1297,7 +1297,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1317,7 +1316,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1330,7 +1330,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1350,7 +1349,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1363,7 +1363,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1383,7 +1382,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1396,7 +1396,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1416,7 +1415,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1429,7 +1429,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1449,7 +1448,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1462,7 +1462,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1482,7 +1481,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1495,7 +1495,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1515,7 +1514,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1528,7 +1528,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1548,7 +1547,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1561,7 +1561,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1581,7 +1580,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1594,7 +1594,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1614,7 +1613,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1627,7 +1627,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1647,7 +1646,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1660,7 +1660,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1680,7 +1679,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1693,7 +1693,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1713,7 +1712,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1726,7 +1726,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1746,7 +1745,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1759,7 +1759,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1779,7 +1778,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1792,7 +1792,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1812,7 +1811,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1825,7 +1825,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1845,7 +1844,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1858,7 +1858,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1878,7 +1877,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1891,7 +1891,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1911,7 +1910,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1924,7 +1924,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1944,7 +1943,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:07.000Z",
@@ -1957,7 +1957,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -1977,7 +1976,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -1990,7 +1990,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2010,7 +2009,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2023,7 +2023,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2043,7 +2042,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2056,7 +2056,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2076,7 +2075,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2089,7 +2089,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2109,7 +2108,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2122,7 +2122,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2142,7 +2141,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2155,7 +2155,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2175,7 +2174,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2188,7 +2188,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2208,7 +2207,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2221,7 +2221,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2241,7 +2240,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2254,7 +2254,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2274,7 +2273,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2287,7 +2287,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2307,7 +2306,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2320,7 +2320,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2340,7 +2339,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2353,7 +2353,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2373,7 +2372,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2386,7 +2386,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2406,7 +2405,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2419,7 +2419,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2439,7 +2438,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2452,7 +2452,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2472,7 +2471,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2485,7 +2485,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2505,7 +2504,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2518,7 +2518,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2538,7 +2537,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2551,7 +2551,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2571,7 +2570,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2584,7 +2584,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2604,7 +2603,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2617,7 +2617,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2637,7 +2636,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2650,7 +2650,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2670,7 +2669,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2683,7 +2683,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2703,7 +2702,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2716,7 +2716,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2736,7 +2735,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2749,7 +2749,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2769,7 +2768,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2782,7 +2782,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2802,7 +2801,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2815,7 +2815,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2835,7 +2834,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2848,7 +2848,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2868,7 +2867,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2881,7 +2881,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2901,7 +2900,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2914,7 +2914,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2934,7 +2933,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2947,7 +2947,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -2967,7 +2966,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -2980,7 +2980,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -3000,7 +2999,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -3013,7 +3013,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -3033,7 +3032,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -3046,7 +3046,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -3066,7 +3065,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -3079,7 +3079,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -3099,7 +3098,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -3112,7 +3112,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -3132,7 +3131,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -3145,7 +3145,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -3165,7 +3164,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -3178,7 +3178,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -3198,7 +3197,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -3211,7 +3211,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -3231,7 +3230,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -3244,7 +3244,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -3264,7 +3263,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     },
     {
         "@timestamp": "2020-10-07T15:57:08.000Z",
@@ -3277,7 +3277,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "NONE",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -3297,6 +3296,7 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "NONE"
     }
 ]

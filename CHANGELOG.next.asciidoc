@@ -21,7 +21,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Enable IMDSv2 support for `add_cloud_metadata` processor on AWS. {issue}22101[22101] {pull}28285[28285]
 - Update kubernetes.namespace from keyword to group field and add name, labels, annotations, uuid as its fields {pull}27917[27917]
 - Previously, RE2 and thus Golang had a bug where `(|a)*` matched more characters than `(|a)+`. To stay consistent with PCRE, the bug was fixed. Configurations that rely on the old, buggy behaviour has to be adjusted. See more about Golang bug: https://github.com/golang/go/issues/46123 {pull}27543[27543]
+- Update docker client. {pull}28716[28716]
 - Remove `auto` from the available options of `setup.ilm.enabled` and set the default value to `true`. {pull}28671[28671]
+- add_process_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
+- add_docker_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
 - Use data streams instead of indices for storing events from Beats. {pull}28450[28450]
 
 *Auditbeat*
@@ -32,6 +35,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Auditd dataset: Removes the authentication_success and authentication_failure event.type values for user logins. {issue}19039[19039] {pull}28378[28378]
 - Fix handling of long file names on Windows. {issue}25334[25334] {pull}28517[28517]
 - System/socket dataset: Fix uninstallation of return kprobes. {issue}28608[28608] {pull}28609[28609]
+- Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
 
 *Filebeat*
 
@@ -53,6 +57,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove old `httpjson` config implementation. {pull}28054[28054]
 - Added dataset `threatq` to the `threatintel` module to ingest indicators from ThreatQ {issue}27423[27423]
 - Fail to start Filebat if none between `queue_url`, `bucket_arn` or `non_aws_bucket_name` is set for a configured aws-s3 input {issue}13911[13911] {pull}28666[28666]
+- All modules: Replace usages of deprecated ECS fields `process.ppid` and `log.original` with `process.parent.pid` and `event.original`. {pull}28620[28620]
+- Replace usages of `host.user.*` fields with `user.*` in `cisco`, `microsoft` and `oracle` modules. {pull}28620[28620]
 
 *Heartbeat*
 
@@ -75,12 +81,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated config option perfmon.counters from windows/perfmon metricset. {pull}28282[28282]
 - Remove deprecated fields in Redis module. {issue}11835[11835] {pull}28246[28246]
 - Align fields to Beats naming conventions in GCP module. {issue}27231[27231] {pull}27974[27974]
+- system/process metricset: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
 
 *Packetbeat*
 
 - Redis: fix incorrectly handle with two-words redis command. {issue}14872[14872] {pull}14873[14873]
 - `event.category` no longer contains the value `network_traffic` because this is not a valid ECS event category value. {pull}20556[20556]
 - Remove deprecated TLS fields in favor of tls.server.x509 and tls.client.x509 ECS fields. {pull}28487[28487]
+- HTTP: The field `http.request.method` will maintain its original case. {pull}28620[28620]
 
 *Winlogbeat*
 
@@ -130,6 +138,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handling of float data types within processors. {issue}28279[28279] {pull}28280[28280]
 - Allow `clone3` syscall in seccomp filters. {pull}28117[28117]
 - Remove unnecessary escaping step in dashboard loading, so they can be displayed in Kibana. {pull}28395[28395]
+- Fix AWS proxy_url config from url to string type.  {pull}28725[28725]
+- Fix `fingerprint` processor to give it access to the `@timestamp` field. {issue}28683[28683]
 
 *Auditbeat*
 
@@ -181,6 +191,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix broken seccomp filtering and improve security via `setcap` and `setuid` when running as root on linux in containers. {pull}27878[27878]
 - Log browser `zip_url` download failures as `warn` instead of as `info`. {pull}28440[28440]
 - Properly locate base stream in fleet configs. {pull}28455[28455]
+- Stop logging params values. {pull}28774[28774]
 
 *Journalbeat*
 
@@ -217,6 +228,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - `beat` module respects `basepath` config option. {pull}28162[28162]
 - Fix list_docker.go {pull}28374[28374]
 - Divide RDS metric cpu.total.pct by 100. {pull}28456[28456]
+- Use xpack.enabled on SM modules to write into .monitoring indices when using Metricbeat standalone {pull}28365[28365]
 
 *Packetbeat*
 
@@ -262,6 +274,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update cloud.google.com/go library. {pull}28229[28229]
 - Add additional metadata to the root HTTP endpoint. {pull}28265[28265]
 - Upgrade k8s.io/client-go library. {pull}28228[28228]
+- Upgrade prometheus library. {pull}28716[28716]
+- Name all k8s workqueue. {pull}28085[28085]
+- Update kubernetes scheduler and controllermanager endpoints in elastic-agent-standalone-kubernetes.yaml with secure ports {pull}28675[28675]
+- Add options to configure k8s client qps/burst. {pull}28151[28151]
+- Update to ECS 8.0 fields. {pull}28620[28620]
 
 *Auditbeat*
 
@@ -314,6 +331,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `text/csv` decoder to `httpjson` input {pull}28564[28564]
 - Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
 - Sophos UTM: Support logs containing hostname in syslog header. {pull}28638[28638]
+- Moving Oracle Filebeat module to GA. {pull}28754[28754]
 
 *Heartbeat*
 

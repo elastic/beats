@@ -5,28 +5,25 @@
 package cmd
 
 import (
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/beater"
-
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/beater"
 )
 
 // Name of this beat
 const (
 	Name = "osquerybeat"
-
-	// ecsVersion specifies the version of ECS that this beat is implementing.
-	ecsVersion = "1.12.0"
 )
 
 // withECSVersion is a modifier that adds ecs.version to events.
 var withECSVersion = processing.WithFields(common.MapStr{
 	"ecs": common.MapStr{
-		"version": ecsVersion,
+		"version": ecs.Version,
 	},
 })
 

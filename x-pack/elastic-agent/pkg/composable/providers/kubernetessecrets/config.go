@@ -4,7 +4,10 @@
 
 package kubernetessecrets
 
+import "github.com/elastic/beats/v7/libbeat/common/kubernetes"
+
 // Config for kubernetes provider
 type Config struct {
-	KubeConfig string `config:"kube_config"`
+	KubeConfig        string                       `config:"kube_config"`
+	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
 }
