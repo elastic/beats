@@ -18,7 +18,7 @@
       migration: true
     - name: ppid
       type: alias
-      path: process.ppid
+      path: process.parent.pid
       migration: true
     - name: pgid
       type: alias

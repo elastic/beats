@@ -31,6 +31,7 @@
         "event.end": "2012-04-10T04:39:59.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:58,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:59,11449,1,59324,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:59,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:59.000-02:00",
         "event.timezone": "-02:00",
@@ -43,7 +44,10 @@
         "input.type": "log",
         "labels.captive_portal": true,
         "log.offset": 0,
+<<<<<<< HEAD
         "log.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:58,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:59,11449,1,59324,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:59,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:MaqerLAYuvMg6JWjWKmIMO6QJ6s=",
@@ -130,6 +134,7 @@
         "event.end": "2012-04-10T04:39:58.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:58,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:59,25572,1,54448,53,0,0,0x200000,udp,allow,76,76,0,1,2012/04/10 04:39:58,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:58.000-02:00",
         "event.timezone": "-02:00",
@@ -141,8 +146,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 364,
         "log.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:58,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:59,25572,1,54448,53,0,0,0x200000,udp,allow,76,76,0,1,2012/04/10 04:39:58,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 362,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 76,
         "network.community_id": "1:rmRctS0ZS56Ixay3V5beNERhPNc=",
@@ -229,6 +238,7 @@
         "event.end": "2012-04-10T04:39:58.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:58,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:59,26208,1,53121,53,0,0,0x200000,udp,allow,76,76,0,1,2012/04/10 04:39:58,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:58.000-02:00",
         "event.timezone": "-02:00",
@@ -240,8 +250,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 717,
         "log.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:58,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:59,26208,1,53121,53,0,0,0x200000,udp,allow,76,76,0,1,2012/04/10 04:39:58,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 715,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 76,
         "network.community_id": "1:NmeRH4O3xNBaUjzIOpdGXeAJ/sg=",
@@ -331,6 +345,7 @@
         "event.end": "2012-04-10T04:39:58.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:58,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:59,14931,1,59323,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:58,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:58.000-02:00",
         "event.timezone": "-02:00",
@@ -342,8 +357,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 1070,
         "log.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:58,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:59,14931,1,59323,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:58,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 1068,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:ej/0QPUwuraByxuNxWsOp2ouPuE=",
@@ -433,6 +452,7 @@
         "event.end": "2012-04-10T04:39:58.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:58,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:59,25544,1,59322,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:58,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:58.000-02:00",
         "event.timezone": "-02:00",
@@ -444,8 +464,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 1434,
         "log.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:58,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:59,25544,1,59322,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:58,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 1430,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:XHKuVPA6enGOr0Qng8AJtYTgWAQ=",
@@ -532,6 +556,7 @@
         "event.end": "2012-04-10T04:39:58.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:58,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:59,25308,1,55766,53,0,0,0x200000,udp,allow,74,74,0,1,2012/04/10 04:39:58,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:58.000-02:00",
         "event.timezone": "-02:00",
@@ -543,8 +568,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 1798,
         "log.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:58,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:59,25308,1,55766,53,0,0,0x200000,udp,allow,74,74,0,1,2012/04/10 04:39:58,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 1792,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 74,
         "network.community_id": "1:bkpOCSg/r3P7zn1eVdfrSSHQMn0=",
@@ -631,6 +660,7 @@
         "event.end": "2012-04-10T04:39:58.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:58,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:59,26376,1,55072,53,0,0,0x200000,udp,allow,74,74,0,1,2012/04/10 04:39:58,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:58.000-02:00",
         "event.timezone": "-02:00",
@@ -642,8 +672,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 2151,
         "log.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:58,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:59,26376,1,55072,53,0,0,0x200000,udp,allow,74,74,0,1,2012/04/10 04:39:58,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 2145,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 74,
         "network.community_id": "1:f08UBDqcNW5jC3R+i40XfD1g8l8=",
@@ -733,6 +767,7 @@
         "event.end": "2012-04-10T04:39:28.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,end,1,2012/04/10 04:39:58,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:58,25118,1,59207,80,0,0,0x200000,tcp,allow,1355,549,806,10,2012/04/10 04:39:27,1,private-ip-addresses,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,6,4",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:27.000-02:00",
         "event.timezone": "-02:00",
@@ -744,8 +779,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 2504,
         "log.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,end,1,2012/04/10 04:39:58,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:58,25118,1,59207,80,0,0,0x200000,tcp,allow,1355,549,806,10,2012/04/10 04:39:27,1,private-ip-addresses,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,6,4",
+=======
+        "log.offset": 2498,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 1355,
         "network.community_id": "1:kGyE7FdnFLrk4Cc6NHaD5WeE81A=",
@@ -835,6 +874,7 @@
         "event.end": "2012-04-10T04:39:28.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,end,1,2012/04/10 04:39:58,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:58,26146,1,59209,80,0,0,0x200000,tcp,allow,1355,549,806,10,2012/04/10 04:39:28,0,private-ip-addresses,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,6,4",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:28.000-02:00",
         "event.timezone": "-02:00",
@@ -846,8 +886,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 2889,
         "log.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,end,1,2012/04/10 04:39:58,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:58,26146,1,59209,80,0,0,0x200000,tcp,allow,1355,549,806,10,2012/04/10 04:39:28,0,private-ip-addresses,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,6,4",
+=======
+        "log.offset": 2881,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 1355,
         "network.community_id": "1:pxN/AvFcFozLjRgniFdZmScORYQ=",
@@ -937,6 +981,7 @@
         "event.end": "2012-04-10T04:39:28.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,end,1,2012/04/10 04:39:58,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:58,25272,1,59208,80,0,0,0x200000,tcp,allow,1355,549,806,10,2012/04/10 04:39:27,1,private-ip-addresses,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,6,4",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:27.000-02:00",
         "event.timezone": "-02:00",
@@ -948,8 +993,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 3274,
         "log.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,end,1,2012/04/10 04:39:58,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:58,25272,1,59208,80,0,0,0x200000,tcp,allow,1355,549,806,10,2012/04/10 04:39:27,1,private-ip-addresses,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,6,4",
+=======
+        "log.offset": 3264,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 1355,
         "network.community_id": "1:HmuQtYxq+NpgJ0zVEIpz7zLNOKM=",
@@ -1039,6 +1088,7 @@
         "event.end": "2012-04-10T04:39:58.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:57,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:58,24069,1,59318,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:58,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:58.000-02:00",
         "event.timezone": "-02:00",
@@ -1050,8 +1100,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 3659,
         "log.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:57,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:58,24069,1,59318,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:58,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 3647,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:I7NZAEypUvCTVa5iVWyAsWeEWgY=",
@@ -1141,6 +1195,7 @@
         "event.end": "2012-04-10T04:39:57.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:57,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:58,25848,1,59317,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:57,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:57.000-02:00",
         "event.timezone": "-02:00",
@@ -1152,8 +1207,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 4023,
         "log.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:57,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:58,25848,1,59317,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:57,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 4009,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:GOqfpUTezPkpm6axBI22kY90kU4=",
@@ -1243,6 +1302,7 @@
         "event.end": "2012-04-10T04:39:57.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:57,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:58,25179,1,59316,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:57,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:57.000-02:00",
         "event.timezone": "-02:00",
@@ -1254,8 +1314,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 4387,
         "log.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:57,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:58,25179,1,59316,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:57,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 4371,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:aiB5YppFUGX0pM/1Xtp3qOSFXJw=",
@@ -1345,6 +1409,7 @@
         "event.end": "2012-04-10T04:39:57.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:57,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:58,25112,1,59315,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:57,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:57.000-02:00",
         "event.timezone": "-02:00",
@@ -1356,8 +1421,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 4751,
         "log.original": "Oct 30 09:46:12 1,2012/10/30 09:46:12,01606001116,TRAFFIC,start,1,2012/04/10 04:39:57,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:58,25112,1,59315,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:57,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 4733,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:ghLw4NDj0JmAhH9lVtlhdQpqEQ0=",
@@ -1447,6 +1516,7 @@
         "event.end": "2012-04-10T04:39:27.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,end,1,2012/04/10 04:39:57,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,26161,1,59206,80,0,0,0x200000,tcp,allow,1355,549,806,10,2012/04/10 04:39:27,0,private-ip-addresses,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,6,4",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:27.000-02:00",
         "event.timezone": "-02:00",
@@ -1458,8 +1528,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 5115,
         "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,end,1,2012/04/10 04:39:57,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,26161,1,59206,80,0,0,0x200000,tcp,allow,1355,549,806,10,2012/04/10 04:39:27,0,private-ip-addresses,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,6,4",
+=======
+        "log.offset": 5095,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 1355,
         "network.community_id": "1:SIxV4kkvJlBljF+gLKAaihputgk=",
@@ -1549,6 +1623,7 @@
         "event.end": "2012-04-10T04:39:27.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,end,1,2012/04/10 04:39:57,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,26000,1,59205,80,0,0,0x200000,tcp,allow,1355,549,806,10,2012/04/10 04:39:26,1,private-ip-addresses,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,6,4",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:26.000-02:00",
         "event.timezone": "-02:00",
@@ -1560,8 +1635,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 5500,
         "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,end,1,2012/04/10 04:39:57,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,26000,1,59205,80,0,0,0x200000,tcp,allow,1355,549,806,10,2012/04/10 04:39:26,1,private-ip-addresses,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,6,4",
+=======
+        "log.offset": 5478,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 1355,
         "network.community_id": "1:rpU2pqp4ioYKgiuDEfjZitnLkow=",
@@ -1651,6 +1730,7 @@
         "event.end": "2012-04-10T04:38:26.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,end,1,2012/04/10 04:39:56,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,65184,1,56858,80,0,0,0x200000,tcp,allow,1910,1359,551,21,2012/04/10 04:29:54,512,malware-sites,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,18,3",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:29:54.000-02:00",
         "event.timezone": "-02:00",
@@ -1662,8 +1742,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 5885,
         "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,end,1,2012/04/10 04:39:56,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,65184,1,56858,80,0,0,0x200000,tcp,allow,1910,1359,551,21,2012/04/10 04:29:54,512,malware-sites,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,18,3",
+=======
+        "log.offset": 5861,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 1910,
         "network.community_id": "1:JuKJfhPs1pDZMiwy04nz1EsD7PA=",
@@ -1753,6 +1837,7 @@
         "event.end": "2012-04-10T04:39:56.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:56,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,26522,1,59314,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:56,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:56.000-02:00",
         "event.timezone": "-02:00",
@@ -1764,8 +1849,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 6267,
         "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:56,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,26522,1,59314,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:56,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 6241,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:bZl1JgwyPgfsbSrD+z8I/hpbdc4=",
@@ -1855,6 +1944,7 @@
         "event.end": "2012-04-10T04:39:56.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:56,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,26067,1,59313,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:56,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:56.000-02:00",
         "event.timezone": "-02:00",
@@ -1866,8 +1956,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 6631,
         "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:56,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,26067,1,59313,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:56,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 6603,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:0fIOSC1t62T9ExNKvZaxl657EVc=",
@@ -1954,6 +2048,7 @@
         "event.end": "2012-04-10T04:39:56.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:56,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,26573,1,52139,53,0,0,0x200000,udp,allow,69,69,0,1,2012/04/10 04:39:56,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:56.000-02:00",
         "event.timezone": "-02:00",
@@ -1965,8 +2060,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 6995,
         "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:56,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,26573,1,52139,53,0,0,0x200000,udp,allow,69,69,0,1,2012/04/10 04:39:56,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 6965,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 69,
         "network.community_id": "1:vFErz1cKNExckY21peQ3YAc8Tmk=",
@@ -2053,6 +2152,7 @@
         "event.end": "2012-04-10T04:39:56.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:56,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,26894,1,60592,53,0,0,0x200000,udp,allow,69,69,0,1,2012/04/10 04:39:56,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:56.000-02:00",
         "event.timezone": "-02:00",
@@ -2064,8 +2164,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 7348,
         "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:56,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,26894,1,60592,53,0,0,0x200000,udp,allow,69,69,0,1,2012/04/10 04:39:56,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 7318,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 69,
         "network.community_id": "1:i4rdWjY94ZjxNIBve+QH3YwdL04=",
@@ -2155,6 +2259,7 @@
         "event.end": "2012-04-10T04:39:56.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:56,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,25149,1,59309,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:56,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:56.000-02:00",
         "event.timezone": "-02:00",
@@ -2166,8 +2271,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 7701,
         "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:56,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:57,25149,1,59309,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:56,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 7671,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:mY2EPMYo0US42k87/2uTzjo/rGA=",
@@ -2254,6 +2363,7 @@
         "event.end": "2012-04-10T04:39:26.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,end,1,2012/04/10 04:39:56,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,25258,1,57322,53,0,0,0x200000,udp,allow,164,66,98,2,2012/04/10 04:39:26,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,1",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:26.000-02:00",
         "event.timezone": "-02:00",
@@ -2265,8 +2375,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 8065,
         "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,end,1,2012/04/10 04:39:56,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,25258,1,57322,53,0,0,0x200000,udp,allow,164,66,98,2,2012/04/10 04:39:26,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,1",
+=======
+        "log.offset": 8033,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 164,
         "network.community_id": "1:GjCL7PEzM4X3r7frQ42mW+tNEIQ=",
@@ -2356,6 +2470,7 @@
         "event.end": "2012-04-10T04:39:26.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,end,1,2012/04/10 04:39:56,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,25025,1,59204,80,0,0,0x200000,tcp,allow,1355,549,806,10,2012/04/10 04:39:26,0,private-ip-addresses,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,6,4",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:26.000-02:00",
         "event.timezone": "-02:00",
@@ -2367,8 +2482,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 8418,
         "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,end,1,2012/04/10 04:39:56,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,25025,1,59204,80,0,0,0x200000,tcp,allow,1355,549,806,10,2012/04/10 04:39:26,0,private-ip-addresses,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,6,4",
+=======
+        "log.offset": 8386,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 1355,
         "network.community_id": "1:2+g5+FYJDJku+1Cl3ZbhVCYdAog=",
@@ -2458,6 +2577,7 @@
         "event.end": "2012-04-10T04:39:26.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,end,1,2012/04/10 04:39:56,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,26138,1,59203,80,0,0,0x200000,tcp,allow,1355,549,806,10,2012/04/10 04:39:26,0,private-ip-addresses,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,6,4",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:26.000-02:00",
         "event.timezone": "-02:00",
@@ -2469,8 +2589,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 8803,
         "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,end,1,2012/04/10 04:39:56,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,26138,1,59203,80,0,0,0x200000,tcp,allow,1355,549,806,10,2012/04/10 04:39:26,0,private-ip-addresses,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,6,4",
+=======
+        "log.offset": 8769,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 1355,
         "network.community_id": "1:+ENVPObTW4uBLTLg/Gs7oB3/t0E=",
@@ -2560,6 +2684,7 @@
         "event.end": "2012-04-10T04:39:56.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:55,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,27175,1,59305,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:56,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:56.000-02:00",
         "event.timezone": "-02:00",
@@ -2571,8 +2696,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 9188,
         "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:55,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,27175,1,59305,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:56,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 9152,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:TPp8b1ubMhxmeJWRt0DCagjd7jA=",
@@ -2659,6 +2788,7 @@
         "event.end": "2012-04-10T04:39:55.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:55,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,26261,1,64005,53,0,0,0x200000,udp,allow,69,69,0,1,2012/04/10 04:39:55,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:55.000-02:00",
         "event.timezone": "-02:00",
@@ -2670,8 +2800,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 9552,
         "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:55,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,26261,1,64005,53,0,0,0x200000,udp,allow,69,69,0,1,2012/04/10 04:39:55,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 9514,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 69,
         "network.community_id": "1:9xSXx0HsnsbhZkZ6kFjNeIn1Aw8=",
@@ -2758,6 +2892,7 @@
         "event.end": "2012-04-10T04:39:55.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:55,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,25022,1,58768,53,0,0,0x200000,udp,allow,69,69,0,1,2012/04/10 04:39:55,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:55.000-02:00",
         "event.timezone": "-02:00",
@@ -2769,8 +2904,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 9905,
         "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:55,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,25022,1,58768,53,0,0,0x200000,udp,allow,69,69,0,1,2012/04/10 04:39:55,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 9867,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 69,
         "network.community_id": "1:Ukie7FwgRVUkTl4/hKbkxseBqj0=",
@@ -2860,6 +2999,7 @@
         "event.end": "2012-04-10T04:39:55.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:55,192.168.0.2,98.149.55.63,0.0.0.0,0.0.0.0,rule1,crusher,,skype,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,24027,1,47752,13069,0,0,0x200000,udp,allow,1008,504,504,16,2012/04/10 04:37:50,125,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,8,8",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:37:50.000-02:00",
         "event.timezone": "-02:00",
@@ -2871,8 +3011,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 10258,
         "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:55,192.168.0.2,98.149.55.63,0.0.0.0,0.0.0.0,rule1,crusher,,skype,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,24027,1,47752,13069,0,0,0x200000,udp,allow,1008,504,504,16,2012/04/10 04:37:50,125,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,8,8",
+=======
+        "log.offset": 10220,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "skype",
         "network.bytes": 1008,
         "network.community_id": "1:7+CQvC/DGk2fhUdWzglWwYXYMZE=",
@@ -2962,6 +3106,7 @@
         "event.end": "2012-04-10T04:39:55.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:55,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,26360,1,59304,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:55,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:55.000-02:00",
         "event.timezone": "-02:00",
@@ -2973,8 +3118,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 10624,
         "log.original": "Oct 30 09:46:17 1,2012/10/30 09:46:17,01606001116,TRAFFIC,start,1,2012/04/10 04:39:55,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,26360,1,59304,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:55,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 10586,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:h+XKHvMK2Oz7QQvaJdhsJWE2c9E=",
@@ -3061,6 +3210,7 @@
         "event.end": "2012-04-10T04:39:55.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:55,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,26394,1,54533,53,0,0,0x200000,udp,allow,71,71,0,1,2012/04/10 04:39:55,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:55.000-02:00",
         "event.timezone": "-02:00",
@@ -3072,8 +3222,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 10988,
         "log.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:55,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:56,26394,1,54533,53,0,0,0x200000,udp,allow,71,71,0,1,2012/04/10 04:39:55,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 10948,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 71,
         "network.community_id": "1:x/kpg5sNW5nn7RkabTWPIKsvO58=",
@@ -3163,6 +3317,7 @@
         "event.end": "2012-04-10T04:39:25.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,end,1,2012/04/10 04:39:55,192.168.0.2,212.48.10.58,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:55,24917,1,59201,80,0,0,0x200000,tcp,allow,9967,837,9130,20,2012/04/10 04:39:24,1,search-engines,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,10,10",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:24.000-02:00",
         "event.timezone": "-02:00",
@@ -3174,8 +3329,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 11341,
         "log.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,end,1,2012/04/10 04:39:55,192.168.0.2,212.48.10.58,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:55,24917,1,59201,80,0,0,0x200000,tcp,allow,9967,837,9130,20,2012/04/10 04:39:24,1,search-engines,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,10,10",
+=======
+        "log.offset": 11301,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 9967,
         "network.community_id": "1:GL6UBrkzpi/gQHrUyqxHb1jJeUU=",
@@ -3265,6 +3424,7 @@
         "event.end": "2012-04-10T04:39:55.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:54,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:55,22860,1,59303,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:55,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:55.000-02:00",
         "event.timezone": "-02:00",
@@ -3276,8 +3436,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 11713,
         "log.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:54,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:55,22860,1,59303,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:55,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 11673,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:6kV576B7jMsBLC62npA6Dgi/zMI=",
@@ -3364,6 +3528,7 @@
         "event.end": "2012-04-10T04:39:54.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:54,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:55,14146,1,50876,53,0,0,0x200000,udp,allow,76,76,0,1,2012/04/10 04:39:54,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:54.000-02:00",
         "event.timezone": "-02:00",
@@ -3375,8 +3540,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 12077,
         "log.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:54,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:55,14146,1,50876,53,0,0,0x200000,udp,allow,76,76,0,1,2012/04/10 04:39:54,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 12035,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 76,
         "network.community_id": "1:TuGe54F1FJdU+mNdTf97Ced2UmI=",
@@ -3463,6 +3632,7 @@
         "event.end": "2012-04-10T04:39:54.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:54,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:55,25876,1,57657,53,0,0,0x200000,udp,allow,76,76,0,1,2012/04/10 04:39:54,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:54.000-02:00",
         "event.timezone": "-02:00",
@@ -3474,8 +3644,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 12430,
         "log.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:54,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:55,25876,1,57657,53,0,0,0x200000,udp,allow,76,76,0,1,2012/04/10 04:39:54,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 12388,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 76,
         "network.community_id": "1:1yn57zVSr0UsUwbuL7XvzIWMbpM=",
@@ -3565,6 +3739,7 @@
         "event.end": "2012-04-10T04:39:54.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:54,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:55,24910,1,59302,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:54,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:54.000-02:00",
         "event.timezone": "-02:00",
@@ -3576,8 +3751,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 12783,
         "log.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:54,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:55,24910,1,59302,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:54,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 12741,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:22ouAyA1O0KgUQOEKP20E7gNa2U=",
@@ -3667,6 +3846,7 @@
         "event.end": "2012-04-10T04:39:54.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:54,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:55,26862,1,59301,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:54,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:54.000-02:00",
         "event.timezone": "-02:00",
@@ -3678,8 +3858,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 13147,
         "log.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:54,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:55,26862,1,59301,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:54,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 13103,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:phQpgsVhj3YxNYzeNkqdzDgcMCg=",
@@ -3766,6 +3950,7 @@
         "event.end": "2012-04-10T04:39:54.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:54,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:55,26222,1,64844,53,0,0,0x200000,udp,allow,80,80,0,1,2012/04/10 04:39:54,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:54.000-02:00",
         "event.timezone": "-02:00",
@@ -3777,8 +3962,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 13511,
         "log.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:54,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:55,26222,1,64844,53,0,0,0x200000,udp,allow,80,80,0,1,2012/04/10 04:39:54,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 13465,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 80,
         "network.community_id": "1:SxifLhXvL8EiCuMvSbDcRARZyRw=",
@@ -3865,6 +4054,7 @@
         "event.end": "2012-04-10T04:39:54.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:54,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:55,26329,1,52257,53,0,0,0x200000,udp,allow,80,80,0,1,2012/04/10 04:39:54,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:54.000-02:00",
         "event.timezone": "-02:00",
@@ -3876,8 +4066,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 13864,
         "log.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:54,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:55,26329,1,52257,53,0,0,0x200000,udp,allow,80,80,0,1,2012/04/10 04:39:54,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 13818,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 80,
         "network.community_id": "1:QYDqyZAUrBKpnIVn+epBn1ew/so=",
@@ -3963,6 +4157,7 @@
         "event.end": "2012-04-10T04:39:24.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,end,1,2012/04/10 04:39:54,192.168.0.100,175.16.199.1,0.0.0.0,0.0.0.0,rule1,,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:54,25142,1,38796,53,0,0,0x0,udp,allow,206,95,111,2,2012/04/10 04:39:24,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,1",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:24.000-02:00",
         "event.timezone": "-02:00",
@@ -3973,8 +4168,12 @@
         ],
         "fileset.name": "panos",
         "input.type": "log",
+<<<<<<< HEAD
         "log.offset": 14217,
         "log.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,end,1,2012/04/10 04:39:54,192.168.0.100,8.8.8.8,0.0.0.0,0.0.0.0,rule1,,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:54,25142,1,38796,53,0,0,0x0,udp,allow,206,95,111,2,2012/04/10 04:39:24,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,1",
+=======
+        "log.offset": 14171,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 206,
         "network.community_id": "1:shHCpyazCigToSNjn/e4N7P4biU=",
@@ -4056,6 +4255,7 @@
         "event.end": "2012-04-10T04:39:24.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,end,1,2012/04/10 04:39:54,192.168.0.2,62.211.68.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:54,25095,1,59200,80,0,0,0x200000,tcp,allow,1503,597,906,13,2012/04/10 04:39:23,1,entertainment-and-arts,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,6,7",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:23.000-02:00",
         "event.timezone": "-02:00",
@@ -4067,8 +4267,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 14556,
         "log.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,end,1,2012/04/10 04:39:54,192.168.0.2,62.211.68.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:54,25095,1,59200,80,0,0,0x200000,tcp,allow,1503,597,906,13,2012/04/10 04:39:23,1,entertainment-and-arts,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,6,7",
+=======
+        "log.offset": 14515,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 1503,
         "network.community_id": "1:cDqhuLJdpDu0NsYQNFC3GAMS3GQ=",
@@ -4157,6 +4361,7 @@
         "event.end": "2012-04-10T04:39:24.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,end,1,2012/04/10 04:39:54,192.168.0.100,50.19.102.116,0.0.0.0,0.0.0.0,rule1,,,paloalto-wildfire-cloud,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:54,24787,1,48412,443,0,0,0x0,tcp,allow,5817,804,5013,17,2012/04/10 04:39:24,0,computer-and-internet-security,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,10,7",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:24.000-02:00",
         "event.timezone": "-02:00",
@@ -4167,8 +4372,12 @@
         ],
         "fileset.name": "panos",
         "input.type": "log",
+<<<<<<< HEAD
         "log.offset": 14933,
         "log.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,end,1,2012/04/10 04:39:54,192.168.0.100,50.19.102.116,0.0.0.0,0.0.0.0,rule1,,,paloalto-wildfire-cloud,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:54,24787,1,48412,443,0,0,0x0,tcp,allow,5817,804,5013,17,2012/04/10 04:39:24,0,computer-and-internet-security,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,10,7",
+=======
+        "log.offset": 14892,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "paloalto-wildfire-cloud",
         "network.bytes": 5817,
         "network.community_id": "1:uf1iUYRFFiUYttG2AFf4pcXOdjw=",
@@ -4253,6 +4462,7 @@
         "event.end": "2012-04-10T04:39:24.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,end,1,2012/04/10 04:39:54,192.168.0.2,65.55.223.19,0.0.0.0,0.0.0.0,rule1,crusher,,skype-probe,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:54,25948,1,47752,40026,0,0,0x200000,udp,allow,286,187,99,2,2012/04/10 04:39:24,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,1",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:24.000-02:00",
         "event.timezone": "-02:00",
@@ -4264,8 +4474,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 15331,
         "log.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,end,1,2012/04/10 04:39:54,192.168.0.2,65.55.223.19,0.0.0.0,0.0.0.0,rule1,crusher,,skype-probe,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:54,25948,1,47752,40026,0,0,0x200000,udp,allow,286,187,99,2,2012/04/10 04:39:24,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,1",
+=======
+        "log.offset": 15290,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "skype-probe",
         "network.bytes": 286,
         "network.community_id": "1:XF4dVSWPB46mtqr78f9EFUDEn6I=",
@@ -4355,6 +4569,7 @@
         "event.end": "2012-04-10T04:39:24.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,end,1,2012/04/10 04:39:54,192.168.0.2,65.55.223.24,0.0.0.0,0.0.0.0,rule1,crusher,,skype-probe,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:54,25444,1,47752,40029,0,0,0x200000,udp,allow,978,76,902,2,2012/04/10 04:39:24,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,1",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:24.000-02:00",
         "event.timezone": "-02:00",
@@ -4366,8 +4581,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 15696,
         "log.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,end,1,2012/04/10 04:39:54,192.168.0.2,65.55.223.24,0.0.0.0,0.0.0.0,rule1,crusher,,skype-probe,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:54,25444,1,47752,40029,0,0,0x200000,udp,allow,978,76,902,2,2012/04/10 04:39:24,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,1",
+=======
+        "log.offset": 15655,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "skype-probe",
         "network.bytes": 978,
         "network.community_id": "1:HEEGx0vjlpNA8Pw0s6pBr2v0rpo=",
@@ -4453,6 +4672,7 @@
         "event.end": "2012-04-10T04:39:24.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,end,1,2012/04/10 04:39:54,192.168.0.100,175.16.199.1,0.0.0.0,0.0.0.0,rule1,,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:54,25349,1,52189,53,0,0,0x0,udp,allow,227,86,141,2,2012/04/10 04:39:24,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,1",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:24.000-02:00",
         "event.timezone": "-02:00",
@@ -4463,8 +4683,12 @@
         ],
         "fileset.name": "panos",
         "input.type": "log",
+<<<<<<< HEAD
         "log.offset": 16061,
         "log.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,end,1,2012/04/10 04:39:54,192.168.0.100,8.8.8.8,0.0.0.0,0.0.0.0,rule1,,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:54,25349,1,52189,53,0,0,0x0,udp,allow,227,86,141,2,2012/04/10 04:39:24,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,1",
+=======
+        "log.offset": 16020,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 227,
         "network.community_id": "1:1CvVfwyezBZcR2u+VcrEzfuQK9s=",
@@ -4549,6 +4773,7 @@
         "event.end": "2012-04-10T04:39:54.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:53,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:54,25713,1,59300,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:54,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:54.000-02:00",
         "event.timezone": "-02:00",
@@ -4560,8 +4785,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 16400,
         "log.original": "Oct 30 09:46:22 1,2012/10/30 09:46:22,01606001116,TRAFFIC,start,1,2012/04/10 04:39:53,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:54,25713,1,59300,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:54,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 16364,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:YDMNSbru670DK5EMT3E28WFJPz4=",
@@ -4648,6 +4877,7 @@
         "event.end": "2012-04-10T04:39:53.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:53,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:54,26499,1,54414,53,0,0,0x200000,udp,allow,73,73,0,1,2012/04/10 04:39:53,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:53.000-02:00",
         "event.timezone": "-02:00",
@@ -4659,8 +4889,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 16764,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:53,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:54,26499,1,54414,53,0,0,0x200000,udp,allow,73,73,0,1,2012/04/10 04:39:53,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 16726,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 73,
         "network.community_id": "1:K6PPTb7ohj/4wQV86uCrgAF1mcY=",
@@ -4750,6 +4984,7 @@
         "event.end": "2012-04-10T04:39:53.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:53,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,25437,1,59299,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:53,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:53.000-02:00",
         "event.timezone": "-02:00",
@@ -4761,8 +4996,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 17117,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:53,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,25437,1,59299,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:53,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 17079,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:C9009xCOuCuGvMPT4caMCizoYr0=",
@@ -4849,6 +5088,7 @@
         "event.end": "2012-04-10T04:39:53.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:53,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,24848,1,60399,53,0,0,0x200000,udp,allow,80,80,0,1,2012/04/10 04:39:53,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:53.000-02:00",
         "event.timezone": "-02:00",
@@ -4860,8 +5100,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 17481,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:53,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,24848,1,60399,53,0,0,0x200000,udp,allow,80,80,0,1,2012/04/10 04:39:53,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 17441,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 80,
         "network.community_id": "1:BKNHj3e0QZpWJwLNiG4yqJnbrxk=",
@@ -4948,6 +5192,7 @@
         "event.end": "2012-04-10T04:39:23.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,end,1,2012/04/10 04:39:53,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,24924,1,59626,53,0,0,0x200000,udp,allow,482,166,316,4,2012/04/10 04:39:22,1,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,2,2",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:22.000-02:00",
         "event.timezone": "-02:00",
@@ -4959,8 +5204,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 17834,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,end,1,2012/04/10 04:39:53,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,24924,1,59626,53,0,0,0x200000,udp,allow,482,166,316,4,2012/04/10 04:39:22,1,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,2,2",
+=======
+        "log.offset": 17794,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 482,
         "network.community_id": "1:RQ3lmwvSayYq24fFbjpDDqDG+Dg=",
@@ -5047,6 +5296,7 @@
         "event.end": "2012-04-10T04:39:23.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,end,1,2012/04/10 04:39:53,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,25899,1,51542,53,0,0,0x200000,udp,allow,196,75,121,2,2012/04/10 04:39:23,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,1",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:23.000-02:00",
         "event.timezone": "-02:00",
@@ -5058,8 +5308,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 18189,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,end,1,2012/04/10 04:39:53,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,25899,1,51542,53,0,0,0x200000,udp,allow,196,75,121,2,2012/04/10 04:39:23,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,1",
+=======
+        "log.offset": 18149,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 196,
         "network.community_id": "1:g5ixoTtR3QVz4le7g1L6PZ67CmU=",
@@ -5146,6 +5400,7 @@
         "event.end": "2012-04-10T04:39:23.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,end,1,2012/04/10 04:39:53,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,26066,1,54182,53,0,0,0x200000,udp,allow,244,75,169,2,2012/04/10 04:39:23,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,1",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:23.000-02:00",
         "event.timezone": "-02:00",
@@ -5157,8 +5412,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 18543,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,end,1,2012/04/10 04:39:53,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,26066,1,54182,53,0,0,0x200000,udp,allow,244,75,169,2,2012/04/10 04:39:23,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,1",
+=======
+        "log.offset": 18503,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 244,
         "network.community_id": "1:z0genl/l2JGIJaNTqaSLGCLTlo4=",
@@ -5245,6 +5504,7 @@
         "event.end": "2012-04-10T04:39:23.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,end,1,2012/04/10 04:39:53,192.168.0.2,62.211.68.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,24908,1,59199,80,0,0,0x200000,tcp,allow,1548,594,954,13,2012/04/10 04:39:23,0,business-and-economy,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,6,7",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:23.000-02:00",
         "event.timezone": "-02:00",
@@ -5256,8 +5516,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 18897,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,end,1,2012/04/10 04:39:53,192.168.0.2,62.211.68.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,24908,1,59199,80,0,0,0x200000,tcp,allow,1548,594,954,13,2012/04/10 04:39:23,0,business-and-economy,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,6,7",
+=======
+        "log.offset": 18857,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 1548,
         "network.community_id": "1:cIfWskY1iVpg8gxVVTX1K8A7+MA=",
@@ -5347,6 +5611,7 @@
         "event.end": "2012-04-10T04:39:23.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,end,1,2012/04/10 04:39:53,192.168.0.2,212.48.10.58,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,25105,1,59198,80,0,0,0x200000,tcp,allow,10135,1005,9130,22,2012/04/10 04:39:21,2,search-engines,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,12,10",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:21.000-02:00",
         "event.timezone": "-02:00",
@@ -5358,8 +5623,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 19272,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,end,1,2012/04/10 04:39:53,192.168.0.2,212.48.10.58,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,25105,1,59198,80,0,0,0x200000,tcp,allow,10135,1005,9130,22,2012/04/10 04:39:21,2,search-engines,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,12,10",
+=======
+        "log.offset": 19232,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 10135,
         "network.community_id": "1:UPWyVvocuULCMUmJlrn6XBha7JE=",
@@ -5449,6 +5718,7 @@
         "event.end": "2012-04-10T04:38:23.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,end,1,2012/04/10 04:39:53,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,11964,1,56856,80,0,0,0x200000,tcp,allow,1918,1363,555,21,2012/04/10 04:29:51,512,malware-sites,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,18,3",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:29:51.000-02:00",
         "event.timezone": "-02:00",
@@ -5460,8 +5730,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 19646,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,end,1,2012/04/10 04:39:53,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,11964,1,56856,80,0,0,0x200000,tcp,allow,1918,1363,555,21,2012/04/10 04:29:51,512,malware-sites,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,18,3",
+=======
+        "log.offset": 19606,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 1918,
         "network.community_id": "1:jFqkUdvAr9S/yeKacw5dlE+0/o0=",
@@ -5548,6 +5822,7 @@
         "event.end": "2012-04-10T04:39:53.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:53,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,26502,1,52489,53,0,0,0x200000,udp,allow,80,80,0,1,2012/04/10 04:39:53,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:53.000-02:00",
         "event.timezone": "-02:00",
@@ -5559,8 +5834,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 20028,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:53,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,26502,1,52489,53,0,0,0x200000,udp,allow,80,80,0,1,2012/04/10 04:39:53,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 19986,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 80,
         "network.community_id": "1:dQTHsEW3omlFoTmdZu1fchcTb9c=",
@@ -5650,6 +5929,7 @@
         "event.end": "2012-04-10T04:39:53.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:52,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,26338,1,59298,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:53,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:53.000-02:00",
         "event.timezone": "-02:00",
@@ -5661,8 +5941,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 20381,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:52,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,26338,1,59298,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:53,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 20339,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:BG6Rk6e+H9jRcZHXqRPFG4iA3uU=",
@@ -5749,6 +6033,7 @@
         "event.end": "2012-04-10T04:39:52.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:52,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,24919,1,60185,53,0,0,0x200000,udp,allow,76,76,0,1,2012/04/10 04:39:52,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:52.000-02:00",
         "event.timezone": "-02:00",
@@ -5760,8 +6045,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 20745,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:52,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,24919,1,60185,53,0,0,0x200000,udp,allow,76,76,0,1,2012/04/10 04:39:52,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 20701,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 76,
         "network.community_id": "1:eLVg5C7+4Gz+x6GBj4MlJHk/vyk=",
@@ -5848,6 +6137,7 @@
         "event.end": "2012-04-10T04:39:52.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:52,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,26731,1,51817,53,0,0,0x200000,udp,allow,76,76,0,1,2012/04/10 04:39:52,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:52.000-02:00",
         "event.timezone": "-02:00",
@@ -5859,8 +6149,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 21098,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:52,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,26731,1,51817,53,0,0,0x200000,udp,allow,76,76,0,1,2012/04/10 04:39:52,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 21054,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 76,
         "network.community_id": "1:2v1FAVArMu9Fw0rZTZH/beAYGjs=",
@@ -5950,6 +6244,7 @@
         "event.end": "2012-04-10T04:39:52.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:52,192.168.0.2,65.55.223.31,0.0.0.0,0.0.0.0,rule1,crusher,,skype-probe,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,26504,1,47752,40043,0,0,0x200000,udp,allow,186,186,0,1,2012/04/10 04:39:52,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:52.000-02:00",
         "event.timezone": "-02:00",
@@ -5961,8 +6256,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 21451,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:52,192.168.0.2,65.55.223.31,0.0.0.0,0.0.0.0,rule1,crusher,,skype-probe,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,26504,1,47752,40043,0,0,0x200000,udp,allow,186,186,0,1,2012/04/10 04:39:52,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 21407,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "skype-probe",
         "network.bytes": 186,
         "network.community_id": "1:2fa34ze5XsRR97Shg/2DWoWt57c=",
@@ -6052,6 +6351,7 @@
         "event.end": "2012-04-10T04:39:52.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:52,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,25543,1,59297,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:52,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:52.000-02:00",
         "event.timezone": "-02:00",
@@ -6063,8 +6363,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 21817,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:52,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,25543,1,59297,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:52,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 21773,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:Sa+u435/AIAAeEelFduJmiGLOv0=",
@@ -6151,6 +6455,7 @@
         "event.end": "2012-04-10T04:39:52.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:52,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,21948,1,52537,53,0,0,0x200000,udp,allow,82,82,0,1,2012/04/10 04:39:52,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:52.000-02:00",
         "event.timezone": "-02:00",
@@ -6162,8 +6467,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 22181,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:52,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:53,21948,1,52537,53,0,0,0x200000,udp,allow,82,82,0,1,2012/04/10 04:39:52,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 22135,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 82,
         "network.community_id": "1:Uym9anPFBcnC+VaX8dVhkzw/pgg=",
@@ -6250,6 +6559,7 @@
         "event.end": "2012-04-10T04:39:52.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:52,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:52,26279,1,53155,53,0,0,0x200000,udp,allow,82,82,0,1,2012/04/10 04:39:52,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:52.000-02:00",
         "event.timezone": "-02:00",
@@ -6261,8 +6571,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 22534,
         "log.original": "Oct 30 09:46:27 1,2012/10/30 09:46:27,01606001116,TRAFFIC,start,1,2012/04/10 04:39:52,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:52,26279,1,53155,53,0,0,0x200000,udp,allow,82,82,0,1,2012/04/10 04:39:52,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 22488,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 82,
         "network.community_id": "1:BWJpN5ucpEKzwxBd0yrkows1+X4=",
@@ -6349,6 +6663,7 @@
         "event.end": "2012-04-10T04:39:22.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,end,1,2012/04/10 04:39:52,192.168.0.2,62.211.68.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:52,24894,1,59197,80,0,0,0x200000,tcp,allow,1487,581,906,13,2012/04/10 04:39:21,1,entertainment-and-arts,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,6,7",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:21.000-02:00",
         "event.timezone": "-02:00",
@@ -6360,8 +6675,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 22887,
         "log.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,end,1,2012/04/10 04:39:52,192.168.0.2,62.211.68.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:52,24894,1,59197,80,0,0,0x200000,tcp,allow,1487,581,906,13,2012/04/10 04:39:21,1,entertainment-and-arts,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,6,7",
+=======
+        "log.offset": 22841,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 1487,
         "network.community_id": "1:k2B753fAG7GMJoQhAbMrDsOfDxA=",
@@ -6448,6 +6767,7 @@
         "event.end": "2012-04-10T04:39:22.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,end,1,2012/04/10 04:39:52,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:52,24985,1,56995,53,0,0,0x200000,udp,allow,251,88,163,2,2012/04/10 04:39:22,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,1",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:22.000-02:00",
         "event.timezone": "-02:00",
@@ -6459,8 +6779,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 23264,
         "log.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,end,1,2012/04/10 04:39:52,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:52,24985,1,56995,53,0,0,0x200000,udp,allow,251,88,163,2,2012/04/10 04:39:22,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,1",
+=======
+        "log.offset": 23218,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 251,
         "network.community_id": "1:PkU1rpfXiwvVRig4MJMcDvEUEas=",
@@ -6547,6 +6871,7 @@
         "event.end": "2012-04-10T04:39:51.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:51,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:52,25380,1,59069,53,0,0,0x200000,udp,allow,76,76,0,1,2012/04/10 04:39:51,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:51.000-02:00",
         "event.timezone": "-02:00",
@@ -6558,8 +6883,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 23618,
         "log.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:51,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:52,25380,1,59069,53,0,0,0x200000,udp,allow,76,76,0,1,2012/04/10 04:39:51,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 23572,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 76,
         "network.community_id": "1:BYZjFq0Mi2hPewpUDaO1jY2UNnA=",
@@ -6646,6 +6975,7 @@
         "event.end": "2012-04-10T04:39:51.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:51,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:52,24994,1,55697,53,0,0,0x200000,udp,allow,76,76,0,1,2012/04/10 04:39:51,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:51.000-02:00",
         "event.timezone": "-02:00",
@@ -6657,8 +6987,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 23971,
         "log.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:51,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:52,24994,1,55697,53,0,0,0x200000,udp,allow,76,76,0,1,2012/04/10 04:39:51,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 23925,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 76,
         "network.community_id": "1:l0WoNEsuwN4ml47IyB3IhM2NX6A=",
@@ -6748,6 +7082,7 @@
         "event.end": "2012-04-10T04:39:51.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:51,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:52,25451,1,59295,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:51,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:51.000-02:00",
         "event.timezone": "-02:00",
@@ -6759,8 +7094,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 24324,
         "log.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:51,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:52,25451,1,59295,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:51,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 24278,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:AEtFqIuwxZ9TQ3w9m74nOrboCXE=",
@@ -6847,6 +7186,7 @@
         "event.end": "2012-04-10T04:39:21.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,end,1,2012/04/10 04:39:51,192.168.0.2,62.211.68.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:51,24866,1,59196,80,0,0,0x200000,tcp,allow,1500,578,922,13,2012/04/10 04:39:20,1,business-and-economy,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,6,7",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:20.000-02:00",
         "event.timezone": "-02:00",
@@ -6858,8 +7198,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 24688,
         "log.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,end,1,2012/04/10 04:39:51,192.168.0.2,62.211.68.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:51,24866,1,59196,80,0,0,0x200000,tcp,allow,1500,578,922,13,2012/04/10 04:39:20,1,business-and-economy,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,6,7",
+=======
+        "log.offset": 24640,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 1500,
         "network.community_id": "1:t42FnU6e46qlRX0ij7ufkKPs3Co=",
@@ -6949,6 +7293,7 @@
         "event.end": "2012-04-10T04:39:51.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:50,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:51,26414,1,59291,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:51,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:51.000-02:00",
         "event.timezone": "-02:00",
@@ -6960,8 +7305,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 25063,
         "log.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:50,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:51,26414,1,59291,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:51,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 25015,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:AuQEAPptnfXLW8oL/ac3CM4Gnnw=",
@@ -7048,6 +7397,7 @@
         "event.end": "2012-04-10T04:39:50.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:50,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:51,26131,1,52858,53,0,0,0x200000,udp,allow,77,77,0,1,2012/04/10 04:39:50,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:50.000-02:00",
         "event.timezone": "-02:00",
@@ -7059,8 +7409,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 25427,
         "log.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:50,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:51,26131,1,52858,53,0,0,0x200000,udp,allow,77,77,0,1,2012/04/10 04:39:50,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 25377,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 77,
         "network.community_id": "1:ZVsgbE2ux52iF80QIxJN36vdI1M=",
@@ -7147,6 +7501,7 @@
         "event.end": "2012-04-10T04:39:50.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:50,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:51,26555,1,61383,53,0,0,0x200000,udp,allow,77,77,0,1,2012/04/10 04:39:50,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:50.000-02:00",
         "event.timezone": "-02:00",
@@ -7158,8 +7513,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 25780,
         "log.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:50,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:51,26555,1,61383,53,0,0,0x200000,udp,allow,77,77,0,1,2012/04/10 04:39:50,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 25730,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 77,
         "network.community_id": "1:p68po3QtexuC2kor01hJgMDKiPM=",
@@ -7249,6 +7608,7 @@
         "event.end": "2012-04-10T04:39:50.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:50,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,15099,1,59290,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:50,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:50.000-02:00",
         "event.timezone": "-02:00",
@@ -7260,8 +7620,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 26133,
         "log.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:50,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,15099,1,59290,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:50,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 26083,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:2UbFMV1DsXMB0b/AUotNCCsHm0s=",
@@ -7348,6 +7712,7 @@
         "event.end": "2012-04-10T04:39:20.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,end,1,2012/04/10 04:39:50,192.168.0.2,8.5.1.1,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,24980,1,59195,80,0,0,0x200000,tcp,allow,28096,1310,26786,39,2012/04/10 04:39:20,0,not-resolved,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,17,22",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:20.000-02:00",
         "event.timezone": "-02:00",
@@ -7359,8 +7724,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 26497,
         "log.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,end,1,2012/04/10 04:39:50,192.168.0.2,8.5.1.1,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,24980,1,59195,80,0,0,0x200000,tcp,allow,28096,1310,26786,39,2012/04/10 04:39:20,0,not-resolved,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,17,22",
+=======
+        "log.offset": 26445,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 28096,
         "network.community_id": "1:J6pba/4Qby485gtIOBCJnQ0T04E=",
@@ -7447,6 +7816,7 @@
         "event.end": "2012-04-10T04:39:50.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:50,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,26215,1,49812,53,0,0,0x200000,udp,allow,83,83,0,1,2012/04/10 04:39:50,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:50.000-02:00",
         "event.timezone": "-02:00",
@@ -7458,8 +7828,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 26873,
         "log.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:50,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,26215,1,49812,53,0,0,0x200000,udp,allow,83,83,0,1,2012/04/10 04:39:50,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 26821,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 83,
         "network.community_id": "1:iSTXT01g3/K5eC8sEHIzTaFShsA=",
@@ -7546,6 +7920,7 @@
         "event.end": "2012-04-10T04:39:50.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:50,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,25881,1,50185,53,0,0,0x200000,udp,allow,83,83,0,1,2012/04/10 04:39:50,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:50.000-02:00",
         "event.timezone": "-02:00",
@@ -7557,8 +7932,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 27226,
         "log.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:50,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,25881,1,50185,53,0,0,0x200000,udp,allow,83,83,0,1,2012/04/10 04:39:50,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 27174,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 83,
         "network.community_id": "1:3UaggcKnXvkcjpVHqbTU3mCMT5E=",
@@ -7648,6 +8027,7 @@
         "event.end": "2012-04-10T04:39:50.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:50,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,24955,1,59286,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:50,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:50.000-02:00",
         "event.timezone": "-02:00",
@@ -7659,8 +8039,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 27579,
         "log.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,start,1,2012/04/10 04:39:50,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,24955,1,59286,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:50,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 27527,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:M8DHGZjrHyuCRpC9MNNfDUke5g4=",
@@ -7740,6 +8124,7 @@
         "event.end": "2012-04-10T04:39:20.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,end,1,2012/04/10 04:39:50,192.168.0.2,192.168.0.1,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,24961,1,52531,53,0,0,0x200000,udp,allow,244,75,169,2,2012/04/10 04:39:20,0,any,0,0,0x0,192.168.0.0-192.168.255.255,192.168.0.0-192.168.255.255,0,1,1",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:20.000-02:00",
         "event.timezone": "-02:00",
@@ -7751,8 +8136,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 27943,
         "log.original": "Oct 30 09:46:32 1,2012/10/30 09:46:32,01606001116,TRAFFIC,end,1,2012/04/10 04:39:50,192.168.0.2,192.168.0.1,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,24961,1,52531,53,0,0,0x200000,udp,allow,244,75,169,2,2012/04/10 04:39:20,0,any,0,0,0x0,192.168.0.0-192.168.255.255,192.168.0.0-192.168.255.255,0,1,1",
+=======
+        "log.offset": 27889,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 244,
         "network.community_id": "1:aqHtUqeIwO72eo1M5ATE45cIze8=",
@@ -7842,6 +8231,7 @@
         "event.end": "2012-04-10T04:39:20.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,end,1,2012/04/10 04:39:50,192.168.0.2,212.48.10.58,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,24226,1,59194,80,0,0,0x200000,tcp,allow,10097,1033,9064,21,2012/04/10 04:39:17,3,search-engines,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,12,9",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:17.000-02:00",
         "event.timezone": "-02:00",
@@ -7853,8 +8243,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 28310,
         "log.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,end,1,2012/04/10 04:39:50,192.168.0.2,212.48.10.58,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,24226,1,59194,80,0,0,0x200000,tcp,allow,10097,1033,9064,21,2012/04/10 04:39:17,3,search-engines,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,12,9",
+=======
+        "log.offset": 28256,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 10097,
         "network.community_id": "1:ZM81iQMHQAIwuZHdw5tm5lXF25A=",
@@ -7944,6 +8338,7 @@
         "event.end": "2012-04-10T04:39:20.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,end,1,2012/04/10 04:39:50,192.168.0.2,212.48.10.58,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,25129,1,59192,80,0,0,0x200000,tcp,allow,10105,981,9124,22,2012/04/10 04:39:13,7,search-engines,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,12,10",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:13.000-02:00",
         "event.timezone": "-02:00",
@@ -7955,8 +8350,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 28683,
         "log.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,end,1,2012/04/10 04:39:50,192.168.0.2,212.48.10.58,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,25129,1,59192,80,0,0,0x200000,tcp,allow,10105,981,9124,22,2012/04/10 04:39:13,7,search-engines,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,12,10",
+=======
+        "log.offset": 28629,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 10105,
         "network.community_id": "1:yYl3JBOjYyGDcmf0pDc+hxky9gU=",
@@ -8036,6 +8435,7 @@
         "event.end": "2012-04-10T04:39:20.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,end,1,2012/04/10 04:39:50,192.168.0.2,192.168.0.1,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,25194,1,56463,53,0,0,0x200000,udp,allow,214,77,137,2,2012/04/10 04:39:20,0,any,0,0,0x0,192.168.0.0-192.168.255.255,192.168.0.0-192.168.255.255,0,1,1",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:20.000-02:00",
         "event.timezone": "-02:00",
@@ -8047,8 +8447,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 29056,
         "log.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,end,1,2012/04/10 04:39:50,192.168.0.2,192.168.0.1,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,25194,1,56463,53,0,0,0x200000,udp,allow,214,77,137,2,2012/04/10 04:39:20,0,any,0,0,0x0,192.168.0.0-192.168.255.255,192.168.0.0-192.168.255.255,0,1,1",
+=======
+        "log.offset": 29002,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 214,
         "network.community_id": "1:VW3f2r1OUrbsOCF06MDfY/o+epU=",
@@ -8128,6 +8532,7 @@
         "event.end": "2012-04-10T04:39:20.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,end,1,2012/04/10 04:39:50,192.168.0.2,192.168.0.1,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,26257,1,55849,53,0,0,0x200000,udp,allow,170,77,93,2,2012/04/10 04:39:20,0,any,0,0,0x0,192.168.0.0-192.168.255.255,192.168.0.0-192.168.255.255,0,1,1",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:20.000-02:00",
         "event.timezone": "-02:00",
@@ -8139,8 +8544,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 29423,
         "log.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,end,1,2012/04/10 04:39:50,192.168.0.2,192.168.0.1,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,26257,1,55849,53,0,0,0x200000,udp,allow,170,77,93,2,2012/04/10 04:39:20,0,any,0,0,0x0,192.168.0.0-192.168.255.255,192.168.0.0-192.168.255.255,0,1,1",
+=======
+        "log.offset": 29369,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 170,
         "network.community_id": "1:yvOxIP48drmX6OmaQqFTRaGanko=",
@@ -8230,6 +8639,7 @@
         "event.end": "2012-04-10T04:39:49.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:49,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,24561,1,59282,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:49,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:49.000-02:00",
         "event.timezone": "-02:00",
@@ -8241,8 +8651,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 29789,
         "log.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:49,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,24561,1,59282,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:49,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 29735,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:Vfi4CxQayypb3DoxclNfeNjXdjo=",
@@ -8329,6 +8743,7 @@
         "event.end": "2012-04-10T04:39:49.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:49,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,26150,1,57846,53,0,0,0x200000,udp,allow,71,71,0,1,2012/04/10 04:39:49,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:49.000-02:00",
         "event.timezone": "-02:00",
@@ -8340,8 +8755,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 30153,
         "log.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:49,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,26150,1,57846,53,0,0,0x200000,udp,allow,71,71,0,1,2012/04/10 04:39:49,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 30097,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 71,
         "network.community_id": "1:cWkoifFGPLq+ZcxaNzzYym9H7jI=",
@@ -8428,6 +8847,7 @@
         "event.end": "2012-04-10T04:39:49.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:49,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,25676,1,51008,53,0,0,0x200000,udp,allow,71,71,0,1,2012/04/10 04:39:49,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:49.000-02:00",
         "event.timezone": "-02:00",
@@ -8439,8 +8859,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 30506,
         "log.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:49,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,25676,1,51008,53,0,0,0x200000,udp,allow,71,71,0,1,2012/04/10 04:39:49,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 30450,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 71,
         "network.community_id": "1:SicjKSp4oQCovx4rjFSg+IThGYA=",
@@ -8530,6 +8954,7 @@
         "event.end": "2012-04-10T04:39:49.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:49,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,25306,1,59281,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:49,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:49.000-02:00",
         "event.timezone": "-02:00",
@@ -8541,8 +8966,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 30859,
         "log.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:49,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,25306,1,59281,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:49,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 30803,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:/tG+YfZ8qFKrUDfQ7EThCBXci9Y=",
@@ -8629,6 +9058,7 @@
         "event.end": "2012-04-10T04:39:49.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:49,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,26411,1,55252,53,0,0,0x200000,udp,allow,80,80,0,1,2012/04/10 04:39:49,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:49.000-02:00",
         "event.timezone": "-02:00",
@@ -8640,8 +9070,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 31223,
         "log.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:49,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,26411,1,55252,53,0,0,0x200000,udp,allow,80,80,0,1,2012/04/10 04:39:49,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 31165,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 80,
         "network.community_id": "1:cp0HVI5MHMB+G4/hIuKGoX1WWac=",
@@ -8721,6 +9155,7 @@
         "event.end": "2012-04-10T04:39:19.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,end,1,2012/04/10 04:39:49,192.168.0.2,192.168.0.1,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,24844,1,56995,53,0,0,0x200000,udp,allow,176,176,0,2,2012/04/10 04:39:18,1,any,0,0,0x0,192.168.0.0-192.168.255.255,192.168.0.0-192.168.255.255,0,2,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:18.000-02:00",
         "event.timezone": "-02:00",
@@ -8732,8 +9167,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 31576,
         "log.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,end,1,2012/04/10 04:39:49,192.168.0.2,192.168.0.1,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:50,24844,1,56995,53,0,0,0x200000,udp,allow,176,176,0,2,2012/04/10 04:39:18,1,any,0,0,0x0,192.168.0.0-192.168.255.255,192.168.0.0-192.168.255.255,0,2,0",
+=======
+        "log.offset": 31518,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 176,
         "network.community_id": "1:X6pWtJqspZOnEXaF1nKblB/B3f4=",
@@ -8820,6 +9259,7 @@
         "event.end": "2012-04-10T04:39:49.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:49,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:49,26335,1,60989,53,0,0,0x200000,udp,allow,80,80,0,1,2012/04/10 04:39:49,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:49.000-02:00",
         "event.timezone": "-02:00",
@@ -8831,8 +9271,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 31942,
         "log.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:49,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:49,26335,1,60989,53,0,0,0x200000,udp,allow,80,80,0,1,2012/04/10 04:39:49,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 31884,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 80,
         "network.community_id": "1:bIf8k1Z5+8sNSsr63qo8XknzQDo=",
@@ -8922,6 +9366,7 @@
         "event.end": "2012-04-10T04:39:48.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:48,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:49,26127,1,59280,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:48,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:48.000-02:00",
         "event.timezone": "-02:00",
@@ -8933,8 +9378,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 32295,
         "log.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:48,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:49,26127,1,59280,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:48,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 32237,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:IRI0j5xLyLhwaONpy7gVZdl/Qow=",
@@ -9021,6 +9470,7 @@
         "event.end": "2012-04-10T04:39:48.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:48,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:49,25488,1,53766,53,0,0,0x200000,udp,allow,81,81,0,1,2012/04/10 04:39:48,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:48.000-02:00",
         "event.timezone": "-02:00",
@@ -9032,8 +9482,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 32659,
         "log.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:48,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:49,25488,1,53766,53,0,0,0x200000,udp,allow,81,81,0,1,2012/04/10 04:39:48,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 32599,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 81,
         "network.community_id": "1:VJaNvIgkNIXRerGHtYQC0HUPZh8=",
@@ -9120,6 +9574,7 @@
         "event.end": "2012-04-10T04:39:48.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:48,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:49,25269,1,56032,53,0,0,0x200000,udp,allow,81,81,0,1,2012/04/10 04:39:48,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:48.000-02:00",
         "event.timezone": "-02:00",
@@ -9131,8 +9586,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 33012,
         "log.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,start,1,2012/04/10 04:39:48,192.168.0.2,205.171.2.25,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:49,25269,1,56032,53,0,0,0x200000,udp,allow,81,81,0,1,2012/04/10 04:39:48,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 32952,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 81,
         "network.community_id": "1:fMeKYeqX7mnB812D1vOtHs7BRO4=",
@@ -9219,6 +9678,7 @@
         "event.end": "2012-04-10T04:39:18.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,end,1,2012/04/10 04:39:48,192.168.0.2,62.211.68.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:48,25715,1,59193,80,0,0,0x200000,tcp,allow,1487,581,906,13,2012/04/10 04:39:17,1,entertainment-and-arts,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,6,7",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:17.000-02:00",
         "event.timezone": "-02:00",
@@ -9230,8 +9690,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 33365,
         "log.original": "Oct 30 09:46:37 1,2012/10/30 09:46:37,01606001116,TRAFFIC,end,1,2012/04/10 04:39:48,192.168.0.2,62.211.68.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:48,25715,1,59193,80,0,0,0x200000,tcp,allow,1487,581,906,13,2012/04/10 04:39:17,1,entertainment-and-arts,0,0,0x0,192.168.0.0-192.168.255.255,Italy,0,6,7",
+=======
+        "log.offset": 33305,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 1487,
         "network.community_id": "1:2482BoM8NEujTrlI4lp2vfAxmus=",
@@ -9321,6 +9785,7 @@
         "event.end": "2012-04-10T04:39:48.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:42 1,2012/10/30 09:46:42,01606001116,TRAFFIC,start,1,2012/04/10 04:39:48,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:48,26251,1,59279,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:48,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:48.000-02:00",
         "event.timezone": "-02:00",
@@ -9332,8 +9797,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 33742,
         "log.original": "Oct 30 09:46:42 1,2012/10/30 09:46:42,01606001116,TRAFFIC,start,1,2012/04/10 04:39:48,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:48,26251,1,59279,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:48,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 33682,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:FmIwID3HJ4Q0574SjlhMHApz/Hs=",
@@ -9423,6 +9892,7 @@
         "event.end": "2012-04-10T04:39:48.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:42 1,2012/10/30 09:46:42,01606001116,TRAFFIC,start,1,2012/04/10 04:39:47,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:48,25871,1,59278,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:48,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:48.000-02:00",
         "event.timezone": "-02:00",
@@ -9434,8 +9904,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 34106,
         "log.original": "Oct 30 09:46:42 1,2012/10/30 09:46:42,01606001116,TRAFFIC,start,1,2012/04/10 04:39:47,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:48,25871,1,59278,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:48,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 34044,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:WiUImNtgjkeNDi1Qigg7+Y6pDAg=",
@@ -9525,6 +9999,7 @@
         "event.end": "2012-04-10T04:39:47.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:42 1,2012/10/30 09:46:42,01606001116,TRAFFIC,start,1,2012/04/10 04:39:47,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:48,25945,1,59277,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:47,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:47.000-02:00",
         "event.timezone": "-02:00",
@@ -9536,8 +10011,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 34470,
         "log.original": "Oct 30 09:46:42 1,2012/10/30 09:46:42,01606001116,TRAFFIC,start,1,2012/04/10 04:39:47,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:48,25945,1,59277,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:47,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 34406,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:/+Opb16c1ye6uLeu1/TNC+SGnYs=",
@@ -9617,6 +10096,7 @@
         "event.end": "2012-04-10T04:39:17.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:42 1,2012/10/30 09:46:42,01606001116,TRAFFIC,end,1,2012/04/10 04:39:47,192.168.0.2,192.168.0.1,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:48,25310,1,60026,53,0,0,0x200000,udp,allow,166,166,0,2,2012/04/10 04:39:16,1,any,0,0,0x0,192.168.0.0-192.168.255.255,192.168.0.0-192.168.255.255,0,2,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:16.000-02:00",
         "event.timezone": "-02:00",
@@ -9628,8 +10108,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 34834,
         "log.original": "Oct 30 09:46:42 1,2012/10/30 09:46:42,01606001116,TRAFFIC,end,1,2012/04/10 04:39:47,192.168.0.2,192.168.0.1,0.0.0.0,0.0.0.0,rule1,crusher,,dns,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:48,25310,1,60026,53,0,0,0x200000,udp,allow,166,166,0,2,2012/04/10 04:39:16,1,any,0,0,0x0,192.168.0.0-192.168.255.255,192.168.0.0-192.168.255.255,0,2,0",
+=======
+        "log.offset": 34768,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "dns",
         "network.bytes": 166,
         "network.community_id": "1:h46cgrbWRw4seDnSlCbWxjLRmqs=",
@@ -9719,6 +10203,7 @@
         "event.end": "2012-04-10T04:39:47.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:42 1,2012/10/30 09:46:42,01606001116,TRAFFIC,start,1,2012/04/10 04:39:47,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:47,27111,1,59276,80,0,0,0x200000,tcp,allow,429,351,78,4,2012/04/10 04:39:47,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,3,1",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:47.000-02:00",
         "event.timezone": "-02:00",
@@ -9730,8 +10215,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 35200,
         "log.original": "Oct 30 09:46:42 1,2012/10/30 09:46:42,01606001116,TRAFFIC,start,1,2012/04/10 04:39:47,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:47,27111,1,59276,80,0,0,0x200000,tcp,allow,429,351,78,4,2012/04/10 04:39:47,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,3,1",
+=======
+        "log.offset": 35134,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 429,
         "network.community_id": "1:uslltTePy/m8Gxhk/MgPbZfk6Rg=",
@@ -9821,6 +10310,7 @@
         "event.end": "2012-04-10T04:39:47.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:42 1,2012/10/30 09:46:42,01606001116,TRAFFIC,start,1,2012/04/10 04:39:47,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:47,25398,1,59275,80,0,0,0x200000,tcp,allow,429,351,78,4,2012/04/10 04:39:47,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,3,1",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:47.000-02:00",
         "event.timezone": "-02:00",
@@ -9832,8 +10322,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 35567,
         "log.original": "Oct 30 09:46:42 1,2012/10/30 09:46:42,01606001116,TRAFFIC,start,1,2012/04/10 04:39:47,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:47,25398,1,59275,80,0,0,0x200000,tcp,allow,429,351,78,4,2012/04/10 04:39:47,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,3,1",
+=======
+        "log.offset": 35499,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 429,
         "network.community_id": "1:AVMiOufq2owuhWpcu/TfRJ38tv4=",
@@ -9923,6 +10417,7 @@
         "event.end": "2012-04-10T04:39:46.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
+        "event.original": "Oct 30 09:46:42 1,2012/10/30 09:46:42,01606001116,TRAFFIC,start,1,2012/04/10 04:39:46,192.168.0.2,67.43.156.12,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:47,23898,1,59274,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:46,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
         "event.outcome": "success",
         "event.start": "2012-04-10T04:39:46.000-02:00",
         "event.timezone": "-02:00",
@@ -9934,8 +10429,12 @@
         "fileset.name": "panos",
         "input.type": "log",
         "labels.captive_portal": true,
+<<<<<<< HEAD
         "log.offset": 35934,
         "log.original": "Oct 30 09:46:42 1,2012/10/30 09:46:42,01606001116,TRAFFIC,start,1,2012/04/10 04:39:46,192.168.0.2,204.232.231.46,0.0.0.0,0.0.0.0,rule1,crusher,,web-browsing,vsys1,trust,untrust,ethernet1/2,ethernet1/1,forwardAll,2012/04/10 04:39:47,23898,1,59274,80,0,0,0x200000,tcp,allow,78,78,0,1,2012/04/10 04:39:46,0,any,0,0,0x0,192.168.0.0-192.168.255.255,United States,0,1,0",
+=======
+        "log.offset": 35864,
+>>>>>>> dde7a1f96 (Update to ECS 8.0 (#28620))
         "network.application": "web-browsing",
         "network.bytes": 78,
         "network.community_id": "1:/0xM0KlMLwieymkDApfqS3/WWiQ=",
