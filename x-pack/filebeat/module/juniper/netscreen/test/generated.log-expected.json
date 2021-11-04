@@ -454,9 +454,7 @@
         "rsa.misc.severity": "medium",
         "rsa.misc.vsys": "iusmodi",
         "service.type": "juniper",
-        "source.ip": [
-            "10.170.139.87"
-        ],
+        "source.ip": "10.170.139.87",
         "tags": [
             "forwarded",
             "juniper.netscreen"
@@ -535,9 +533,7 @@
         "rsa.network.dinterface": "eth3657",
         "rsa.network.sinterface": "lo2786",
         "service.type": "juniper",
-        "source.ip": [
-            "10.198.41.214"
-        ],
+        "source.ip": "10.198.41.214",
         "tags": [
             "forwarded",
             "juniper.netscreen"
@@ -671,9 +667,7 @@
         "rsa.misc.vsys": "tanimi",
         "rsa.network.network_port": 2206,
         "service.type": "juniper",
-        "source.ip": [
-            "10.80.237.27"
-        ],
+        "source.ip": "10.80.237.27",
         "source.port": 2883,
         "tags": [
             "forwarded",
@@ -1337,9 +1331,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.154.16.147"
-        ],
+        "destination.ip": "10.154.16.147",
         "destination.port": 6881,
         "event.code": "00625",
         "event.dataset": "juniper.netscreen",
@@ -1361,18 +1353,14 @@
         "rsa.misc.log_session_id": "tationu",
         "rsa.misc.severity": "low",
         "service.type": "juniper",
-        "source.ip": [
-            "10.142.21.251"
-        ],
+        "source.ip": "10.142.21.251",
         "tags": [
             "forwarded",
             "juniper.netscreen"
         ]
     },
     {
-        "destination.ip": [
-            "10.119.53.68"
-        ],
+        "destination.ip": "10.119.53.68",
         "destination.port": 1783,
         "event.code": "00042",
         "event.dataset": "juniper.netscreen",
@@ -1397,9 +1385,7 @@
         "rsa.misc.vsys": "ratvo",
         "rsa.network.interface": "enp0s1170",
         "service.type": "juniper",
-        "source.ip": [
-            "10.105.212.51"
-        ],
+        "source.ip": "10.105.212.51",
         "tags": [
             "forwarded",
             "juniper.netscreen"
@@ -1431,9 +1417,7 @@
         "rsa.network.dinterface": "enp0s90",
         "rsa.network.sinterface": "lo6813",
         "service.type": "juniper",
-        "source.ip": [
-            "10.174.2.175"
-        ],
+        "source.ip": "10.174.2.175",
         "tags": [
             "forwarded",
             "juniper.netscreen"
@@ -1584,9 +1568,7 @@
         "rsa.misc.vsys": "mquisno",
         "rsa.network.interface": "enp0s4987",
         "service.type": "juniper",
-        "source.ip": [
-            "10.57.108.5"
-        ],
+        "source.ip": "10.57.108.5",
         "source.port": 5523,
         "tags": [
             "forwarded",
@@ -1670,9 +1652,7 @@
         "rsa.misc.severity": "high",
         "rsa.misc.vsys": "imipsam",
         "service.type": "juniper",
-        "source.ip": [
-            "10.59.51.171"
-        ],
+        "source.ip": "10.59.51.171",
         "tags": [
             "forwarded",
             "juniper.netscreen"
@@ -1730,9 +1710,7 @@
         "rsa.misc.severity": "high",
         "rsa.misc.vsys": "occaeca",
         "service.type": "juniper",
-        "source.ip": [
-            "10.80.103.229"
-        ],
+        "source.ip": "10.80.103.229",
         "tags": [
             "forwarded",
             "juniper.netscreen"
@@ -1835,9 +1813,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.193.80.21"
-        ],
+        "destination.ip": "10.193.80.21",
         "destination.port": 5657,
         "event.code": "00625",
         "event.dataset": "juniper.netscreen",
@@ -1859,9 +1835,7 @@
         "rsa.misc.log_session_id": "ntoccae",
         "rsa.misc.severity": "low",
         "service.type": "juniper",
-        "source.ip": [
-            "10.51.161.245"
-        ],
+        "source.ip": "10.51.161.245",
         "tags": [
             "forwarded",
             "juniper.netscreen"
@@ -1964,9 +1938,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.134.20.213"
-        ],
+        "destination.ip": "10.134.20.213",
         "event.code": "00040",
         "event.dataset": "juniper.netscreen",
         "event.module": "juniper",
@@ -2301,9 +2273,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.185.50.112"
-        ],
+        "destination.ip": "10.185.50.112",
         "destination.port": 7180,
         "event.code": "00625",
         "event.dataset": "juniper.netscreen",
@@ -2325,9 +2295,7 @@
         "rsa.misc.log_session_id": "oreeu",
         "rsa.misc.severity": "high",
         "service.type": "juniper",
-        "source.ip": [
-            "10.126.150.15"
-        ],
+        "source.ip": "10.126.150.15",
         "tags": [
             "forwarded",
             "juniper.netscreen"
@@ -2382,9 +2350,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.166.144.66"
-        ],
+        "destination.ip": "10.166.144.66",
         "destination.port": 3051,
         "event.code": "00625",
         "event.dataset": "juniper.netscreen",
@@ -2406,9 +2372,7 @@
         "rsa.misc.log_session_id": "gnamal",
         "rsa.misc.severity": "low",
         "service.type": "juniper",
-        "source.ip": [
-            "10.119.181.171"
-        ],
+        "source.ip": "10.119.181.171",
         "tags": [
             "forwarded",
             "juniper.netscreen"
@@ -2462,9 +2426,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.96.218.99"
-        ],
+        "destination.ip": "10.96.218.99",
         "destination.port": 277,
         "event.code": "00021",
         "event.dataset": "juniper.netscreen",
@@ -2491,9 +2453,7 @@
         "rsa.misc.hardware_id": "isquames",
         "rsa.misc.severity": "low",
         "service.type": "juniper",
-        "source.ip": [
-            "10.96.165.147"
-        ],
+        "source.ip": "10.96.165.147",
         "tags": [
             "forwarded",
             "juniper.netscreen"
@@ -2501,9 +2461,7 @@
         "user.name": "utla"
     },
     {
-        "destination.ip": [
-            "10.230.29.67"
-        ],
+        "destination.ip": "10.230.29.67",
         "destination.port": 7478,
         "event.code": "00021",
         "event.dataset": "juniper.netscreen",
@@ -2530,9 +2488,7 @@
         "rsa.misc.hardware_id": "ratvolu",
         "rsa.misc.severity": "medium",
         "service.type": "juniper",
-        "source.ip": [
-            "10.201.72.59"
-        ],
+        "source.ip": "10.201.72.59",
         "tags": [
             "forwarded",
             "juniper.netscreen"

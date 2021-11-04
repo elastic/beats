@@ -8,7 +8,6 @@
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 0,
-        "log.original": "Connection Opened",
         "observer.ingress.interface.name": "WAN dst=89.160.20.156:50000:WAN proto=tcp/50000",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
@@ -22,9 +21,7 @@
         "rsa.network.sinterface": "WAN dst=89.160.20.156:50000:WAN proto=tcp/50000",
         "rsa.time.event_time": "2007-01-03T16:48:06.000Z",
         "service.type": "sonicwall",
-        "source.ip": [
-            "2.2.2.2"
-        ],
+        "source.ip": "2.2.2.2",
         "source.port": 36701,
         "tags": [
             "forwarded",
@@ -67,7 +64,6 @@
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 438,
-        "log.original": "Connection Opened",
         "observer.ingress.interface.name": "WAN dst=89.160.20.156:50000:WAN proto=tcp/50000",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
@@ -81,9 +77,7 @@
         "rsa.network.sinterface": "WAN dst=89.160.20.156:50000:WAN proto=tcp/50000",
         "rsa.time.event_time": "2007-01-03T16:48:07.000Z",
         "service.type": "sonicwall",
-        "source.ip": [
-            "2.2.2.2"
-        ],
+        "source.ip": "2.2.2.2",
         "source.port": 36702,
         "tags": [
             "forwarded",
@@ -211,7 +205,6 @@
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 1626,
-        "log.original": "Connection Opened",
         "observer.ingress.interface.name": "WAN dst=89.160.20.156:50000:WAN proto=tcp/50000",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
@@ -225,9 +218,7 @@
         "rsa.network.sinterface": "WAN dst=89.160.20.156:50000:WAN proto=tcp/50000",
         "rsa.time.event_time": "2007-01-03T16:48:10.000Z",
         "service.type": "sonicwall",
-        "source.ip": [
-            "2.2.2.2"
-        ],
+        "source.ip": "2.2.2.2",
         "source.port": 36703,
         "tags": [
             "forwarded",
@@ -270,7 +261,6 @@
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 2064,
-        "log.original": "Connection Opened",
         "observer.ingress.interface.name": "WAN dst=89.160.20.156:50000:WAN proto=tcp/50000",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
@@ -284,9 +274,7 @@
         "rsa.network.sinterface": "WAN dst=89.160.20.156:50000:WAN proto=tcp/50000",
         "rsa.time.event_time": "2007-01-03T16:48:11.000Z",
         "service.type": "sonicwall",
-        "source.ip": [
-            "2.2.2.2"
-        ],
+        "source.ip": "2.2.2.2",
         "source.port": 36704,
         "tags": [
             "forwarded",
@@ -317,9 +305,7 @@
         "rsa.network.sinterface": "WAN",
         "rsa.time.event_time": "2007-01-03T16:48:14.000Z",
         "service.type": "sonicwall",
-        "source.ip": [
-            "219.89.19.223"
-        ],
+        "source.ip": "219.89.19.223",
         "source.port": 1026,
         "tags": [
             "forwarded",
@@ -363,7 +349,6 @@
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 2708,
-        "log.original": "IKE Initiator: Start Quick Mode (Phase 2).",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
@@ -385,7 +370,6 @@
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 2918,
-        "log.original": "Connection Opened",
         "observer.ingress.interface.name": "WAN dst=2.2.2.2:500:WAN proto=udp/500",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
@@ -409,9 +393,7 @@
         "source.geo.location.lon": 15.6167,
         "source.geo.region_iso_code": "SE-E",
         "source.geo.region_name": "\u00d6sterg\u00f6tland County",
-        "source.ip": [
-            "89.160.20.156"
-        ],
+        "source.ip": "89.160.20.156",
         "source.port": 500,
         "tags": [
             "forwarded",
@@ -447,7 +429,6 @@
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 3327,
-        "log.original": "Connection Opened",
         "observer.ingress.interface.name": "WAN dst=192.168.5.10:53:LAN proto=tcp/dns",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
@@ -461,9 +442,7 @@
         "rsa.network.sinterface": "WAN dst=192.168.5.10:53:LAN proto=tcp/dns",
         "rsa.time.event_time": "2007-01-03T16:48:15.000Z",
         "service.type": "sonicwall",
-        "source.ip": [
-            "192.168.115.10"
-        ],
+        "source.ip": "192.168.115.10",
         "source.port": 11549,
         "tags": [
             "forwarded",
@@ -479,7 +458,6 @@
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 3543,
-        "log.original": "Connection Opened",
         "observer.ingress.interface.name": "LAN dst=192.168.1.100:445:WAN proto=tcp/445",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
@@ -493,9 +471,7 @@
         "rsa.network.sinterface": "LAN dst=192.168.1.100:445:WAN proto=tcp/445",
         "rsa.time.event_time": "2007-01-03T16:48:17.000Z",
         "service.type": "sonicwall",
-        "source.ip": [
-            "192.168.5.64"
-        ],
+        "source.ip": "192.168.5.64",
         "source.port": 3182,
         "tags": [
             "forwarded",
@@ -567,7 +543,6 @@
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 4241,
-        "log.original": "Connection Opened",
         "observer.ingress.interface.name": "WAN dst=192.168.5.10:3582:LAN proto=udp/3582",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
@@ -581,9 +556,7 @@
         "rsa.network.sinterface": "WAN dst=192.168.5.10:3582:LAN proto=udp/3582",
         "rsa.time.event_time": "2007-01-03T16:48:20.000Z",
         "service.type": "sonicwall",
-        "source.ip": [
-            "192.168.125.75"
-        ],
+        "source.ip": "192.168.125.75",
         "source.port": 524,
         "tags": [
             "forwarded",
@@ -599,7 +572,6 @@
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 4458,
-        "log.original": "Connection Opened",
         "observer.ingress.interface.name": "WAN dst=192.168.5.10:53:LAN proto=tcp/dns",
         "observer.product": "Firewalls",
         "observer.type": "Firewall",
@@ -613,9 +585,7 @@
         "rsa.network.sinterface": "WAN dst=192.168.5.10:53:LAN proto=tcp/dns",
         "rsa.time.event_time": "2007-01-03T16:48:21.000Z",
         "service.type": "sonicwall",
-        "source.ip": [
-            "192.168.6.10"
-        ],
+        "source.ip": "192.168.6.10",
         "source.port": 28503,
         "tags": [
             "forwarded",

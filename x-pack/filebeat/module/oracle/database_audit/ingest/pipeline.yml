@@ -92,7 +92,7 @@ processors:
         - "%{ISO8601_TIMEZONE:event.timezone}$"
   - rename:
       field: oracle.database_audit.privilege
-      target_field: host.user.roles
+      target_field: user.roles
       ignore_missing: true
   - rename:
       field: LENGTH
