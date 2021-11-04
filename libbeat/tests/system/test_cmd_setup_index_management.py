@@ -169,8 +169,8 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.template.pattern=" + self.custom_template + "*"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_loaded(self.data_stream)
-        self.idxmgmt.assert_index_template_index_pattern(self.data_stream, [self.data_stream + "*"])
+        self.idxmgmt.assert_index_template_loaded(self.custom_template)
+        self.idxmgmt.assert_index_template_index_pattern(self.custom_template, [self.custom_template + "*"])
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')

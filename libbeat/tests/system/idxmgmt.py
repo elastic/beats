@@ -17,6 +17,7 @@ class IdxMgmt(unittest.TestCase):
     def delete(self, indices=[], policies=[], data_streams=[]):
         for ds in data_streams:
             self.delete_data_stream(ds)
+            self.delete_template(template=ds)
         for i in indices:
             self.delete_index_and_alias(i)
             self.delete_template(template=i)

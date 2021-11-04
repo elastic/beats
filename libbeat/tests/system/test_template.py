@@ -125,14 +125,14 @@ class TestRunTemplate(BaseTest):
     def setUp(self):
         super(TestRunTemplate, self).setUp()
         # auto-derived default settings, if nothing else is set
-        self.index_name = self.beat_name + "-9.9.9"
+        self.data_stream = self.beat_name + "-9.9.9"
 
         self.es = self.es_client()
-        self.idxmgmt = IdxMgmt(self.es, self.index_name)
-        self.idxmgmt.delete(indices=[self.index_name])
+        self.idxmgmt = IdxMgmt(self.es, self.data_stream)
+        self.idxmgmt.delete(data_streams=[self.data_stream])
 
     def tearDown(self):
-        self.idxmgmt.delete(indices=[self.index_name])
+        self.idxmgmt.delete(data_streams=[self.data_stream])
 
     def render_config(self, **kwargs):
         self.render_config_template(
@@ -153,8 +153,8 @@ class TestRunTemplate(BaseTest):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.idxmgmt.assert_ilm_index_template_loaded(self.index_name, self.beat_name, self.index_name)
-        self.idxmgmt.assert_docs_written_to_data_stream(self.index_name)
+        self.idxmgmt.assert_index_template_loaded(self.data_stream)
+        self.idxmgmt.assert_docs_written_to_data_stream(self.data_stream)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
@@ -168,7 +168,7 @@ class TestRunTemplate(BaseTest):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.idxmgmt.assert_index_template_not_loaded(self.index_name)
+        self.idxmgmt.assert_index_template_not_loaded(self.data_stream)
 
 
 class TestCommandSetupTemplate(BaseTest):
@@ -181,17 +181,17 @@ class TestCommandSetupTemplate(BaseTest):
 
         # auto-derived default settings, if nothing else is set
         self.setupCmd = "--template"
-        self.index_name = self.beat_name + "-9.9.9"
+        self.data_stream = self.beat_name + "-9.9.9"
         self.policy_name = self.beat_name
 
         self.es = self.es_client()
-        self.idxmgmt = IdxMgmt(self.es, self.index_name)
-        self.idxmgmt.delete(indices=[self.index_name], policies=[self.policy_name])
+        self.idxmgmt = IdxMgmt(self.es, self.data_stream)
+        self.idxmgmt.delete(indices=[self.data_stream], policies=[self.policy_name])
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
     def tearDown(self):
-        self.idxmgmt.delete(indices=[self.index_name], policies=[self.policy_name])
+        self.idxmgmt.delete(indices=[self.data_stream], policies=[self.policy_name])
 
     def render_config(self, **kwargs):
         self.render_config_template(
@@ -210,7 +210,7 @@ class TestCommandSetupTemplate(BaseTest):
                                   extra_args=["setup", self.setupCmd, "--ilm-policy"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_index_template_loaded(self.index_name, self.policy_name, self.index_name)
+        self.idxmgmt.assert_index_template_loaded(self.data_stream)
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -224,11 +224,9 @@ class TestCommandSetupTemplate(BaseTest):
                                   extra_args=["setup", self.setupCmd])
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_index_template_loaded(self.index_name, self.policy_name, self.index_name)
-        self.idxmgmt.assert_index_template_index_pattern(self.index_name, [self.index_name + "*"])
+        self.idxmgmt.assert_index_template_loaded(self.data_stream)
+        self.idxmgmt.assert_index_template_index_pattern(self.data_stream, [self.data_stream + "*"])
 
-        # when running `setup --template`
-        # write_alias and rollover_policy related to ILM are also created
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -243,10 +241,8 @@ class TestCommandSetupTemplate(BaseTest):
                                               "-E", "setup.template.enabled=false"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_not_loaded(self.index_name)
+        self.idxmgmt.assert_index_template_not_loaded(self.data_stream)
 
-        # when running `setup --template` and `setup.template.enabled=false`
-        # write_alias and rollover_policy related to ILM are still created
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -262,13 +258,13 @@ class TestCommandSetupTemplate(BaseTest):
                                               "-E", "setup.template.settings.index.number_of_shards=2"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_index_template_loaded(self.data_stream)
 
         # check that settings are overwritten
-        resp = self.es.transport.perform_request('GET', '/_index_template/' + self.index_name)
+        resp = self.es.transport.perform_request('GET', '/_index_template/' + self.data_stream)
         found = False
         for index_template in resp["index_templates"]:
-            if self.index_name == index_template["name"]:
+            if self.data_stream == index_template["name"]:
                 found = True
                 index = index_template["index_template"]["template"]["settings"]["index"]
                 assert index["number_of_shards"] == "2", index["number_of_shards"]
@@ -281,13 +277,12 @@ class TestCommandSetupTemplate(BaseTest):
         Test template setup overwrites template when new ilm policy is created
         """
 
-        # ensure template with ilm rollover_alias name is created, but ilm policy not yet
         self.render_config()
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.setupCmd,
                                               "-E", "setup.ilm.enabled=false"])
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_index_template_loaded(self.data_stream)
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
         # ensure ilm policy is created, triggering overwriting existing template
@@ -327,22 +322,6 @@ class TestCommandExportTemplate(BaseTest):
 
         assert exit_code == 0
         self.assert_log_contains_template(self.template_name + "*")
-
-    def test_changed_index_pattern(self):
-        """
-        Test export template with changed index pattern
-        """
-        self.render_config_template(self.beat_name, self.output,
-                                    fields=self.output)
-        alias_name = "mockbeat-ilm-index-pattern"
-
-        exit_code = self.run_beat(
-            extra_args=["export", "template",
-                        "-E", "setup.ilm.rollover_alias=" + alias_name],
-            config=self.config)
-
-        assert exit_code == 0
-        self.assert_log_contains_template(alias_name + "*")
 
     def test_load_disabled(self):
         """
