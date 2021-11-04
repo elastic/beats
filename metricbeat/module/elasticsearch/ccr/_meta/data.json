@@ -13,52 +13,36 @@
                 },
                 "success": {
                     "follow_indices": {
-                        "count": 1
+                        "count": 0
                     }
                 }
             },
-            "bytes_read": 32768,
+            "bytes_read": 0,
             "follower": {
-                "global_checkpoint": 768,
-                "index": "follower_index",
-                "max_seq_no": 896,
+                "aliases_version": 1,
+                "global_checkpoint": -1,
+                "index": "rats",
+                "max_seq_no": -1,
                 "operations": {
                     "read": {
-                        "count": 896
+                        "count": 0
                     }
                 },
-                "operations_written": 832,
-                "settings_version": 2,
+                "operations_written": 0,
+                "settings_version": 1,
                 "shard": {
                     "number": 0
                 },
                 "time_since_last_read": {
-                    "ms": 8
+                    "ms": 3095
                 }
             },
             "leader": {
-                "global_checkpoint": 1024,
-                "index": "leader_index",
-                "max_seq_no": 1536
+                "global_checkpoint": -1,
+                "index": "pied_piper",
+                "max_seq_no": -1
             },
-            "read_exceptions": [
-                {
-                    "exception": {
-                        "reason": "my_reason",
-                        "type": "my_warn"
-                    },
-                    "from_seq_no": 1234,
-                    "retries": 5
-                },
-                {
-                    "exception": {
-                        "reason": "my_reason",
-                        "type": "my_warn"
-                    },
-                    "from_seq_no": 1234,
-                    "retries": 5
-                }
-            ],
+            "read_exceptions": [],
             "requests": {
                 "failed": {
                     "read": {
@@ -70,43 +54,43 @@
                 },
                 "outstanding": {
                     "read": {
-                        "count": 8
+                        "count": 1
                     },
                     "write": {
-                        "count": 2
+                        "count": 0
                     }
                 },
                 "successful": {
                     "read": {
-                        "count": 32
+                        "count": 0
                     },
                     "write": {
-                        "count": 16
+                        "count": 0
                     }
                 }
             },
             "total_time": {
                 "read": {
-                    "ms": 32768,
+                    "ms": 0,
                     "remote_exec": {
-                        "ms": 16384
+                        "ms": 0
                     }
                 },
                 "write": {
-                    "ms": 16384
+                    "ms": 0
                 }
             },
             "write_buffer": {
                 "operation": {
-                    "count": 64
+                    "count": 0
                 },
                 "size": {
-                    "bytes": 1536
+                    "bytes": 0
                 }
             }
         },
         "cluster": {
-            "id": "8l_zoGznQRmtoX9iSC-goA",
+            "id": "WocBBA0QRma0sGpdQ7vLfQ",
             "name": "docker-cluster"
         }
     },
@@ -120,7 +104,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:37735",
+        "address": "172.19.0.2:9200",
         "name": "elasticsearch",
         "type": "elasticsearch"
     }
