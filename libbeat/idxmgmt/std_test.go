@@ -133,22 +133,6 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 			cfg:      map[string]interface{}{"index": "TeSt-%{[agent.version]}"},
 			want:     stable("test-9.9.9"),
 		},
-		"event alias without ilm": {
-			ilmCalls: noILM,
-			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
-			want:     stable("test"),
-			meta: common.MapStr{
-				"alias": "test",
-			},
-		},
-		"event alias without ilm must be lowercae": {
-			ilmCalls: noILM,
-			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
-			want:     stable("test"),
-			meta: common.MapStr{
-				"alias": "Test",
-			},
-		},
 		"event index without ilm": {
 			ilmCalls: noILM,
 			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
@@ -167,29 +151,13 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 		},
 		"with ilm": {
 			ilmCalls: ilmTemplateSettings("test-9.9.9"),
-			cfg:      map[string]interface{}{"index": "wrong-%{[agent.version]}"},
+			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
 			want:     stable("test-9.9.9"),
 		},
 		"with ilm must be lowercase": {
 			ilmCalls: ilmTemplateSettings("Test-9.9.9"),
-			cfg:      map[string]interface{}{"index": "wrong-%{[agent.version]}"},
+			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
 			want:     stable("test-9.9.9"),
-		},
-		"event alias wit ilm": {
-			ilmCalls: ilmTemplateSettings("test-9.9.9"),
-			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
-			want:     stable("event-alias"),
-			meta: common.MapStr{
-				"alias": "event-alias",
-			},
-		},
-		"event alias wit ilm must be lowercase": {
-			ilmCalls: ilmTemplateSettings("test-9.9.9"),
-			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
-			want:     stable("event-alias"),
-			meta: common.MapStr{
-				"alias": "Event-alias",
-			},
 		},
 		"event index with ilm": {
 			ilmCalls: ilmTemplateSettings("test-9.9.9"),
@@ -258,7 +226,7 @@ func TestIndexManager_VerifySetup(t *testing.T) {
 	}{
 		"load template with ilm without loading ilm": {
 			ilmEnabled: true, tmplEnabled: true, loadILM: LoadModeDisabled,
-			warn: "whithout loading ILM policy and alias",
+			warn: "whithout loading ILM policy",
 		},
 		"load ilm without template": {
 			ilmEnabled: true, loadILM: LoadModeUnset,
