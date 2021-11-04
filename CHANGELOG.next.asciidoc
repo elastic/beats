@@ -58,6 +58,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fail to start Filebat if none between `queue_url`, `bucket_arn` or `non_aws_bucket_name` is set for a configured aws-s3 input {issue}13911[13911] {pull}28666[28666]
 - All modules: Replace usages of deprecated ECS fields `process.ppid` and `log.original` with `process.parent.pid` and `event.original`. {pull}28620[28620]
 - Replace usages of `host.user.*` fields with `user.*` in `cisco`, `microsoft` and `oracle` modules. {pull}28620[28620]
+- Remove `docker` input. {pull}28817[28817]
 
 *Heartbeat*
 
