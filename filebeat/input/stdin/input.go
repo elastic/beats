@@ -19,6 +19,7 @@ package stdin
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/harvester"
@@ -26,7 +27,12 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/filebeat/input/log"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
+)
+
+var (
+	deprecatedNotificationOnce sync.Once
 )
 
 func init() {
@@ -48,6 +54,10 @@ type Input struct {
 // NewInput creates a new stdin input
 // This input contains one harvester which is reading from stdin
 func NewInput(cfg *common.Config, outlet channel.Connector, context input.Context) (input.Input, error) {
+	deprecatedNotificationOnce.Do(func() {
+		cfgwarn.Deprecate("", "Stdin input is deprecated.")
+	})
+
 	out, err := outlet.Connect(cfg)
 	if err != nil {
 		return nil, err
