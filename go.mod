@@ -92,7 +92,7 @@ require (
 	github.com/golang/protobuf v1.4.3
 	github.com/golang/snappy v0.0.1
 	github.com/gomodule/redigo v1.8.3
-	github.com/google/flatbuffers v1.7.2-0.20170925184458-7a6b2bf521e9
+	github.com/google/flatbuffers v1.12.1
 	github.com/google/go-cmp v0.5.2
 	github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34
 	github.com/google/uuid v1.1.2
