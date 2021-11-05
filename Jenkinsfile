@@ -830,7 +830,7 @@ def archiveTestOutput(Map args = [:]) {
       catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
         withMageEnv(version: "${env.GO_VERSION}"){
           dir(directory){
-            cmd(label: "Archive system tests files", script: 'mage packageSystemTests')
+            cmd(label: "Archive system tests files", script: 'mage packageSystemTests', returnStatus: true)
           }
         }
 
