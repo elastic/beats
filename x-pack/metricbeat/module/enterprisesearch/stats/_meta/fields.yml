@@ -291,7 +291,7 @@
 
                 - name: nofollow
                   type: long
-                  description: Total number of URLs denied due to a nofollow meta tag or URL attribute.
+                  description: Total number of URLs denied due to a nofollow meta tag or an HTML link attribute.
 
                 - name: unsupported_content_type
                   type: long

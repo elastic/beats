@@ -32918,7 +32918,7 @@ type: long
 *`enterprisesearch.stats.crawler.node.urls_denied.nofollow`*::
 +
 --
-Total number of URLs denied due to a nofollow meta tag or URL attribute.
+Total number of URLs denied due to a nofollow meta tag or an HTML link attribute.
 
 type: long
 
