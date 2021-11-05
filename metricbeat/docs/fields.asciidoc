@@ -32403,7 +32403,7 @@ Workplace Search worker pools stats.
 [float]
 === extract_worker_pool
 
-Status information for the extrator workers pool.
+Status information for the extractor workers pool.
 
 
 *`enterprisesearch.stats.connectors.pool.extract_worker_pool.size`*::
@@ -32463,7 +32463,7 @@ type: long
 [float]
 === subextract_worker_pool
 
-Status information for the sub-extrator workers pool.
+Status information for the sub-extractor workers pool.
 
 
 *`enterprisesearch.stats.connectors.pool.subextract_worker_pool.size`*::
@@ -32825,7 +32825,7 @@ type: long
 *`enterprisesearch.stats.crawler.global.crawl_requests.active`*::
 +
 --
-Total number of crawl requests cyrrently being processed (running crawls).
+Total number of crawl requests currently being processed (running crawls).
 
 type: long
 
@@ -32876,13 +32876,13 @@ type: long
 [float]
 === urls_denied
 
-Total number of URLs debied by the crawler during discovery since the instance start, broken down by deny reason.
+Total number of URLs denied by the crawler during discovery since the instance start, broken down by deny reason.
 
 
 *`enterprisesearch.stats.crawler.node.urls_denied.already_seen`*::
 +
 --
-Total number of URLs not followed becuase of URL de-duplication (each URL is visited only once).
+Total number of URLs not followed because of URL de-duplication (each URL is visited only once).
 
 type: long
 
@@ -32927,7 +32927,7 @@ type: long
 *`enterprisesearch.stats.crawler.node.urls_denied.unsupported_content_type`*::
 +
 --
-Total number of URLs denied due to an unsuported content type.
+Total number of URLs denied due to an unsupported content type.
 
 type: long
 
@@ -32936,7 +32936,7 @@ type: long
 [float]
 === status_codes
 
-HTTP request result counts, broken by status code.
+HTTP request result counts, by status code.
 
 
 *`enterprisesearch.stats.crawler.node.status_codes.200`*::

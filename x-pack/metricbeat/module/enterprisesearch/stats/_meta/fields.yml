@@ -45,7 +45,7 @@
           fields:
             - name: extract_worker_pool
               type: group
-              description: Status information for the extrator workers pool.
+              description: Status information for the extractor workers pool.
               fields:
                 - name: size
                   type: long
@@ -73,7 +73,7 @@
 
             - name: subextract_worker_pool
               type: group
-              description: Status information for the sub-extrator workers pool.
+              description: Status information for the sub-extractor workers pool.
               fields:
                 - name: size
                   type: long
@@ -249,7 +249,7 @@
                   description: Total number of crawl requests waiting to be processed.
                 - name: active
                   type: long
-                  description: Total number of crawl requests cyrrently being processed (running crawls).
+                  description: Total number of crawl requests currently being processed (running crawls).
                 - name: successful
                   type: long
                   description: Total number of crawl requests that have succeeded.
@@ -271,11 +271,11 @@
 
             - name: urls_denied
               type: group
-              description: Total number of URLs debied by the crawler during discovery since the instance start, broken down by deny reason.
+              description: Total number of URLs denied by the crawler during discovery since the instance start, broken down by deny reason.
               fields:
                 - name: already_seen
                   type: long
-                  description: Total number of URLs not followed becuase of URL de-duplication (each URL is visited only once).
+                  description: Total number of URLs not followed because of URL de-duplication (each URL is visited only once).
 
                 - name: domain_filter_denied
                   type: long
@@ -295,11 +295,11 @@
 
                 - name: unsupported_content_type
                   type: long
-                  description: Total number of URLs denied due to an unsuported content type.
+                  description: Total number of URLs denied due to an unsupported content type.
 
             - name: status_codes
               type: group
-              description: HTTP request result counts, broken by status code.
+              description: HTTP request result counts, by status code.
               fields:
                 - name: "200"
                   type: long
