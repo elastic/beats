@@ -246,8 +246,7 @@ pipeline {
           agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
           steps {
-            log(level: 'WARN', text: "E2E Tests for Beats are disabled until latest breaking changes in Kibana affecting Package Registry are resolved.")
-            //runE2ETests()
+            runE2ETests()
           }
         }
       }
