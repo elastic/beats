@@ -10179,11 +10179,11 @@ Contents of probable licence file $GOMODCACHE/github.com/gomodule/redigo@v1.8.3/
 
 --------------------------------------------------------------------------------
 Dependency : github.com/google/flatbuffers
-Version: v1.12.0
+Version: v1.12.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/google/flatbuffers@v1.12.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/google/flatbuffers@v1.12.1/LICENSE.txt:
 
 
                                  Apache License
