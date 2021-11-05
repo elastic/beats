@@ -85,7 +85,11 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 		}
 	}
 
-	if all := wantFields(fields, "file."+typ+".sections"); all || wantFields(fields, "file."+typ+".sections.name", "file."+typ+".sections.virtual_size", "file."+typ+".sections.entropy") {
+	if all := wantFields(fields, "file."+typ+".sections"); all || wantFields(fields,
+		"file."+typ+".sections.name",
+		"file."+typ+".sections.virtual_size",
+		"file."+typ+".sections.entropy",
+	) {
 		sections, err := f.Sections()
 		if err != nil {
 			return err
@@ -133,7 +137,14 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 		}
 	}
 
-	if typ != "plan9" { // Plan9 is purely statically linked.
+	if typ != "plan9" && // Plan9 is purely statically linked.
+		wantFields(fields,
+			"file.pe.imphash",
+			"file.macho.symhash",
+			"file."+typ+".import_hash",
+			"file."+typ+".imports",
+			"file."+typ+".imports_names_entropy",
+		) {
 		h, symbols, err := f.ImportHash()
 		if err != nil {
 			return err
@@ -162,29 +173,36 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 		}
 	}
 
-	h, symbols, err := f.GoSymbolHash(false)
-	if err != nil {
-		if err == toutoumomoma.ErrNotGoExecutable {
-			return nil
+	if wantFields(fields,
+		"file."+typ+".go_import_hash",
+		"file."+typ+".go_imports",
+		"file."+typ+".go_imports_names_entropy",
+	) {
+		h, symbols, err := f.GoSymbolHash(false)
+		if err != nil {
+			if err == toutoumomoma.ErrNotGoExecutable {
+				return nil
+			}
+			return err
 		}
-		return err
-	}
-	if wantFields(fields, "file."+typ+".go_import_hash") {
-		details.Put("go_import_hash", Digest(h))
-	}
-	if len(symbols) != 0 {
-		if wantFields(fields, "file."+typ+".go_imports") {
-			details.Put("go_imports", symbols)
+		if wantFields(fields, "file."+typ+".go_import_hash") {
+			details.Put("go_import_hash", Digest(h))
 		}
-		if wantFields(fields, "file."+typ+".go_imports_names_entropy") {
-			details.Put("go_imports_names_entropy", toutoumomoma.NameEntropy(symbols))
+		if len(symbols) != 0 {
+			if wantFields(fields, "file."+typ+".go_imports") {
+				details.Put("go_imports", symbols)
+			}
+			if wantFields(fields, "file."+typ+".go_imports_names_entropy") {
+				details.Put("go_imports_names_entropy", toutoumomoma.NameEntropy(symbols))
+			}
 		}
 	}
-	stripped, err := f.Stripped()
-	if err != nil {
-		return err
-	}
+
 	if wantFields(fields, "file."+typ+".go_stripped") {
+		stripped, err := f.Stripped()
+		if err != nil {
+			return err
+		}
 		details.Put("go_stripped", stripped)
 	}
 
