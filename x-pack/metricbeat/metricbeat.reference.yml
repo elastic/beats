@@ -183,15 +183,6 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: password
 
-#------------------------------ App Search Module ------------------------------
-- module: appsearch
-  metricsets: ["stats"]
-  enabled: true
-  period: 10s
-  hosts: ["http://localhost:3002"]
-  #username: "elastic"
-  #password: "changeme"
-
 #--------------------------------- AWS Module ---------------------------------
 - module: aws
   period: 300s
