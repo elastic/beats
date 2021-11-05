@@ -1348,14 +1348,12 @@ class Test(BaseTest):
         self.render_config_template(
             type='container',
             input_raw='''
-    paths: [{path}]
-    stream: stdout
-    ids:
-      - container_id
+  paths: {path}
+  stream: stdout
 - type: container
-  paths: [{path}]
+  paths: {path}
   stream: stderr
-'''.format(path=os.path.abspath(self.working_dir) + "/log/")
+'''.format(path=os.path.abspath(self.working_dir) + "/log/*/*.log")
         )
         os.mkdir(self.working_dir + "/log/")
         os.mkdir(self.working_dir + "/log/container_id")
