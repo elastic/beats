@@ -833,17 +833,20 @@ def archiveTestOutput(Map args = [:]) {
             cmd(label: "Archive system tests files", script: 'mage packageSystemTests')
           }
         }
-        def fileName = 'build/system-tests-*.tar.gz' // see dev-tools/mage/target/common/package.go#PackageSystemTests method
+
         def files = findFiles(glob: "${fileName}")
-        files.each { file ->
-          echo "${file.name}"
+
+        if (files?.length() > 0) {
+          def fileName = 'build/system-tests-*.tar.gz' // see dev-tools/mage/target/common/package.go#PackageSystemTests method
+          googleStorageUploadExt(
+            bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
+            credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+            pattern: "${fileName}",
+            sharedPublicly: true
+          )
+        } else {
+          log(level: 'WARN', text: "There are no system-tests files to upload Google Storage}")
         }
-        googleStorageUploadExt(
-          bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
-          credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-          pattern: "${fileName}",
-          sharedPublicly: true
-        )
       }
     }
   }
