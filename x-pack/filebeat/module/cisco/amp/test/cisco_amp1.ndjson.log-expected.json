@@ -150,7 +150,6 @@
         "host.name": "Demo_AMP_Threat_Quarantined",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 2295,
         "process.hash.md5": "54a47f6b5e09a77e61649109c6a08866",
@@ -177,7 +176,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T10:06:39.000Z",
@@ -331,7 +331,6 @@
         "host.name": "Demo_AMP_Threat_Quarantined",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 6204,
         "process.hash.md5": "54a47f6b5e09a77e61649109c6a08866",
@@ -358,7 +357,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T10:05:52.000Z",
@@ -402,7 +402,6 @@
         "host.name": "Demo_AMP_Threat_Quarantined",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 7800,
         "process.hash.md5": "54a47f6b5e09a77e61649109c6a08866",
@@ -427,7 +426,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T10:05:52.000Z",
@@ -930,7 +930,6 @@
         "host.name": "Demo_BP_WMIPRVSE",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 27082,
         "process.hash.md5": "23ee3d381cfe3b9f6229483e2ce2f9e1",
@@ -955,7 +954,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T09:56:55.000Z",
@@ -2039,7 +2039,6 @@
         "host.name": "Demo_AMP_Intel",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 52332,
         "process.hash.md5": "38ae1b3c38faef56fe4907922f0385ba",
@@ -2066,7 +2065,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2020-12-25T05:49:09.000Z",
@@ -2165,7 +2165,6 @@
         "host.name": "Demo_AMP_Intel",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 55057,
         "process.hash.md5": "92f44e405db16ac55d97e3bfe3b132fa",
@@ -2192,7 +2191,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2020-12-25T05:30:44.000Z",

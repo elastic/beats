@@ -134,9 +134,7 @@
         "rsa.time.duration_time": 116.48,
         "rsa.time.starttime": "2016-04-09T19:22:51.000Z",
         "service.type": "netscout",
-        "source.ip": [
-            "10.51.132.10"
-        ],
+        "source.ip": "10.51.132.10",
         "tags": [
             "forwarded",
             "netscout.sightline"
@@ -356,9 +354,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.155.162.162"
-        ],
+        "destination.ip": "10.155.162.162",
         "event.code": "Blocked_Host",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -378,9 +374,7 @@
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
         "service.type": "netscout",
-        "source.ip": [
-            "10.66.171.247"
-        ],
+        "source.ip": "10.66.171.247",
         "tags": [
             "forwarded",
             "netscout.sightline"
@@ -441,9 +435,7 @@
         "user.name": "uiano"
     },
     {
-        "destination.ip": [
-            "10.179.26.34"
-        ],
+        "destination.ip": "10.179.26.34",
         "event.code": "Blocked_Host",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -463,9 +455,7 @@
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
         "service.type": "netscout",
-        "source.ip": [
-            "10.38.77.13"
-        ],
+        "source.ip": "10.38.77.13",
         "tags": [
             "forwarded",
             "netscout.sightline"
@@ -644,9 +634,7 @@
         "user.name": "caecatc"
     },
     {
-        "destination.ip": [
-            "10.224.68.213"
-        ],
+        "destination.ip": "10.224.68.213",
         "event.code": "GRE",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -777,9 +765,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.60.185.151"
-        ],
+        "destination.ip": "10.60.185.151",
         "event.code": "GRE",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1037,9 +1023,7 @@
         "user.name": "suntexp"
     },
     {
-        "destination.ip": [
-            "10.168.131.247"
-        ],
+        "destination.ip": "10.168.131.247",
         "event.code": "Blocked_Host",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1059,9 +1043,7 @@
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
         "service.type": "netscout",
-        "source.ip": [
-            "10.136.232.108"
-        ],
+        "source.ip": "10.136.232.108",
         "tags": [
             "forwarded",
             "netscout.sightline"
@@ -1075,9 +1057,7 @@
         "url.scheme": "https"
     },
     {
-        "destination.ip": [
-            "10.209.182.237"
-        ],
+        "destination.ip": "10.209.182.237",
         "event.code": "GRE",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1168,9 +1148,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.163.161.165"
-        ],
+        "destination.ip": "10.163.161.165",
         "event.code": "Blocked_Host",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1190,9 +1168,7 @@
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
         "service.type": "netscout",
-        "source.ip": [
-            "10.83.23.104"
-        ],
+        "source.ip": "10.83.23.104",
         "tags": [
             "forwarded",
             "netscout.sightline"
@@ -1206,9 +1182,7 @@
         "url.scheme": "https"
     },
     {
-        "destination.ip": [
-            "10.53.248.4"
-        ],
+        "destination.ip": "10.53.248.4",
         "event.code": "GRE",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1594,9 +1568,7 @@
         "rsa.time.duration_time": 29.657,
         "rsa.time.starttime": "2018-08-15T09:57:06.000Z",
         "service.type": "netscout",
-        "source.ip": [
-            "10.54.49.84"
-        ],
+        "source.ip": "10.54.49.84",
         "tags": [
             "forwarded",
             "netscout.sightline"
@@ -1785,9 +1757,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.28.226.128"
-        ],
+        "destination.ip": "10.28.226.128",
         "event.code": "Blocked_Host",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1807,9 +1777,7 @@
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
         "service.type": "netscout",
-        "source.ip": [
-            "10.122.76.148"
-        ],
+        "source.ip": "10.122.76.148",
         "tags": [
             "forwarded",
             "netscout.sightline"
@@ -1913,9 +1881,7 @@
         "url.scheme": "https"
     },
     {
-        "destination.ip": [
-            "10.98.209.10"
-        ],
+        "destination.ip": "10.98.209.10",
         "event.code": "Blocked_Host",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1935,9 +1901,7 @@
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
         "service.type": "netscout",
-        "source.ip": [
-            "10.31.177.226"
-        ],
+        "source.ip": "10.31.177.226",
         "tags": [
             "forwarded",
             "netscout.sightline"
@@ -1951,9 +1915,7 @@
         "url.scheme": "https"
     },
     {
-        "destination.ip": [
-            "10.179.210.218"
-        ],
+        "destination.ip": "10.179.210.218",
         "event.code": "Blocked_Host",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -1973,9 +1935,7 @@
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
         "service.type": "netscout",
-        "source.ip": [
-            "10.44.47.27"
-        ],
+        "source.ip": "10.44.47.27",
         "tags": [
             "forwarded",
             "netscout.sightline"
@@ -2238,9 +2198,7 @@
         "user.name": "veniamq"
     },
     {
-        "destination.ip": [
-            "10.55.156.64"
-        ],
+        "destination.ip": "10.55.156.64",
         "event.code": "Blocked_Host",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2260,9 +2218,7 @@
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
         "service.type": "netscout",
-        "source.ip": [
-            "10.151.129.181"
-        ],
+        "source.ip": "10.151.129.181",
         "tags": [
             "forwarded",
             "netscout.sightline"
@@ -2327,9 +2283,7 @@
         "rsa.time.duration_time": 77.637,
         "rsa.time.starttime": "2019-09-19T15:09:05.000Z",
         "service.type": "netscout",
-        "source.ip": [
-            "10.46.77.76"
-        ],
+        "source.ip": "10.46.77.76",
         "tags": [
             "forwarded",
             "netscout.sightline"
@@ -2381,9 +2335,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.166.90.130"
-        ],
+        "destination.ip": "10.166.90.130",
         "event.code": "Blocked_Host",
         "event.dataset": "netscout.sightline",
         "event.module": "netscout",
@@ -2403,9 +2355,7 @@
         "rsa.misc.msgIdPart1": "Blocked",
         "rsa.misc.msgIdPart2": "Host",
         "service.type": "netscout",
-        "source.ip": [
-            "10.73.89.189"
-        ],
+        "source.ip": "10.73.89.189",
         "tags": [
             "forwarded",
             "netscout.sightline"

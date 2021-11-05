@@ -23,7 +23,7 @@ class Test(BaseTest):
         assert o["client.port"] == 46249
         assert o["server.port"] == 8888
         assert o["status"] == "OK"
-        assert o["http.request.method"] == "get"
+        assert o["http.request.method"] == "GET"
         assert o["url.path"] == "/"
         assert o["http.response.status_code"] == 200
         assert o["http.response.status_phrase"] == "ok"
