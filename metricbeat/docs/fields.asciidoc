@@ -32130,7 +32130,7 @@ Workplace Search worker pools stats.
 [float]
 === extract_worker_pool
 
-Status information for the extrator workers pool.
+Status information for the extractor workers pool.
 
 
 *`enterprisesearch.stats.connectors.pool.extract_worker_pool.size`*::
@@ -32190,7 +32190,7 @@ type: long
 [float]
 === subextract_worker_pool
 
-Status information for the sub-extrator workers pool.
+Status information for the sub-extractor workers pool.
 
 
 *`enterprisesearch.stats.connectors.pool.subextract_worker_pool.size`*::
@@ -32517,6 +32517,369 @@ type: long
 +
 --
 Total number of jobs waiting in the failed queue.
+
+type: long
+
+--
+
+[float]
+=== crawler
+
+Aggregate stats on the functioning of the crawler subsystem within Enterprise Search.
+
+
+[float]
+=== global
+
+Global deployment-wide metrics for the crawler.
+
+
+[float]
+=== crawl_requests
+
+Crawl request summary for the deployment.
+
+
+*`enterprisesearch.stats.crawler.global.crawl_requests.pending`*::
++
+--
+Total number of crawl requests waiting to be processed.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.global.crawl_requests.active`*::
++
+--
+Total number of crawl requests currently being processed (running crawls).
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.global.crawl_requests.successful`*::
++
+--
+Total number of crawl requests that have succeeded.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.global.crawl_requests.failed`*::
++
+--
+Total number of failed crawl requests.
+
+type: long
+
+--
+
+[float]
+=== node
+
+Node-level statistics for the crawler.
+
+
+*`enterprisesearch.stats.crawler.node.pages_visited`*::
++
+--
+Total number of pages visited by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.urls_allowed`*::
++
+--
+Total number of URLs allowed by the crawler during discovery since the instance start.
+
+type: long
+
+--
+
+[float]
+=== urls_denied
+
+Total number of URLs denied by the crawler during discovery since the instance start, broken down by deny reason.
+
+
+*`enterprisesearch.stats.crawler.node.urls_denied.already_seen`*::
++
+--
+Total number of URLs not followed because of URL de-duplication (each URL is visited only once).
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.urls_denied.domain_filter_denied`*::
++
+--
+Total number of URLs denied because of an unknown domain.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.urls_denied.incorrect_protocol`*::
++
+--
+Total number of URLs with incorrect/invalid/unsupported protocols.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.urls_denied.link_too_deep`*::
++
+--
+Total number of URLs not followed due to crawl depth limits.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.urls_denied.nofollow`*::
++
+--
+Total number of URLs denied due to a nofollow meta tag or an HTML link attribute.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.urls_denied.unsupported_content_type`*::
++
+--
+Total number of URLs denied due to an unsupported content type.
+
+type: long
+
+--
+
+[float]
+=== status_codes
+
+HTTP request result counts, by status code.
+
+
+*`enterprisesearch.stats.crawler.node.status_codes.200`*::
++
+--
+Total number of HTTP 200 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.301`*::
++
+--
+Total number of HTTP 301 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.302`*::
++
+--
+Total number of HTTP 302 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.400`*::
++
+--
+Total number of HTTP 400 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.401`*::
++
+--
+Total number of HTTP 401 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.402`*::
++
+--
+Total number of HTTP 402 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.403`*::
++
+--
+Total number of HTTP 403 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.404`*::
++
+--
+Total number of HTTP 404 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.405`*::
++
+--
+Total number of HTTP 405 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.410`*::
++
+--
+Total number of HTTP 410 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.422`*::
++
+--
+Total number of HTTP 422 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.429`*::
++
+--
+Total number of HTTP 429 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.500`*::
++
+--
+Total number of HTTP 500 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.501`*::
++
+--
+Total number of HTTP 501 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.502`*::
++
+--
+Total number of HTTP 502 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.503`*::
++
+--
+Total number of HTTP 503 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.504`*::
++
+--
+Total number of HTTP 504 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+[float]
+=== queue_size
+
+Total current URL queue size for the instance.
+
+
+*`enterprisesearch.stats.crawler.node.queue_size.primary`*::
++
+--
+Total number of URLs waiting to be crawled by the instance.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.queue_size.purge`*::
++
+--
+Total number of URLs waiting to be checked by the purge crawl phase.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.active_threads`*::
++
+--
+Total number of crawler worker threads currently active on the instance.
+
+type: long
+
+--
+
+[float]
+=== workers
+
+Crawler workers information for the instance.
+
+
+*`enterprisesearch.stats.crawler.node.workers.pool_size`*::
++
+--
+Total size of the crawl workers pool (number of concurrent crawls possible) for the instance.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.workers.active`*::
++
+--
+Total number of currently active crawl workers (running crawls) for the instance.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.workers.available`*::
++
+--
+Total number of currently available (free) crawl workers for the instance.
 
 type: long
 
