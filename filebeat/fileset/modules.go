@@ -100,6 +100,20 @@ func newModuleRegistry(modulesPath string,
 		}
 	}
 
+	logp.Info("Enabled modules/filesets: %s", reg.InfoString())
+	for _, mod := range reg.ModuleNames() {
+		if mod == "" {
+			continue
+		}
+		filesets, err := reg.ModuleConfiguredFilesets(mod)
+		if err != nil {
+			logp.Err("Failed listing filesets for module %s", mod)
+			continue
+		}
+		if len(filesets) == 0 {
+			return nil, errors.Errorf("module %s is configured but has no enabled filesets", mod)
+		}
+	}
 	return &reg, nil
 }
 
