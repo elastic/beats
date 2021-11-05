@@ -50,13 +50,10 @@ func Format() {
 	mg.Deps(GoImports, PythonAutopep8)
 }
 
-// GoImports executes goimports against all .go files in and below the CWD. It
-// ignores vendor/ and generator/_templates/ directories.
+// GoImports executes goimports against all .go files in and below the CWD.
 func GoImports() error {
 	goFiles, err := FindFilesRecursive(func(path string, _ os.FileInfo) bool {
-		return filepath.Ext(path) == ".go" &&
-			!strings.Contains(path, "vendor/") &&
-			!strings.Contains(path, "generator/_templates/")
+		return filepath.Ext(path) == ".go"
 	})
 	if err != nil {
 		return err
@@ -84,9 +81,7 @@ func GoImports() error {
 // ignores build/ directories.
 func PythonAutopep8() error {
 	pyFiles, err := FindFilesRecursive(func(path string, _ os.FileInfo) bool {
-		return filepath.Ext(path) == ".py" &&
-			!strings.Contains(path, "build/") &&
-			!strings.Contains(path, "vendor/")
+		return filepath.Ext(path) == ".py" && !strings.Contains(path, "build/")
 	})
 	if err != nil {
 		return err
