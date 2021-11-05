@@ -43,20 +43,15 @@ type encoderCreator func(cfg zapcore.EncoderConfig) zapcore.Encoder
 func buildEncoder(cfg Config) zapcore.Encoder {
 	var encCfg zapcore.EncoderConfig
 	var encCreator encoderCreator
-	if cfg.JSON {
-		encCfg = JSONEncoderConfig()
-		encCreator = zapcore.NewJSONEncoder
-	} else if cfg.ToSyslog {
+	if cfg.ToSyslog {
 		encCfg = SyslogEncoderConfig()
 		encCreator = zapcore.NewConsoleEncoder
 	} else {
-		encCfg = ConsoleEncoderConfig()
-		encCreator = zapcore.NewConsoleEncoder
+		encCfg = JSONEncoderConfig()
+		encCreator = zapcore.NewJSONEncoder
 	}
 
-	if cfg.ECSEnabled {
-		encCfg = ecszap.ECSCompatibleEncoderConfig(encCfg)
-	}
+	encCfg = ecszap.ECSCompatibleEncoderConfig(encCfg)
 	return encCreator(encCfg)
 }
 

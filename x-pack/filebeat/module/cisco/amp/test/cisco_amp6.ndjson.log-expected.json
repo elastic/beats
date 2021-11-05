@@ -370,7 +370,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 7166,
         "related.hash": [
@@ -390,7 +389,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T14:41:05.000Z",
@@ -436,7 +436,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 8444,
         "process.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
@@ -461,7 +460,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T14:41:05.000Z",
@@ -504,7 +504,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 9978,
         "related.hash": [
@@ -524,7 +523,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T14:41:05.000Z",
@@ -567,7 +567,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 11255,
         "related.hash": [
@@ -587,7 +586,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T14:41:05.000Z",
@@ -789,7 +789,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 15913,
         "related.hash": [
@@ -809,7 +808,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T14:41:04.000Z",
@@ -855,7 +855,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 17191,
         "process.hash.md5": "ad7b9c14083b52bc532fba5948342b98",
@@ -882,7 +881,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T14:41:04.000Z",
@@ -928,7 +928,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 18820,
         "process.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
@@ -953,7 +952,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T14:41:04.000Z",
@@ -997,7 +997,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 20367,
         "process.hash.md5": "4e568dbe3fff1a0025eb432dc929b78f",
@@ -1022,7 +1021,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T14:41:03.000Z",
@@ -1068,7 +1068,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 21878,
         "process.hash.md5": "4e568dbe3fff1a0025eb432dc929b78f",
@@ -1095,7 +1094,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T14:37:40.000Z",
@@ -1773,7 +1773,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 37598,
         "related.hash": [
@@ -1795,7 +1794,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T13:43:32.000Z",
@@ -1839,7 +1839,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 38955,
         "process.hash.md5": "db349b97c37d22f5ea1d1841e3c89eb4",
@@ -1864,7 +1863,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T13:43:32.000Z",
@@ -1907,7 +1907,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_WannaCry_Ransomware",
         "host.name": "Demo_WannaCry_Ransomware",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 40483,
         "related.hash": [
@@ -1929,7 +1928,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T13:43:32.000Z",
@@ -1975,7 +1975,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 41833,
         "process.hash.md5": "4e568dbe3fff1a0025eb432dc929b78f",
@@ -2002,7 +2001,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T13:43:32.000Z",
@@ -2047,7 +2047,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 43444,
         "related.hash": [
@@ -2069,7 +2068,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T13:43:32.000Z",
@@ -2112,7 +2112,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_WannaCry_Ransomware",
         "host.name": "Demo_WannaCry_Ransomware",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 44801,
         "related.hash": [
@@ -2134,7 +2133,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T13:43:32.000Z",
@@ -2286,7 +2286,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 48401,
         "process.hash.md5": "db349b97c37d22f5ea1d1841e3c89eb4",
@@ -2313,7 +2312,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T13:29:36.000Z",
@@ -2509,7 +2509,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 53339,
         "related.hash": [
@@ -2529,7 +2528,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T13:06:19.000Z",
@@ -2572,7 +2572,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 54617,
         "related.hash": [
@@ -2592,7 +2591,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T13:06:18.000Z",
@@ -2913,7 +2913,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 61877,
         "process.hash.sha256": "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
@@ -2938,7 +2937,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T13:06:18.000Z",
@@ -2981,7 +2981,6 @@
         "host.name": "Demo_WannaCry_Ransomware",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 63411,
         "related.hash": [
@@ -3001,7 +3000,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T13:06:18.000Z",

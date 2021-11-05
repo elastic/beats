@@ -78,7 +78,7 @@ var ciscoIOS = (function() {
 
     var copyOriginalMessage = new processor.Convert({
         fields: [
-            {from: "message", to: "log.original"},
+            {from: "message", to: "event.original"},
         ],
         mode: "copy",
     });

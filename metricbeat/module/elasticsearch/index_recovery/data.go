@@ -83,7 +83,7 @@ var (
 	}
 )
 
-func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
+func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
 
 	var data map[string]map[string][]map[string]interface{}
 
@@ -116,6 +116,13 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 				continue
 			}
 			event.MetricSetFields.Put("name", indexName)
+
+			// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+			// When using Agent, the index name is overwritten anyways.
+			if isXpack {
+				index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+				event.Index = index
+			}
 
 			r.Event(event)
 		}

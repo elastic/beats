@@ -76,9 +76,7 @@
     },
     {
         "destination.address": "tenbyCic5882.api.home",
-        "destination.ip": [
-            "10.69.20.77"
-        ],
+        "destination.ip": "10.69.20.77",
         "event.code": "err",
         "event.dataset": "proofpoint.emailsecurity",
         "event.module": "proofpoint",
@@ -180,9 +178,7 @@
         "rsa.misc.obj_type": "listen cmd=dun",
         "rsa.misc.severity": "high",
         "service.type": "proofpoint",
-        "source.ip": [
-            "10.89.185.38"
-        ],
+        "source.ip": "10.89.185.38",
         "tags": [
             "forwarded",
             "proofpoint.emailsecurity"
@@ -582,9 +578,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.193.83.81"
-        ],
+        "destination.ip": "10.193.83.81",
         "event.code": "queued-alert",
         "event.dataset": "proofpoint.emailsecurity",
         "event.module": "proofpoint",
@@ -664,9 +658,7 @@
     },
     {
         "destination.address": "sit6590.lan",
-        "destination.ip": [
-            "10.123.143.188"
-        ],
+        "destination.ip": "10.123.143.188",
         "event.code": "sendmail",
         "event.dataset": "proofpoint.emailsecurity",
         "event.module": "proofpoint",
@@ -1318,9 +1310,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.65.174.31"
-        ],
+        "destination.ip": "10.65.174.31",
         "event.code": "queued-aglife",
         "event.dataset": "proofpoint.emailsecurity",
         "event.module": "proofpoint",
@@ -1478,9 +1468,7 @@
     },
     {
         "destination.address": "str4641.domain",
-        "destination.ip": [
-            "10.151.31.58"
-        ],
+        "destination.ip": "10.151.31.58",
         "event.code": "quide",
         "event.dataset": "proofpoint.emailsecurity",
         "event.module": "proofpoint",
@@ -1589,9 +1577,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.113.119.47"
-        ],
+        "destination.ip": "10.113.119.47",
         "event.code": "queued-vdedc2v5",
         "event.dataset": "proofpoint.emailsecurity",
         "event.module": "proofpoint",
@@ -1846,9 +1832,7 @@
         "rsa.misc.obj_type": "autodita",
         "rsa.misc.severity": "medium",
         "service.type": "proofpoint",
-        "source.ip": [
-            "10.27.154.247"
-        ],
+        "source.ip": "10.27.154.247",
         "tags": [
             "forwarded",
             "proofpoint.emailsecurity"
@@ -2021,9 +2005,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.147.147.248"
-        ],
+        "destination.ip": "10.147.147.248",
         "event.code": "sm-msp-queue",
         "event.dataset": "proofpoint.emailsecurity",
         "event.module": "proofpoint",
@@ -2077,9 +2059,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.232.240.177"
-        ],
+        "destination.ip": "10.232.240.177",
         "event.code": "queued-alert",
         "event.dataset": "proofpoint.emailsecurity",
         "event.module": "proofpoint",
@@ -2411,9 +2391,7 @@
         "rsa.misc.obj_type": "olup",
         "rsa.misc.severity": "very-high",
         "service.type": "proofpoint",
-        "source.ip": [
-            "10.199.46.88"
-        ],
+        "source.ip": "10.199.46.88",
         "tags": [
             "forwarded",
             "proofpoint.emailsecurity"
@@ -2421,9 +2399,7 @@
     },
     {
         "destination.address": "Sedutper7794.www5.domain",
-        "destination.ip": [
-            "10.154.22.241"
-        ],
+        "destination.ip": "10.154.22.241",
         "event.code": "lloinve",
         "event.dataset": "proofpoint.emailsecurity",
         "event.module": "proofpoint",
@@ -2521,9 +2497,7 @@
         "rsa.misc.obj_type": "itaed",
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
-        "source.ip": [
-            "10.38.111.125"
-        ],
+        "source.ip": "10.38.111.125",
         "tags": [
             "forwarded",
             "proofpoint.emailsecurity"
