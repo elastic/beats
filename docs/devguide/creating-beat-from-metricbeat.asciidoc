@@ -1,6 +1,8 @@
 [[creating-beat-from-metricbeat]]
 === Creating a Beat based on Metricbeat
 
+deprecated:[7.16.0]
+
 The metricset Beat generator enables you to create a Beat that uses Metricbeat as a library and has your
 own metricsets.
 

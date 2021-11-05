@@ -129,3 +129,4 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 ==== Deprecated
 
 - Deprecated the `common.Float` type. {issue}28279[28279] {pull}28280[28280]
+- Deprecate Beat generators. {pull}28814[28814]
