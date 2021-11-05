@@ -56,6 +56,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Remove Metricbeat EventFetcher and EventsFetcher interface. Use the reporter interface instead. {pull}25093[25093]
 - Update Darwin build image to a debian 10 base that increases the MacOS SDK and minimum supported version used in build to 10.14. {issue}24193[24193]
 - Removed the `common.Float` type. {issue}28279[28279] {pull}28280[28280] {pull}28376[28376]
+- libbeat.logp package forces ECS compliant logs. Logs are JSON formatted. Options to enable ECS/JSON have been removed. {issue}15544[15544] {pull}28573[28573]
 
 ==== Bugfixes
 

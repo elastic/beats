@@ -47,6 +47,6 @@ func TestInvalid(t *testing.T) {
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, info, content)
+	err = eventsMapping(reporter, info, content, true)
 	require.Error(t, err)
 }

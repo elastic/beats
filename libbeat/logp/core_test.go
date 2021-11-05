@@ -48,7 +48,7 @@ func TestLogger(t *testing.T) {
 
 	TestingSetup()
 	exerciseLogger()
-	TestingSetup(AsJSON())
+	TestingSetup()
 	exerciseLogger()
 }
 
@@ -152,7 +152,6 @@ func TestLoggingECSFields(t *testing.T) {
 		Beat:        "beat1",
 		Level:       DebugLevel,
 		development: true,
-		ECSEnabled:  true,
 		Files: FileConfig{
 			Name: "beat1.log",
 		},
