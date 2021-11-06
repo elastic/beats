@@ -1,7 +1,6 @@
 - name: juniper.srx
   type: group
   release: beta
-  default_field: false
   overwrite: true
   description: >
     Module for parsing junipersrx syslog.

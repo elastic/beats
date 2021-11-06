@@ -1,7 +1,6 @@
 - name: zoom
   type: group
   release: ga
-  default_field: false
   description: >
     Module for parsing Zoom API Webhooks.
   fields:
