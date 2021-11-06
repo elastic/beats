@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config/operations"
@@ -89,12 +90,17 @@ func newDiagnosticsCollectCommandWithArgs(_ []string, streams *cli.IOStreams) *c
 				return fmt.Errorf("unsupported output: %s", output)
 			}
 
-			return diagnosticsCollectCmd(streams, file, output)
+			pprof, _ := c.Flags().GetBool("pprof")
+			d, _ := c.Flags().GetDuration("pprof-duration")
+
+			return diagnosticsCollectCmd(streams, file, output, pprof, d)
 		},
 	}
 
 	cmd.Flags().StringP("file", "f", "", "name of the output diagnostics zip archive")
 	cmd.Flags().String("output", "yaml", "Output the collected information in either json, or yaml (default: yaml)") // replace output flag with different options
+	cmd.Flags().Bool("pprof", false, "Collect all pprof data from all running applications.")
+	cmd.Flags().Duration("pprof-duration", time.Second*30, "The duration to collect trace and profiling data from the debug/pprof endpoints. (default: 30s)")
 
 	return cmd
 }
@@ -127,14 +133,18 @@ func diagnosticCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) er
 	return outputFunc(streams.Out, diag)
 }
 
-func diagnosticsCollectCmd(streams *cli.IOStreams, fileName, outputFormat string) error {
+func diagnosticsCollectCmd(streams *cli.IOStreams, fileName, outputFormat string, pprof bool, pprofDur time.Duration) error {
 	err := tryContainerLoadPaths()
 	if err != nil {
 		return err
 	}
 
 	ctx := handleSignal(context.Background())
-	innerCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	d := time.Second * 30
+	if pprof {
+		d = 2 * pprofDur
+	}
+	innerCtx, cancel := context.WithTimeout(ctx, d)
 	defer cancel()
 
 	diag, err := getDiagnostics(innerCtx)
@@ -151,7 +161,15 @@ func diagnosticsCollectCmd(streams *cli.IOStreams, fileName, outputFormat string
 		return fmt.Errorf("unable to gather config data: %w", err)
 	}
 
-	err = createZip(fileName, outputFormat, diag, cfg)
+	var pprofData map[string][]client.ProcPProf = nil
+	if pprof {
+		pprofData, err = getAllPprof(innerCtx, pprofDur)
+		if err != nil {
+			return fmt.Errorf("unable to gather pprof data: %w", err)
+		}
+	}
+
+	err = createZip(fileName, outputFormat, diag, cfg, pprofData)
 	if err != nil {
 		return fmt.Errorf("unable to create archive %q: %w", fileName, err)
 	}
@@ -242,7 +260,7 @@ func gatherConfig() (AgentConfig, error) {
 //
 // The passed DiagnosticsInfo and AgentConfig data is written in the specified output format.
 // Any local log files are collected and copied into the archive.
-func createZip(fileName, outputFormat string, diag DiagnosticsInfo, cfg AgentConfig) error {
+func createZip(fileName, outputFormat string, diag DiagnosticsInfo, cfg AgentConfig, pprof map[string][]client.ProcPProf) error {
 	f, err := os.Create(fileName)
 	if err != nil {
 		return err
@@ -296,6 +314,13 @@ func createZip(fileName, outputFormat string, diag DiagnosticsInfo, cfg AgentCon
 
 	if err := zipLogs(zw); err != nil {
 		return closeHandlers(err, zw, f)
+	}
+
+	if pprof != nil {
+		err := zipProfs(zw, pprof)
+		if err != nil {
+			return closeHandlers(err, zw, f)
+		}
 	}
 
 	return closeHandlers(nil, zw, f)
@@ -370,4 +395,59 @@ func closeHandlers(err error, closers ...io.Closer) error {
 		}
 	}
 	return mErr.ErrorOrNil()
+}
+
+func getAllPprof(ctx context.Context, d time.Duration) (map[string][]client.ProcPProf, error) {
+	daemon := client.New()
+	err := daemon.Connect(ctx)
+	if err != nil {
+		return nil, err
+	}
+	pprofTypes := []proto.PprofOption{
+		proto.PprofOption_ALLOCS,
+		proto.PprofOption_BLOCK,
+		proto.PprofOption_CMDLINE,
+		proto.PprofOption_GOROUTINE,
+		proto.PprofOption_HEAP,
+		proto.PprofOption_MUTEX,
+		proto.PprofOption_PROFILE,
+		proto.PprofOption_THREADCREATE,
+		proto.PprofOption_TRACE,
+	}
+	return daemon.Pprof(ctx, d, pprofTypes, "", "")
+}
+
+func zipProfs(zw *zip.Writer, pprof map[string][]client.ProcPProf) error {
+	zf, err = zw.Create("pprof/")
+	if err != nil {
+		return err
+	}
+	for pType, profs := range pprof {
+		zf, err = zw.Create("pprof/" + pType + "/")
+		if err != nil {
+			return err
+		}
+		for _, p := range profs {
+			if p.Error != "" {
+				zf, err = zw.Create("pprof/" + pType + "/" + p.Name + "_" + p.RouteKey + "_error.txt")
+				if err != nil {
+					return err
+				}
+				_, err = zf.Write([]byte(p.Error))
+				if err != nil {
+					return err
+				}
+				continue
+			}
+			zf, err = zw.Create("pprof/" + pType + "/" + p.Name + "_" + p.RouteKey + ".pprof")
+			if err != nil {
+				return err
+			}
+			_, err = zf.Write(p.Results)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }

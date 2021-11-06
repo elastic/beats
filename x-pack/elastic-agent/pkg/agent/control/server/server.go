@@ -7,6 +7,8 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"runtime"
@@ -210,68 +212,215 @@ func (s *Server) ProcMeta(ctx context.Context, _ *proto.Empty) (*proto.ProcMetaR
 		specs := sp.Specs()
 
 		for n, spec := range specs {
-			procMeta := &proto.ProcMeta{
-				Name:     n,
-				RouteKey: rk,
-			}
-
-			client := http.Client{
-				Timeout: time.Second * 5,
-			}
 			endpoint := monitoring.MonitoringEndpoint(spec, runtime.GOOS, rk)
-			if strings.HasPrefix(endpoint, "unix://") {
-				client.Transport = &http.Transport{
-					Proxy:       nil,
-					DialContext: socket.DialContext(strings.TrimPrefix(endpoint, "unix://")),
-				}
-				endpoint = "unix"
-			} else if strings.HasPrefix(endpoint, "npipe://") {
-				client.Transport = &http.Transport{
-					Proxy:       nil,
-					DialContext: socket.DialContext(strings.TrimPrefix(endpoint, "npipe:///")),
-				}
-				endpoint = "npipe"
-			}
+			client := newSocketRequester(time.Second*5, n, rk, endpoint)
 
-			res, err := client.Get("http://" + endpoint + "/")
-			if err != nil {
-				procMeta.Error = err.Error()
-				resp.Procs = append(resp.Procs, procMeta)
-				continue
-			}
-			if res.StatusCode != 200 {
-				procMeta.Error = "response status is: " + res.Status
-				resp.Procs = append(resp.Procs, procMeta)
-				continue
-			}
-
-			bi := &BeatInfo{}
-			dec := json.NewDecoder(res.Body)
-			if err := dec.Decode(bi); err != nil {
-				res.Body.Close()
-				procMeta.Error = err.Error()
-				resp.Procs = append(resp.Procs, procMeta)
-				continue
-			}
-			res.Body.Close()
-
-			procMeta.Process = bi.Beat
-			procMeta.Hostname = bi.Hostname
-			procMeta.Id = bi.ID
-			procMeta.EphemeralId = bi.EphemeralID
-			procMeta.Version = bi.Version
-			procMeta.BuildCommit = bi.Commit
-			procMeta.BuildTime = bi.Time
-			procMeta.Username = bi.Username
-			procMeta.UserId = bi.UserID
-			procMeta.UserGid = bi.GroupID
-			procMeta.Architecture = bi.BinaryArch
-			procMeta.ElasticLicensed = bi.ElasticLicensed
-
+			procMeta := client.ProcMeta(ctx)
 			resp.Procs = append(resp.Procs, procMeta)
 		}
 	}
 	return resp, nil
+}
+
+func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.PprofResponse, error) {
+	if s.routeFn == nil {
+		return nil, errors.New("route function is nil")
+	}
+
+	dur, err := time.ParseDuration(req.TraceDuration)
+	if err != nil {
+		return nil, fmt.Errorf("unable to parse trace duration: %w", err)
+	}
+
+	resp := &proto.PprofResonse{
+		Results: []*proto.PprofResult{},
+	}
+
+	var wg sync.WaitGroup
+	ch := make(chan *proto.PprofResult, 1)
+
+	routes := s.routeFn()
+	for _, rk := range routes.Keys() {
+		// Skip the rk if it does not match and one has been requested.
+		if req.RouteKey != "" && req.RouteKey != rk {
+			continue
+		}
+		programs, ok := routes.Get(rk)
+		if !ok {
+			s.logger.With("route_key", rk).Warn("Unable to retrieve route.")
+			continue
+		}
+
+		sp, ok := programs.(specer)
+		if !ok {
+			s.logger.With("route_key", rk, "route", programs).Warn("Unable to cast route as specer.")
+			continue
+		}
+		specs := sp.Specs()
+		for n, spec := range specs {
+			if req.AppName != "" && req.AppName != n {
+				continue // Skip the app if it does not match and one has been requested.
+			}
+			endpoint := monitoring.DebugEndpoint(spec, runtime.GOOS, rk)
+			c := newSocketRequester(dur*2, n, rk, endpoint)
+
+			// Launch a concurrent goroutine to gather all pprof endpoints from a socket.
+			for _, opt := range req.PprofType {
+				wg.Add(1)
+				go func() {
+					res := c.GetPprof(ctx, opt, dur)
+					ch <- res
+					wg.Done()
+				}()
+			}
+		}
+	}
+
+	// wait for the waitgroup to be done and close the channel
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+
+	// gather all results from channel until closed.
+	for res := range ch {
+		resp.Results = append(resp.Results, res)
+	}
+	return resp, nil
+}
+
+// socketRequester is a struct to gather (diagnostics) data from a socket opened by elastic-agent or one if it's processes
+type socketRequester struct {
+	c        http.Client
+	endpoint string
+	appName  string
+	routeKey string
+}
+
+func newSocketRequester(timeout time.Duration, appName, routeKey, endpoint string) *socketRequester {
+	c := http.Client{Timeout: timeout}
+	if strings.HasPrefix(endpoint, "unix://") {
+		c.Transport = &http.Transport{
+			Proxy:       nil,
+			DialContext: socket.DialContext(strings.TrimPrefix(endpoint, "unix://")),
+		}
+		endpoint = "unix"
+	} else if strings.HasPrefix(endpoint, "npipe://") {
+		c.Transport = &http.Transport{
+			Proxy:       nil,
+			DialContext: socket.DialContext(strings.TrimPrefix(endpoint, "npipe:///")),
+		}
+		endpoint = "npipe"
+	}
+	return &socketRequester{
+		c:        c,
+		appName:  appName,
+		routeKey: routeKey,
+		endpoint: endpoint,
+	}
+}
+
+// getPath creates a get request for the specified path.
+// Will return an error if that status code is not 200.
+func (r *socketRequester) getPath(ctx context.Context, path string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", "http://"+r.endpoint+path, nil)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	res, err := r.c.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode != 200 {
+		res.Body.Close()
+		return nil, fmt.Errorf("response status is %d", res.StatusCode)
+	}
+	return res, nil
+
+}
+
+// ProcMeta will return process metadata by querying the "/" path.
+func (r *socketRequester) ProcMeta(ctx context.Context) *proto.ProcMeta {
+	pm := &proto.ProcMeta{
+		Name:     r.appName,
+		RouteKey: r.routeKey,
+	}
+
+	res, err := r.c.getPath(ctx, "/")
+	if err != nil {
+		pm.Error = err.Error()
+		return pm
+	}
+	defer res.Body.Close()
+
+	bi := &BeatInfo{}
+	dec := json.NewDecoder(res.Body)
+	if err := dec.Decode(bi); err != nil {
+		pm.Error = err.Error()
+		return pm
+	}
+
+	pm.Process = bi.Beat
+	pm.Hostname = bi.Hostname
+	pm.Id = bi.ID
+	pm.EphemeralId = bi.EphemeralID
+	pm.Version = bi.Version
+	pm.BuildCommit = bi.Commit
+	pm.BuildTime = bi.Time
+	pm.Username = bi.Username
+	pm.UserId = bi.UserID
+	pm.UserGid = bi.GroupID
+	pm.Architecture = bi.BinaryArch
+	pm.ElasticLicensed = bi.ElasticLicensed
+
+	return pm
+}
+
+var pprofEndopoints = map[proto.PprofOption]string{
+	proto.PprofOption_ALLOCS:       "/debug/pprof/allocs",
+	proto.PprofOption_BLOCK:        "/debug/pprof/block",
+	proto.PprofOption_CMDLINE:      "/debug/pprof/cmdline",
+	proto.PprofOption_GOROUTINE:    "/debug/pprof/goroutine",
+	proto.PprofOption_HEAP:         "/debug/pprof/heap",
+	proto.PprofOption_MUTEX:        "/debug/pprof/mutex",
+	proto.PprofOption_PROFILE:      "/debug/pprof/profile",
+	proto.PprofOption_THREADCREATE: "/debug/pprof/threadcreate",
+	proto.PprofOption_TRACE:        "/debug/pprof/trace",
+}
+
+// GetProf will gather pprof data specified by the option.
+func (r *socketRequester) GetPprof(ctx context.Context, opt proto.PprofOption, dur time.Duration) *proto.PprofResult {
+	res := &proto.PprofResult{
+		AppName:   r.appName,
+		RouteKey:  r.routeKey,
+		PprofType: opt,
+	}
+
+	path, ok := pprofEndpoints[opt]
+	if !ok {
+		res.Error = "unknown path for option"
+		return res
+	}
+
+	if opt == proto.PprofOption_PROFILE || opt == proto.PprofOption_TRACE {
+		path += fmt.Sprintf("?seconds=%0.f", dur.Seconds())
+	}
+
+	resp, err := r.c.getPath(ctx, path)
+	if err != nil {
+		res.Error = err.Error()
+		return res
+	}
+	defer resp.Body.Close()
+
+	p, err := io.ReadAll(resp.Body)
+	if err != nil {
+		res.Error = err.Error()
+		return res
+	}
+	res.Result = p
+	return res
 }
 
 type upgradeRequest struct {
