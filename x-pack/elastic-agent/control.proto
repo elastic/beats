@@ -29,6 +29,19 @@ enum ActionStatus {
   FAILURE = 1;
 }
 
+// pprof endpoint that can be requested.
+enum PprofOption {
+	ALLOCS = 0;
+	BLOCK = 1;
+	CMDLINE = 2;
+	GOROUTINE = 3;
+	HEAP = 4;
+	MUTEX = 5;
+	PROFILE = 6;
+	THREADCREATE = 7;
+	TRACE = 8;
+}
+
 // Empty message.
 message Empty {
 }
@@ -128,6 +141,32 @@ message ProcMetaResponse {
   repeated ProcMeta procs = 1;
 }
 
+// PprofRequest is a request for pprof data from and http/pprof endpoint.
+message PprofRequest {
+	// The profiles that are requested
+	repeated PprofOption pprofType = 1;
+	// A string representing a time.Duration to apply to trace, and profile options.
+	string traceDuration = 2;
+	// The application that will be profiled, if empty all applications are profiled.
+	string appName = 3;
+	// The route key to match for profiling, if empty all are profiled.
+	string routeKey = 4;
+}
+
+// PprofResult is the result of a pprof request for a given application/route key.
+message PprofResult {
+	string appName = 1;
+	string routeKey = 2;
+	PprofOption pprofType = 3;
+	bytes result = 4;
+	string error = 5;
+}
+
+// PprofResponse is a wrapper to return all pprof responses.
+message PprofResponse {
+	repeated PprofResult results = 1;
+}
+
 service ElasticAgentControl {
   // Fetches the currently running version of the Elastic Agent.
   rpc Version(Empty) returns (VersionResponse);
@@ -143,4 +182,7 @@ service ElasticAgentControl {
 
   // Gather all running process metadata.
   rpc ProcMeta(Empty) returns (ProcMetaResponse);
+
+  // Gather requested pprof data from specified applications.
+  rpc Pprof(PprofRequest) returns (PprofResponse);
 }
