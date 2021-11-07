@@ -71,9 +71,14 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	libCfg, err := newSaramaConfig(log, config)
+	clientId, err := buildClientIdSelector(cfg)
 	if err != nil {
 		return outputs.Fail(err)
+	}
+
+	shouldUseMultiKafka := !clientId.IsConst()
+	if shouldUseMultiKafka {
+		config.ClientID = "beats" // Will be replaced inside NewKafkaMultiClient with calculated value
 	}
 
 	hosts, err := outputs.ReadHostList(cfg)
@@ -81,12 +86,23 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	codec, err := codec.CreateEncoder(beat, config.Codec)
-	if err != nil {
-		return outputs.Fail(err)
-	}
+	var client outputs.Client
 
-	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, config.Key, topic, codec, libCfg)
+	if !shouldUseMultiKafka {
+		libCfg, err := newSaramaConfig(log, config, "")
+		if err != nil {
+			return outputs.Fail(err)
+		}
+
+		encoder, err := codec.CreateEncoder(beat, config.Codec)
+		if err != nil {
+			return outputs.Fail(err)
+		}
+
+		client, err = newKafkaClient(observer, hosts, beat.IndexPrefix, config.Key, topic, encoder, libCfg)
+	} else {
+		client, err = NewKafkaMultiClient(beat, observer, hosts, topic, config, log, clientId)
+	}
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -105,5 +121,12 @@ func buildTopicSelector(cfg *common.Config) (outil.Selector, error) {
 		EnableSingleOnly: true,
 		FailEmpty:        true,
 		Case:             outil.SelectorKeepCase,
+	})
+}
+
+func buildClientIdSelector(cfg *common.Config) (outil.Selector, error) {
+	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
+		Key:              "client_id",
+		EnableSingleOnly: true,
 	})
 }

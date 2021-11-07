@@ -201,6 +201,26 @@ NOTE: Publishing to a subset of available partitions potentially increases resou
 
 The configurable ClientID used for logging, debugging, and auditing purposes. The default is "beats".
 
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.kafka:
+  client_id: 'beats'
+------------------------------------------------------------------------------
+
+beta[]
+
+You can set the clientID dynamically by using a format string to access any event field. For example, this configuration uses a custom field, `kubernetes.pod.annotations.tenant_name`, to set the topic for each event:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.kafka:
+  client_id: '%{[kubernetes.pod.annotations.tenant_name]}_logs'
+------------------------------------------------------------------------------
+
+In this case, a new Kafka client will be created for each calculated `client_id` value.
+
+NOTE: Unused connections will be closed after 15 minutes of inactivity.
+
 ===== `worker`
 
 The number of concurrent load-balanced Kafka output workers.

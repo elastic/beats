@@ -71,7 +71,7 @@ func TestConfigAcceptValid(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Can not create test configuration: %v", err)
 			}
-			if _, err := newSaramaConfig(logp.L(), cfg); err != nil {
+			if _, err := newSaramaConfig(logp.L(), cfg, ""); err != nil {
 				t.Fatalf("Failure creating sarama config: %v", err)
 			}
 		})
