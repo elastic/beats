@@ -1,0 +1,11 @@
+language: go
+install:
+ - go get github.com/tsg/gopacket
+ - go get github.com/tsg/gopacket/layers
+ - go get github.com/tsg/gopacket/tcpassembly
+script:
+ - go test github.com/tsg/gopacket
+ - go test github.com/tsg/gopacket/layers
+ - go test github.com/tsg/gopacket/tcpassembly
+ - ./.travis.gofmt.sh
+ #- ./.travis.govet.sh

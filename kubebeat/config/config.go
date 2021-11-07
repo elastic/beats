@@ -6,7 +6,8 @@ package config
 import "time"
 
 type Config struct {
-	Period time.Duration `config:"period"`
+	KubeConfig string        `config:"kube_config"`
+	Period     time.Duration `config:"period"`
 }
 
 var DefaultConfig = Config{

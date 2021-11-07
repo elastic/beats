@@ -1,0 +1,1672 @@
+---
+# Macros declares some YAML anchors that can be referenced for some common
+# object type normalizations like user-session, socket, or process.
+macros:
+  - &defaults
+    subject:
+      primary: auid
+      secondary: uid
+    how: [exe, comm]
+
+  - &macro-user-session
+    subject:
+      primary: auid
+      secondary: [acct, id, uid]
+    object:
+      primary: terminal
+      secondary: [addr, hostname]
+      what: user-session
+    how: [exe, terminal]
+
+  - &macro-socket
+    <<: *defaults
+    object:
+      primary: [addr, path]
+      secondary: port
+      what: socket
+
+  - &macro-process
+    <<: *defaults
+    object:
+      primary: [cmd, exe, comm]
+      secondary: pid
+      what: process
+    how: terminal
+
+  - &ecs-iam
+    category: iam
+    type: info
+
+  - &ecs-auth
+    category: authentication
+    type: info
+    mappings:
+      - from: subject.primary
+        to: user
+      - from: subject.secondary
+        to: user.effective
+
+  - &ecs-session
+    category: session
+    type: info
+    mappings:
+      - from: subject.primary
+        to: user
+      - from: subject.secondary
+        to: user.effective
+
+  - &ecs-host
+    category: host
+    type: info
+
+  - &ecs-process
+    category: process
+    type: info
+
+  - &ecs-file
+    category: file
+    type: info
+
+  - &ecs-driver
+    category: driver
+    type: info
+
+  - &ecs-network
+    category: network
+    type:
+      - connection
+      - info
+
+  - &ecs-user-modification-mappings
+    mappings:
+      - from: subject.primary
+        to: user
+      - from: subject.secondary
+        to: user.effective
+      - from: object.primary
+        to: user.target
+
+  - &ecs-group-modification-mappings
+    mappings:
+      - from: subject.primary
+        to: user
+      - from: subject.secondary
+        to: user.effective
+      - from: object.primary
+        to: group
+
+# Normalizations is a list of declarations specifying how to normalize the data
+# contained in an event. The normalization can be applied based on the syscall
+# name (e.g. connect, open) or based on the record type (e.g. USER_LOGIN).
+# No two normalizations can apply to the same syscall or record type. This
+# will result in a failure at load time.
+#
+# Each normalization should specify:
+#   action - what happened
+#   actor  - who did this or who triggered the event
+#   object - what was the "thing" involved in the action (e.g. process, socket)
+#   how    - how was the action performed (e.g. exe or terminal)
+normalizations:
+  - ecs: *ecs-process
+    syscalls:
+      - '*' # this is a catch all
+  - action: opened-file
+    object:
+      what: file
+    syscalls:
+      # creat - open and possibly create a file
+      - creat
+    ecs:
+      <<: *ecs-file
+      type: creation
+  - action: opened-file
+    object:
+      what: file
+    syscalls:
+      # fallocate - manipulate file space
+      - fallocate
+      # truncate - truncate a file to a specified length
+      - truncate
+      # ftruncate - truncate a file to a specified length
+      - ftruncate
+    ecs:
+      <<: *ecs-file
+      # technically you can truncate a file to the same length
+      # but regardless, we consider this a change
+      type: change
+  - action: opened-file
+    object:
+      what: file
+    syscalls:
+      # open - open and possibly create a file
+      - open
+      # openat - open and possibly create a file
+      - openat
+      # readlink - read value of a symbolic link
+      - readlink
+      # readlinkat - read value of a symbolic link
+      - readlinkat
+    ecs: *ecs-file
+  - action: read-file
+    object:
+      what: file
+    syscalls:
+      # read - read from a file descriptor
+      - read
+    ecs: *ecs-file
+  - action: wrote-to-file
+    object:
+      what: file
+    syscalls:
+      # write - write to a file descriptor
+      - write
+    ecs:
+      <<: *ecs-file
+      type: change
+  - action: changed-file-attributes-of
+    object:
+      what: file
+    syscalls:
+      # setxattr - set an extended attribute value
+      - setxattr
+      # fsetxattr - set an extended attribute value
+      - fsetxattr
+      # lsetxattr - set an extended attribute value
+      - lsetxattr
+      # removexattr - remove an extended attribute
+      - removexattr
+      # fremovexattr - remove an extended attribute
+      - fremovexattr
+      # lremovexattr - remove an extended attribute
+      - lremovexattr
+    ecs:
+      <<: *ecs-file
+      type: change
+  - action: changed-file-permissions-of
+    object:
+      what: file
+    syscalls:
+      # chmod - change permissions of a file
+      - chmod
+      # fchmod - change permissions of a file
+      - fchmod
+      # fchmodat - change permissions of a file
+      - fchmodat
+    ecs:
+      <<: *ecs-file
+      type: change
+  - action: changed-file-ownership-of
+    object:
+      what: file
+    syscalls:
+      # chown - change ownership of a file
+      - chown
+      # fchown - change ownership of a file
+      - fchown
+      # fchownat - change ownership of a file
+      - fchownat
+      # lchown - change ownership of a file
+      - lchown
+    ecs:
+      <<: *ecs-file
+      type: change
+  - action: loaded-kernel-module
+    object:
+      what: file
+      primary: name
+    record_types:
+      - KERN_MODULE
+    syscalls:
+      # finit_module - load a kernel module
+      - finit_module
+      # init_module - load a kernel module
+      - init_module
+    ecs:
+      <<: *ecs-driver
+      type: start
+  - action: unloaded-kernel-module
+    object:
+      what: file
+    syscalls:
+      # delete_module - unload a kernel module
+      - delete_module
+    ecs:
+      <<: *ecs-driver
+      type: end
+  - action: created-directory
+    object:
+      what: file
+      path_index: 1
+    syscalls:
+      # mkdir - create a directory
+      - mkdir
+      # mkdirat - create a directory
+      - mkdirat
+    ecs:
+      <<: *ecs-file
+      type: creation
+  - action: mounted
+    object:
+      what: filesystem
+      path_index: 1
+    syscalls:
+      # mount - mount filesystem
+      - mount
+    ecs:
+      <<: *ecs-file
+      # since a new mount appears on the system
+      # we consider this a high-level "creation" event
+      type: creation
+  - action: renamed
+    object:
+      what: file
+      path_index: 2
+    syscalls:
+      # rename - change the name or location of a file
+      - rename
+      # renameat - change the name or location of a file
+      - renameat
+      # renameat2 - change the name or location of a file
+      - renameat2
+    ecs:
+      <<: *ecs-file
+      type: change
+  - action: checked-metadata-of
+    object:
+      what: file
+    syscalls:
+      # access - check user's permissions for a file
+      - access
+      # faccessat - check user's permissions for a file
+      - faccessat
+      # fstatat - get file status
+      - fstatat
+      # newfstatat - get file status
+      - newfstatat
+      # stat - get file status
+      - stat
+      # stat64 - get file status
+      - stat64
+      # fstat - get file status
+      - fstat
+      # lstat - get file status
+      - lstat
+      # getxattr - retrieve an extended attribute value
+      - getxattr
+      # lgetxattr - retrieve an extended attribute value
+      - lgetxattr
+      # fgetxattr - retrieve an extended attribute value
+      - fgetxattr
+    ecs: *ecs-file
+  - action: checked-filesystem-metadata-of
+    object:
+      what: filesystem
+    syscalls:
+      # statfs - get filesystem statistics
+      - statfs
+      # fstatfs - get filesystem statistics
+      - fstatfs
+    ecs: *ecs-file
+  - action: symlinked
+    object:
+      what: file
+    syscalls:
+      # symlink - make a new name for a file
+      - symlink
+      # symlinkat - make a new name for a file
+      - symlinkat
+    ecs:
+      <<: *ecs-file
+      # "creation" since we're creating a new file system
+      # entry for the symlink
+      type: creation
+  - action: unmounted
+    object:
+      what: filesystem
+    syscalls:
+      # umount - unmount filesystem
+      - umount
+      # umount2 - unmount filesystem
+      - umount2
+    ecs:
+      <<: *ecs-file
+      # "deletion" to mirror the "creation" of the mount
+      type: deletion
+  - action: deleted
+    object:
+      what: file
+    syscalls:
+      # rmdir - delete a directory
+      - rmdir
+      # unlink - delete a name and possibly the file it refers to
+      - unlink
+      # unlinkat - delete a name and possibly the file it refers to
+      - unlinkat
+    ecs:
+      <<: *ecs-file
+      type: deletion
+  - action: changed-timestamp-of
+    object:
+      what: file
+    syscalls:
+      # utime - change file last access and modification times
+      - utime
+      # utimes - change file last access and modification times
+      - utimes
+      # futimesat - change timestamps of a file relative to a \ directory file descriptor
+      - futimesat
+      # futimens - change file timestamps with nanosecond precision
+      - futimens
+      # utimensat - change file timestamps with nanosecond precision
+      - utimensat
+    ecs: *ecs-file
+  - action: executed
+    object:
+      what: file
+    syscalls:
+      # execve - execute program
+      - execve
+      # execveat - execute program relative to a directory file descriptor
+      - execveat
+    ecs:
+      <<: *ecs-process
+      type: start
+  - action: listen-for-connections
+    object:
+      what: socket
+    syscalls:
+      # listen- listen for connections on a socket
+      - listen
+    ecs:
+      <<: *ecs-network
+      type: start
+  - action: accepted-connection-from
+    object:
+      what: socket
+    syscalls:
+      # accept - accept a connection on a socket
+      - accept
+      # accept4 - accept a connection on a socket
+      - accept4
+    ecs:
+      <<: *ecs-network
+      type:
+        - connection
+        - start
+  - action: bound-socket
+    object:
+      what: socket
+    syscalls:
+      # bind -bind a name to a socket
+      - bind
+    ecs:
+      <<: *ecs-network
+      type: start
+  - action: connected-to
+    object:
+      what: socket
+    syscalls:
+      - connect
+    ecs:
+      <<: *ecs-network
+      type:
+        - connection
+        - start
+  - action: received-from
+    object:
+      what: socket
+    syscalls:
+      # recv - receive a message from a socket
+      - recv
+      # recvfrom - receive a message from a socket
+      - recvfrom
+      # recvmsg - receive a message from a socket
+      - recvmsg
+      # recvmmsg - receive multiple messages on a socket
+      - recvmmsg
+    ecs:
+      <<: *ecs-network
+  - action: sent-to
+    object:
+      what: socket
+    syscalls:
+      # send - send a message on a socket
+      - send
+      # sendto - send a message on a socket
+      - sendto
+      # sendmsg - send a message on a socket
+      - sendmsg
+      # sendmmsg - send multiple messages on a socket
+      - sendmmsg
+    ecs:
+      <<: *ecs-network
+  - action: killed-pid
+    object:
+      what: process
+    syscalls:
+      # kill - send signal to a process
+      - kill
+      # tkill - send a signal to a thread
+      - tkill
+      # tgkill - send a signal to a thread
+      - tgkill
+    ecs:
+      <<: *ecs-process
+      type: end
+  - action: changed-identity-of
+    object:
+      what: process
+    how: syscall
+    syscalls:
+      # setuid - set user identity
+      - setuid
+      # seteuid - set effective user or group ID
+      - seteuid
+      # setfsuid - set user identity used for filesystem checks
+      - setfsuid
+      # setreuid - set real and/or effective user or group ID
+      - setreuid
+      # setgid - set group identity
+      - setgid
+      # setegid - set effective user or group ID
+      - setegid
+      # setfsgid - set group identity used for filesystem checks
+      - setfsgid
+      # setregid - set real and/or effective user or group ID
+      - setregid
+      # setresuid - set real, effective and saved user or group ID
+      - setresuid
+      # setresgid - set real, effective and saved user or group ID
+      - setresgid
+    ecs:
+      <<: *ecs-process
+      type: change
+  - action: changed-system-time
+    object:
+      what: system
+    syscalls:
+      # settimeofday - get / set time
+      - settimeofday
+      # clock_settime - clock and time functions
+      - clock_settime
+      # stime - set time
+      - stime
+      # adjtimex - tune kernel clock
+      - adjtimex
+    ecs:
+      <<: *ecs-host
+      type: change
+  - action: make-device
+    object:
+      what: file
+    syscalls:
+      # mknod - create a special or ordinary file
+      - mknod
+      # mknodat - create a special or ordinary file
+      - mknodat
+    ecs:
+      <<: *ecs-file
+      type: creation
+  - action: changed-system-name
+    object:
+      what: system
+    syscalls:
+      # sethostname - get/set hostname
+      - sethostname
+      # setdomainname - get/set NIS domain name
+      - setdomainname
+    ecs:
+      <<: *ecs-host
+      type: change
+  - action: allocated-memory
+    object:
+      what: memory
+    syscalls:
+      # mmap - map or unmap files or devices into memory
+      - mmap
+      # mmap2 - map files or devices into memory
+      - mmap2
+      # brk - change data segment size
+      - brk
+    ecs: *ecs-process
+  - action: adjusted-scheduling-policy-of
+    object:
+      what: process
+    how: syscall
+    syscalls:
+      # sched_setparam - set and get scheduling parameters
+      - sched_setparam
+      # sched_setscheduler - set and get scheduling policy/parameters
+      - sched_setscheduler
+      # sched_setattr - set and get scheduling policy and attributes
+      - sched_setattr
+    ecs:
+      <<: *ecs-process
+      type: change
+
+  # Currently unhandled
+  # this list comes from parsing linux man pages at https://git.kernel.org/pub/scm/docs/man-pages/man-pages.git
+
+  # sigaction - examine and change a signal action
+  # rt_sigaction - examine and change a signal action
+  # pread - read from or write to a file descriptor at a given offset
+  # pwrite - read from or write to a file descriptor at a given offset
+  # s390_guarded_storage - operations with z/Architecture guarded storage facility
+  # sched_getattr - set and get scheduling policy and attributes
+  # getrusage - get resource usage
+  # flock - apply or remove an advisory lock on an open file
+  # pidfd_getfd - obtain a duplicate of another process's file descriptor
+  # clock_nanosleep - high-resolution sleep with specifiable clock
+  # getpagesize - get memory page size
+  # pidfd_open - obtain a file descriptor that refers to a process
+  # splice - splice data to/from a pipe
+  # getresuid - get real, effective and saved user/group IDs
+  # getresgid - get real, effective and saved user/group IDs
+  # remap_file_pages - create a nonlinear file mapping
+  # io_cancel - cancel an outstanding asynchronous I/O operation
+  # prctl - operations on a process or thread
+  # clock_getres - clock and time functions
+  # clock_gettime - clock and time functions
+  # getgroups - get/set list of supplementary group IDs
+  # setgroups - get/set list of supplementary group IDs
+  # vmsplice - splice user pages to/from a pipe
+  # epoll_create - open an epoll file descriptor
+  # epoll_create1 - open an epoll file descriptor
+  # posix_fadvise - predeclare an access pattern for file data
+  # sigwaitinfo - synchronously wait for queued signals
+  # sigtimedwait - synchronously wait for queued signals
+  # rt_sigtimedwait - synchronously wait for queued signals
+  # sigreturn - return from signal handler and cleanup stack frame
+  # rt_sigreturn - return from signal handler and cleanup stack frame
+  # getrandom - obtain a series of random bytes
+  # keyctl - manipulate the kernel's key management facility
+  # sched_getscheduler - set and get scheduling policy/parameters
+  # mbind - set memory policy for a memory range
+  # getpriority - get/set program scheduling priority
+  # setpriority - get/set program scheduling priority
+  # inotify_init - initialize an inotify instance
+  # inotify_init1 - initialize an inotify instance
+  # semctl - System V semaphore control operations
+  # gethostname - get/set hostname
+  # ptrace - process trace
+  # sysctl - read/write system parameters
+  # getpeername - get name of connected peer socket
+  # fork - create a child process
+  # query_module - query the kernel for various bits pertaining to modules
+  # ioctl_list - list of ioctl calls in Linux/i386 kernel
+  # msgget - get a System V message queue identifier
+  # spu_create - create a new spu context
+  # subpage_prot - define a subpage protection for an address range
+  # quotactl - manipulate disk quotas
+  # nfsservctl - syscall interface to kernel nfs daemon
+  # openat2 - open and possibly create a file (extended)
+  # getrlimit - get/set resource limits
+  # setrlimit - get/set resource limits
+  # prlimit - get/set resource limits
+  # tee - duplicating pipe content
+  # shmget - allocates a System V shared memory segment
+  # create_module - create a loadable module entry
+  # gettimeofday - get / set time
+  # timer_create - create a POSIX per-process timer
+  # fanotify_mark - add, remove, or modify an fanotify mark on a filesystem object
+  # pipe - create pipe
+  # pipe2 - create pipe
+  # intro - introduction to system calls
+  # lookup_dcookie - return a directory entry's path
+  # sysfs - get filesystem type information
+  # s390_runtime_instr - enable/disable s390 CPU run-time instrumentation
+  # setns - reassociate thread with a namespace
+  # set_mempolicy - set default NUMA memory policy for a thread and its children
+  # nice - change process priority
+  # io_setup - create an asynchronous I/O context
+  # mincore - determine whether pages are resident in memory
+  # ioctl_console - ioctls for console terminal and virtual consoles
+  # poll - wait for some event on a file descriptor
+  # ppoll - wait for some event on a file descriptor
+  # capget - set/get capabilities of thread(s)
+  # capset - set/get capabilities of thread(s)
+  # ioctl_tty - ioctls for terminals and serial lines
+  # iopl - change I/O privilege level
+  # io_getevents - read asynchronous I/O events from the completion queue
+  # process_vm_readv - transfer data between process address spaces
+  # process_vm_writev - transfer data between process address spaces
+  # pciconfig_read - pci device information handling
+  # pciconfig_write - pci device information handling
+  # pciconfig_iobase - pci device information handling
+  # sbrk - change data segment size
+  # set_tid_address - set pointer to thread ID
+  # pkey_alloc - allocate or free a protection key
+  # pkey_free - allocate or free a protection key
+  # select - synchronous I/O multiplexing
+  # pselect - synchronous I/O multiplexing
+  # kexec_load - load a new kernel for later execution
+  # kexec_file_load - load a new kernel for later execution
+  # personality - set the process execution domain
+  # ioctl_getfsmap - retrieve the physical layout of the filesystem
+  # inotify_rm_watch - remove an existing watch from an inotify instance
+  # perf_event_open - set up performance monitoring
+  # timer_getoverrun - get overrun count for a POSIX per-process timer
+  # wait3 - wait for process to change state, BSD style
+  # wait4 - wait for process to change state, BSD style
+  # link - make a new name for a file
+  # linkat - make a new name for a file
+  # sched_rr_get_interval - get the SCHED_RR interval for the named process
+  # munmap - map or unmap files or devices into memory
+  # socketcall - socket system calls
+  # mremap - remap a virtual memory address
+  # vfork - create a child process and block parent
+  # seccomp - operate on Secure Computing state of the process
+  # request_key - request a key from the kernel's key management facility
+  # syscall - indirect system call
+  # kcmp - compare two processes to determine if they share a kernel resource
+  # readdir - read directory entry
+  # ioperm - set port input/output permissions
+  # spu_run - execute an SPU context
+  # reboot - reboot or enable/disable Ctrl-Alt-Del
+  # readahead - initiate file readahead into page cache
+  # sched_getparam - set and get scheduling parameters
+  # acct - switch process accounting on or off
+  # sigsuspend - wait for a signal
+  # rt_sigsuspend - wait for a signal
+  # exit_group - exit all threads in a process
+  # socket - create an endpoint for communication
+  # ioctl_userfaultfd - create a file descriptor for handling page faults in user space
+  # sched_get_priority_max - get static priority range
+  # sched_get_priority_min  - get static priority range
+  # getdents - get directory entries
+  # getdents64 - get directory entries
+  # select - synchronous I/O multiplexing
+  # pselect - synchronous I/O multiplexing
+  # alloc_hugepages - allocate or free huge pages
+  # free_hugepages - allocate or free huge pages
+  # fsync - synchronize a file's in-core state with storage device
+  # fdatasync - synchronize a file's in-core state with storage device
+  # syscalls - Linux system calls
+  # memfd_create - create an anonymous file
+  # modify_ldt - get or set a per-process LDT entry
+  # get_kernel_syms - retrieve exported kernel and module symbols
+  # lseek - reposition read/write file offset
+  # shmat - System V shared memory operations
+  # shmdt - System V shared memory operations
+  # timer_delete - delete a POSIX per-process timer
+  # perfmonctl - interface to IA-64 performance monitoring unit
+  # move_pages - move individual pages of a process to another node
+  # chdir - change working directory
+  # fchdir - change working directory
+  # time - get time in seconds
+  # _exit - terminate the calling process
+  # _Exit - terminate the calling process
+  # s390_sthyi - emulate STHYI instruction
+  # io_submit - submit asynchronous I/O blocks for processing
+  # mlock - lock and unlock memory
+  # mlock2 - lock and unlock memory
+  # munlock - lock and unlock memory
+  # mlockall - lock and unlock memory
+  # munlockall - lock and unlock memory
+  # umask - set file mode creation mask
+  # arch_prctl - set architecture-specific thread state
+  # uselib - load shared library
+  # sendfile - transfer data between file descriptors
+  # shmctl - System V shared memory control
+  # epoll_wait - wait for an I/O event on an epoll file descriptor
+  # epoll_pwait - wait for an I/O event on an epoll file descriptor
+  # sigaltstack - set and/or get signal stack context
+  # ioctl - control device
+  # signalfd - create a file descriptor for accepting signals
+  # unshare - disassociate parts of the process execution context
+  # chroot - change root directory
+  # madvise - give advice about use of memory
+  # gettid - get thread identification
+  # getsockname - get socket name
+  # io_destroy - destroy an asynchronous I/O context
+  # setup - setup devices and filesystems, mount root filesystem
+  # ntp_adjtime - tune kernel clock
+  # semget - get a System V semaphore set identifier
+  # getuid - get user identity
+  # geteuid - get user identity
+  # _syscall - invoking a system call without library support (OBSOLETE)
+  # sched_setaffinity - \ set and get a thread's CPU affinity mask
+  # sched_getaffinity - \ set and get a thread's CPU affinity mask
+  # cacheflush - flush contents of instruction and/or data cache
+  # pivot_root - change the root mount
+  # msgctl - System V message control operations
+  # ioctl_fat - manipulating the FAT filesystem
+  # setpgid - set/get process group
+  # getpgid - set/get process group
+  # setpgrp - set/get process group
+  # getpgrp - set/get process group
+  # socketpair - create a pair of connected sockets
+  # bdflush - start, flush, or tune buffer-dirty-flush daemon
+  # alarm - set an alarm clock for delivery of a signal
+  # timer_settime - arm/disarm and fetch state of POSIX per-process timer
+  # timer_gettime - arm/disarm and fetch state of POSIX per-process timer
+  # add_key - add a key to the kernel's key management facility
+  # rt_sigqueueinfo - queue a signal and data
+  # rt_tgsigqueueinfo - queue a signal and data
+  # userfaultfd - create a file descriptor for handling page faults in user space
+  # semop - System V semaphore operations
+  # semtimedop - System V semaphore operations
+  # getgid - get group identity
+  # getegid - get group identity
+  # getpid - get process identification
+  # getppid - get process identification
+  # sigprocmask - examine and change blocked signals
+  # rt_sigprocmask - examine and change blocked signals
+  # uname - get name and information about current kernel
+  # statx - get file status (extended)
+  # ioctl_ficlonerange - share some the data of one file with another file
+  # ioctl_ficlone - share some the data of one file with another file
+  # mq_getsetattr - get/set message queue attributes
+  # ioprio_get - get/set I/O scheduling class and priority
+  # ioprio_set - get/set I/O scheduling class and priority
+  # epoll_ctl - control interface for an epoll file descriptor
+  # sync - commit filesystem caches to disk
+  # syncfs - commit filesystem caches to disk
+  # setsid - creates a session and sets the process group ID
+  # shutdown - shut down part of a full-duplex connection
+  # getsid - get session ID
+  # get_thread_area - manipulate thread-local storage information
+  # set_thread_area - manipulate thread-local storage information
+  # timerfd_create - timers that notify via file descriptors
+  # timerfd_settime - timers that notify via file descriptors
+  # timerfd_gettime - timers that notify via file descriptors
+  # ioctl_fideduperange - share some the data of one file with another file
+  # name_to_handle_at - obtain handle for a pathname and open file via a handle
+  # open_by_handle_at - obtain handle for a pathname and open file via a handle
+  # futex - fast user-space locking
+  # ioctl_ns - ioctl() operations for Linux namespaces
+  # pidfd_send_signal - send a signal to a process specified by a file descriptor
+  # clone - create a child process
+  # __clone2 - create a child process
+  # clone3 - create a child process
+  # times - get process times
+  # sysinfo - return system information
+  # ipc - System V IPC system calls
+  # eventfd - create a file descriptor for event notification
+  # wait - wait for process to change state
+  # waitpid - wait for process to change state
+  # waitid - wait for process to change state
+  # getdomainname - get/set NIS domain name
+  # idle - make process 0 idle
+  # inotify_add_watch - add a watch to an initialized inotify instance
+  # get_mempolicy - retrieve NUMA memory policy for a thread
+  # bpf - perform a command on an extended BPF map or program
+  # getsockopt - get and set options on sockets
+  # setsockopt - get and set options on sockets
+  # getitimer - get or set value of an interval timer
+  # setitimer - get or set value of an interval timer
+  # membarrier - issue memory barriers on a set of threads
+  # mprotect - set protection on a region of memory
+  # pkey_mprotect - set protection on a region of memory
+  # getcpu - determine CPU and NUMA node on which the calling thread is running
+  # ioctl_fslabel - get or set a filesystem label
+  # listxattr - list extended attribute names
+  # llistxattr - list extended attribute names
+  # flistxattr - list extended attribute names
+  # _llseek - reposition read/write file offset
+  # fcntl - manipulate file descriptor
+  # ustat - get filesystem statistics
+  # signal - ANSI C signal handling
+  # nanosleep - high-resolution sleep
+  # connect - initiate a connection on a socket
+  # vm86old - enter virtual 8086 mode
+  # vm86 - enter virtual 8086 mode
+  # fanotify_init - create and initialize fanotify group
+  # migrate_pages - move all pages in a process to another set of nodes
+  # restart_syscall - restart a system call after interruption by a stop signal
+  # close - close a file descriptor
+  # msgrcv - System V message queue operations
+  # msgsnd - System V message queue operations
+  # readv - read or write data into multiple buffers
+  # writev - read or write data into multiple buffers
+  # preadv - read or write data into multiple buffers
+  # pwritev - read or write data into multiple buffers
+  # preadv2 - read or write data into multiple buffers
+  # pwritev2 - read or write data into multiple buffers
+  # syslog - read and/or clear kernel message ring buffer; set console_loglevel
+  # klogctl - read and/or clear kernel message ring buffer; set console_loglevel
+  # sched_yield - yield the processor
+  # vhangup - virtually hangup the current terminal
+  # ioctl_iflags - ioctl() operations for inode flags
+  # sgetmask - manipulation of signal mask (obsolete)
+  # ssetmask - manipulation of signal mask (obsolete)
+  # sync_file_range - sync a file segment with disk
+  # copy_file_range - Copy a range of data from one file to another
+  # sigpending - examine pending signals
+  # rt_sigpending - examine pending signals
+  # getunwind - copy the unwind data to caller's buffer
+  # msync - synchronize a file with a memory map
+  # get_robust_list - get/set list of robust futexes
+  # set_robust_list - get/set list of robust futexes
+  # dup - duplicate a file descriptor
+  # dup2 - duplicate a file descriptor
+  # dup3 - duplicate a file descriptor
+  # s390_pci_mmio_write - transfer data to/from PCI MMIO memory page
+  # s390_pci_mmio_read - transfer data to/from PCI MMIO memory page
+  # pause - wait for signal
+  # swapon - start/stop swapping to file/device
+  # swapoff - start/stop swapping to file/device
+
+  # Record type normalizations
+  # Useful links:
+  # https://raw.githubusercontent.com/torvalds/linux/v4.16/include/uapi/linux/audit.h
+  # https://raw.githubusercontent.com/linux-audit/audit-userspace/4d933301b1835cafa08b9e9ef705c8fb6c96cb62/lib/libaudit.h
+  # https://www.elastic.co/guide/en/ecs/current/ecs-allowed-values-event-category.html
+
+  # IAM related events
+
+  # AUDIT_ACCT_LOCK - User's account locked by admin
+  - record_types: ACCT_LOCK
+    action: locked-account
+    ecs:
+      <<: *ecs-iam
+      type:
+        - user
+        - info
+  # AUDIT_ACCT_UNLOCK - User's account unlocked by admin
+  - record_types: ACCT_UNLOCK
+    action: unlocked-account
+    ecs:
+      <<: *ecs-iam
+      type:
+        - user
+        - info
+  # AUDIT_ADD_GROUP - Group account added
+  - record_types: ADD_GROUP
+    action: added-group-account-to
+    object:
+      primary: [id, acct]
+      what: account
+    ecs:
+      <<: *ecs-iam
+      <<: *ecs-group-modification-mappings
+      type:
+        - group
+        - creation
+
+  # AUDIT_ADD_USER - User account added
+  - record_types: ADD_USER
+    action: added-user-account
+    object:
+      primary: [id, acct]
+      what: account
+    ecs:
+      <<: *ecs-iam
+      <<: *ecs-user-modification-mappings
+      type:
+        - user
+        - creation
+  # AUDIT_DEL_GROUP - Group account deleted
+  - record_types: DEL_GROUP
+    action: deleted-group-account-from
+    object:
+      primary: [id, acct]
+      what: account
+    ecs:
+      <<: *ecs-iam
+      <<: *ecs-group-modification-mappings
+      type:
+        - group
+        - deletion
+  # AUDIT_DEL_USER - User account deleted
+  - record_types: DEL_USER
+    action: deleted-user-account
+    object:
+      primary: [id, acct]
+      what: account
+    ecs:
+      <<: *ecs-iam
+      <<: *ecs-user-modification-mappings
+      type:
+        - user
+        - deletion
+  # AUDIT_GRP_MGMT - Group account attr was modified
+  - record_types: GRP_MGMT
+    action: modified-group-account
+    object:
+      primary: [id, acct]
+      what: account
+    ecs:
+      <<: *ecs-iam
+      type:
+        - group
+        - change
+      mappings:
+        - from: subject.primary
+          to: user
+        - from: subject.secondary
+          to: group
+        - from: uid.uid
+          to: user.effective
+  # AUDIT_ROLE_ASSIGN - Admin assigned user to role
+  - record_types: ROLE_ASSIGN
+    action: assigned-user-role-to
+    object:
+      primary: [id, acct]
+      what: account
+    ecs:
+      <<: *ecs-iam
+      type:
+        - user
+        - change
+  # AUDIT_ROLE_MODIFY - Admin modified a role
+  - record_types: ROLE_MODIFY
+    action: modified-role
+    ecs:
+      <<: *ecs-iam
+      type:
+        - change
+  # AUDIT_ROLE_REMOVE - Admin removed user from role
+  - record_types: ROLE_REMOVE
+    action: removed-user-role-from
+    object:
+      primary: [id, acct]
+      what: account
+    ecs:
+      <<: *ecs-iam
+      type:
+        - user
+        - change
+  # AUDIT_USER_MGMT - User acct attribute change
+  - <<: *macro-user-session
+    record_types: USER_MGMT
+    action: modified-user-account
+    ecs:
+      <<: *ecs-iam
+      type:
+        - user
+        - change
+      mappings:
+        - from: subject.primary
+          to: user
+        - from: subject.secondary
+          to: user.target
+        - from: uid.uid
+          to: user.effective
+  # AUDIT_USER_CHAUTHTOK - User acct password or pin changed
+  - <<: *macro-user-session
+    record_types: USER_CHAUTHTOK
+    action: changed-password
+    ecs:
+      <<: *ecs-iam
+      type:
+        - user
+        - change
+      mappings:
+        - from: subject.primary
+          to: user
+        - from: uid.uid
+          to: user.effective
+        - from: subject.secondary
+          to: user.target
+
+  # AUDIT_GRP_CHAUTHTOK - Group acct password or pin changed
+  - <<: *macro-user-session
+    record_types: GRP_CHAUTHTOK
+    action: changed-group-password
+    object:
+      primary: acct
+      what: user-session
+    ecs:
+      <<: *ecs-iam
+      type:
+        - group
+        - change
+      mappings:
+        - from: subject.primary
+          to: user
+        - from: uid.uid
+          to: user.effective
+        - from: subject.secondary
+          to: group
+
+  # Authentication related events
+
+  # AUDIT_CRED_ACQ - User credential acquired
+  - <<: *macro-user-session
+    record_types: CRED_ACQ
+    action: acquired-credentials
+    ecs: *ecs-auth
+  # AUDIT_CRED_DISP - User credential disposed
+  - <<: *macro-user-session
+    record_types: CRED_DISP
+    action: disposed-credentials
+    ecs: *ecs-auth
+  # AUDIT_CRED_REFR - User credential refreshed
+  - <<: *macro-user-session
+    record_types: CRED_REFR
+    action: refreshed-credentials
+    ecs: *ecs-auth
+  # AUDIT_GRP_AUTH - Authentication for group password
+  - record_types: GRP_AUTH
+    action: authenticated-to-group
+    ecs: *ecs-auth
+  # AUDIT_LOGIN - Define the login id and information
+  - record_types: LOGIN
+    action: changed-login-id-to
+    subject:
+      primary: [old_auid, old-auid]
+      secondary: uid
+    object:
+      primary: [new-auid, new_auid, auid]
+      what: user-session
+    ecs:
+      <<: *ecs-auth
+      type: start
+      mappings:
+        - from: subject.primary
+          to: user
+        - from: object.primary
+          to: user.effective
+  # AUDIT_USER_ACCT - User system access authorization
+  - <<: *macro-user-session
+    record_types: USER_ACCT
+    action: was-authorized
+    ecs: *ecs-auth
+  # AUDIT_USER_AUTH - User system access authentication
+  - <<: *macro-user-session
+    record_types: USER_AUTH
+    action: authenticated
+    ecs: *ecs-auth
+  # AUDIT_USER_END - User session end
+  - <<: *macro-user-session
+    record_types: USER_END
+    action: ended-session
+    ecs:
+      <<: *ecs-session
+      type: end
+  # AUDIT_USER_ERR - User acct state error
+  - <<: *macro-user-session
+    record_types: USER_ERR
+    action: error
+    source_ip: [addr]
+    ecs: *ecs-auth
+  # AUDIT_USER_LOGIN - User has logged in
+  - <<: *macro-user-session
+    record_types: USER_LOGIN
+    action: logged-in
+    source_ip: [addr]
+    ecs:
+      <<: *ecs-auth
+      type: start
+  # AUDIT_USER_LOGOUT - User has logged out
+  - <<: *macro-user-session
+    record_types: USER_LOGOUT
+    action: logged-out
+    ecs:
+      <<: *ecs-auth
+      type: end
+  # AUDIT_USER_ROLE_CHANGE - User changed to a new role
+  - <<: *macro-user-session
+    record_types: USER_ROLE_CHANGE
+    action: changed-role-to
+    object:
+      primary: selected-context
+      what: user-session
+  # AUDIT_USER_START - User session start
+  - <<: *macro-user-session
+    record_types: USER_START
+    action: started-session
+    source_ip: [addr]
+    ecs:
+      <<: *ecs-session
+      type: start
+
+  # Host virtualization events
+
+  # AUDIT_VIRT_CONTROL - Start, Pause, Stop VM
+  - record_types: VIRT_CONTROL
+    action: issued-vm-control
+    object:
+      primary: op
+      secondary: vm
+      what: virtual-machine
+    ecs: *ecs-host
+  # AUDIT_VIRT_CREATE - Creation of guest image
+  - record_types: VIRT_CREATE
+    action: created-vm-image
+    ecs: *ecs-host
+  # AUDIT_VIRT_DESTROY - Destruction of guest image
+  - record_types: VIRT_DESTROY
+    action: deleted-vm-image
+    ecs: *ecs-host
+  # AUDIT_VIRT_INTEGRITY_CHECK - Guest integrity results
+  - record_types: VIRT_INTEGRITY_CHECK
+    action: checked-integrity-of
+    ecs: *ecs-host
+  # AUDIT_VIRT_MACHINE_ID - Binding of label to VM
+  - record_types: VIRT_MACHINE_ID
+    action: assigned-vm-id
+    object:
+      primary: vm
+      what: virtual-machine
+    ecs: *ecs-host
+  # AUDIT_VIRT_MIGRATE_IN - Inbound guest migration info
+  - record_types: VIRT_MIGRATE_IN
+    action: migrated-vm-from
+    ecs: *ecs-host
+  # AUDIT_VIRT_MIGRATE_OUT - Outbound guest migration info
+  - record_types: VIRT_MIGRATE_OUT
+    action: migrated-vm-to
+    ecs: *ecs-host
+  # AUDIT_VIRT_RESOURCE - Resource assignment
+  - record_types: VIRT_RESOURCE
+    action: assigned-vm-resource
+    object:
+      primary: resrc
+      secondary: vm
+      what: virtual-machine
+    ecs: *ecs-host
+
+  # Userspace process events
+
+  # AUDIT_CHGRP_ID - User space group ID changed
+  - record_types: CHGRP_ID
+    action: changed-group
+    ecs:
+      <<: *ecs-process
+      type: change
+  # AUDIT_CHUSER_ID - Changed user ID supplemental data
+  - record_types: CHUSER_ID
+    action: changed-user-id
+    ecs:
+      <<: *ecs-process
+      type: change
+  # AUDIT_TEST - Used for test success messages
+  - record_types: TEST
+    action: sent-test
+    ecs: *ecs-process
+  # AUDIT_TRUSTED_APP - Trusted app msg - freestyle text
+  - record_types: TRUSTED_APP
+    action: unknown
+    ecs: *ecs-process
+  # AUDIT_USER_CMD - User shell command and args
+  - record_types: USER_CMD
+    action: ran-command
+    object:
+      primary: cmd
+      what: process
+    description: >
+      These messages are from user-space apps, like sudo, that log commands
+      being run by a user. The uid contained in these messages is user's UID at
+      the time the command was run. It is not the "target" UID used to run the
+      command, which is normally root.
+    ecs:
+      <<: *ecs-process
+      type: start
+
+  # Host-level events
+
+  # AUDIT_SYSTEM_BOOT - System boot
+  - record_types: SYSTEM_BOOT
+    action: booted-system
+    object:
+      what: system
+    ecs:
+      <<: *ecs-host
+      type: start
+  # AUDIT_SYSTEM_RUNLEVEL - System runlevel change
+  - record_types: SYSTEM_RUNLEVEL
+    action: changed-to-runlevel
+    object:
+      primary: new-level
+      what: system
+    ecs:
+      <<: *ecs-host
+      type: change
+  # AUDIT_SYSTEM_SHUTDOWN - System shutdown
+  - record_types: SYSTEM_SHUTDOWN
+    action: shutdown-system
+    object:
+      what: system
+    ecs:
+      <<: *ecs-host
+      type: end
+
+  # Service-level events
+
+  # AUDIT_SERVICE_START - Service (daemon) start
+  - record_types: SERVICE_START
+    action: started-service
+    object:
+      primary: unit
+      what: service
+    ecs:
+      <<: *ecs-process
+      type: start
+  # AUDIT_SERVICE_STOP - Service (daemon) stop
+  - record_types: SERVICE_STOP
+    action: stopped-service
+    object:
+      primary: unit
+      what: service
+    ecs:
+      <<: *ecs-process
+      type: stop
+
+  # Auditd internal events
+
+  # AUDIT_CONFIG_CHANGE - Audit system configuration change
+  - record_types: CONFIG_CHANGE
+    action: changed-audit-configuration
+    object:
+      primary:
+        [op, key, audit_enabled, audit_pid, audit_backlog_limit, audit_failure]
+      what: audit-config
+    ecs:
+      category: [process, configuration]
+      type: change
+  # AUDIT_DAEMON_ABORT - Daemon error stop record
+  - record_types: DAEMON_ABORT
+    action: aborted-auditd-startup
+    object:
+      what: service
+    ecs:
+      <<: *ecs-process
+      type: stop
+  # AUDIT_DAEMON_ACCEPT - Auditd accepted remote connection
+  - record_types: DAEMON_ACCEPT
+    action: remote-audit-connected
+    object:
+      what: service
+    ecs:
+      <<: *ecs-network
+      type:
+        - connection
+        - start
+  # AUDIT_DAEMON_CLOSE - Auditd closed remote connection
+  - record_types: DAEMON_CLOSE
+    action: remote-audit-disconnected
+    object:
+      what: service
+    ecs:
+      <<: *ecs-network
+      type:
+        - connection
+        - start
+  # AUDIT_DAEMON_CONFIG - Daemon config change
+  - record_types: DAEMON_CONFIG
+    action: changed-auditd-configuration
+    object:
+      what: service
+    ecs:
+      category: [process, configuration]
+      type: change
+  # AUDIT_DAEMON_END - Daemon normal stop record
+  - record_types: DAEMON_END
+    action: shutdown-audit
+    object:
+      what: service
+    ecs:
+      <<: *ecs-process
+      type: stop
+  # AUDIT_DAEMON_ERR - Auditd internal error
+  - record_types: DAEMON_ERR
+    action: audit-error
+    object:
+      what: service
+    ecs: *ecs-process
+  # AUDIT_DAEMON_RECONFIG - Auditd should reconfigure
+  - record_types: DAEMON_RECONFIG
+    action: reconfigured-auditd
+    object:
+      what: service
+    ecs:
+      category: [process, configuration]
+      type: info
+  # AUDIT_DAEMON_RESUME - Auditd should resume logging
+  - record_types: DAEMON_RESUME
+    action: resumed-audit-logging
+    object:
+      what: service
+    ecs:
+      <<: *ecs-process
+      type: change
+  # AUDIT_DAEMON_ROTATE - Auditd should rotate logs
+  - record_types: DAEMON_ROTATE
+    action: rotated-audit-logs
+    object:
+      what: service
+    ecs:
+      <<: *ecs-process
+      type: change
+  # AUDIT_DAEMON_START - Daemon startup record
+  - record_types: DAEMON_START
+    action: started-audit
+    object:
+      what: service
+    ecs:
+      <<: *ecs-process
+      type: start
+  # AUDIT_KERNEL - Asynchronous audit record. NOT A REQUEST.
+  - record_types: KERNEL
+    action: initialized-audit-subsystem
+    ecs: *ecs-process
+
+  # Configuration change events
+
+  # AUDIT_USYS_CONFIG - User space system config change
+  - record_types: USYS_CONFIG
+    action: changed-configuration
+    object:
+      primary: op
+      what: system
+    ecs:
+      category: configuration
+      type: change
+  # AUDIT_NETFILTER_CFG - Netfilter chain modifications
+  - record_types: NETFILTER_CFG
+    action: loaded-firewall-rule-to
+    object:
+      primary: table
+      what: firewall
+    ecs:
+      category: configuration
+      type: change
+  # AUDIT_FEATURE_CHANGE - audit log listing feature changes
+  - record_types: FEATURE_CHANGE
+    action: changed-audit-feature
+    object:
+      primary: feature
+      what: system
+    ecs:
+      category: configuration
+      type: change
+  # AUDIT_REPLACE - Replace auditd if this packet unanswerd
+
+  # TTY events
+
+  - record_types:
+      # AUDIT_TTY - Input on an administrative TTY
+      - TTY
+      # AUDIT_USER_TTY - Non-ICANON TTY input meaning
+      - USER_TTY
+    action: typed
+    object:
+      primary: data
+      what: keystrokes
+    how: [comm, exe]
+
+  # Policy events
+
+  # AUDIT_AVC - SE Linux avc denial or grant (selinux)
+  - record_types: AVC
+    action: violated-selinux-policy
+    subject:
+      primary: scontext
+    object:
+      primary: tcontext
+      secondary: tclass
+    has_fields:
+      - seresult
+  # AUDIT_AVC - SE Linux avc denial or grant (apparmor)
+  - record_types: AVC
+    action: violated-apparmor-policy
+    object:
+      primary: operation
+      secondary: [requested_mask, denied_mask, capname]
+      what: policy
+    has_fields:
+      - apparmor
+  # AUDIT_FS_RELABEL - Filesystem relabeled
+  - record_types: FS_RELABEL
+    action: relabeled-filesystem
+    object:
+      what: mac-config
+  # AUDIT_LABEL_LEVEL_CHANGE - Object's level was changed
+  - record_types: LABEL_LEVEL_CHANGE
+    action: modified-level-of
+    object:
+      primary: printer
+      what: printer
+  # AUDIT_LABEL_OVERRIDE - Admin is overriding a label
+  - record_types: LABEL_OVERRIDE
+    action: overrode-label-of
+    object:
+      what: mac-config
+  # AUDIT_MAC_CHECK - User space MAC decision results
+  - record_types: MAC_CHECK
+    action: mac-permission
+  # AUDIT_MAC_CONFIG_CHANGE - Changes to booleans
+  - record_types: MAC_CONFIG_CHANGE
+    action: changed-selinux-boolean
+    object:
+      primary: bool
+      what: mac-config
+    ecs:
+      category: configuration
+      type: change
+  # AUDIT_MAC_POLICY_LOAD - Policy file load
+  - record_types: MAC_POLICY_LOAD
+    action: loaded-selinux-policy
+    object:
+      what: mac-config
+    ecs:
+      category: configuration
+      type: access
+  # AUDIT_MAC_STATUS - Changed enforcing,permissive,off
+  - record_types: MAC_STATUS
+    action: changed-selinux-enforcement
+    object:
+      primary: enforcing
+      what: mac-config
+    ecs:
+      category: configuration
+      type: change
+  # AUDIT_USER_AVC - User space avc message
+  - record_types: USER_AVC
+    action: access-permission
+  # AUDIT_USER_MAC_CONFIG_CHANGE - Change made to MAC policy
+  - record_types: USER_MAC_CONFIG_CHANGE
+    action: changed-mac-configuration
+    object:
+      what: mac-config
+    ecs:
+      category: configuration
+      type: change
+  # AUDIT_USER_MAC_POLICY_LOAD - Userspc daemon loaded polic
+  - record_types: USER_MAC_POLICY_LOAD
+    action: loaded-mac-policy
+    object:
+      what: mac-config
+    ecs:
+      category: configuration
+      type: access
+  # AUDIT_USER_SELINUX_ERR - SE Linux user space error
+  - record_types: USER_SELINUX_ERR
+    action: access-error
+  # AUDIT_SECCOMP - Secure Computing event
+  - record_types: SECCOMP
+    action: violated-seccomp-policy
+    object:
+      primary: syscall
+      what: process
+  # AUDIT_SELINUX_ERR - Internal SE Linux Errors
+  - action: caused-mac-policy-error
+    object:
+      what: system
+    record_types: SELINUX_ERR
+  # AUDIT_APPARMOR_ALLOWED
+  # AUDIT_APPARMOR_DENIED
+  # AUDIT_APPARMOR_ERROR
+  # AUDIT_AVC_PATH - dentry, vfsmount pair from avc
+  # AUDIT_APPARMOR_AUDIT
+  # AUDIT_APPARMOR_HINT
+  # AUDIT_APPARMOR_STATUS
+  # AUDIT_APPARMOR_ERROR
+  # AUDIT_DEV_ALLOC - Device was allocated
+  # AUDIT_DEV_DEALLOC - Device was deallocated
+  # AUDIT_MAC_UNLBL_ALLOW - NetLabel: allow unlabeled traffic
+  # AUDIT_MAC_CIPSOV4_ADD - NetLabel: add CIPSOv4 DOI entry
+  # AUDIT_MAC_CIPSOV4_DEL - NetLabel: del CIPSOv4 DOI entry
+  # AUDIT_MAC_MAP_ADD - NetLabel: add LSM domain mapping
+  # AUDIT_MAC_MAP_DEL - NetLabel: del LSM domain mapping
+  # AUDIT_MAC_IPSEC_EVENT - Audit an IPSec event
+  # AUDIT_MAC_UNLBL_STCADD - NetLabel: add a static label
+  # AUDIT_MAC_UNLBL_STCDEL - NetLabel: del a static label
+  # AUDIT_MAC_CALIPSO_ADD - NetLabel: add CALIPSO DOI entry
+  # AUDIT_MAC_CALIPSO_DEL - NetLabel: del CALIPSO DOI entry
+  # AUDIT_USER_LABELED_EXPORT - Object exported with label
+  # AUDIT_USER_UNLABELED_EXPORT - Object exported without label
+
+  # Crypto events
+
+  - <<: *macro-user-session
+    action: negotiated-crypto-key
+    object:
+      primary: fp
+      secondary: [addr, hostname]
+      what: user-session
+    record_types: CRYPTO_KEY_USER
+    source_ip: [addr]
+    ecs: *ecs-process
+  - action: crypto-officer-logged-in
+    record_types: CRYPTO_LOGIN
+  - action: crypto-officer-logged-out
+    record_types: CRYPTO_LOGOUT
+    ecs: *ecs-process
+  - <<: *macro-user-session
+    action: started-crypto-session
+    object:
+      primary: addr
+      secondary: [rport]
+    record_types: CRYPTO_SESSION
+    source_ip: [addr]
+    ecs: *ecs-process
+  - action: access-result
+    record_types: DAC_CHECK
+
+  # Anomalies
+
+  # AUDIT_ANOM_ABEND - Process ended abnormally
+  - record_types: ANOM_ABEND
+    action: crashed-program
+    object:
+      primary: [comm, exe]
+      secondary: pid
+      what: process
+    how: sig
+    ecs:
+      # consider adding an anomaly category when we introduce
+      # to ECS
+      <<: *ecs-process
+      type: end
+  # AUDIT_ANOM_EXEC - Execution of file
+  - record_types: ANOM_EXEC
+    action: attempted-execution-of-forbidden-program
+    object:
+      primary: cmd
+      what: process
+    how: terminal
+    ecs:
+      # consider adding an anomaly category when we introduce
+      # to ECS
+      <<: *ecs-process
+      type: start
+  # AUDIT_ANOM_LINK - Suspicious use of file links
+  - record_types: ANOM_LINK
+    action: used-suspicious-link
+  # AUDIT_ANOM_LOGIN_FAILURES - Failed login limit reached
+  - <<: *macro-user-session
+    record_types: ANOM_LOGIN_FAILURES
+    action: failed-log-in-too-many-times-to
+  # AUDIT_ANOM_LOGIN_LOCATION - Login from forbidden location
+  - <<: *macro-user-session
+    record_types: ANOM_LOGIN_LOCATION
+    action: attempted-log-in-from-unusual-place-to
+  # AUDIT_ANOM_LOGIN_SESSIONS - Max concurrent sessions reached
+  - <<: *macro-user-session
+    record_types: ANOM_LOGIN_SESSIONS
+    action: opened-too-many-sessions-to
+  # AUDIT_ANOM_LOGIN_TIME - Login attempted at bad time
+  - <<: *macro-user-session
+    record_types: ANOM_LOGIN_TIME
+    action: attempted-log-in-during-unusual-hour-to
+  # AUDIT_ANOM_PROMISCUOUS - Device changed promiscuous mode
+  - record_types: ANOM_PROMISCUOUS
+    action: changed-promiscuous-mode-on-device # Could be entered or exited based on prom field.
+    object:
+      primary: dev
+      what: network-device
+  # AUDIT_ANOM_RBAC_INTEGRITY_FAIL - RBAC file integrity failure
+  - record_types: ANOM_RBAC_INTEGRITY_FAIL
+    action: tested-file-system-integrity-of
+    object:
+      primary: hostname
+      what: filesystem
+  # AUDIT_ANOM_LOGIN_ACCT - Login attempted to watched acct
+  # AUDIT_ANOM_MAX_DAC - Max DAC failures reached
+  # AUDIT_ANOM_MAX_MAC - Max MAC failures reached
+  # AUDIT_ANOM_AMTU_FAIL - AMTU failure
+  # AUDIT_ANOM_RBAC_FAIL - RBAC self test failure
+  # AUDIT_ANOM_CRYPTO_FAIL - Crypto system test failure
+  # AUDIT_ANOM_MK_EXE - Make an executable
+  # AUDIT_ANOM_ACCESS_FS - Access of file or dir
+  # AUDIT_ANOM_ADD_ACCT - Adding an acct
+  # AUDIT_ANOM_DEL_ACCT - Deleting an acct
+  # AUDIT_ANOM_MOD_ACCT - Changing an acct
+  # AUDIT_ANOM_ROOT_TRANS - User became root
+  # AUDIT_ANOM_LOGIN_SERVICE - Service acct attempted login
+
+  # Anomaly responses
+
+  # AUDIT_RESP_ANOMALY - Anomaly not reacted to
+  # AUDIT_RESP_ALERT - Alert email was sent
+  # AUDIT_RESP_KILL_PROC - Kill program
+  # AUDIT_RESP_TERM_ACCESS - Terminate session
+  # AUDIT_RESP_ACCT_REMOTE - Acct locked from remote access
+  # AUDIT_RESP_ACCT_LOCK_TIMED - User acct locked for time
+  # AUDIT_RESP_ACCT_UNLOCK_TIMED - User acct unlocked from time
+  # AUDIT_RESP_ACCT_LOCK - User acct was locked
+  # AUDIT_RESP_TERM_LOCK - Terminal was locked
+  # AUDIT_RESP_SEBOOL - Set an SE Linux boolean
+  # AUDIT_RESP_EXEC - Execute a script
+  # AUDIT_RESP_SINGLE - Go to single user mode
+  # AUDIT_RESP_HALT - take the system down
+  # AUDIT_RESP_ORIGIN_BLOCK - Address blocked by iptables
+  # AUDIT_RESP_ORIGIN_BLOCK_TIMED - Address blocked for time
+
+  # Audit rule events
+
+  # AUDIT_SYSCALL - Syscall event
+  # AUDIT_PATH - Filename path information
+  # AUDIT_IPC - IPC record
+  # AUDIT_SOCKETCALL - sys_socketcall arguments
+  # AUDIT_SOCKADDR - sockaddr copied as syscall arg
+  # AUDIT_CWD - Current working directory
+  # AUDIT_EXECVE - execve arguments
+  # AUDIT_IPC_SET_PERM - IPC new permissions record type
+  # AUDIT_MQ_OPEN - POSIX MQ open record type
+  # AUDIT_MQ_SENDRECV- POSIX MQ send/receive record type
+  # AUDIT_MQ_NOTIFY - POSIX MQ notify record type
+  # AUDIT_MQ_GETSETATTR - POSIX MQ get/set attribute record type
+  # AUDIT_FD_PAIR - audit record for pipe/socketpair
+  # AUDIT_OBJ_PID - ptrace target
+  # AUDIT_BPRM_FCAPS - Information about fcaps increasing perms
+  # AUDIT_CAPSET - Record showing argument to sys_capset
+  # AUDIT_MMAP - Record showing descriptor and flags in mmap
+  # AUDIT_NETFILTER_PKT - Packets traversing netfilter chains
+
+  # Integrity checks
+
+  # AUDIT_INTEGRITY_DATA - Data integrity verification
+  # AUDIT_INTEGRITY_METADATA - Metadata integrity verification
+  # AUDIT_INTEGRITY_STATUS - Integrity enable status
+  # AUDIT_INTEGRITY_HASH - Integrity HASH type
+  # AUDIT_INTEGRITY_PCR - PCR invalidation msgs
+  # AUDIT_INTEGRITY_RULE - Policy rule
+
+  # Various
+
+  # AUDIT_USER - Message from userspace -- deprecated
+  - record_types: USER
+    action: sent-message
+    object:
+      primary: addr
+
+  # AUDIT_SOFTWARE_UPDATE - Package management
+  - record_types: SOFTWARE_UPDATE
+    action: package-updated
+    ecs:
+      category: package
+      type: info
