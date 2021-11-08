@@ -95,7 +95,7 @@ type compressionConfig struct {
 	Level int    `config:"level"`
 }
 
-func DefaultConfig() Config {
+func defaultConfig() Config {
 	cfg := Config{
 		MaxRedirects: 0,
 		Response: responseConfig{

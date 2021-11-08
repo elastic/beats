@@ -46,7 +46,7 @@ func create(
 	name string,
 	cfg *common.Config,
 ) (p plugin.Plugin, err error) {
-	config := DefaultConfig()
+	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return plugin.Plugin{}, err
 	}
