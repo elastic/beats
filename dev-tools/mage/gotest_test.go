@@ -139,7 +139,7 @@ func TestGoTest_CaptureOutput(t *testing.T) {
 
 			output := buf.String()
 			if !re.MatchString(output) {
-				t.Fatalf("GoTest output missmatch:\nwant:\n%v\n\ngot:\n%v", test.want, output)
+				t.Fatalf("GoTest output mismatch:\nwant:\n%v\n\ngot:\n%v", test.want, output)
 			}
 		})
 	}

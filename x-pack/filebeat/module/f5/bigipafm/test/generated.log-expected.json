@@ -55,9 +55,7 @@
         "rule.name": "ite",
         "service.type": "f5",
         "source.geo.country_name": "sperna",
-        "source.ip": [
-            "10.208.121.85"
-        ],
+        "source.ip": "10.208.121.85",
         "source.nat.ip": "10.11.196.142",
         "source.nat.port": 5222,
         "source.port": 884,
@@ -123,9 +121,7 @@
         "rule.name": "mod",
         "service.type": "f5",
         "source.geo.country_name": "tionulam",
-        "source.ip": [
-            "10.162.9.235"
-        ],
+        "source.ip": "10.162.9.235",
         "source.nat.ip": "10.92.202.200",
         "source.nat.port": 6772,
         "source.port": 2548,
@@ -190,9 +186,7 @@
         "rule.name": "atcup",
         "service.type": "f5",
         "source.geo.country_name": "tenima",
-        "source.ip": [
-            "10.209.155.149"
-        ],
+        "source.ip": "10.209.155.149",
         "source.nat.ip": "10.191.68.244",
         "source.nat.port": 6905,
         "source.port": 1073,
@@ -258,9 +252,7 @@
         "rule.name": "ect",
         "service.type": "f5",
         "source.geo.country_name": "tevelit",
-        "source.ip": [
-            "10.202.66.28"
-        ],
+        "source.ip": "10.202.66.28",
         "source.nat.ip": "10.50.112.141",
         "source.nat.port": 7303,
         "source.port": 5098,
@@ -326,9 +318,7 @@
         "rule.name": "amquisno",
         "service.type": "f5",
         "source.geo.country_name": "umdolore",
-        "source.ip": [
-            "10.159.182.171"
-        ],
+        "source.ip": "10.159.182.171",
         "source.nat.ip": "10.206.197.113",
         "source.nat.port": 4075,
         "source.port": 6680,
@@ -393,9 +383,7 @@
         "rule.name": "tquiinea",
         "service.type": "f5",
         "source.geo.country_name": "ali",
-        "source.ip": [
-            "10.213.113.28"
-        ],
+        "source.ip": "10.213.113.28",
         "source.nat.ip": "10.89.163.114",
         "source.nat.port": 5166,
         "source.port": 6446,
@@ -461,9 +449,7 @@
         "rule.name": "ctetura",
         "service.type": "f5",
         "source.geo.country_name": "entsu",
-        "source.ip": [
-            "10.146.88.52"
-        ],
+        "source.ip": "10.146.88.52",
         "source.nat.ip": "10.103.107.47",
         "source.nat.port": 6094,
         "source.port": 5364,
@@ -528,9 +514,7 @@
         "rule.name": "sunt",
         "service.type": "f5",
         "source.geo.country_name": "olupt",
-        "source.ip": [
-            "10.69.57.206"
-        ],
+        "source.ip": "10.69.57.206",
         "source.nat.ip": "10.150.220.75",
         "source.nat.port": 1298,
         "source.port": 5979,
@@ -595,9 +579,7 @@
         "rule.name": "deFinibu",
         "service.type": "f5",
         "source.geo.country_name": "amvolup",
-        "source.ip": [
-            "10.199.34.241"
-        ],
+        "source.ip": "10.199.34.241",
         "source.nat.ip": "10.121.219.204",
         "source.nat.port": 3496,
         "source.port": 7700,
@@ -662,9 +644,7 @@
         "rule.name": "siarchi",
         "service.type": "f5",
         "source.geo.country_name": "iadese",
-        "source.ip": [
-            "10.64.141.105"
-        ],
+        "source.ip": "10.64.141.105",
         "source.nat.ip": "10.182.199.231",
         "source.nat.port": 1426,
         "source.port": 2374,
@@ -730,9 +710,7 @@
         "rule.name": "rinrepre",
         "service.type": "f5",
         "source.geo.country_name": "olestiae",
-        "source.ip": [
-            "10.164.6.207"
-        ],
+        "source.ip": "10.164.6.207",
         "source.nat.ip": "10.3.134.237",
         "source.nat.port": 3156,
         "source.port": 5485,
@@ -798,9 +776,7 @@
         "rule.name": "neav",
         "service.type": "f5",
         "source.geo.country_name": "veniam",
-        "source.ip": [
-            "10.235.101.253"
-        ],
+        "source.ip": "10.235.101.253",
         "source.nat.ip": "10.201.6.10",
         "source.nat.port": 6608,
         "source.port": 2400,
@@ -866,9 +842,7 @@
         "rule.name": "tsu",
         "service.type": "f5",
         "source.geo.country_name": "eroi",
-        "source.ip": [
-            "10.22.102.198"
-        ],
+        "source.ip": "10.22.102.198",
         "source.nat.ip": "10.86.101.235",
         "source.nat.port": 3266,
         "source.port": 176,
@@ -933,9 +907,7 @@
         "rule.name": "dant",
         "service.type": "f5",
         "source.geo.country_name": "sperna",
-        "source.ip": [
-            "10.174.252.105"
-        ],
+        "source.ip": "10.174.252.105",
         "source.nat.ip": "10.167.172.155",
         "source.nat.port": 3544,
         "source.port": 5368,
@@ -1000,9 +972,7 @@
         "rule.name": "aali",
         "service.type": "f5",
         "source.geo.country_name": "iatisu",
-        "source.ip": [
-            "10.99.249.210"
-        ],
+        "source.ip": "10.99.249.210",
         "source.nat.ip": "10.81.26.208",
         "source.nat.port": 7651,
         "source.port": 6684,
@@ -1067,9 +1037,7 @@
         "rule.name": "tquov",
         "service.type": "f5",
         "source.geo.country_name": "rsitv",
-        "source.ip": [
-            "10.101.226.128"
-        ],
+        "source.ip": "10.101.226.128",
         "source.nat.ip": "10.201.238.90",
         "source.nat.port": 2715,
         "source.port": 3087,
@@ -1134,9 +1102,7 @@
         "rule.name": "illoin",
         "service.type": "f5",
         "source.geo.country_name": "itess",
-        "source.ip": [
-            "10.157.18.252"
-        ],
+        "source.ip": "10.157.18.252",
         "source.nat.ip": "10.243.218.215",
         "source.nat.port": 662,
         "source.port": 52,
@@ -1202,9 +1168,7 @@
         "rule.name": "trumexer",
         "service.type": "f5",
         "source.geo.country_name": "ciadeser",
-        "source.ip": [
-            "10.148.161.250"
-        ],
+        "source.ip": "10.148.161.250",
         "source.nat.ip": "10.167.227.44",
         "source.nat.port": 6595,
         "source.port": 6135,
@@ -1269,9 +1233,7 @@
         "rule.name": "labo",
         "service.type": "f5",
         "source.geo.country_name": "ima",
-        "source.ip": [
-            "10.84.163.178"
-        ],
+        "source.ip": "10.84.163.178",
         "source.nat.ip": "10.74.11.43",
         "source.nat.port": 55,
         "source.port": 2031,
@@ -1337,9 +1299,7 @@
         "rule.name": "iamquis",
         "service.type": "f5",
         "source.geo.country_name": "runtmol",
-        "source.ip": [
-            "10.112.32.213"
-        ],
+        "source.ip": "10.112.32.213",
         "source.nat.ip": "10.230.129.252",
         "source.nat.port": 3947,
         "source.port": 1749,
@@ -1404,9 +1364,7 @@
         "rule.name": "uaUten",
         "service.type": "f5",
         "source.geo.country_name": "fdeF",
-        "source.ip": [
-            "10.199.216.143"
-        ],
+        "source.ip": "10.199.216.143",
         "source.nat.ip": "10.7.200.140",
         "source.nat.port": 3298,
         "source.port": 593,
@@ -1471,9 +1429,7 @@
         "rule.name": "rationev",
         "service.type": "f5",
         "source.geo.country_name": "aincidu",
-        "source.ip": [
-            "10.206.96.56"
-        ],
+        "source.ip": "10.206.96.56",
         "source.nat.ip": "10.22.187.69",
         "source.nat.port": 3590,
         "source.port": 2687,
@@ -1539,9 +1495,7 @@
         "rule.name": "velite",
         "service.type": "f5",
         "source.geo.country_name": "itsedd",
-        "source.ip": [
-            "10.71.114.14"
-        ],
+        "source.ip": "10.71.114.14",
         "source.nat.ip": "10.183.130.225",
         "source.nat.port": 5693,
         "source.port": 3010,
@@ -1607,9 +1561,7 @@
         "rule.name": "iusmodte",
         "service.type": "f5",
         "source.geo.country_name": "uii",
-        "source.ip": [
-            "10.45.253.103"
-        ],
+        "source.ip": "10.45.253.103",
         "source.nat.ip": "10.107.45.175",
         "source.nat.port": 4185,
         "source.port": 5923,
@@ -1674,9 +1626,7 @@
         "rule.name": "sit",
         "service.type": "f5",
         "source.geo.country_name": "tMal",
-        "source.ip": [
-            "10.213.94.135"
-        ],
+        "source.ip": "10.213.94.135",
         "source.nat.ip": "10.44.58.106",
         "source.nat.port": 1241,
         "source.port": 2607,
@@ -1741,9 +1691,7 @@
         "rule.name": "boNem",
         "service.type": "f5",
         "source.geo.country_name": "atu",
-        "source.ip": [
-            "10.163.209.70"
-        ],
+        "source.ip": "10.163.209.70",
         "source.nat.ip": "10.255.74.136",
         "source.nat.port": 5902,
         "source.port": 4718,
@@ -1809,9 +1757,7 @@
         "rule.name": "olup",
         "service.type": "f5",
         "source.geo.country_name": "henderit",
-        "source.ip": [
-            "10.252.102.110"
-        ],
+        "source.ip": "10.252.102.110",
         "source.nat.ip": "10.12.129.137",
         "source.nat.port": 721,
         "source.port": 7829,
@@ -1877,9 +1823,7 @@
         "rule.name": "iruredol",
         "service.type": "f5",
         "source.geo.country_name": "saquaea",
-        "source.ip": [
-            "10.81.184.7"
-        ],
+        "source.ip": "10.81.184.7",
         "source.nat.ip": "10.199.194.79",
         "source.nat.port": 7713,
         "source.port": 6344,
@@ -1945,9 +1889,7 @@
         "rule.name": "umwritte",
         "service.type": "f5",
         "source.geo.country_name": "exeacomm",
-        "source.ip": [
-            "10.110.2.166"
-        ],
+        "source.ip": "10.110.2.166",
         "source.nat.ip": "10.251.231.142",
         "source.nat.port": 872,
         "source.port": 79,
@@ -2013,9 +1955,7 @@
         "rule.name": "accusa",
         "service.type": "f5",
         "source.geo.country_name": "eosquira",
-        "source.ip": [
-            "10.99.202.229"
-        ],
+        "source.ip": "10.99.202.229",
         "source.nat.ip": "10.192.98.247",
         "source.nat.port": 4308,
         "source.port": 4392,
@@ -2080,9 +2020,7 @@
         "rule.name": "eiu",
         "service.type": "f5",
         "source.geo.country_name": "admi",
-        "source.ip": [
-            "10.172.154.97"
-        ],
+        "source.ip": "10.172.154.97",
         "source.nat.ip": "10.37.193.70",
         "source.nat.port": 170,
         "source.port": 7165,
@@ -2147,9 +2085,7 @@
         "rule.name": "est",
         "service.type": "f5",
         "source.geo.country_name": "edquia",
-        "source.ip": [
-            "10.171.221.230"
-        ],
+        "source.ip": "10.171.221.230",
         "source.nat.ip": "10.45.35.180",
         "source.nat.port": 653,
         "source.port": 1977,
@@ -2214,9 +2150,7 @@
         "rule.name": "enbyCi",
         "service.type": "f5",
         "source.geo.country_name": "amnisi",
-        "source.ip": [
-            "10.1.171.61"
-        ],
+        "source.ip": "10.1.171.61",
         "source.nat.ip": "10.83.238.145",
         "source.nat.port": 5392,
         "source.port": 7258,
@@ -2281,9 +2215,7 @@
         "rule.name": "atems",
         "service.type": "f5",
         "source.geo.country_name": "iqui",
-        "source.ip": [
-            "10.170.252.219"
-        ],
+        "source.ip": "10.170.252.219",
         "source.nat.ip": "10.74.213.42",
         "source.nat.port": 5922,
         "source.port": 1978,
@@ -2348,9 +2280,7 @@
         "rule.name": "unt",
         "service.type": "f5",
         "source.geo.country_name": "cor",
-        "source.ip": [
-            "10.183.223.149"
-        ],
+        "source.ip": "10.183.223.149",
         "source.nat.ip": "10.225.141.172",
         "source.nat.port": 956,
         "source.port": 2648,
@@ -2416,9 +2346,7 @@
         "rule.name": "itae",
         "service.type": "f5",
         "source.geo.country_name": "oluptat",
-        "source.ip": [
-            "10.97.138.181"
-        ],
+        "source.ip": "10.97.138.181",
         "source.nat.ip": "10.169.123.103",
         "source.nat.port": 519,
         "source.port": 7128,
@@ -2484,9 +2412,7 @@
         "rule.name": "minim",
         "service.type": "f5",
         "source.geo.country_name": "ici",
-        "source.ip": [
-            "10.53.101.131"
-        ],
+        "source.ip": "10.53.101.131",
         "source.nat.ip": "10.169.101.161",
         "source.nat.port": 4577,
         "source.port": 5097,
@@ -2551,9 +2477,7 @@
         "rule.name": "tasnul",
         "service.type": "f5",
         "source.geo.country_name": "aliqu",
-        "source.ip": [
-            "10.6.222.112"
-        ],
+        "source.ip": "10.6.222.112",
         "source.nat.ip": "10.87.120.87",
         "source.nat.port": 1636,
         "source.port": 780,
@@ -2618,9 +2542,7 @@
         "rule.name": "gelitse",
         "service.type": "f5",
         "source.geo.country_name": "rur",
-        "source.ip": [
-            "10.57.89.155"
-        ],
+        "source.ip": "10.57.89.155",
         "source.nat.ip": "10.4.126.103",
         "source.nat.port": 892,
         "source.port": 3553,
@@ -2686,9 +2608,7 @@
         "rule.name": "inBC",
         "service.type": "f5",
         "source.geo.country_name": "nonn",
-        "source.ip": [
-            "10.248.206.210"
-        ],
+        "source.ip": "10.248.206.210",
         "source.nat.ip": "10.143.183.208",
         "source.nat.port": 5214,
         "source.port": 4478,
@@ -2754,9 +2674,7 @@
         "rule.name": "iat",
         "service.type": "f5",
         "source.geo.country_name": "iumtotam",
-        "source.ip": [
-            "10.69.170.107"
-        ],
+        "source.ip": "10.69.170.107",
         "source.nat.ip": "10.142.186.43",
         "source.nat.port": 4691,
         "source.port": 1010,
@@ -2822,9 +2740,7 @@
         "rule.name": "occaeca",
         "service.type": "f5",
         "source.geo.country_name": "smoditem",
-        "source.ip": [
-            "10.121.153.197"
-        ],
+        "source.ip": "10.121.153.197",
         "source.nat.ip": "10.170.165.164",
         "source.nat.port": 505,
         "source.port": 6593,
@@ -2890,9 +2806,7 @@
         "rule.name": "reprehen",
         "service.type": "f5",
         "source.geo.country_name": "olesti",
-        "source.ip": [
-            "10.247.114.30"
-        ],
+        "source.ip": "10.247.114.30",
         "source.nat.ip": "10.176.83.7",
         "source.nat.port": 5908,
         "source.port": 7584,
@@ -2957,9 +2871,7 @@
         "rule.name": "dolor",
         "service.type": "f5",
         "source.geo.country_name": "aevitaed",
-        "source.ip": [
-            "10.40.177.138"
-        ],
+        "source.ip": "10.40.177.138",
         "source.nat.ip": "10.70.7.23",
         "source.nat.port": 2758,
         "source.port": 1082,
@@ -3025,9 +2937,7 @@
         "rule.name": "eavolup",
         "service.type": "f5",
         "source.geo.country_name": "orin",
-        "source.ip": [
-            "10.2.189.20"
-        ],
+        "source.ip": "10.2.189.20",
         "source.nat.ip": "10.67.173.228",
         "source.nat.port": 5767,
         "source.port": 535,
@@ -3092,9 +3002,7 @@
         "rule.name": "doeiu",
         "service.type": "f5",
         "source.geo.country_name": "minimav",
-        "source.ip": [
-            "10.147.127.181"
-        ],
+        "source.ip": "10.147.127.181",
         "source.nat.ip": "10.196.176.243",
         "source.nat.port": 3465,
         "source.port": 6994,
@@ -3160,9 +3068,7 @@
         "rule.name": "dexercit",
         "service.type": "f5",
         "source.geo.country_name": "lapa",
-        "source.ip": [
-            "10.231.18.90"
-        ],
+        "source.ip": "10.231.18.90",
         "source.nat.ip": "10.248.140.59",
         "source.nat.port": 5760,
         "source.port": 4860,
@@ -3228,9 +3134,7 @@
         "rule.name": "remagnaa",
         "service.type": "f5",
         "source.geo.country_name": "equuntu",
-        "source.ip": [
-            "10.207.183.204"
-        ],
+        "source.ip": "10.207.183.204",
         "source.nat.ip": "10.59.215.207",
         "source.nat.port": 6195,
         "source.port": 2673,
@@ -3295,9 +3199,7 @@
         "rule.name": "natu",
         "service.type": "f5",
         "source.geo.country_name": "uisautem",
-        "source.ip": [
-            "10.73.84.95"
-        ],
+        "source.ip": "10.73.84.95",
         "source.nat.ip": "10.230.38.148",
         "source.nat.port": 3213,
         "source.port": 6701,
@@ -3363,9 +3265,7 @@
         "rule.name": "ssec",
         "service.type": "f5",
         "source.geo.country_name": "oremipsu",
-        "source.ip": [
-            "10.166.142.198"
-        ],
+        "source.ip": "10.166.142.198",
         "source.nat.ip": "10.175.181.138",
         "source.nat.port": 3787,
         "source.port": 465,
@@ -3431,9 +3331,7 @@
         "rule.name": "ati",
         "service.type": "f5",
         "source.geo.country_name": "eriam",
-        "source.ip": [
-            "10.122.133.162"
-        ],
+        "source.ip": "10.122.133.162",
         "source.nat.ip": "10.195.139.25",
         "source.nat.port": 5566,
         "source.port": 4838,
@@ -3498,9 +3396,7 @@
         "rule.name": "emporin",
         "service.type": "f5",
         "source.geo.country_name": "pta",
-        "source.ip": [
-            "10.53.72.161"
-        ],
+        "source.ip": "10.53.72.161",
         "source.nat.ip": "10.247.144.9",
         "source.nat.port": 2494,
         "source.port": 4723,
@@ -3566,9 +3462,7 @@
         "rule.name": "boreetd",
         "service.type": "f5",
         "source.geo.country_name": "uisautei",
-        "source.ip": [
-            "10.21.58.162"
-        ],
+        "source.ip": "10.21.58.162",
         "source.nat.ip": "10.113.65.192",
         "source.nat.port": 7807,
         "source.port": 7881,
@@ -3634,9 +3528,7 @@
         "rule.name": "litani",
         "service.type": "f5",
         "source.geo.country_name": "temveleu",
-        "source.ip": [
-            "10.53.27.253"
-        ],
+        "source.ip": "10.53.27.253",
         "source.nat.ip": "10.129.16.166",
         "source.nat.port": 5141,
         "source.port": 3599,
@@ -3702,9 +3594,7 @@
         "rule.name": "xcep",
         "service.type": "f5",
         "source.geo.country_name": "issu",
-        "source.ip": [
-            "10.120.50.13"
-        ],
+        "source.ip": "10.120.50.13",
         "source.nat.ip": "10.22.213.196",
         "source.nat.port": 7230,
         "source.port": 4426,
@@ -3770,9 +3660,7 @@
         "rule.name": "epreh",
         "service.type": "f5",
         "source.geo.country_name": "eirured",
-        "source.ip": [
-            "10.85.52.249"
-        ],
+        "source.ip": "10.85.52.249",
         "source.nat.ip": "10.229.155.171",
         "source.nat.port": 6978,
         "source.port": 3772,
@@ -3838,9 +3726,7 @@
         "rule.name": "tlab",
         "service.type": "f5",
         "source.geo.country_name": "catcupid",
-        "source.ip": [
-            "10.198.150.185"
-        ],
+        "source.ip": "10.198.150.185",
         "source.nat.ip": "10.220.1.249",
         "source.nat.port": 4200,
         "source.port": 3167,
@@ -3905,9 +3791,7 @@
         "rule.name": "les",
         "service.type": "f5",
         "source.geo.country_name": "umiure",
-        "source.ip": [
-            "10.251.82.195"
-        ],
+        "source.ip": "10.251.82.195",
         "source.nat.ip": "10.38.185.31",
         "source.nat.port": 1085,
         "source.port": 5186,
@@ -3972,9 +3856,7 @@
         "rule.name": "upt",
         "service.type": "f5",
         "source.geo.country_name": "mSecti",
-        "source.ip": [
-            "10.190.247.194"
-        ],
+        "source.ip": "10.190.247.194",
         "source.nat.ip": "10.211.198.50",
         "source.nat.port": 7510,
         "source.port": 4210,
@@ -4040,9 +3922,7 @@
         "rule.name": "niamqui",
         "service.type": "f5",
         "source.geo.country_name": "diduntut",
-        "source.ip": [
-            "10.219.83.199"
-        ],
+        "source.ip": "10.219.83.199",
         "source.nat.ip": "10.251.101.61",
         "source.nat.port": 5153,
         "source.port": 1321,
@@ -4108,9 +3988,7 @@
         "rule.name": "strud",
         "service.type": "f5",
         "source.geo.country_name": "pariat",
-        "source.ip": [
-            "10.31.86.83"
-        ],
+        "source.ip": "10.31.86.83",
         "source.nat.ip": "10.83.136.233",
         "source.nat.port": 6643,
         "source.port": 6646,
@@ -4176,9 +4054,7 @@
         "rule.name": "des",
         "service.type": "f5",
         "source.geo.country_name": "rema",
-        "source.ip": [
-            "10.45.152.205"
-        ],
+        "source.ip": "10.45.152.205",
         "source.nat.ip": "10.27.181.27",
         "source.nat.port": 5509,
         "source.port": 5107,
@@ -4243,9 +4119,7 @@
         "rule.name": "roinBCS",
         "service.type": "f5",
         "source.geo.country_name": "umdo",
-        "source.ip": [
-            "10.222.2.132"
-        ],
+        "source.ip": "10.222.2.132",
         "source.nat.ip": "10.183.90.25",
         "source.nat.port": 5038,
         "source.port": 6187,
@@ -4311,9 +4185,7 @@
         "rule.name": "ficia",
         "service.type": "f5",
         "source.geo.country_name": "litsed",
-        "source.ip": [
-            "10.189.162.131"
-        ],
+        "source.ip": "10.189.162.131",
         "source.nat.ip": "10.248.156.138",
         "source.nat.port": 2125,
         "source.port": 6019,
@@ -4378,9 +4250,7 @@
         "rule.name": "eprehe",
         "service.type": "f5",
         "source.geo.country_name": "rrorsi",
-        "source.ip": [
-            "10.6.146.184"
-        ],
+        "source.ip": "10.6.146.184",
         "source.nat.ip": "10.142.106.66",
         "source.nat.port": 3790,
         "source.port": 7247,
@@ -4446,9 +4316,7 @@
         "rule.name": "sno",
         "service.type": "f5",
         "source.geo.country_name": "aincidu",
-        "source.ip": [
-            "10.93.39.237"
-        ],
+        "source.ip": "10.93.39.237",
         "source.nat.ip": "10.119.179.182",
         "source.nat.port": 7255,
         "source.port": 232,
@@ -4513,9 +4381,7 @@
         "rule.name": "mSe",
         "service.type": "f5",
         "source.geo.country_name": "sper",
-        "source.ip": [
-            "10.28.145.163"
-        ],
+        "source.ip": "10.28.145.163",
         "source.nat.ip": "10.30.189.166",
         "source.nat.port": 2749,
         "source.port": 72,
@@ -4581,9 +4447,7 @@
         "rule.name": "usan",
         "service.type": "f5",
         "source.geo.country_name": "nder",
-        "source.ip": [
-            "10.145.128.250"
-        ],
+        "source.ip": "10.145.128.250",
         "source.nat.ip": "10.29.122.183",
         "source.nat.port": 6166,
         "source.port": 5641,
@@ -4649,9 +4513,7 @@
         "rule.name": "periam",
         "service.type": "f5",
         "source.geo.country_name": "ati",
-        "source.ip": [
-            "10.166.169.167"
-        ],
+        "source.ip": "10.166.169.167",
         "source.nat.ip": "10.142.235.217",
         "source.nat.port": 5846,
         "source.port": 1544,
@@ -4717,9 +4579,7 @@
         "rule.name": "nibus",
         "service.type": "f5",
         "source.geo.country_name": "nor",
-        "source.ip": [
-            "10.215.184.154"
-        ],
+        "source.ip": "10.215.184.154",
         "source.nat.ip": "10.53.188.140",
         "source.nat.port": 6455,
         "source.port": 3306,
@@ -4784,9 +4644,7 @@
         "rule.name": "epr",
         "service.type": "f5",
         "source.geo.country_name": "remagna",
-        "source.ip": [
-            "10.76.148.147"
-        ],
+        "source.ip": "10.76.148.147",
         "source.nat.ip": "10.74.74.129",
         "source.nat.port": 5904,
         "source.port": 1121,
@@ -4851,9 +4709,7 @@
         "rule.name": "tationem",
         "service.type": "f5",
         "source.geo.country_name": "quisnos",
-        "source.ip": [
-            "10.130.203.37"
-        ],
+        "source.ip": "10.130.203.37",
         "source.nat.ip": "10.145.49.29",
         "source.nat.port": 2464,
         "source.port": 2132,
@@ -4918,9 +4774,7 @@
         "rule.name": "elit",
         "service.type": "f5",
         "source.geo.country_name": "itautfu",
-        "source.ip": [
-            "10.24.23.209"
-        ],
+        "source.ip": "10.24.23.209",
         "source.nat.ip": "10.48.75.140",
         "source.nat.port": 1837,
         "source.port": 1503,
@@ -4985,9 +4839,7 @@
         "rule.name": "iaconse",
         "service.type": "f5",
         "source.geo.country_name": "orinrep",
-        "source.ip": [
-            "10.66.92.83"
-        ],
+        "source.ip": "10.66.92.83",
         "source.nat.ip": "10.97.105.115",
         "source.nat.port": 3576,
         "source.port": 2549,
@@ -5053,9 +4905,7 @@
         "rule.name": "ngelitse",
         "service.type": "f5",
         "source.geo.country_name": "eetd",
-        "source.ip": [
-            "10.201.132.114"
-        ],
+        "source.ip": "10.201.132.114",
         "source.nat.ip": "10.169.139.250",
         "source.nat.port": 1374,
         "source.port": 6058,
@@ -5120,9 +4970,7 @@
         "rule.name": "utper",
         "service.type": "f5",
         "source.geo.country_name": "niamq",
-        "source.ip": [
-            "10.111.128.11"
-        ],
+        "source.ip": "10.111.128.11",
         "source.nat.ip": "10.200.116.191",
         "source.nat.port": 3068,
         "source.port": 5336,
@@ -5187,9 +5035,7 @@
         "rule.name": "tio",
         "service.type": "f5",
         "source.geo.country_name": "ern",
-        "source.ip": [
-            "10.236.67.227"
-        ],
+        "source.ip": "10.236.67.227",
         "source.nat.ip": "10.240.62.238",
         "source.nat.port": 1251,
         "source.port": 881,
@@ -5254,9 +5100,7 @@
         "rule.name": "emveleum",
         "service.type": "f5",
         "source.geo.country_name": "sitas",
-        "source.ip": [
-            "10.109.14.142"
-        ],
+        "source.ip": "10.109.14.142",
         "source.nat.ip": "10.22.231.91",
         "source.nat.port": 2652,
         "source.port": 6036,
@@ -5321,9 +5165,7 @@
         "rule.name": "iumtota",
         "service.type": "f5",
         "source.geo.country_name": "modi",
-        "source.ip": [
-            "10.64.161.215"
-        ],
+        "source.ip": "10.64.161.215",
         "source.nat.ip": "10.89.221.90",
         "source.nat.port": 5835,
         "source.port": 4869,
@@ -5389,9 +5231,7 @@
         "rule.name": "inimve",
         "service.type": "f5",
         "source.geo.country_name": "rehende",
-        "source.ip": [
-            "10.79.208.135"
-        ],
+        "source.ip": "10.79.208.135",
         "source.nat.ip": "10.140.118.182",
         "source.nat.port": 4566,
         "source.port": 3688,
@@ -5456,9 +5296,7 @@
         "rule.name": "smo",
         "service.type": "f5",
         "source.geo.country_name": "dolo",
-        "source.ip": [
-            "10.35.73.208"
-        ],
+        "source.ip": "10.35.73.208",
         "source.nat.ip": "10.189.244.22",
         "source.nat.port": 734,
         "source.port": 6552,
@@ -5524,9 +5362,7 @@
         "rule.name": "nula",
         "service.type": "f5",
         "source.geo.country_name": "veni",
-        "source.ip": [
-            "10.35.65.72"
-        ],
+        "source.ip": "10.35.65.72",
         "source.nat.ip": "10.240.94.109",
         "source.nat.port": 5437,
         "source.port": 3387,
@@ -5592,9 +5428,7 @@
         "rule.name": "ape",
         "service.type": "f5",
         "source.geo.country_name": "ncidu",
-        "source.ip": [
-            "10.38.253.213"
-        ],
+        "source.ip": "10.38.253.213",
         "source.nat.ip": "10.150.56.227",
         "source.nat.port": 4686,
         "source.port": 3369,
@@ -5659,9 +5493,7 @@
         "rule.name": "veritat",
         "service.type": "f5",
         "source.geo.country_name": "yCiceroi",
-        "source.ip": [
-            "10.62.218.239"
-        ],
+        "source.ip": "10.62.218.239",
         "source.nat.ip": "10.203.193.134",
         "source.nat.port": 6251,
         "source.port": 166,
@@ -5727,9 +5559,7 @@
         "rule.name": "enimips",
         "service.type": "f5",
         "source.geo.country_name": "stiaec",
-        "source.ip": [
-            "10.10.46.43"
-        ],
+        "source.ip": "10.10.46.43",
         "source.nat.ip": "10.131.127.113",
         "source.nat.port": 853,
         "source.port": 7346,
@@ -5795,9 +5625,7 @@
         "rule.name": "iat",
         "service.type": "f5",
         "source.geo.country_name": "isiuta",
-        "source.ip": [
-            "10.233.181.250"
-        ],
+        "source.ip": "10.233.181.250",
         "source.nat.ip": "10.248.0.74",
         "source.nat.port": 6349,
         "source.port": 2868,
@@ -5863,9 +5691,7 @@
         "rule.name": "nul",
         "service.type": "f5",
         "source.geo.country_name": "ationemu",
-        "source.ip": [
-            "10.248.248.120"
-        ],
+        "source.ip": "10.248.248.120",
         "source.nat.ip": "10.80.129.81",
         "source.nat.port": 4827,
         "source.port": 1282,
@@ -5931,9 +5757,7 @@
         "rule.name": "rspi",
         "service.type": "f5",
         "source.geo.country_name": "iono",
-        "source.ip": [
-            "10.102.109.199"
-        ],
+        "source.ip": "10.102.109.199",
         "source.nat.ip": "10.91.115.139",
         "source.nat.port": 412,
         "source.port": 2061,
@@ -5998,9 +5822,7 @@
         "rule.name": "sita",
         "service.type": "f5",
         "source.geo.country_name": "uisa",
-        "source.ip": [
-            "10.159.155.88"
-        ],
+        "source.ip": "10.159.155.88",
         "source.nat.ip": "10.221.223.127",
         "source.nat.port": 2687,
         "source.port": 7034,
@@ -6066,9 +5888,7 @@
         "rule.name": "umf",
         "service.type": "f5",
         "source.geo.country_name": "ion",
-        "source.ip": [
-            "10.7.212.201"
-        ],
+        "source.ip": "10.7.212.201",
         "source.nat.ip": "10.189.70.237",
         "source.nat.port": 1457,
         "source.port": 949,
@@ -6134,9 +5954,7 @@
         "rule.name": "sequatD",
         "service.type": "f5",
         "source.geo.country_name": "usm",
-        "source.ip": [
-            "10.83.105.69"
-        ],
+        "source.ip": "10.83.105.69",
         "source.nat.ip": "10.60.224.93",
         "source.nat.port": 1508,
         "source.port": 2153,
@@ -6202,9 +6020,7 @@
         "rule.name": "prehe",
         "service.type": "f5",
         "source.geo.country_name": "eritqu",
-        "source.ip": [
-            "10.17.20.93"
-        ],
+        "source.ip": "10.17.20.93",
         "source.nat.ip": "10.219.174.45",
         "source.nat.port": 4055,
         "source.port": 4368,
@@ -6270,9 +6086,7 @@
         "rule.name": "rsitvolu",
         "service.type": "f5",
         "source.geo.country_name": "adminim",
-        "source.ip": [
-            "10.223.99.90"
-        ],
+        "source.ip": "10.223.99.90",
         "source.nat.ip": "10.37.14.20",
         "source.nat.port": 6531,
         "source.port": 4324,
@@ -6338,9 +6152,7 @@
         "rule.name": "nimadm",
         "service.type": "f5",
         "source.geo.country_name": "nvento",
-        "source.ip": [
-            "10.50.61.114"
-        ],
+        "source.ip": "10.50.61.114",
         "source.nat.ip": "10.8.32.17",
         "source.nat.port": 3788,
         "source.port": 649,
@@ -6406,9 +6218,7 @@
         "rule.name": "suntin",
         "service.type": "f5",
         "source.geo.country_name": "Sedutper",
-        "source.ip": [
-            "10.215.224.27"
-        ],
+        "source.ip": "10.215.224.27",
         "source.nat.ip": "10.181.63.82",
         "source.nat.port": 168,
         "source.port": 6726,
@@ -6474,9 +6284,7 @@
         "rule.name": "doeiu",
         "service.type": "f5",
         "source.geo.country_name": "reeufugi",
-        "source.ip": [
-            "10.169.95.128"
-        ],
+        "source.ip": "10.169.95.128",
         "source.nat.ip": "10.243.43.168",
         "source.nat.port": 2110,
         "source.port": 7737,
@@ -6542,9 +6350,7 @@
         "rule.name": "aturve",
         "service.type": "f5",
         "source.geo.country_name": "rehe",
-        "source.ip": [
-            "10.90.93.4"
-        ],
+        "source.ip": "10.90.93.4",
         "source.nat.ip": "10.18.176.44",
         "source.nat.port": 7284,
         "source.port": 3382,
@@ -6609,9 +6415,7 @@
         "rule.name": "lmolest",
         "service.type": "f5",
         "source.geo.country_name": "exeacom",
-        "source.ip": [
-            "10.163.203.191"
-        ],
+        "source.ip": "10.163.203.191",
         "source.nat.ip": "10.173.13.179",
         "source.nat.port": 1211,
         "source.port": 2599,
@@ -6677,9 +6481,7 @@
         "rule.name": "xplic",
         "service.type": "f5",
         "source.geo.country_name": "par",
-        "source.ip": [
-            "10.84.64.28"
-        ],
+        "source.ip": "10.84.64.28",
         "source.nat.ip": "10.31.147.51",
         "source.nat.port": 7780,
         "source.port": 3938,
@@ -6745,9 +6547,7 @@
         "rule.name": "ite",
         "service.type": "f5",
         "source.geo.country_name": "odtem",
-        "source.ip": [
-            "10.225.189.229"
-        ],
+        "source.ip": "10.225.189.229",
         "source.nat.ip": "10.52.13.192",
         "source.nat.port": 4714,
         "source.port": 2287,
