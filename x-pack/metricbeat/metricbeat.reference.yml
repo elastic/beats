@@ -183,15 +183,6 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: password
 
-#------------------------------ App Search Module ------------------------------
-- module: appsearch
-  metricsets: ["stats"]
-  enabled: true
-  period: 10s
-  hosts: ["http://localhost:3002"]
-  #username: "elastic"
-  #password: "changeme"
-
 #--------------------------------- AWS Module ---------------------------------
 - module: aws
   period: 300s
@@ -2800,14 +2791,6 @@ logging.files:
   # renamed during rotation. Or when set to date, the date is added to
   # the end of the file. On rotation a new file is created, older files are untouched.
   #suffix: count
-
-# Set to true to log messages in JSON format.
-#logging.json: false
-
-# Set to true, to log messages with minimal required Elastic Common Schema (ECS)
-# information. Recommended to use in combination with `logging.json=true`
-# Defaults to false.
-#logging.ecs: false
 
 # ============================= X-Pack Monitoring ==============================
 # Metricbeat can export internal metrics to a central Elasticsearch monitoring

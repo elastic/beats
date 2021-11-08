@@ -1,7 +1,0 @@
-/.idea
-/build
-
-.DS_Store
-/{beat}
-/{beat}.test
-*.pyc

@@ -1,7 +1,6 @@
 - name: sophos.xg
   type: group
   release: beta
-  default_field: false
   description: >
     Module for parsing sophosxg syslog.
   fields:

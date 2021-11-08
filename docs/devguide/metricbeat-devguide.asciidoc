@@ -18,7 +18,6 @@ This following topics describe how to contribute to Metricbeat by adding metrics
 * <<creating-metricsets>>
 * <<metricset-details>>
 * <<creating-metricbeat-module>>
-* <<creating-beat-from-metricbeat>>
 * <<dev-faq>>
 
 If you would like to contribute to Metricbeat or the Beats project, also see
@@ -58,7 +57,5 @@ include::./create-metricset.asciidoc[]
 include::./metricset-details.asciidoc[]
 
 include::./create-module.asciidoc[]
-
-include::./creating-beat-from-metricbeat.asciidoc[]
 
 include::./faq.asciidoc[]

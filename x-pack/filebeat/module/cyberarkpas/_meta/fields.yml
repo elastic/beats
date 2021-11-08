@@ -5,6 +5,5 @@
   fields:
     - name: cyberarkpas
       type: group
-      default_field: false
       fields:
 

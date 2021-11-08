@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"golang.org/x/sync/semaphore"
+	"gotest.tools/gotestsum/log"
 
 	"github.com/osquery/osquery-go"
 	genosquery "github.com/osquery/osquery-go/gen/osquery"
@@ -125,28 +126,21 @@ func (c *Client) Connect(ctx context.Context) error {
 func (c *Client) reconnect(ctx context.Context) error {
 	c.close()
 
-	for i := 0; i < c.connectRetries; i++ {
-		attempt := i + 1
-		llog := c.log.With("attempt", attempt)
-		llog.Debug("connecting")
+	r := retry{
+		maxRetry:  c.connectRetries,
+		retryWait: retryWait,
+		log:       c.log.With("context", "osquery client connect"),
+	}
+
+	return r.Run(ctx, func(ctx context.Context) error {
 		cli, err := osquery.NewClient(c.socketPath, c.timeout)
 		if err != nil {
-			llog.Errorf("failed to connect: %v", err)
-			if i < c.connectRetries-1 {
-				llog.Infof("wait before next connect attempt: retry_wait: %v", retryWait)
-				if werr := waitWithContext(ctx, retryWait); werr != nil {
-					err = werr
-					break // Context cancelled, exit loop
-				}
-			} else {
-				return err
-			}
-			continue
+			log.Errorf("failed to connect: %v", err)
+			return err
 		}
 		c.cli = cli
-		break
-	}
-	return nil
+		return nil
+	})
 }
 
 func (c *Client) Close() {
@@ -285,17 +279,6 @@ func (c *Client) queryColumnTypes(ctx context.Context, sql string) (map[string]s
 		c.cache.Add(sql, colTypes)
 	}
 	return colTypes, nil
-}
-
-func waitWithContext(ctx context.Context, to time.Duration) error {
-	t := time.NewTimer(to)
-	defer t.Stop()
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-t.C:
-	}
-	return nil
 }
 
 func resolveTypes(hits []map[string]string, colTypes map[string]string) []map[string]interface{} {
