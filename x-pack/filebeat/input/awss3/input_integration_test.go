@@ -50,11 +50,11 @@ const (
 )
 
 type terraformOutputData struct {
-	AWSRegion   string `yaml:"aws_region"`
-	BucketName  string `yaml:"bucket_name"`
-	QueueURL    string `yaml:"queue_url"`
-	BucketName2 string `yaml:"bucket_name_for_sns"`
-	QueueURL2   string `yaml:"queue_url_for_sns"`
+	AWSRegion        string `yaml:"aws_region"`
+	BucketName       string `yaml:"bucket_name"`
+	QueueURL         string `yaml:"queue_url"`
+	BucketNameForSNS string `yaml:"bucket_name_for_sns"`
+	QueueURLForSNS   string `yaml:"queue_url_for_sns"`
 }
 
 func getTerraformOutputs(t *testing.T) terraformOutputData {
@@ -458,12 +458,12 @@ func TestInputRunSNS(t *testing.T) {
 	tfConfig := getTerraformOutputs(t)
 
 	// Ensure SQS is empty before testing.
-	drainSQS(t, tfConfig.AWSRegion, tfConfig.QueueURL2)
+	drainSQS(t, tfConfig.AWSRegion, tfConfig.QueueURLForSNS)
 
 	// Ensure metrics are removed before testing.
 	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
 
-	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName2,
+	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketNameForSNS,
 		"testdata/events-array.json",
 		"testdata/invalid.json",
 		"testdata/log.json",
@@ -474,7 +474,7 @@ func TestInputRunSNS(t *testing.T) {
 		"testdata/log.txt", // Skipped (no match).
 	)
 
-	s3Input := createInput(t, makeTestConfigSQS(tfConfig.QueueURL2))
+	s3Input := createInput(t, makeTestConfigSQS(tfConfig.QueueURLForSNS))
 
 	inputCtx, cancel := newV2Context()
 	t.Cleanup(cancel)
@@ -486,7 +486,6 @@ func TestInputRunSNS(t *testing.T) {
 	defer close(client.Channel)
 	go func() {
 		for event := range client.Channel {
-			// Fake the ACK handling that's not implemented in pubtest.
 			event.Private.(*eventACKTracker).ACK()
 		}
 	}()
