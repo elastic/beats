@@ -47,13 +47,13 @@ import (
 type Heartbeat struct {
 	done chan struct{}
 	// config is used for iterating over elements of the config.
-	config          config.Config
-	scheduler       *scheduler.Scheduler
-	monitorReloader *cfgfile.Reloader
-	dynamicFactory  *monitors.RunnerFactory
-	autodiscover    *autodiscover.Autodiscover
+	config            config.Config
+	scheduler         *scheduler.Scheduler
+	monitorReloader   *cfgfile.Reloader
+	dynamicFactory    *monitors.RunnerFactory
+	autodiscover      *autodiscover.Autodiscover
 	servicePushTicker *time.Ticker
-	servicePushWait sync.WaitGroup
+	servicePushWait   sync.WaitGroup
 }
 
 // New creates a new heartbeat.
@@ -101,7 +101,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	if bt.config.RunViaSyntheticsService {
 		bt.servicePushWait = sync.WaitGroup{}
 
-		err :=  bt.runViaSyntheticsService(b)
+		err := bt.runViaSyntheticsService(b)
 		if err != nil {
 			return err
 		}
@@ -275,7 +275,7 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
-	if bt.servicePushTicker != nil{
+	if bt.servicePushTicker != nil {
 		bt.servicePushTicker.Stop()
 	}
 	close(bt.done)

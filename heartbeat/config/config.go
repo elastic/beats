@@ -35,7 +35,7 @@ type Config struct {
 	Autodiscover            *autodiscover.Config `config:"autodiscover"`
 	SyntheticSuites         []*common.Config     `config:"synthetic_suites"`
 	Jobs                    map[string]JobLimit  `config:"jobs"`
-	Service                 ServiceConfig              `config:"service"`
+	Service                 ServiceConfig        `config:"service"`
 }
 
 type JobLimit struct {
@@ -49,10 +49,10 @@ type Scheduler struct {
 }
 
 type ServiceConfig struct {
-	UpdateInterval string             `config:"update_interval"`
-	Username       string             `config:"username"`
-	Password       string             `config:"password"`
-	ManifestURL    string             `config:"manifest_url"`
+	UpdateInterval string `config:"update_interval"`
+	Username       string `config:"username"`
+	Password       string `config:"password"`
+	ManifestURL    string `config:"manifest_url"`
 }
 
 type ServiceLocation struct {
@@ -69,10 +69,8 @@ type ServiceLocation struct {
 }
 
 type ServiceManifest struct {
-	Locations map[string]ServiceLocation  `json:"locations"`
+	Locations map[string]ServiceLocation `json:"locations"`
 }
-
-
 
 // DefaultConfig is the canonical instantiation of Config.
 var DefaultConfig = Config{}

@@ -121,10 +121,7 @@ func (bt *Heartbeat) getSyntheticServiceManifest() (config.ServiceManifest, erro
 
 	serviceManifest := config.ServiceManifest{}
 
-
-
 	read, err := ioutil.ReadAll(resp.Body)
-
 
 	err = json.Unmarshal(read, &serviceManifest)
 
