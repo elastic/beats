@@ -114,7 +114,7 @@ it was uploaded. For example: `application/json`.
 ==== `encoding`
 
 The file encoding to use for reading data that contains international
-characters. This only applies to non-JSON logs. See <<_encoding_5>>.
+characters. This only applies to non-JSON logs. See <<_encoding_3>>.
 
 
 [float]
