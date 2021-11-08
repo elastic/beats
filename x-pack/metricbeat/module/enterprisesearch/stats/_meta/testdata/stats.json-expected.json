@@ -1,6 +1,7 @@
 [
     {
         "enterprisesearch": {
+            "cluster_uuid": "s7QHFAuAQmqeqnGZmAqXIA",
             "stats": {
                 "connectors": {
                     "job_store": {
@@ -40,6 +41,42 @@
                         }
                     }
                 },
+                "crawler": {
+                    "global": {
+                        "crawl_requests": {
+                            "active": 2,
+                            "failed": 0,
+                            "pending": 0,
+                            "successful": 2
+                        }
+                    },
+                    "node": {
+                        "active_threads": 18,
+                        "pages_visited": 385,
+                        "queue_size": {
+                            "primary": 91,
+                            "purge": 0
+                        },
+                        "status_codes": {
+                            "200": 367,
+                            "301": 18
+                        },
+                        "urls_allowed": 478,
+                        "urls_denied": {
+                            "already_seen": 8466,
+                            "domain_filter_denied": 5286,
+                            "incorrect_protocol": 23,
+                            "link_too_deep": 45,
+                            "nofollow": 98,
+                            "unsupported_content_type": 4
+                        },
+                        "workers": {
+                            "active": 2,
+                            "available": 14,
+                            "pool_size": 16
+                        }
+                    }
+                },
                 "http": {
                     "connections": {
                         "current": 1,
@@ -73,6 +110,15 @@
                         "3xx": 3,
                         "4xx": 4,
                         "5xx": 5
+                    }
+                },
+                "product_usage": {
+                    "app_search": {
+                        "total_engines": 1
+                    },
+                    "workplace_search": {
+                        "total_org_sources": 2,
+                        "total_private_sources": 3
                     }
                 },
                 "queues": {

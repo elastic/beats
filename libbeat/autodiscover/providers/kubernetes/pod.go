@@ -15,6 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !aix
+// +build !aix
+
 package kubernetes
 
 import (
@@ -79,7 +82,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 
 	logger.Debugf("Initializing a new Kubernetes watcher using node: %v", config.Node)
 
-	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
+	watcher, err := kubernetes.NewNamedWatcher("pod", client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout:  config.SyncPeriod,
 		Node:         config.Node,
 		Namespace:    config.Namespace,
@@ -100,11 +103,11 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	if metaConf == nil {
 		metaConf = metadata.GetDefaultResourceMetadataConfig()
 	}
-	nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
+	nodeWatcher, err := kubernetes.NewNamedWatcher("node", client, &kubernetes.Node{}, options, nil)
 	if err != nil {
 		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
 	}
-	namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+	namespaceWatcher, err := kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
 	}, nil)
 	if err != nil {
@@ -186,7 +189,8 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 		}
 
 		// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
-		if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
+		rawNsAnn, err := kubeMeta.GetValue("namespace.annotations")
+		if err == nil {
 			namespaceAnnotations, _ := rawNsAnn.(common.MapStr)
 			if len(namespaceAnnotations) != 0 {
 				annotations.DeepUpdateNoOverwrite(namespaceAnnotations)
@@ -381,7 +385,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerI
 		"runtime": c.runtime,
 	}
 	if len(namespaceAnnotations) != 0 {
-		kubemeta["namespace_annotations"] = namespaceAnnotations
+		kubemeta.Put("namespace.annotations", namespaceAnnotations)
 	}
 
 	ports := c.spec.Ports
@@ -433,7 +437,7 @@ func (p *pod) podEvent(flag string, pod *kubernetes.Pod, ports common.MapStr, in
 	kubemeta = kubemeta.Clone()
 	kubemeta["annotations"] = annotations
 	if len(namespaceAnnotations) != 0 {
-		kubemeta["namespace_annotations"] = namespaceAnnotations
+		kubemeta.Put("namespace.annotations", namespaceAnnotations)
 	}
 
 	// Don't set a port on the event

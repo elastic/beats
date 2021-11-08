@@ -133,7 +133,9 @@ func TestPod_Generate(t *testing.T) {
 					"annotations": common.MapStr{
 						"app": "production",
 					},
-					"namespace": "default",
+					"namespace": common.MapStr{
+						"name": "default",
+					},
 					"node": common.MapStr{
 						"name": "testnode",
 					},
@@ -179,7 +181,9 @@ func TestPod_Generate(t *testing.T) {
 						"uid":  uid,
 						"ip":   "127.0.0.5",
 					},
-					"namespace": "default",
+					"namespace": common.MapStr{
+						"name": "default",
+					},
 					"deployment": common.MapStr{
 						"name": "owner",
 					},
@@ -234,7 +238,9 @@ func TestPod_Generate(t *testing.T) {
 						"uid":  uid,
 						"ip":   "127.0.0.5",
 					},
-					"namespace": "default",
+					"namespace": common.MapStr{
+						"name": "default",
+					},
 					"daemonset": common.MapStr{
 						"name": "owner",
 					},
@@ -289,7 +295,9 @@ func TestPod_Generate(t *testing.T) {
 						"uid":  uid,
 						"ip":   "127.0.0.5",
 					},
-					"namespace": "default",
+					"namespace": common.MapStr{
+						"name": "default",
+					},
 					"deployment": common.MapStr{
 						"name": "nginx-deployment",
 					},
@@ -347,7 +355,9 @@ func TestPod_Generate(t *testing.T) {
 						"uid":  uid,
 						"ip":   "127.0.0.5",
 					},
-					"namespace": "default",
+					"namespace": common.MapStr{
+						"name": "default",
+					},
 					"deployment": common.MapStr{
 						"name": "nginx-deployment",
 					},
@@ -374,7 +384,7 @@ func TestPod_Generate(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	metagen := NewPodMetadataGenerator(config, nil, client, nil, nil)
+	metagen := NewPodMetadataGenerator(config, nil, client, nil, nil, true)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
@@ -422,7 +432,9 @@ func TestPod_GenerateFromName(t *testing.T) {
 					"uid":  uid,
 					"ip":   "127.0.0.5",
 				},
-				"namespace": "default",
+				"namespace": common.MapStr{
+					"name": "default",
+				},
 				"node": common.MapStr{
 					"name": "testnode",
 				},
@@ -472,7 +484,9 @@ func TestPod_GenerateFromName(t *testing.T) {
 					"uid":  uid,
 					"ip":   "127.0.0.5",
 				},
-				"namespace": "default",
+				"namespace": common.MapStr{
+					"name": "default",
+				},
 				"deployment": common.MapStr{
 					"name": "owner",
 				},
@@ -496,7 +510,7 @@ func TestPod_GenerateFromName(t *testing.T) {
 		assert.NoError(t, err)
 		pods := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		pods.Add(test.input)
-		metagen := NewPodMetadataGenerator(config, pods, client, nil, nil)
+		metagen := NewPodMetadataGenerator(config, pods, client, nil, nil, true)
 
 		accessor, err := meta.Accessor(test.input)
 		require.NoError(t, err)
@@ -579,10 +593,12 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 					"uid":  uid,
 					"ip":   "127.0.0.5",
 				},
-				"namespace":     "default",
-				"namespace_uid": uid,
-				"namespace_labels": common.MapStr{
-					"nskey": "nsvalue",
+				"namespace": common.MapStr{
+					"name": "default",
+					"uid":  uid,
+					"labels": common.MapStr{
+						"nskey": "nsvalue",
+					},
 				},
 				"node": common.MapStr{
 					"name": "testnode",
@@ -618,7 +634,7 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 		namespaces.Add(test.namespace)
 		nsMeta := NewNamespaceMetadataGenerator(config, namespaces, client)
 
-		metagen := NewPodMetadataGenerator(config, pods, client, nodeMeta, nsMeta)
+		metagen := NewPodMetadataGenerator(config, pods, client, nodeMeta, nsMeta, true)
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
 		})

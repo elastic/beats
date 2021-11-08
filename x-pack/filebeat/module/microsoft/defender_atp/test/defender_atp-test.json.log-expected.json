@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2020-07-03T15:15:39.130Z",
         "cloud.account.id": "123543-d66c-4c7e-9e30-40034eb7c6f3",
         "cloud.instance.id": "c5a964f417c11f6277d5bf9489f0d",
         "cloud.provider": "azure",
@@ -53,6 +54,7 @@
         "threat.technique.name": "Malware"
     },
     {
+        "@timestamp": "2020-06-30T15:29:44.773Z",
         "cloud.account.id": "123543-d66c-4c7e-9e30-40034eb7c6f3",
         "cloud.instance.id": "543bc5a964f417c11f6277d5bf9489f0d",
         "cloud.provider": "azure",
@@ -82,8 +84,6 @@
         "fileset.name": "defender_atp",
         "host.hostname": "testserver4",
         "host.name": "testserver4",
-        "host.user.domain": "TestServer4",
-        "host.user.name": "administrator1",
         "input.type": "log",
         "log.offset": 1825,
         "message": "Suspicious process injection observed",
@@ -123,6 +123,7 @@
         "user.name": "administrator1"
     },
     {
+        "@timestamp": "2020-06-30T15:29:44.773Z",
         "cloud.account.id": "43521344-d66c-4c7e-9e30-40034eb7c6f3",
         "cloud.instance.id": "53425a964f417c11f6277d5bf9489f0d",
         "cloud.provider": "azure",
@@ -148,9 +149,6 @@
         "fileset.name": "defender_atp",
         "host.hostname": "testserver4",
         "host.name": "testserver4",
-        "host.user.domain": "TestServer4",
-        "host.user.id": "S-1-5-21-46152456-1367606905-4031241297-500",
-        "host.user.name": "administrator1",
         "input.type": "log",
         "log.offset": 3537,
         "message": "Suspicious process injection observed",
@@ -184,6 +182,7 @@
         "user.name": "administrator1"
     },
     {
+        "@timestamp": "2020-06-30T11:13:12.900Z",
         "cloud.account.id": "1234543-d66c-4c7e-9e30-40034eb7c6f3",
         "cloud.instance.id": "t4563234bc5a964f417c11f6277d5bf9489f0d",
         "cloud.provider": "azure",

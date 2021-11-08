@@ -823,7 +823,7 @@ packetbeat.ignore_outgoing: false
 #  - add_docker_metadata:
 #      host: "unix:///var/run/docker.sock"
 #      match_fields: ["system.process.cgroup.id"]
-#      match_pids: ["process.pid", "process.ppid"]
+#      match_pids: ["process.pid", "process.parent.pid"]
 #      match_source: true
 #      match_source_index: 4
 #      match_short_id: false
@@ -974,7 +974,7 @@ output.elasticsearch:
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
   #index: "packetbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
-  # Optional ingest node pipeline. By default no pipeline will be used.
+  # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
 
   # Optional HTTP path
@@ -1942,14 +1942,6 @@ logging.files:
   # renamed during rotation. Or when set to date, the date is added to
   # the end of the file. On rotation a new file is created, older files are untouched.
   #suffix: count
-
-# Set to true to log messages in JSON format.
-#logging.json: false
-
-# Set to true, to log messages with minimal required Elastic Common Schema (ECS)
-# information. Recommended to use in combination with `logging.json=true`
-# Defaults to false.
-#logging.ecs: false
 
 # ============================= X-Pack Monitoring ==============================
 # Packetbeat can export internal metrics to a central Elasticsearch monitoring

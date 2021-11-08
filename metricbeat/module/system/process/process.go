@@ -15,12 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build darwin || freebsd || linux || windows
 // +build darwin freebsd linux windows
 
 package process
 
 import (
-	"fmt"
 	"os"
 	"runtime"
 
@@ -33,7 +33,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 var debugf = logp.MakeDebug("system.process")
@@ -48,10 +47,9 @@ func init() {
 // MetricSet that fetches process metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	stats   *process.Stats
-	cgroup  *cgroup.Reader
-	perCPU  bool
-	IsAgent bool
+	stats  *process.Stats
+	cgroup *cgroup.Reader
+	perCPU bool
 }
 
 // New creates and returns a new MetricSet.
@@ -59,11 +57,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
-	}
-
-	systemModule, ok := base.Module().(*system.Module)
-	if !ok {
-		return nil, fmt.Errorf("unexpected module type")
 	}
 
 	enableCgroups := false
@@ -88,8 +81,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				IgnoreRootCgroups: true,
 			},
 		},
-		perCPU:  config.IncludePerCPU,
-		IsAgent: systemModule.IsAgent,
+		perCPU: config.IncludePerCPU,
 	}
 
 	// If hostfs is set, we may not want to force the hierarchy override, as the user could be expecting a custom path.
@@ -120,7 +112,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			"process": common.MapStr{
 				"name": getAndRemove(proc, "name"),
 				"pid":  getAndRemove(proc, "pid"),
-				"ppid": getAndRemove(proc, "ppid"),
+				"parent": common.MapStr{
+					"pid": getAndRemove(proc, "ppid"),
+				},
 				"pgid": getAndRemove(proc, "pgid"),
 			},
 			"user": common.MapStr{

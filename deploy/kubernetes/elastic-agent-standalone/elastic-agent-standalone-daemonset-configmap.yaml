@@ -341,19 +341,23 @@ data:
               type: metrics
             metricsets:
               - controllermanager
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
             hosts:
-              - '${kubernetes.pod.ip}:10252'
+              - 'https://${kubernetes.pod.ip}:10257'
             period: 10s
-            condition: ${kubernetes.pod.labels.component} == 'kube-controller-manager'
+            ssl.verification_mode: none
+            condition: ${kubernetes.labels.component} == 'kube-controller-manager'
           - data_stream:
               dataset: kubernetes.scheduler
               type: metrics
             metricsets:
               - scheduler
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
             hosts:
-              - '${kubernetes.pod.ip}:10251'
+              - 'https://${kubernetes.pod.ip}:10259'
             period: 10s
-            condition: ${kubernetes.pod.labels.component} == 'kube-scheduler'
+            ssl.verification_mode: none
+            condition: ${kubernetes.labels.component} == 'kube-scheduler'
           - data_stream:
               dataset: kubernetes.proxy
               type: metrics
@@ -441,4 +445,4 @@ data:
       #      maxconn: 10
       #      network: tcp
       #      period: 10s
-      #      condition: ${kubernetes.pod.labels.app} == 'redis'
+      #      condition: ${kubernetes.labels.app} == 'redis'

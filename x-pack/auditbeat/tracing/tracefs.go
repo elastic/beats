@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux
 // +build linux
 
 package tracing
@@ -24,7 +25,10 @@ const (
 )
 
 var (
-	kprobeRegexp *regexp.Regexp = regexp.MustCompile("^([pr]):(?:([^/ ]*)/)?([^/ ]+) ([^ ]+) ?(.*)")
+	// p[:[GRP/]EVENT] [MOD:]SYM[+offs]|MEMADDR [FETCHARGS] : Set a probe
+	// r[MAXACTIVE][:[GRP/]EVENT] [MOD:]SYM[+0] [FETCHARGS] : Set a return probe
+	kprobeRegexp *regexp.Regexp = regexp.MustCompile("^([pr])[0-9]*:(?:([^/ ]*)/)?([^/ ]+) ([^ ]+) ?(.*)")
+
 	formatRegexp *regexp.Regexp = regexp.MustCompile("\\s+([^:]+):([^;]*);")
 )
 

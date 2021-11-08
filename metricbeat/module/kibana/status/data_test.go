@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package status
@@ -34,7 +35,7 @@ func TestEventMapping(t *testing.T) {
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventMapping(reporter, content)
+	err = eventMapping(reporter, content, true)
 	require.NoError(t, err, f)
 	require.True(t, len(reporter.GetEvents()) >= 1, f)
 	require.Equal(t, 0, len(reporter.GetErrors()), f)

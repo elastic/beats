@@ -15,28 +15,34 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // ConfigAWS is a structure defined for AWS credentials
 type ConfigAWS struct {
-	AccessKeyID          string   `config:"access_key_id"`
-	SecretAccessKey      string   `config:"secret_access_key"`
-	SessionToken         string   `config:"session_token"`
-	ProfileName          string   `config:"credential_profile_name"`
-	SharedCredentialFile string   `config:"shared_credential_file"`
-	Endpoint             string   `config:"endpoint"`
-	RoleArn              string   `config:"role_arn"`
-	ProxyUrl             *url.URL `config:"proxy_url"`
+	AccessKeyID          string `config:"access_key_id"`
+	SecretAccessKey      string `config:"secret_access_key"`
+	SessionToken         string `config:"session_token"`
+	ProfileName          string `config:"credential_profile_name"`
+	SharedCredentialFile string `config:"shared_credential_file"`
+	Endpoint             string `config:"endpoint"`
+	RoleArn              string `config:"role_arn"`
+	ProxyUrl             string `config:"proxy_url"`
 }
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
 func InitializeAWSConfig(config ConfigAWS) (awssdk.Config, error) {
 	AWSConfig, _ := GetAWSCredentials(config)
-	if config.ProxyUrl != nil {
+	if config.ProxyUrl != "" {
+		proxyUrl, err := httpcommon.NewProxyURIFromString(config.ProxyUrl)
+		if err != nil {
+			return AWSConfig, err
+		}
+
 		httpClient := &http.Client{
 			Transport: &http.Transport{
-				Proxy: http.ProxyURL(config.ProxyUrl),
+				Proxy: http.ProxyURL(proxyUrl.URI()),
 			},
 		}
 		AWSConfig.HTTPClient = httpClient
@@ -138,10 +144,15 @@ func getRoleArn(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
 // service clients when endpoint is given in config.
 func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName string, awsConfig awssdk.Config) awssdk.Config {
 	if endpoint != "" {
-		if regionName == "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + endpoint)
+		parsedEndpoint, _ := url.Parse(endpoint)
+		if parsedEndpoint.Scheme != "" {
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL(endpoint)
 		} else {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + regionName + "." + endpoint)
+			if regionName == "" {
+				awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + endpoint)
+			} else {
+				awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + regionName + "." + endpoint)
+			}
 		}
 	}
 	return awsConfig

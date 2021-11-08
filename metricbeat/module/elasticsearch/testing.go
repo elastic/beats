@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package elasticsearch
@@ -54,7 +55,7 @@ func TestMapper(t *testing.T, glob string, mapper func(mb.ReporterV2, []byte) er
 }
 
 // TestMapperWithInfo tests mapping methods with Info fields
-func TestMapperWithInfo(t *testing.T, glob string, mapper func(mb.ReporterV2, Info, []byte) error) {
+func TestMapperWithInfo(t *testing.T, glob string, mapper func(mb.ReporterV2, Info, []byte, bool) error) {
 	files, err := filepath.Glob(glob)
 	require.NoError(t, err)
 	// Makes sure glob matches at least 1 file
@@ -71,7 +72,7 @@ func TestMapperWithInfo(t *testing.T, glob string, mapper func(mb.ReporterV2, In
 			require.NoError(t, err)
 
 			reporter := &mbtest.CapturingReporterV2{}
-			err = mapper(reporter, info, input)
+			err = mapper(reporter, info, input, true)
 			require.NoError(t, err)
 			require.True(t, len(reporter.GetEvents()) >= 1)
 			require.Equal(t, 0, len(reporter.GetErrors()))
@@ -80,7 +81,7 @@ func TestMapperWithInfo(t *testing.T, glob string, mapper func(mb.ReporterV2, In
 }
 
 // TestMapperWithMetricSetAndInfo tests mapping methods with Info fields
-func TestMapperWithMetricSetAndInfo(t *testing.T, glob string, ms MetricSetAPI, mapper func(mb.ReporterV2, MetricSetAPI, Info, []byte) error) {
+func TestMapperWithMetricSetAndInfo(t *testing.T, glob string, ms MetricSetAPI, mapper func(mb.ReporterV2, MetricSetAPI, Info, []byte, bool) error) {
 	files, err := filepath.Glob(glob)
 	require.NoError(t, err)
 	// Makes sure glob matches at least 1 file
@@ -97,7 +98,7 @@ func TestMapperWithMetricSetAndInfo(t *testing.T, glob string, ms MetricSetAPI, 
 			require.NoError(t, err)
 
 			reporter := &mbtest.CapturingReporterV2{}
-			err = mapper(reporter, ms, info, input)
+			err = mapper(reporter, ms, info, input, true)
 			require.NoError(t, err)
 			require.True(t, len(reporter.GetEvents()) >= 1)
 			require.Equal(t, 0, len(reporter.GetErrors()))
@@ -107,7 +108,7 @@ func TestMapperWithMetricSetAndInfo(t *testing.T, glob string, ms MetricSetAPI, 
 
 // TestMapperWithMetricSetAndInfo tests mapping methods with Info fields
 func TestMapperWithHttpHelper(t *testing.T, glob string, httpClient *helper.HTTP,
-	mapper func(mb.ReporterV2, *helper.HTTP, Info, []byte) error) {
+	mapper func(mb.ReporterV2, *helper.HTTP, Info, []byte, bool) error) {
 	files, err := filepath.Glob(glob)
 	require.NoError(t, err)
 	// Makes sure glob matches at least 1 file
@@ -129,7 +130,7 @@ func TestMapperWithHttpHelper(t *testing.T, glob string, httpClient *helper.HTTP
 			require.NoError(t, err)
 
 			reporter := &mbtest.CapturingReporterV2{}
-			err = mapper(reporter, httpClient, info, input)
+			err = mapper(reporter, httpClient, info, input, true)
 			require.NoError(t, err)
 			require.True(t, len(reporter.GetEvents()) >= 1)
 			require.Equal(t, 0, len(reporter.GetErrors()))

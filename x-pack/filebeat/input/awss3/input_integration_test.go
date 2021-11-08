@@ -4,8 +4,8 @@
 
 // See _meta/terraform/README.md for integration test usage instructions.
 
-// +build integration
-// +build aws
+//go:build integration && aws
+// +build integration,aws
 
 package awss3
 
@@ -368,6 +368,11 @@ func drainSQS(t *testing.T, tfConfig terraformOutputData) {
 	t.Logf("Drained %d SQS messages.", deletedCount)
 }
 
+func TestGetBucketNameFromARN(t *testing.T) {
+	bucketName := getBucketNameFromARN("arn:aws:s3:::my_corporate_bucket")
+	assert.Equal("my_corporate_bucket", bucketName)
+}
+
 func TestGetRegionForBucketARN(t *testing.T) {
 	logp.TestingSetup()
 
@@ -381,6 +386,62 @@ func TestGetRegionForBucketARN(t *testing.T) {
 
 	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", awsConfig))
 
-	regionName, err := getRegionForBucketARN(context.Background(), s3Client, tfConfig.BucketName)
+	regionName, err := getRegionForBucket(context.Background(), s3Client, getBucketNameFromARN(tfConfig.BucketName))
 	assert.Equal(t, tfConfig.AWSRegion, regionName)
+}
+
+func TestPaginatorListPrefix(t *testing.T) {
+	logp.TestingSetup()
+
+	// Terraform is used to setup S3 and must be executed manually.
+	tfConfig := getTerraformOutputs(t)
+
+	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName,
+		"testdata/events-array.json",
+		"testdata/invalid.json",
+		"testdata/log.json",
+		"testdata/log.ndjson",
+		"testdata/multiline.json",
+		"testdata/multiline.json.gz",
+		"testdata/multiline.txt",
+		"testdata/log.txt", // Skipped (no match).
+	)
+
+	awsConfig, err := external.LoadDefaultAWSConfig()
+	awsConfig.Region = tfConfig.AWSRegion
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", awsConfig))
+
+	s3API := &awsS3API{
+		client: s3Client,
+	}
+
+	var objects []string
+	paginator := s3API.ListObjectsPaginator(tfConfig.BucketName, "log")
+	for paginator.Next(context.Background()) {
+		page := paginator.CurrentPage()
+		for _, object := range page.Contents {
+			objects = append(objects, *object.Key)
+		}
+	}
+
+	assert.NoError(t, paginator.Err())
+
+	expected := []string{
+		"log.json",
+		"log.ndjson",
+		"log.txt",
+	}
+
+	assert.Equal(t, expected, objects)
+}
+
+func TestGetProviderFromDomain(t *testing.T) {
+	assert.Equal("aws", getProviderFromDomain("", ""))
+	assert.Equal("aws", getProviderFromDomain("c2s.ic.gov", ""))
+	assert.Equal("abc", getProviderFromDomain("abc.com", "abc"))
+	assert.Equal("xyz", getProviderFromDomain("oraclecloud.com", "xyz"))
 }

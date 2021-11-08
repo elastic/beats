@@ -13,7 +13,7 @@ the following:
   The {beatname_uc} configuration is also responsible with stitching together
   multiline events when needed.
 
-* {es} {ref}/ingest.html[Ingest Node] pipeline definition,
+* {es} {ref}/ingest.html[ingest pipeline] definition,
   which is used to parse the log lines.
 
 * Fields definitions, which are used to configure {es} with the

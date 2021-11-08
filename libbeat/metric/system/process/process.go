@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build darwin || freebsd || linux || windows
 // +build darwin freebsd linux windows
 
 package process
@@ -28,6 +29,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+
+	"github.com/elastic/go-sysinfo/types"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -60,7 +63,7 @@ type Process struct {
 	FD         sigar.ProcFDUsage
 	Env        common.MapStr
 
-	//cpu stats
+	// cpu stats
 	cpuSinceStart   float64
 	cpuTotalPct     float64
 	cpuTotalPctNorm float64
@@ -94,6 +97,7 @@ type Stats struct {
 	envRegexps  []match.Matcher // List of regular expressions used to whitelist env vars.
 	cgroups     *cgroup.Reader
 	logger      *logp.Logger
+	host        types.Host
 }
 
 // Ticks of CPU for a process
@@ -292,15 +296,11 @@ func GetOwnResourceUsageTimeInMillis() (int64, int64, error) {
 }
 
 func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
-
 	// This is a holdover until we migrate this library to metricbeat/internal
 	// At which point we'll use the memory code there.
 	var totalPhyMem uint64
-	host, err := sysinfo.Host()
-	if err != nil {
-		procStats.logger.Warnf("Getting host details: %v", err)
-	} else {
-		memStats, err := host.Memory()
+	if procStats.host != nil {
+		memStats, err := procStats.host.Memory()
 		if err != nil {
 			procStats.logger.Warnf("Getting memory details: %v", err)
 		} else {
@@ -426,6 +426,14 @@ func (procStats *Stats) matchProcess(name string) bool {
 // cannot be compiled.
 func (procStats *Stats) Init() error {
 	procStats.logger = logp.NewLogger("processes")
+
+	var err error
+	procStats.host, err = sysinfo.Host()
+	if err != nil {
+		procStats.host = nil
+		procStats.logger.Warnf("Getting host details: %v", err)
+	}
+
 	procStats.ProcsMap = make(ProcsMap)
 
 	if len(procStats.Procs) == 0 {

@@ -1,4 +1,5 @@
 - key: host
+  default_field: true
   title: Host
   description: >
     Info collected for the host machine.
@@ -8,6 +9,7 @@
     # ECS fields are in fields.ecs.yml.
     # These are the non-ECS fields.
     - name: host
+      default_field: true
       type: group
       fields:
 

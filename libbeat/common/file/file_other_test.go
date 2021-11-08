@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !windows && !integration
 // +build !windows,!integration
 
 package file

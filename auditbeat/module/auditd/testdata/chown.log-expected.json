@@ -85,7 +85,9 @@
       "executable": "/usr/bin/chown",
       "name": "chown",
       "pid": 9494,
-      "ppid": 9492,
+      "parent": {
+         "pid": 9492
+      },
       "title": "chown -R alice test",
       "working_directory": "/home/vagrant"
     },

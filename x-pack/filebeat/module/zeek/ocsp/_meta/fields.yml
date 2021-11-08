@@ -1,6 +1,5 @@
 - name: ocsp
   type: group
-  default_field: false
   description: |
     Fields exported by the Zeek OCSP log
     Online Certificate Status Protocol (OCSP). Only created if policy script is loaded.
