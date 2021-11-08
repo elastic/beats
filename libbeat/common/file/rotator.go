@@ -22,28 +22,17 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"sync"
 	"time"
 
 	"github.com/pkg/errors"
 )
 
-type SuffixType uint32
-
 const (
 	// MaxBackupsLimit is the upper bound on the number of backup files. Any values
 	// greater will result in an error.
 	MaxBackupsLimit = 1024
-
-	SuffixCount SuffixType = iota + 1
-	SuffixDate
 )
-
-var suffixes = map[string]SuffixType{
-	"count": SuffixCount,
-	"date":  SuffixDate,
-}
 
 // rotater is the interface responsible for rotating and finding files.
 type rotater interface {
@@ -69,7 +58,6 @@ type Rotator struct {
 	interval        time.Duration
 	permissions     os.FileMode
 	log             Logger // Optional Logger (may be nil).
-	suffix          SuffixType
 	rotateOnStartup bool
 	redirectStderr  bool
 
@@ -84,14 +72,6 @@ type Logger interface {
 
 // RotatorOption is a configuration option for Rotator.
 type RotatorOption func(r *Rotator)
-
-// Interval sets the time interval for log rotation in addition to log
-// rotation by size. The default is 0 for disabled.
-func Suffix(s SuffixType) RotatorOption {
-	return func(r *Rotator) {
-		r.suffix = s
-	}
-}
 
 // MaxSizeBytes configures the maximum number of bytes that a file should
 // contain before being rotated. The default is 10 MiB.
@@ -158,7 +138,6 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 		permissions:     0600,
 		interval:        0,
 		rotateOnStartup: true,
-		suffix:          SuffixCount,
 	}
 
 	for _, opt := range options {
@@ -179,7 +158,7 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 		return nil, errors.New("the minimum time interval for log rotation is 1 second")
 	}
 
-	r.rot = newRotater(r.log, r.suffix, filename, r.maxBackups, r.interval)
+	r.rot = newDateRotater(r.log, filename)
 
 	shouldRotateOnStart := r.rotateOnStartup
 	if _, err := os.Stat(r.rot.ActiveFile()); os.IsNotExist(err) {
@@ -194,7 +173,6 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 			"max_size_bytes", r.maxSizeBytes,
 			"max_backups", r.maxBackups,
 			"permissions", r.permissions,
-			"suffix", r.suffix,
 		)
 	}
 
@@ -395,41 +373,11 @@ func (r *Rotator) closeFile() error {
 	return errors.Wrap(err, "failed to close active file")
 }
 
-type countRotator struct {
-	log             Logger
-	filename        string
-	intervalRotator *intervalRotator
-	maxBackups      uint
-}
-
 type dateRotator struct {
 	log             Logger
 	format          string
 	filenamePrefix  string
 	currentFilename string
-	intervalRotator *intervalRotator
-}
-
-func newRotater(log Logger, s SuffixType, filename string, maxBackups uint, interval time.Duration) rotater {
-	switch s {
-	case SuffixCount:
-		if interval > 0 {
-			return newIntervalRotator(log, interval, filename)
-		}
-		return &countRotator{
-			log:        log,
-			filename:   filename,
-			maxBackups: maxBackups,
-		}
-	case SuffixDate:
-		return newDateRotater(log, filename)
-	default:
-		return &countRotator{
-			log:        log,
-			filename:   filename,
-			maxBackups: maxBackups,
-		}
-	}
 }
 
 func newDateRotater(log Logger, filename string) rotater {
@@ -498,82 +446,4 @@ func (d *dateRotator) OrderLog(filename string) time.Time {
 		return time.Time{}
 	}
 	return ts
-}
-
-func (c *countRotator) ActiveFile() string {
-	return c.filename
-}
-
-func (c *countRotator) RotatedFiles() []string {
-	files := make([]string, 0)
-	for i := c.maxBackups + 1; i >= 1; i-- {
-		name := c.backupName(i)
-		if _, err := os.Stat(name); os.IsNotExist(err) {
-			continue
-		} else if err != nil {
-			c.log.Debugw("failed to stat rotated file")
-			return files
-		}
-		files = append(files, name)
-	}
-
-	return files
-}
-
-func (c *countRotator) backupName(n uint) string {
-	if n == 0 {
-		return c.ActiveFile()
-	}
-	return c.ActiveFile() + "." + strconv.Itoa(int(n))
-}
-
-func (c *countRotator) Rotate(reason rotateReason, _ time.Time) error {
-	for i := c.maxBackups + 1; i > 0; i-- {
-		old := c.backupName(i - 1)
-		older := c.backupName(i)
-
-		if _, err := os.Stat(old); os.IsNotExist(err) {
-			continue
-		} else if err != nil {
-			return errors.Wrap(err, "failed to rotate backups")
-		}
-
-		if err := os.Remove(older); err != nil && !os.IsNotExist(err) {
-			return errors.Wrap(err, "failed to rotate backups")
-		}
-		if err := os.Rename(old, older); err != nil {
-			return errors.Wrap(err, "failed to rotate backups")
-		} else if i == 1 {
-			// Log when rotation of the main file occurs.
-			if c.log != nil {
-				c.log.Debugw("Rotating file", "filename", old, "reason", reason)
-			}
-		}
-	}
-	return nil
-}
-
-func (s *SuffixType) Unpack(v string) error {
-	i, err := strconv.Atoi(v)
-	if err == nil {
-		t := SuffixType(i)
-		v = t.String()
-	}
-
-	val, ok := suffixes[v]
-	if !ok {
-		return fmt.Errorf("invalid suffix type: %+v", v)
-	}
-
-	*s = val
-	return nil
-}
-
-func (s *SuffixType) String() string {
-	for k, v := range suffixes {
-		if v == *s {
-			return k
-		}
-	}
-	return ""
 }
