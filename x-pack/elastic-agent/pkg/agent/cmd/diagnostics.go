@@ -418,7 +418,7 @@ func getAllPprof(ctx context.Context, d time.Duration) (map[string][]client.Proc
 }
 
 func zipProfs(zw *zip.Writer, pprof map[string][]client.ProcPProf) error {
-	zf, err = zw.Create("pprof/")
+	zf, err := zw.Create("pprof/")
 	if err != nil {
 		return err
 	}
@@ -443,7 +443,7 @@ func zipProfs(zw *zip.Writer, pprof map[string][]client.ProcPProf) error {
 			if err != nil {
 				return err
 			}
-			_, err = zf.Write(p.Results)
+			_, err = zf.Write(p.Result)
 			if err != nil {
 				return err
 			}

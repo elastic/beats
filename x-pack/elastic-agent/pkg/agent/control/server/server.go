@@ -222,6 +222,7 @@ func (s *Server) ProcMeta(ctx context.Context, _ *proto.Empty) (*proto.ProcMetaR
 	return resp, nil
 }
 
+// Pprof returns /debug/pprof data for the requested applicaiont-route_key or all running applications.
 func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.PprofResponse, error) {
 	if s.routeFn == nil {
 		return nil, errors.New("route function is nil")
@@ -232,7 +233,7 @@ func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.Ppr
 		return nil, fmt.Errorf("unable to parse trace duration: %w", err)
 	}
 
-	resp := &proto.PprofResonse{
+	resp := &proto.PprofResponse{
 		Results: []*proto.PprofResult{},
 	}
 
@@ -267,11 +268,11 @@ func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.Ppr
 			// Launch a concurrent goroutine to gather all pprof endpoints from a socket.
 			for _, opt := range req.PprofType {
 				wg.Add(1)
-				go func() {
+				go func(opt proto.PprofOption) {
 					res := c.GetPprof(ctx, opt, dur)
 					ch <- res
 					wg.Done()
-				}()
+				}(opt)
 			}
 		}
 	}
@@ -347,7 +348,7 @@ func (r *socketRequester) ProcMeta(ctx context.Context) *proto.ProcMeta {
 		RouteKey: r.routeKey,
 	}
 
-	res, err := r.c.getPath(ctx, "/")
+	res, err := r.getPath(ctx, "/")
 	if err != nil {
 		pm.Error = err.Error()
 		return pm
@@ -377,7 +378,7 @@ func (r *socketRequester) ProcMeta(ctx context.Context) *proto.ProcMeta {
 	return pm
 }
 
-var pprofEndopoints = map[proto.PprofOption]string{
+var pprofEndpoints = map[proto.PprofOption]string{
 	proto.PprofOption_ALLOCS:       "/debug/pprof/allocs",
 	proto.PprofOption_BLOCK:        "/debug/pprof/block",
 	proto.PprofOption_CMDLINE:      "/debug/pprof/cmdline",
@@ -407,7 +408,7 @@ func (r *socketRequester) GetPprof(ctx context.Context, opt proto.PprofOption, d
 		path += fmt.Sprintf("?seconds=%0.f", dur.Seconds())
 	}
 
-	resp, err := r.c.getPath(ctx, path)
+	resp, err := r.getPath(ctx, path)
 	if err != nil {
 		res.Error = err.Error()
 		return res

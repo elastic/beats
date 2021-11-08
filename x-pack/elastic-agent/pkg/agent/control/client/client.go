@@ -103,6 +103,8 @@ type Client interface {
 	Upgrade(ctx context.Context, version string, sourceURI string) (string, error)
 	// ProcMeta gathers running process meta-data.
 	ProcMeta(ctx context.Context) ([]ProcMeta, error)
+	// Ppro
+	Pprof(ctx context.Context, d time.Duration, pprofTypes []proto.PprofOption, appName, routeKey string) (map[string][]ProcPProf, error)
 }
 
 // client manages the state and communication to the Elastic Agent.
@@ -274,7 +276,7 @@ func (c *client) Pprof(ctx context.Context, d time.Duration, pprofTypes []proto.
 		res[r.PprofType.String()] = append(res[r.PprofType.String()], ProcPProf{
 			Name:     r.AppName,
 			RouteKey: r.RouteKey,
-			Results:  r.Result,
+			Result:   r.Result,
 			Error:    r.Error,
 		})
 	}
