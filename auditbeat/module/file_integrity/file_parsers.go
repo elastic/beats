@@ -21,7 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-// FileParser is a file analyser the provides inrichment for file.* fields.
+// FileParser is a file analyser the provides enrichment for file.* fields.
 type FileParser interface {
 	Parse(dst common.MapStr, path string) error
 }
