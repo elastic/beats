@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
 	monitoring "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/socket"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
@@ -239,6 +240,20 @@ func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.Ppr
 
 	var wg sync.WaitGroup
 	ch := make(chan *proto.PprofResult, 1)
+
+	// retrieve elastic-agent pprof data if requested or application is unspecified.
+	if req.AppName == "" || req.AppName == "elastic-agent" {
+		endpoint := beats.AgentDebugEndpoint(runtime.GOOS)
+		c := newSocketRequester(dur*2, "elastic-agent", "", endpoint)
+		for _, opt := range req.PprofType {
+			wg.Add(1)
+			go func(opt proto.PprofOption) {
+				res := c.GetPprof(ctx, opt, dur)
+				ch <- res
+				wg.Done()
+			}(opt)
+		}
+	}
 
 	routes := s.routeFn()
 	for _, rk := range routes.Keys() {

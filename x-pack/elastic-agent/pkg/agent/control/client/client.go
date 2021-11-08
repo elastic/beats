@@ -258,6 +258,7 @@ func (c *client) ProcMeta(ctx context.Context) ([]ProcMeta, error) {
 	return procMeta, nil
 }
 
+// Pprof gathers /debug/pprof data and returns a map of pprof-type: ProcPProf data
 func (c *client) Pprof(ctx context.Context, d time.Duration, pprofTypes []proto.PprofOption, appName, routeKey string) (map[string][]ProcPProf, error) {
 	resp, err := c.client.Pprof(ctx, &proto.PprofRequest{
 		PprofType:     pprofTypes,

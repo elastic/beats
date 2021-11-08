@@ -64,6 +64,7 @@ func newDiagnosticsCommand(s []string, streams *cli.IOStreams) *cobra.Command {
 
 	cmd.Flags().String("output", "human", "Output the diagnostics information in either human, json, or yaml (default: human)")
 	cmd.AddCommand(newDiagnosticsCollectCommandWithArgs(s, streams))
+	cmd.AddCommand(newDiagnosticsPprofCommandWithArgs(s, streams))
 
 	return cmd
 }
@@ -73,7 +74,7 @@ func newDiagnosticsCollectCommandWithArgs(_ []string, streams *cli.IOStreams) *c
 		Use:   "collect",
 		Short: "Collect diagnostics information from the elastic-agent and write it to a zip archive.",
 		Long:  "Collect diagnostics information from the elastic-agent and write it to a zip archive.\nNote that any credentials will appear in plain text.",
-		Args:  cobra.MaximumNArgs(1),
+		Args:  cobra.MaximumNArgs(3),
 		RunE: func(c *cobra.Command, args []string) error {
 			file, _ := c.Flags().GetString("file")
 
@@ -101,6 +102,32 @@ func newDiagnosticsCollectCommandWithArgs(_ []string, streams *cli.IOStreams) *c
 	cmd.Flags().String("output", "yaml", "Output the collected information in either json, or yaml (default: yaml)") // replace output flag with different options
 	cmd.Flags().Bool("pprof", false, "Collect all pprof data from all running applications.")
 	cmd.Flags().Duration("pprof-duration", time.Second*30, "The duration to collect trace and profiling data from the debug/pprof endpoints. (default: 30s)")
+
+	return cmd
+}
+
+func newDiagnosticsPprofCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "pprof",
+		Short: "Collect pprof information from a running process.",
+		Long:  "Collect pprof information from the elastic-agent or one of its processes and write to stdout or a file.",
+		Args:  cobra.MaximumNArgs(5),
+		RunE: func(c *cobra.Command, args []string) error {
+			file, _ := c.Flags().GetString("file")
+			pprofType, _ := c.Flags().GetString("pprof-type")
+			d, _ := c.Flags().GetDuration("pprof-duration")
+			pprofApp, _ := c.Flags().GetString("pprof-application")
+			pprofRK, _ := c.Flags().GetString("pprof-route-key")
+
+			return diagnosticsPprofCmd(streams, d, file, pprofType, pprofApp, pprofRK)
+		},
+	}
+
+	cmd.Flags().StringP("file", "f", "", "name of the output file, stdout if unspecified.")
+	cmd.Flags().String("pprof-type", "profile", "Collect all pprof data from all running applications. Select one of [allocs, block, cmdline, goroutine, heap, mutex, profile, threadcreate, trace]")
+	cmd.Flags().Duration("pprof-duration", time.Second*30, "The duration to collect trace and profiling data from the debug/pprof endpoints. (default: 30s)")
+	cmd.Flags().String("pprof-application", "elastic-agent", "Application name to collect pprof data from.")
+	cmd.Flags().String("pprof-route-key", "default", "Route key to collect pprof data from.")
 
 	return cmd
 }
@@ -175,6 +202,64 @@ func diagnosticsCollectCmd(streams *cli.IOStreams, fileName, outputFormat string
 	}
 	fmt.Fprintf(streams.Out, "Created diagnostics archive %q\n", fileName)
 	fmt.Fprintln(streams.Out, "***** WARNING *****\nCreated archive may contain plain text credentials.\nEnsure that files in archive are redacted before sharing.\n*******************")
+	return nil
+}
+
+func diagnosticsPprofCmd(streams *cli.IOStreams, dur time.Duration, outFile, pType, appName, rk string) error {
+	pt, ok := proto.PprofOption_value[strings.ToUpper(pType)]
+	if !ok {
+		return fmt.Errorf("unknown pprof-type %q, select one of [allocs, block, cmdline, goroutine, heap, mutex, profile, threadcreate, trace]", pType)
+	}
+
+	// the elastic-agent application does not have a route key
+	if appName == "elastic-agent" {
+		rk = ""
+	}
+
+	ctx := handleSignal(context.Background())
+	innerCtx, cancel := context.WithTimeout(ctx, dur*2)
+	defer cancel()
+
+	daemon := client.New()
+	err := daemon.Connect(ctx)
+	if err != nil {
+		return err
+	}
+
+	pprofData, err := daemon.Pprof(innerCtx, dur, []proto.PprofOption{proto.PprofOption(pt)}, appName, rk)
+	if err != nil {
+		return err
+	}
+
+	// validate response
+	pArr, ok := pprofData[proto.PprofOption_name[pt]]
+	if !ok {
+		return fmt.Errorf("route key %q not found in response data (map length: %d)", rk, len(pprofData))
+	}
+	if len(pArr) != 1 {
+		return fmt.Errorf("route key application length 1 expected, recieved %d", len(pArr))
+	}
+	res := pArr[0]
+
+	if res.Error != "" {
+		return fmt.Errorf(res.Error)
+	}
+
+	// handle result
+	if outFile != "" {
+		f, err := os.Create(outFile)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		_, err = f.Write(res.Result)
+		if err != nil {
+			return err
+		}
+		fmt.Fprintf(streams.Out, "pprof data written to %s\n", outFile)
+		return nil
+	}
+	streams.Out.Write(res.Result)
 	return nil
 }
 
