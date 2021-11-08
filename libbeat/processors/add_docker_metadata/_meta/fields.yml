@@ -6,6 +6,7 @@
   anchor: docker-processor
   fields:
     - name: docker
+      default_field: true
       type: group
       fields:
         - name: container.id

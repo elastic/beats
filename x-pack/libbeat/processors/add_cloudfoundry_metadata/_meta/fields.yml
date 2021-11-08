@@ -6,6 +6,7 @@
   anchor: cloudfoundry-processor
   fields:
     - name: cloudfoundry
+      default_field: true
       type: group
       fields:
         - name: app.id

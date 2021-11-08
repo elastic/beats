@@ -646,7 +646,7 @@ func TestProcessDefaultField(t *testing.T) {
 	)
 
 	fields := mapping.Fields{
-		// By default foo will be included in default_field.
+		// By default foo will be excluded in default_field.
 		mapping.Field{
 			Name: "foo",
 			Type: "keyword",
@@ -694,8 +694,9 @@ func TestProcessDefaultField(t *testing.T) {
 		},
 		// Check that multi_fields are correctly stored in defaultFields.
 		mapping.Field{
-			Name: "qux",
-			Type: "keyword",
+			Name:         "qux",
+			Type:         "keyword",
+			DefaultField: &enableDefaultField,
 			MultiFields: []mapping.Field{
 				{
 					Name: "text",
@@ -742,7 +743,6 @@ func TestProcessDefaultField(t *testing.T) {
 
 	expectedFields := []string{
 		"bar",
-		"foo",
 		"nested.bar",
 		"nested.foo",
 		"qux",
@@ -752,7 +752,7 @@ func TestProcessDefaultField(t *testing.T) {
 	}
 	sort.Strings(defaultFields)
 	sort.Strings(expectedFields)
-	assert.Equal(t, defaultFields, expectedFields)
+	assert.Equal(t, expectedFields, defaultFields)
 }
 
 func TestProcessWildcardOSS(t *testing.T) {
