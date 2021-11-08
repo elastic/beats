@@ -179,10 +179,6 @@ func (t *SimpleTransport) readResponse(
 	t.sigStartRead()
 
 	if resp.Header.Get("Content-Encoding") == gzipEncoding {
-		resp.Header.Del("Content-Encoding")
-		resp.Header.Del("Content-Length")
-		resp.ContentLength = -1
-
 		unzipper, err := gzip.NewReader(resp.Body)
 		if err != nil {
 			resp.Body.Close()
