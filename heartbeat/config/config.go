@@ -27,13 +27,15 @@ import (
 
 // Config defines the structure of heartbeat.yml.
 type Config struct {
-	RunOnce         bool                 `config:"run_once"`
-	Monitors        []*common.Config     `config:"monitors"`
-	ConfigMonitors  *common.Config       `config:"config.monitors"`
-	Scheduler       Scheduler            `config:"scheduler"`
-	Autodiscover    *autodiscover.Config `config:"autodiscover"`
-	SyntheticSuites []*common.Config     `config:"synthetic_suites"`
-	Jobs            map[string]JobLimit  `config:"jobs"`
+	RunOnce                 bool                 `config:"run_once"`
+	RunViaSyntheticsService bool                 `config:"run_via_synthetics_service"`
+	Monitors                []*common.Config     `config:"monitors"`
+	ConfigMonitors          *common.Config       `config:"config.monitors"`
+	Scheduler               Scheduler            `config:"scheduler"`
+	Autodiscover            *autodiscover.Config `config:"autodiscover"`
+	SyntheticSuites         []*common.Config     `config:"synthetic_suites"`
+	Jobs                    map[string]JobLimit  `config:"jobs"`
+	Service                 ServiceConfig              `config:"service"`
 }
 
 type JobLimit struct {
@@ -45,6 +47,32 @@ type Scheduler struct {
 	Limit    int64  `config:"limit"  validate:"min=0"`
 	Location string `config:"location"`
 }
+
+type ServiceConfig struct {
+	UpdateInterval string             `config:"update_interval"`
+	Username       string             `config:"username"`
+	Password       string             `config:"password"`
+	ManifestURL    string             `config:"manifest_url"`
+}
+
+type ServiceLocation struct {
+	Url string `json:"url"`
+
+	Geo struct {
+		Name     string `json:"name"`
+		Location struct {
+			Lat float64 `json:"lat"`
+			Lon float64 `json:"lon"`
+		} `json:"location"`
+	} `json:"geo"`
+	Status string `json:"status"`
+}
+
+type ServiceManifest struct {
+	Locations map[string]ServiceLocation  `json:"locations"`
+}
+
+
 
 // DefaultConfig is the canonical instantiation of Config.
 var DefaultConfig = Config{}

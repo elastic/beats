@@ -70,6 +70,10 @@ const (
 var hasSelector = logp.HasSelector
 var configDebugf = logp.Debug
 
+func NewConfigNameSpace(name string, config *Config ) *ConfigNamespace {
+	return &ConfigNamespace{name: name, config: config}
+}
+
 func NewConfig() *Config {
 	return fromConfig(ucfg.New())
 }

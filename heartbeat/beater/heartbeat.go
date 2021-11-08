@@ -52,6 +52,8 @@ type Heartbeat struct {
 	monitorReloader *cfgfile.Reloader
 	dynamicFactory  *monitors.RunnerFactory
 	autodiscover    *autodiscover.Autodiscover
+	servicePushTicker *time.Ticker
+	servicePushWait sync.WaitGroup
 }
 
 // New creates a new heartbeat.
@@ -94,6 +96,16 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	if bt.config.RunViaSyntheticsService {
+		bt.servicePushWait = sync.WaitGroup{}
+
+		err :=  bt.runViaSyntheticsService(b)
+		if err != nil {
+			return err
+		}
+		bt.servicePushWait.Wait()
 		return nil
 	}
 
@@ -263,5 +275,8 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
+	if bt.servicePushTicker != nil{
+		bt.servicePushTicker.Stop()
+	}
 	close(bt.done)
 }

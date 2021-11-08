@@ -62,6 +62,20 @@ func Parse(in string) (*Schedule, error) {
 	return &Schedule{s}, nil
 }
 
+func ParseSchedule(in string) (*time.Duration, error) {
+	every := "@every"
+
+	if strings.HasPrefix(in, every) {
+		interval := strings.TrimSpace(in[len(every):])
+		d, err := time.ParseDuration(interval)
+		if err != nil {
+			return nil, err
+		}
+		return &d, nil
+	}
+	return nil, nil
+}
+
 func MustParse(in string) *Schedule {
 	sched, err := Parse(in)
 	if err != nil {
