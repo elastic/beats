@@ -1,0 +1,102 @@
+{
+    "process": {
+        "memory": {
+            "heap": {
+                "total_bytes": 845037568,
+                "used_bytes": 610019088,
+                "size_limit": 4345298944
+            },
+            "resident_set_size_bytes": 323944448
+        },
+        "pid": 86243,
+        "event_loop_delay": 11462679.540229885,
+        "event_loop_delay_histogram": {
+            "min": 9273344,
+            "max": 18923519,
+            "mean": 11462679.540229885,
+            "exceeds": 0,
+            "stddev": 1118653.118990417,
+            "from_timestamp": "2021-11-01T06:59:57.273Z",
+            "last_updated_at": "2021-11-01T07:00:02.272Z",
+            "percentiles": {
+                "50": 11378687,
+                "75": 12541951,
+                "95": 12869631,
+                "99": 14295039
+            }
+        },
+        "uptime_ms": 12163899.635417
+    },
+    "processes": [
+        {
+            "memory": {
+                "heap": {
+                    "total_bytes": 845037568,
+                    "used_bytes": 610019088,
+                    "size_limit": 4345298944
+                },
+                "resident_set_size_bytes": 323944448
+            },
+            "pid": 86243,
+            "event_loop_delay": 11462679.540229885,
+            "event_loop_delay_histogram": {
+                "min": 9273344,
+                "max": 18923519,
+                "mean": 11462679.540229885,
+                "exceeds": 0,
+                "stddev": 1118653.118990417,
+                "from_timestamp": "2021-11-01T06:59:57.273Z",
+                "last_updated_at": "2021-11-01T07:00:02.272Z",
+                "percentiles": {
+                    "50": 11378687,
+                    "75": 12541951,
+                    "95": 12869631,
+                    "99": 14295039
+                }
+            },
+            "uptime_ms": 12163899.635417
+        }
+    ],
+    "os": {
+        "platform": "darwin",
+        "platform_release": "darwin-20.6.0",
+        "load": {
+            "1m": 26.32470703125,
+            "5m": 27.869140625,
+            "15m": 25.392578125
+        },
+        "memory": {
+            "total_bytes": 17179869184,
+            "free_bytes": 128368640,
+            "used_bytes": 17051500544
+        },
+        "uptime_ms": 606122000
+    },
+    "requests": {
+        "disconnects": 0,
+        "total": 1,
+        "status_codes": {
+            "200": 1
+        }
+    },
+    "response_times": {
+        "avg_ms": 30,
+        "max_ms": 30
+    },
+    "concurrent_connections": 0,
+    "kibana": {
+        "uuid": "5b2de169-2785-441b-ae8c-186a1936b17d",
+        "name": "matschaffer-mbp2021-temp.lan",
+        "index": ".kibana",
+        "host": "localhost",
+        "locale": "en",
+        "transport_address": "localhost:5603",
+        "version": "8.1.0",
+        "snapshot": false,
+        "status": "green"
+    },
+    "last_updated": "2021-11-01T07:00:02.274Z",
+    "collection_interval_ms": 5000,
+    "usage": {},
+    "cluster_uuid": "TDDfLGkcS-CU5SVwhLqY0w"
+}

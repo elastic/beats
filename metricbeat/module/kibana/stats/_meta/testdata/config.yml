@@ -1,0 +1,4 @@
+# Note, we can't actually use testdata since the kibana module also 
+# type: http
+# url: "/api/stats"
+# suffix: json
