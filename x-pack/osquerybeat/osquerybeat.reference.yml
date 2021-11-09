@@ -1145,6 +1145,9 @@ logging.files:
 # `http.user`.
 #http.named_pipe.security_descriptor:
 
+# Defines if the HTTP pprof endpoints are enabled.
+#http.pprof.enabled: false
+
 # ============================== Process Security ==============================
 
 # Enable or disable seccomp system call filtering on Linux. Default is enabled.
