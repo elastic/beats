@@ -819,7 +819,7 @@ def archiveTestOutput(Map args = [:]) {
         def fileName = 'build/system-tests-*.tar.gz' // see dev-tools/mage/target/common/package.go#PackageSystemTests method
         def files = findFiles(glob: "${fileName}")
 
-        if (files?.length() > 0) {
+        if (files?.length > 0) {
           googleStorageUploadExt(
             bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
             credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
