@@ -81,7 +81,7 @@ const containerIdLen = 64
 func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 	value, err := event.GetValue("log.file.path")
 	if err != nil {
-		f.logger.Errorf("Error extracting log.file.path from the event")
+		f.logger.Debugf("Error extracting log.file.path from the event: %s.", event)
 		return ""
 	}
 
@@ -119,7 +119,7 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 				if len(pathDirs) > podUIDPos {
 					podUID := strings.Split(pathDirs[podUIDPos], "_")
 					if len(podUID) > 2 {
-						f.logger.Debugf("Using pod uid: %s", podUID)
+						f.logger.Debugf("Using pod uid: %s", podUID[2])
 						return podUID[2]
 					}
 				}
