@@ -69,6 +69,9 @@ func (k *kubeAnnotatorConfig) Validate() error {
 		k.Host = ""
 	}
 
+	// Checks below were added to warn the users early on and avoid initialising the processor in case the `logs_path`
+	// matcher config is not valid: supported paths defined as a `logs_path` configuration setting are strictly defined
+	// if `resource_type` is set
 	for _, matcher := range k.Matchers {
 		if matcherCfg, ok := matcher["logs_path"]; ok {
 			if matcherCfg.HasField("resource_type") {
