@@ -18,10 +18,8 @@
 package beater
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"sync"
 	"syscall"
 	"time"
@@ -90,19 +88,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	logp.Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()
 	logp.Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
-
-	for _, m := range bt.config.Monitors {
-		target := make(map[string]interface{})
-		m.Unpack(target)
-		bytes, err := json.Marshal(target)
-		if err != nil {
-			panic(fmt.Sprintf("got err: %s", err))
-		}
-		fmt.Printf("Found monitor")
-		os.Stdout.Write(bytes)
-		fmt.Printf("\n")
-		syscall.Exit(0)
-	}
 
 	if bt.config.RunOnce {
 		err := bt.runRunOnce(b)
