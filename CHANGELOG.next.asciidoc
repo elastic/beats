@@ -186,6 +186,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Properly locate base stream in fleet configs. {pull}28455[28455]
 - Stop logging params values. {pull}28774[28774]
 - Fix race in fleet / agent managed monitors that caused dupe ID errors. {pull}28799[28799]
+- Remove accidentally included cups library in docker images. {pull}28853[pull]
 
 *Journalbeat*
 
