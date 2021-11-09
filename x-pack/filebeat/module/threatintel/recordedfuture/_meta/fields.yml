@@ -1,6 +1,5 @@
 - name: recordedfuture
   type: group
-  default_field: false
   description: >
     Fields for Recorded Future Threat Intel
   fields:
@@ -69,7 +68,6 @@
             - name: text
               type: text
               norms: false
-              default_field: false
         - name: rules
           type: long
           description: >

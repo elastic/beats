@@ -1929,7 +1929,6 @@
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
-        "host.user.name": "aaaa",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 5449,
@@ -1947,7 +1946,8 @@
         "tags": [
             "cisco-asa",
             "forwarded"
-        ]
+        ],
+        "user.name": "aaaa"
     },
     {
         "cisco.asa.command_line_arguments": "show access-list aaa_out brief",
@@ -1968,7 +1968,6 @@
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
-        "host.user.name": "aaaa",
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 5556,
@@ -1986,7 +1985,8 @@
         "tags": [
             "cisco-asa",
             "forwarded"
-        ]
+        ],
+        "user.name": "aaaa"
     },
     {
         "cisco.asa.destination_interface": "fw111",
@@ -2903,7 +2903,6 @@
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
-        "host.user.name": "enable_15",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 8520,
@@ -2926,7 +2925,8 @@
         "tags": [
             "cisco-asa",
             "forwarded"
-        ]
+        ],
+        "user.name": "enable_15"
     },
     {
         "cisco.asa.message_id": "502103",
@@ -2948,7 +2948,6 @@
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
-        "host.user.name": "enable_15",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 8627,
@@ -2966,7 +2965,8 @@
         "tags": [
             "cisco-asa",
             "forwarded"
-        ]
+        ],
+        "user.name": "enable_15"
     },
     {
         "cisco.asa.destination_interface": "FCD-FS-LAN",
@@ -3039,7 +3039,6 @@
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
-        "host.user.name": "admin",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 8845,
@@ -3062,7 +3061,8 @@
         "tags": [
             "cisco-asa",
             "forwarded"
-        ]
+        ],
+        "user.name": "admin"
     },
     {
         "cisco.asa.destination_interface": "FCD-FS-LAN",
@@ -3135,7 +3135,6 @@
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
-        "host.user.name": "admin",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 9070,
@@ -3158,7 +3157,8 @@
         "tags": [
             "cisco-asa",
             "forwarded"
-        ]
+        ],
+        "user.name": "admin"
     },
     {
         "cisco.asa.message_id": "713049",

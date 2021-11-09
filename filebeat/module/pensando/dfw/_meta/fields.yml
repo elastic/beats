@@ -1,7 +1,6 @@
 - name: dfw 
   type: group
   release: beta
-  default_field: false
   description: >
    Fields for Pensando DFW
   fields:

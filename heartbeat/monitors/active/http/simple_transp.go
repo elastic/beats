@@ -39,8 +39,7 @@ const (
 
 // SimpleTransport contains the dialer and read/write callbacks
 type SimpleTransport struct {
-	Dialer             transport.Dialer
-	DisableCompression bool
+	Dialer transport.Dialer
 
 	OnStartWrite func()
 	OnEndWrite   func()
@@ -86,17 +85,6 @@ func (t *SimpleTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 
-	requestedGzip := false
-	if t.DisableCompression &&
-		req.Header.Get("Accept-Encoding") == "" &&
-		req.Header.Get("Range") == "" &&
-		req.Method != "HEAD" {
-
-		requestedGzip = true
-		req.Header.Add("Accept-Encoding", gzipEncoding)
-		defer req.Header.Del("Accept-Encoding")
-	}
-
 	done := req.Context().Done()
 	readerDone := make(chan readReturn, 1)
 	writerDone := make(chan error, 1)
@@ -108,7 +96,7 @@ func (t *SimpleTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 
 	// read response
 	go func() {
-		resp, err := t.readResponse(conn, req, requestedGzip)
+		resp, err := t.readResponse(conn, req)
 		readerDone <- readReturn{resp, err}
 	}()
 
@@ -180,7 +168,6 @@ func (c comboConnReadCloser) Close() error {
 func (t *SimpleTransport) readResponse(
 	conn net.Conn,
 	req *http.Request,
-	requestedGzip bool,
 ) (*http.Response, error) {
 	reader := bufio.NewReader(conn)
 	resp, err := http.ReadResponse(reader, req)
@@ -191,11 +178,7 @@ func (t *SimpleTransport) readResponse(
 
 	t.sigStartRead()
 
-	if requestedGzip && resp.Header.Get("Content-Encoding") == gzipEncoding {
-		resp.Header.Del("Content-Encoding")
-		resp.Header.Del("Content-Length")
-		resp.ContentLength = -1
-
+	if resp.Header.Get("Content-Encoding") == gzipEncoding {
 		unzipper, err := gzip.NewReader(resp.Body)
 		if err != nil {
 			resp.Body.Close()

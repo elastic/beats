@@ -27,7 +27,7 @@ import (
 )
 
 // DefaultField controls the default value for the default_field flag.
-const DefaultField = true
+const DefaultField = false
 
 var (
 	minVersionAlias                   = common.MustNewVersion("6.4.0")

@@ -15,7 +15,6 @@ import (
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/generator/common/beatgen"
 	heartbeat "github.com/elastic/beats/v7/heartbeat/scripts/mage"
 
 	// mage:import
@@ -35,11 +34,6 @@ func init() {
 	common.RegisterCheckDeps(Update)
 
 	devtools.BeatLicense = "Elastic License"
-}
-
-// VendorUpdate updates elastic/beats/v7 in the vendor dir
-func VendorUpdate() error {
-	return beatgen.VendorUpdate()
 }
 
 // Package packages the Beat for distribution.

@@ -4,8 +4,8 @@
     Fields from AWS CloudWatch logs.
   fields:
     - name: aws-cloudwatch
+      default_field: true
       type: group
-      default_field: false
       description: >
         Fields from AWS CloudWatch logs.
       fields:

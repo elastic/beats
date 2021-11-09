@@ -1,6 +1,5 @@
 - name: weird
   type: group
-  default_field: false
   description: >
     Fields exported by the Zeek Weird log.
   fields:
