@@ -83,24 +83,15 @@ func MockSyntheticService(t *testing.T, rawConfigStr string) *SyntheticService {
 
 }
 
+func mockResponse() (*http.Response, error) {
+	return &http.Response{
+		StatusCode: http.StatusOK,
+		Body: ioutil.NopCloser(bytes.NewBufferString("success")),
+	}, nil
+}
+
 func TestPushConfiguration(t *testing.T) {
-
-	myJsonString := `{
-	  "monitors": [{
-		"type":     "test",
-		"urls":     ["https://google.com"],
-		"schedule": "@every 10m",
-		"service_locations": ["us-east"]
-	  }],
-	  "service": {
-		"username": "admin",
-		"password": "changeme",
-		"manifest_url": "http://localhost:8220"
- 		}
-	}`
-
-	sv := MockSyntheticService(t, myJsonString)
-
+	sv := MockSyntheticService(t, "")
 	payload := SyntheticServicePayload{}
 
 	GetDoFunc = func(req *http.Request) (*http.Response, error) {
@@ -109,9 +100,7 @@ func TestPushConfiguration(t *testing.T) {
 		if err != nil {
 			return nil, err
 		}
-		return nil, errors.New(
-			"error from web server",
-		)
+		return mockResponse()
 	}
 	username := "elastic"
 	password := "changeme"
@@ -131,6 +120,31 @@ func TestPushConfiguration(t *testing.T) {
 
 	assert.Equal(t, username, payload.Output.Username)
 	assert.Equal(t, password, payload.Output.Password)
+}
+
+func TestPushConfigurationRetries(t *testing.T) {
+	sv := MockSyntheticService(t, "")
+	numberOfTimeCalled :=0
+
+	GetDoFunc = func(req *http.Request) (*http.Response, error) {
+		numberOfTimeCalled++
+		return nil, errors.New("error")
+	}
+	username := "elastic"
+	password := "changeme"
+
+	sv.servicePushWait.Add(1)
+
+	sv.pushConfigsToSyntheticsService("us-east", config.ServiceLocation{
+		Url: "http://localhost:8220/cronjob",
+	}, Output{
+		Hosts:    []string{"http:localhost:9200"},
+		Username: username,
+		Password: password,
+	})
+
+	assert.Equal(t, numberOfTimeCalled, 3)
+
 }
 
 func TestRunViaSyntheticsService(t *testing.T) {
@@ -192,9 +206,7 @@ func TestRunViaSyntheticsService(t *testing.T) {
 			assert.Equal(t, serviceUser, "admin")
 			assert.Equal(t, servicePass, "changeme")
 
-			return nil, errors.New(
-				"error from web server",
-			)
+			return mockResponse()
 		}
 
 		jsonStr := `{
@@ -209,11 +221,10 @@ func TestRunViaSyntheticsService(t *testing.T) {
 						}
 					  }
 					}`
-		body := ioutil.NopCloser(bytes.NewReader([]byte(jsonStr)))
 
 		return &http.Response{
 			StatusCode: 200,
-			Body:       body,
+			Body:       ioutil.NopCloser(bytes.NewReader([]byte(jsonStr))),
 		}, nil
 	}
 

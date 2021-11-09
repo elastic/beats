@@ -90,7 +90,7 @@ func (service *SyntheticService) Run(b *beat.Beat) error {
 		go service.pushConfigsToSyntheticsService(locationKey, serviceLocation, output)
 	}
 	go service.schedulePushConfig(serviceLocations, output)
-	if service.config.ConfigMonitors.Enabled(){
+	if service.config.ConfigMonitors.Enabled() {
 		go service.scheduleReloadPushConfig(serviceLocations, output)
 	}
 	return nil
@@ -112,7 +112,6 @@ func (service *SyntheticService) schedulePushConfig(serviceLocations map[string]
 		case <-service.servicePushTicker.C:
 			for locationKey, serviceLocation := range serviceLocations {
 				service.servicePushWait.Add(1)
-				// first we need to do at start, and then ticker will take over
 				go service.pushConfigsToSyntheticsService(locationKey, serviceLocation, output)
 			}
 
@@ -144,6 +143,7 @@ func (service *SyntheticService) scheduleReloadPushConfig(serviceLocations map[s
 }
 
 func (service *SyntheticService) getSyntheticServiceManifest() (config.ServiceManifest, error) {
+	logp.Info("fetching manifest file to get service locations")
 	serviceCfg := service.config.Service
 	var err error
 
@@ -163,22 +163,43 @@ func (service *SyntheticService) getSyntheticServiceManifest() (config.ServiceMa
 		return config.ServiceManifest{}, err
 	}
 
-	req, err := http.NewRequest("GET", serviceCfg.ManifestURL, nil)
+	fetchManifestFile := func() (config.ServiceManifest, error) {
+		req, err := http.NewRequest("GET", serviceCfg.ManifestURL, nil)
 
-	resp, err := Client.Do(req)
+		resp, err := Client.Do(req)
 
-	if err != nil {
-		return config.ServiceManifest{}, err
+		if err != nil {
+			logp.Warn("failed to fetch manifest file with error: %s", err)
+			return config.ServiceManifest{}, err
+		}
+
+		serviceManifest := config.ServiceManifest{}
+
+		read, err := ioutil.ReadAll(resp.Body)
+
+		if err != nil {
+			logp.Warn("failed to fetch manifest file with error: %s", err)
+			return config.ServiceManifest{}, err
+		}
+
+		err = json.Unmarshal(read, &serviceManifest)
+		return serviceManifest, err
+
 	}
 
-	serviceManifest := config.ServiceManifest{}
+	for attempt := 1; attempt <= 3; attempt++ {
+		if attempt > 1 {
+			waitAfter := time.Second * time.Duration(attempt*2)
+			logp.Info("retrying fetching manifest file after %d seconds", waitAfter)
+			time.Sleep(waitAfter)
+		}
+		manifest, err := fetchManifestFile()
+		if err == nil {
+			return manifest, nil
+		}
+	}
 
-	read, err := ioutil.ReadAll(resp.Body)
-
-	err = json.Unmarshal(read, &serviceManifest)
-
-	return serviceManifest, err
-
+	return config.ServiceManifest{}, err
 }
 
 func (service *SyntheticService) validateMonitorsSchedule() error {
@@ -209,6 +230,7 @@ func (service *SyntheticService) pushConfigsToSyntheticsService(locationKey stri
 			payload.Monitors = append(payload.Monitors, target)
 		}
 	}
+
 	monitorsById := map[string]*common.Config{}
 	for _, monCfg := range service.config.Monitors {
 		monitorFields, _ := stdfields.ConfigToStdMonitorFields(monCfg)
@@ -235,12 +257,7 @@ func (service *SyntheticService) pushConfigsToSyntheticsService(locationKey stri
 	jsonValue, _ := json.Marshal(payload)
 	url := fmt.Sprintf("%s/cronjob", serviceLocation.Url)
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonValue))
-	req.Header.Set("Content-Type", "application/json")
-
-	req.SetBasicAuth(serviceCfg.Username, serviceCfg.Password)
-
-	resp, err := Client.Do(req)
+	resp, err := postConfig(url, jsonValue, serviceCfg)
 	if err != nil {
 		logp.Info("Failed to push configurations to the synthetics service: %s for %d monitors",
 			serviceLocation.Geo.Name, len(payload.Monitors))
@@ -264,7 +281,35 @@ func (service *SyntheticService) pushConfigsToSyntheticsService(locationKey stri
 				serviceLocation.Geo.Name, len(payload.Monitors))
 		}
 	}
+}
 
+func postConfig(url string, jsonValue []byte, serviceCfg config.ServiceConfig) (*http.Response, error) {
+	var err error
+	var resp *http.Response
+	for attempt := 1; attempt <= 3; attempt++ {
+		if attempt > 1 {
+			waitAfter := time.Second * time.Duration(attempt*10)
+			logp.Warn("failed pushing configs with err %s", err)
+			logp.Info("retrying pushing configuration after %d seconds", waitAfter)
+			time.Sleep(waitAfter)
+		}
+
+		req, errReq := http.NewRequest("POST", url, bytes.NewBuffer(jsonValue))
+		if errReq != nil {
+			return nil, errReq
+		}
+		req.Header.Set("Content-Type", "application/json")
+
+		req.SetBasicAuth(serviceCfg.Username, serviceCfg.Password)
+
+		resp, err = Client.Do(req)
+
+		if resp != nil && resp.StatusCode == http.StatusOK {
+			return resp, err
+		}
+	}
+
+	return nil, err
 }
 
 func locationInServiceLocation(location string, locationsList []string) bool {
