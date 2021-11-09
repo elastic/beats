@@ -117,8 +117,6 @@ func (service *SyntheticService) schedulePushConfig(serviceLocations map[string]
 			}
 
 			defer service.servicePushWait.Done()
-			//case <-service.done:
-			//	service.servicePushTicker.Stop()
 		}
 	}
 }
@@ -141,8 +139,6 @@ func (service *SyntheticService) scheduleReloadPushConfig(serviceLocations map[s
 				go service.pushConfigsToSyntheticsService(locationKey, serviceLocation, output)
 			}
 			reloadPushTicker.Stop()
-			//case <-service.done:
-			//	service.servicePushTicker.Stop()
 		}
 	}
 }

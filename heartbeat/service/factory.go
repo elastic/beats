@@ -100,7 +100,7 @@ func (r MonitorRunner) Start() {
 	defer r.runnerFactory.lock.Unlock()
 
 	r.runnerFactory.monitorsById[r.monitorId] = r.config
-	r.runnerFactory.Update <- true
+	//r.runnerFactory.Update <- true
 }
 
 func (r MonitorRunner) Stop() {
@@ -110,5 +110,5 @@ func (r MonitorRunner) Stop() {
 	defer r.runnerFactory.lock.Unlock()
 
 	delete(r.runnerFactory.monitorsById, r.monitorId)
-	r.runnerFactory.Update <- true
+	//r.runnerFactory.Update <- true
 }

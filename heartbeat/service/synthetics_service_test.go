@@ -37,7 +37,7 @@ func init() {
 	}
 }
 
-func MockSyntheticService(t *testing.T, rawConfigStr string) *SyntheticService {
+func MockMonitorConfig(t *testing.T, rawConfigStr string) (config.Config, *common.Config )  {
 	myJsonString := `{
 	  "monitors": [{
 		"type":     "test",
@@ -70,9 +70,15 @@ func MockSyntheticService(t *testing.T, rawConfigStr string) *SyntheticService {
 	if err1 != nil {
 		t.Error(err1)
 	}
+	return parsedConfig, rawConfig
+}
+
+func MockSyntheticService(t *testing.T, rawConfigStr string) *SyntheticService {
+
+	cfg, _ := MockMonitorConfig(t, rawConfigStr)
 
 	return &SyntheticService{
-		config: parsedConfig,
+		config: cfg,
 	}
 
 }
