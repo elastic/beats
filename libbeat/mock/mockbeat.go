@@ -39,7 +39,7 @@ type Mockbeat struct {
 }
 
 // Creates beater
-func New(b *beat.Beat, _ *common.Config) (beat.Beater, error) {
+func New(_ *beat.Beat, _ *common.Config) (beat.Beater, error) {
 	return &Mockbeat{
 		done:   make(chan struct{}),
 		logger: logp.NewLogger("mock"),
