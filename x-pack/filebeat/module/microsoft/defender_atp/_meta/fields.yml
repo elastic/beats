@@ -1,7 +1,6 @@
 - name: microsoft.defender_atp
   type: group
   release: ga
-  default_field: false
   description: >
     Module for ingesting Microsoft Defender ATP.
   fields:

@@ -26,6 +26,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove `auto` from the available options of `setup.ilm.enabled` and set the default value to `true`. {pull}28671[28671]
 - add_process_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
 - add_docker_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
+- Index template's default_fields setting is only populated with ECS fields. {pull}28596[28596] {issue}28215[28215]
 
 *Auditbeat*
 
@@ -59,6 +60,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fail to start Filebat if none between `queue_url`, `bucket_arn` or `non_aws_bucket_name` is set for a configured aws-s3 input {issue}13911[13911] {pull}28666[28666]
 - All modules: Replace usages of deprecated ECS fields `process.ppid` and `log.original` with `process.parent.pid` and `event.original`. {pull}28620[28620]
 - Replace usages of `host.user.*` fields with `user.*` in `cisco`, `microsoft` and `oracle` modules. {pull}28620[28620]
+- Remove `docker` input. Please use `filestream` input with `container` parser or `container` input. {pull}28817[28817]
 
 *Heartbeat*
 
@@ -138,6 +140,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handling of float data types within processors. {issue}28279[28279] {pull}28280[28280]
 - Allow `clone3` syscall in seccomp filters. {pull}28117[28117]
 - Remove unnecessary escaping step in dashboard loading, so they can be displayed in Kibana. {pull}28395[28395]
+- Allows disable pod events enrichment with deployment name {pull}28521[28521]
 - Fix AWS proxy_url config from url to string type.  {pull}28725[28725]
 - Fix `fingerprint` processor to give it access to the `@timestamp` field. {issue}28683[28683]
 

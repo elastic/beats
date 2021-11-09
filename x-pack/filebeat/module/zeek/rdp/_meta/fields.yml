@@ -1,6 +1,5 @@
 - name: rdp
   type: group
-  default_field: false
   description: >
     Fields exported by the Zeek RDP log.
   fields:
