@@ -233,7 +233,7 @@ func (service *SyntheticService) pushConfigsToSyntheticsService(locationKey stri
 	serviceCfg := service.config.Service
 
 	jsonValue, _ := json.Marshal(payload)
-	url := fmt.Sprintf("https://%s/cronjob", serviceLocation.Url)
+	url := fmt.Sprintf("%s/cronjob", serviceLocation.Url)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonValue))
 	req.Header.Set("Content-Type", "application/json")
