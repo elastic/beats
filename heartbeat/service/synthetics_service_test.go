@@ -1,4 +1,4 @@
-package beater
+package service
 
 import (
 	"bytes"
@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
-	"sync"
 	"testing"
 	"time"
 )
@@ -38,7 +37,7 @@ func init() {
 	}
 }
 
-func MockHeartbeat(t *testing.T, rawConfigStr string) *Heartbeat {
+func MockSyntheticService(t *testing.T, rawConfigStr string) *SyntheticService {
 	myJsonString := `{
 	  "monitors": [{
 		"type":     "test",
@@ -72,12 +71,10 @@ func MockHeartbeat(t *testing.T, rawConfigStr string) *Heartbeat {
 		t.Error(err1)
 	}
 
-	bt := &Heartbeat{
-		config:          parsedConfig,
-		servicePushWait: sync.WaitGroup{},
+	return &SyntheticService{
+		config: parsedConfig,
 	}
 
-	return bt
 }
 
 func TestPushConfiguration(t *testing.T) {
@@ -96,9 +93,9 @@ func TestPushConfiguration(t *testing.T) {
  		}
 	}`
 
-	bt := MockHeartbeat(t, myJsonString)
+	sv := MockSyntheticService(t, myJsonString)
 
-	payload := ServicePayload{}
+	payload := SyntheticServicePayload{}
 
 	GetDoFunc = func(req *http.Request) (*http.Response, error) {
 		bd, _ := ioutil.ReadAll(req.Body)
@@ -113,8 +110,8 @@ func TestPushConfiguration(t *testing.T) {
 	username := "elastic"
 	password := "changeme"
 
-	bt.servicePushWait.Add(1)
-	bt.pushConfigsToSyntheticsService("us-east", config.ServiceLocation{
+	sv.servicePushWait.Add(1)
+	sv.pushConfigsToSyntheticsService("us-east", config.ServiceLocation{
 		Url: "http://localhost:8220/cronjob",
 	}, Output{
 		Hosts:    []string{"http:localhost:9200"},
@@ -146,7 +143,7 @@ func TestRunViaSyntheticsService(t *testing.T) {
  		}
 	}`
 
-	hbt := MockHeartbeat(t, myJsonString)
+	sv := MockSyntheticService(t, myJsonString)
 
 	binfo := beat.Info{
 		Beat:        "heartbeat",
@@ -175,7 +172,7 @@ func TestRunViaSyntheticsService(t *testing.T) {
 		Config: &bConfig,
 	}
 
-	payload := ServicePayload{}
+	payload := SyntheticServicePayload{}
 
 	GetDoFunc = func(req *http.Request) (*http.Response, error) {
 		if req.Body != nil {
@@ -214,11 +211,11 @@ func TestRunViaSyntheticsService(t *testing.T) {
 		}, nil
 	}
 
-	err2 := hbt.runViaSyntheticsService(&b)
+	err2 := sv.Run(&b)
 	if err2 != nil {
 		t.Error(err2)
 	}
-	defer hbt.servicePushWait.Wait()
+	defer sv.servicePushWait.Wait()
 
 	// wait for go routine
 	time.Sleep(time.Second * 5)
@@ -231,9 +228,9 @@ func TestRunViaSyntheticsService(t *testing.T) {
 	assert.Equal(t, password, payload.Output.Password)
 	assert.Equal(t, hosts, payload.Output.Hosts)
 
-	hbt.servicePushWait.Done()
+	sv.servicePushWait.Done()
 
-	defer hbt.servicePushTicker.Stop()
+	sv.Stop()
 }
 
 func TestValidateMonitorsSchedule(t *testing.T) {
@@ -247,9 +244,9 @@ func TestValidateMonitorsSchedule(t *testing.T) {
 	  }]
 	}`
 
-	hbt := MockHeartbeat(t, invalidMonitorCfg)
+	sv := MockSyntheticService(t, invalidMonitorCfg)
 
-	err := hbt.validateMonitorsSchedule()
+	err := sv.validateMonitorsSchedule()
 
 	if err == nil {
 		t.Error("it should return error of an invalid monitor")
@@ -264,9 +261,9 @@ func TestValidateMonitorsSchedule(t *testing.T) {
 	  }]
 	}`
 
-	hbt = MockHeartbeat(t, validMonitorCfg)
+	sv = MockSyntheticService(t, validMonitorCfg)
 
-	err = hbt.validateMonitorsSchedule()
+	err = sv.validateMonitorsSchedule()
 
 	if err != nil {
 		t.Error("it should not return an error of a valid monitor")
