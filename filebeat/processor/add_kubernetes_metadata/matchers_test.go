@@ -136,7 +136,13 @@ func TestLogsPathMatcher_InvalidVarLogPodIDFormat(t *testing.T) {
 func TestLogsPathMatcher_ValidVarLogPod(t *testing.T) {
 	cfgLogsPath := "/var/log/pods/"
 	cfgResourceType := "pod"
-	source := fmt.Sprintf("/var/log/pods/namespace_pod-name_%s/container/0.log", puid)
+	sourcePath := "/var/log/pods/namespace_pod-name_%s/container/0.log"
+
+	if runtime.GOOS == "windows" {
+		cfgLogsPath = "C:\\var\\log\\pods\\"
+		sourcePath = "C:\\var\\log\\pods\\namespace_pod-name_%s\\container\\0.log"
+	}
+	source := fmt.Sprintf(sourcePath, puid)
 	expectedResult := puid
 	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
 }
