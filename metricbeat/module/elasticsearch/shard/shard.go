@@ -64,5 +64,5 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	return eventsMapping(r, content)
+	return eventsMapping(r, content, m.XPackEnabled)
 }

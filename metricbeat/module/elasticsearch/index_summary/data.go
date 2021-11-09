@@ -20,6 +20,8 @@ package index_summary
 import (
 	"encoding/json"
 
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -86,7 +88,7 @@ var bulkStatsDict = c.Dict("bulk", s.Schema{
 	},
 }, c.DictOptional)
 
-func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) error {
+func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXpack bool) error {
 	var all struct {
 		Data map[string]interface{} `json:"_all"`
 	}
@@ -111,6 +113,14 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) erro
 
 	event.MetricSetFields = fields
 
+	// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+	// When using Agent, the index name is overwritten anyways.
+	if isXpack {
+		index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+		event.Index = index
+	}
+
 	r.Event(event)
+
 	return nil
 }

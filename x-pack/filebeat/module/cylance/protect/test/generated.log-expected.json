@@ -207,9 +207,7 @@
         ],
         "rsa.network.eth_host": "01:00:5e:dc:bb:8b",
         "service.type": "cylance",
-        "source.ip": [
-            "10.124.61.119"
-        ],
+        "source.ip": "10.124.61.119",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -590,9 +588,7 @@
         "rsa.misc.event_type": "threat_found",
         "rsa.misc.node": "sequatur",
         "service.type": "cylance",
-        "source.ip": [
-            "10.199.98.186"
-        ],
+        "source.ip": "10.199.98.186",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -635,9 +631,7 @@
         ],
         "rsa.web.reputation_num": 145.898,
         "service.type": "cylance",
-        "source.ip": [
-            "10.64.70.5"
-        ],
+        "source.ip": "10.64.70.5",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -679,9 +673,7 @@
         ],
         "rsa.network.eth_host": "01:00:5e:93:1c:9f",
         "service.type": "cylance",
-        "source.ip": [
-            "10.143.239.210"
-        ],
+        "source.ip": "10.143.239.210",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -727,9 +719,7 @@
             "maccusa5126.api.domain"
         ],
         "service.type": "cylance",
-        "source.ip": [
-            "10.32.143.134"
-        ],
+        "source.ip": "10.32.143.134",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -935,9 +925,7 @@
         "rsa.misc.node": "ectio",
         "rsa.network.eth_host": "01:00:5e:3f:c4:6c",
         "service.type": "cylance",
-        "source.ip": [
-            "10.237.205.140"
-        ],
+        "source.ip": "10.237.205.140",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -1017,9 +1005,7 @@
             "maven3758.www.invalid"
         ],
         "service.type": "cylance",
-        "source.ip": [
-            "10.74.104.215"
-        ],
+        "source.ip": "10.74.104.215",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -1292,9 +1278,7 @@
         ],
         "rsa.network.eth_host": "01:00:5e:45:8b:97",
         "service.type": "cylance",
-        "source.ip": [
-            "10.190.175.158"
-        ],
+        "source.ip": "10.190.175.158",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -1429,9 +1413,7 @@
         "rsa.misc.event_type": "SyslogSettingsSave",
         "rsa.misc.mail_id": "ritt",
         "service.type": "cylance",
-        "source.ip": [
-            "10.13.66.97"
-        ],
+        "source.ip": "10.13.66.97",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -1544,9 +1526,7 @@
             "olori416.api.test"
         ],
         "service.type": "cylance",
-        "source.ip": [
-            "10.31.190.145"
-        ],
+        "source.ip": "10.31.190.145",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -1654,9 +1634,7 @@
         ],
         "rsa.web.reputation_num": 51.523,
         "service.type": "cylance",
-        "source.ip": [
-            "10.252.165.146"
-        ],
+        "source.ip": "10.252.165.146",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -1697,9 +1675,7 @@
         ],
         "rsa.network.eth_host": "01:00:5e:de:32:2c",
         "service.type": "cylance",
-        "source.ip": [
-            "10.105.46.101"
-        ],
+        "source.ip": "10.105.46.101",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -1741,9 +1717,7 @@
         ],
         "rsa.network.eth_host": "01:00:5e:f9:78:c2",
         "service.type": "cylance",
-        "source.ip": [
-            "10.124.88.222"
-        ],
+        "source.ip": "10.124.88.222",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -1789,9 +1763,7 @@
             "nsec923.internal.local"
         ],
         "service.type": "cylance",
-        "source.ip": [
-            "10.28.120.149"
-        ],
+        "source.ip": "10.28.120.149",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -1868,9 +1840,7 @@
             "queips4947.mail.example"
         ],
         "service.type": "cylance",
-        "source.ip": [
-            "10.165.16.231"
-        ],
+        "source.ip": "10.165.16.231",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -1912,9 +1882,7 @@
         ],
         "rsa.network.eth_host": "01:00:5e:54:ab:3f",
         "service.type": "cylance",
-        "source.ip": [
-            "10.156.34.19"
-        ],
+        "source.ip": "10.156.34.19",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -1990,9 +1958,7 @@
         ],
         "rsa.network.eth_host": "01:00:5e:ee:e8:77",
         "service.type": "cylance",
-        "source.ip": [
-            "10.22.94.10"
-        ],
+        "source.ip": "10.22.94.10",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -2157,9 +2123,7 @@
         "rsa.misc.event_type": "PolicyAdd",
         "rsa.misc.node": "fugits",
         "service.type": "cylance",
-        "source.ip": [
-            "10.153.34.43"
-        ],
+        "source.ip": "10.153.34.43",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -2269,9 +2233,7 @@
             "pisc3553.internal.home"
         ],
         "service.type": "cylance",
-        "source.ip": [
-            "10.43.110.203"
-        ],
+        "source.ip": "10.43.110.203",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -2313,9 +2275,7 @@
             "uipexe7153.api.corp"
         ],
         "service.type": "cylance",
-        "source.ip": [
-            "10.127.20.244"
-        ],
+        "source.ip": "10.127.20.244",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -2456,9 +2416,7 @@
         ],
         "rsa.web.reputation_num": 75.498,
         "service.type": "cylance",
-        "source.ip": [
-            "10.48.209.115"
-        ],
+        "source.ip": "10.48.209.115",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -2534,9 +2492,7 @@
         ],
         "rsa.network.eth_host": "01:00:5e:e8:41:ae",
         "service.type": "cylance",
-        "source.ip": [
-            "10.7.99.47"
-        ],
+        "source.ip": "10.7.99.47",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -2958,9 +2914,7 @@
         ],
         "rsa.network.eth_host": "01:00:5e:e6:a6:a2",
         "service.type": "cylance",
-        "source.ip": [
-            "10.232.90.3"
-        ],
+        "source.ip": "10.232.90.3",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -3131,9 +3085,7 @@
         ],
         "rsa.network.eth_host": "01:00:5e:bc:c1:21",
         "service.type": "cylance",
-        "source.ip": [
-            "10.139.80.71"
-        ],
+        "source.ip": "10.139.80.71",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -3278,9 +3230,7 @@
         ],
         "rsa.web.reputation_num": 105.845,
         "service.type": "cylance",
-        "source.ip": [
-            "10.223.246.244"
-        ],
+        "source.ip": "10.223.246.244",
         "tags": [
             "cylance.protect",
             "forwarded"
@@ -3560,9 +3510,7 @@
             "nulamc5617.mail.host"
         ],
         "service.type": "cylance",
-        "source.ip": [
-            "10.134.137.205"
-        ],
+        "source.ip": "10.134.137.205",
         "tags": [
             "cylance.protect",
             "forwarded"

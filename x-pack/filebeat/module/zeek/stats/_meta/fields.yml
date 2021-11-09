@@ -1,6 +1,5 @@
 - name: stats
   type: group
-  default_field: false
   description: >
     Fields exported by the Zeek stats log.
   fields:

@@ -52,10 +52,3 @@ func ToDiscardOutput() Option {
 		cfg.ToStderr = false
 	}
 }
-
-// AsJSON specifies to log the output as JSON.
-func AsJSON() Option {
-	return func(cfg *Config) {
-		cfg.JSON = true
-	}
-}

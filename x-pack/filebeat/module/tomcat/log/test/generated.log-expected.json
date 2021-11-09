@@ -40,9 +40,7 @@
         "rsa.web.web_ref_domain": "mail.example.net",
         "service.type": "tomcat",
         "source.bytes": 5293,
-        "source.ip": [
-            "10.251.224.219"
-        ],
+        "source.ip": "10.251.224.219",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -101,9 +99,7 @@
         "rsa.web.web_ref_domain": "mail.example.com",
         "service.type": "tomcat",
         "source.bytes": 5222,
-        "source.ip": [
-            "10.196.153.12"
-        ],
+        "source.ip": "10.196.153.12",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -165,9 +161,7 @@
         "rsa.web.web_ref_domain": "www.example.com",
         "service.type": "tomcat",
         "source.bytes": 7019,
-        "source.ip": [
-            "10.156.194.38"
-        ],
+        "source.ip": "10.156.194.38",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -227,9 +221,7 @@
         "rsa.web.web_ref_domain": "mail.example.com",
         "service.type": "tomcat",
         "source.bytes": 1156,
-        "source.ip": [
-            "10.196.118.192"
-        ],
+        "source.ip": "10.196.118.192",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -289,9 +281,7 @@
         "rsa.web.web_ref_domain": "internal.example.net",
         "service.type": "tomcat",
         "source.bytes": 1998,
-        "source.ip": [
-            "10.246.209.145"
-        ],
+        "source.ip": "10.246.209.145",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -351,9 +341,7 @@
         "rsa.web.web_ref_domain": "www5.example.org",
         "service.type": "tomcat",
         "source.bytes": 2770,
-        "source.ip": [
-            "10.114.191.225"
-        ],
+        "source.ip": "10.114.191.225",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -417,9 +405,7 @@
         "rsa.web.web_ref_domain": "api.example.com",
         "service.type": "tomcat",
         "source.bytes": 3856,
-        "source.ip": [
-            "10.38.77.13"
-        ],
+        "source.ip": "10.38.77.13",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -483,9 +469,7 @@
         "rsa.web.web_ref_domain": "mail.example.org",
         "service.type": "tomcat",
         "source.bytes": 3341,
-        "source.ip": [
-            "10.11.201.109"
-        ],
+        "source.ip": "10.11.201.109",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -545,9 +529,7 @@
         "rsa.web.web_ref_domain": "example.org",
         "service.type": "tomcat",
         "source.bytes": 5529,
-        "source.ip": [
-            "10.182.166.181"
-        ],
+        "source.ip": "10.182.166.181",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -607,9 +589,7 @@
         "rsa.web.web_ref_domain": "internal.example.com",
         "service.type": "tomcat",
         "source.bytes": 5075,
-        "source.ip": [
-            "10.185.126.247"
-        ],
+        "source.ip": "10.185.126.247",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -671,9 +651,7 @@
         "rsa.web.web_ref_domain": "mail.example.net",
         "service.type": "tomcat",
         "source.bytes": 1640,
-        "source.ip": [
-            "10.72.114.23"
-        ],
+        "source.ip": "10.72.114.23",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -736,9 +714,7 @@
         "rsa.web.web_ref_domain": "internal.example.net",
         "service.type": "tomcat",
         "source.bytes": 152,
-        "source.ip": [
-            "10.129.241.147"
-        ],
+        "source.ip": "10.129.241.147",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -801,9 +777,7 @@
         "rsa.web.web_ref_domain": "internal.example.net",
         "service.type": "tomcat",
         "source.bytes": 3768,
-        "source.ip": [
-            "10.185.101.76"
-        ],
+        "source.ip": "10.185.101.76",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -863,9 +837,7 @@
         "rsa.web.web_ref_domain": "www.example.org",
         "service.type": "tomcat",
         "source.bytes": 3088,
-        "source.ip": [
-            "10.57.170.140"
-        ],
+        "source.ip": "10.57.170.140",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -924,9 +896,7 @@
         "rsa.web.web_ref_domain": "internal.example.net",
         "service.type": "tomcat",
         "source.bytes": 6136,
-        "source.ip": [
-            "10.33.153.47"
-        ],
+        "source.ip": "10.33.153.47",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -989,9 +959,7 @@
         "rsa.web.web_ref_domain": "internal.example.net",
         "service.type": "tomcat",
         "source.bytes": 5076,
-        "source.ip": [
-            "10.116.104.101"
-        ],
+        "source.ip": "10.116.104.101",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -1051,9 +1019,7 @@
         "rsa.web.web_ref_domain": "example.com",
         "service.type": "tomcat",
         "source.bytes": 2716,
-        "source.ip": [
-            "10.202.194.67"
-        ],
+        "source.ip": "10.202.194.67",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -1117,9 +1083,7 @@
         "rsa.web.web_ref_domain": "www.example.com",
         "service.type": "tomcat",
         "source.bytes": 4621,
-        "source.ip": [
-            "10.153.111.103"
-        ],
+        "source.ip": "10.153.111.103",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -1179,9 +1143,7 @@
         "rsa.web.web_ref_domain": "internal.example.net",
         "service.type": "tomcat",
         "source.bytes": 4168,
-        "source.ip": [
-            "10.52.186.29"
-        ],
+        "source.ip": "10.52.186.29",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -1245,9 +1207,7 @@
         "rsa.web.web_ref_domain": "example.net",
         "service.type": "tomcat",
         "source.bytes": 3423,
-        "source.ip": [
-            "10.209.182.237"
-        ],
+        "source.ip": "10.209.182.237",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -1311,9 +1271,7 @@
         "rsa.web.web_ref_domain": "api.example.org",
         "service.type": "tomcat",
         "source.bytes": 3128,
-        "source.ip": [
-            "10.63.194.87"
-        ],
+        "source.ip": "10.63.194.87",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -1373,9 +1331,7 @@
         "rsa.web.web_ref_domain": "www5.example.org",
         "service.type": "tomcat",
         "source.bytes": 4940,
-        "source.ip": [
-            "10.62.191.18"
-        ],
+        "source.ip": "10.62.191.18",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -1435,9 +1391,7 @@
         "rsa.web.web_ref_domain": "example.org",
         "service.type": "tomcat",
         "source.bytes": 2660,
-        "source.ip": [
-            "10.238.164.29"
-        ],
+        "source.ip": "10.238.164.29",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -1496,9 +1450,7 @@
         "rsa.web.web_ref_domain": "example.com",
         "service.type": "tomcat",
         "source.bytes": 4674,
-        "source.ip": [
-            "10.155.230.17"
-        ],
+        "source.ip": "10.155.230.17",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -1562,9 +1514,7 @@
         "rsa.web.web_ref_domain": "mail.example.net",
         "service.type": "tomcat",
         "source.bytes": 5263,
-        "source.ip": [
-            "10.102.229.102"
-        ],
+        "source.ip": "10.102.229.102",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -1627,9 +1577,7 @@
         "rsa.web.web_ref_domain": "www5.example.org",
         "service.type": "tomcat",
         "source.bytes": 3536,
-        "source.ip": [
-            "10.194.14.7"
-        ],
+        "source.ip": "10.194.14.7",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -1689,9 +1637,7 @@
         "rsa.web.web_ref_domain": "example.com",
         "service.type": "tomcat",
         "source.bytes": 5649,
-        "source.ip": [
-            "10.99.0.226"
-        ],
+        "source.ip": "10.99.0.226",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -1751,9 +1697,7 @@
         "rsa.web.web_ref_domain": "api.example.org",
         "service.type": "tomcat",
         "source.bytes": 2438,
-        "source.ip": [
-            "10.107.174.213"
-        ],
+        "source.ip": "10.107.174.213",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -1817,9 +1761,7 @@
         "rsa.web.web_ref_domain": "www.example.org",
         "service.type": "tomcat",
         "source.bytes": 5315,
-        "source.ip": [
-            "10.84.25.23"
-        ],
+        "source.ip": "10.84.25.23",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -1879,9 +1821,7 @@
         "rsa.web.web_ref_domain": "api.example.com",
         "service.type": "tomcat",
         "source.bytes": 3105,
-        "source.ip": [
-            "10.193.143.108"
-        ],
+        "source.ip": "10.193.143.108",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -1945,9 +1885,7 @@
         "rsa.web.web_ref_domain": "example.org",
         "service.type": "tomcat",
         "source.bytes": 2450,
-        "source.ip": [
-            "10.190.51.22"
-        ],
+        "source.ip": "10.190.51.22",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -2010,9 +1948,7 @@
         "rsa.web.web_ref_domain": "www5.example.com",
         "service.type": "tomcat",
         "source.bytes": 2382,
-        "source.ip": [
-            "10.194.90.130"
-        ],
+        "source.ip": "10.194.90.130",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -2068,9 +2004,7 @@
         "rsa.web.web_ref_domain": "internal.example.com",
         "service.type": "tomcat",
         "source.bytes": 23,
-        "source.ip": [
-            "10.10.213.83"
-        ],
+        "source.ip": "10.10.213.83",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -2134,9 +2068,7 @@
         "rsa.web.web_ref_domain": "mail.example.net",
         "service.type": "tomcat",
         "source.bytes": 2552,
-        "source.ip": [
-            "10.52.125.9"
-        ],
+        "source.ip": "10.52.125.9",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -2196,9 +2128,7 @@
         "rsa.web.web_ref_domain": "www5.example.org",
         "service.type": "tomcat",
         "source.bytes": 814,
-        "source.ip": [
-            "10.19.17.202"
-        ],
+        "source.ip": "10.19.17.202",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -2262,9 +2192,7 @@
         "rsa.web.web_ref_domain": "api.example.com",
         "service.type": "tomcat",
         "source.bytes": 344,
-        "source.ip": [
-            "10.195.64.5"
-        ],
+        "source.ip": "10.195.64.5",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -2328,9 +2256,7 @@
         "rsa.web.web_ref_domain": "mail.example.com",
         "service.type": "tomcat",
         "source.bytes": 4843,
-        "source.ip": [
-            "10.209.77.194"
-        ],
+        "source.ip": "10.209.77.194",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -2390,9 +2316,7 @@
         "rsa.web.web_ref_domain": "mail.example.org",
         "service.type": "tomcat",
         "source.bytes": 6941,
-        "source.ip": [
-            "10.168.6.90"
-        ],
+        "source.ip": "10.168.6.90",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -2451,9 +2375,7 @@
         "rsa.web.web_ref_domain": "api.example.org",
         "service.type": "tomcat",
         "source.bytes": 4765,
-        "source.ip": [
-            "10.89.137.238"
-        ],
+        "source.ip": "10.89.137.238",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -2513,9 +2435,7 @@
         "rsa.web.web_ref_domain": "www5.example.net",
         "service.type": "tomcat",
         "source.bytes": 7645,
-        "source.ip": [
-            "10.246.61.213"
-        ],
+        "source.ip": "10.246.61.213",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -2578,9 +2498,7 @@
         "rsa.web.web_ref_domain": "www5.example.net",
         "service.type": "tomcat",
         "source.bytes": 2760,
-        "source.ip": [
-            "10.117.44.138"
-        ],
+        "source.ip": "10.117.44.138",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -2640,9 +2558,7 @@
         "rsa.web.web_ref_domain": "www.example.net",
         "service.type": "tomcat",
         "source.bytes": 4808,
-        "source.ip": [
-            "10.69.30.196"
-        ],
+        "source.ip": "10.69.30.196",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -2699,9 +2615,7 @@
         "rsa.web.web_ref_domain": "example.org",
         "service.type": "tomcat",
         "source.bytes": 2241,
-        "source.ip": [
-            "10.135.91.88"
-        ],
+        "source.ip": "10.135.91.88",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -2765,9 +2679,7 @@
         "rsa.web.web_ref_domain": "api.example.org",
         "service.type": "tomcat",
         "source.bytes": 7699,
-        "source.ip": [
-            "10.81.45.174"
-        ],
+        "source.ip": "10.81.45.174",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -2825,9 +2737,7 @@
         "rsa.web.web_ref_domain": "www.example.org",
         "service.type": "tomcat",
         "source.bytes": 6137,
-        "source.ip": [
-            "10.87.179.233"
-        ],
+        "source.ip": "10.87.179.233",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -2887,9 +2797,7 @@
         "rsa.web.web_ref_domain": "example.com",
         "service.type": "tomcat",
         "source.bytes": 294,
-        "source.ip": [
-            "10.198.57.130"
-        ],
+        "source.ip": "10.198.57.130",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -2949,9 +2857,7 @@
         "rsa.web.web_ref_domain": "www.example.org",
         "service.type": "tomcat",
         "source.bytes": 609,
-        "source.ip": [
-            "10.218.0.197"
-        ],
+        "source.ip": "10.218.0.197",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -3015,9 +2921,7 @@
         "rsa.web.web_ref_domain": "example.com",
         "service.type": "tomcat",
         "source.bytes": 1390,
-        "source.ip": [
-            "10.123.199.198"
-        ],
+        "source.ip": "10.123.199.198",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -3081,9 +2985,7 @@
         "rsa.web.web_ref_domain": "example.org",
         "service.type": "tomcat",
         "source.bytes": 39,
-        "source.ip": [
-            "10.29.119.245"
-        ],
+        "source.ip": "10.29.119.245",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -3147,9 +3049,7 @@
         "rsa.web.web_ref_domain": "www.example.org",
         "service.type": "tomcat",
         "source.bytes": 2170,
-        "source.ip": [
-            "10.130.175.17"
-        ],
+        "source.ip": "10.130.175.17",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -3209,9 +3109,7 @@
         "rsa.web.web_ref_domain": "internal.example.org",
         "service.type": "tomcat",
         "source.bytes": 1043,
-        "source.ip": [
-            "10.166.90.130"
-        ],
+        "source.ip": "10.166.90.130",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -3275,9 +3173,7 @@
         "rsa.web.web_ref_domain": "internal.example.org",
         "service.type": "tomcat",
         "source.bytes": 6174,
-        "source.ip": [
-            "10.248.111.207"
-        ],
+        "source.ip": "10.248.111.207",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -3337,9 +3233,7 @@
         "rsa.web.web_ref_domain": "api.example.net",
         "service.type": "tomcat",
         "source.bytes": 3286,
-        "source.ip": [
-            "10.185.37.32"
-        ],
+        "source.ip": "10.185.37.32",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -3399,9 +3293,7 @@
         "rsa.web.web_ref_domain": "internal.example.com",
         "service.type": "tomcat",
         "source.bytes": 7278,
-        "source.ip": [
-            "10.5.194.202"
-        ],
+        "source.ip": "10.5.194.202",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -3464,9 +3356,7 @@
         "rsa.web.web_ref_domain": "www.example.org",
         "service.type": "tomcat",
         "source.bytes": 1559,
-        "source.ip": [
-            "10.183.34.1"
-        ],
+        "source.ip": "10.183.34.1",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -3526,9 +3416,7 @@
         "rsa.web.web_ref_domain": "internal.example.com",
         "service.type": "tomcat",
         "source.bytes": 3512,
-        "source.ip": [
-            "10.101.163.40"
-        ],
+        "source.ip": "10.101.163.40",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -3592,9 +3480,7 @@
         "rsa.web.web_ref_domain": "internal.example.com",
         "service.type": "tomcat",
         "source.bytes": 2699,
-        "source.ip": [
-            "10.216.188.152"
-        ],
+        "source.ip": "10.216.188.152",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -3654,9 +3540,7 @@
         "rsa.web.web_ref_domain": "mail.example.net",
         "service.type": "tomcat",
         "source.bytes": 5050,
-        "source.ip": [
-            "10.94.140.77"
-        ],
+        "source.ip": "10.94.140.77",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -3714,9 +3598,7 @@
         "rsa.web.web_ref_domain": "mail.example.org",
         "service.type": "tomcat",
         "source.bytes": 7526,
-        "source.ip": [
-            "10.223.205.204"
-        ],
+        "source.ip": "10.223.205.204",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -3780,9 +3662,7 @@
         "rsa.web.web_ref_domain": "example.com",
         "service.type": "tomcat",
         "source.bytes": 2804,
-        "source.ip": [
-            "10.85.137.156"
-        ],
+        "source.ip": "10.85.137.156",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -3846,9 +3726,7 @@
         "rsa.web.web_ref_domain": "www5.example.net",
         "service.type": "tomcat",
         "source.bytes": 3000,
-        "source.ip": [
-            "10.12.54.142"
-        ],
+        "source.ip": "10.12.54.142",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -3908,9 +3786,7 @@
         "rsa.web.web_ref_domain": "internal.example.org",
         "service.type": "tomcat",
         "source.bytes": 4262,
-        "source.ip": [
-            "10.158.6.52"
-        ],
+        "source.ip": "10.158.6.52",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -3973,9 +3849,7 @@
         "rsa.web.web_ref_domain": "example.com",
         "service.type": "tomcat",
         "source.bytes": 1325,
-        "source.ip": [
-            "10.195.160.182"
-        ],
+        "source.ip": "10.195.160.182",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -4035,9 +3909,7 @@
         "rsa.web.web_ref_domain": "example.net",
         "service.type": "tomcat",
         "source.bytes": 1742,
-        "source.ip": [
-            "10.20.68.117"
-        ],
+        "source.ip": "10.20.68.117",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -4101,9 +3973,7 @@
         "rsa.web.web_ref_domain": "www5.example.org",
         "service.type": "tomcat",
         "source.bytes": 6923,
-        "source.ip": [
-            "10.94.136.235"
-        ],
+        "source.ip": "10.94.136.235",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -4167,9 +4037,7 @@
         "rsa.web.web_ref_domain": "example.com",
         "service.type": "tomcat",
         "source.bytes": 2783,
-        "source.ip": [
-            "10.152.11.26"
-        ],
+        "source.ip": "10.152.11.26",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -4228,9 +4096,7 @@
         "rsa.web.web_ref_domain": "www5.example.com",
         "service.type": "tomcat",
         "source.bytes": 5211,
-        "source.ip": [
-            "10.82.118.95"
-        ],
+        "source.ip": "10.82.118.95",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -4290,9 +4156,7 @@
         "rsa.web.web_ref_domain": "www5.example.net",
         "service.type": "tomcat",
         "source.bytes": 3948,
-        "source.ip": [
-            "10.187.152.213"
-        ],
+        "source.ip": "10.187.152.213",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -4356,9 +4220,7 @@
         "rsa.web.web_ref_domain": "internal.example.net",
         "service.type": "tomcat",
         "source.bytes": 5440,
-        "source.ip": [
-            "10.98.71.45"
-        ],
+        "source.ip": "10.98.71.45",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -4418,9 +4280,7 @@
         "rsa.web.web_ref_domain": "www5.example.org",
         "service.type": "tomcat",
         "source.bytes": 757,
-        "source.ip": [
-            "10.86.123.33"
-        ],
+        "source.ip": "10.86.123.33",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -4480,9 +4340,7 @@
         "rsa.web.web_ref_domain": "api.example.net",
         "service.type": "tomcat",
         "source.bytes": 6169,
-        "source.ip": [
-            "10.6.112.183"
-        ],
+        "source.ip": "10.6.112.183",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -4546,9 +4404,7 @@
         "rsa.web.web_ref_domain": "www5.example.org",
         "service.type": "tomcat",
         "source.bytes": 6587,
-        "source.ip": [
-            "10.227.156.143"
-        ],
+        "source.ip": "10.227.156.143",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -4607,9 +4463,7 @@
         "rsa.web.web_ref_domain": "example.net",
         "service.type": "tomcat",
         "source.bytes": 7182,
-        "source.ip": [
-            "10.124.129.248"
-        ],
+        "source.ip": "10.124.129.248",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -4672,9 +4526,7 @@
         "rsa.web.web_ref_domain": "www5.example.net",
         "service.type": "tomcat",
         "source.bytes": 3380,
-        "source.ip": [
-            "10.173.125.112"
-        ],
+        "source.ip": "10.173.125.112",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -4734,9 +4586,7 @@
         "rsa.web.web_ref_domain": "api.example.net",
         "service.type": "tomcat",
         "source.bytes": 5911,
-        "source.ip": [
-            "10.37.156.140"
-        ],
+        "source.ip": "10.37.156.140",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -4794,9 +4644,7 @@
         "rsa.web.web_ref_domain": "www5.example.org",
         "service.type": "tomcat",
         "source.bytes": 2448,
-        "source.ip": [
-            "10.121.225.135"
-        ],
+        "source.ip": "10.121.225.135",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -4855,9 +4703,7 @@
         "rsa.web.web_ref_domain": "mail.example.net",
         "service.type": "tomcat",
         "source.bytes": 1206,
-        "source.ip": [
-            "10.123.68.56"
-        ],
+        "source.ip": "10.123.68.56",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -4921,9 +4767,7 @@
         "rsa.web.web_ref_domain": "mail.example.net",
         "service.type": "tomcat",
         "source.bytes": 4638,
-        "source.ip": [
-            "10.63.56.164"
-        ],
+        "source.ip": "10.63.56.164",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -4987,9 +4831,7 @@
         "rsa.web.web_ref_domain": "example.com",
         "service.type": "tomcat",
         "source.bytes": 6648,
-        "source.ip": [
-            "10.62.10.137"
-        ],
+        "source.ip": "10.62.10.137",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -5052,9 +4894,7 @@
         "rsa.web.web_ref_domain": "api.example.net",
         "service.type": "tomcat",
         "source.bytes": 1119,
-        "source.ip": [
-            "10.89.154.115"
-        ],
+        "source.ip": "10.89.154.115",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -5113,9 +4953,7 @@
         "rsa.web.web_ref_domain": "api.example.org",
         "service.type": "tomcat",
         "source.bytes": 3904,
-        "source.ip": [
-            "10.122.252.130"
-        ],
+        "source.ip": "10.122.252.130",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -5175,9 +5013,7 @@
         "rsa.web.web_ref_domain": "www.example.net",
         "service.type": "tomcat",
         "source.bytes": 5560,
-        "source.ip": [
-            "10.195.152.53"
-        ],
+        "source.ip": "10.195.152.53",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -5236,9 +5072,7 @@
         "rsa.web.web_ref_domain": "mail.example.com",
         "service.type": "tomcat",
         "source.bytes": 3089,
-        "source.ip": [
-            "10.9.255.204"
-        ],
+        "source.ip": "10.9.255.204",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -5302,9 +5136,7 @@
         "rsa.web.web_ref_domain": "internal.example.net",
         "service.type": "tomcat",
         "source.bytes": 5930,
-        "source.ip": [
-            "10.214.235.133"
-        ],
+        "source.ip": "10.214.235.133",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -5368,9 +5200,7 @@
         "rsa.web.web_ref_domain": "api.example.org",
         "service.type": "tomcat",
         "source.bytes": 3197,
-        "source.ip": [
-            "10.5.134.204"
-        ],
+        "source.ip": "10.5.134.204",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -5430,9 +5260,7 @@
         "rsa.web.web_ref_domain": "internal.example.com",
         "service.type": "tomcat",
         "source.bytes": 7615,
-        "source.ip": [
-            "10.144.111.42"
-        ],
+        "source.ip": "10.144.111.42",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -5491,9 +5319,7 @@
         "rsa.web.web_ref_domain": "www.example.com",
         "service.type": "tomcat",
         "source.bytes": 2945,
-        "source.ip": [
-            "10.122.0.80"
-        ],
+        "source.ip": "10.122.0.80",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -5556,9 +5382,7 @@
         "rsa.web.web_ref_domain": "www.example.net",
         "service.type": "tomcat",
         "source.bytes": 1569,
-        "source.ip": [
-            "10.165.33.19"
-        ],
+        "source.ip": "10.165.33.19",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -5622,9 +5446,7 @@
         "rsa.web.web_ref_domain": "internal.example.org",
         "service.type": "tomcat",
         "source.bytes": 6211,
-        "source.ip": [
-            "10.87.92.17"
-        ],
+        "source.ip": "10.87.92.17",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -5684,9 +5506,7 @@
         "rsa.web.web_ref_domain": "internal.example.org",
         "service.type": "tomcat",
         "source.bytes": 5823,
-        "source.ip": [
-            "10.51.52.203"
-        ],
+        "source.ip": "10.51.52.203",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -5748,9 +5568,7 @@
         "rsa.web.web_ref_domain": "internal.example.net",
         "service.type": "tomcat",
         "source.bytes": 6776,
-        "source.ip": [
-            "10.0.211.86"
-        ],
+        "source.ip": "10.0.211.86",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -5810,9 +5628,7 @@
         "rsa.web.web_ref_domain": "example.net",
         "service.type": "tomcat",
         "source.bytes": 3714,
-        "source.ip": [
-            "10.106.34.244"
-        ],
+        "source.ip": "10.106.34.244",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -5872,9 +5688,7 @@
         "rsa.web.web_ref_domain": "example.net",
         "service.type": "tomcat",
         "source.bytes": 7052,
-        "source.ip": [
-            "10.191.210.188"
-        ],
+        "source.ip": "10.191.210.188",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -5934,9 +5748,7 @@
         "rsa.web.web_ref_domain": "www.example.org",
         "service.type": "tomcat",
         "source.bytes": 5775,
-        "source.ip": [
-            "10.2.38.49"
-        ],
+        "source.ip": "10.2.38.49",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -5996,9 +5808,7 @@
         "rsa.web.web_ref_domain": "mail.example.com",
         "service.type": "tomcat",
         "source.bytes": 4580,
-        "source.ip": [
-            "10.66.92.90"
-        ],
+        "source.ip": "10.66.92.90",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -6061,9 +5871,7 @@
         "rsa.web.web_ref_domain": "mail.example.com",
         "service.type": "tomcat",
         "source.bytes": 7649,
-        "source.ip": [
-            "10.97.108.108"
-        ],
+        "source.ip": "10.97.108.108",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -6126,9 +5934,7 @@
         "rsa.web.web_ref_domain": "www5.example.org",
         "service.type": "tomcat",
         "source.bytes": 177,
-        "source.ip": [
-            "10.147.147.248"
-        ],
+        "source.ip": "10.147.147.248",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -6192,9 +5998,7 @@
         "rsa.web.web_ref_domain": "api.example.com",
         "service.type": "tomcat",
         "source.bytes": 6708,
-        "source.ip": [
-            "10.152.190.61"
-        ],
+        "source.ip": "10.152.190.61",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -6258,9 +6062,7 @@
         "rsa.web.web_ref_domain": "api.example.org",
         "service.type": "tomcat",
         "source.bytes": 5321,
-        "source.ip": [
-            "10.129.232.105"
-        ],
+        "source.ip": "10.129.232.105",
         "tags": [
             "forwarded",
             "tomcat.log"
@@ -6320,9 +6122,7 @@
         "rsa.web.web_ref_domain": "api.example.net",
         "service.type": "tomcat",
         "source.bytes": 423,
-        "source.ip": [
-            "10.12.173.112"
-        ],
+        "source.ip": "10.12.173.112",
         "tags": [
             "forwarded",
             "tomcat.log"

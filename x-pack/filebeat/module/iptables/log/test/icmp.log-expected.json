@@ -9,6 +9,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan  8 03:37:09 DENY: IN=eth0 OUT= MAC=90:10:28:5f:62:24:90:10:18:5a:89:2a:08:00 SRC=192.0.2.71 DST=192.0.2.83 LEN=88 TOS=0x00 PREC=0x00 TTL=118 ID=21684 PROTO=ICMP TYPE=3 CODE=3 [SRC=192.0.2.83 DST=192.168.173.191 LEN=60 TOS=0x00 PREC=0x00 TTL=54 ID=0 DF PROTO=UDP SPT=21458 DPT=62936 LEN=40 ]",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -27,7 +28,6 @@
         "iptables.tos": 0,
         "iptables.ttl": 118,
         "log.offset": 0,
-        "log.original": "Jan  8 03:37:09 DENY: IN=eth0 OUT= MAC=90:10:28:5f:62:24:90:10:18:5a:89:2a:08:00 SRC=192.0.2.71 DST=192.0.2.83 LEN=88 TOS=0x00 PREC=0x00 TTL=118 ID=21684 PROTO=ICMP TYPE=3 CODE=3 [SRC=192.0.2.83 DST=192.168.173.191 LEN=60 TOS=0x00 PREC=0x00 TTL=54 ID=0 DF PROTO=UDP SPT=21458 DPT=62936 LEN=40 ]",
         "network.community_id": "1:T79jBEYlbFhpnIGt2rOuzIv31hE=",
         "network.transport": "icmp",
         "network.type": "ipv4",
