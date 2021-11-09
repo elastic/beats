@@ -125,8 +125,7 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 				}
 			}
 
-			f.logger.Error(`Error extracting pod uid - source value does not contains matcher's logs_path,
-				supported log_path for 'pod' resource_type: '/var/lib/kubelet/pods/', '/var/log/pods/'.`)
+			f.logger.Error("Error extracting pod uid - source value does not contains matcher's logs_path")
 			return ""
 		}
 	}
