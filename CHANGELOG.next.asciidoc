@@ -327,6 +327,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
 - Sophos UTM: Support logs containing hostname in syslog header. {pull}28638[28638]
 - Moving Oracle Filebeat module to GA. {pull}28754[28754]
+- Add support in aws-s3 input for s3 notification from SNS to SQS. {pull}28800[28800]
 
 *Heartbeat*
 
