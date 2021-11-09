@@ -5,8 +5,10 @@
 package aws
 
 import (
+	"crypto/tls"
 	"net/http"
 	"net/url"
+	"strings"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/defaults"
@@ -16,6 +18,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -29,23 +32,32 @@ type ConfigAWS struct {
 	Endpoint             string `config:"endpoint"`
 	RoleArn              string `config:"role_arn"`
 	ProxyUrl             string `config:"proxy_url"`
+	FIPSEnabled          bool   `config:"fips_enabled"`
+	// TLS provides ssl/tls setup settings
+	TLS *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty" json:"ssl,omitempty"`
 }
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
 func InitializeAWSConfig(config ConfigAWS) (awssdk.Config, error) {
 	AWSConfig, _ := GetAWSCredentials(config)
+	var proxy func(*http.Request) (*url.URL, error)
 	if config.ProxyUrl != "" {
 		proxyUrl, err := httpcommon.NewProxyURIFromString(config.ProxyUrl)
 		if err != nil {
 			return AWSConfig, err
 		}
-
-		httpClient := &http.Client{
-			Transport: &http.Transport{
-				Proxy: http.ProxyURL(proxyUrl.URI()),
-			},
-		}
-		AWSConfig.HTTPClient = httpClient
+		proxy = http.ProxyURL(proxyUrl.URI())
+	}
+	var tlsConfig *tls.Config
+	if config.TLS != nil {
+		TLSConfig, _ := tlscommon.LoadTLSConfig(config.TLS)
+		tlsConfig = TLSConfig.ToConfig()
+	}
+	AWSConfig.HTTPClient = &http.Client{
+		Transport: &http.Transport{
+			Proxy:           proxy,
+			TLSClientConfig: tlsConfig,
+		},
 	}
 	return AWSConfig, nil
 }
@@ -143,17 +155,42 @@ func getRoleArn(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
 // EnrichAWSConfigWithEndpoint function enabled endpoint resolver for AWS
 // service clients when endpoint is given in config.
 func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName string, awsConfig awssdk.Config) awssdk.Config {
+	var eurl string
 	if endpoint != "" {
 		parsedEndpoint, _ := url.Parse(endpoint)
 		if parsedEndpoint.Scheme != "" {
 			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL(endpoint)
 		} else {
 			if regionName == "" {
-				awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + endpoint)
+				eurl = "https://" + serviceName + "." + endpoint
 			} else {
-				awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + regionName + "." + endpoint)
+				eurl = "https://" + serviceName + "." + regionName + "." + endpoint
 			}
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL(eurl)
 		}
 	}
 	return awsConfig
+}
+
+//Create AWS service name based on Region and FIPS
+func CreateServiceName(serviceName string, fipsEnabled bool, region string) string {
+	if fipsEnabled {
+		OptionalGovCloudFIPS := []string{"s3"}
+		_, found := Find(OptionalGovCloudFIPS, serviceName)
+		if !strings.HasPrefix(region, "us-gov-") || found {
+			return serviceName + "-fips"
+		}
+	}
+	return serviceName
+}
+
+// Find takes a slice and looks for an element in it. If found it will
+// return it's key, otherwise it will return -1 and a bool of false.
+func Find(slice []string, val string) (int, bool) {
+	for i, item := range slice {
+		if item == val {
+			return i, true
+		}
+	}
+	return -1, false
 }

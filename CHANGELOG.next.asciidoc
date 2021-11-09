@@ -229,6 +229,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Discover changes in Kubernetes nodes metadata as soon as they happen. {pull}23139[23139]
 - Support self signed certificates on outputs {pull}29229[29229]
 - Update k8s library {pull}29394[29394]
+- Add FIPS configuration option for all AWS API calls. {pull}[28899]
 
 *Auditbeat*
 
