@@ -37,4 +37,3 @@ class Test(BaseTest):
         """
         r = requests.get("http://localhost:5066/debug/pprof/not-exist")
         assert r.status_code == 404
-
