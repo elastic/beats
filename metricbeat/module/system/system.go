@@ -51,7 +51,9 @@ type SystemModule interface {
 
 func NewModule(base mb.BaseModule) (mb.Module, error) {
 	var hostfs string
+
 	// If this is fleet, ignore the global path, as its not being set.
+	// This is a temporary hack
 	if fleetmode.Enabled() {
 		partialConfig := HostFSConfig{}
 		base.UnpackConfig(&partialConfig)
