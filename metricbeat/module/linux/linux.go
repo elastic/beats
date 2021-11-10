@@ -61,7 +61,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	}
 
 	// Steer towards system.hostfs, since the two behave fundamentally the same, and system.hostfs has a CLI flag that many users may default to.
-	if paths.Paths.Hostfs != "/" {
+	if len(paths.Paths.Hostfs) > 2 {
 		dir = paths.Paths.Hostfs
 	}
 
