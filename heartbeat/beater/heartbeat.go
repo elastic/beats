@@ -53,8 +53,8 @@ type Heartbeat struct {
 	monitorReloader      *cfgfile.Reloader
 	monitorRunnerFactory *monitors.RunnerFactory
 	serviceRunnerFactory *service.MonitorRunnerFactory
-	autodiscover         *autodiscover.Autodiscover
-	syntheticService     *service.SyntheticService
+	autodiscover      *autodiscover.Autodiscover
+	syntheticsService *service.SyntheticsService
 }
 
 // New creates a new heartbeat.
@@ -119,14 +119,14 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	}
 
 	if bt.config.RunViaSyntheticsService {
-		bt.syntheticService = service.NewSyntheticService(bt.config, bt.monitorReloader, bt.serviceRunnerFactory)
+		bt.syntheticsService = service.NewSyntheticService(bt.config, bt.serviceRunnerFactory)
 
-		err := bt.syntheticService.Run(b)
+		err := bt.syntheticsService.Run(b)
 		if err != nil {
 			return err
 		}
 
-		bt.syntheticService.Wait()
+		bt.syntheticsService.Wait()
 
 		if bt.monitorReloader != nil {
 			defer bt.monitorReloader.Stop()
@@ -315,8 +315,8 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 
 // Stop stops the beat.
 func (bt *Heartbeat) Stop() {
-	if bt.syntheticService != nil {
-		bt.syntheticService.Stop()
+	if bt.syntheticsService != nil {
+		bt.syntheticsService.Stop()
 	}
 	close(bt.done)
 }

@@ -9,7 +9,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"io/ioutil"
@@ -41,25 +40,23 @@ type SyntheticServicePayload struct {
 	Output   Output                   `json:"output"`
 }
 
-type SyntheticService struct {
+type SyntheticsService struct {
 	config               config.Config
-	monitorReloader      *cfgfile.Reloader
 	servicePushTicker    *time.Ticker
 	servicePushWait      sync.WaitGroup
 	serviceRunnerFactory *MonitorRunnerFactory
 }
 
-func NewSyntheticService(c config.Config, monReload *cfgfile.Reloader, sr *MonitorRunnerFactory) *SyntheticService {
-	return &SyntheticService{
+func NewSyntheticService(c config.Config, sr *MonitorRunnerFactory) *SyntheticsService {
+	return &SyntheticsService{
 		config:               c,
-		monitorReloader:      monReload,
 		servicePushTicker:    nil,
 		servicePushWait:      sync.WaitGroup{},
 		serviceRunnerFactory: sr,
 	}
 }
 
-func (service *SyntheticService) Run(b *beat.Beat) error {
+func (service *SyntheticsService) Run(b *beat.Beat) error {
 	logp.Info("Starting run via synthetics service. This is an experimental feature and may be changed or removed in the future!")
 
 	validationErr := service.validateMonitorsSchedule()
@@ -69,7 +66,7 @@ func (service *SyntheticService) Run(b *beat.Beat) error {
 
 	serviceManifest, sErr := service.getSyntheticServiceManifest()
 	if sErr != nil {
-		logp.Warn("Failed to fetch service manifest file with err %w", sErr)
+		logp.Warn("Failed to fetch service manifest file with err %s", sErr)
 		return sErr
 	}
 
@@ -97,15 +94,15 @@ func (service *SyntheticService) Run(b *beat.Beat) error {
 	return nil
 }
 
-func (service *SyntheticService) Wait() {
+func (service *SyntheticsService) Wait() {
 	service.servicePushWait.Wait()
 }
 
-func (service *SyntheticService) Stop() {
+func (service *SyntheticsService) Stop() {
 	service.servicePushTicker.Stop()
 }
 
-func (service *SyntheticService) schedulePushConfig(serviceLocations map[string]config.ServiceLocation, output Output) {
+func (service *SyntheticsService) schedulePushConfig(serviceLocations map[string]config.ServiceLocation, output Output) {
 	service.servicePushWait.Add(1)
 	for {
 		select {
@@ -120,7 +117,7 @@ func (service *SyntheticService) schedulePushConfig(serviceLocations map[string]
 	}
 }
 
-func (service *SyntheticService) scheduleReloadPushConfig(serviceLocations map[string]config.ServiceLocation, output Output) {
+func (service *SyntheticsService) scheduleReloadPushConfig(serviceLocations map[string]config.ServiceLocation, output Output) {
 	reloadPushTicker := time.NewTicker(1 * time.Hour)
 	for {
 		select {
@@ -142,7 +139,7 @@ func (service *SyntheticService) scheduleReloadPushConfig(serviceLocations map[s
 	}
 }
 
-func (service *SyntheticService) getSyntheticServiceManifest() (config.ServiceManifest, error) {
+func (service *SyntheticsService) getSyntheticServiceManifest() (config.ServiceManifest, error) {
 	logp.Info("fetching manifest file to get service locations")
 	serviceCfg := service.config.Service
 	var err error
@@ -203,7 +200,7 @@ func (service *SyntheticService) getSyntheticServiceManifest() (config.ServiceMa
 	return config.ServiceManifest{}, err
 }
 
-func (service *SyntheticService) validateMonitorsSchedule() error {
+func (service *SyntheticsService) validateMonitorsSchedule() error {
 	for _, m := range service.config.Monitors {
 		monitorFields, err := stdfields.ConfigToStdMonitorFields(m)
 		if err !=nil{
@@ -222,7 +219,7 @@ func (service *SyntheticService) validateMonitorsSchedule() error {
 	return nil
 }
 
-func (service *SyntheticService) pushConfigsToSyntheticsService(locationKey string, serviceLocation config.ServiceLocation, output Output, retryInterval time.Duration) {
+func (service *SyntheticsService) pushConfigsToSyntheticsService(locationKey string, serviceLocation config.ServiceLocation, output Output, retryInterval time.Duration) {
 	defer service.servicePushWait.Done()
 
 	payload := SyntheticServicePayload{Output: output}
@@ -264,7 +261,7 @@ func (service *SyntheticService) pushConfigsToSyntheticsService(locationKey stri
 	serviceCfg := service.config.Service
 
 	jsonValue, _ := json.Marshal(payload)
-	url := fmt.Sprintf("%s/test/cronjob", serviceLocation.Url)
+	url := fmt.Sprintf("%s/cronjob", serviceLocation.Url)
 
 	resp, err := postConfig(url, jsonValue, serviceCfg, retryInterval)
 	if err != nil || resp == nil {

@@ -56,20 +56,20 @@ type ServiceConfig struct {
 }
 
 type ServiceLocation struct {
-	Url string `json:"url"`
+	Url string `config:"url"`
 
 	Geo struct {
-		Name     string `json:"name"`
+		Name     string `config:"name"`
 		Location struct {
-			Lat float64 `json:"lat"`
-			Lon float64 `json:"lon"`
-		} `json:"location"`
-	} `json:"geo"`
-	Status string `json:"status"`
+			Lat float64 `config:"lat"`
+			Lon float64 `config:"lon"`
+		} `config:"location"`
+	} `config:"geo"`
+	Status string `config:"status"`
 }
 
 type ServiceManifest struct {
-	Locations map[string]ServiceLocation `json:"locations"`
+	Locations map[string]ServiceLocation `config:"locations"`
 }
 
 // DefaultConfig is the canonical instantiation of Config.

@@ -73,11 +73,11 @@ func MockMonitorConfig(t *testing.T, rawConfigStr string) (config.Config, *commo
 	return parsedConfig, rawConfig
 }
 
-func MockSyntheticService(t *testing.T, rawConfigStr string) *SyntheticService {
+func MockSyntheticService(t *testing.T, rawConfigStr string) *SyntheticsService {
 
 	cfg, _ := MockMonitorConfig(t, rawConfigStr)
 
-	return &SyntheticService{
+	return &SyntheticsService{
 		config: cfg,
 	}
 
