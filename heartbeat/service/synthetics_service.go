@@ -69,6 +69,7 @@ func (service *SyntheticService) Run(b *beat.Beat) error {
 
 	serviceManifest, sErr := service.getSyntheticServiceManifest()
 	if sErr != nil {
+		logp.Warn("Failed to fetch service manifest file with err %w", sErr)
 		return sErr
 	}
 
@@ -87,14 +88,13 @@ func (service *SyntheticService) Run(b *beat.Beat) error {
 	// first we need to push at start, and then ticker will take over
 	for locationKey, serviceLocation := range serviceLocations {
 		service.servicePushWait.Add(1)
-		go service.pushConfigsToSyntheticsService(locationKey, serviceLocation, output)
+		go service.pushConfigsToSyntheticsService(locationKey, serviceLocation, output, time.Millisecond)
 	}
 	go service.schedulePushConfig(serviceLocations, output)
 	if service.config.ConfigMonitors.Enabled() {
 		go service.scheduleReloadPushConfig(serviceLocations, output)
 	}
 	return nil
-
 }
 
 func (service *SyntheticService) Wait() {
@@ -112,7 +112,7 @@ func (service *SyntheticService) schedulePushConfig(serviceLocations map[string]
 		case <-service.servicePushTicker.C:
 			for locationKey, serviceLocation := range serviceLocations {
 				service.servicePushWait.Add(1)
-				go service.pushConfigsToSyntheticsService(locationKey, serviceLocation, output)
+				go service.pushConfigsToSyntheticsService(locationKey, serviceLocation, output, 0)
 			}
 
 			defer service.servicePushWait.Done()
@@ -135,7 +135,7 @@ func (service *SyntheticService) scheduleReloadPushConfig(serviceLocations map[s
 			for locationKey, serviceLocation := range serviceLocations {
 				service.servicePushWait.Add(1)
 				// first we need to do at start, and then ticker will take over
-				go service.pushConfigsToSyntheticsService(locationKey, serviceLocation, output)
+				go service.pushConfigsToSyntheticsService(locationKey, serviceLocation, output, 0)
 			}
 			reloadPushTicker.Stop()
 		}
@@ -146,6 +146,7 @@ func (service *SyntheticService) getSyntheticServiceManifest() (config.ServiceMa
 	logp.Info("fetching manifest file to get service locations")
 	serviceCfg := service.config.Service
 	var err error
+	var manifest config.ServiceManifest
 
 	if serviceCfg.Username == "" {
 		err = errors.New("synthetic service username is required for authentication")
@@ -190,10 +191,10 @@ func (service *SyntheticService) getSyntheticServiceManifest() (config.ServiceMa
 	for attempt := 1; attempt <= 3; attempt++ {
 		if attempt > 1 {
 			waitAfter := time.Second * time.Duration(attempt*2)
-			logp.Info("retrying fetching manifest file after %d seconds", waitAfter)
+			logp.Info("retrying fetching manifest file after %.0f seconds", waitAfter.Seconds())
 			time.Sleep(waitAfter)
 		}
-		manifest, err := fetchManifestFile()
+		manifest, err = fetchManifestFile()
 		if err == nil {
 			return manifest, nil
 		}
@@ -204,8 +205,16 @@ func (service *SyntheticService) getSyntheticServiceManifest() (config.ServiceMa
 
 func (service *SyntheticService) validateMonitorsSchedule() error {
 	for _, m := range service.config.Monitors {
-		monitorFields, _ := stdfields.ConfigToStdMonitorFields(m)
-		monitorSchedule, _ := schedule.ParseSchedule(monitorFields.ScheduleStr)
+		monitorFields, err := stdfields.ConfigToStdMonitorFields(m)
+		if err !=nil{
+			logp.Error(err)
+			return err
+		}
+		monitorSchedule, err := schedule.ParseSchedule(monitorFields.ScheduleStr)
+		if err !=nil{
+			logp.Error(err)
+			return err
+		}
 		if monitorSchedule.Seconds() < 60 {
 			return errors.New("schedule can't be less than 1 minute while using synthetics service")
 		}
@@ -213,7 +222,7 @@ func (service *SyntheticService) validateMonitorsSchedule() error {
 	return nil
 }
 
-func (service *SyntheticService) pushConfigsToSyntheticsService(locationKey string, serviceLocation config.ServiceLocation, output Output) {
+func (service *SyntheticService) pushConfigsToSyntheticsService(locationKey string, serviceLocation config.ServiceLocation, output Output, retryInterval time.Duration) {
 	defer service.servicePushWait.Done()
 
 	payload := SyntheticServicePayload{Output: output}
@@ -255,10 +264,10 @@ func (service *SyntheticService) pushConfigsToSyntheticsService(locationKey stri
 	serviceCfg := service.config.Service
 
 	jsonValue, _ := json.Marshal(payload)
-	url := fmt.Sprintf("%s/cronjob", serviceLocation.Url)
+	url := fmt.Sprintf("%s/test/cronjob", serviceLocation.Url)
 
-	resp, err := postConfig(url, jsonValue, serviceCfg)
-	if err != nil {
+	resp, err := postConfig(url, jsonValue, serviceCfg, retryInterval)
+	if err != nil || resp == nil {
 		logp.Info("Failed to push configurations to the synthetics service: %s for %d monitors",
 			serviceLocation.Geo.Name, len(payload.Monitors))
 		logp.Error(err)
@@ -283,17 +292,12 @@ func (service *SyntheticService) pushConfigsToSyntheticsService(locationKey stri
 	}
 }
 
-func postConfig(url string, jsonValue []byte, serviceCfg config.ServiceConfig) (*http.Response, error) {
+func postConfig(url string, jsonValue []byte, serviceCfg config.ServiceConfig, retryInterval time.Duration) (*http.Response, error) {
 	var err error
 	var resp *http.Response
-	for attempt := 1; attempt <= 3; attempt++ {
-		if attempt > 1 {
-			waitAfter := time.Second * time.Duration(attempt*10)
-			logp.Warn("failed pushing configs with err %s", err)
-			logp.Info("retrying pushing configuration after %d seconds", waitAfter)
-			time.Sleep(waitAfter)
-		}
+	var retryTicker *time.Ticker
 
+	executePush := func() (*http.Response, error) {
 		req, errReq := http.NewRequest("POST", url, bytes.NewBuffer(jsonValue))
 		if errReq != nil {
 			return nil, errReq
@@ -307,9 +311,48 @@ func postConfig(url string, jsonValue []byte, serviceCfg config.ServiceConfig) (
 		if resp != nil && resp.StatusCode == http.StatusOK {
 			return resp, err
 		}
+
+		if resp != nil && resp.StatusCode == http.StatusNotFound {
+			return nil, errors.New("service not found at provided url")
+		}
+		return nil, err
 	}
 
-	return nil, err
+	resp, err =  executePush()
+	if resp !=nil {
+		return resp, err
+	}
+
+	retryAttempts := 1
+	if retryInterval != 0{
+		retryTicker = time.NewTicker(retryInterval)
+	}else {
+		retryTicker = time.NewTicker(time.Second * time.Duration(retryAttempts*10))
+
+	}
+	for  {
+		select {
+		case <- retryTicker.C:
+			waitAfter := time.Second * time.Duration(retryAttempts*10)
+			logp.Warn("failed pushing configs with error: %s", err)
+			logp.Info("retrying pushing configuration after %.0f seconds", waitAfter.Seconds())
+			resp, err =  executePush()
+			if resp !=nil {
+				return resp, err
+			}
+			retryAttempts++
+			if retryAttempts == 3 {
+				retryTicker.Stop()
+				return resp, err
+			}
+			if retryInterval != 0{
+				retryTicker.Reset(retryInterval)
+			}else {
+				retryTicker.Reset(waitAfter)
+			}
+		}
+	}
+
 }
 
 func locationInServiceLocation(location string, locationsList []string) bool {

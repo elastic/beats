@@ -37,7 +37,7 @@ func init() {
 	}
 }
 
-func MockMonitorConfig(t *testing.T, rawConfigStr string) (config.Config, *common.Config )  {
+func MockMonitorConfig(t *testing.T, rawConfigStr string) (config.Config, *common.Config) {
 	myJsonString := `{
 	  "monitors": [{
 		"type":     "test",
@@ -86,7 +86,7 @@ func MockSyntheticService(t *testing.T, rawConfigStr string) *SyntheticService {
 func mockResponse() (*http.Response, error) {
 	return &http.Response{
 		StatusCode: http.StatusOK,
-		Body: ioutil.NopCloser(bytes.NewBufferString("success")),
+		Body:       ioutil.NopCloser(bytes.NewBufferString("success")),
 	}, nil
 }
 
@@ -112,7 +112,7 @@ func TestPushConfiguration(t *testing.T) {
 		Hosts:    []string{"http:localhost:9200"},
 		Username: username,
 		Password: password,
-	})
+	}, time.Millisecond)
 
 	if len(payload.Monitors) != 1 {
 		t.Error("expected payload monitors length to be 1")
@@ -124,7 +124,7 @@ func TestPushConfiguration(t *testing.T) {
 
 func TestPushConfigurationRetries(t *testing.T) {
 	sv := MockSyntheticService(t, "")
-	numberOfTimeCalled :=0
+	numberOfTimeCalled := 0
 
 	GetDoFunc = func(req *http.Request) (*http.Response, error) {
 		numberOfTimeCalled++
@@ -141,7 +141,7 @@ func TestPushConfigurationRetries(t *testing.T) {
 		Hosts:    []string{"http:localhost:9200"},
 		Username: username,
 		Password: password,
-	})
+	}, time.Millisecond)
 
 	assert.Equal(t, numberOfTimeCalled, 3)
 
@@ -286,4 +286,34 @@ func TestValidateMonitorsSchedule(t *testing.T) {
 		t.Error("it should not return an error of a valid monitor")
 	}
 
+}
+
+func TestGetServiceManifest(t *testing.T) {
+	sv := MockSyntheticService(t, "")
+	GetDoFunc = func(req *http.Request) (*http.Response, error) {
+		jsonStr := `{
+				  "locations": {
+					"us_central": {
+					  "url": "us-central.synthetics.elastic.dev",
+					  "geo": {
+						"name": "US Central",
+						"location": {"lat": 41.25, "lon": -95.86}
+					  },
+					  "status": "beta"
+					}
+				  }
+				}`
+
+		return &http.Response{
+			StatusCode: 200,
+			Body:       ioutil.NopCloser(bytes.NewReader([]byte(jsonStr))),
+		}, nil
+	}
+	manifest, _ := sv.getSyntheticServiceManifest()
+
+	assert.Equal(t, len(manifest.Locations), 1)
+	for locName, loc := range manifest.Locations {
+		assert.Equal(t, locName, "us_central")
+		assert.Equal(t, loc.Url, "us-central.synthetics.elastic.dev")
+	}
 }
