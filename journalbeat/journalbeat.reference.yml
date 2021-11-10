@@ -1576,6 +1576,7 @@ logging.files:
 #http.named_pipe.security_descriptor:
 
 # Defines if the HTTP pprof endpoints are enabled.
+# It is recommended that this is only enabled on localhost as these endpoints may leak data.
 #http.pprof.enabled: false
 
 # ============================== Process Security ==============================
