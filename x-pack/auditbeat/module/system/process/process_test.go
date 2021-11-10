@@ -73,7 +73,7 @@ func TestProcessEvent(t *testing.T) {
 		"message":        "Process zsh (PID: 9086) by user elastic STARTED",
 
 		"process.pid":        9086,
-		"process.ppid":       9085,
+		"process.parent.pid": 9085,
 		"process.name":       "zsh",
 		"process.executable": "/bin/zsh",
 		"process.args":       []string{"zsh"},

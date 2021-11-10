@@ -32,8 +32,9 @@ type Config struct {
 
 // AddResourceMetadataConfig allows adding config for enriching additional resources
 type AddResourceMetadataConfig struct {
-	Node      *common.Config `config:"node"`
-	Namespace *common.Config `config:"namespace"`
+	Node       *common.Config `config:"node"`
+	Namespace  *common.Config `config:"namespace"`
+	Deployment bool           `config:"deployment"`
 }
 
 // InitDefaults initializes the defaults for the config.
@@ -52,7 +53,8 @@ func GetDefaultResourceMetadataConfig() *AddResourceMetadataConfig {
 	metaConfig.InitDefaults()
 	metaCfg, _ := common.NewConfigFrom(&metaConfig)
 	return &AddResourceMetadataConfig{
-		Node:      metaCfg,
-		Namespace: metaCfg,
+		Node:       metaCfg,
+		Namespace:  metaCfg,
+		Deployment: true,
 	}
 }

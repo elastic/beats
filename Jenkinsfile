@@ -141,11 +141,9 @@ pipeline {
     stage('Packaging') {
       options { skipDefaultCheckout() }
       when {
-        // Always when running builds on branches/tags
         // On a PR basis, skip if changes are only related to docs.
         // Always when forcing the input parameter
         anyOf {
-          not { changeRequest() }                           // If no PR
           allOf {                                           // If PR and no docs changes
             expression { return env.ONLY_DOCS == "false" }
             changeRequest()
@@ -831,20 +829,23 @@ def archiveTestOutput(Map args = [:]) {
       catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
         withMageEnv(version: "${env.GO_VERSION}"){
           dir(directory){
-            cmd(label: "Archive system tests files", script: 'mage packageSystemTests')
+            cmd(label: "Archive system tests files", script: 'mage packageSystemTests', returnStatus: true)
           }
         }
+
         def fileName = 'build/system-tests-*.tar.gz' // see dev-tools/mage/target/common/package.go#PackageSystemTests method
         def files = findFiles(glob: "${fileName}")
-        files.each { file ->
-          echo "${file.name}"
+
+        if (files?.length > 0) {
+          googleStorageUploadExt(
+            bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
+            credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+            pattern: "${fileName}",
+            sharedPublicly: true
+          )
+        } else {
+          log(level: 'WARN', text: "There are no system-tests files to upload Google Storage}")
         }
-        googleStorageUploadExt(
-          bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
-          credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-          pattern: "${fileName}",
-          sharedPublicly: true
-        )
       }
     }
   }
