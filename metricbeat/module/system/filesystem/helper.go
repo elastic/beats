@@ -34,6 +34,9 @@ import (
 	sigar "github.com/elastic/gosigar"
 )
 
+//  In some case for Windows OS the value will be `unavailable` as access to this information is not allowed (ex. external disks).
+const UnavailableDisk = "unavailable"
+
 // Config stores the metricset-local config
 type Config struct {
 	IgnoreTypes []string `config:"filesystem.ignore_types"`
@@ -112,8 +115,10 @@ func filterFileSystemList(fsList []sigar.FileSystem) []sigar.FileSystem {
 // GetFileSystemStat retreves stats for a single filesystem
 func GetFileSystemStat(fs sigar.FileSystem) (*FSStat, error) {
 	stat := sigar.FileSystemUsage{}
-	if err := stat.Get(fs.DirName); err != nil {
-		return nil, err
+	if fs.SysTypeName != UnavailableDisk {
+		if err := stat.Get(fs.DirName); err != nil {
+			return nil, err
+		}
 	}
 
 	filesystem := FSStat{
