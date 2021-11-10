@@ -263,6 +263,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added proxy support to threatintel/malwarebazaar. {pull}28533[28533]
 - Sophos UTM: Support logs containing hostname in syslog header. {pull}28638[28638]
 - Moving Oracle Filebeat module to GA. {pull}28754[28754]
+- Add support in aws-s3 input for s3 notification from SNS to SQS. {pull}28800[28800]
 
 *Heartbeat*
 
