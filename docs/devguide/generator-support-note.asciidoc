@@ -1,10 +1,3 @@
-// tag::beat-generator[]
-IMPORTANT: Elastic provides no warranty or support for the code used to generate
-a Beat. The Beat generator is mainly offered as guidance for developers who want
-to create their own data shippers.
-
-// end::beat-generator[]
-
 // tag::metricset-generator[]
 IMPORTANT: Elastic provides no warranty or support for the code used to generate
 metricsets. The generator is mainly offered as guidance for developers who want
