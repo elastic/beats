@@ -41,6 +41,9 @@ stages:
     crosscompile:
         make: "make -C auditbeat crosscompile"
         stage: mandatory
+    macosActions:
+        githubAction: "mage build unitTest"
+        stage: extended
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
