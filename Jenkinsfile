@@ -341,6 +341,30 @@ def k8sTest(Map args = [:]) {
 }
 
 /**
+* This method runs the GitHub action
+*/
+def githubAction(Map args = [:]) {
+  // We don't support branches/tags for the time being.
+  if (!isPR()) { return }
+
+  // Notify the status with a specific GitHub Check
+  withGithubNotify(context: args.context) {
+    // Provision a worker with the given labels. For the time being, let's provision a worker.
+    // We can revisit this to maybe use the async mode when triggering the github action.
+    withNode(labels: args.label, forceWorkspace: true){
+
+      // TODO: This is the section regarding how to run the GitHub actions.
+      // Just calling the step from https://github.com/elastic/apm-pipeline-library/pull/1358
+      // Environment variables:
+      //   env.GIT_BASE_COMMIT, this environment variable points to the git ref commit.
+      //   env.TARGET_BRANCH, this environment variable points to the target branch in a Pull Request.
+      //   env.GO_VERSION, this environment variable points to the Golang version.
+
+    }
+  }
+}
+
+/**
 * This method runs the packaging for ARM
 */
 def packagingArm(Map args = [:]) {
@@ -1141,6 +1165,14 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
       }
       if(args?.content?.containsKey('cloud')) {
         steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id)
+      }
+      if(args?.content?.containsKey('githubAction')) {
+        steps.githubAction(context: args.context,
+                           command: args.content.githubAction,
+                           directory: args.project,
+                           label: args.label,
+                           id: args.id,
+                           enableRetry: enableRetry)
       }
     }
   }
