@@ -49,7 +49,7 @@ services:
       elasticsearch_monitoring:       { condition: service_healthy }
       elasticsearchssl:               { condition: service_healthy }
       logstash:                       { condition: service_healthy }
-      kafka:                          { condition: service_healthy }
+#      kafka:                          { condition: service_healthy }
       redis:                          { condition: service_healthy }
       sredis:                         { condition: service_healthy }
       kibana:                         { condition: service_healthy }
@@ -121,13 +121,13 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
 
-  kafka:
-    build: ${ES_BEATS}/testing/environments/docker/kafka
-    expose:
-      - 9092
-      - 2181
-    environment:
-      - ADVERTISED_HOST=kafka
+#  kafka:
+#    build: ${ES_BEATS}/testing/environments/docker/kafka
+#    expose:
+#      - 9092
+#      - 2181
+#    environment:
+#      - ADVERTISED_HOST=kafka
 
   # elasticsearch_kerberos.elastic:
   #   build: ${ES_BEATS}/testing/environments/docker/elasticsearch_kerberos

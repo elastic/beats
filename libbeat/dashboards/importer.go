@@ -125,7 +125,9 @@ func (imp Importer) ImportDir(dirType string, dir string) error {
 		return fmt.Errorf("The directory %s is empty, nothing to import", dir)
 	}
 	for _, file := range files {
+		imp.loader.statusMsg("start file %s", file)
 		err = imp.ImportFile(dirType, file)
+		imp.loader.statusMsg("finish file %s", file)
 		if err != nil {
 			errors = append(errors, fmt.Sprintf("  error loading %s: %s", file, err))
 		}
