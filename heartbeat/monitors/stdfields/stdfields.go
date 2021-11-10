@@ -41,7 +41,6 @@ type StdMonitorFields struct {
 	LegacyServiceName string             `config:"service_name"`
 	Enabled           bool               `config:"enabled"`
 	ServiceLocations  []string           `config:"service_locations"`
-	ScheduleStr       string             `config:"schedule"`
 }
 
 func ConfigToStdMonitorFields(config *common.Config) (StdMonitorFields, error) {

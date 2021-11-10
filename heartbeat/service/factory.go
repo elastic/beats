@@ -30,16 +30,14 @@ import (
 // MonitorRunnerFactory that can be used to create cfg.MonitorRunner cast versions of Monitor
 // suitable for config reloading.
 type MonitorRunnerFactory struct {
-	info         beat.Info
 	monitorsById map[string]*common.Config
 	lock         sync.Mutex
 	Update       chan bool
 }
 
 // NewRunnerFactory takes a scheduler and creates a MonitorRunnerFactory that can create cfgfile.Runner(Monitor) objects.
-func NewRunnerFactory(info beat.Info) *MonitorRunnerFactory {
+func NewRunnerFactory() *MonitorRunnerFactory {
 	return &MonitorRunnerFactory{
-		info:         info,
 		monitorsById: map[string]*common.Config{},
 		lock:         sync.Mutex{},
 		Update: make(chan bool),
@@ -100,7 +98,7 @@ func (r MonitorRunner) Start() {
 	defer r.runnerFactory.lock.Unlock()
 
 	r.runnerFactory.monitorsById[r.monitorId] = r.config
-	//r.runnerFactory.Update <- true
+	r.runnerFactory.Update <- true
 }
 
 func (r MonitorRunner) Stop() {
@@ -110,5 +108,5 @@ func (r MonitorRunner) Stop() {
 	defer r.runnerFactory.lock.Unlock()
 
 	delete(r.runnerFactory.monitorsById, r.monitorId)
-	//r.runnerFactory.Update <- true
+	r.runnerFactory.Update <- true
 }

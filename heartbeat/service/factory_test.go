@@ -1,81 +1,75 @@
 package service
 
 import (
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
+var testMonCfgMap = MapStr{
+	"id":                "testId",
+	"type":              "test",
+	"urls":              []string{"https://google.com"},
+	"schedule":          "@every 10m",
+	"service_locations": []string{"us-east"},
+}
+
 func TestNewRunnerFactoryCreatingMonitor(t *testing.T) {
-	fact := NewRunnerFactory(beat.Info{
-		Beat:        "heartbeat",
-		IndexPrefix: "heartbeat",
-		Version:     "8.0.0",
-	})
-	myJsonString := `{
-		"id":       "testId",
-		"type":     "test",
-		"urls":     ["https://google.com"],
-		"schedule": "@every 10m",
-		"service_locations": ["us-east"]
-	 }`
+	f := NewRunnerFactory()
 
-	_, rawConfig := MockMonitorConfig(t, myJsonString)
-
-	runner, err := fact.Create(nil, rawConfig)
+	_, rawConfig := MockMonitorConfig(t, testMonCfgMap)
+	r, err := f.Create(nil, rawConfig)
 	if err != nil {
 		t.Error(err)
 	}
+	var isUpdated bool
+   go func() {
+	   isUpdated = <- f.Update
+   }()
+	r.Start()
 
-	runner.Start()
+	monitors := f.GetMonitorsById()
 
-	monitors := fact.GetMonitorsById()
+	assert.Equal(t, isUpdated, true)
 
-	for id, _ := range monitors{
+	for id, _ := range monitors {
 		assert.Equal(t, id, "testId")
 	}
-		assert.Equal(t, 1, len(monitors))
-
+	assert.Equal(t, 1, len(monitors))
 
 }
 
 func TestNewRunnerFactoryDeletingMonitor(t *testing.T) {
-	fact := NewRunnerFactory(beat.Info{
-		Beat:        "heartbeat",
-		IndexPrefix: "heartbeat",
-		Version:     "8.0.0",
-	})
-	myJsonString := `{
-		"id":       "testId",
-		"type":     "test",
-		"urls":     ["https://google.com"],
-		"schedule": "@every 10m",
-		"service_locations": ["us-east"]
-	 }`
+	f := NewRunnerFactory()
 
-	_, rawConfig := MockMonitorConfig(t, myJsonString)
-
-	runner, err := fact.Create(nil, rawConfig)
+	_, rawConfig := MockMonitorConfig(t, testMonCfgMap)
+	r, err := f.Create(nil, rawConfig)
 	if err != nil {
 		t.Error(err)
 	}
+	var isUpdated bool
+	go func() {
+		isUpdated = <- f.Update
+	}()
 
-	runner.Start()
-
-	monitors := fact.GetMonitorsById()
-
+	r.Start()
+	monitors := f.GetMonitorsById()
 	assert.Equal(t, 1, len(monitors))
 
-	for id, _ := range monitors{
+	for id, _ := range monitors {
 		assert.Equal(t, id, "testId")
 	}
 
-	 runner.Stop()
+	assert.Equal(t, isUpdated, true)
+	isUpdated = false
+	go func() {
+		isUpdated = <- f.Update
+	}()
+	r.Stop()
 	if err != nil {
 		t.Error(err)
 	}
+	assert.Equal(t, isUpdated, true)
 
-	monitors = fact.GetMonitorsById()
-
+	monitors = f.GetMonitorsById()
 	assert.Equal(t, 0, len(monitors))
 }

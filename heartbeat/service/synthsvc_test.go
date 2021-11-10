@@ -37,50 +37,41 @@ func init() {
 	}
 }
 
-func MockMonitorConfig(t *testing.T, rawConfigStr string) (config.Config, *common.Config) {
-	myJsonString := `{
-	  "monitors": [{
-		"type":     "test",
-		"urls":     ["https://google.com"],
-		"schedule": "@every 10m",
-		"service_locations": ["us-east"]
-	  }],
-	  "service": {
-		"username": "admin",
-		"password": "changeme",
-		"manifest_url": "http://localhost:8220"
- 		}
-	}`
+type MapStr = common.MapStr
 
-	if rawConfigStr != "" {
-		myJsonString = rawConfigStr
+func MockMonitorConfig(t *testing.T, rawConf MapStr) (config.Config, *common.Config) {
+	testHbConf := MapStr{
+		"monitors": []MapStr{{
+			"type":              "test",
+			"urls":              []string{"https://google.com"},
+			"schedule":          "@every 10m",
+			"service_locations": []string{"us-east"},
+		},
+		},
+		"service": MapStr{
+			"username":     "admin",
+			"password":     "changeme",
+			"manifest_url": "http://localhost:8220",
+		},
 	}
 
-	confMap := common.MapStr{}
-
-	err := json.Unmarshal([]byte(myJsonString), &confMap)
-	if err != nil {
-		t.Error("Unable to parse config map,", err)
+	if rawConf != nil {
+		testHbConf = rawConf
 	}
-
-	rawConfig, _ := common.NewConfigFrom(confMap)
+	rawConfig, _ := common.NewConfigFrom(testHbConf)
 	parsedConfig := config.DefaultConfig
 	err1 := rawConfig.Unpack(&parsedConfig)
-
 	if err1 != nil {
 		t.Error(err1)
 	}
 	return parsedConfig, rawConfig
 }
 
-func MockSyntheticService(t *testing.T, rawConfigStr string) *SyntheticsService {
-
-	cfg, _ := MockMonitorConfig(t, rawConfigStr)
-
+func MockSyntheticService(t *testing.T, rawConfig MapStr) *SyntheticsService {
+	cfg, _ := MockMonitorConfig(t, rawConfig)
 	return &SyntheticsService{
 		config: cfg,
 	}
-
 }
 
 func mockResponse() (*http.Response, error) {
@@ -91,9 +82,8 @@ func mockResponse() (*http.Response, error) {
 }
 
 func TestPushConfiguration(t *testing.T) {
-	sv := MockSyntheticService(t, "")
+	sv := MockSyntheticService(t, nil)
 	payload := SyntheticServicePayload{}
-
 	GetDoFunc = func(req *http.Request) (*http.Response, error) {
 		bd, _ := ioutil.ReadAll(req.Body)
 		err := json.Unmarshal(bd, &payload)
@@ -104,7 +94,6 @@ func TestPushConfiguration(t *testing.T) {
 	}
 	username := "elastic"
 	password := "changeme"
-
 	sv.servicePushWait.Add(1)
 	sv.pushConfigsToSyntheticsService("us-east", config.ServiceLocation{
 		Url: "http://localhost:8220/cronjob",
@@ -113,28 +102,23 @@ func TestPushConfiguration(t *testing.T) {
 		Username: username,
 		Password: password,
 	}, time.Millisecond)
-
 	if len(payload.Monitors) != 1 {
 		t.Error("expected payload monitors length to be 1")
 	}
-
 	assert.Equal(t, username, payload.Output.Username)
 	assert.Equal(t, password, payload.Output.Password)
 }
 
 func TestPushConfigurationRetries(t *testing.T) {
-	sv := MockSyntheticService(t, "")
+	sv := MockSyntheticService(t, nil)
 	numberOfTimeCalled := 0
-
 	GetDoFunc = func(req *http.Request) (*http.Response, error) {
 		numberOfTimeCalled++
 		return nil, errors.New("error")
 	}
 	username := "elastic"
 	password := "changeme"
-
 	sv.servicePushWait.Add(1)
-
 	sv.pushConfigsToSyntheticsService("us-east", config.ServiceLocation{
 		Url: "http://localhost:8220/cronjob",
 	}, Output{
@@ -142,58 +126,46 @@ func TestPushConfigurationRetries(t *testing.T) {
 		Username: username,
 		Password: password,
 	}, time.Millisecond)
-
 	assert.Equal(t, numberOfTimeCalled, 3)
-
 }
 
 func TestRunViaSyntheticsService(t *testing.T) {
-
-	myJsonString := `{
-	  "monitors": [{
-		"type":     "test",
-		"urls":     ["https://google.com"],
-		"schedule": "@every 10m",
-		"service_locations": ["us_central"]
-	  }],
-	  "service": {
-		"username": "admin",
-		"password": "changeme",
-		"manifest_url": "http://localhost:8220"
- 		}
-	}`
-
-	sv := MockSyntheticService(t, myJsonString)
-
-	binfo := beat.Info{
+	testHbConf := MapStr{
+		"monitors": []MapStr{{
+			"type":              "test",
+			"urls":              []string{"https://google.com"},
+			"schedule":          "@every 10m",
+			"service_locations": []string{"us_central"},
+		},
+		},
+		"service": MapStr{
+			"username":     "admin",
+			"password":     "changeme",
+			"manifest_url": "http://localhost:8220",
+		},
+	}
+	sv := MockSyntheticService(t, testHbConf)
+	bInfo := beat.Info{
 		Beat:        "heartbeat",
 		IndexPrefix: "heartbeat",
 		Version:     "8.0.0",
 	}
-
 	username := "elastic"
 	password := "changeme"
 	hosts := []string{"http://localhost:9200"}
-
 	cfgMap := common.MapStr{
 		"hosts":    hosts,
 		"username": username,
 		"password": password,
 	}
-
 	cfg, _ := common.NewConfigFrom(cfgMap)
-
 	output := common.NewConfigNameSpace("output", cfg)
-
 	bConfig := beat.BeatConfig{Output: *output}
-
 	b := beat.Beat{
-		Info:   binfo,
+		Info:   bInfo,
 		Config: &bConfig,
 	}
-
 	payload := SyntheticServicePayload{}
-
 	GetDoFunc = func(req *http.Request) (*http.Response, error) {
 		if req.Body != nil {
 			bd, _ := ioutil.ReadAll(req.Body)
@@ -208,7 +180,6 @@ func TestRunViaSyntheticsService(t *testing.T) {
 
 			return mockResponse()
 		}
-
 		jsonStr := `{
 					  "locations": {
 						"us_central": {
@@ -221,13 +192,11 @@ func TestRunViaSyntheticsService(t *testing.T) {
 						}
 					  }
 					}`
-
 		return &http.Response{
 			StatusCode: 200,
 			Body:       ioutil.NopCloser(bytes.NewReader([]byte(jsonStr))),
 		}, nil
 	}
-
 	err2 := sv.Run(&b)
 	if err2 != nil {
 		t.Error(err2)
@@ -251,45 +220,38 @@ func TestRunViaSyntheticsService(t *testing.T) {
 }
 
 func TestValidateMonitorsSchedule(t *testing.T) {
-
-	invalidMonitorCfg := `{
-	  "monitors": [{
-		"type":     "test",
-		"urls":     ["https://google.com"],
-		"schedule": "@every 10s",
-		"service_locations": ["us-east"]
-	  }]
-	}`
-
-	sv := MockSyntheticService(t, invalidMonitorCfg)
-
+	inValidMonCfg := MapStr{
+		"monitors": []MapStr{{
+			"type":              "test",
+			"urls":              []string{"https://google.com"},
+			"schedule":          "@every 10s",
+			"service_locations": []string{"us-east"},
+		},
+		},
+	}
+	sv := MockSyntheticService(t, inValidMonCfg)
 	err := sv.validateMonitorsSchedule()
-
 	if err == nil {
 		t.Error("it should return error of an invalid monitor")
 	}
-
-	validMonitorCfg := `{
-	  "monitors": [{
-		"type":     "test",
-		"urls":     ["https://google.com"],
-		"schedule": "@every 10m",
-		"service_locations": ["us-east"]
-	  }]
-	}`
-
-	sv = MockSyntheticService(t, validMonitorCfg)
-
+	validMonCfg := MapStr{
+		"monitors": []MapStr{{
+			"type":              "test",
+			"urls":              []string{"https://google.com"},
+			"schedule":          "@every 10m",
+			"service_locations": []string{"us-east"},
+		},
+		},
+	}
+	sv = MockSyntheticService(t, validMonCfg)
 	err = sv.validateMonitorsSchedule()
-
 	if err != nil {
 		t.Error("it should not return an error of a valid monitor")
 	}
-
 }
 
 func TestGetServiceManifest(t *testing.T) {
-	sv := MockSyntheticService(t, "")
+	sv := MockSyntheticService(t, nil)
 	GetDoFunc = func(req *http.Request) (*http.Response, error) {
 		jsonStr := `{
 				  "locations": {
@@ -310,7 +272,6 @@ func TestGetServiceManifest(t *testing.T) {
 		}, nil
 	}
 	manifest, _ := sv.getSyntheticServiceManifest()
-
 	assert.Equal(t, len(manifest.Locations), 1)
 	for locName, loc := range manifest.Locations {
 		assert.Equal(t, locName, "us_central")

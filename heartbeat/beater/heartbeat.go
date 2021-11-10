@@ -51,8 +51,7 @@ type Heartbeat struct {
 	config               config.Config
 	scheduler            *scheduler.Scheduler
 	monitorReloader      *cfgfile.Reloader
-	monitorRunnerFactory *monitors.RunnerFactory
-	serviceRunnerFactory *service.MonitorRunnerFactory
+	monitorRunnerFactory cfgfile.RunnerFactory
 	autodiscover      *autodiscover.Autodiscover
 	syntheticsService *service.SyntheticsService
 }
@@ -76,22 +75,10 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 
 	scheduler := scheduler.NewWithLocation(limit, hbregistry.SchedulerRegistry, location, jobConfig)
 
-	var monitorRunnerFactory *monitors.RunnerFactory
-	var serviceRunnerFactory *service.MonitorRunnerFactory
-
-	if !parsedConfig.RunViaSyntheticsService {
-		monitorRunnerFactory = monitors.NewFactory(b.Info, scheduler)
-	} else {
-		serviceRunnerFactory = service.NewRunnerFactory(b.Info)
-	}
-
 	bt := &Heartbeat{
 		done:      make(chan struct{}),
 		config:    parsedConfig,
 		scheduler: scheduler,
-		// monitorFactory is the factory used for dynamic configs, e.g. autodiscover / reload
-		monitorRunnerFactory: monitorRunnerFactory,
-		serviceRunnerFactory: serviceRunnerFactory,
 	}
 	return bt, nil
 }
@@ -101,6 +88,14 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	logp.Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()
 	logp.Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
+
+	// monitorRunnerFactory is the factory used for dynamic configs, e.g. autodiscover / reload
+	if !bt.config.RunViaSyntheticsService {
+		bt.monitorRunnerFactory = monitors.NewFactory(b.Info, bt.scheduler)
+	} else {
+		bt.syntheticsService = service.NewSyntheticService(bt.config)
+		bt.monitorRunnerFactory = bt.syntheticsService.ServiceRunnerFactory
+	}
 
 	if bt.config.RunOnce {
 		err := bt.runRunOnce(b)
@@ -112,15 +107,12 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	if bt.config.ConfigMonitors.Enabled() {
 		err := bt.enableMonitorReloader(b)
 		defer bt.monitorReloader.Stop()
-
 		if err != nil {
 			return err
 		}
 	}
 
 	if bt.config.RunViaSyntheticsService {
-		bt.syntheticsService = service.NewSyntheticService(bt.config, bt.serviceRunnerFactory)
-
 		err := bt.syntheticsService.Run(b)
 		if err != nil {
 			return err
@@ -252,19 +244,10 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
 
 // RunCentralMgmtMonitors loads any central management configured configs.
 func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
-
-	var factory cfgfile.RunnerFactory
-	if bt.monitorRunnerFactory != nil {
-		factory = bt.monitorRunnerFactory
-	} else {
-		factory = bt.serviceRunnerFactory
-	}
-
-	monitors := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher)
-	reload.Register.MustRegisterList(b.Info.Beat+".monitors", monitors)
-	inputs := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher)
+	mons := cfgfile.NewRunnerList(management.DebugK, bt.monitorRunnerFactory, b.Publisher)
+	reload.Register.MustRegisterList(b.Info.Beat+".monitors", mons)
+	inputs := cfgfile.NewRunnerList(management.DebugK, bt.monitorRunnerFactory, b.Publisher)
 	reload.Register.MustRegisterList("inputs", inputs)
-
 }
 
 func (bt *Heartbeat) enableMonitorReloader(b *beat.Beat) error {
@@ -279,20 +262,13 @@ func (bt *Heartbeat) enableMonitorReloader(b *beat.Beat) error {
 
 // RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
-	var factory cfgfile.RunnerFactory
-	if bt.monitorRunnerFactory != nil {
-		factory = bt.monitorRunnerFactory
-	} else {
-		factory = bt.serviceRunnerFactory
-	}
-
 	// Check monitor configs
-	if err := bt.monitorReloader.Check(factory); err != nil {
+	if err := bt.monitorReloader.Check(bt.monitorRunnerFactory); err != nil {
 		logp.Error(fmt.Errorf("error loading reloadable monitors: %w", err))
 	}
 
 	// Execute the monitor
-	go bt.monitorReloader.Run(factory)
+	go bt.monitorReloader.Run(bt.monitorRunnerFactory)
 
 	return nil
 }
