@@ -41,8 +41,11 @@ stages:
     crosscompile:
         make: "make -C auditbeat crosscompile"
         stage: mandatory
-    macosActions:
+    macosAction:
         githubAction: "mage build unitTest"
+        when:                  ## Override the top-level when.
+            comments:
+                - "/test auditbeat github actions for macos"
         stage: extended
     macos:
         mage: "mage build unitTest"
