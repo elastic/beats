@@ -26,13 +26,18 @@ Please note that the docker container is built in both standard and 'complete' v
 The 'complete' variant contains extra files, like the chromium browser, that are too large
 for the standard variant.
 
-### Testing Elastic Agent in standalone mode on Kubernetes
+### Testing Elastic Agent on Kubernetes
 
 #### Prerequisites
 - create kubernetes cluster using kind, check [here](https://github.com/elastic/beats/blob/master/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
 - deploy kube-state-metrics, check [here](https://github.com/elastic/beats/blob/master/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
-- deploy ELK stack or use [elastic cloud](https://cloud.elastic.co), check [here](https://github.com/elastic/beats/blob/master/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
-
+- deploy required infrastructure:
+  - for elastic agent in standalone mode: EK stack or use [elastic cloud](https://cloud.elastic.co), check [here](https://github.com/elastic/beats/blob/master/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
+  - for managed mode: use [elastic cloud](https://cloud.elastic.co) or bring up the stack on docker and then connect docker network with kubernetes kind nodes:
+  ```
+  elastic-package stack up -d -v
+  docker network connect elastic-package-stack_default <kind_container_id>
+  ```
 
 1. Build elastic-agent:
 ```bash
@@ -48,34 +53,30 @@ docker build -t custom-agent-image .
 ```
 kind load docker-image custom-agent-image:latest
 ```
-4. Deploy agent with that image, change version if needed:
-- download all-in-ome manifest:
+4. Deploy agent with that image:
+- download all-in-ome manifest for elastic-agent in standalone or managed mode, change version if needed
 ```
 ELASTIC_AGENT_VERSION="8.0"
-curl -L -O https://raw.githubusercontent.com/elastic/beats/${ELASTIC_AGENT_VERSION}/deploy/kubernetes/elastic-agent-standalone-kubernetes.yaml
+ELASTIC_AGENT_MODE="standalone"     # ELASTIC_AGENT_MODE="managed"
+curl -L -O https://raw.githubusercontent.com/elastic/beats/${ELASTIC_AGENT_VERSION}/deploy/kubernetes/elastic-agent-${ELASTIC_AGENT_MODE}-kubernetes.yaml
 ```
 - Modify downloaded manifest:
-    - image name to the one, that was created in the previous step and add `imagePullPolicy: Never`:
+    - change image name to the one, that was created in the previous step and add `imagePullPolicy: Never`:
     ```
     containers:
       - name: elastic-agent
         image: custom-agent-image:latest
         imagePullPolicy: Never
     ``` 
-    - set environment variables `ES_USERNAME`, `ES_PASSWORD`,`ES_HOST`.
-    For local EK setup:
-    ```
-    env:
-      - name: ES_USERNAME
-        value: "elastic"
-      - name: ES_PASSWORD
-        value: "changeme"
-      - name: ES_HOST
-        value: "elasticsearch.default.svc.cluster.local"
-    ```
+    - set environment variables accordingly to the used setup.
+
+    Elastic-agent in standalone mode: set `ES_USERNAME`, `ES_PASSWORD`,`ES_HOST`.
+
+    Elastic-agent in managed mode: set `FLEET_URL` and `FLEET_ENROLLMENT_TOKEN`.
+
 - create
 ```
-kubectl apply -f elastic-agent-standalone-kubernetes.yaml
+kubectl apply -f elastic-agent-${ELASTIC_AGENT_MODE}-kubernetes.yaml
 ```
 5. Check status of elastic-agent:
 ```
