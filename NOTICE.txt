@@ -7289,11 +7289,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-seccomp-bpf
-Version: v1.1.0
+Version: v1.2.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-seccomp-bpf@v1.1.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-seccomp-bpf@v1.2.0/LICENSE.txt:
 
 
                                  Apache License
