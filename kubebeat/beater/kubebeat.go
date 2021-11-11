@@ -33,6 +33,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("error reading config file: %v", err)
 	}
+
 	logp.Info("Config initiated.")
 
 	client, err := kubernetes.GetKubernetesClient(c.KubeConfig, kubernetes.KubeClientOptions{})
@@ -100,8 +101,6 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 	logp.Info("kubebeat is running! Hit CTRL-C to stop it.")
 
 	err := bt.watcher.Start()
-	timestamp := time.Now()
-
 	if err != nil {
 		return err
 	}
@@ -119,118 +118,67 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 		case <-ticker.C:
 		}
 
-		//pods := bt.watcher.Store().List()
+		pods := bt.watcher.Store().List()
 		events := make([]beat.Event, 0)
-		fileResults, err := ExtractFiles(bt.config.Files)
-		if err == nil {
+		timestamp := time.Now()
 
-			for _, fileResult := range fileResults {
+		for _, p := range pods {
+			pod, ok := p.(*kubernetes.Pod)
+			if !ok {
+				logp.Info("could not convert to pod")
+				continue
+			}
+			pod.SetManagedFields(nil)
+			pod.Status.Reset()
+			pod.Kind = "Pod" // see https://github.com/kubernetes/kubernetes/issues/3030
 
-				decision, err := bt.Decision(fileResult.Data)
-				if err != nil {
-					errEvent := beat.Event{
+			result, err := bt.Decision(pod)
+			if err != nil {
+				errEvent := beat.Event{
+					Timestamp: timestamp,
+					Fields: common.MapStr{
+						"type":     b.Info.Name,
+						"err":      fmt.Errorf("error running the policy: %v", err.Error()),
+						"resource": pod,
+					},
+				}
+				events = append(events, errEvent)
+				continue
+			}
+
+			var decoded PolicyResult
+			err = mapstructure.Decode(result, &decoded)
+			if err != nil {
+				errEvent := beat.Event{
+					Timestamp: timestamp,
+					Fields: common.MapStr{
+						"type":       b.Info.Name,
+						"err":        fmt.Errorf("error parsing the policy result: %v", err.Error()),
+						"resource":   pod,
+						"raw_result": result,
+					},
+				}
+				events = append(events, errEvent)
+				continue
+			}
+
+			for ruleName, ruleResult := range decoded {
+				for _, Finding := range ruleResult.Findings {
+					event := beat.Event{
 						Timestamp: timestamp,
 						Fields: common.MapStr{
-							"type":     b.Info.Name,
-							"err":      fmt.Errorf("error running the policy: %v", err.Error()),
-							"resource": "file",
+							"type":      b.Info.Name,
+							"rule_id":      ruleName,
+							"compliant": Finding.Compliant,
+							"resource":  Finding.Resource,
+							"message":   Finding.Message,
 						},
 					}
-					events = append(events, errEvent)
-					continue
-				}
-
-				var decoded PolicyResult
-				err = mapstructure.Decode(decision, &decoded)
-				if err != nil {
-					errEvent := beat.Event{
-						Timestamp: timestamp,
-						Fields: common.MapStr{
-							"type":       b.Info.Name,
-							"err":        fmt.Errorf("error parsing the policy result: %v", err.Error()),
-							"resource":   "file",
-							"raw_result": decision,
-						},
-					}
-					events = append(events, errEvent)
-					continue
-				}
-
-				for ruleName, ruleResult := range decoded {
-					for _, Finding := range ruleResult.Findings {
-						event := beat.Event{
-							Timestamp: timestamp,
-							Fields: common.MapStr{
-								"type":      b.Info.Name,
-								"rule_id":   ruleName,
-								"compliant": Finding.Compliant,
-								"resource":  Finding.Resource,
-								"message":   Finding.Message,
-							},
-						}
-						events = append(events, event)
-					}
+					events = append(events, event)
 				}
 			}
-		}
 
-		//for _, p := range pods {
-		//	pod, ok := p.(*kubernetes.Pod)
-		//	if !ok {
-		//		logp.Info("could not convert to pod")
-		//		continue
-		//	}
-		//	pod.SetManagedFields(nil)
-		//	pod.Status.Reset()
-		//	pod.Kind = "Pod" // see https://github.com/kubernetes/kubernetes/issues/3030
-		//
-		//	result, err := bt.Decision(pod)
-		//	if err != nil {
-		//		errEvent := beat.Event{
-		//			Timestamp: timestamp,
-		//			Fields: common.MapStr{
-		//				"type":     b.Info.Name,
-		//				"err":      fmt.Errorf("error running the policy: %v", err.Error()),
-		//				"resource": pod,
-		//			},
-		//		}
-		//		events = append(events, errEvent)
-		//		continue
-		//	}
-		//
-		//	var decoded PolicyResult
-		//	err = mapstructure.Decode(result, &decoded)
-		//	if err != nil {
-		//		errEvent := beat.Event{
-		//			Timestamp: timestamp,
-		//			Fields: common.MapStr{
-		//				"type":       b.Info.Name,
-		//				"err":        fmt.Errorf("error parsing the policy result: %v", err.Error()),
-		//				"resource":   pod,
-		//				"raw_result": result,
-		//			},
-		//		}
-		//		events = append(events, errEvent)
-		//		continue
-		//	}
-		//
-		//	for ruleName, ruleResult := range decoded {
-		//		for _, Finding := range ruleResult.Findings {
-		//			event := beat.Event{
-		//				Timestamp: timestamp,
-		//				Fields: common.MapStr{
-		//					"type":      b.Info.Name,
-		//					"rule_id":   ruleName,
-		//					"compliant": Finding.Compliant,
-		//					"resource":  Finding.Resource,
-		//					"message":   Finding.Message,
-		//				},
-		//			}
-		//			events = append(events, event)
-		//		}
-		//	}
-		//
-		//}
+		}
 
 		bt.client.PublishAll(events)
 		logp.Info("%v events sent", len(events))
