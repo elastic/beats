@@ -16,7 +16,6 @@ func TestFileFetcherFetchFilesFromFileSystem(t *testing.T) {
 	}
 
 	defer os.RemoveAll(dir)
-
 	file := filepath.Join(dir, "file.txt")
 	if err = ioutil.WriteFile(file, []byte("test txt\n"), 0600); err != nil {
 		t.Fatal(err)
