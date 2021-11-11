@@ -35,55 +35,55 @@ import (
 
 const logMessage = "Test file rotator.\n"
 
-func TestFileRotatorB(t *testing.T) {
+func TestFileRotator(t *testing.T) {
 	logp.TestingSetup()
 
 	dir := t.TempDir()
 	logname := "sample"
-	testClock := &testClock{time.Date(2021, 11, 11, 11, 12, 0, 0, time.Local)}
+	c := &testClock{time.Date(2021, 11, 11, 11, 12, 0, 0, time.Local)}
 
 	filename := filepath.Join(dir, logname)
 	r, err := file.NewFileRotator(filename,
 		file.MaxBackups(2),
 		file.WithLogger(logp.NewLogger("rotator").With(logp.Namespace("rotator"))),
-		file.WithClock(testClock),
+		file.WithClock(c),
 	)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer r.Close()
 
-	firstFile := fmt.Sprintf("%s-%s.ndjson", logname, testClock.Now().Format("20060102150405"))
+	firstFile := fmt.Sprintf("%s-%s.ndjson", logname, c.Now().Format("20060102150405"))
 
 	WriteMsg(t, r)
 	AssertDirContents(t, dir, firstFile)
 
-	testClock.time = time.Date(2021, 11, 11, 11, 13, 0, 0, time.Local)
+	c.time = time.Date(2021, 11, 11, 11, 13, 0, 0, time.Local)
 
 	Rotate(t, r)
 	AssertDirContents(t, dir, firstFile)
 
 	WriteMsg(t, r)
 
-	secondFile := fmt.Sprintf("%s-%s.ndjson", logname, testClock.Now().Format("20060102150405"))
+	secondFile := fmt.Sprintf("%s-%s.ndjson", logname, c.Now().Format("20060102150405"))
 	AssertDirContents(t, dir, firstFile, secondFile)
 
-	testClock.time = time.Date(2021, 11, 11, 11, 14, 0, 0, time.Local)
+	c.time = time.Date(2021, 11, 11, 11, 14, 0, 0, time.Local)
 
 	Rotate(t, r)
 	AssertDirContents(t, dir, firstFile, secondFile)
 
 	WriteMsg(t, r)
-	thirdFile := fmt.Sprintf("%s-%s.ndjson", logname, testClock.Now().Format("20060102150405"))
+	thirdFile := fmt.Sprintf("%s-%s.ndjson", logname, c.Now().Format("20060102150405"))
 	AssertDirContents(t, dir, firstFile, secondFile, thirdFile)
 
-	testClock.time = time.Date(2021, 11, 11, 11, 15, 0, 0, time.Local)
+	c.time = time.Date(2021, 11, 11, 11, 15, 0, 0, time.Local)
 	Rotate(t, r)
 	AssertDirContents(t, dir, secondFile, thirdFile)
 
-	testClock.time = time.Date(2021, 11, 11, 11, 16, 0, 0, time.Local)
+	c.time = time.Date(2021, 11, 11, 11, 16, 0, 0, time.Local)
 	Rotate(t, r)
-	AssertDirContents(t, dir, thirdFile)
+	AssertDirContents(t, dir, secondFile, thirdFile)
 }
 
 func TestFileRotatorConcurrently(t *testing.T) {
@@ -179,13 +179,15 @@ func TestRotateOnStartup(t *testing.T) {
 	dir := t.TempDir()
 
 	logname := "rotate_on_open"
-	filename := filepath.Join(dir, logname)
+	c := &testClock{time.Date(2021, 11, 11, 11, 12, 0, 0, time.Local)}
+	firstFile := fmt.Sprintf("%s-%s.ndjson", logname, c.Now().Format("20060102150405"))
+	filename := filepath.Join(dir, firstFile)
 
 	// Create an existing log file with this name.
 	CreateFile(t, filename)
-	AssertDirContents(t, dir, logname)
+	AssertDirContents(t, dir, firstFile)
 
-	r, err := file.NewFileRotator(filename, file.RotateOnStartup(false))
+	r, err := file.NewFileRotator(filepath.Join(dir, logname), file.RotateOnStartup(false), file.WithClock(c))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -193,24 +195,27 @@ func TestRotateOnStartup(t *testing.T) {
 	WriteMsg(t, r)
 
 	// The line should have been appended to the existing file without rotation.
-	AssertDirContents(t, dir, logname)
+	AssertDirContents(t, dir, firstFile)
 
 	// Close the first rotator early (the deferred close will be a no-op if
 	// we haven't hit an error by now), so it can't interfere with the second one.
 	r.Close()
 
 	// Create a second rotator with the default setting of rotateOnStartup=true
-	r, err = file.NewFileRotator(filename)
+	c = &testClock{time.Date(2021, 11, 11, 11, 20, 0, 0, time.Local)}
+	r, err = file.NewFileRotator(filepath.Join(dir, logname), file.WithClock(c))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer r.Close()
 
 	// The directory contents shouldn't change until the first Write.
-	AssertDirContents(t, dir, logname)
+	AssertDirContents(t, dir, firstFile)
+
+	secondFile := fmt.Sprintf("%s-%s.ndjson", logname, c.Now().Format("20060102150405"))
 
 	WriteMsg(t, r)
-	AssertDirContents(t, dir, logname, logname+".1")
+	AssertDirContents(t, dir, firstFile, secondFile)
 }
 
 func TestRotateDat(t *testing.T) {

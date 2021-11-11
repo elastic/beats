@@ -173,7 +173,7 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 		shouldRotateOnStart = false
 	}
 
-	r.triggers = newTriggers(shouldRotateOnStart, r.interval, r.maxSizeBytes)
+	r.triggers = newTriggers(shouldRotateOnStart, r.interval, r.maxSizeBytes, r.clock)
 
 	if r.log != nil {
 		r.log.Debugw("Initialized file rotator",
@@ -325,7 +325,7 @@ func (r *Rotator) isRotationTriggered(dataLen uint) (rotateReason, time.Time) {
 	for _, t := range r.triggers {
 		reason := t.TriggerRotation(dataLen)
 		if reason != rotateReasonNoRotate {
-			return reason, time.Now()
+			return reason, r.clock.Now()
 		}
 	}
 	return rotateReasonNoRotate, time.Time{}
