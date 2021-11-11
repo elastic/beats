@@ -53,41 +53,37 @@ func TestFileRotatorB(t *testing.T) {
 	}
 	defer r.Close()
 
-	expectedPatterns := []string{
-		fmt.Sprintf("%s-%s.ndjson", logname, testClock.Now().Format("20060102150405")),
-	}
+	firstFile := fmt.Sprintf("%s-%s.ndjson", logname, testClock.Now().Format("20060102150405"))
 
 	WriteMsg(t, r)
-	AssertDirContents(t, dir, expectedPatterns...)
+	AssertDirContents(t, dir, firstFile)
 
 	testClock.time = time.Date(2021, 11, 11, 11, 13, 0, 0, time.Local)
 
 	Rotate(t, r)
-	AssertDirContents(t, dir, expectedPatterns...)
+	AssertDirContents(t, dir, firstFile)
 
 	WriteMsg(t, r)
 
-	expectedPatterns = append(expectedPatterns, fmt.Sprintf("%s-%s.ndjson", logname, testClock.Now().Format("20060102150405")))
-	AssertDirContents(t, dir, expectedPatterns...)
+	secondFile := fmt.Sprintf("%s-%s.ndjson", logname, testClock.Now().Format("20060102150405"))
+	AssertDirContents(t, dir, firstFile, secondFile)
 
 	testClock.time = time.Date(2021, 11, 11, 11, 14, 0, 0, time.Local)
 
 	Rotate(t, r)
-	AssertDirContents(t, dir, expectedPatterns...)
+	AssertDirContents(t, dir, firstFile, secondFile)
 
 	WriteMsg(t, r)
-	expectedPatterns = append(expectedPatterns, fmt.Sprintf("%s-%s.ndjson", logname, testClock.Now().Format("20060102150405")))
-	AssertDirContents(t, dir, expectedPatterns...)
+	thirdFile := fmt.Sprintf("%s-%s.ndjson", logname, testClock.Now().Format("20060102150405"))
+	AssertDirContents(t, dir, firstFile, secondFile, thirdFile)
 
 	testClock.time = time.Date(2021, 11, 11, 11, 15, 0, 0, time.Local)
 	Rotate(t, r)
-	expectedPatterns = expectedPatterns[1:]
-	AssertDirContents(t, dir, expectedPatterns...)
+	AssertDirContents(t, dir, secondFile, thirdFile)
 
 	testClock.time = time.Date(2021, 11, 11, 11, 16, 0, 0, time.Local)
 	Rotate(t, r)
-	expectedPatterns = expectedPatterns[1:]
-	AssertDirContents(t, dir, expectedPatterns...)
+	AssertDirContents(t, dir, thirdFile)
 }
 
 func TestFileRotatorConcurrently(t *testing.T) {
