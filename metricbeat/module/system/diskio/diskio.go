@@ -21,7 +21,10 @@
 package diskio
 
 import (
+<<<<<<< HEAD
 	"fmt"
+=======
+>>>>>>> d9d000d1b3 (Fix behavior of hostfs under agent (#28546))
 	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common"

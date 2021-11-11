@@ -31,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/process"
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/system"
@@ -62,16 +61,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+<<<<<<< HEAD
 	systemModule, ok := base.Module().(*system.Module)
 	if !ok {
 		return nil, fmt.Errorf("unexpected module type")
 	}
+=======
+	sys := base.Module().(system.SystemModule)
+>>>>>>> d9d000d1b3 (Fix behavior of hostfs under agent (#28546))
 
 	enableCgroups := false
 	if runtime.GOOS == "linux" {
 		if config.Cgroups == nil || *config.Cgroups {
 			enableCgroups = true
-			debugf("process cgroup data collection is enabled, using hostfs='%v'", paths.Paths.Hostfs)
+			debugf("process cgroup data collection is enabled, using hostfs='%v'", sys.GetHostFS())
 		}
 	}
 
@@ -85,7 +88,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			IncludeTop:    config.IncludeTop,
 			EnableCgroups: enableCgroups,
 			CgroupOpts: cgroup.ReaderOptions{
-				RootfsMountpoint:  paths.Paths.Hostfs,
+				RootfsMountpoint:  sys.GetHostFS(),
 				IgnoreRootCgroups: true,
 			},
 		},
@@ -94,7 +97,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	// If hostfs is set, we may not want to force the hierarchy override, as the user could be expecting a custom path.
-	if len(paths.Paths.Hostfs) < 2 {
+	if len(sys.GetHostFS()) < 2 {
 		override, isset := os.LookupEnv("LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE")
 		if isset {
 			m.stats.CgroupOpts.CgroupsHierarchyOverride = override

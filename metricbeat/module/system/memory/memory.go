@@ -45,11 +45,16 @@ func init() {
 // MetricSet for fetching system memory metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
+<<<<<<< HEAD
 	IsAgent bool
+=======
+	mod system.SystemModule
+>>>>>>> d9d000d1b3 (Fix behavior of hostfs under agent (#28546))
 }
 
 // New is a mb.MetricSetFactory that returns a memory.MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+<<<<<<< HEAD
 
 	systemModule, ok := base.Module().(*system.Module)
 	if !ok {
@@ -59,12 +64,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		cfgwarn.Deprecate("8.0", "linux-only memory stats, such as hugepages, and page_stats, will be moved to the linux module")
 	}
 	return &MetricSet{BaseMetricSet: base, IsAgent: systemModule.IsAgent}, nil
+=======
+	sys := base.Module().(system.SystemModule)
+	return &MetricSet{BaseMetricSet: base, mod: sys}, nil
+>>>>>>> d9d000d1b3 (Fix behavior of hostfs under agent (#28546))
 }
 
 // Fetch fetches memory metrics from the OS.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
-	eventRaw, err := metrics.Get("")
+	eventRaw, err := metrics.Get(m.mod.GetHostFS())
 	if err != nil {
 		return errors.Wrap(err, "error fetching memory metrics")
 	}

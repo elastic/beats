@@ -27,6 +27,7 @@ import (
 	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/cpu"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 func init() {
@@ -58,11 +59,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if config.CPUTicks != nil && *config.CPUTicks {
 		config.Metrics = append(config.Metrics, "ticks")
 	}
-
+	sys := base.Module().(system.SystemModule)
 	return &MetricSet{
 		BaseMetricSet: base,
 		opts:          opts,
-		cpu:           metrics.New(""),
+		cpu:           metrics.New(sys.GetHostFS()),
 	}, nil
 }
 
