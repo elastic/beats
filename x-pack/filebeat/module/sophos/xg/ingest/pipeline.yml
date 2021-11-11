@@ -178,6 +178,10 @@ processors:
     target_field: observer.serial_number
     ignore_missing: true
 - rename:
+    field: sophos.xg.device_serial_id
+    target_field: observer.serial_number
+    ignore_missing: true
+- rename:
     field: sophos.xg.out_interface
     target_field: observer.egress.interface.name
     ignore_missing: true
@@ -190,7 +194,15 @@ processors:
     target_field: observer.ingress.zone
     ignore_missing: true
 - rename:
+    field: sophos.xg.src_zone_type
+    target_field: observer.ingress.zone
+    ignore_missing: true
+- rename:
     field: sophos.xg.dstzonetype
+    target_field: observer.egress.zone
+    ignore_missing: true
+- rename:
+    field: sophos.xg.dst_zone_type
     target_field: observer.egress.zone
     ignore_missing: true
 
