@@ -35,41 +35,59 @@ import (
 
 const logMessage = "Test file rotator.\n"
 
-func TestFileRotator(t *testing.T) {
+func TestFileRotatorB(t *testing.T) {
 	logp.TestingSetup()
 
 	dir := t.TempDir()
+	logname := "sample"
+	testClock := &testClock{time.Date(2021, 11, 11, 11, 12, 0, 0, time.Local)}
 
-	filename := filepath.Join(dir, "sample.log")
+	filename := filepath.Join(dir, logname)
 	r, err := file.NewFileRotator(filename,
 		file.MaxBackups(2),
 		file.WithLogger(logp.NewLogger("rotator").With(logp.Namespace("rotator"))),
+		file.WithClock(testClock),
 	)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer r.Close()
 
-	WriteMsg(t, r)
-	AssertDirContents(t, dir, "sample.log")
-
-	Rotate(t, r)
-	AssertDirContents(t, dir, "sample.log.1")
+	expectedPatterns := []string{
+		fmt.Sprintf("%s-%s.ndjson", logname, testClock.Now().Format("20060102150405")),
+	}
 
 	WriteMsg(t, r)
-	AssertDirContents(t, dir, "sample.log", "sample.log.1")
+	AssertDirContents(t, dir, expectedPatterns...)
+
+	testClock.time = time.Date(2021, 11, 11, 11, 13, 0, 0, time.Local)
 
 	Rotate(t, r)
-	AssertDirContents(t, dir, "sample.log.1", "sample.log.2")
+	AssertDirContents(t, dir, expectedPatterns...)
 
 	WriteMsg(t, r)
-	AssertDirContents(t, dir, "sample.log", "sample.log.1", "sample.log.2")
+
+	expectedPatterns = append(expectedPatterns, fmt.Sprintf("%s-%s.ndjson", logname, testClock.Now().Format("20060102150405")))
+	AssertDirContents(t, dir, expectedPatterns...)
+
+	testClock.time = time.Date(2021, 11, 11, 11, 14, 0, 0, time.Local)
 
 	Rotate(t, r)
-	AssertDirContents(t, dir, "sample.log.1", "sample.log.2")
+	AssertDirContents(t, dir, expectedPatterns...)
 
+	WriteMsg(t, r)
+	expectedPatterns = append(expectedPatterns, fmt.Sprintf("%s-%s.ndjson", logname, testClock.Now().Format("20060102150405")))
+	AssertDirContents(t, dir, expectedPatterns...)
+
+	testClock.time = time.Date(2021, 11, 11, 11, 15, 0, 0, time.Local)
 	Rotate(t, r)
-	AssertDirContents(t, dir, "sample.log.2", "sample.log.3")
+	expectedPatterns = expectedPatterns[1:]
+	AssertDirContents(t, dir, expectedPatterns...)
+
+	testClock.time = time.Date(2021, 11, 11, 11, 16, 0, 0, time.Local)
+	Rotate(t, r)
+	expectedPatterns = expectedPatterns[1:]
+	AssertDirContents(t, dir, expectedPatterns...)
 }
 
 func TestFileRotatorConcurrently(t *testing.T) {
@@ -199,13 +217,13 @@ func TestRotateOnStartup(t *testing.T) {
 	AssertDirContents(t, dir, logname, logname+".1")
 }
 
-func TestRotateDateSuffix(t *testing.T) {
+func TestRotateDat(t *testing.T) {
 	dir := t.TempDir()
 
 	logname := "beatname"
 	filename := filepath.Join(dir, logname)
 
-	r, err := file.NewFileRotator(filename, file.Suffix(file.SuffixDate), file.MaxBackups(1))
+	r, err := file.NewFileRotator(filename, file.MaxBackups(1))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -258,9 +276,7 @@ func AssertDirContents(t *testing.T, dir string, files ...string) {
 		t.Fatal(err)
 	}
 
-	sort.Strings(files)
-	sort.Strings(names)
-	assert.EqualValues(t, files, names)
+	assert.ElementsMatch(t, files, names)
 }
 
 func AssertDirContentsPattern(t *testing.T, dir string, patterns ...string) {
@@ -306,4 +322,12 @@ func Rotate(t *testing.T, r *file.Rotator) {
 	if err := r.Rotate(); err != nil {
 		t.Fatal(err)
 	}
+}
+
+type testClock struct {
+	time time.Time
+}
+
+func (t testClock) Now() time.Time {
+	return t.time
 }

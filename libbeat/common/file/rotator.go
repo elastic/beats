@@ -60,6 +60,7 @@ type Rotator struct {
 	log             Logger // Optional Logger (may be nil).
 	rotateOnStartup bool
 	redirectStderr  bool
+	clock           clock
 
 	file  *os.File
 	mutex sync.Mutex
@@ -130,6 +131,12 @@ func RedirectStderr(redirect bool) RotatorOption {
 	}
 }
 
+func WithClock(clock clock) RotatorOption {
+	return func(r *Rotator) {
+		r.clock = clock
+	}
+}
+
 // NewFileRotator returns a new Rotator.
 func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error) {
 	r := &Rotator{
@@ -138,6 +145,7 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 		permissions:     0600,
 		interval:        0,
 		rotateOnStartup: true,
+		clock:           &realClock{},
 	}
 
 	for _, opt := range options {
@@ -158,7 +166,7 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 		return nil, errors.New("the minimum time interval for log rotation is 1 second")
 	}
 
-	r.rot = newDateRotater(r.log, filename)
+	r.rot = newDateRotater(r.log, filename, r.clock)
 
 	shouldRotateOnStart := r.rotateOnStartup
 	if _, err := os.Stat(r.rot.ActiveFile()); os.IsNotExist(err) {
@@ -270,7 +278,7 @@ func (r *Rotator) openFile() error {
 }
 
 func (r *Rotator) rotate(reason rotateReason) error {
-	return r.rotateWithTime(reason, time.Now())
+	return r.rotateWithTime(reason, r.clock.Now())
 }
 
 // rotateWithTime closes the actively written file, and rotates it along with exising
@@ -375,20 +383,24 @@ func (r *Rotator) closeFile() error {
 
 type dateRotator struct {
 	log             Logger
+	clock           clock
 	format          string
 	filenamePrefix  string
 	currentFilename string
+	extension       string
 }
 
-func newDateRotater(log Logger, filename string) rotater {
+func newDateRotater(log Logger, filename string, clock clock) rotater {
 	d := &dateRotator{
 		log:            log,
+		clock:          clock,
 		filenamePrefix: filename + "-",
+		extension:      ".ndjson",
 		format:         "20060102150405",
 	}
 
-	d.currentFilename = d.filenamePrefix + time.Now().Format(d.format)
-	files, err := filepath.Glob(d.filenamePrefix + "*")
+	d.currentFilename = d.filenamePrefix + d.clock.Now().Format(d.format) + d.extension
+	files, err := filepath.Glob(d.filenamePrefix + "*" + d.extension)
 	if err != nil {
 		return d
 	}
@@ -415,7 +427,7 @@ func (d *dateRotator) Rotate(reason rotateReason, rotateTime time.Time) error {
 		d.log.Debugw("Rotating file", "filename", d.currentFilename, "reason", reason)
 	}
 
-	d.currentFilename = d.filenamePrefix + rotateTime.Format(d.format)
+	d.currentFilename = d.filenamePrefix + rotateTime.Format(d.format) + d.extension
 	return nil
 }
 
