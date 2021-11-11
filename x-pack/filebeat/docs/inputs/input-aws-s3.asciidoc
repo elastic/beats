@@ -17,7 +17,7 @@ The use of SQS notification is preferred: polling list of S3 objects is expensiv
 in terms of performance and costs and should be preferably used only when no SQS
 notification can be attached to the S3 buckets. This input can, for example, be
 used to receive S3 access logs to monitor detailed records for the requests that
-are made to a bucket.
+are made to a bucket. This input also supports S3 notification from SNS to SQS.
 
 SQS notification method is enabled setting `queue_url` configuration value.
 S3 bucket list polling method is enabled setting `bucket_arn` configuration value.
@@ -114,7 +114,7 @@ it was uploaded. For example: `application/json`.
 ==== `encoding`
 
 The file encoding to use for reading data that contains international
-characters. This only applies to non-JSON logs. See <<_encoding_5>>.
+characters. This only applies to non-JSON logs. See <<_encoding_3>>.
 
 
 [float]
@@ -385,6 +385,14 @@ Enable bucket notification: any new object creation in S3 bucket will also
 create a notification through SQS. Please see
 https://docs.aws.amazon.com/AmazonS3/latest/dev/ways-to-add-notification-config-to-bucket.html#step1-create-sqs-queue-for-notification[create-sqs-queue-for-notification]
 for more details.
+
+[float]
+=== S3 -> SNS -> SQS setup
+If you would like to use the bucket notification in multiple different consumers
+(others than {beatname_lc}), you should use an SNS topic for the bucket notification.
+Please see https://docs.aws.amazon.com/AmazonS3/latest/userguide/ways-to-add-notification-config-to-bucket.html#step1-create-sns-topic-for-notification[create-SNS-topic-for-notification]
+for more details. SQS queue will be configured as a
+https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html[subscriber to the SNS topic].
 
 [float]
 === Parallel Processing

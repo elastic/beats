@@ -1,6 +1,5 @@
 - name: sip
   type: group
-  default_field: false
   description: >
     Fields exported by the Zeek SIP log.
   fields:

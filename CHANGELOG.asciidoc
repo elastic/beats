@@ -3,6 +3,11 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.0.0-beta1]]
+=== Beats version 8.0.0-beta1
+
+Changes will be described in a later RC / GA.
+
 [[release-notes-8.0.0-alpha2]]
 === Beats version 8.0.0-alpha2
 
@@ -12,6 +17,37 @@ Changes will be described in a later alpha / beta.
 === Beats version 8.0.0-alpha1
 
 Changes will be described in a later alpha / beta.
+[[release-notes-7.15.2]]
+=== Beats version 7.15.2
+https://github.com/elastic/beats/compare/v7.15.1...v7.15.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Beats dashboards use custom index when `setup.dashboards.index` is set. {issue}21232[21232] {pull}27901[27901]
+- Fix handling of float data types within processors. {issue}28279[28279] {pull}28280[28280]
+- Allow `clone3` syscall in seccomp filters. {pull}28117[28117]
+- Remove unnecessary escaping step in dashboard loading, so they can be displayed in Kibana. {pull}28395[28395]
+- Fix AWS proxy_url config from url to string type.  {pull}28725[28725]
+- Fix `fingerprint` processor to give it access to the `@timestamp` field. {issue}28683[28683]
+
+*Filebeat*
+
+- Fix initialization of http client in Cloudfoundry input. {issue}28271[28271] {pull}28277[28277]
+- Fix aws-s3 input by checking if GetObject API call response content type exists. {pull}28457[28457]
+- Set `url` as a pointer in the `httpjson` template context to ensure access to all methods. {pull}28695[28695]
+- Fix `google_workspace` documentation links. {pull}28657[28657]
+
+*Metricbeat*
+
+- Divide RDS metric cpu.total.pct by 100. {pull}28456[28456]
+
+*Packetbeat*
+
+- Handle truncated DNS records more gracefully. {issue}21495[21495] {pull}28297[28297]
+- Fix data stream name for network flows when running under Elastic Agent and Fleet. {pull}28408[28408]
+
 [[release-notes-7.15.1]]
 === Beats version 7.15.1
 https://github.com/elastic/beats/compare/v7.15.0...v7.15.1[View commits]
