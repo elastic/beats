@@ -1,9 +1,0 @@
-- key: {beat}
-  title: {beat}
-  description:
-  fields:
-    - name: counter
-      type: long
-      required: true
-      description: >
-        PLEASE UPDATE DOCUMENTATION

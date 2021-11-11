@@ -4,6 +4,7 @@
     Process metadata fields
   fields:
     - name: process
+      default_field: true
       type: group
       fields:
         - name: exe
@@ -25,7 +26,6 @@
               - name: text
                 type: text
                 norms: false
-                default_field: false
               description: Short name or login of the user.
               example: albert
 
