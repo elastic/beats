@@ -613,14 +613,7 @@
                   type: alias
                 - name: rejected
                   path: elasticsearch.node.stats.thread_pool.write.rejected.count
-                  type: alias
-        - name: ingest
-          type: group
-          fields: 
-            - name: total
-              type: alias
-              path: elasticsearch.node.stats.ingest.total
-        
+                  type: alias    
         - name: indexing_pressure
           type: group
           description: >
