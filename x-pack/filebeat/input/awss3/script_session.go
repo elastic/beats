@@ -55,8 +55,7 @@ func newSession(p *goja.Program, conf scriptConfig, test bool) (*session, error)
 		},
 	)
 
-	// Register constructors for 'new XXXX' to enable creating them from the JS code.
-	// s.vm.Set("MapStr", newJSMapStrConstructor(s))
+	// Register constructors for 'new S3EventV2' to enable creating them from the JS code.
 	s.vm.Set("S3EventV2", newJSS3EventV2Constructor(s))
 
 	if _, err := s.vm.RunProgram(p); err != nil {
@@ -158,11 +157,6 @@ func (s *session) runParseFunc(m common.MapStr) (out []s3EventV2, err error) {
 		})
 		defer t.Stop()
 	}
-
-	// jsm, err := newJSMapStr(s, m)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("failed initializing JS object from map: %w", err)
-	// }
 
 	v, err := s.parseFunc(goja.Undefined(), s.vm.ToValue(m))
 	if err != nil {
