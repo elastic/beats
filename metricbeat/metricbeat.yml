@@ -98,8 +98,8 @@ output.elasticsearch:
 
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-  #username: "elastic-admin"
-  #password: "elastic-password"
+  #username: "elastic"
+  #password: "changeme"
 
 
 # ------------------------------ Logstash Output -------------------------------
