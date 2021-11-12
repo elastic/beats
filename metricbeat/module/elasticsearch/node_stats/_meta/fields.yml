@@ -312,15 +312,6 @@
               type: long
             - name: rejected.count
               type: long
-    - name: ingest
-          type: group
-          fields: 
-            - name: total
-              type: alias
-              path: elasticsearch.node.stats.ingest.total
-            #- name: pipelines
-            #  type: flattened
-            #  path: elasticsearch.node.stats.ingest.pipelines
     - name: indexing_pressure
           type: group
           description: >
@@ -344,3 +335,6 @@
               type: alias
               path: elasticsearch.node.stats.indexing_pressure.limit_in_bytes
         
+- name: pipelines
+      type: alias
+      path: elasticsearch.node.stats.ingest.pipelines

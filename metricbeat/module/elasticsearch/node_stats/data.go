@@ -271,7 +271,6 @@ var (
 				"current":        c.Int("current"),
 				"failed":         c.Int("failed"),
 			}),
-			"pipelines": s.Object{},
 		}, c.DictOptional),
 	}
 
@@ -300,10 +299,6 @@ var (
 		"primary_rejections":                         c.Int("primary_rejections"),
 		"replica_rejections":                         c.Int("replica_rejections"),
 	}
-
-	//pipelines = s.Schema{
-	//"pipelines": s.Object{},
-	//}
 
 	threadPoolStatsSchema = s.Schema{
 		"queue": s.Object{
