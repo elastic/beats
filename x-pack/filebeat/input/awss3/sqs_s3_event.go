@@ -18,6 +18,7 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
@@ -86,9 +87,10 @@ type sqsS3EventProcessor struct {
 	log                  *logp.Logger
 	warnOnce             sync.Once
 	metrics              *inputMetrics
+	script               *script
 }
 
-func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, sqsVisibilityTimeout time.Duration, maxReceiveCount int, s3 s3ObjectHandlerFactory) *sqsS3EventProcessor {
+func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, script *script, sqsVisibilityTimeout time.Duration, maxReceiveCount int, s3 s3ObjectHandlerFactory) *sqsS3EventProcessor {
 	if metrics == nil {
 		metrics = newInputMetrics(monitoring.NewRegistry(), "")
 	}
@@ -99,6 +101,7 @@ func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI,
 		sqs:                  sqs,
 		log:                  log,
 		metrics:              metrics,
+		script:               script,
 	}
 }
 
@@ -185,6 +188,17 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 }
 
 func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, error) {
+	// Check if a parsing script is defined. If so, it takes precedence over
+	// format autodetection.
+	if p.script != nil {
+		var raw common.MapStr
+		dec := json.NewDecoder(strings.NewReader(body))
+		if err := dec.Decode(&raw); err != nil {
+			return nil, fmt.Errorf("failed to decode SQS message body: %w", err)
+		}
+		return p.script.run(raw)
+	}
+
 	// NOTE: If AWS introduces a V3 schema this will need updated to handle that schema.
 	var events s3EventsV2
 	dec := json.NewDecoder(strings.NewReader(body))

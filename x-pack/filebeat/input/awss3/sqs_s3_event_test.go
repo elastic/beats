@@ -38,7 +38,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
 		)
 
-		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, time.Minute, 5, mockS3HandlerFactory)
+		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
 		require.NoError(t, p.ProcessSQS(ctx, &msg))
 	})
 
@@ -60,7 +60,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&invalidBodyMsg)).Return(nil),
 		)
 
-		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, time.Minute, 5, mockS3HandlerFactory)
+		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
 		err := p.ProcessSQS(ctx, &invalidBodyMsg)
 		require.Error(t, err)
 		t.Log(err)
@@ -81,7 +81,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&emptyRecordsMsg)).Return(nil),
 		)
 
-		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, time.Minute, 5, mockS3HandlerFactory)
+		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
 		require.NoError(t, p.ProcessSQS(ctx, &emptyRecordsMsg))
 	})
 
@@ -108,7 +108,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
 		)
 
-		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, visibilityTimeout, 5, mockS3HandlerFactory)
+		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, visibilityTimeout, 5, mockS3HandlerFactory)
 		require.NoError(t, p.ProcessSQS(ctx, &msg))
 	})
 
@@ -127,7 +127,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 			mockS3Handler.EXPECT().ProcessS3Object().Return(errors.New("fake connectivity problem")),
 		)
 
-		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, time.Minute, 5, mockS3HandlerFactory)
+		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
 		err := p.ProcessSQS(ctx, &msg)
 		t.Log(err)
 		require.Error(t, err)
@@ -154,7 +154,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
 		)
 
-		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, time.Minute, 5, mockS3HandlerFactory)
+		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
 		err := p.ProcessSQS(ctx, &msg)
 		t.Log(err)
 		require.Error(t, err)
@@ -164,7 +164,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 func TestSqsProcessor_getS3Notifications(t *testing.T) {
 	logp.TestingSetup()
 
-	p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, nil, time.Minute, 5, nil)
+	p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, nil, nil, time.Minute, 5, nil)
 
 	t.Run("s3 key is url unescaped", func(t *testing.T) {
 		msg := newSQSMessage(newS3Event("Happy+Face.jpg"))
