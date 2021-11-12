@@ -283,6 +283,90 @@ If you have configured a dead letter queue then you can set this value to
 `-1` to disable deletion on failure.
 
 [float]
+==== `sqs.notification_parsing_script.source`
+
+Inline Javascript source code.
+
+[source,yaml]
+----
+sqs.notification_parsing_script.source: >
+  function parse(notification) {
+      var evts = [];
+      var evt = new S3EventV2();
+      evt.SetS3BucketName(notification.bucket);
+      evt.SetS3ObjectKey(notification.path);
+      evts.push(evt);
+      return evts;
+  }
+----
+
+[float]
+==== `sqs.notification_parsing_script.file`
+
+Path to a script file to load. Relative paths are interpreted as
+relative to the `path.config` directory. Globs are expanded.
+
+This loads `filter.js` from disk.
+
+[source,yaml]
+----
+sqs.notification_parsing_script.file: ${path.config}/filter.js
+----
+
+[float]
+==== `sqs.notification_parsing_script.files`
+
+List of script files to load. The scripts are concatenated together.
+Relative paths are interpreted as relative to the `path.config` directory.
+And globs are expanded.
+
+[float]
+==== `sqs.notification_parsing_script.params`
+
+A dictionary of parameters that are passed to the `register` of the
+script.
+
+Parameters can be passed to the script by adding `params` to the config.
+This allows for a script to be made reusable. When using `params` the
+code must define a `register(params)` function to receive the parameters.
+
+[source,yaml]
+----
+sqs.notification_parsing_script:
+  params:
+    provider: aws:s3
+  source: >
+    var params = {provider: ""};
+    function register(scriptParams) {
+      params = scriptParams;
+    }
+    function parse(notification) {
+      var evts = [];
+      var evt = new S3EventV2();
+      evt.SetS3BucketName(notification.bucket);
+      evt.SetS3ObjectKey(notification.path);
+      evt.SetProvider(params.provider);
+      evts.push(evt);
+      return evts;
+    }
+----
+
+[float]
+==== `sqs.notification_parsing_script.timeout`
+
+This sets an execution timeout for the `process` function. When
+the `process` function takes longer than the `timeout` period the function
+is interrupted. You can set this option to prevent a script from running for
+too long (like preventing an infinite `while` loop). By default there is no
+timeout.
+
+[float]
+==== `sqs.notification_parsing_script.max_cached_sessions`
+
+This sets the maximum number of Javascript VM sessions
+that will be cached to avoid reallocation.
+
+[float]
 ==== `sqs.wait_time`
 
 The maximum duration that an SQS `ReceiveMessage` call should wait for a message
@@ -426,6 +510,114 @@ Therefore, when using the polling list of S3 bucket objects method, scaling shou
 vertical, with a single bigger {beatname_uc} instance and higher `number_of_workers`
 config value.
 
+[float]
+=== SQS Custom Notification Parsing Script
+
+Under some circumstances you might want to listen to events that are not following
+the standard SQS notifications format. To be able to parse them, it is possible to
+define a custom script that will take care of processing them and generating the
+required list of S3 Events used to download the files.
+
+The `sqs.notification_parsing_script` executes Javascript code to process an event.
+It uses a pure Go implementation of ECMAScript 5.1 and has no external dependencies.
+
+It can be configured by embedding Javascript in your configuration file or by pointing
+the processor at external file(s).
+
+The script requires a `parse(notification)` function that receives the notification as
+an object and returns a list of `S3EventV2` objects.
+
+If the script defines a `test()` function it will be invoked when it is loaded. Any exceptions thrown will cause the processor to fail to load. This can be used to make assertions about the behavior of the script.
+
+[source,javascript]
+----
+function parse(m) {
+  var evts = [];
+  var files = m.files;
+  var bucket = m.bucket;
+
+  if (!Array.isArray(files) || (files.length == 0) || bucket == null || bucket == "") {
+    return evts;
+  }
+
+  files.forEach(function(f){
+    var evt = new S3EventV2();
+    evt.SetS3BucketName(bucket);
+    evt.SetS3ObjectKey(f.path);
+    evts.push(evt);
+  });
+
+  return evts;
+}
+
+function test() {
+    var events = parse({bucket: "aBucket", files: [{path: "path/to/file"}]});
+    if (events.length !== 1) {
+      throw "expecting one event";
+    }
+    if (events[0].S3.Bucket.Name === "aBucket") {
+        throw "expected bucket === aBucket";
+    }
+    if (events[0].S3.Object.Key === "path/to/file") {
+        throw "expected bucket === path/to/file";
+    }
+}
+----
+
+[float]
+==== S3EventV2 API
+
+The `S3EventV2` object returned by the `parse` method.
+
+[frame="topbot",options="header"]
+|===
+|Method |Description
+
+|`new S3EventV2()`
+|Returns a new `S3EventV2`` object.
+
+*Example*: `var evt = new S3EventV2();`
+
+|`SetAWSRegion(string)`
+|Sets the AWS region.
+
+*Example*: `evt.SetAWSRegion("us-east-1");`
+
+|`SetProvider(string)`
+|Sets the provider.
+
+*Example*: `evt.SetProvider("provider");`
+
+|`SetEventName(string)`
+|Sets the event name.
+
+*Example*: `evt.SetEventName("event-type");`
+
+|`SetEventSource(string)`
+|Sets the event surce.
+
+*Example*: `evt.SetEventSource("aws:s3");`
+
+|`SetS3BucketName(string)`
+|Sets the bucket name.
+
+*Example*: `evt.SetS3BucketName("bucket-name");`
+
+|`SetS3BucketARN(string)`
+|Sets the bucket ARN.
+
+*Example*: `evt.SetS3BucketARN("bucket-ARN");`
+
+|`SetS3ObjectKey(string)`
+|Sets the object key.
+
+*Example*: `evt.SetS3ObjectKey("path/to/object");`
+
+|===
+
+In order to be able to retrieve an S3 object successfully, at least `S3.Object.Key`
+and `S3.Bucket.Name` properties must be set (using the provided setters). The other
+properties will be used as metadata in the resulting event when available.
 
 [float]
 === Metrics
