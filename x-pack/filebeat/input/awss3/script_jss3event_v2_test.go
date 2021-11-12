@@ -14,6 +14,21 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+const (
+	header = `function parse(m) {`
+	footer = `}`
+)
+
+var log = logp.NewLogger("test")
+
+func testMapStr() common.MapStr {
+	return common.MapStr{
+		"obj": common.MapStr{
+			"key": "val",
+		},
+	}
+}
+
 func TestJSS3EventV2(t *testing.T) {
 	logp.TestingSetup()
 

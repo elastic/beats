@@ -72,12 +72,12 @@ func TestSessionTestFunction(t *testing.T) {
 				throw "intentional failure";
 			}
 			var e = new S3EventV2();
-			e.SetS3ObjectKey(m.Get("hello"));
+			e.SetS3ObjectKey(m["hello"]);
 			return [e];
 		}
 
 		function test() {
-			var m = new MapStr({"hello": "earth"});
+			var m = {"hello": "earth"};
 			var evts = parse(m);
 
 			if (evts[0].S3.Object.Key !== "earth") {
@@ -120,8 +120,8 @@ func TestSessionTimeout(t *testing.T) {
 	logp.TestingSetup()
 
 	const runawayLoop = `
-		while (!m.Get("stop")) {
-			m.Put("hello", "world");
+		while (!m.stop) {
+			m.hello = "world";
 		}
     `
 
@@ -153,7 +153,7 @@ func TestSessionParallel(t *testing.T) {
 	logp.TestingSetup()
 
 	const script = `
-		m.Put("hello.world", "hello");
+		m.hello.world = "hello";
     `
 
 	p, err := newScriptFromConfig(log, &scriptConfig{
@@ -223,8 +223,8 @@ func TestCreateS3EventsFromNotification(t *testing.T) {
 	const script = `
 	function parse(m) {
 		var evts = [];
-		var files = m.Get("files");
-		var bucket = m.Get("bucket");
+		var files = m.files;
+		var bucket = m.bucket;
 
 		if (!Array.isArray(files) || (files.length == 0) || bucket == null || bucket == "") {
 			return evts;
