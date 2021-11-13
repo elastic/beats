@@ -2,7 +2,7 @@ version: '2.3'
 
 services:
   logstash:
-    image: docker.elastic.co/integrations-ci/beats-logstash:${LOGSTASH_VERSION:-7.15.1}-1
+    image: docker.elastic.co/integrations-ci/beats-logstash:${LOGSTASH_VERSION:-7.15.2}-1
     build:
       context: ./_meta
       args:
@@ -13,7 +13,7 @@ services:
       - elasticsearch
 
   elasticsearch:
-    image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-7.15.1}-1
+    image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-7.15.2}-1
     build:
       context: ../elasticsearch/_meta
       args:
