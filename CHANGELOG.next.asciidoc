@@ -26,6 +26,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Index template's default_fields setting is only populated with ECS fields. {pull}28596[28596] {issue}28215[28215]
 - Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
 - Remove options `logging.files.suffix` and default to datetime endings. {pull}28927[28927]
+- Add job.name in pods controlled by Jobs {pull}28954[28954]
 
 *Auditbeat*
 
