@@ -43,7 +43,7 @@ processors:
   - add_docker_metadata:
       host: "unix:///var/run/docker.sock"
       #match_fields: ["system.process.cgroup.id"]
-      #match_pids: ["process.pid", "process.ppid"]
+      #match_pids: ["process.pid", "process.parent.pid"]
       #match_source: true
       #match_source_index: 4
       #match_short_id: true
@@ -69,7 +69,7 @@ one of them should hold a container ID to get the event enriched.
 
 `match_pids`:: (Optional) A list of fields that contain process IDs. If the
 process is running in Docker then the event will be enriched. The default value
-is `["process.pid", "process.ppid"]`.
+is `["process.pid", "process.parent.pid"]`.
 
 `match_source`:: (Optional) Match container ID from a log path present in the
 `log.file.path` field. Enabled by default.

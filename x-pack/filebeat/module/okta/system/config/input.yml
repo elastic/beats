@@ -1,7 +1,6 @@
 {{ if eq .input "httpjson" }}
 
 type: httpjson
-config_version: "2"
 interval: {{ .interval }}
 
 {{ if .ssl }}
@@ -23,6 +22,7 @@ request.rate_limit:
   limit: '[[.last_response.header.Get "X-Rate-Limit-Limit"]]'
   remaining: '[[.last_response.header.Get "X-Rate-Limit-Remaining"]]'
   reset: '[[.last_response.header.Get "X-Rate-Limit-Reset"]]'
+  early_limit: 0.89
 request.transforms:
   - set:
       target: header.Authorization
@@ -69,4 +69,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.11.0
+        ecs.version: 1.12.0

@@ -3,6 +3,10 @@
 [id="{beatname_lc}-input-{type}"]
 === Log input
 
+deprecated:[7.16.0]
+
+The log input is deprecated. Please use the the <<filebeat-input-filestream,`filestream input`>> for sending log files to outputs.
+
 ++++
 <titleabbrev>Log</titleabbrev>
 ++++

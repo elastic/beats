@@ -121,10 +121,12 @@ func (p Process) Hash() uint64 {
 func (p Process) toMapStr() common.MapStr {
 	return common.MapStr{
 		// https://github.com/elastic/ecs#-process-fields
-		"name":              p.Info.Name,
-		"args":              p.Info.Args,
-		"pid":               p.Info.PID,
-		"ppid":              p.Info.PPID,
+		"name": p.Info.Name,
+		"args": p.Info.Args,
+		"pid":  p.Info.PID,
+		"parent": common.MapStr{
+			"pid": p.Info.PPID,
+		},
 		"working_directory": p.Info.CWD,
 		"executable":        p.Info.Exe,
 		"start":             p.Info.StartTime,

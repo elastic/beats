@@ -315,18 +315,18 @@ processors:
       description: "111009"
       field: "message"
       patterns:
-      - "^%{NOTSPACE} '%{NOTSPACE:host.user.name}' executed %{NOTSPACE} %{GREEDYDATA:_temp_.cisco.command_line_arguments}"
+      - "^%{NOTSPACE} '%{NOTSPACE:user.name}' executed %{NOTSPACE} %{GREEDYDATA:_temp_.cisco.command_line_arguments}"
   - grok:
       if: "ctx._temp_.cisco.message_id == '111010'"
       field: "message"
       description: "111010"
       patterns:
-      - "User '%{NOTSPACE:host.user.name}', running %{QUOTEDSTRING} from IP %{IP:source.address}, executed %{QUOTEDSTRING:_temp_.cisco.command_line_arguments}"
+      - "User '%{NOTSPACE:user.name}', running %{QUOTEDSTRING} from IP %{IP:source.address}, executed %{QUOTEDSTRING:_temp_.cisco.command_line_arguments}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '113019'"
       field: "message"
       description: "113019"
-      pattern: "Group = %{}, Username = %{source.user.name}, IP = %{destination.address}, Session disconnected. Session Type: %{}, Duration: %{_temp_.duration_hms}, Bytes xmt: %{source.bytes}, Bytes rcv: %{destination.bytes}, Reason: %{message}"
+      pattern: "Group = %{source.user.group.name}, Username = %{source.user.name}, IP = %{destination.address}, Session disconnected. Session Type: %{_temp_.cisco.session_type}, Duration: %{_temp_.duration_hms}, Bytes xmt: %{source.bytes}, Bytes rcv: %{destination.bytes}, Reason: %{event.reason}"
   - grok:
       if: '["302013", "302015"].contains(ctx._temp_.cisco.message_id)'
       field: "message"
@@ -598,7 +598,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '502103'"
       field: "message"
       description: "502103"
-      pattern: "User priv level changed: Uname: %{host.user.name} From: %{_temp_.cisco.privilege.old} To: %{_temp_.cisco.privilege.new}"
+      pattern: "User priv level changed: Uname: %{user.name} From: %{_temp_.cisco.privilege.old} To: %{_temp_.cisco.privilege.new}"
   - append:
       if: "ctx._temp_.cisco.message_id == '502103'"
       field: "event.type"
@@ -635,7 +635,7 @@ processors:
       if: '["611102", "611101"].contains(ctx._temp_.cisco.message_id)'
       field: "message"
       description: "611102, 611101"
-      pattern: 'User authentication %{event.outcome}: IP address: %{source.address}, Uname: %{host.user.name}'
+      pattern: 'User authentication %{event.outcome}: IP address: %{source.address}, Uname: %{user.name}'
   - dissect:
       if: "ctx._temp_.cisco.message_id == '710003'"
       field: "message"
@@ -651,6 +651,13 @@ processors:
       field: "message"
       description: "713049"
       pattern: "Group = %{}, IP = %{source.address}, Security negotiation complete for LAN-to-LAN Group (%{}) %{}, Inbound SPI = %{}, Outbound SPI = %{}"
+      ignore_failure: true
+  - dissect:
+      if: "ctx._temp_.cisco.message_id == '713049'"
+      field: "message"
+      description: "713049"
+      pattern: "Group = %{}, Username = %{user.name}, IP = %{source.address}, Security negotiation complete for User (%{}) %{}, Inbound SPI = %{}, Outbound SPI = %{}"
+      ignore_failure: true
   - grok:
       if: "ctx._temp_.cisco.message_id == '716002'"
       field: "message"
@@ -1318,7 +1325,7 @@ processors:
                 } else if (c == (char)':') {
                     total = (total + cur) * 60;
                     cur = 0;
-                } else {
+                } else if (c != (char)'h' && c == (char)'m' && c == (char)'s') {
                     return 0;
                 }
             }
@@ -1914,11 +1921,6 @@ processors:
       field: related.user
       value: "{{{user.name}}}"
       if: ctx?.user?.name != null && ctx?.user?.name != ''
-      allow_duplicates: false
-  - append:
-      field: related.user
-      value: "{{{host.user.name}}}"
-      if: ctx?.host?.user?.name != null && ctx?.host?.user?.name != ''
       allow_duplicates: false
   - append:
       field: related.user

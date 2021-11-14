@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package node
@@ -46,6 +47,6 @@ func TestInvalid(t *testing.T) {
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	err = eventsMapping(reporter, info, content)
+	err = eventsMapping(reporter, info, content, true)
 	require.Error(t, err)
 }

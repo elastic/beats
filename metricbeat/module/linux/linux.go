@@ -20,6 +20,7 @@ package linux
 import (
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -28,6 +29,10 @@ func init() {
 	if err := mb.Registry.AddModule("linux", NewModule); err != nil {
 		panic(err)
 	}
+}
+
+type LinuxModule interface {
+	GetHostFS() string
 }
 
 // Module defines the base module config used in `linux`
@@ -55,5 +60,14 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		dir = "/"
 	}
 
+	// Steer towards system.hostfs, since the two behave fundamentally the same, and system.hostfs has a CLI flag that many users may default to.
+	if len(paths.Paths.Hostfs) > 2 {
+		dir = paths.Paths.Hostfs
+	}
+
 	return &Module{BaseModule: base, HostFS: dir, Period: config.Period}, nil
+}
+
+func (m Module) GetHostFS() string {
+	return m.HostFS
 }

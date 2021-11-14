@@ -1,3 +1,0 @@
-// +build !integration
-
-package config

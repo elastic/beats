@@ -2,8 +2,14 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: zookeeper
+
 [[metricbeat-module-zookeeper]]
 == ZooKeeper module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 The ZooKeeper module fetches statistics from the ZooKeeper service. The default
 metricsets are `mntr` and `server`.

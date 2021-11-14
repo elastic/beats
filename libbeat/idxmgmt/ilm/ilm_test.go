@@ -31,27 +31,6 @@ import (
 func TestDefaultSupport_Init(t *testing.T) {
 	info := beat.Info{Beat: "test", Version: "9.9.9"}
 
-	t.Run("mode from config", func(t *testing.T) {
-		cases := map[string]Mode{
-			"true":  ModeEnabled,
-			"false": ModeDisabled,
-			"auto":  ModeAuto,
-		}
-		for setting, expected := range cases {
-			expected := expected
-			t.Run(setting, func(t *testing.T) {
-				cfg := common.MustNewConfigFrom(map[string]interface{}{
-					"enabled":        setting,
-					"rollover_alias": "test",
-				})
-
-				s, err := DefaultSupport(nil, info, cfg)
-				require.NoError(t, err)
-				assert.Equal(t, expected, s.Mode())
-			})
-		}
-	})
-
 	t.Run("with an empty rollover_alias", func(t *testing.T) {
 		_, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
 			map[string]interface{}{
@@ -82,7 +61,7 @@ func TestDefaultSupport_Init(t *testing.T) {
 		assert := assert.New(t)
 		assert.Equal(true, s.overwrite)
 		assert.Equal(false, s.checkExists)
-		assert.Equal(ModeEnabled, s.Mode())
+		assert.Equal(true, s.Enabled())
 		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
 		assert.Equal(Alias{Name: "alias", Pattern: "01"}, s.Alias())
 	})
@@ -103,7 +82,7 @@ func TestDefaultSupport_Init(t *testing.T) {
 		assert := assert.New(t)
 		assert.Equal(true, s.overwrite)
 		assert.Equal(false, s.checkExists)
-		assert.Equal(ModeEnabled, s.Mode())
+		assert.Equal(true, s.Enabled())
 		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
 		assert.Equal(Alias{Name: "alias-9.9.9", Pattern: "01"}, s.Alias())
 	})
@@ -123,7 +102,7 @@ func TestDefaultSupport_Init(t *testing.T) {
 		assert := assert.New(t)
 		assert.Equal(true, s.overwrite)
 		assert.Equal(false, s.checkExists)
-		assert.Equal(ModeEnabled, s.Mode())
+		assert.Equal(true, s.Enabled())
 		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
 		assert.Equal(Alias{Name: "test-9.9.9", Pattern: "01"}, s.Alias())
 	})
@@ -150,32 +129,33 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 		},
 		"disabled via handler": {
 			calls: []onCall{
-				onCheckILMEnabled(ModeAuto).Return(false, nil),
+				onCheckILMEnabled(true).Return(false, ErrESILMDisabled),
 			},
+			err: true,
 		},
 		"enabled via handler": {
 			calls: []onCall{
-				onCheckILMEnabled(ModeAuto).Return(true, nil),
+				onCheckILMEnabled(true).Return(true, nil),
 			},
 			enabled: true,
 		},
 		"handler confirms enabled flag": {
 			calls: []onCall{
-				onCheckILMEnabled(ModeEnabled).Return(true, nil),
+				onCheckILMEnabled(true).Return(true, nil),
 			},
 			cfg:     map[string]interface{}{"enabled": true},
 			enabled: true,
 		},
 		"fail enabled": {
 			calls: []onCall{
-				onCheckILMEnabled(ModeEnabled).Return(false, nil),
+				onCheckILMEnabled(true).Return(false, nil),
 			},
 			cfg:  map[string]interface{}{"enabled": true},
 			fail: ErrESILMDisabled,
 		},
 		"io error": {
 			calls: []onCall{
-				onCheckILMEnabled(ModeAuto).Return(false, errors.New("ups")),
+				onCheckILMEnabled(true).Return(false, errors.New("ups")),
 			},
 			cfg: map[string]interface{}{},
 			err: true,

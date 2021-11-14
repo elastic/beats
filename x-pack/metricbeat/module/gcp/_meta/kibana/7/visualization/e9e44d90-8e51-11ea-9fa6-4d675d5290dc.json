@@ -29,7 +29,7 @@
                         "line_width": "2",
                         "metrics": [
                             {
-                                "field": "gcp.storage.network.sent_bytes_count.value",
+                                "field": "gcp.storage.network.sent.bytes",
                                 "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "type": "avg"
                             }

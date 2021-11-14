@@ -83,9 +83,12 @@ func SizedResponseHandler(bytes int) http.HandlerFunc {
 	)
 }
 
-func CustomResponseHandler(body []byte, status int) http.HandlerFunc {
+func CustomResponseHandler(body []byte, status int, extraHeaders map[string]string) http.HandlerFunc {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
+			for key, val := range extraHeaders {
+				w.Header().Add(key, val)
+			}
 			w.WriteHeader(status)
 			w.Write(body)
 		},

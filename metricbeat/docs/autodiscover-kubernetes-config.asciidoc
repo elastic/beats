@@ -67,7 +67,7 @@ where `REDIS_PASSWORD` is a key stored in local keystore of Metricbeat.
 [float]
 ===== Kubernetes Secrets
 Metricbeat autodiscover supports leveraging https://kubernetes.io/docs/concepts/configuration/secret/[Kubernetes secrets]
-in order to retrieve sensitive data like passwords. In order to enable this future add the following section
+in order to retrieve sensitive data like passwords. In order to enable this feature add the following section
 in Metricbeat's `ClusterRole` rules:
 
 ["source","yaml",subs="attributes"]
@@ -80,8 +80,8 @@ in Metricbeat's `ClusterRole` rules:
 
 CAUTION: The above rule will give permission to Metricbeat Pod to access Kubernetes Secrets API.
 This means that anyone who have access to Metricbeat Pod (`kubectl exec` for example) will be able to access
-Kubernetes Secrets API and get a specific secret no matter which namespace it belongs to. In this,
-this option should be carefully considered, specially when used with hints.
+Kubernetes Secrets API and get a specific secret no matter which namespace it belongs to.
+This option should be carefully considered, specially when used with hints.
 
 One option to give permissions only for one namespace, and not cluster-scoped, is to use
 a specific Role for a targeted namespace so as to better control access:
@@ -126,7 +126,7 @@ where `kubernetes.default.somesecret.value` specifies a key stored as Kubernetes
 . Kubernetes Secret Name: `somesecret`
 . Secret Data Key: `value`
 
-This secret can be created in a Kubernetes environment using the following the command:
+This secret can be created in a Kubernetes environment using the following command:
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
 cat << EOF | kubectl apply -f -

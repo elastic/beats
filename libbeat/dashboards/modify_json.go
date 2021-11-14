@@ -375,36 +375,7 @@ func EncodeJSONObjects(content []byte) []byte {
 		logger.Errorf("Object does not have attributes key")
 		return content
 	}
-
-	if kibanaSavedObject, ok := attributes["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
-		if searchSourceJSON, ok := kibanaSavedObject["searchSourceJSON"].(map[string]interface{}); ok {
-			b, err := json.Marshal(searchSourceJSON)
-			if err != nil {
-				return content
-			}
-			kibanaSavedObject["searchSourceJSON"] = string(b)
-		}
-	}
-
-	fieldsToStr := []string{"visState", "uiStateJSON", "optionsJSON"}
-	for _, field := range fieldsToStr {
-		if rootField, ok := attributes[field].(map[string]interface{}); ok {
-			b, err := json.Marshal(rootField)
-			if err != nil {
-				return content
-			}
-			attributes[field] = string(b)
-		}
-	}
-
-	if panelsJSON, ok := attributes["panelsJSON"].([]interface{}); ok {
-		b, err := json.Marshal(panelsJSON)
-		if err != nil {
-			return content
-		}
-		attributes["panelsJSON"] = string(b)
-
-	}
+	objectMap["attributes"] = convertAttributes(attributes)
 
 	b, err := json.Marshal(objectMap)
 	if err != nil {
@@ -414,6 +385,61 @@ func EncodeJSONObjects(content []byte) []byte {
 
 	return b
 
+}
+
+func convertAttributes(attributes map[string]interface{}) map[string]interface{} {
+	if kibanaSavedObject, ok := attributes["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
+		if searchSourceJSON, ok := kibanaSavedObject["searchSourceJSON"].(map[string]interface{}); ok {
+			b, err := json.Marshal(searchSourceJSON)
+			if err != nil {
+				return attributes
+			}
+			kibanaSavedObject["searchSourceJSON"] = string(b)
+		}
+	}
+
+	if panelsJSON, ok := attributes["panelsJSON"].([]interface{}); ok {
+		for i, panel := range panelsJSON {
+			if panelMap, ok := panel.(map[string]interface{}); ok {
+				if embeddableConfig, ok := panelMap["embeddableConfig"].(map[string]interface{}); ok {
+					if embeddedAttributes, ok := embeddableConfig["attributes"].(map[string]interface{}); ok {
+						embeddableConfig["attributes"] = convertAttributes(embeddedAttributes)
+						panelMap["embeddableConfig"] = embeddableConfig
+						panelsJSON[i] = panelMap
+					}
+				}
+			}
+		}
+		attributes["panelsJSON"] = panelsJSON
+	}
+
+	attributes = convertObjectsToString(attributes)
+	return attributes
+}
+
+func convertObjectsToString(attributes map[string]interface{}) map[string]interface{} {
+	fieldsToStr := []string{
+		"layerListJSON",
+		"mapStateJSON",
+		"optionsJSON",
+		"panelsJSON",
+		"uiStateJSON",
+		"visState",
+	}
+	for _, field := range fieldsToStr {
+		switch rootField := attributes[field].(type) {
+		case map[string]interface{}, []interface{}:
+			b, err := json.Marshal(rootField)
+			if err != nil {
+				return attributes
+			}
+			attributes[field] = string(b)
+		default:
+			continue
+		}
+	}
+
+	return attributes
 }
 
 // ReplaceStringInDashboard replaces a string field in a dashboard

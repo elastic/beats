@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build mage
 // +build mage
 
 package main
@@ -133,7 +134,17 @@ func MockedTests(ctx context.Context) error {
 
 // Fields generates a fields.yml and fields.go for each module.
 func Fields() {
-	mg.Deps(fieldsYML, moduleFieldsGo)
+	mg.Deps(libbeatAndMetricbeatCommonFieldsGo, moduleFieldsGo)
+	mg.Deps(fieldsYML)
+}
+
+// libbeatAndMetricbeatCommonFieldsGo generates a fields.go containing both
+// libbeat and metricbeat's common fields.
+func libbeatAndMetricbeatCommonFieldsGo() error {
+	if err := devtools.GenerateFieldsYAML(); err != nil {
+		return err
+	}
+	return devtools.GenerateMetricbeatAllInOneFieldsGo()
 }
 
 func fieldsYML() error {

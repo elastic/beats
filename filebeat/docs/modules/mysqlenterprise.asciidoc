@@ -10,6 +10,7 @@ This file is generated! See scripts/docs_collector.py
 
 
 == MySQL Enterprise module
+
 beta[]
 
 This is a module for different types of MySQL logs. Currently focusing on data from the MySQL Enterprise Audit Plugin in JSON format.

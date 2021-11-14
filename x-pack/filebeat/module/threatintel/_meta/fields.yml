@@ -5,7 +5,6 @@
     Threat intelligence Filebeat Module.
   fields:
     - name: threatintel
-      default_field: false
       type: group
       description: >
         Fields from the threatintel Filebeat module.

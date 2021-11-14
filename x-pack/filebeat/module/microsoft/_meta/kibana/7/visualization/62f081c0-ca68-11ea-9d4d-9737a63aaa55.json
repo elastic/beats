@@ -64,7 +64,7 @@
                     "id": "1",
                     "params": {
                         "customLabel": "Related Users",
-                        "field": "host.user.name"
+                        "field": "user.name"
                     },
                     "schema": "metric",
                     "type": "cardinality"

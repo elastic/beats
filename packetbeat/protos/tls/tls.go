@@ -22,11 +22,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/ecs/code/go/ecs"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/x509util"
+	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -280,20 +279,13 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	}
 	detailed := common.MapStr{}
 
-	// Fixups for non array datatypes (1)
-	var (
-		tlsServerCertificateChain,
-		tlsClientCertificateChain,
-		tlsClientSupportedCiphers []string
-	)
-
 	emptyHello := &helloMessage{}
 	var clientHello, serverHello *helloMessage
 	if client.parser.hello != nil {
 		clientHello = client.parser.hello
 		detailed["client_hello"] = clientHello.toMap()
 		tls.ClientJa3, _ = getJa3Fingerprint(clientHello)
-		tlsClientSupportedCiphers = clientHello.supportedCiphers()
+		tls.ClientSupportedCiphers = clientHello.supportedCiphers()
 	} else {
 		clientHello = emptyHello
 	}
@@ -319,8 +311,8 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		}
 	}
 	if plugin.includeRawCertificates {
-		tlsClientCertificateChain = getPEMCertChain(client.parser.certificates)
-		tlsServerCertificateChain = getPEMCertChain(server.parser.certificates)
+		tls.ClientCertificateChain = getPEMCertChain(client.parser.certificates)
+		tls.ServerCertificateChain = getPEMCertChain(server.parser.certificates)
 	}
 	if list := client.parser.certificates; len(list) > 0 {
 		cert := list[0]
@@ -445,32 +437,25 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	// Serialize ECS TLS fields
 	pb.MarshalStruct(fields, "tls", tls)
 	if plugin.includeDetailedFields {
-		fields.Put("tls.detailed", detailed)
 		if cert, ok := detailed["client_certificate"]; ok {
 			fields.Put("tls.client.x509", cert)
+			detailed.Delete("client_certificate")
 		}
 		if cert, ok := detailed["server_certificate"]; ok {
 			fields.Put("tls.server.x509", cert)
+			detailed.Delete("server_certificate")
 		}
+		fields.Put("tls.detailed", detailed)
 	}
 
-	// Fixes for non-array datatypes
-	// =============================
-	//
-	// Code at github.com/elastic/ecs/code/go/ecs has some fields as string
-	// when they should be []string.
-	//
-	// Once the code generator is fixed, the if statements below will cause
-	// a compilation error. To fix it, remove the if statements and replace
-	// all uses of the tlsSomething variables with tls.Something.
-	if tls.ServerCertificateChain == "" && len(tlsServerCertificateChain) > 0 {
-		fields.Put("tls.server.certificate_chain", tlsServerCertificateChain)
+	if len(tls.ServerCertificateChain) > 0 {
+		fields.Put("tls.server.certificate_chain", tls.ServerCertificateChain)
 	}
-	if tls.ClientCertificateChain == "" && len(tlsClientCertificateChain) > 0 {
-		fields.Put("tls.client.certificate_chain", tlsClientCertificateChain)
+	if len(tls.ClientCertificateChain) > 0 {
+		fields.Put("tls.client.certificate_chain", tls.ClientCertificateChain)
 	}
-	if tls.ClientSupportedCiphers == "" && len(tlsClientSupportedCiphers) > 0 {
-		fields.Put("tls.client.supported_ciphers", tlsClientSupportedCiphers)
+	if len(tls.ClientSupportedCiphers) > 0 {
+		fields.Put("tls.client.supported_ciphers", tls.ClientSupportedCiphers)
 	}
 	// Enforce booleans (not serialized when false)
 	if !tls.Established {

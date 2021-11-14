@@ -10,6 +10,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Okta module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The Okta module collects events from the
 https://developer.okta.com/docs/reference/[Okta API]. Specifically this supports
 reading from the https://developer.okta.com/docs/reference/api/system-log/[Okta
@@ -98,6 +100,17 @@ An initial interval can be defined. The first time the module starts, will fetch
 [source,yaml]
 ----
     var.initial_interval: 24h # will fetch events starting 24h ago.
+----
+
+*`input.request.rate_limit.early_limit`*::
+
+You can override the default rate-limiting behavior in <<filebeat-input-httpjson>>.
+The default for the Okta module is to use up to 89% of the Okta rate-limit,
+which should avoid Okta Warnings on rate-limit usage.
++
+[source.yaml]
+----
+    input.request.rate_limit.early_limit: 0.89
 ----
 
 [float]

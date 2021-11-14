@@ -27,6 +27,7 @@ type service struct {
 	scope            string
 	config           *Config
 	metagen          metadata.MetaGen
+	watcher          kubernetes.Watcher
 	namespaceWatcher kubernetes.Watcher
 }
 
@@ -36,13 +37,13 @@ type serviceData struct {
 	processors []map[string]interface{}
 }
 
-// NewServiceWatcher creates a watcher that can discover and process service objects
-func NewServiceWatcher(
+// NewServiceEventer creates an eventer that can discover and process service objects
+func NewServiceEventer(
 	comm composable.DynamicProviderComm,
 	cfg *Config,
 	logger *logp.Logger,
 	client k8s.Interface,
-	scope string) (kubernetes.Watcher, error) {
+	scope string) (Eventer, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Service{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
@@ -68,17 +69,38 @@ func NewServiceWatcher(
 	}
 
 	metaGen := metadata.NewServiceMetadataGenerator(rawConfig, watcher.Store(), namespaceMeta, client)
-	watcher.AddEventHandler(&service{
+	s := &service{
 		logger,
 		cfg.CleanupTimeout,
 		comm,
 		scope,
 		cfg,
 		metaGen,
+		watcher,
 		namespaceWatcher,
-	})
+	}
+	watcher.AddEventHandler(s)
 
-	return watcher, nil
+	return s, nil
+}
+
+// Start starts the eventer
+func (s *service) Start() error {
+	if s.namespaceWatcher != nil {
+		if err := s.namespaceWatcher.Start(); err != nil {
+			return err
+		}
+	}
+	return s.watcher.Start()
+}
+
+// Stop stops the eventer
+func (s *service) Stop() {
+	s.watcher.Stop()
+
+	if s.namespaceWatcher != nil {
+		s.namespaceWatcher.Stop()
+	}
 }
 
 func (s *service) emitRunning(service *kubernetes.Service) {
@@ -164,14 +186,13 @@ func generateServiceData(
 		return &serviceData{}
 	}
 
+	ckMeta := kubemetaMap.(common.MapStr).Clone()
+	if len(namespaceAnnotations) != 0 {
+		ckMeta.Put("namespace.annotations", namespaceAnnotations)
+	}
 	// k8sMapping includes only the metadata that fall under kubernetes.*
 	// and these are available as dynamic vars through the provider
-	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr).Clone())
-
-	if len(namespaceAnnotations) != 0 {
-		// TODO: convert it to namespace.annotations for 8.0
-		k8sMapping["namespace_annotations"] = namespaceAnnotations
-	}
+	k8sMapping := map[string]interface{}(ckMeta)
 
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}

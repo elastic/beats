@@ -5,13 +5,15 @@
 
 == NetFlow module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for receiving NetFlow and IPFIX flow records over UDP. This
 input supports NetFlow versions 1, 5, 6, 7, 8 and 9, as well as IPFIX. For
 NetFlow versions older than 9, fields are mapped automatically to NetFlow v9.
 
 This module wraps the <<filebeat-input-netflow,netflow input>> to enrich the
 flow records with geolocation information about the IP endpoints by using
-Elasticsearch Ingest Node.
+an {es} ingest pipeline.
 
 include::../include/gs-link.asciidoc[]
 

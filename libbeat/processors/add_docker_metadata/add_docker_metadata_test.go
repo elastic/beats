@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build (linux || darwin || windows) && !integration
 // +build linux darwin windows
 // +build !integration
 
@@ -339,7 +340,7 @@ func TestMatchPIDs(t *testing.T) {
 	t.Run("pid is not containerized", func(t *testing.T) {
 		input := common.MapStr{}
 		input.Put("process.pid", 2000)
-		input.Put("process.ppid", 1000)
+		input.Put("process.parent.pid", 1000)
 
 		expected := common.MapStr{}
 		expected.DeepUpdate(input)
@@ -377,7 +378,7 @@ func TestMatchPIDs(t *testing.T) {
 	t.Run("pid exited and ppid is containerized", func(t *testing.T) {
 		fields := common.MapStr{}
 		fields.Put("process.pid", 9999)
-		fields.Put("process.ppid", 1000)
+		fields.Put("process.parent.pid", 1000)
 
 		expected := common.MapStr{}
 		expected.DeepUpdate(dockerMetadata)

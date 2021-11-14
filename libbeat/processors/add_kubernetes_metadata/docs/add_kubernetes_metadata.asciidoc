@@ -115,6 +115,8 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 `host`:: (Optional) Specify the node to scope {beatname_lc} to in case it
 cannot be accurately detected, as when running {beatname_lc} in host network
 mode.
+`scope`:: (Optional) Specify if the processor should have visibility at the node level or at the entire cluster
+level. Possible values are `node` and `cluster`. Scope is `node` by default.
 `namespace`:: (Optional) Select the namespace from which to collect the
 metadata. If it is not set, the processor collects metadata from all namespaces.
 It is unset by default.
@@ -136,5 +138,19 @@ Example:
 -------------------------------------------------------------------------------------
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
 client. It defaults to `KUBECONFIG` environment variable if present.
+`kube_client_options`:: (Optional) Additional options can be configured for Kubernetes
+client. Currently client QPS and burst are supported, if not set Kubernetes client's
+https://pkg.go.dev/k8s.io/client-go/rest#pkg-constants[default QPS and burst] will be used.
+Example:
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+      kube_client_options:
+        qps: 5
+        burst: 10
+-------------------------------------------------------------------------------------
+
+`cleanup_timeout`:: (Optional) Specify the time of inactivity before stopping the
+running configuration for a container. This is `60s` by default.
+`sync_period`:: (Optional) Specify the timeout for listing historical resources.
 `default_indexers.enabled`:: (Optional) Enable or disable default pod indexers when you want to specify your own.
 `default_matchers.enabled`:: (Optional) Enable or disable default pod matchers when you want to specify your own.

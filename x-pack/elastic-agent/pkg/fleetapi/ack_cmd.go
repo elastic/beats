@@ -27,10 +27,11 @@ type AckEvent struct {
 	Message   string `json:"message,omitempty"` // : 'hello2',
 	Payload   string `json:"payload,omitempty"` // : 'payload2',
 
-	ActionData  json.RawMessage `json:"action_data,omitempty"`  // copy of original action data
-	StartedAt   string          `json:"started_at,omitempty"`   // time action started
-	CompletedAt string          `json:"completed_at,omitempty"` // time action completed
-	Error       string          `json:"error,omitempty"`        // optional action error
+	ActionData     json.RawMessage        `json:"action_data,omitempty"`     // copy of original action data
+	ActionResponse map[string]interface{} `json:"action_response,omitempty"` // custom (per beat) response payload
+	StartedAt      string                 `json:"started_at,omitempty"`      // time action started
+	CompletedAt    string                 `json:"completed_at,omitempty"`    // time action completed
+	Error          string                 `json:"error,omitempty"`           // optional action error
 }
 
 // AckRequest consists of multiple actions acked to fleet ui.

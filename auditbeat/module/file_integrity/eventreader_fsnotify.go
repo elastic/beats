@@ -15,11 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || freebsd || openbsd || netbsd || windows
 // +build linux freebsd openbsd netbsd windows
 
 package file_integrity
 
 import (
+	"path/filepath"
 	"syscall"
 	"time"
 
@@ -138,6 +140,17 @@ func (r *reader) nextEvent(done <-chan struct{}) *Event {
 			r.log.Debugw("Received fsnotify event",
 				"file_path", event.Name,
 				"event_flags", event.Op)
+
+			abs, err := filepath.Abs(event.Name)
+			if err != nil {
+				r.log.Errorw("Failed to obtain absolute path",
+					"file_path", event.Name,
+					"error", err,
+				)
+				event.Name = filepath.Clean(event.Name)
+			} else {
+				event.Name = abs
+			}
 
 			start := time.Now()
 			e := NewEvent(event.Name, opToAction(event.Op), SourceFSNotify,

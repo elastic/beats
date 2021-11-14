@@ -384,7 +384,7 @@ func FormatEventString(
 	// Open a publisher handle if one was not provided.
 	ph := publisherHandle
 	if ph == 0 {
-		ph, err := OpenPublisherMetadata(0, publisher, 0)
+		ph, err := OpenPublisherMetadata(0, publisher, lang)
 		if err != nil {
 			return err
 		}

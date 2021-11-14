@@ -10,6 +10,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Azure module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The azure module retrieves different types of log data from Azure.
 There are several requirements before using the module since the logs will actually be read from azure event hubs.
 
@@ -118,6 +120,7 @@ Users can also use this in case of a Hybrid Cloud model, where one may define th
 include::../include/what-happens.asciidoc[]
 
 include::../include/gs-link.asciidoc[]
+
 
 [float]
 === Dashboards

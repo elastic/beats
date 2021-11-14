@@ -2,14 +2,12 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// TODO review the need for this
-// +build linux darwin windows
-
 package kubernetes
 
 import (
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -19,7 +17,9 @@ type Config struct {
 	Scope     string    `config:"scope"`
 	Resources Resources `config:"resources"`
 
-	KubeConfig     string        `config:"kube_config"`
+	KubeConfig        string                       `config:"kube_config"`
+	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
+
 	Namespace      string        `config:"namespace"`
 	SyncPeriod     time.Duration `config:"sync_period"`
 	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
@@ -30,12 +30,10 @@ type Config struct {
 	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
 	IncludeLabels       []string                            `config:"include_labels"`
 	ExcludeLabels       []string                            `config:"exclude_labels"`
+	IncludeAnnotations  []string                            `config:"include_annotations"`
 
 	LabelsDedot      bool `config:"labels.dedot"`
 	AnnotationsDedot bool `config:"annotations.dedot"`
-
-	// Undocumented settings, to be deprecated in favor of `drop_fields` processor:
-	IncludeCreatorMetadata bool `config:"include_creator_metadata"`
 }
 
 // Resources config section for resources' config blocks
@@ -55,7 +53,6 @@ func (c *Config) InitDefaults() {
 	c.CleanupTimeout = 60 * time.Second
 	c.SyncPeriod = 10 * time.Minute
 	c.Scope = "node"
-	c.IncludeCreatorMetadata = true
 	c.LabelsDedot = true
 	c.AnnotationsDedot = true
 }

@@ -27,6 +27,7 @@ type node struct {
 	scope          string
 	config         *Config
 	metagen        metadata.MetaGen
+	watcher        kubernetes.Watcher
 }
 
 type nodeData struct {
@@ -35,13 +36,13 @@ type nodeData struct {
 	processors []map[string]interface{}
 }
 
-// NewNodeWatcher creates a watcher that can discover and process node objects
-func NewNodeWatcher(
+// NewNodeEventer creates an eventer that can discover and process node objects
+func NewNodeEventer(
 	comm composable.DynamicProviderComm,
 	cfg *Config,
 	logger *logp.Logger,
 	client k8s.Interface,
-	scope string) (kubernetes.Watcher, error) {
+	scope string) (Eventer, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
@@ -57,15 +58,17 @@ func NewNodeWatcher(
 		return nil, errors.New(err, "failed to unpack configuration")
 	}
 	metaGen := metadata.NewNodeMetadataGenerator(rawConfig, watcher.Store(), client)
-	watcher.AddEventHandler(&node{
+	n := &node{
 		logger,
 		cfg.CleanupTimeout,
 		comm,
 		scope,
 		cfg,
-		metaGen})
+		metaGen,
+		watcher}
+	watcher.AddEventHandler(n)
 
-	return watcher, nil
+	return n, nil
 }
 
 func (n *node) emitRunning(node *kubernetes.Node) {
@@ -81,6 +84,16 @@ func (n *node) emitRunning(node *kubernetes.Node) {
 
 func (n *node) emitStopped(node *kubernetes.Node) {
 	n.comm.Remove(string(node.GetUID()))
+}
+
+// Start starts the eventer
+func (n *node) Start() error {
+	return n.watcher.Start()
+}
+
+// Stop stops the eventer
+func (n *node) Stop() {
+	n.watcher.Stop()
 }
 
 // OnAdd ensures processing of node objects that are newly created
