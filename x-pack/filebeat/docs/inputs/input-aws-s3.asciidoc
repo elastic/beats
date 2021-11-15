@@ -522,7 +522,8 @@ The `sqs.notification_parsing_script` executes Javascript code to process an eve
 It uses a pure Go implementation of ECMAScript 5.1 and has no external dependencies.
 
 It can be configured by embedding Javascript in your configuration file or by pointing
-the processor at external file(s).
+the processor at external file(s). Only one of the options `sqs.notification_parsing_script.source`, `sqs.notification_parsing_script.file`, and `sqs.notification_parsing_script.files`
+can be set at the same time.
 
 The script requires a `parse(notification)` function that receives the notification as
 an object and returns a list of `S3EventV2` objects.
