@@ -8,12 +8,15 @@ import (
 	"syscall"
 )
 
-type FilesFetcher struct {
+type FileSystemFetcher struct {
 	filesPaths []string // Files and directories paths for the fetcher to extract info from
 }
 
+const (
+	FILE_SYSTEM_INPUT_TYPE = "file-system"
+)
 
-type FileData struct {
+type FileSystemResourceData struct {
 	FileName  string `json:"fileName"`
 	FileMode  string `json:"fileMode"`
 	Gid       string `json:"gid"`
@@ -23,18 +26,18 @@ type FileData struct {
 }
 
 func NewFileFetcher(filesPaths []string) Fetcher {
-	return &FilesFetcher{
+	return &FileSystemFetcher{
 		filesPaths: filesPaths,
 	}
 }
 
-func (f *FilesFetcher) Fetch() (interface{}, error) {
-	results := make([]FileData, 0)
+func (f *FileSystemFetcher) Fetch() (interface{}, error) {
+	results := make([]FileSystemResourceData, 0)
 
 	for _, filePath := range f.filesPaths {
 		info, err := os.Stat(filePath)
 
-		// If errors occur during files read, just skip on the file
+		// If errors occur during file system resource, just skip on the file and log the error
 		if err != nil {
 			logp.Err("Failed to fetch %s, error - %+v", filePath, err)
 			continue
@@ -47,13 +50,13 @@ func (f *FilesFetcher) Fetch() (interface{}, error) {
 	return results, nil
 }
 
-func (f *FilesFetcher) Stop() {
+func (f *FileSystemFetcher) Stop() {
 }
 
-func FromFileInfo(info os.FileInfo, path string) FileData {
+func FromFileInfo(info os.FileInfo, path string) FileSystemResourceData {
 
 	if info == nil {
-		return FileData{}
+		return FileSystemResourceData{}
 	}
 
 	stat := info.Sys().(*syscall.Stat_t)
@@ -66,12 +69,13 @@ func FromFileInfo(info os.FileInfo, path string) FileData {
 	mod := strconv.FormatUint(uint64(info.Mode().Perm()), 8)
 
 	data :=
-		FileData{
+		FileSystemResourceData{
 			FileName: info.Name(),
 			FileMode: mod,
 			Uid:      usr.Name,
 			Gid:      group.Name,
 			Path:     path,
+			InputType: FILE_SYSTEM_INPUT_TYPE,
 		}
 
 	return data

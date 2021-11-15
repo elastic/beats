@@ -28,7 +28,7 @@ func TestFileFetcherFetchFilesFromFileSystem(t *testing.T) {
 	if err != nil {
 		assert.Fail(t, "Fetcher did not work")
 	}
-	result := results.([]FileData)[0]
+	result := results.([]FileSystemResourceData)[0]
 
 	assert.Equal(t, file, result.Path)
 	assert.Equal(t, "600", result.FileMode)
