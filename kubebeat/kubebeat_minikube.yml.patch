@@ -1,5 +1,5 @@
---- kubebeat.yml	2021-11-15 18:27:39.000000000 +0200
-+++ kubebeat_new.yml	2021-11-15 18:30:47.000000000 +0200
+--- kubebeat.yml	2021-11-15 18:48:10.000000000 +0200
++++ kubebeat_new.yml	2021-11-15 18:52:13.000000000 +0200
 @@ -4,7 +4,7 @@
  
  kubebeat:
@@ -10,14 +10,14 @@
        "/hostfs/etc/kubernetes/scheduler.conf",
        "/hostfs/etc/kubernetes/controller-manager.conf",
 @@ -57,7 +57,7 @@
-   # Scheme and port can be left out and will be set to the default (http and 5601)
-   # In case you specify and additional path, the scheme is required: http://localhost:5601/path
-   # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
--  #host: "localhost:5601"
-+  host: "http://host.minikube.internal:5601"
+ # Scheme and port can be left out and will be set to the default (http and 5601)
+ # In case you specify and additional path, the scheme is required: http://localhost:5601/path
+ # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
+-#host: "localhost:5601"
++host: "http://host.minikube.internal:5601"
  
-   # Kibana Space ID
-   # ID of the Kibana Space into which the dashboards should be loaded. By default,
+ # Kibana Space ID
+ # ID of the Kibana Space into which the dashboards should be loaded. By default,
 @@ -84,15 +84,15 @@
  # ---------------------------- Elasticsearch Output ----------------------------
  output.elasticsearch:
@@ -35,5 +35,5 @@
 +  username: "elastic"
 +  password: "changeme"
  
- # ------------------------------ Logstash Output -------------------------------
- #output.logstash:
+   # ------------------------------ Logstash Output -------------------------------
+   #output.logstash:
