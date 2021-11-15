@@ -23,6 +23,7 @@ import (
 	"net/http"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
@@ -30,8 +31,55 @@ import (
 	"github.com/elastic/beats/v7/libbeat/mock"
 )
 
+type mockbeat struct {
+	done     chan struct{}
+	initDone chan struct{}
+}
+
+func (mb mockbeat) Run(b *beat.Beat) error {
+	client, err := b.Publisher.Connect()
+	if err != nil {
+		return err
+	}
+
+	ticker := time.NewTicker(1 * time.Second)
+	go func() {
+		// unblocks mb.waitUntilRunning
+		close(mb.initDone)
+		for {
+			select {
+			case <-ticker.C:
+				client.Publish(beat.Event{
+					Timestamp: time.Now(),
+					Fields: common.MapStr{
+						"type":    "mock",
+						"message": "Mockbeat is alive!",
+					},
+				})
+			case <-mb.done:
+				ticker.Stop()
+				return
+			}
+		}
+	}()
+
+	<-mb.done
+	return nil
+}
+
+func (mb mockbeat) waitUntilRunning() {
+	<-mb.initDone
+}
+
+func (mb mockbeat) Stop() {
+	close(mb.done)
+}
+
 func TestMonitoringNameFromConfig(t *testing.T) {
-	mockBeat, _ := mock.New(nil, nil)
+	mockBeat := mockbeat{
+		done:     make(chan struct{}),
+		initDone: make(chan struct{}),
+	}
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 
@@ -44,13 +92,21 @@ func TestMonitoringNameFromConfig(t *testing.T) {
 		// Set the configuration file path flag so the beat can read it
 		flag.Set("c", "testdata/mockbeat.yml")
 		instance.Run(mock.Settings, func(_ *beat.Beat, _ *common.Config) (beat.Beater, error) {
-			return mockBeat, nil
+			return &mockBeat, nil
 		})
 	}()
 
 	t.Cleanup(func() {
 		mockBeat.Stop()
 	})
+
+	// Make sure the beat is running
+	mockBeat.waitUntilRunning()
+
+	// As the HTTP server runs in a different goroutine from the
+	// beat main loop, give the scheduler another chance to schedule
+	// the HTTP server goroutine
+	time.Sleep(10 * time.Millisecond)
 
 	resp, err := http.Get("http://localhost:5066/state")
 	if err != nil {
