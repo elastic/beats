@@ -19,6 +19,86 @@ package opt
 
 import "github.com/elastic/go-structform"
 
+// String
+
+// String is a wrapper for "optional" types, with the bool value indicating
+// if the stored int is a legitimate value.
+type String struct {
+	exists bool
+	value  string
+}
+
+// NewStringNone returns a new OptUint wrapper
+func NewStringNone() String {
+	return String{
+		exists: false,
+		value:  "",
+	}
+}
+
+// StringWith returns a new OptUint wrapper with a given int
+func StringWith(s string) String {
+	return String{
+		exists: true,
+		value:  s,
+	}
+}
+
+// IsZero returns true if the underlying value nil
+func (opt String) IsZero() bool {
+	return !opt.exists
+}
+
+// Exists returns true if the underlying value exists
+func (opt String) Exists() bool {
+	return opt.exists
+}
+
+// Int
+
+// Int is a wrapper for "optional" types, with the bool value indicating
+// if the stored int is a legitimate value.
+type Int struct {
+	exists bool
+	value  int
+}
+
+// NewUintNone returns a new OptUint wrapper
+func NewIntNone() Uint {
+	return Uint{
+		exists: false,
+		value:  0,
+	}
+}
+
+// UintWith returns a new OptUint wrapper with a given int
+func IntWith(i int) Int {
+	return Int{
+		exists: true,
+		value:  i,
+	}
+}
+
+// IsZero returns true if the underlying value nil
+func (opt Int) IsZero() bool {
+	return !opt.exists
+}
+
+// Exists returns true if the underlying value exists
+func (opt Int) Exists() bool {
+	return opt.exists
+}
+
+// ValueOr returns the stored value, or a given int
+// Please do not use this for populating reported data,
+// as we actually want to avoid sending zeros where values are functionally null
+func (opt Int) ValueOr(i int) int {
+	if opt.exists {
+		return opt.value
+	}
+	return i
+}
+
 // Uint
 
 // Uint is a wrapper for "optional" types, with the bool value indicating

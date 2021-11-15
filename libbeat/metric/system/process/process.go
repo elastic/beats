@@ -107,6 +107,108 @@ type Ticks struct {
 	Total  uint64
 }
 
+// Init initializes a Stats instance. It returns errors if the provided process regexes
+// cannot be compiled.
+func (procStats *Stats) Init() error {
+	procStats.logger = logp.NewLogger("processes")
+
+	var err error
+	procStats.host, err = sysinfo.Host()
+	if err != nil {
+		procStats.host = nil
+		procStats.logger.Warnf("Getting host details: %v", err)
+	}
+
+	procStats.ProcsMap = make(ProcsMap)
+
+	if len(procStats.Procs) == 0 {
+		return nil
+	}
+
+	procStats.procRegexps = []match.Matcher{}
+	for _, pattern := range procStats.Procs {
+		reg, err := match.Compile(pattern)
+		if err != nil {
+			return fmt.Errorf("Failed to compile regexp [%s]: %v", pattern, err)
+		}
+		procStats.procRegexps = append(procStats.procRegexps, reg)
+	}
+
+	procStats.envRegexps = make([]match.Matcher, 0, len(procStats.EnvWhitelist))
+	for _, pattern := range procStats.EnvWhitelist {
+		reg, err := match.Compile(pattern)
+		if err != nil {
+			return fmt.Errorf("failed to compile env whitelist regexp [%v]: %v", pattern, err)
+		}
+		procStats.envRegexps = append(procStats.envRegexps, reg)
+	}
+
+	if procStats.EnableCgroups {
+		cgReader, err := cgroup.NewReaderOptions(procStats.CgroupOpts)
+		if err == cgroup.ErrCgroupsMissing {
+			logp.Warn("cgroup data collection will be disabled: %v", err)
+		} else if err != nil {
+			return errors.Wrap(err, "error initializing cgroup reader")
+		}
+		procStats.cgroups = cgReader
+	}
+
+	return nil
+}
+
+// Get fetches process data which matches the provided regexes from the host.
+func (procStats *Stats) Get() ([]common.MapStr, error) {
+	if len(procStats.Procs) == 0 {
+		return nil, nil
+	}
+
+	pids, err := Pids()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to fetch the list of PIDs")
+	}
+
+	var processes []Process
+	newProcs := make(ProcsMap, len(pids))
+
+	for _, pid := range pids {
+		process := procStats.getSingleProcess(pid, newProcs)
+		if process == nil {
+			continue
+		}
+		processes = append(processes, *process)
+	}
+	procStats.ProcsMap = newProcs
+
+	processes = procStats.includeTopProcesses(processes)
+	procStats.logger.Debugf("Filtered top processes down to %d processes", len(processes))
+
+	procs := make([]common.MapStr, 0, len(processes))
+	for _, process := range processes {
+		proc := procStats.getProcessEvent(&process)
+		procs = append(procs, proc)
+	}
+
+	return procs, nil
+}
+
+// GetOne fetches process data for a given PID if its name matches the regexes provided from the host.
+func (procStats *Stats) GetOne(pid int) (common.MapStr, error) {
+	if len(procStats.Procs) == 0 {
+		return nil, nil
+	}
+
+	newProcs := make(ProcsMap, 1)
+	p := procStats.getSingleProcess(pid, newProcs)
+	if p == nil {
+		return common.MapStr{}, nil
+	}
+
+	e := procStats.getProcessEvent(p)
+	procStats.ProcsMap = newProcs
+
+	return e, nil
+}
+
 // newProcess creates a new Process object and initializes it with process
 // state information. If the process's command line and environment variables
 // are known they should be passed in to avoid re-fetching the information.
@@ -420,108 +522,6 @@ func (procStats *Stats) matchProcess(name string) bool {
 		}
 	}
 	return false
-}
-
-// Init initializes a Stats instance. It returns errors if the provided process regexes
-// cannot be compiled.
-func (procStats *Stats) Init() error {
-	procStats.logger = logp.NewLogger("processes")
-
-	var err error
-	procStats.host, err = sysinfo.Host()
-	if err != nil {
-		procStats.host = nil
-		procStats.logger.Warnf("Getting host details: %v", err)
-	}
-
-	procStats.ProcsMap = make(ProcsMap)
-
-	if len(procStats.Procs) == 0 {
-		return nil
-	}
-
-	procStats.procRegexps = []match.Matcher{}
-	for _, pattern := range procStats.Procs {
-		reg, err := match.Compile(pattern)
-		if err != nil {
-			return fmt.Errorf("Failed to compile regexp [%s]: %v", pattern, err)
-		}
-		procStats.procRegexps = append(procStats.procRegexps, reg)
-	}
-
-	procStats.envRegexps = make([]match.Matcher, 0, len(procStats.EnvWhitelist))
-	for _, pattern := range procStats.EnvWhitelist {
-		reg, err := match.Compile(pattern)
-		if err != nil {
-			return fmt.Errorf("failed to compile env whitelist regexp [%v]: %v", pattern, err)
-		}
-		procStats.envRegexps = append(procStats.envRegexps, reg)
-	}
-
-	if procStats.EnableCgroups {
-		cgReader, err := cgroup.NewReaderOptions(procStats.CgroupOpts)
-		if err == cgroup.ErrCgroupsMissing {
-			logp.Warn("cgroup data collection will be disabled: %v", err)
-		} else if err != nil {
-			return errors.Wrap(err, "error initializing cgroup reader")
-		}
-		procStats.cgroups = cgReader
-	}
-
-	return nil
-}
-
-// Get fetches process data which matches the provided regexes from the host.
-func (procStats *Stats) Get() ([]common.MapStr, error) {
-	if len(procStats.Procs) == 0 {
-		return nil, nil
-	}
-
-	pids, err := Pids()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to fetch the list of PIDs")
-	}
-
-	var processes []Process
-	newProcs := make(ProcsMap, len(pids))
-
-	for _, pid := range pids {
-		process := procStats.getSingleProcess(pid, newProcs)
-		if process == nil {
-			continue
-		}
-		processes = append(processes, *process)
-	}
-	procStats.ProcsMap = newProcs
-
-	processes = procStats.includeTopProcesses(processes)
-	procStats.logger.Debugf("Filtered top processes down to %d processes", len(processes))
-
-	procs := make([]common.MapStr, 0, len(processes))
-	for _, process := range processes {
-		proc := procStats.getProcessEvent(&process)
-		procs = append(procs, proc)
-	}
-
-	return procs, nil
-}
-
-// GetOne fetches process data for a given PID if its name matches the regexes provided from the host.
-func (procStats *Stats) GetOne(pid int) (common.MapStr, error) {
-	if len(procStats.Procs) == 0 {
-		return nil, nil
-	}
-
-	newProcs := make(ProcsMap, 1)
-	p := procStats.getSingleProcess(pid, newProcs)
-	if p == nil {
-		return common.MapStr{}, nil
-	}
-
-	e := procStats.getProcessEvent(p)
-	procStats.ProcsMap = newProcs
-
-	return e, nil
 }
 
 func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
