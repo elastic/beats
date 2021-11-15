@@ -50,7 +50,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir))
 	data.RegisterFetcher("file_system", NewFileFetcher(c.Files))
 
-	// create a mock HTTP bundle bundleServerq
+	// create a mock HTTP bundle bundleServer
 	bundleServer, err := sdktest.NewServer(sdktest.MockBundle("/bundles/bundle.tar.gz", bundle.Policies))
 	if err != nil {
 		return nil, fmt.Errorf("fail to init bundle server: %s", err.Error())
