@@ -318,9 +318,12 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 	}
 
 	parsedEndpoint, _ := url.Parse(endpoint)
-	domain := parsedEndpoint.Hostname()
 	for key, provider := range providers {
-		if strings.HasSuffix(domain, key) {
+		constraint := parsedEndpoint.Hostname()
+		if len(parsedEndpoint.Scheme) == 0 {
+			constraint = parsedEndpoint.Path
+		}
+		if strings.HasSuffix(constraint, key) {
 			return provider
 		}
 	}
