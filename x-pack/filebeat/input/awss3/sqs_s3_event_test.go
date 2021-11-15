@@ -194,6 +194,24 @@ func TestSqsProcessor_getS3Notifications(t *testing.T) {
 		assert.Equal(t, "arn:aws:s3:::vpc-flow-logs-ks", events[0].S3.Bucket.ARN)
 		assert.Equal(t, "vpc-flow-logs-ks", events[0].S3.Bucket.Name)
 	})
+
+	t.Run("missing Records fail", func(t *testing.T) {
+		msg := `{"message":"missing records"}`
+		_, err := p.getS3Notifications(msg)
+		require.Error(t, err)
+		assert.EqualError(t, err, "the message is an invalid S3 notification: missing Records field")
+		msg = `{"message":"null records", "Records": null}`
+		_, err = p.getS3Notifications(msg)
+		require.Error(t, err)
+		assert.EqualError(t, err, "the message is an invalid S3 notification: missing Records field")
+	})
+
+	t.Run("empty Records does not fail", func(t *testing.T) {
+		msg := `{"Records":[]}`
+		events, err := p.getS3Notifications(msg)
+		require.NoError(t, err)
+		assert.Equal(t, 0, len(events))
+	})
 }
 
 func TestNonRecoverableError(t *testing.T) {

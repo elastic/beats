@@ -215,6 +215,12 @@ func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, erro
 			return nil, fmt.Errorf("failed to decode SQS message body as an S3 notification: %w", err)
 		}
 	}
+
+	if events.Records == nil {
+		p.log.Debugw("Invalid SQS message body: missing Records field", "sqs_message_body", body)
+		return nil, errors.New("the message is an invalid S3 notification: missing Records field")
+	}
+
 	return p.getS3Info(events)
 }
 
