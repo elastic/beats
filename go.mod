@@ -9,7 +9,7 @@ require (
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
 	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
-	github.com/Azure/azure-event-hubs-go/v3 v3.1.2
+	github.com/Azure/azure-event-hubs-go/v3 v3.3.15
 	github.com/Azure/azure-sdk-for-go v57.0.0+incompatible
 	github.com/Azure/azure-storage-blob-go v0.8.0
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
@@ -197,9 +197,9 @@ require (
 
 require (
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
-	github.com/Azure/azure-amqp-common-go/v3 v3.0.0 // indirect
+	github.com/Azure/azure-amqp-common-go/v3 v3.2.1 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.1 // indirect
-	github.com/Azure/go-amqp v0.12.6 // indirect
+	github.com/Azure/go-amqp v0.16.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/azure/cli v0.3.1 // indirect
 	github.com/Azure/go-autorest/autorest/to v0.3.0 // indirect
