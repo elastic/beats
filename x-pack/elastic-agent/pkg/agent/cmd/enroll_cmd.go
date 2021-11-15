@@ -80,6 +80,8 @@ type enrollCmdFleetServerOption struct {
 	PolicyID              string
 	Host                  string
 	Port                  uint16
+	InternalHost          string
+	InternalPort          uint16
 	Cert                  string
 	CertKey               string
 	Insecure              bool
@@ -91,6 +93,7 @@ type enrollCmdFleetServerOption struct {
 // enrollCmdOption define all the supported enrollment option.
 type enrollCmdOption struct {
 	URL                  string                     `yaml:"url,omitempty"`
+	InternalURL          string                     `yaml:"-"`
 	CAs                  []string                   `yaml:"ca,omitempty"`
 	CASha256             []string                   `yaml:"ca_sha256,omitempty"`
 	Insecure             bool                       `yaml:"insecure,omitempty"`
@@ -307,6 +310,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context, persistentConfig m
 		c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
 		c.options.FleetServer.PolicyID,
 		c.options.FleetServer.Host, c.options.FleetServer.Port,
+		c.options.FleetServer.InternalHost, c.options.FleetServer.InternalPort,
 		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
 		c.options.FleetServer.Headers,
 		c.options.ProxyURL,
@@ -401,6 +405,11 @@ func (c *enrollCmd) prepareFleetTLS() error {
 	if c.options.URL == "" {
 		return errors.New("url is required when a certificate is provided")
 	}
+
+	if c.options.FleetServer.InternalPort > 0 {
+		c.options.InternalURL = fmt.Sprintf("%s:%d", c.options.FleetServer.InternalHost, c.options.FleetServer.InternalPort)
+	}
+
 	return nil
 }
 
@@ -505,6 +514,7 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 			c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
 			c.options.FleetServer.PolicyID,
 			c.options.FleetServer.Host, c.options.FleetServer.Port,
+			c.options.FleetServer.InternalHost, c.options.FleetServer.InternalPort,
 			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
 			c.options.FleetServer.Headers,
 			c.options.ProxyURL, c.options.ProxyDisabled, c.options.ProxyHeaders,
@@ -516,6 +526,10 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 		// no longer need bootstrap at this point
 		serverConfig.Server.Bootstrap = false
 		fleetConfig.Server = serverConfig.Server
+		// use internal URL for future requests
+		if c.options.InternalURL != "" {
+			fleetConfig.Client.Host = c.options.InternalURL
+		}
 	}
 
 	configToStore := map[string]interface{}{
@@ -837,6 +851,7 @@ func storeAgentInfo(s saver, reader io.Reader) error {
 func createFleetServerBootstrapConfig(
 	connStr, serviceToken, policyID, host string,
 	port uint16,
+	internalHost string, internalPort uint16,
 	cert, key, esCA string,
 	headers map[string]string,
 	proxyURL string,
@@ -888,6 +903,11 @@ func createFleetServerBootstrapConfig(
 		Host: host,
 		Port: port,
 	}
+	if localFleetServer {
+		cfg.Server.InternalHost = internalHost
+		cfg.Server.InternalPort = internalPort
+	}
+
 	if policyID != "" {
 		cfg.Server.Policy = &configuration.FleetServerPolicyConfig{ID: policyID}
 	}
