@@ -218,6 +218,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Do not load ML jobs to Elasticsearch 8.x from new Beats 7.x releases. {pull}27771[27771]
 - Update kubernetes scheduler and controllermanager endpoints in elastic-agent-standalone-kubernetes.yaml with secure ports {pull}28675[28675]
 - Add default seccomp policy for linux arm64. {pull}27955[27955]
+- Add options to configure k8s client qps/burst. {pull}28151[28151]
+- Update to ECS 8.0 fields. {pull}28620[28620]
+- Add http.pprof.enabled option to libbeat to allow http/pprof endpoints on the socket that libbeat creates for metrics. {issue}21965[21965]
 
 *Auditbeat*
 
