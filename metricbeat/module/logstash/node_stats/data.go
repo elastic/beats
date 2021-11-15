@@ -21,6 +21,8 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 
 	"github.com/pkg/errors"
@@ -142,7 +144,7 @@ type PipelineStats struct {
 	Vertices    []map[string]interface{} `json:"vertices"`
 }
 
-func eventMapping(r mb.ReporterV2, content []byte) error {
+func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	var nodeStats NodeStats
 	err := json.Unmarshal(content, &nodeStats)
 	if err != nil {
@@ -203,6 +205,13 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 
 		if clusterUUID != "" {
 			event.ModuleFields["cluster.id"] = clusterUUID
+		}
+
+		// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+		// When using Agent, the index name is overwritten anyways.
+		if isXpack {
+			index := elastic.MakeXPackMonitoringIndexName(elastic.Logstash)
+			event.Index = index
 		}
 
 		r.Event(event)

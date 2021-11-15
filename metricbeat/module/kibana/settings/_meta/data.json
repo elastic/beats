@@ -8,20 +8,20 @@
     "kibana": {
         "elasticsearch": {
             "cluster": {
-                "id": "9Am6m3bHTJ6YrNg1pmac2Q"
+                "id": "WocBBA0QRma0sGpdQ7vLfQ"
             }
         },
         "settings": {
-            "host": "0",
+            "host": "0.0.0.0",
             "index": ".kibana",
             "locale": "en",
-            "name": "kibana",
+            "name": "b04775fa6831",
             "port": 5601,
             "snapshot": false,
             "status": "green",
-            "transport_address": "0:5601",
-            "uuid": "2076c0f0-fd6e-4ce0-bf04-59541bd3ba0c",
-            "version": "7.10.0"
+            "transport_address": "0.0.0.0:5601",
+            "uuid": "f87393a7-e8ae-48fd-af1e-91f229fd93fd",
+            "version": "7.14.0"
         }
     },
     "metricset": {
@@ -29,7 +29,7 @@
         "period": 10000
     },
     "service": {
-        "address": "172.20.0.3:5601",
+        "address": "172.19.0.3:5601",
         "type": "kibana"
     }
 }

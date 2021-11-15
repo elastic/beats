@@ -63,7 +63,7 @@ class Test(AuditbeatXPackTest):
         process metricset collects information about processes running on a system.
         """
 
-        fields = ["process.entity_id", "process.pid", "process.ppid", "process.name", "process.executable",
+        fields = ["process.entity_id", "process.pid", "process.parent.pid", "process.name", "process.executable",
                   "process.args", "process.start", "process.working_directory", "user.id", "user.group.id"]
 
         # Windows does not have effective and saved IDs, and user.name is not always filled for system processes.

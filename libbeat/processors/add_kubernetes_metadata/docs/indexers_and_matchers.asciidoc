@@ -83,10 +83,29 @@ the `log.file.path` field.
 This matcher has the following configuration settings:
 
 `logs_path`:: (Optional) Base path of container logs. If not specified, it uses
-the default logs path of the platform where {beatname_uc} is running.
-`resource_type`:: (Optional) Type of the resource to obtain the ID of. It can be
-`pod`, to make the lookup based on the pod UID, or `container`, to make the
-lookup based on the container ID. It defaults to `container`.
+the default logs path of the platform where {beatname_uc} is running: for Linux -
+`/var/lib/docker/containers/`, Windows - `C:\\ProgramData\\Docker\\containers`.
+To change the default value: container ID must follow right after the `logs_path` -
+`<log_path>/<container_id>`, where `container_id` is a 64-character-long
+hexadecimal string.
+
+`resource_type`:: (Optional) Type of the resource to obtain the ID of.
+Valid `resource_type`:
+* `pod`: to make the lookup based on the pod UID. When `resource_type` is set to
+`pod`, `logs_path` must be set as well, supported path in this case:
+** `/var/lib/kubelet/pods/` used to read logs from mounted into the pod volumes,
+those logs end up under `/var/lib/kubelet/pods/<pod UID>/volumes/<volume name>/...`
+To use `/var/lib/kubelet/pods/` as a `log_path`, `/var/lib/kubelet/pods` must be
+mounted into the filebeat Pods.
+** `/var/log/pods/`
+Note: when using `resource_type: 'pod'` logs will be enriched only with pod
+metadata: pod id, pod name, etc., not container metadata.
+*`container`: to make the lookup based on the container ID, `logs_path` must
+be set to `/var/log/containers/`.
+It defaults to `container`.
+
+To be able to use `logs_path` matcher filebeat input path must be a subdirectory
+of directory defined in `logs_path` configuration setting.
 
 The default configuration is able to lookup the metadata using the container ID
 when the logs are collected from the default docker logs path

@@ -3,7 +3,7 @@
         "@timestamp": "2021-01-14T10:33:46.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -54,7 +54,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -66,7 +66,7 @@
         "@timestamp": "2021-01-14T10:15:29.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -92,13 +92,13 @@
         "host.hostname": "Demo_AMP_Threat_Quarantined",
         "host.name": "Demo_AMP_Threat_Quarantined",
         "input.type": "log",
-        "log.offset": 1358,
+        "log.offset": 1363,
         "related.hosts": [
             "Demo_AMP_Threat_Quarantined"
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -110,7 +110,7 @@
         "@timestamp": "2021-01-14T10:06:39.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -150,9 +150,8 @@
         "host.name": "Demo_AMP_Threat_Quarantined",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
-        "log.offset": 2295,
+        "log.offset": 2305,
         "process.hash.md5": "54a47f6b5e09a77e61649109c6a08866",
         "process.hash.sha1": "4af001b3c3816b860660cf2de2c0fd3c1dfb4878",
         "process.hash.sha256": "121118a0f5e0e8c933efd28c9901e54e42792619a8a3a6d11e1f0025a7324bc2",
@@ -168,7 +167,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -177,13 +176,14 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T10:06:39.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -215,7 +215,7 @@
         "host.hostname": "Demo_AMP_Threat_Quarantined",
         "host.name": "Demo_AMP_Threat_Quarantined",
         "input.type": "log",
-        "log.offset": 3885,
+        "log.offset": 3900,
         "related.hash": [
             "a78c29d1fa05c2b23d1dc9b75da8c053399143682fe3779bc466f10e1a997850"
         ],
@@ -224,7 +224,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -236,7 +236,7 @@
         "@timestamp": "2021-01-14T10:05:52.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -270,7 +270,7 @@
         "host.hostname": "Demo_AMP_Threat_Quarantined",
         "host.name": "Demo_AMP_Threat_Quarantined",
         "input.type": "log",
-        "log.offset": 5008,
+        "log.offset": 5028,
         "related.hash": [
             "a78c29d1fa05c2b23d1dc9b75da8c053399143682fe3779bc466f10e1a997850"
         ],
@@ -279,7 +279,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -291,7 +291,7 @@
         "@timestamp": "2021-01-14T10:05:52.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -331,9 +331,8 @@
         "host.name": "Demo_AMP_Threat_Quarantined",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
-        "log.offset": 6204,
+        "log.offset": 6229,
         "process.hash.md5": "54a47f6b5e09a77e61649109c6a08866",
         "process.hash.sha1": "4af001b3c3816b860660cf2de2c0fd3c1dfb4878",
         "process.hash.sha256": "121118a0f5e0e8c933efd28c9901e54e42792619a8a3a6d11e1f0025a7324bc2",
@@ -349,7 +348,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -358,13 +357,14 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T10:05:52.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -402,9 +402,8 @@
         "host.name": "Demo_AMP_Threat_Quarantined",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
-        "log.offset": 7800,
+        "log.offset": 7830,
         "process.hash.md5": "54a47f6b5e09a77e61649109c6a08866",
         "process.hash.sha1": "4af001b3c3816b860660cf2de2c0fd3c1dfb4878",
         "process.hash.sha256": "121118a0f5e0e8c933efd28c9901e54e42792619a8a3a6d11e1f0025a7324bc2",
@@ -418,7 +417,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -427,13 +426,14 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T10:05:52.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -465,7 +465,7 @@
         "host.hostname": "Demo_AMP_Threat_Quarantined",
         "host.name": "Demo_AMP_Threat_Quarantined",
         "input.type": "log",
-        "log.offset": 9301,
+        "log.offset": 9336,
         "related.hash": [
             "a78c29d1fa05c2b23d1dc9b75da8c053399143682fe3779bc466f10e1a997850"
         ],
@@ -474,7 +474,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -488,7 +488,7 @@
         "cisco.amp.cloud_ioc.short_description": "W32.WScriptExecuteFakeExtension.ioc",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -523,7 +523,7 @@
         "host.hostname": "Demo_AMP_Threat_Quarantined",
         "host.name": "Demo_AMP_Threat_Quarantined",
         "input.type": "log",
-        "log.offset": 10424,
+        "log.offset": 10464,
         "process.hash.sha256": "0a8ce026714e03e72c619307bd598add5f9b639cfd91437cb8d9c847bf9f6894",
         "related.hash": [
             "047f3c5a7ab0ea05f35b2ca8037bf62dd4228786d07707064dbd0d46569305d0"
@@ -533,7 +533,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -547,7 +547,7 @@
         "cisco.amp.cloud_ioc.short_description": "W32.Bitsadmin.ioc",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -582,7 +582,7 @@
         "host.hostname": "Demo_AMP_Threat_Quarantined",
         "host.name": "Demo_AMP_Threat_Quarantined",
         "input.type": "log",
-        "log.offset": 12096,
+        "log.offset": 12141,
         "process.hash.sha256": "047f3c5a7ab0ea05f35b2ca8037bf62dd4228786d07707064dbd0d46569305d0",
         "related.hash": [
             "838670c83e6d1984d0c46e39c196028d292b3a6d2df96183f2f6e408f1a16e00"
@@ -592,7 +592,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -606,7 +606,7 @@
         "cisco.amp.cloud_ioc.short_description": "W32.WScriptLaunchedZippedJS.ioc",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -641,7 +641,7 @@
         "host.hostname": "Demo_AMP_Threat_Quarantined",
         "host.name": "Demo_AMP_Threat_Quarantined",
         "input.type": "log",
-        "log.offset": 14294,
+        "log.offset": 14344,
         "process.hash.sha256": "0a8ce026714e03e72c619307bd598add5f9b639cfd91437cb8d9c847bf9f6894",
         "related.hash": [
             "047f3c5a7ab0ea05f35b2ca8037bf62dd4228786d07707064dbd0d46569305d0"
@@ -651,7 +651,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -665,7 +665,7 @@
         "cisco.amp.cloud_ioc.short_description": "W32.PossibleRansomwareShadowCopyDeletion.ioc",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -700,7 +700,7 @@
         "host.hostname": "Demo_WannaCry_Ransomware",
         "host.name": "Demo_WannaCry_Ransomware",
         "input.type": "log",
-        "log.offset": 16006,
+        "log.offset": 16061,
         "process.hash.sha256": "17f746d82695fa9b35493b41859d39d786d32b23a9d2e00f4011dec7a02402ae",
         "related.hash": [
             "e09bf4d27555ec7567a598ba89ccc33667252cef1fb0b604315ea7562d18ad10"
@@ -710,7 +710,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -724,7 +724,7 @@
         "cisco.amp.cloud_ioc.short_description": "W32.BCDEditDisableRecovery.ioc",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -759,7 +759,7 @@
         "host.hostname": "Demo_WannaCry_Ransomware",
         "host.name": "Demo_WannaCry_Ransomware",
         "input.type": "log",
-        "log.offset": 17775,
+        "log.offset": 17835,
         "process.hash.sha256": "b9c5d4339809e0ad9a00d4d3dd26fdf44a32819a54abf846bb9b560d81391c25",
         "related.hash": [
             "17f746d82695fa9b35493b41859d39d786d32b23a9d2e00f4011dec7a02402ae"
@@ -769,7 +769,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -783,7 +783,7 @@
         "cisco.amp.cloud_ioc.short_description": "W32.FakeExtensionExec.RET",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -819,7 +819,7 @@
         "host.hostname": "Demo_Low_Prev_Retro",
         "host.name": "Demo_Low_Prev_Retro",
         "input.type": "log",
-        "log.offset": 19558,
+        "log.offset": 19623,
         "process.hash.sha256": "93b2ed4004ed5f7f3039dd7ecbd22c7e4e24b6373b4d9ef8d6e45a179b13a5e8",
         "related.hash": [
             "d5221f6847978682234cb8ebfa951cb56b1323658679a820b168bbc1f5261a3b"
@@ -829,7 +829,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -841,7 +841,7 @@
         "@timestamp": "2021-01-14T10:01:51.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -872,7 +872,7 @@
         "host.hostname": "Demo_BP_WMIPRVSE",
         "host.name": "Demo_BP_WMIPRVSE",
         "input.type": "log",
-        "log.offset": 21167,
+        "log.offset": 21237,
         "related.hash": [
             "5c84acc90941b0501acc22ea959b533ddf1e1cbebc57f42e4f8c724bffaf3a6e"
         ],
@@ -881,7 +881,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -893,7 +893,7 @@
         "@timestamp": "2021-01-14T10:01:50.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -930,9 +930,8 @@
         "host.name": "Demo_BP_WMIPRVSE",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
-        "log.offset": 27082,
+        "log.offset": 27177,
         "process.hash.md5": "23ee3d381cfe3b9f6229483e2ce2f9e1",
         "process.hash.sha1": "93cf877f5627e55ec076a656e935042fac39950e",
         "process.hash.sha256": "4240a12e0b246c9d69af1f697488fe7da1b497df20f4a6f95135b4d5fe180a57",
@@ -946,7 +945,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -955,7 +954,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-14T09:56:55.000Z",
@@ -963,7 +963,7 @@
         "cisco.amp.cloud_ioc.short_description": "W32.PsexecAsAdmin.ioc",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -998,7 +998,7 @@
         "host.hostname": "Demo_AMP_MAP_FriedEx",
         "host.name": "Demo_AMP_MAP_FriedEx",
         "input.type": "log",
-        "log.offset": 28604,
+        "log.offset": 28704,
         "process.hash.sha256": "db06c3534964e3fc79d2763144ba53742d7fa250ca336f4a0fe724b75aaff386",
         "related.hash": [
             "3337e3875b05e0bfba69ab926532e3f179e8cfbf162ebb60ce58a0281437a7ef"
@@ -1008,7 +1008,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1020,7 +1020,7 @@
         "@timestamp": "2021-01-14T07:56:40.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -1058,7 +1058,7 @@
         "host.os.family": "windows",
         "host.os.platform": "windows",
         "input.type": "log",
-        "log.offset": 30050,
+        "log.offset": 30155,
         "related.hash": [
             "41476df3138717868118d8542cf3d1d6",
             "5ca4bef8de6def53519d4b22632675bb4c1e470b",
@@ -1069,7 +1069,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1083,7 +1083,7 @@
         "cisco.amp.cloud_ioc.short_description": "W32.PowershellEncodedBuffer.ioc",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -1118,7 +1118,7 @@
         "host.hostname": "Demo_AMP_MAP_FriedEx",
         "host.name": "Demo_AMP_MAP_FriedEx",
         "input.type": "log",
-        "log.offset": 31276,
+        "log.offset": 31386,
         "process.hash.sha256": "a8fdba9df15e41b6f5c69c79f66a26a9d48e174f9e7018a371600b866867dab8",
         "related.hash": [
             "a8fdba9df15e41b6f5c69c79f66a26a9d48e174f9e7018a371600b866867dab8"
@@ -1128,7 +1128,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1140,7 +1140,7 @@
         "@timestamp": "2021-01-14T00:37:44.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -1173,7 +1173,7 @@
         "host.hostname": "Demo_AMP",
         "host.name": "Demo_AMP",
         "input.type": "log",
-        "log.offset": 33023,
+        "log.offset": 33138,
         "related.hash": [
             "6a37d750f02de99767770a2d1274c3a4e0259e98d38bd8a801949ae3972eef86"
         ],
@@ -1182,7 +1182,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1194,7 +1194,7 @@
         "@timestamp": "2021-01-14T00:27:10.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -1232,7 +1232,7 @@
         "host.os.family": "windows",
         "host.os.platform": "windows",
         "input.type": "log",
-        "log.offset": 34132,
+        "log.offset": 34252,
         "related.hash": [
             "41476df3138717868118d8542cf3d1d6",
             "5ca4bef8de6def53519d4b22632675bb4c1e470b",
@@ -1243,7 +1243,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1255,7 +1255,7 @@
         "@timestamp": "2021-01-14T00:02:08.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -1281,13 +1281,13 @@
         "host.hostname": "Demo_AMP_MAP_FriedEx",
         "host.name": "Demo_AMP_MAP_FriedEx",
         "input.type": "log",
-        "log.offset": 35358,
+        "log.offset": 35483,
         "related.hosts": [
             "Demo_AMP_MAP_FriedEx"
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1299,7 +1299,7 @@
         "@timestamp": "2021-01-13T15:36:52.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -1333,7 +1333,7 @@
         "host.hostname": "Demo_Qakbot_1",
         "host.name": "Demo_Qakbot_1",
         "input.type": "log",
-        "log.offset": 36288,
+        "log.offset": 36418,
         "related.hash": [
             "0b965ca8afea0638749b71ec6ad53f94e8bd9f9b359f1cb2e707dbe52f5d3960"
         ],
@@ -1342,7 +1342,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1354,7 +1354,7 @@
         "@timestamp": "2021-01-13T15:36:52.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -1386,7 +1386,7 @@
         "host.hostname": "Demo_Qakbot_1",
         "host.name": "Demo_Qakbot_1",
         "input.type": "log",
-        "log.offset": 37489,
+        "log.offset": 37624,
         "related.hash": [
             "0b965ca8afea0638749b71ec6ad53f94e8bd9f9b359f1cb2e707dbe52f5d3960"
         ],
@@ -1395,7 +1395,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1407,7 +1407,7 @@
         "@timestamp": "2021-01-13T15:36:52.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -1445,7 +1445,7 @@
         "host.os.family": "windows",
         "host.os.platform": "windows",
         "input.type": "log",
-        "log.offset": 38602,
+        "log.offset": 38742,
         "related.hash": [
             "0b965ca8afea0638749b71ec6ad53f94e8bd9f9b359f1cb2e707dbe52f5d3960"
         ],
@@ -1454,7 +1454,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1466,7 +1466,7 @@
         "@timestamp": "2021-01-13T15:36:52.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -1506,7 +1506,7 @@
         "host.os.family": "windows",
         "host.os.platform": "windows",
         "input.type": "log",
-        "log.offset": 39856,
+        "log.offset": 40001,
         "related.hash": [
             "0b965ca8afea0638749b71ec6ad53f94e8bd9f9b359f1cb2e707dbe52f5d3960",
             "5faebef3bb880489195e80e6656ccf442ff7123b",
@@ -1517,7 +1517,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1529,7 +1529,7 @@
         "@timestamp": "2021-01-13T10:37:33.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -1659,7 +1659,7 @@
         "host.hostname": "Demo_AMP",
         "host.name": "Demo_AMP",
         "input.type": "log",
-        "log.offset": 41214,
+        "log.offset": 41364,
         "process.hash.sha256": "d5bc504277172be5c54b60ad5c13209dc1f729131def084de3ec8c72e54c58ef",
         "related.hash": [
             "3d46e95284f93bbb76b3b7e1bf0e1b2d51e8a9411c2b6e649112f22f92de63c2"
@@ -1669,7 +1669,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1681,7 +1681,7 @@
         "@timestamp": "2021-01-13T10:23:35.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -1707,13 +1707,13 @@
         "host.hostname": "Demo_AMP",
         "host.name": "Demo_AMP",
         "input.type": "log",
-        "log.offset": 44193,
+        "log.offset": 44348,
         "related.hosts": [
             "Demo_AMP"
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1727,7 +1727,7 @@
         "cisco.amp.cloud_ioc.short_description": "W32.PowershellDownloadedExecutable.ioc",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -1762,7 +1762,7 @@
         "host.hostname": "Demo_AMP",
         "host.name": "Demo_AMP",
         "input.type": "log",
-        "log.offset": 45111,
+        "log.offset": 45271,
         "process.hash.sha256": "3d46e95284f93bbb76b3b7e1bf0e1b2d51e8a9411c2b6e649112f22f92de63c2",
         "related.hash": [
             "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7"
@@ -1772,7 +1772,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1786,7 +1786,7 @@
         "cisco.amp.cloud_ioc.short_description": "W32.WinWord.Powershell",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -1821,7 +1821,7 @@
         "host.hostname": "Demo_AMP",
         "host.name": "Demo_AMP",
         "input.type": "log",
-        "log.offset": 46862,
+        "log.offset": 47027,
         "process.hash.sha256": "3d46e95284f93bbb76b3b7e1bf0e1b2d51e8a9411c2b6e649112f22f92de63c2",
         "related.hash": [
             "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7"
@@ -1831,7 +1831,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1843,7 +1843,7 @@
         "@timestamp": "2021-01-13T10:00:07.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -1875,7 +1875,7 @@
         "host.hostname": "Demo_AMP",
         "host.name": "Demo_AMP",
         "input.type": "log",
-        "log.offset": 48509,
+        "log.offset": 48679,
         "related.hash": [
             "4a45dbc60436fc72fbd8a8bf81995c378575142e0022015f29a4b25546e19cef"
         ],
@@ -1884,7 +1884,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1898,7 +1898,7 @@
         "cisco.amp.cloud_ioc.short_description": "W32.PowershellDownloadedExecutable.ioc",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -1933,7 +1933,7 @@
         "host.hostname": "Demo_AMP_Exploit_Prevention_Audit",
         "host.name": "Demo_AMP_Exploit_Prevention_Audit",
         "input.type": "log",
-        "log.offset": 49613,
+        "log.offset": 49788,
         "process.hash.sha256": "17f746d82695fa9b35493b41859d39d786d32b23a9d2e00f4011dec7a02402ae",
         "related.hash": [
             "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7"
@@ -1943,7 +1943,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1955,7 +1955,7 @@
         "@timestamp": "2021-01-12T10:15:22.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -1981,13 +1981,13 @@
         "host.hostname": "Demo_AMP_Exploit_Prevention_Audit",
         "host.name": "Demo_AMP_Exploit_Prevention_Audit",
         "input.type": "log",
-        "log.offset": 51389,
+        "log.offset": 51569,
         "related.hosts": [
             "Demo_AMP_Exploit_Prevention_Audit"
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1999,7 +1999,7 @@
         "@timestamp": "2020-12-25T05:49:09.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -2039,9 +2039,8 @@
         "host.name": "Demo_AMP_Intel",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
-        "log.offset": 52332,
+        "log.offset": 52517,
         "process.hash.md5": "38ae1b3c38faef56fe4907922f0385ba",
         "process.hash.sha1": "84123a3decdaa217e3588a1de59fe6cee1998004",
         "process.hash.sha256": "d5bc504277172be5c54b60ad5c13209dc1f729131def084de3ec8c72e54c58ef",
@@ -2057,7 +2056,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2066,13 +2065,14 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2020-12-25T05:49:09.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -2104,7 +2104,7 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 53947,
+        "log.offset": 54137,
         "related.hash": [
             "edb1ff2521fb4bf748111f92786d260d40407a2e8463dcd24bb09f908ee13eb9"
         ],
@@ -2113,7 +2113,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2125,7 +2125,7 @@
         "@timestamp": "2020-12-25T05:30:44.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -2165,9 +2165,8 @@
         "host.name": "Demo_AMP_Intel",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
-        "log.offset": 55057,
+        "log.offset": 55252,
         "process.hash.md5": "92f44e405db16ac55d97e3bfe3b132fa",
         "process.hash.sha1": "04c5d2b4da9a0f3fa8a45702d4256cee42d8c48d",
         "process.hash.sha256": "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7",
@@ -2183,7 +2182,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2192,13 +2191,14 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2020-12-25T05:30:44.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -2230,7 +2230,7 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 56674,
+        "log.offset": 56874,
         "related.hash": [
             "f2863a775c7faa85aefa3814530d9356ff700ae8bf534584652c2b4b720ee117"
         ],
@@ -2239,7 +2239,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2253,7 +2253,7 @@
         "cisco.amp.cloud_ioc.short_description": "W32.PowershellDownloadedExecutable.ioc",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -2288,7 +2288,7 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 57784,
+        "log.offset": 57989,
         "process.hash.sha256": "664e83900e42179cfea99edb71abaf00b35e558da8d5f2e35004b2a623d5b5f7",
         "related.hash": [
             "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7"
@@ -2298,7 +2298,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2312,7 +2312,7 @@
         "cisco.amp.cloud_ioc.short_description": "W32.WinWord.Powershell",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -2347,7 +2347,7 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 59541,
+        "log.offset": 59751,
         "process.hash.sha256": "664e83900e42179cfea99edb71abaf00b35e558da8d5f2e35004b2a623d5b5f7",
         "related.hash": [
             "6c05e11399b7e3c8ed31bae72014cf249c144a8f4a2c54a758eb2e6fad47aec7"
@@ -2357,7 +2357,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2369,7 +2369,7 @@
         "@timestamp": "2020-12-25T05:02:27.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -2421,7 +2421,7 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 61194,
+        "log.offset": 61409,
         "process.hash.sha256": "93b2ed4004ed5f7f3039dd7ecbd22c7e4e24b6373b4d9ef8d6e45a179b13a5e8",
         "related.hash": [
             "d1bea74ac9d85b3dcd4abc1af42af6c37b9349defc8e6577993611b773f56ca0"
@@ -2431,7 +2431,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2443,7 +2443,7 @@
         "@timestamp": "2020-12-25T05:02:26.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -2495,7 +2495,7 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 62768,
+        "log.offset": 62988,
         "process.hash.sha256": "93b2ed4004ed5f7f3039dd7ecbd22c7e4e24b6373b4d9ef8d6e45a179b13a5e8",
         "related.hash": [
             "1dc5d15a26a79bb46519952a60b15aa4acb36f6ce3247ebf50df9c157bc4fcf4"
@@ -2505,7 +2505,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2517,7 +2517,7 @@
         "@timestamp": "2020-12-25T04:32:53.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -2599,7 +2599,7 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 64342,
+        "log.offset": 64567,
         "process.hash.sha256": "71854d2c40664493e05c0a7e4f0c7cc74ada1a63eec1d4fe32350f6af8728243",
         "related.hash": [
             "465f398ae8e3c32395eb7c04bc8cd24595068e6a127e243bed3e9b4931556bfc"
@@ -2609,7 +2609,7 @@
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2621,7 +2621,7 @@
         "@timestamp": "2020-12-25T04:22:45.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -2647,13 +2647,13 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 66455,
+        "log.offset": 66685,
         "related.hosts": [
             "Demo_AMP_Intel"
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2665,7 +2665,7 @@
         "@timestamp": "2020-12-25T04:07:21.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -2697,13 +2697,13 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 67379,
+        "log.offset": 67614,
         "related.hosts": [
             "Demo_AMP_Intel"
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2715,7 +2715,7 @@
         "@timestamp": "2020-12-25T04:06:40.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
-        "cisco.amp.computer.external_ip": "8.8.8.8",
+        "cisco.amp.computer.external_ip": "175.16.199.1",
         "cisco.amp.computer.network_addresses": [
             {
                 "ip": "10.10.10.10",
@@ -2742,13 +2742,13 @@
         "host.hostname": "Demo_AMP_Intel",
         "host.name": "Demo_AMP_Intel",
         "input.type": "log",
-        "log.offset": 68455,
+        "log.offset": 68695,
         "related.hosts": [
             "Demo_AMP_Intel"
         ],
         "related.ip": [
             "10.10.10.10",
-            "8.8.8.8"
+            "175.16.199.1"
         ],
         "service.type": "cisco",
         "tags": [
