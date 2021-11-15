@@ -832,11 +832,11 @@ Contents of probable licence file $GOMODCACHE/code.cloudfoundry.org/go-loggregat
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-event-hubs-go/v3
-Version: v3.1.2
+Version: v3.3.15
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-event-hubs-go/v3@v3.1.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-event-hubs-go/v3@v3.3.15/LICENSE:
 
     MIT License
 
@@ -20030,11 +20030,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-amqp-common-go/v3
-Version: v3.0.0
+Version: v3.2.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-amqp-common-go/v3@v3.0.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-amqp-common-go/v3@v3.2.1/LICENSE:
 
     MIT License
 
@@ -20091,15 +20091,16 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-pipeline-g
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/go-amqp
-Version: v0.12.6
+Version: v0.16.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/go-amqp@v0.12.6/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/go-amqp@v0.16.0/LICENSE:
 
     MIT License
 
-    Copyright (c) Microsoft Corporation.
+    Copyright (C) 2017 Kale Blankenship
+    Portions Copyright (C) Microsoft Corporation
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
