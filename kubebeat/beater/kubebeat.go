@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/elastic/beats/v7/kubebeat/bundle"
 	"github.com/mitchellh/mapstructure"
-	"time"
 
 	"github.com/elastic/beats/v7/kubebeat/config"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/open-policy-agent/opa/sdk"
 	sdktest "github.com/open-policy-agent/opa/sdk/test"
@@ -22,38 +22,32 @@ type kubebeat struct {
 	done         chan struct{}
 	config       config.Config
 	client       beat.Client
-	watcher      kubernetes.Watcher
 	opa          *sdk.OPA
 	bundleServer *sdktest.Server
+	data         *Data
 }
 
 // New creates an instance of kubebeat.
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+	ctx := context.Background()
+
 	c := config.DefaultConfig
 	if err := cfg.Unpack(&c); err != nil {
-		return nil, fmt.Errorf("error reading config file: %v", err)
+		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 
 	logp.Info("Config initiated.")
 
-	client, err := kubernetes.GetKubernetesClient(c.KubeConfig, kubernetes.KubeClientOptions{})
+	data := NewData(ctx, c.Period)
+
+	data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir))
+
+	kubef, err := NewKubeFetcher(c.KubeConfig, c.Period)
 	if err != nil {
-		return nil, fmt.Errorf("fail to get k8sclient client: %s", err.Error())
+		return nil, err
 	}
 
-	logp.Info("Client initiated.")
-
-	watchOptions := kubernetes.WatchOptions{
-		SyncTimeout: c.Period,
-		Namespace:   "kube-system",
-	}
-
-	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, watchOptions, nil)
-	if err != nil {
-		return nil, fmt.Errorf("error creating k8s client set: %v", err)
-	}
-
-	logp.Info("Watcher initiated.")
+	data.RegisterFetcher("kube_api", kubef)
 
 	// create a mock HTTP bundle bundleServer
 	bundleServer, err := sdktest.NewServer(sdktest.MockBundle("/bundles/bundle.tar.gz", bundle.Policies))
@@ -79,7 +73,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		config:       c,
 		opa:          opa,
 		bundleServer: bundleServer,
-		watcher:      watcher,
+		data:         data,
 	}
 	return bt, nil
 }
@@ -91,7 +85,7 @@ type RuleResult struct {
 }
 
 type Finding struct {
-	Compliant bool        `json:"compliant""`
+	Compliant bool        `json:"compliant"`
 	Message   string      `json:"message"`
 	Resource  interface{} `json:"resource"`
 }
@@ -100,88 +94,73 @@ type Finding struct {
 func (bt *kubebeat) Run(b *beat.Beat) error {
 	logp.Info("kubebeat is running! Hit CTRL-C to stop it.")
 
-	err := bt.watcher.Start()
+	err := bt.data.Run()
 	if err != nil {
 		return err
 	}
 
-	bt.client, err = b.Publisher.Connect()
-	if err != nil {
+	if bt.client, err = b.Publisher.Connect(); err != nil {
 		return err
 	}
 
-	ticker := time.NewTicker(bt.config.Period)
+	// ticker := time.NewTicker(bt.config.Period)
+	output := bt.data.Output()
+
 	for {
 		select {
 		case <-bt.done:
 			return nil
-		case <-ticker.C:
-		}
+		case o := <-output:
+			events := make([]beat.Event, 0)
+			timestamp := time.Now()
 
-		pods := bt.watcher.Store().List()
-		events := make([]beat.Event, 0)
-		timestamp := time.Now()
-
-		for _, p := range pods {
-			pod, ok := p.(*kubernetes.Pod)
-			if !ok {
-				logp.Info("could not convert to pod")
-				continue
-			}
-			pod.SetManagedFields(nil)
-			pod.Status.Reset()
-			pod.Kind = "Pod" // see https://github.com/kubernetes/kubernetes/issues/3030
-
-			result, err := bt.Decision(pod)
+			result, err := bt.Decision(o)
 			if err != nil {
 				errEvent := beat.Event{
 					Timestamp: timestamp,
 					Fields: common.MapStr{
 						"type":     b.Info.Name,
 						"err":      fmt.Errorf("error running the policy: %v", err.Error()),
-						"resource": pod,
+						"resource": o,
 					},
 				}
 				events = append(events, errEvent)
-				continue
-			}
-
-			var decoded PolicyResult
-			err = mapstructure.Decode(result, &decoded)
-			if err != nil {
-				errEvent := beat.Event{
-					Timestamp: timestamp,
-					Fields: common.MapStr{
-						"type":       b.Info.Name,
-						"err":        fmt.Errorf("error parsing the policy result: %v", err.Error()),
-						"resource":   pod,
-						"raw_result": result,
-					},
-				}
-				events = append(events, errEvent)
-				continue
-			}
-
-			for ruleName, ruleResult := range decoded {
-				for _, Finding := range ruleResult.Findings {
-					event := beat.Event{
+			} else {
+				var decoded PolicyResult
+				err = mapstructure.Decode(result, &decoded)
+				if err != nil {
+					errEvent := beat.Event{
 						Timestamp: timestamp,
 						Fields: common.MapStr{
-							"type":      b.Info.Name,
-							"rule_id":      ruleName,
-							"compliant": Finding.Compliant,
-							"resource":  Finding.Resource,
-							"message":   Finding.Message,
+							"type":       b.Info.Name,
+							"err":        fmt.Errorf("error parsing the policy result: %v", err.Error()),
+							"resource":   o,
+							"raw_result": result,
 						},
 					}
-					events = append(events, event)
+					events = append(events, errEvent)
+				} else {
+					for ruleName, ruleResult := range decoded {
+						for _, Finding := range ruleResult.Findings {
+							event := beat.Event{
+								Timestamp: timestamp,
+								Fields: common.MapStr{
+									"type":      b.Info.Name,
+									"rule_id":   ruleName,
+									"compliant": Finding.Compliant,
+									"resource":  Finding.Resource,
+									"message":   Finding.Message,
+								},
+							}
+							events = append(events, event)
+						}
+					}
 				}
 			}
 
+			bt.client.PublishAll(events)
+			logp.Info("%v events sent", len(events))
 		}
-
-		bt.client.PublishAll(events)
-		logp.Info("%v events sent", len(events))
 	}
 }
 
