@@ -34,9 +34,6 @@ import (
 	sigar "github.com/elastic/gosigar"
 )
 
-//  In some case for Windows OS the value will be `unavailable` as access to this information is not allowed (ex. external disks).
-const UnavailableDisk = "unavailable"
-
 // Config stores the metricset-local config
 type Config struct {
 	IgnoreTypes []string `config:"filesystem.ignore_types"`
@@ -113,22 +110,13 @@ func filterFileSystemList(fsList []sigar.FileSystem) []sigar.FileSystem {
 }
 
 // GetFileSystemStat retreves stats for a single filesystem
-func GetFileSystemStat(fs sigar.FileSystem) (*FSStat, error) {
+func GetFileSystemStat(fs sigar.FileSystem) (sigar.FileSystemUsage, error) {
 	stat := sigar.FileSystemUsage{}
-	if fs.SysTypeName != UnavailableDisk {
-		if err := stat.Get(fs.DirName); err != nil {
-			return nil, err
-		}
+	//  In some case for Windows OS the disk type value will be `unavailable` and access to this information is not allowed (ex. external disks).
+	if err := stat.Get(fs.DirName); err != nil {
+		return stat, err
 	}
-
-	filesystem := FSStat{
-		FileSystemUsage: stat,
-		DevName:         fs.DevName,
-		Mount:           fs.DirName,
-		SysTypeName:     fs.SysTypeName,
-	}
-
-	return &filesystem, nil
+	return stat, nil
 }
 
 // AddFileSystemUsedPercentage adds usage data to the filesystem struct
@@ -142,18 +130,20 @@ func AddFileSystemUsedPercentage(f *FSStat) {
 }
 
 // GetFilesystemEvent turns a stat struct into a MapStr
-func GetFilesystemEvent(fsStat *FSStat) common.MapStr {
+func GetFilesystemEvent(fsStat *FSStat, addStats bool) common.MapStr {
 	evt := common.MapStr{
 		"type":        fsStat.SysTypeName,
 		"device_name": fsStat.DevName,
 		"mount_point": fsStat.Mount,
-		"total":       fsStat.Total,
-		"available":   fsStat.Avail,
-		"free":        fsStat.Free,
-		"used": common.MapStr{
+	}
+	if addStats == true {
+		evt.Put("total", fsStat.Total)
+		evt.Put("available", fsStat.Avail)
+		evt.Put("free", fsStat.Free)
+		evt.Put("used", common.MapStr{
 			"pct":   fsStat.UsedPercent,
 			"bytes": fsStat.Used,
-		},
+		})
 	}
 	if runtime.GOOS != "windows" {
 		evt.Put("files", fsStat.Files)
