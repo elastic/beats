@@ -23,13 +23,14 @@ package collector
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
-	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/golang/protobuf/proto"
 	prometheuslabels "github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/textparse"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
