@@ -23,7 +23,6 @@ wait_for_port 2181
 	--entity-type users \
 	--entity-name beats
 
-
 echo "Starting Kafka broker"
 mkdir -p ${KAFKA_LOGS_DIR}
 ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
