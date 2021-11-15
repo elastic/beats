@@ -75,7 +75,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		mockAPI := NewMockSQSAPI(ctrl)
 		mockS3HandlerFactory := NewMockS3ObjectHandlerFactory(ctrl)
 
-		emptyRecordsMsg := newSQSMessage()
+		emptyRecordsMsg := newSQSMessage([]s3EventV2{}...)
 
 		gomock.InOrder(
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&emptyRecordsMsg)).Return(nil),
