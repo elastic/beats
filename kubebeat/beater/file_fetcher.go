@@ -8,11 +8,6 @@ import (
 	"syscall"
 )
 
-type Fetcher interface {
-	Fetch() (interface{}, error)
-	Stop()
-}
-
 type FilesFetcher struct {
 	filesPaths []string // Files and directories paths for the fetcher to extract info from
 }
