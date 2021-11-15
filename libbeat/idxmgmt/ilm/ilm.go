@@ -37,7 +37,7 @@ type SupportFactory func(*logp.Logger, beat.Info, *common.Config) (Supporter, er
 // write alias a manager instance must be generated.
 type Supporter interface {
 	// Query settings
-	Mode() Mode
+	Enabled() bool
 	Alias() Alias
 	Policy() Policy
 	Overwrite() bool
@@ -82,7 +82,7 @@ func DefaultSupport(log *logp.Logger, info beat.Info, config *common.Config) (Su
 		}
 	}
 
-	if cfg.Mode == ModeDisabled {
+	if !cfg.Enabled {
 		return NewNoopSupport(info, config)
 	}
 
@@ -137,7 +137,7 @@ func StdSupport(log *logp.Logger, info beat.Info, config *common.Config) (Suppor
 		policy.Body = body
 	}
 
-	return NewStdSupport(log, cfg.Mode, alias, policy, cfg.Overwrite, cfg.CheckExists), nil
+	return NewStdSupport(log, cfg.Enabled, alias, policy, cfg.Overwrite, cfg.CheckExists), nil
 }
 
 // NoopSupport configures a new noop ILM support implementation,
