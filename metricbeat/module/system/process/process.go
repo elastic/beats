@@ -61,14 +61,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-<<<<<<< HEAD
 	systemModule, ok := base.Module().(*system.Module)
 	if !ok {
 		return nil, fmt.Errorf("unexpected module type")
 	}
-=======
 	sys := base.Module().(system.SystemModule)
->>>>>>> d9d000d1b3 (Fix behavior of hostfs under agent (#28546))
 
 	enableCgroups := false
 	if runtime.GOOS == "linux" {

@@ -21,10 +21,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
-<<<<<<< HEAD
-=======
 	"github.com/elastic/beats/v7/libbeat/logp"
->>>>>>> d9d000d1b3 (Fix behavior of hostfs under agent (#28546))
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -45,15 +42,12 @@ type HostFSConfig struct {
 // Module represents the system module
 type Module struct {
 	mb.BaseModule
-<<<<<<< HEAD
 	IsAgent bool // Looks to see if metricbeat is running under agent. Useful if we have breaking changes in one but not the other.
-=======
-	HostFS string
+	HostFS  string
 }
 
 type SystemModule interface {
 	GetHostFS() string
->>>>>>> d9d000d1b3 (Fix behavior of hostfs under agent (#28546))
 }
 
 func NewModule(base mb.BaseModule) (mb.Module, error) {
@@ -80,18 +74,14 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		initModule(hostfs)
 	})
 
-<<<<<<< HEAD
-	return &Module{BaseModule: base, IsAgent: fleetmode.Enabled()}, nil
-=======
 	// set the main Path,
 	if fleetmode.Enabled() && len(paths.Paths.Hostfs) < 2 {
 		paths.Paths.Hostfs = hostfs
 	}
 
-	return &Module{BaseModule: base, HostFS: hostfs}, nil
+	return &Module{BaseModule: base, HostFS: hostfs, IsAgent: fleetmode.Enabled()}, nil
 }
 
 func (m Module) GetHostFS() string {
 	return m.HostFS
->>>>>>> d9d000d1b3 (Fix behavior of hostfs under agent (#28546))
 }
