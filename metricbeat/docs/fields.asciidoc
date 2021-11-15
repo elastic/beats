@@ -52820,16 +52820,6 @@ type: keyword
 
 --
 
-*`openmetrics.created`*::
-+
---
-Metric creation time in seconds
-
-
-type: keyword
-
---
-
 *`openmetrics.labels.*`*::
 +
 --
