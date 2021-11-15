@@ -19,8 +19,6 @@ package ilm
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -29,7 +27,7 @@ import (
 
 // Config is used for unpacking a common.Config.
 type Config struct {
-	Mode          Mode                     `config:"enabled"`
+	Enabled       bool                     `config:"enabled"`
 	PolicyName    fmtstr.EventFormatString `config:"policy_name"`
 	PolicyFile    string                   `config:"policy_file"`
 	RolloverAlias fmtstr.EventFormatString `config:"rollover_alias"`
@@ -43,20 +41,6 @@ type Config struct {
 	// Enable always overwrite policy mode. This required manage_ilm privileges.
 	Overwrite bool `config:"overwrite"`
 }
-
-//Mode is used for enumerating the ilm mode.
-type Mode uint8
-
-const (
-	//ModeAuto enum 'auto'
-	ModeAuto Mode = iota
-
-	//ModeEnabled enum 'true'
-	ModeEnabled
-
-	//ModeDisabled enum 'false'
-	ModeDisabled
-)
 
 const ilmDefaultPattern = "{now/d}-000001"
 
@@ -79,31 +63,9 @@ var DefaultPolicy = common.MapStr{
 	},
 }
 
-//Unpack creates enumeration value true, false or auto
-func (m *Mode) Unpack(in string) error {
-	in = strings.ToLower(in)
-
-	if in == "auto" {
-		*m = ModeAuto
-		return nil
-	}
-
-	b, err := strconv.ParseBool(in)
-	if err != nil {
-		return fmt.Errorf("ilm.enabled` mode '%v' is invalid (try auto, true, false)", in)
-	}
-
-	if b {
-		*m = ModeEnabled
-	} else {
-		*m = ModeDisabled
-	}
-	return nil
-}
-
 //Validate verifies that expected config options are given and valid
 func (cfg *Config) Validate() error {
-	if cfg.RolloverAlias.IsEmpty() && cfg.Mode != ModeDisabled {
+	if cfg.RolloverAlias.IsEmpty() && cfg.Enabled {
 		return fmt.Errorf("rollover_alias must be set when ILM is not disabled")
 	}
 	return nil
@@ -115,7 +77,7 @@ func defaultConfig(info beat.Info) Config {
 	policyFmt := fmtstr.MustCompileEvent(info.Beat)
 
 	return Config{
-		Mode:          ModeAuto,
+		Enabled:       true,
 		PolicyName:    *policyFmt,
 		RolloverAlias: *aliasFmt,
 		Pattern:       ilmDefaultPattern,
