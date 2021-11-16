@@ -137,3 +137,8 @@ func copy(m map[string]interface{}) (map[string]interface{}, error) {
 	}
 	return copy, nil
 }
+
+func init() {
+	gob.Register([]interface{}{})
+	gob.Register(map[string]Process{})
+}
