@@ -59,8 +59,7 @@ func FetchPids(hostfs string, filter func(name string) bool) ([]ProcState, error
 		return nil, errors.Wrap(err, "error reading directory names")
 	}
 
-	capacity := len(names)
-	list := make([]ProcState, 0, capacity)
+	list := make([]ProcState, 0)
 
 	// Iterate over the directory, fetch just enough info so we can filter based on user input.
 	logger := logp.L()
@@ -72,6 +71,7 @@ func FetchPids(hostfs string, filter func(name string) bool) ([]ProcState, error
 		// Will this actually fail?
 		pid, err := strconv.Atoi(name)
 		if err != nil {
+			logger.Debugf("Error converting PID name %s", name)
 			continue
 		}
 		// Fetch proc state so we can get the name for filtering based on user's filter.
@@ -85,7 +85,7 @@ func FetchPids(hostfs string, filter func(name string) bool) ([]ProcState, error
 			logger.Debugf("Process name does not matches the provided regex; PID=%d; name=%s", pid, status.Name)
 			continue
 		}
-
+		list = append(list, status)
 	}
 
 	return list, nil

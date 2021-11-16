@@ -2,6 +2,7 @@ package process
 
 import (
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
@@ -41,10 +42,15 @@ type ProcState struct {
 	// Resource Metrics
 	Memory ProcMeminfo `struct:"memory,omitempty"`
 	CPU    ProcCPUInfo `struct:"cpu,omitempty"`
+	FD     ProcLimits  `struct:"fd,omitempty"`
+
+	// cgroups
+	Cgroup cgroup.CGStats `struct:"cgroups,omitempty"`
 }
 
 type ProcCPUInfo struct {
 	StartTime common.Time `struct:"start_time,omitempty"`
+	Total     CPUTotal    `struct:"total,omitempty"`
 }
 
 type CPUTotal struct {
@@ -62,4 +68,14 @@ type ProcMeminfo struct {
 type MemBytePct struct {
 	Bytes opt.Uint  `struct:"bytes,omitempty"`
 	Pct   opt.Float `struct:"pct,omitempty"`
+}
+
+type ProcFDInfo struct {
+	Open  opt.Uint   `struct:"open,omitempty"`
+	Limit ProcLimits `struct:"limit,omitempty"`
+}
+
+type ProcLimits struct {
+	Soft opt.Uint `struct:"soft,omitempty"`
+	Hard opt.Uint `struct:"hard,omitempty"`
 }

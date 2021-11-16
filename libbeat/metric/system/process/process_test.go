@@ -31,11 +31,28 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/gosigar"
 )
 
 // numCPU is the number of CPUs of the host
 var numCPU = runtime.NumCPU()
+
+func TestPidFetch(t *testing.T) {
+	logp.DevelopmentSetup()
+	matcherFunc := func(name string) bool {
+		// if strings.Contains(name, "vscode") {
+		// 	return true
+		// }
+		// return false
+		return true
+	}
+
+	procList, err := FetchPids("/proc", matcherFunc)
+	assert.NoError(t, err, "error in FetchPids")
+	t.Logf("Process list is: %d", len(procList))
+
+}
 
 func TestPids(t *testing.T) {
 	pids, err := Pids()
