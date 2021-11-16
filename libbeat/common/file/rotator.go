@@ -22,6 +22,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"sync"
 	"time"
 
@@ -32,6 +33,7 @@ const (
 	// MaxBackupsLimit is the upper bound on the number of backup files. Any values
 	// greater will result in an error.
 	MaxBackupsLimit = 1024
+	DateFormat      = "2006010215"
 )
 
 // rotater is the interface responsible for rotating and finding files.
@@ -396,7 +398,7 @@ func newDateRotater(log Logger, filename string, clock clock) rotater {
 		clock:          clock,
 		filenamePrefix: filename + "-",
 		extension:      ".ndjson",
-		format:         "20060102150405",
+		format:         DateFormat,
 	}
 
 	d.currentFilename = d.filenamePrefix + d.clock.Now().Format(d.format) + d.extension
@@ -427,7 +429,22 @@ func (d *dateRotator) Rotate(reason rotateReason, rotateTime time.Time) error {
 		d.log.Debugw("Rotating file", "filename", d.currentFilename, "reason", reason)
 	}
 
-	d.currentFilename = d.filenamePrefix + rotateTime.Format(d.format) + d.extension
+	newFileNamePrefix := d.filenamePrefix + rotateTime.Format(d.format)
+	files, err := filepath.Glob(newFileNamePrefix + "*" + d.extension)
+	if err != nil {
+		return fmt.Errorf("failed to get possible files: %+v", err)
+	}
+
+	if len(files) == 0 {
+		d.currentFilename = newFileNamePrefix + d.extension
+		return nil
+	}
+
+	d.SortModTimeLogs(files)
+	order := d.OrderLog(files[len(files)-1])
+
+	d.currentFilename = newFileNamePrefix + "-" + strconv.Itoa(order.count+1) + d.extension
+
 	return nil
 }
 
@@ -439,10 +456,18 @@ func (d *dateRotator) RotatedFiles() []string {
 		}
 	}
 
+	for i, name := range files {
+		if name == d.ActiveFile() {
+			files = append(files[:i], files[i+1:]...)
+			break
+		}
+	}
+
 	d.SortModTimeLogs(files)
 	return files
 }
 
+// the newest file is going to be the last
 func (d *dateRotator) SortModTimeLogs(strings []string) {
 	sort.Slice(
 		strings,
@@ -452,10 +477,39 @@ func (d *dateRotator) SortModTimeLogs(strings []string) {
 	)
 }
 
-func (d *dateRotator) OrderLog(filename string) time.Time {
-	ts, err := time.Parse(d.filenamePrefix+d.format, filepath.Base(filename))
-	if err != nil {
-		return time.Time{}
+type logOrder struct {
+	count    int
+	datetime time.Time
+}
+
+func (o logOrder) After(other logOrder) bool {
+	if o.datetime.Equal(other.datetime) {
+		return other.count > o.count
 	}
-	return ts
+	return !o.datetime.After(other.datetime)
+}
+
+func (d *dateRotator) OrderLog(filename string) logOrder {
+	prefixLength := len(d.filenamePrefix)
+	filenameLength := prefixLength + len(d.format)
+
+	var o logOrder
+	if filenameLength+len(d.extension) < len(filename) {
+		countStr := filename[filenameLength:]
+		countStr = countStr[:len(countStr)-len(d.extension)]
+		if len(countStr) > 0 {
+			countStr = countStr[1:]
+			c, err := strconv.Atoi(countStr)
+			if err != nil {
+				return o
+			}
+			o.count = c
+		}
+	}
+	ts, err := time.Parse(d.format, filename[prefixLength:filenameLength])
+	if err != nil {
+		return o
+	}
+	o.datetime = ts
+	return o
 }
