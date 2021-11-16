@@ -390,6 +390,13 @@ type dateRotator struct {
 	filenamePrefix  string
 	currentFilename string
 	extension       string
+
+	prefixLen    int
+	filenameLen  int
+	extensionLen int
+
+	// logOrderCache is used to cache log file meta information between rotations
+	logOrderCache map[string]logOrder
 }
 
 func newDateRotater(log Logger, filename string, clock clock) rotater {
@@ -399,7 +406,11 @@ func newDateRotater(log Logger, filename string, clock clock) rotater {
 		filenamePrefix: filename + "-",
 		extension:      ".ndjson",
 		format:         DateFormat,
+		logOrderCache:  make(map[string]logOrder),
 	}
+	d.prefixLen = len(d.filenamePrefix)
+	d.filenameLen = d.prefixLen + len(DateFormat)
+	d.extensionLen = len(d.extension)
 
 	d.currentFilename = d.filenamePrefix + d.clock.Now().Format(d.format) + d.extension
 	files, err := filepath.Glob(d.filenamePrefix + "*" + d.extension)
@@ -429,6 +440,8 @@ func (d *dateRotator) Rotate(reason rotateReason, rotateTime time.Time) error {
 		d.log.Debugw("Rotating file", "filename", d.currentFilename, "reason", reason)
 	}
 
+	d.logOrderCache = make(map[string]logOrder, 0)
+
 	newFileNamePrefix := d.filenamePrefix + rotateTime.Format(d.format)
 	files, err := filepath.Glob(newFileNamePrefix + "*" + d.extension)
 	if err != nil {
@@ -443,7 +456,7 @@ func (d *dateRotator) Rotate(reason rotateReason, rotateTime time.Time) error {
 	d.SortModTimeLogs(files)
 	order := d.OrderLog(files[len(files)-1])
 
-	d.currentFilename = newFileNamePrefix + "-" + strconv.Itoa(order.count+1) + d.extension
+	d.currentFilename = newFileNamePrefix + "-" + strconv.Itoa(order.index+1) + d.extension
 
 	return nil
 }
@@ -467,7 +480,7 @@ func (d *dateRotator) RotatedFiles() []string {
 	return files
 }
 
-// the newest file is going to be the last
+// SortModTimeLogs puts newest file to the last
 func (d *dateRotator) SortModTimeLogs(strings []string) {
 	sort.Slice(
 		strings,
@@ -477,39 +490,53 @@ func (d *dateRotator) SortModTimeLogs(strings []string) {
 	)
 }
 
+// logOrder stores information required to sort log files
+// parsed out from the following format {filename}-{datetime}-{index}.ndjson
 type logOrder struct {
-	count    int
+	index    int
 	datetime time.Time
 }
 
 func (o logOrder) After(other logOrder) bool {
 	if o.datetime.Equal(other.datetime) {
-		return other.count > o.count
+		return other.index > o.index
 	}
 	return !o.datetime.After(other.datetime)
 }
 
 func (d *dateRotator) OrderLog(filename string) logOrder {
-	prefixLength := len(d.filenamePrefix)
-	filenameLength := prefixLength + len(d.format)
+	if o, ok := d.logOrderCache[filename]; ok {
+		return o
+	}
 
 	var o logOrder
-	if filenameLength+len(d.extension) < len(filename) {
-		countStr := filename[filenameLength:]
-		countStr = countStr[:len(countStr)-len(d.extension)]
-		if len(countStr) > 0 {
-			countStr = countStr[1:]
-			c, err := strconv.Atoi(countStr)
-			if err != nil {
-				return o
-			}
-			o.count = c
-		}
-	}
-	ts, err := time.Parse(d.format, filename[prefixLength:filenameLength])
+	var err error
+
+	o.datetime, err = time.Parse(d.format, filename[d.prefixLen:d.filenameLen])
 	if err != nil {
 		return o
 	}
-	o.datetime = ts
+
+	if d.isFilenameWithIndex(filename) {
+		o.index, err = d.filenameIndex(filename)
+		if err != nil {
+			return o
+		}
+	}
+
+	d.logOrderCache[filename] = o
+
 	return o
+}
+
+func (d *dateRotator) isFilenameWithIndex(filename string) bool {
+	return d.filenameLen+d.extensionLen < len(filename)
+}
+
+func (d *dateRotator) filenameIndex(filename string) (int, error) {
+	indexStr := filename[d.filenameLen+1 : len(filename)-d.extensionLen]
+	if len(indexStr) > 0 {
+		return strconv.Atoi(indexStr)
+	}
+	return 0, nil
 }
