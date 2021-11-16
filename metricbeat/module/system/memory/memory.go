@@ -28,6 +28,7 @@ import (
 	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 func init() {
@@ -40,17 +41,19 @@ func init() {
 // MetricSet for fetching system memory metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
+	mod system.SystemModule
 }
 
 // New is a mb.MetricSetFactory that returns a memory.MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return &MetricSet{BaseMetricSet: base}, nil
+	sys := base.Module().(system.SystemModule)
+	return &MetricSet{BaseMetricSet: base, mod: sys}, nil
 }
 
 // Fetch fetches memory metrics from the OS.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
-	eventRaw, err := metrics.Get("")
+	eventRaw, err := metrics.Get(m.mod.GetHostFS())
 	if err != nil {
 		return errors.Wrap(err, "error fetching memory metrics")
 	}
