@@ -124,6 +124,14 @@ The supported hash types are `blake2b_256`, `blake2b_384`, `blake2b_512`, `md5`,
 `sha1`, `sha224`, `sha256`, `sha384`, `sha512`, `sha512_224`, `sha512_256`,
 `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`, and `xxh64`. The default value is `sha1`.
 
+*`file_parsers`*:: A list of `file_integrity` fields under `file` that will be
+populated by file format parsers. The available fields that can be analysed
+are listed in the auditbeat.reference.yml file. File parsers are run on all
+files within the configured paths during a scan or when a file event involves
+the file. Files that are not targets of the specific file parser are only sniffed
+to examine whether analysis should proceed. This will usually only involve reading
+a small number of bytes.
+
 *`recursive`*:: By default, the watches set to the paths specified in
 `paths` are not recursive. This means that only changes to the contents
 of this directories are watched. If `recursive` is set to `true`, the
