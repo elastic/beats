@@ -186,6 +186,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Properly locate base stream in fleet configs. {pull}28455[28455]
 - Stop logging params values. {pull}28774[28774]
 - Remove accidentally included cups library in docker images. {pull}28853[pull]
+- Fix broken monitors with newer versions of image relying on dup3. {pull}28938[pull]
 
 *Journalbeat*
 
@@ -231,6 +232,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add source.ip validation for event ID 4778 in the Security module. {issue}19627[19627]
 - Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
 - Add ECS 1.9 new users fields {pull}26509[26509]
+- Don't split hyphenated tokens {pull}28483[28483]
 
 *Functionbeat*
 
@@ -269,6 +271,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add options to configure k8s client qps/burst. {pull}28151[28151]
 - Update to ECS 8.0 fields. {pull}28620[28620]
 - Add http.pprof.enabled option to libbeat to allow http/pprof endpoints on the socket that libbeat creates for metrics. {issue}21965[21965]
+- Support custom analyzers in fields.yml. {issue}28540[28540] {pull}28926[28926]
 
 *Auditbeat*
 
