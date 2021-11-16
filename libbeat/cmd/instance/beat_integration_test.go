@@ -80,7 +80,7 @@ func TestMonitoringNameFromConfig(t *testing.T) {
 		done:     make(chan struct{}),
 		initDone: make(chan struct{}),
 	}
-	wg := sync.WaitGroup{}
+	var wg sync.WaitGroup
 	wg.Add(1)
 
 	// Make sure the beat has stopped before finishing the test
