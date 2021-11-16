@@ -114,11 +114,6 @@ func TestDailyRotation(t *testing.T) {
 
 	// seed directory with existing log files
 	files := []string{
-		logname + "-" + twoDaysAgo + ".ndjson",
-		logname + "-" + twoDaysAgo + "-1.ndjson",
-		logname + "-" + twoDaysAgo + "-2.ndjson",
-		logname + "-" + twoDaysAgo + "-3.ndjson",
-		logname + "-" + yesterday + ".ndjson",
 		logname + "-" + yesterday + "-1.ndjson",
 		logname + "-" + yesterday + "-2.ndjson",
 		logname + "-" + yesterday + "-3.ndjson",
@@ -132,6 +127,9 @@ func TestDailyRotation(t *testing.T) {
 		logname + "-" + yesterday + "-11.ndjson",
 		logname + "-" + yesterday + "-12.ndjson",
 		logname + "-" + yesterday + "-13.ndjson",
+		logname + "-" + twoDaysAgo + "-1.ndjson",
+		logname + "-" + twoDaysAgo + "-2.ndjson",
+		logname + "-" + twoDaysAgo + "-3.ndjson",
 	}
 
 	for _, f := range files {
