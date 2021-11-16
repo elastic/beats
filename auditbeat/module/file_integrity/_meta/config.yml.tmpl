@@ -79,7 +79,10 @@
   #keep_null: false
 
   # Parse detailed information for the listed fields. Field paths in the list below
-  # that are a prefix of other field paths imply the longer field path.
+  # that are a prefix of other field paths imply the longer field path. A set of
+  # fields may be specified using an RE2 regular expression quoted in //. For example
+  # /^file\.pe\./ will match all file.pe.* fields. Note that the expression is not
+  # implicitly anchored, so the empty expression will match all fields.
   # file_parsers:
   # - file.elf.sections
   # - file.elf.sections.name

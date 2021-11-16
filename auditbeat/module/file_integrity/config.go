@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"math"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -115,6 +116,24 @@ nextHash:
 	}
 
 	for _, p := range c.FileParsers {
+		if pat, ok := unquoteRegexp(p); ok {
+			re, err := regexp.Compile(pat)
+			if err != nil {
+				errs = append(errs, err)
+				continue
+			}
+			found := false
+			for k := range fileParserFor {
+				if re.MatchString(k) {
+					found = true
+					break
+				}
+			}
+			if !found {
+				errs = append(errs, errors.Errorf("invalid file_parsers value '%v'", p))
+			}
+			continue
+		}
 		if _, ok := fileParserFor[p]; !ok {
 			errs = append(errs, errors.Errorf("invalid file_parsers value '%v'", p))
 		}

@@ -18,6 +18,8 @@
 package file_integrity
 
 import (
+	"regexp"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
@@ -30,20 +32,35 @@ type FileParser interface {
 func FileParsers(c Config) []FileParser {
 	// TODO: Consider whether to allow specification by fileparser name in
 	// addition to target field.
-	// TODO: Implement globbing paths so that the user can write things like
-	// "file.*.imports".
 
-	parserNames := make(map[string]bool)
-	fields := make(map[string]bool)
-	for _, f := range c.FileParsers {
-		fields[f] = true
-		parserNames[fileParserFor[f]] = true
-	}
+	parserNames, fields := parserNamesAndFields(c)
 	var parsers []FileParser
 	for name := range parserNames {
 		parsers = append(parsers, fileParsers[name](fields))
 	}
 	return parsers
+}
+
+func parserNamesAndFields(c Config) (parserNames, fields map[string]bool) {
+	parserNames = make(map[string]bool)
+	fields = make(map[string]bool)
+	for _, p := range c.FileParsers {
+		if pat, ok := unquoteRegexp(p); ok {
+			// The Config has been verified by this point, so we know the patterns are valid.
+			re := regexp.MustCompile(pat)
+			for f := range fileParserFor {
+				if re.MatchString(f) {
+					fields[f] = true
+					parserNames[fileParserFor[f]] = true
+				}
+			}
+			continue
+		}
+
+		fields[p] = true
+		parserNames[fileParserFor[p]] = true
+	}
+	return parserNames, fields
 }
 
 // wantFields is a helper that a FileParser can use to filter fields. It returns
@@ -59,6 +76,15 @@ func wantFields(want map[string]bool, queries ...string) bool {
 		}
 	}
 	return false
+}
+
+// unquoteRegexp returns whether s is a regexp quoted by // and returns the
+// quoted pattern.
+func unquoteRegexp(s string) (pat string, ok bool) {
+	if len(s) >= 2 && s[0] == '/' && s[len(s)-1] == '/' {
+		return s[1 : len(s)-1], true
+	}
+	return "", false
 }
 
 // fileParserFor returns the name of the file parser for the given field. It is

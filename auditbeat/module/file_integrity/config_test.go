@@ -38,6 +38,7 @@ func TestConfig(t *testing.T) {
 		"scan_rate_per_sec": "10MiB",
 		"exclude_files":     []string{`\.DS_Store$`, `\.swp$`},
 		"include_files":     []string{`\.ssh/$`},
+		"file_parsers":      []string{"file.elf.sections", `/\.pe\./`},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -56,6 +57,7 @@ func TestConfig(t *testing.T) {
 	assert.EqualValues(t, `\.swp(?-m:$)`, c.ExcludeFiles[1].String())
 	assert.Len(t, c.IncludeFiles, 1)
 	assert.EqualValues(t, `\.ssh/(?-m:$)`, c.IncludeFiles[0].String())
+	assert.Len(t, c.FileParsers, 2)
 }
 
 func TestConfigInvalid(t *testing.T) {
