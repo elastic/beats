@@ -183,16 +183,6 @@ func NewEventFromFileInfo(
 		return event
 	}
 
-	if len(fileParsers) != 0 && event.ParserResults == nil {
-		event.ParserResults = make(common.MapStr)
-	}
-	for _, p := range fileParsers {
-		err = p.Parse(event.ParserResults, path)
-		if err != nil {
-			event.errors = append(event.errors, err)
-		}
-	}
-
 	switch event.Info.Type {
 	case FileType:
 		if event.Info.Size <= maxFileSize {
@@ -206,6 +196,16 @@ func NewEventFromFileInfo(
 				// - File size at the time of hashing is larger than configured limit.
 				event.Hashes = hashes
 				event.Info.Size = nbytes
+			}
+
+			if len(fileParsers) != 0 && event.ParserResults == nil {
+				event.ParserResults = make(common.MapStr)
+			}
+			for _, p := range fileParsers {
+				err = p.Parse(event.ParserResults, path)
+				if err != nil {
+					event.errors = append(event.errors, err)
+				}
 			}
 		}
 	case SymlinkType:
