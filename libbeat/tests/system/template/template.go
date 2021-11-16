@@ -63,7 +63,7 @@ func testTemplateDefaultFieldLength(beatName string, elasticLicensed bool) func(
 			t.Fatal("Failed to load template bytes:", err)
 		}
 
-		templateMap := tmpl.Generate(fields, nil)
+		templateMap := tmpl.Generate(fields, nil, nil)
 
 		v, _ := templateMap.GetValue("settings.index.query.default_field")
 		defaultValue, ok := v.([]string)
