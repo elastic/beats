@@ -57,6 +57,7 @@ func newSession(p *goja.Program, conf scriptConfig, test bool) (*session, error)
 
 	// Register constructors for 'new S3EventV2' to enable creating them from the JS code.
 	s.vm.Set("S3EventV2", newJSS3EventV2Constructor(s))
+	s.vm.Set("XMLDecoder", newXMLDecoderConstructor(s))
 
 	if _, err := s.vm.RunProgram(p); err != nil {
 		return nil, err
@@ -138,12 +139,12 @@ func (s *session) executeTestFunction() error {
 }
 
 // runParseFunc executes parse() from the JS script.
-func (s *session) runParseFunc(m common.MapStr) (out []s3EventV2, err error) {
+func (s *session) runParseFunc(n string) (out []s3EventV2, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			s.log.Errorw("The javascript script caused an unexpected panic "+
 				"while parsing a notification. Recovering, but please report this.",
-				"notification", common.MapStr{"original": m.String()},
+				"notification", common.MapStr{"original": n},
 				"panic", r,
 				zap.Stack("stack"))
 			err = fmt.Errorf("unexpected panic in javascript script: %v", r)
@@ -158,7 +159,7 @@ func (s *session) runParseFunc(m common.MapStr) (out []s3EventV2, err error) {
 		defer t.Stop()
 	}
 
-	v, err := s.parseFunc(goja.Undefined(), s.vm.ToValue(m))
+	v, err := s.parseFunc(goja.Undefined(), s.vm.ToValue(n))
 	if err != nil {
 		return nil, fmt.Errorf("failed in parse function: %w", err)
 	}

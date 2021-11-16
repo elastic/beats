@@ -5,8 +5,12 @@
 package awss3
 
 import (
+	"strings"
+
 	"github.com/dop251/goja"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/common/encoding/xml"
 )
 
 func newJSS3EventV2Constructor(s *session) func(call goja.ConstructorCall) *goja.Object {
@@ -44,4 +48,22 @@ func (e *s3EventV2) SetS3BucketARN(v string) {
 
 func (e *s3EventV2) SetS3ObjectKey(v string) {
 	e.S3.Object.Key = v
+}
+
+func newXMLDecoderConstructor(s *session) func(call goja.ConstructorCall) *goja.Object {
+	return func(call goja.ConstructorCall) *goja.Object {
+		if len(call.Arguments) != 1 {
+			panic(errors.New("Event constructor requires one argument"))
+		}
+
+		a0 := call.Argument(0).Export()
+		s0, ok := a0.(string)
+
+		if !ok {
+			panic(errors.Errorf("Event constructor requires a "+
+				"string argument but got %T", a0))
+		}
+
+		return s.vm.ToValue(xml.NewDecoder(strings.NewReader(s0))).(*goja.Object)
+	}
 }

@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/stretchr/testify/assert"
@@ -45,7 +44,7 @@ func TestSessionScriptParams(t *testing.T) {
 				}
 			}
 
-			function parse(m) {}
+			function parse(n) {}
 		`
 		_, err := newScriptFromConfig(log, &scriptConfig{
 			Source: script,
@@ -67,18 +66,19 @@ func TestSessionTestFunction(t *testing.T) {
 			fail = params["fail"];
 		}
 
-		function parse(m) {
+		function parse(n) {
 			if (fail) {
 				throw "intentional failure";
 			}
+			var m = JSON.parse(n);
 			var e = new S3EventV2();
 			e.SetS3ObjectKey(m["hello"]);
 			return [e];
 		}
 
 		function test() {
-			var m = {"hello": "earth"};
-			var evts = parse(m);
+			var n = "{\"hello\": \"earth\"}";
+			var evts = parse(n);
 
 			if (evts[0].S3.Object.Key !== "earth") {
 				throw "invalid key value";
@@ -120,6 +120,7 @@ func TestSessionTimeout(t *testing.T) {
 	logp.TestingSetup()
 
 	const runawayLoop = `
+		var m = JSON.parse(n);
 		while (!m.stop) {
 			m.hello = "world";
 		}
@@ -133,19 +134,17 @@ func TestSessionTimeout(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	m := common.MapStr{
-		"stop": false,
-	}
+	n := `{"stop": false}`
 
 	// Execute and expect a timeout.
-	_, err = p.run(m)
+	_, err = p.run(n)
 	if assert.Error(t, err) {
 		assert.Contains(t, err.Error(), timeoutError)
 	}
 
 	// Verify that any internal runtime interrupt state has been cleared.
-	m.Put("stop", true)
-	_, err = p.run(m)
+	n = `{"stop": true}`
+	_, err = p.run(n)
 	assert.NoError(t, err)
 }
 
@@ -153,7 +152,10 @@ func TestSessionParallel(t *testing.T) {
 	logp.TestingSetup()
 
 	const script = `
-		m.hello.world = "hello";
+		var m = JSON.parse(n);
+		var evt = new S3EventV2();
+		evt.SetS3ObjectKey(m.hello.world);
+		return [evt];
     `
 
 	p, err := newScriptFromConfig(log, &scriptConfig{
@@ -173,11 +175,11 @@ func TestSessionParallel(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for ctx.Err() == nil {
-				m := common.MapStr{
-					"hello": common.MapStr{"world": "hello"},
-				}
-				_, err := p.run(m)
-				assert.NoError(t, err)
+				n := `{"hello":{"world": "hello"}}`
+				evts, err := p.run(n)
+				require.NoError(t, err)
+				require.Equal(t, 1, len(evts))
+				assert.Equal(t, "hello", evts[0].S3.Object.Key)
 			}
 		}()
 	}
@@ -189,39 +191,40 @@ func TestSessionParallel(t *testing.T) {
 func TestCreateS3EventsFromNotification(t *testing.T) {
 	logp.TestingSetup()
 
-	n := common.MapStr{
+	n := `{
 		"cid":        "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
 		"timestamp":  1492726639222,
 		"fileCount":  4,
 		"totalSize":  349986221,
 		"bucket":     "bucketNNNN",
 		"pathPrefix": "logs/aaaa-bbbb-cccc-dddd-eeee-ffff",
-		"files": []common.MapStr{
+		"files": [
 			{
 				"path":     "logs/aaaa-bbbb-cccc-dddd-eeee-ffff/part-00000.gz",
 				"size":     90506437,
-				"checksum": "ffffffffffffffffffff",
+				"checksum": "ffffffffffffffffffff"
 			},
 			{
 				"path":     "logs/aaaa-bbbb-cccc-dddd-eeee-ffff/part-00001.gz",
 				"size":     86467594,
-				"checksum": "ffffffffffffffffffff",
+				"checksum": "ffffffffffffffffffff"
 			},
 			{
 				"path":     "logs/aaaa-bbbb-cccc-dddd-eeee-ffff/part-00002.gz",
 				"size":     83893710,
-				"checksum": "ffffffffffffffffffff",
+				"checksum": "ffffffffffffffffffff"
 			},
 			{
 				"path":     "logs/aaaa-bbbb-cccc-dddd-eeee-ffff/part-00003.gz",
 				"size":     89118480,
-				"checksum": "ffffffffffffffffffff",
-			},
-		},
-	}
+				"checksum": "ffffffffffffffffffff"
+			}
+		]
+	}`
 
 	const script = `
-	function parse(m) {
+	function parse(n) {
+		var m = JSON.parse(n);
 		var evts = [];
 		var files = m.files;
 		var bucket = m.bucket;
@@ -253,6 +256,58 @@ func TestCreateS3EventsFromNotification(t *testing.T) {
 		"logs/aaaa-bbbb-cccc-dddd-eeee-ffff/part-00001.gz",
 		"logs/aaaa-bbbb-cccc-dddd-eeee-ffff/part-00002.gz",
 		"logs/aaaa-bbbb-cccc-dddd-eeee-ffff/part-00003.gz",
+	}
+
+	for i, e := range expectedObjectKeys {
+		assert.Equal(t, expectedBucket, evts[i].S3.Bucket.Name)
+		assert.Equal(t, e, evts[i].S3.Object.Key)
+	}
+}
+
+func TestParseXML(t *testing.T) {
+	logp.TestingSetup()
+
+	n := `<record>
+	<bucket>bucketNNNN</bucket>
+	<files>
+		<file><path>logs/aaaa-bbbb-cccc-dddd-eeee-ffff/part-00000.gz</path></file>
+		<file><path>logs/aaaa-bbbb-cccc-dddd-eeee-ffff/part-00001.gz</path></file>
+	</files>
+	</record>`
+
+	const script = `
+	function parse(n) {
+		var dec = new XMLDecoder(n);
+		var m = dec.Decode();
+		var evts = [];
+		var files = m.record.files.file;
+		var bucket = m.record.bucket;
+
+		if (!Array.isArray(files) || (files.length == 0) || bucket == null || bucket == "") {
+			return evts;
+		}
+
+		files.forEach(function(f){
+			var evt = new S3EventV2();
+			evt.SetS3BucketName(bucket);
+			evt.SetS3ObjectKey(f.path);
+			evts.push(evt);
+		});
+
+		return evts;
+	}
+`
+	s, err := newScriptFromConfig(log, &scriptConfig{Source: script})
+	require.NoError(t, err)
+
+	evts, err := s.run(n)
+	require.NoError(t, err)
+	require.Equal(t, 2, len(evts))
+
+	const expectedBucket = "bucketNNNN"
+	expectedObjectKeys := []string{
+		"logs/aaaa-bbbb-cccc-dddd-eeee-ffff/part-00000.gz",
+		"logs/aaaa-bbbb-cccc-dddd-eeee-ffff/part-00001.gz",
 	}
 
 	for i, e := range expectedObjectKeys {

@@ -125,14 +125,14 @@ func loadSources(files ...string) (string, []byte, error) {
 	return strings.Join(sources, ";"), buf.Bytes(), nil
 }
 
-// run runs the parse function. It receives an unmarshalled notification
-// represented by a common.MapStr and returns a list of S3 Events describing
+// run runs the parse function. It receives a raw notification
+// as a string and returns a list of S3 Events describing
 // which files are going to be downloaded.
-func (p *script) run(event common.MapStr) ([]s3EventV2, error) {
+func (p *script) run(n string) ([]s3EventV2, error) {
 	s := p.sessionPool.Get()
 	defer p.sessionPool.Put(s)
 
-	return s.runParseFunc(event)
+	return s.runParseFunc(n)
 }
 
 func (p *script) String() string {

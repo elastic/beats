@@ -18,7 +18,6 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
@@ -191,12 +190,7 @@ func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, erro
 	// Check if a parsing script is defined. If so, it takes precedence over
 	// format autodetection.
 	if p.script != nil {
-		var raw common.MapStr
-		dec := json.NewDecoder(strings.NewReader(body))
-		if err := dec.Decode(&raw); err != nil {
-			return nil, fmt.Errorf("failed to decode SQS message body: %w", err)
-		}
-		return p.script.run(raw)
+		return p.script.run(body)
 	}
 
 	// NOTE: If AWS introduces a V3 schema this will need updated to handle that schema.

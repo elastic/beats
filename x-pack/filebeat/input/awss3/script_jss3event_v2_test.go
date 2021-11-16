@@ -10,24 +10,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 const (
-	header = `function parse(m) {`
+	header = `function parse(n) {`
 	footer = `}`
 )
 
 var log = logp.NewLogger("test")
-
-func testMapStr() common.MapStr {
-	return common.MapStr{
-		"obj": common.MapStr{
-			"key": "val",
-		},
-	}
-}
 
 func TestJSS3EventV2(t *testing.T) {
 	logp.TestingSetup()
@@ -51,7 +42,7 @@ func TestJSS3EventV2(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	evts, err := p.run(common.MapStr{})
+	evts, err := p.run(`{}`)
 	require.NoError(t, err)
 	require.Equal(t, 1, len(evts))
 

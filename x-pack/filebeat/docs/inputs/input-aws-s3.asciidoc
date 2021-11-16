@@ -526,13 +526,15 @@ the processor at external file(s). Only one of the options `sqs.notification_par
 can be set at the same time.
 
 The script requires a `parse(notification)` function that receives the notification as
-an object and returns a list of `S3EventV2` objects.
+a raw string and returns a list of `S3EventV2` objects. This raw string can then be
+processed as needed, e.g.: `JSON.parse(n)` or the provided helper for XML `new XMLDecoder(n)`.
 
 If the script defines a `test()` function it will be invoked when it is loaded. Any exceptions thrown will cause the processor to fail to load. This can be used to make assertions about the behavior of the script.
 
 [source,javascript]
 ----
-function parse(m) {
+function parse(n) {
+  var m = JSON.parse(n);
   var evts = [];
   var files = m.files;
   var bucket = m.bucket;
@@ -575,7 +577,7 @@ The `S3EventV2` object returned by the `parse` method.
 |Method |Description
 
 |`new S3EventV2()`
-|Returns a new `S3EventV2`` object.
+|Returns a new `S3EventV2` object.
 
 *Example*: `var evt = new S3EventV2();`
 
@@ -619,6 +621,66 @@ The `S3EventV2` object returned by the `parse` method.
 In order to be able to retrieve an S3 object successfully, at least `S3.Object.Key`
 and `S3.Bucket.Name` properties must be set (using the provided setters). The other
 properties will be used as metadata in the resulting event when available.
+
+[float]
+==== XMLDecoder API
+
+To help with XML decoding, an `XMLDecoder` class is provided.
+
+Example XML input:
+
+[source,xml]
+-------------------------------------------------------------------------------
+<catalog>
+  <book seq="1">
+    <author>William H. Gaddis</author>
+    <title>The Recognitions</title>
+    <review>One of the great seminal American novels of the 20th century.</review>
+  </book>
+</catalog>
+-------------------------------------------------------------------------------
+
+Will produce the following output:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "catalog": {
+    "book": {
+      "author": "William H. Gaddis",
+      "review": "One of the great seminal American novels of the 20th century.",
+      "seq": "1",
+      "title": "The Recognitions"
+    }
+  }
+}
+-------------------------------------------------------------------------------
+
+[frame="topbot",options="header"]
+|===
+|Method |Description
+
+|`new XMLDecoder(string)`
+|Returns a new `XMLDecoder` object to decode the provided `string`.
+
+*Example*: `var dec = new XMLDecoder(n);`
+
+|`PrependHyphenToAttr()`
+|Causes the Decoder to prepend a hyphen (`-`) to to all XML attribute names.
+
+*Example*: `dec.PrependHyphenToAttr();`
+
+|`LowercaseKeys()`
+|Causes the Decoder to transform all key name to lowercase.
+
+*Example*: `dec.LowercaseKeys();`
+
+|`Decode()`
+|Reads the XML string and return a map containing the data.
+
+*Example*: `var m = dec.Decode();`
+
+|===
 
 [float]
 === Metrics
