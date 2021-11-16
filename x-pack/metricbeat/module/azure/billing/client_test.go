@@ -6,10 +6,11 @@ package billing
 
 import (
 	"errors"
+	"testing"
+
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )

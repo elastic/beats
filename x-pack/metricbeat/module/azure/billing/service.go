@@ -13,6 +13,7 @@ import (
 	"github.com/Azure/go-autorest/autorest/azure/auth"
 
 	prevConsumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
