@@ -105,6 +105,8 @@ pull_request_rules:
     conditions:
       - -label~=^backport
       - base=master
+      - -merged
+      - -closed
     actions:
       comment:
         message: |
@@ -120,6 +122,8 @@ pull_request_rules:
   - name: remove-backport label
     conditions:
       - label~=backport-v
+      - -merged
+      - -closed
     actions:
       label:
         remove:
