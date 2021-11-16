@@ -18,9 +18,20 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/snapshot"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+	"go.elastic.co/apm"
 )
 
-func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI string) (string, error) {
+func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI string) (_ string, err error) {
+	// TODO: span type?
+	span, ctx := apm.StartSpan(ctx, "Upgrader.downloadArtifact()", "custom")
+	defer func() {
+		span.End()
+		// TODO: do we want to capture the errors at this top-level, in
+		// the lower levels, or at each level?
+		if err != nil {
+			apm.CaptureError(ctx, err).Send()
+		}
+	}()
 	// do not update source config
 	settings := *u.settings
 	if sourceURI != "" {

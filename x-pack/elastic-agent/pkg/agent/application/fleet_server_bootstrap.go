@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 	"github.com/elastic/go-sysinfo"
+	"go.elastic.co/apm"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
@@ -51,6 +52,7 @@ func newFleetServerBootstrap(
 	rawConfig *config.Config,
 	statusCtrl status.Controller,
 	agentInfo *info.AgentInfo,
+	tracer *apm.Tracer,
 ) (*FleetServerBootstrap, error) {
 	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
@@ -79,7 +81,7 @@ func newFleetServerBootstrap(
 	}
 
 	bootstrapApp.bgContext, bootstrapApp.cancelCtxFn = context.WithCancel(ctx)
-	bootstrapApp.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{})
+	bootstrapApp.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{}, tracer)
 	if err != nil {
 		return nil, errors.New(err, "initialize GRPC listener")
 	}

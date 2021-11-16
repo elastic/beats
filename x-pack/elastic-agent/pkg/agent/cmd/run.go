@@ -14,6 +14,7 @@ import (
 	"syscall"
 
 	"github.com/spf13/cobra"
+	"go.elastic.co/apm"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -135,21 +136,27 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 
 	statusCtrl := status.NewController(logger)
 
+	// TODO: How do we get the version?
+	version := release.Version()
+	tracer, err := apm.NewTracer(agentName, version)
+	if err != nil {
+		return err
+	}
+	control := server.New(logger.Named("control"), rex, statusCtrl, nil, tracer)
 	// start the control listener
-	control := server.New(logger.Named("control"), rex, statusCtrl, nil)
 	if err := control.Start(); err != nil {
 		return err
 	}
 	defer control.Stop()
 
-	app, err := application.New(logger, pathConfigFile, rex, statusCtrl, control, agentInfo)
+	app, err := application.New(logger, pathConfigFile, rex, statusCtrl, control, agentInfo, tracer)
 	if err != nil {
 		return err
 	}
 
 	control.SetRouteFn(app.Routes)
 
-	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS(), cfg.Settings.MonitoringConfig, app)
+	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS(), cfg.Settings.MonitoringConfig, app, tracer)
 	if err != nil {
 		return err
 	}
@@ -295,7 +302,14 @@ func defaultLogLevel(cfg *configuration.Configuration) string {
 	return defaultLogLevel
 }
 
-func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSystem string, cfg *monitoringCfg.MonitoringConfig, app application.Application) (func() error, error) {
+func setupMetrics(
+	agentInfo *info.AgentInfo,
+	logger *logger.Logger,
+	operatingSystem string,
+	cfg *monitoringCfg.MonitoringConfig,
+	app application.Application,
+	tracer *apm.Tracer,
+) (func() error, error) {
 	// use libbeat to setup metrics
 	if err := metrics.SetupMetrics(agentName); err != nil {
 		return nil, err
@@ -307,7 +321,7 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 		Host:    beats.AgentMonitoringEndpoint(operatingSystem, cfg.HTTP),
 	}
 
-	s, err := monitoringServer.New(logger, endpointConfig, monitoring.GetNamespace, app.Routes, isProcessStatsEnabled(cfg.HTTP))
+	s, err := monitoringServer.New(logger, endpointConfig, monitoring.GetNamespace, app.Routes, isProcessStatsEnabled(cfg.HTTP), tracer)
 	if err != nil {
 		return nil, errors.New(err, "could not start the HTTP server for the API")
 	}

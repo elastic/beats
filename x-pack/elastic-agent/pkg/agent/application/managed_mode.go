@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/go-sysinfo"
+	"go.elastic.co/apm"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway"
@@ -78,6 +79,7 @@ func newManaged(
 	reexec reexecManager,
 	statusCtrl status.Controller,
 	agentInfo *info.AgentInfo,
+	tracer *apm.Tracer,
 ) (*Managed, error) {
 	caps, err := capabilities.Load(paths.AgentCapabilitiesPath(), log, statusCtrl)
 	if err != nil {
@@ -105,7 +107,7 @@ func newManaged(
 	}
 
 	managedApplication.bgContext, managedApplication.cancelCtxFn = context.WithCancel(ctx)
-	managedApplication.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{})
+	managedApplication.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{}, tracer)
 	if err != nil {
 		return nil, errors.New(err, "initialize GRPC listener", errors.TypeNetwork)
 	}
@@ -155,6 +157,7 @@ func newManaged(
 	if err != nil {
 		return nil, err
 	}
+	// Client has been instrumented with apm
 	acker, err := fleet.NewAcker(log, agentInfo, client)
 	if err != nil {
 		return nil, err
@@ -170,6 +173,7 @@ func newManaged(
 	managedApplication.stateStore = stateStore
 	actionAcker := store.NewStateStoreActionAcker(batchedAcker, stateStore)
 
+	// TODO: Is there something to instrument here
 	actionDispatcher, err := dispatcher.New(managedApplication.bgContext, log, handlers.NewDefault(log))
 	if err != nil {
 		return nil, err
