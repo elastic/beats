@@ -21,6 +21,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -34,18 +35,53 @@ func init() {
 	}
 }
 
+type HostFSConfig struct {
+	HostFS string `config:"system.hostfs"`
+}
+
 // Module represents the system module
 type Module struct {
 	mb.BaseModule
 	IsAgent bool // Looks to see if metricbeat is running under agent. Useful if we have breaking changes in one but not the other.
+	HostFS  string
 }
 
-// NewModule instatiates the system module
+type SystemModule interface {
+	GetHostFS() string
+}
+
 func NewModule(base mb.BaseModule) (mb.Module, error) {
+	var hostfs string
+
+	// If this is fleet, ignore the global path, as its not being set.
+	// This is a temporary hack
+	if fleetmode.Enabled() {
+		partialConfig := HostFSConfig{}
+		base.UnpackConfig(&partialConfig)
+
+		if partialConfig.HostFS != "" {
+			hostfs = partialConfig.HostFS
+		} else {
+			hostfs = "/"
+		}
+
+		logp.Info("In Fleet, using HostFS: %s", hostfs)
+	} else {
+		hostfs = paths.Paths.Hostfs
+	}
 
 	once.Do(func() {
-		initModule(paths.Paths.Hostfs)
+		initModule(hostfs)
 	})
 
-	return &Module{BaseModule: base, IsAgent: fleetmode.Enabled()}, nil
+	// set the main Path,
+	if fleetmode.Enabled() && len(paths.Paths.Hostfs) < 2 {
+		paths.Paths.Hostfs = hostfs
+	}
+
+	return &Module{BaseModule: base, HostFS: hostfs, IsAgent: fleetmode.Enabled()}, nil
+}
+
+func (m Module) GetHostFS() string {
+	return m.HostFS
 }

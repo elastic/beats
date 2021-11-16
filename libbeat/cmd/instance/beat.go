@@ -105,6 +105,7 @@ type beatConfig struct {
 
 	// beat internal components configurations
 	HTTP            *common.Config         `config:"http"`
+	HTTPPprof       *common.Config         `config:"http.pprof"`
 	Path            paths.Path             `config:"path"`
 	Logging         *common.Config         `config:"logging"`
 	MetricLogging   *common.Config         `config:"logging.metrics"`
@@ -455,6 +456,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		}
 		s.Start()
 		defer s.Stop()
+		if b.Config.HTTPPprof.Enabled() {
+			s.AttachPprof()
+		}
 	}
 
 	if err = seccomp.LoadFilter(b.Config.Seccomp); err != nil {
