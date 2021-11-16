@@ -6,12 +6,10 @@ package billing
 
 import (
 	"errors"
-	"testing"
-	"time"
-
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"testing"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
@@ -28,9 +26,7 @@ func TestClient(t *testing.T) {
 		m.On("GetForcast", mock.Anything).Return(consumption.ForecastsListResult{}, errors.New("invalid query"))
 		m.On("GetUsageDetails", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(consumption.UsageDetailsListResultPage{}, nil)
 		client.BillingService = m
-		startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-48) * time.Hour)
-		endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
-		results, err := client.GetMetrics(startTime, endTime)
+		results, err := client.GetMetrics()
 		assert.Error(t, err)
 		assert.Equal(t, len(results.ActualCosts), 0)
 		m.AssertExpectations(t)
@@ -43,9 +39,7 @@ func TestClient(t *testing.T) {
 		m.On("GetForcast", mock.Anything).Return(consumption.ForecastsListResult{Value: &forecasts}, nil)
 		m.On("GetUsageDetails", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(consumption.UsageDetailsListResultPage{}, nil)
 		client.BillingService = m
-		startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-48) * time.Hour)
-		endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
-		results, err := client.GetMetrics(startTime, endTime)
+		results, err := client.GetMetrics()
 		assert.NoError(t, err)
 		assert.Equal(t, len(results.ActualCosts), 2)
 		assert.Equal(t, len(results.ForecastCosts), 2)
