@@ -18,6 +18,7 @@
 package template
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -38,19 +39,24 @@ func TestFileLoader_Load(t *testing.T) {
 	for name, test := range map[string]struct {
 		settings TemplateSettings
 		body     common.MapStr
+		fields   []byte
+		want     common.MapStr
+		wantErr  error
 	}{
 		"load minimal config info": {
 			body: common.MapStr{
 				"index_patterns": []string{"mock-7.0.0-*"},
 				"order":          order,
-				"settings":       common.MapStr{"index": nil}},
+				"settings":       common.MapStr{"index": nil},
+			},
 		},
 		"load minimal config with index settings": {
 			settings: TemplateSettings{Index: common.MapStr{"code": "best_compression"}},
 			body: common.MapStr{
 				"index_patterns": []string{"mock-7.0.0-*"},
 				"order":          order,
-				"settings":       common.MapStr{"index": common.MapStr{"code": "best_compression"}}},
+				"settings":       common.MapStr{"index": common.MapStr{"code": "best_compression"}},
+			},
 		},
 		"load minimal config with source settings": {
 			settings: TemplateSettings{Source: common.MapStr{"enabled": false}},
@@ -64,7 +70,134 @@ func TestFileLoader_Load(t *testing.T) {
 					"date_detection":    false,
 					"dynamic_templates": nil,
 					"properties":        nil,
-				}},
+				},
+			},
+		},
+		"load config and in-line analyzer fields": {
+			body: common.MapStr{
+				"index_patterns": []string{"mock-7.0.0-*"},
+				"order":          order,
+				"settings":       common.MapStr{"index": nil},
+			},
+			fields: []byte(`- key: test
+  title: Test fields.yml with analyzer
+  description: >
+    Contains text fields with in-line analyzer for testing
+  fields:
+    - name: script_block_text
+      type: text
+      analyzer:
+        test_powershell:
+          type: pattern
+          pattern: "[\\W&&[^-]]+"
+
+    - name: code_block_text
+      type: text
+      analyzer:
+        test_powershell:
+          type: pattern
+          pattern: "[\\W&&[^-]]+"
+
+    - name: standard_text
+      type: text
+      analyzer: simple
+`),
+			want: common.MapStr{
+				"index_patterns": []string{
+					"mock-7.0.0-*",
+				},
+				"order": 1,
+				"mappings": common.MapStr{
+					"_meta": common.MapStr{
+						"version": "7.0.0",
+						"beat":    "mock",
+					},
+					"date_detection": false,
+					"dynamic_templates": []common.MapStr{
+						{
+							"strings_as_keyword": common.MapStr{
+								"mapping": common.MapStr{
+									"ignore_above": 1024,
+									"type":         "keyword",
+								},
+								"match_mapping_type": "string",
+							},
+						},
+					},
+					"properties": common.MapStr{
+						"code_block_text": common.MapStr{
+							"type":     "text",
+							"norms":    false,
+							"analyzer": "test_powershell",
+						},
+						"script_block_text": common.MapStr{
+							"type":     "text",
+							"norms":    false,
+							"analyzer": "test_powershell",
+						},
+						"standard_text": common.MapStr{
+							"type":     "text",
+							"norms":    false,
+							"analyzer": "simple",
+						},
+					},
+				},
+				"settings": common.MapStr{
+					"index": common.MapStr{
+						"refresh_interval": "5s",
+						"mapping": common.MapStr{
+							"total_fields": common.MapStr{
+								"limit": 10000,
+							},
+						},
+						"query": common.MapStr{
+							"default_field": []string{
+								"fields.*",
+							},
+						},
+						"max_docvalue_fields_search": 200,
+					},
+					"analysis": common.MapStr{
+						"analyzer": common.MapStr{
+							"test_powershell": map[string]interface{}{
+								"type":    "pattern",
+								"pattern": "[\\W&&[^-]]+",
+							},
+						},
+					},
+				},
+			},
+		},
+		"load config and in-line analyzer fields with name collision": {
+			body: common.MapStr{
+				"index_patterns": []string{"mock-7.0.0-*"},
+				"order":          order,
+				"settings":       common.MapStr{"index": nil},
+			},
+			fields: []byte(`- key: test
+  title: Test fields.yml with analyzer
+  description: >
+    Contains text fields with in-line analyzer for testing
+  fields:
+    - name: script_block_text
+      type: text
+      analyzer:
+        test_powershell:
+          type: pattern
+          pattern: "[\\W&&[^-]]+"
+
+    - name: code_block_text
+      type: text
+      analyzer:
+        test_powershell:
+          type: pattern
+          pattern: "[\\W&&[^*-]]+"
+
+    - name: standard_text
+      type: text
+      analyzer: simple
+`),
+			wantErr: errors.New(`error creating template: inconsistent definitions for analyzers with the name "test_powershell"`),
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
@@ -75,11 +208,18 @@ func TestFileLoader_Load(t *testing.T) {
 			cfg := DefaultConfig()
 			cfg.Settings = test.settings
 
-			err = fl.Load(cfg, info, nil, false)
-			require.NoError(t, err)
+			err = fl.Load(cfg, info, test.fields, false)
+			require.Equal(t, test.wantErr, err)
+			if err != nil {
+				return
+			}
 			assert.Equal(t, "template", fc.component)
 			assert.Equal(t, tmplName, fc.name)
-			assert.Equal(t, test.body.StringToPrint()+"\n", fc.body)
+			want := test.body
+			if test.fields != nil {
+				want = test.want
+			}
+			assert.Equal(t, want.StringToPrint()+"\n", fc.body)
 		})
 	}
 }
