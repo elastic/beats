@@ -170,7 +170,7 @@ func TestDailyRotation(t *testing.T) {
 		WriteMsg(t, r)
 	}
 
-	AssertDirContents(t, dir, logname+"-"+today+"-1.ndjson", logname+"-"+today+"-2.ndjson")
+	AssertDirContents(t, dir, logname+"-"+today+"-1.ndjson", logname+"-"+today+"-2.ndjson", logname+"-"+today+"-3.ndjson")
 }
 
 // Tests the FileConfig.RotateOnStartup parameter
@@ -217,7 +217,7 @@ func TestRotateOnStartup(t *testing.T) {
 	AssertDirContents(t, dir, firstFile, secondFile)
 }
 
-func TestRotateDat(t *testing.T) {
+func TestRotate(t *testing.T) {
 	dir := t.TempDir()
 
 	logname := "beatname"
