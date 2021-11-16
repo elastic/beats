@@ -163,19 +163,14 @@ func Run(settings Settings, bt beat.Creator) error {
 		return errw.Wrap(err, "could not set umask")
 	}
 
-	name := settings.Name
-	idxPrefix := settings.IndexPrefix
-	agentVersion := settings.Version
-	elasticLicensed := settings.ElasticLicensed
-
 	return handleError(func() error {
 		defer func() {
 			if r := recover(); r != nil {
-				logp.NewLogger(name).Fatalw("Failed due to panic.",
+				logp.NewLogger(settings.Name).Fatalw("Failed due to panic.",
 					"panic", r, zap.Stack("stack"))
 			}
 		}()
-		b, err := NewBeat(name, idxPrefix, agentVersion, elasticLicensed)
+		b, err := NewInitializedBeat(settings)
 		if err != nil {
 			return err
 		}
@@ -410,10 +405,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	defer logp.Sync()
 	defer logp.Info("%s stopped.", b.Info.Beat)
 
-	err := b.InitWithSettings(settings)
-	if err != nil {
-		return err
-	}
 	defer func() {
 		if err := b.processing.Close(); err != nil {
 			logp.Warn("Failed to close global processing: %v", err)
@@ -429,7 +420,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path.
 	bl := newLocker(b)
-	err = bl.lock()
+	err := bl.lock()
 	if err != nil {
 		return err
 	}
