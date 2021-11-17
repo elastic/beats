@@ -22,6 +22,7 @@ import (
 	"expvar"
 	"flag"
 	"fmt"
+	"net"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -31,7 +32,6 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
@@ -119,36 +119,7 @@ func BeforeRun() {
 	mux.HandleFunc("/debug/vars", metricsHandler)
 
 	// Ensure we are listening before returning
-	listener, err := api.MakeListener(api.Config{Host: *httpprof})
-	if err != nil {
-		logger.Errorf("Failed to start pprof listener: %v", err)
-		os.Exit(1)
-	}
-
-	go func() {
-		// Serve returns always a non-nil error
-		err := http.Serve(listener, mux)
-		logger.Infof("Finished pprof endpoint: %v", err)
-	}()
-}
-
-// BeforeRunWithPprof will start the http/pprof endpoints on the specified listener.
-// The listener may be a host:socket, unix port, or Windows named pipe.
-func BeforeRunWithPprof(listen string) {
-	logger := logp.NewLogger("service")
-	logger.Info("Start pprof endpoint")
-	mux := http.NewServeMux()
-
-	// Register pprof handler
-	mux.HandleFunc("/debug/pprof/", func(w http.ResponseWriter, r *http.Request) {
-		http.DefaultServeMux.ServeHTTP(w, r)
-	})
-
-	// Register metrics handler
-	mux.HandleFunc("/debug/vars", metricsHandler)
-
-	// Ensure we are listening before returning
-	listener, err := api.MakeListener(api.Config{Host: listen})
+	listener, err := net.Listen("tcp", *httpprof)
 	if err != nil {
 		logger.Errorf("Failed to start pprof listener: %v", err)
 		os.Exit(1)

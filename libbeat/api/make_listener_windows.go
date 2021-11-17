@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/api/npipe"
 )
 
-func MakeListener(cfg Config) (net.Listener, error) {
+func makeListener(cfg Config) (net.Listener, error) {
 	if len(cfg.User) > 0 && len(cfg.SecurityDescriptor) > 0 {
 		return nil, errors.New("user and security_descriptor are mutually exclusive, define only one of them")
 	}

@@ -94,10 +94,6 @@ func (b *Monitor) generateMonitoringEndpoint(spec program.Spec, pipelineID strin
 	return MonitoringEndpoint(spec, b.operatingSystem, pipelineID)
 }
 
-func (b *Monitor) generateDebugEndpoint(spec program.Spec, pipelineID string) string {
-	return DebugEndpoint(spec, b.operatingSystem, pipelineID)
-}
-
 func (b *Monitor) generateLoggingFile(spec program.Spec, pipelineID string) string {
 	return getLoggingFile(spec, b.operatingSystem, b.installPath, pipelineID)
 }
@@ -128,11 +124,6 @@ func (b *Monitor) EnrichArgs(spec program.Spec, pipelineID string, args []string
 			"-E", "http.host="+endpoint,
 		)
 	}
-
-	debugEndpoint := b.generateDebugEndpoint(spec, pipelineID)
-	appendix = append(appendix,
-		"-httpprof", debugEndpoint,
-	)
 
 	loggingPath := b.generateLoggingPath(spec, pipelineID)
 	if loggingPath != "" {
