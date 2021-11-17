@@ -23,15 +23,15 @@ package cpu
 import (
 	"bufio"
 	"os"
-	"path/filepath"
 	"strconv"
 
+	"github.com/elastic/beats/v7/libbeat/metric/system"
 	"github.com/pkg/errors"
 )
 
 // Get returns a metrics object for CPU data
-func Get(procfs string) (CPUMetrics, error) {
-	path := filepath.Join(procfs, "/proc/stat")
+func Get(procfs system.Resolver) (CPUMetrics, error) {
+	path := procfs.ResolveHostFS("/proc/stat")
 	fd, err := os.Open(path)
 	if err != nil {
 		return CPUMetrics{}, errors.Wrapf(err, "error opening file %s", path)

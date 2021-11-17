@@ -22,18 +22,18 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
-	"path/filepath"
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/metric/system"
 	"github.com/pkg/errors"
 )
 
 // ParseMeminfo parses the contents of /proc/meminfo into a hashmap
-func ParseMeminfo(rootfs string) (map[string]uint64, error) {
+func ParseMeminfo(rootfs system.Resolver) (map[string]uint64, error) {
 	table := map[string]uint64{}
 
-	meminfoPath := filepath.Join(rootfs, "/proc/meminfo")
+	meminfoPath := rootfs.ResolveHostFS("/proc/meminfo")
 	err := readFile(meminfoPath, func(line string) bool {
 		fields := strings.Split(line, ":")
 

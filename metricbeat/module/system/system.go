@@ -18,11 +18,9 @@
 package system
 
 import (
+	"path/filepath"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -42,45 +40,41 @@ type HostFSConfig struct {
 // Module represents the system module
 type Module struct {
 	mb.BaseModule
-	HostFS string
+	HostFS        string
+	UserSetHostFS bool
 }
 
 type SystemModule interface {
-	GetHostFS() string
+	ResolveHostFS(string) string
 }
 
 func NewModule(base mb.BaseModule) (mb.Module, error) {
 	var hostfs string
 
-	// If this is fleet, ignore the global path, as its not being set.
-	// This is a temporary hack
-	if fleetmode.Enabled() {
-		partialConfig := HostFSConfig{}
-		base.UnpackConfig(&partialConfig)
-
-		if partialConfig.HostFS != "" {
-			hostfs = partialConfig.HostFS
-		} else {
-			hostfs = "/"
-		}
-
-		logp.Info("In Fleet, using HostFS: %s", hostfs)
+	partialConfig := HostFSConfig{}
+	base.UnpackConfig(&partialConfig)
+	userSet := false
+	if partialConfig.HostFS != "" {
+		hostfs = partialConfig.HostFS
+		userSet = true
 	} else {
-		hostfs = paths.Paths.Hostfs
+		hostfs = "/"
 	}
 
 	once.Do(func() {
 		initModule(hostfs)
 	})
 
-	// set the main Path,
-	if fleetmode.Enabled() && len(paths.Paths.Hostfs) < 2 {
-		paths.Paths.Hostfs = hostfs
-	}
-
-	return &Module{BaseModule: base, HostFS: hostfs}, nil
+	return &Module{BaseModule: base, HostFS: hostfs, UserSetHostFS: userSet}, nil
 }
 
-func (m Module) GetHostFS() string {
-	return m.HostFS
+// ResolveHostFS returns a full path based on a user-suppled path, and impliments the Resolver interface
+// This is mostly to prevent any chance that other metricsets will develop their own way of
+// using a user-suppied hostfs flag. We try to do all the logic in one place.
+func (m Module) ResolveHostFS(path string) string {
+	return filepath.Join(m.HostFS, path)
+}
+
+func (m Module) IsSet() bool {
+	return m.UserSetHostFS
 }

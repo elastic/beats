@@ -18,9 +18,10 @@
 package linux
 
 import (
+	"os"
+	"path/filepath"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -38,8 +39,9 @@ type LinuxModule interface {
 // Module defines the base module config used in `linux`
 type Module struct {
 	mb.BaseModule
-	HostFS string `config:"hostfs"`
-	Period time.Duration
+	HostFS  string `config:"hostfs"`
+	UserSet bool
+	Period  time.Duration
 }
 
 // NewModule initializes a new module
@@ -54,20 +56,36 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	if err := base.UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-
+	userSet := false
 	dir := config.Hostfs
 	if dir == "" {
 		dir = "/"
+	} else {
+		userSet = true
 	}
 
-	// Steer towards system.hostfs, since the two behave fundamentally the same, and system.hostfs has a CLI flag that many users may default to.
-	if len(paths.Paths.Hostfs) > 2 {
-		dir = paths.Paths.Hostfs
-	}
-
-	return &Module{BaseModule: base, HostFS: dir, Period: config.Period}, nil
+	return &Module{BaseModule: base, HostFS: dir, Period: config.Period, UserSet: userSet}, nil
 }
 
-func (m Module) GetHostFS() string {
-	return m.HostFS
+// In the case of a few vendored libraries, we need to set hostfs globally.
+// On the off chance that the user is doing something particularly weird
+func trySetHostfsEnv(path string) {
+	_, isSet := os.LookupEnv("HOST_PROC")
+	if isSet {
+		return
+	}
+
+	// environment variables for gopsutil.
+	os.Setenv("HOST_PROC", filepath.Join(path, "/proc"))
+	os.Setenv("HOST_SYS", filepath.Join(path, "/sys"))
+	os.Setenv("HOST_ETC", filepath.Join(path, "/etc"))
+
+}
+
+func (m Module) ResolveHostFS(path string) string {
+	return filepath.Join(m.HostFS, path)
+}
+
+func (m Module) IsSet() bool {
+	return m.IsSet()
 }

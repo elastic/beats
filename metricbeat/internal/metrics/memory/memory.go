@@ -18,10 +18,10 @@
 package memory
 
 import (
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/metric/system"
 	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/pkg/errors"
 )
 
 // Memory holds os-specifc memory usage data
@@ -65,7 +65,7 @@ type SwapMetrics struct {
 }
 
 // Get returns platform-independent memory metrics.
-func Get(procfs string) (Memory, error) {
+func Get(procfs system.Resolver) (Memory, error) {
 	base, err := get(procfs)
 	if err != nil {
 		return Memory{}, errors.Wrap(err, "error getting system memory info")

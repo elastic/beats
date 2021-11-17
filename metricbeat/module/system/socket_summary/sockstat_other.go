@@ -28,7 +28,7 @@ import (
 
 //a stub function for non-linux systems
 //get a list of platform-specific enhancements and apply them to our mapStr object.
-func applyEnhancements(data common.MapStr) (common.MapStr, error) {
+func applyEnhancements(data common.MapStr, sys system.SystemModule) (common.MapStr, error) {
 	return data, nil
 }
 

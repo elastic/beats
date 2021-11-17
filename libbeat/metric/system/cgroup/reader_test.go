@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/metric/system"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -31,7 +32,7 @@ const (
 )
 
 func TestReaderGetStatsV1(t *testing.T) {
-	reader, err := NewReader("testdata/docker", true)
+	reader, err := NewReader(system.NewTestResolver("testdata/docker"), true)
 	assert.NoError(t, err, "error in NewReader")
 
 	stats, err := reader.GetV1StatsForProcess(985)
@@ -67,7 +68,7 @@ func TestReaderGetStatsV1(t *testing.T) {
 }
 
 func TestReaderGetStatsV2(t *testing.T) {
-	reader, err := NewReader("testdata/docker", true)
+	reader, err := NewReader(system.NewTestResolver("testdata/docker"), true)
 	assert.NoError(t, err, "error in NewReader")
 
 	stats, err := reader.GetV2StatsForProcess(312)
@@ -93,7 +94,7 @@ func TestReaderGetStatsHierarchyOverride(t *testing.T) {
 	// within a Docker container.
 
 	reader, err := NewReaderOptions(ReaderOptions{
-		RootfsMountpoint:         "testdata/docker",
+		RootfsMountpoint:         system.NewTestResolver("testdata/docker"),
 		IgnoreRootCgroups:        false,
 		CgroupsHierarchyOverride: "/",
 	})
@@ -113,7 +114,7 @@ func TestReaderGetStatsHierarchyOverride(t *testing.T) {
 	assert.NotZero(t, stats.CPU.CFS.Shares)
 
 	reader2, err := NewReaderOptions(ReaderOptions{
-		RootfsMountpoint:         "testdata/docker",
+		RootfsMountpoint:         system.NewTestResolver("testdata/docker"),
 		IgnoreRootCgroups:        true,
 		CgroupsHierarchyOverride: "/system.slice/",
 	})

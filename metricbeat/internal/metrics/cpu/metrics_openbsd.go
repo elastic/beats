@@ -36,11 +36,12 @@ import (
 	"syscall"
 	"unsafe"
 
+	"github.com/elastic/beats/v7/libbeat/metric/system"
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 // Get is the OpenBSD implementation of get
-func Get(_ string) (CPUMetrics, error) {
+func Get(_ system.Resolver) (CPUMetrics, error) {
 
 	// see man 2 sysctl
 	loadGlobal := [C.CPUSTATES]C.long{
