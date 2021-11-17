@@ -207,8 +207,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             config = self.beat_name + ".yml"
 
         if output is None:
-            today = datetime.now().strftime("%Y%m%d")
-            output = self.beat_name+"-"+today+".ndjson"
+            output = self.beat_name + "-" + self.today + ".ndjson"
 
         args = [cmd, "-systemTest"]
         if os.getenv("TEST_COVERAGE") == "true":
@@ -369,8 +368,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         Returns the log as a string.
         """
         if logfile is None:
-            today = datetime.now().strftime("%Y%m%d")
-            logfile = self.beat_name + "-"+today+".ndjson"
+            logfile = self.beat_name + "-" + self.today + ".ndjson"
 
         with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
             data = f.read()
@@ -404,6 +402,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         Returns true if the give logfile contains the given message.
         Note that the msg must be present in a single line.
         """
+        print("bu")
 
         return self.log_contains_count(msg, logfile, ignore_case=ignore_case) > 0
 
@@ -419,8 +418,9 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if logfile is None:
-            logfile = self.beat_name +"-" + self.today + ".ndjson"
+            logfile = self.beat_name + "-" + self.today + ".ndjson"
 
+        print("logfile", logfile, self.working_dir)
         try:
             with open(os.path.join(self.working_dir, logfile), "r", encoding="utf_8") as f:
                 for line in f:
@@ -432,7 +432,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                         line = line.lower()
                     if line.find(msg) >= 0:
                         counter = counter + 1
-        except IOError:
+        except IOError as e:
+            print(e)
             counter = -1
 
         return counter
@@ -464,7 +465,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
     def output_lines(self, output_file=None):
         """ Count number of lines in a file."""
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
