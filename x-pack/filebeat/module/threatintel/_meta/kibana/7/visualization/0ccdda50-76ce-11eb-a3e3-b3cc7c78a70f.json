@@ -30,13 +30,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.indicator.file.hash.md5"
+                            "field": "threat.indicator.file.hash.md5"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                            "key": "threatintel.indicator.file.hash.md5",
+                            "key": "threat.indicator.file.hash.md5",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -67,7 +67,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "AlienVault OTX MD5 Hash Indicator",
-                        "field": "threatintel.indicator.file.hash.md5",
+                        "field": "threat.indicator.file.hash.md5",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

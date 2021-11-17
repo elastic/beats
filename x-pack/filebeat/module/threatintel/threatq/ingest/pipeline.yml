@@ -303,6 +303,11 @@ processors:
   # Cleanup processors #
   ######################
   # Setting indicator type to unknown if it does not match anything
+  - remove:
+      field: event.original
+      if: "ctx?.tags == null || !(ctx.tags.contains('preserve_original_event'))"
+      ignore_failure: true
+      ignore_missing: true
   - set:
       field: threat.indicator.type
       value: unknown
