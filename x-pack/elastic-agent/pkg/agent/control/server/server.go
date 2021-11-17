@@ -214,9 +214,9 @@ func (s *Server) ProcMeta(ctx context.Context, _ *proto.Empty) (*proto.ProcMetaR
 
 		for n, spec := range specs {
 			endpoint := monitoring.MonitoringEndpoint(spec, runtime.GOOS, rk)
-			client := newSocketRequester(time.Second*5, n, rk, endpoint)
+			client := newSocketRequester(n, rk, endpoint)
 
-			procMeta := client.ProcMeta(ctx)
+			procMeta := client.procMeta(ctx)
 			resp.Procs = append(resp.Procs, procMeta)
 		}
 	}
@@ -244,11 +244,11 @@ func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.Ppr
 	// retrieve elastic-agent pprof data if requested or application is unspecified.
 	if req.AppName == "" || req.AppName == "elastic-agent" {
 		endpoint := beats.AgentMonitoringEndpoint(runtime.GOOS)
-		c := newSocketRequester(dur*2, "elastic-agent", "", endpoint)
+		c := newSocketRequester("elastic-agent", "", endpoint)
 		for _, opt := range req.PprofType {
 			wg.Add(1)
 			go func(opt proto.PprofOption) {
-				res := c.GetPprof(ctx, opt, dur)
+				res := c.getPprof(ctx, opt, dur)
 				ch <- res
 				wg.Done()
 			}(opt)
@@ -274,8 +274,9 @@ func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.Ppr
 		}
 		specs := sp.Specs()
 		for n, spec := range specs {
+			// Skip the app if it does not match and one has been requested.
 			if req.AppName != "" && req.AppName != n {
-				continue // Skip the app if it does not match and one has been requested.
+				continue
 			}
 			endpoint := monitoring.MonitoringEndpoint(spec, runtime.GOOS, rk)
 			c := newSocketRequester(dur*2, n, rk, endpoint)
@@ -284,7 +285,7 @@ func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.Ppr
 			for _, opt := range req.PprofType {
 				wg.Add(1)
 				go func(opt proto.PprofOption) {
-					res := c.GetPprof(ctx, opt, dur)
+					res := c.getPprof(ctx, opt, dur)
 					ch <- res
 					wg.Done()
 				}(opt)
@@ -313,8 +314,8 @@ type socketRequester struct {
 	routeKey string
 }
 
-func newSocketRequester(timeout time.Duration, appName, routeKey, endpoint string) *socketRequester {
-	c := http.Client{Timeout: timeout}
+func newSocketRequester(appName, routeKey, endpoint string) *socketRequester {
+	c := http.Client{}
 	if strings.HasPrefix(endpoint, "unix://") {
 		c.Transport = &http.Transport{
 			Proxy:       nil,
@@ -356,8 +357,8 @@ func (r *socketRequester) getPath(ctx context.Context, path string) (*http.Respo
 
 }
 
-// ProcMeta will return process metadata by querying the "/" path.
-func (r *socketRequester) ProcMeta(ctx context.Context) *proto.ProcMeta {
+// procMeta will return process metadata by querying the "/" path.
+func (r *socketRequester) procMeta(ctx context.Context) *proto.ProcMeta {
 	pm := &proto.ProcMeta{
 		Name:     r.appName,
 		RouteKey: r.routeKey,
@@ -405,8 +406,8 @@ var pprofEndpoints = map[proto.PprofOption]string{
 	proto.PprofOption_TRACE:        "/debug/pprof/trace",
 }
 
-// GetProf will gather pprof data specified by the option.
-func (r *socketRequester) GetPprof(ctx context.Context, opt proto.PprofOption, dur time.Duration) *proto.PprofResult {
+// getProf will gather pprof data specified by the option.
+func (r *socketRequester) getPprof(ctx context.Context, opt proto.PprofOption, dur time.Duration) *proto.PprofResult {
 	res := &proto.PprofResult{
 		AppName:   r.appName,
 		RouteKey:  r.routeKey,

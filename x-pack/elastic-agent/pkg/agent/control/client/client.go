@@ -103,7 +103,7 @@ type Client interface {
 	Upgrade(ctx context.Context, version string, sourceURI string) (string, error)
 	// ProcMeta gathers running process meta-data.
 	ProcMeta(ctx context.Context) ([]ProcMeta, error)
-	// Ppro
+	// Pprof gathers data from the /debug/pprof/ endpoints specified.
 	Pprof(ctx context.Context, d time.Duration, pprofTypes []proto.PprofOption, appName, routeKey string) (map[string][]ProcPProf, error)
 }
 

@@ -168,8 +168,9 @@ func diagnosticsCollectCmd(streams *cli.IOStreams, fileName, outputFormat string
 
 	ctx := handleSignal(context.Background())
 	d := time.Second * 30
+	// Add more time to the ctx to allow profile/trace data to be gathered and processed
 	if pprof {
-		d = 2 * pprofDur
+		d += pprofDur
 	}
 	innerCtx, cancel := context.WithTimeout(ctx, d)
 	defer cancel()
@@ -217,7 +218,7 @@ func diagnosticsPprofCmd(streams *cli.IOStreams, dur time.Duration, outFile, pTy
 	}
 
 	ctx := handleSignal(context.Background())
-	innerCtx, cancel := context.WithTimeout(ctx, dur*2)
+	innerCtx, cancel := context.WithTimeout(ctx, dur+time.Second*30)
 	defer cancel()
 
 	daemon := client.New()
