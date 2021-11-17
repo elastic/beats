@@ -207,7 +207,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
             config = self.beat_name + ".yml"
 
         if output is None:
-            output = self.beat_name + ".log"
+            today = datetime.now().strftime("%Y%m%d")
+            output = self.beat_name+"-"+today+".ndjson"
 
         args = [cmd, "-systemTest"]
         if os.getenv("TEST_COVERAGE") == "true":
@@ -368,7 +369,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
         Returns the log as a string.
         """
         if logfile is None:
-            logfile = self.beat_name + ".log"
+            today = datetime.now().strftime("%Y%m%d")
+            logfile = self.beat_name + "-"+today+".ndjson"
 
         with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
             data = f.read()
@@ -416,8 +418,9 @@ class TestCase(unittest.TestCase, ComposeMixin):
             msg = msg.lower()
 
         # Init defaults
+        today = datetime.now().strftime("%Y%m%d")
         if logfile is None:
-            logfile = self.beat_name + ".log"
+            logfile = self.beat_name +"-"+today+ ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, logfile), "r", encoding="utf_8") as f:

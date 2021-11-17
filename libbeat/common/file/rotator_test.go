@@ -87,7 +87,7 @@ func TestFileRotator(t *testing.T) {
 func TestFileRotatorConcurrently(t *testing.T) {
 	dir := t.TempDir()
 
-	filename := filepath.Join(dir, "sample.log")
+	filename := filepath.Join(dir, "sample")
 	r, err := file.NewFileRotator(filename, file.MaxBackups(2))
 	if err != nil {
 		t.Fatal(err)
