@@ -52790,10 +52790,40 @@ Openmetrics module
 
 
 
+*`openmetrics.help`*::
++
+--
+Brief description of the MetricFamily
+
+
+type: keyword
+
+--
+
+*`openmetrics.type`*::
++
+--
+Metric type
+
+
+type: keyword
+
+--
+
+*`openmetrics.unit`*::
++
+--
+Metric unit
+
+
+type: keyword
+
+--
+
 *`openmetrics.labels.*`*::
 +
 --
-Prometheus metric labels
+Openmetrics metric labels
 
 
 type: object
@@ -52803,7 +52833,27 @@ type: object
 *`openmetrics.metrics.*`*::
 +
 --
-Prometheus metric
+Openmetrics metric
+
+
+type: object
+
+--
+
+*`openmetrics.exemplar.*`*::
++
+--
+Openmetrics exemplars
+
+
+type: object
+
+--
+
+*`openmetrics.exemplar.labels.*`*::
++
+--
+Openmetrics metric exemplar labels
 
 
 type: object
