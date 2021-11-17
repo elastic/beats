@@ -119,6 +119,7 @@ class Proc(object):
 
 
 class TestCase(unittest.TestCase, ComposeMixin):
+    today = datetime.now().strftime("%Y%m%d")
 
     @classmethod
     def setUpClass(self):
