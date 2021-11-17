@@ -14,15 +14,9 @@ jobs:
       with:
         go-version: '1.17.2'
     - name: Install dependencies
-      run: |
-        go version
-        go get -u github.com/magefile/mage
+      run: go get -u github.com/magefile/mage
     - uses: actions/checkout@v2
-      with:
-        path: src/github.com/elastic/beats
-    - name: Debug
-      run: ls -ltr && ls -tra src/github.com/elastic/beats && ls -ltra src/github.com/elastic/beats/metricbeat
     - name: Run build
-      run: cd src/github.com/elastic/beats/metricbeat && mage build
+      run: cd metricbeat && mage build
     - name: Run test
-      run: cd src/github.com/elastic/beats/metricbeat && mage unitTest
+      run: cd metricbeat && mage unitTest
