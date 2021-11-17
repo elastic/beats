@@ -1,0 +1,36 @@
+name: build
+
+env:
+  GOPATH: /home/runner/work/gotest/gotest
+  GO111MODULE: off
+  REPO_PATH: src/gotest
+  MACOS_GOPATH: /Users/runner/work/gotest/gotest
+
+on:
+  pull_request:
+    paths:
+      - 'metricbeat/**'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+    - name: Set environment for macos
+      run: |
+        echo Changed GOPATH to ${{ env.MACOS_GOPATH }}
+        echo "GOPATH="${{ env.MACOS_GOPATH }} >> $GITHUB_ENV
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.17.2'
+    - uses: actions/checkout@v2
+    - name: Run build
+      run: |
+        set -x
+        cd ${{ env.GOPATH }}/${{ env.REPO_PATH }}/metricbeat
+        mage build
+    - name: Run test
+      run: |
+        set -x
+        cd ${{ env.GOPATH }}/${{ env.REPO_PATH }}/metricbeat
+        mage unitTest
