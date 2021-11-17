@@ -33,7 +33,7 @@ const (
 	// MaxBackupsLimit is the upper bound on the number of backup files. Any values
 	// greater will result in an error.
 	MaxBackupsLimit = 1024
-	DateFormat      = "2006010215"
+	DateFormat      = "20060102"
 )
 
 // rotater is the interface responsible for rotating and finding files.

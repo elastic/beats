@@ -418,9 +418,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
             msg = msg.lower()
 
         # Init defaults
-        today = datetime.now().strftime("%Y%m%d")
         if logfile is None:
-            logfile = self.beat_name +"-"+today+ ".ndjson"
+            logfile = self.beat_name +"-" + self.today + ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, logfile), "r", encoding="utf_8") as f:
