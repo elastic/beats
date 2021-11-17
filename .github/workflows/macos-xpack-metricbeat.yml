@@ -10,7 +10,7 @@ env:
   BEAT_MODULE: 'x-pack/metricbeat'
 
 jobs:
-  build:
+  macos:
     runs-on: macos-latest
     steps:
     - name: Set up Go
