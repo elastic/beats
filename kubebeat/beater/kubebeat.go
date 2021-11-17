@@ -31,8 +31,6 @@ type kubebeat struct {
 	data         *Data
 }
 
-
-
 //go:embed opa-policy-test
 var opaPolicyTestContent embed.FS
 
@@ -96,10 +94,10 @@ func CreateCISPolicy(fileSystem embed.FS) map[string]string {
 		if err != nil {
 			log.Fatal(err)
 		}
-		if info.IsDir() == false && strings.HasSuffix(info.Name(), ".rego"){
+		if info.IsDir() == false && strings.HasSuffix(info.Name(), ".rego") {
 
-			data,err := fs.ReadFile(fileSystem, filepath)
-			if err == nil{
+			data, err := fs.ReadFile(fileSystem, filepath)
+			if err == nil {
 				policies[filepath] = string(data)
 			}
 		}
