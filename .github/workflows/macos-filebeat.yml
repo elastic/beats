@@ -1,4 +1,4 @@
-name: build
+name: filebeat
 
 on:
   pull_request:

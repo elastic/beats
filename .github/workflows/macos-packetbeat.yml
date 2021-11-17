@@ -1,4 +1,4 @@
-name: build
+name: packetbeat
 
 on:
   pull_request:

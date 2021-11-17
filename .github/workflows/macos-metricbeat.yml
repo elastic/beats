@@ -1,4 +1,4 @@
-name: build
+name: metricbeat
 
 on:
   pull_request:
