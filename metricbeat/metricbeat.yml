@@ -101,7 +101,6 @@ output.elasticsearch:
   #username: "elastic"
   #password: "changeme"
 
-
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
   # The Logstash hosts
