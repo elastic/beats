@@ -33,6 +33,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.first_seen": "2021-06-20T00:00:00.000Z",
         "threat.indicator.last_seen": "2021-06-20T23:59:59.000Z",
         "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/url%3Ahttps://d6s.example.net/nzy/vvc68ke?p5uxwn=1bj",
@@ -77,6 +79,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.first_seen": "2021-06-20T00:00:00.000Z",
         "threat.indicator.last_seen": "2021-06-20T23:59:59.000Z",
         "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/url%3Ahttps://ga7v9u.example.org/bnqv8e2v8/qb49?7kq=iw61",
@@ -121,6 +125,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.first_seen": "2021-06-20T00:00:00.000Z",
         "threat.indicator.last_seen": "2021-06-20T23:59:59.000Z",
         "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/url%3Ahttps://cdmw.example.net/c20fwa/wwn?dlz53=z6ovc",
@@ -165,6 +171,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.first_seen": "2021-06-20T00:00:00.000Z",
         "threat.indicator.last_seen": "2021-06-20T23:59:59.000Z",
         "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/url%3Ahttps://4mne.example.local/ns2rk8f/wngtk2xz?vceuk7wl6=3p0",
@@ -209,6 +217,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.first_seen": "2021-06-20T00:00:00.000Z",
         "threat.indicator.last_seen": "2021-06-20T23:59:59.000Z",
         "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/url%3Ahttp://z198hloc8.example.com/f8ih39/f6kou?f6-u3=uwhii",
@@ -253,6 +263,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.first_seen": "2021-06-20T00:00:00.000Z",
         "threat.indicator.last_seen": "2021-06-20T23:59:59.000Z",
         "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/url%3Ahttp://y484j-fb6.example.local/b97s24xf/prz?sg-x1do=4myont",
@@ -297,6 +309,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.first_seen": "2021-06-20T00:00:00.000Z",
         "threat.indicator.last_seen": "2021-06-20T23:59:59.000Z",
         "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/url%3Ahttp://sp2xyqq82.example.local/zxvm093/kat1rcz?vaev0aeod=rc0513",
@@ -341,6 +355,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.first_seen": "2021-06-20T00:00:00.000Z",
         "threat.indicator.last_seen": "2021-06-20T23:59:59.000Z",
         "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/url%3Ahttps://zh4o7xc.example.com/-yiq/vg2whtxif?cb0-knk=s6poib5r",
@@ -385,6 +401,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.first_seen": "2021-06-20T00:00:00.000Z",
         "threat.indicator.last_seen": "2021-06-20T23:59:59.000Z",
         "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/url%3Ahttp://fiivf4s.example.org/8u2qi/86vfcfq7m?pfb2ensc0=h7imk8io2",
@@ -429,6 +447,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.first_seen": "2021-06-20T00:00:00.000Z",
         "threat.indicator.last_seen": "2021-06-20T23:59:59.000Z",
         "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/url%3Ahttp://abav9v.example.org/gj93q/7fs7?kcq7=pjaj1",

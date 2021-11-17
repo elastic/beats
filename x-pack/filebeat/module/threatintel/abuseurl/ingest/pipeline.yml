@@ -39,6 +39,12 @@ processors:
   # Threat ECS Fields #
   #####################
   - set:
+      field: threat.feed.name
+      value: "[Filebeat] AbuseCH URL"
+  - set:
+      field: threat.feed.dashboard_id
+      value: "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f"
+  - set:
       field: threat.indicator.type
       value: url
   - date:

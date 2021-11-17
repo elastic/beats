@@ -121,7 +121,10 @@ processors:
   #####################
   - set:
       field: threat.feed.name
-      value: "MISP"
+      value: "[Filebeat] MISP"
+  - set:
+      field: threat.feed.dashboard_id
+      value: "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f"
   - rename:
       field: misp.attribute.first_seen
       target_field: threat.indicator.first_seen

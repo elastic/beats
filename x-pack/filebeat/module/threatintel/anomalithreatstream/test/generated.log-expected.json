@@ -29,6 +29,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.as.organization.name": "OVH Hosting",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-08T12:21:50.000Z",
@@ -76,6 +78,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.as.organization.name": "IP Khnykin Vitaliy Yakovlevich",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-08T12:21:59.000Z",
@@ -121,6 +125,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.as.number": 22773,
         "threat.indicator.as.organization.name": "Cox Communications",
         "threat.indicator.confidence": "Low",
@@ -169,6 +175,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-08T12:22:16.000Z",
         "threat.indicator.last_seen": "2020-10-08T12:24:42.000Z",
@@ -210,6 +218,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.as.number": 20001,
         "threat.indicator.as.organization.name": "Spectrum",
         "threat.indicator.confidence": "Med",
@@ -256,6 +266,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.as.number": 11351,
         "threat.indicator.as.organization.name": "Spectrum",
         "threat.indicator.confidence": "Med",
@@ -312,6 +324,8 @@
             "threatintel-anomalithreatstream",
             "type=2"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:14:43.000Z",
         "threat.indicator.ip": "203.0.113.130",
@@ -355,6 +369,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:30:10.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:30:10.000Z",
@@ -396,6 +412,8 @@
             "jn5jpvg",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:30:13.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -446,6 +464,8 @@
             "threatintel-anomalithreatstream",
             "xl4"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:30:13.000Z",
         "threat.indicator.geo.country_iso_code": "CN",
@@ -496,6 +516,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:30:22.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:30:22.000Z",
@@ -539,6 +561,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:30:23.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:30:23.000Z",
@@ -580,6 +604,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:30:30.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -631,6 +657,8 @@
             "threatintel-anomalithreatstream",
             "vnx4nu7c"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:30:37.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:30:37.000Z",
@@ -672,6 +700,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:30:40.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:30:40.000Z",
@@ -714,6 +744,8 @@
             "ica",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:30:45.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:30:45.000Z",
@@ -758,6 +790,8 @@
             "iop",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "None",
         "threat.indicator.first_seen": "2020-10-09T18:30:54.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:30:54.000Z",
@@ -801,6 +835,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:30:59.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:30:59.000Z",
@@ -842,6 +878,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:31:10.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:31:10.000Z",
@@ -885,6 +923,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:31:16.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:31:16.000Z",
@@ -927,6 +967,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:31:22.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:31:22.000Z",
@@ -973,6 +1015,8 @@
             "threat=bm-uj8c12",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:31:27.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:31:27.000Z",
@@ -1014,6 +1058,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "None",
         "threat.indicator.first_seen": "2020-10-09T18:31:29.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:31:29.000Z",
@@ -1054,6 +1100,8 @@
             "g1wn0g",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:31:34.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -1104,6 +1152,8 @@
             "pzs4xlqy",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:31:36.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:31:36.000Z",
@@ -1147,6 +1197,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:31:39.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:31:39.000Z",
@@ -1189,6 +1241,8 @@
             "g80r1d4sj",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:31:43.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:31:43.000Z",
@@ -1230,6 +1284,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "None",
         "threat.indicator.first_seen": "2020-10-09T18:31:49.000Z",
         "threat.indicator.geo.country_iso_code": "DE",
@@ -1272,6 +1328,8 @@
             "om0z7",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:31:49.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -1321,6 +1379,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:31:58.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -1372,6 +1432,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:32:02.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:32:02.000Z",
@@ -1414,6 +1476,8 @@
             "nj3f",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:32:03.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:32:03.000Z",
@@ -1457,6 +1521,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:32:04.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:32:04.000Z",
@@ -1499,6 +1565,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:32:08.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:32:08.000Z",
@@ -1542,6 +1610,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:32:11.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:32:11.000Z",
@@ -1584,6 +1654,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:32:19.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:32:19.000Z",
@@ -1624,6 +1696,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:32:30.000Z",
         "threat.indicator.geo.country_iso_code": "CN",
@@ -1668,6 +1742,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:32:35.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:32:35.000Z",
@@ -1710,6 +1786,8 @@
             "threatintel-anomalithreatstream",
             "ziqdk"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "None",
         "threat.indicator.first_seen": "2020-10-09T18:33:10.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -1760,6 +1838,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:33:13.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:33:13.000Z",
@@ -1802,6 +1882,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:33:14.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:33:14.000Z",
@@ -1843,6 +1925,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:33:14.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:33:14.000Z",
@@ -1885,6 +1969,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "None",
         "threat.indicator.first_seen": "2020-10-09T18:33:22.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -1935,6 +2021,8 @@
             "knjq-wt",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:33:24.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:33:24.000Z",
@@ -1976,6 +2064,8 @@
             "rb2my5u7",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:33:26.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -2024,6 +2114,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:33:27.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -2076,6 +2168,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "None",
         "threat.indicator.first_seen": "2020-10-09T18:33:29.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:33:29.000Z",
@@ -2119,6 +2213,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:33:43.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:33:43.000Z",
@@ -2163,6 +2259,8 @@
             "kpjt",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:33:45.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:33:45.000Z",
@@ -2204,6 +2302,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:33:45.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:33:45.000Z",
@@ -2245,6 +2345,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:33:48.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -2296,6 +2398,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:33:51.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:33:51.000Z",
@@ -2337,6 +2441,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:33:57.000Z",
         "threat.indicator.geo.country_iso_code": "VN",
@@ -2379,6 +2485,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:34:00.000Z",
         "threat.indicator.geo.country_iso_code": "DE",
@@ -2421,6 +2529,8 @@
             "threatintel-anomalithreatstream",
             "v9ycq"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:34:00.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -2469,6 +2579,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "None",
         "threat.indicator.first_seen": "2020-10-09T18:34:00.000Z",
         "threat.indicator.geo.country_iso_code": "IN",
@@ -2514,6 +2626,8 @@
             "threatintel-anomalithreatstream",
             "xva1ki"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:34:02.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:34:02.000Z",
@@ -2558,6 +2672,8 @@
             "threatintel-anomalithreatstream",
             "wwsw"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:34:05.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:34:05.000Z",
@@ -2599,6 +2715,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:34:11.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:34:11.000Z",
@@ -2641,6 +2759,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:34:12.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:34:12.000Z",
@@ -2681,6 +2801,8 @@
             "gry2doqf",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "None",
         "threat.indicator.first_seen": "2020-10-09T18:34:17.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -2733,6 +2855,8 @@
             "k6p",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:34:20.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:34:20.000Z",
@@ -2776,6 +2900,8 @@
             "threatintel-anomalithreatstream",
             "ulx"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:34:20.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:34:20.000Z",
@@ -2820,6 +2946,8 @@
             "wsu7l1",
             "zrb"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:34:32.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:34:32.000Z",
@@ -2861,6 +2989,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:34:32.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:34:32.000Z",
@@ -2902,6 +3032,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "None",
         "threat.indicator.first_seen": "2020-10-09T18:34:39.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:34:39.000Z",
@@ -2944,6 +3076,8 @@
             "qr2wno4",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:34:40.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:34:40.000Z",
@@ -2984,6 +3118,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:34:41.000Z",
         "threat.indicator.geo.country_iso_code": "VN",
@@ -3027,6 +3163,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:34:43.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -3076,6 +3214,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:34:48.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:34:48.000Z",
@@ -3117,6 +3257,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:34:53.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:34:53.000Z",
@@ -3159,6 +3301,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:34:53.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:34:53.000Z",
@@ -3200,6 +3344,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "None",
         "threat.indicator.first_seen": "2020-10-09T18:34:54.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -3249,6 +3395,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:34:55.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:34:55.000Z",
@@ -3290,6 +3438,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:35:01.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:35:01.000Z",
@@ -3333,6 +3483,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:35:01.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:35:01.000Z",
@@ -3373,6 +3525,8 @@
             "threatintel-anomalithreatstream",
             "y7d71"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:35:04.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -3423,6 +3577,8 @@
             "nknea",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:35:06.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:35:06.000Z",
@@ -3465,6 +3621,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:35:22.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:35:22.000Z",
@@ -3511,6 +3669,8 @@
             "popularity=high",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:44:01.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -3561,6 +3721,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:44:04.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -3611,6 +3773,8 @@
             "n5okkr7mg",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:44:19.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:44:19.000Z",
@@ -3658,6 +3822,8 @@
             "threatintel-anomalithreatstream",
             "u96h"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:44:27.000Z",
         "threat.indicator.geo.country_iso_code": "RU",
@@ -3701,6 +3867,8 @@
             "t37z5d2",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:44:35.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -3751,6 +3919,8 @@
             "rprsi-",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:44:36.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -3806,6 +3976,8 @@
             "popularity=low",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:44:37.000Z",
         "threat.indicator.geo.country_iso_code": "IN",
@@ -3856,6 +4028,8 @@
             "qztcai",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:44:45.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -3910,6 +4084,8 @@
             "q0n",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:44:47.000Z",
         "threat.indicator.geo.country_iso_code": "CN",
@@ -3956,6 +4132,8 @@
             "smh",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Med",
         "threat.indicator.first_seen": "2020-10-09T18:44:50.000Z",
         "threat.indicator.geo.country_iso_code": "HK",
@@ -4005,6 +4183,8 @@
             "sv5lmqoo",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:44:50.000Z",
         "threat.indicator.last_seen": "2020-10-09T18:44:50.000Z",
@@ -4051,6 +4231,8 @@
             "l019r8",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2020-10-09T18:44:54.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -4101,6 +4283,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:44:58.000Z",
         "threat.indicator.geo.country_iso_code": "US",
@@ -4155,6 +4339,8 @@
             "qqo5fg",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2020-10-09T18:45:05.000Z",
         "threat.indicator.geo.country_iso_code": "IN",
@@ -4198,6 +4384,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.as.number": 3356,
         "threat.indicator.as.organization.name": "Level 3 Communications",
         "threat.indicator.confidence": "Low",
@@ -4243,6 +4431,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2021-04-29T16:02:17.000Z",
         "threat.indicator.ip": "203.0.113.5",
@@ -4282,6 +4472,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2021-04-29T16:02:23.000Z",
         "threat.indicator.ip": "192.0.2.68",
@@ -4322,6 +4514,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2021-04-29T16:02:24.000Z",
         "threat.indicator.ip": "203.0.113.54",
@@ -4362,6 +4556,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "High",
         "threat.indicator.first_seen": "2021-04-29T16:02:25.000Z",
         "threat.indicator.ip": "203.0.113.195",
@@ -4403,6 +4599,8 @@
             "forwarded",
             "threatintel-anomalithreatstream"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2021-04-29T16:02:25.000Z",
         "threat.indicator.ip": "192.0.2.239",
@@ -4445,6 +4643,8 @@
             "threatintel-anomalithreatstream",
             "vjb9lmpcf"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali ThreatStream",
         "threat.indicator.confidence": "Low",
         "threat.indicator.first_seen": "2021-04-29T16:02:26.000Z",
         "threat.indicator.ip": "192.0.2.169",

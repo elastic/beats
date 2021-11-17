@@ -47,7 +47,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.file.hash.md5": "70461da8b94c6ca5d2fda3260c5a8c3b",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
@@ -105,7 +106,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.file.hash.md5": "60461da8b94c6ca5d2fda3260c5a8c3b",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
@@ -163,7 +165,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
         "threat.indicator.type": "domain-name",
@@ -221,7 +224,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.ip": "10.0.0.1",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
@@ -279,7 +283,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.ip": "192.168.1.50",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
@@ -353,7 +358,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
         "threat.indicator.type": "unknown",
@@ -426,7 +432,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
         "threat.indicator.type": "unknown",
@@ -498,7 +505,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.file.hash.md5": "70461da8b94c6ca5d2fda3260c5a8c3b",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
@@ -571,7 +579,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.file.hash.sha256": "f33c27745f2bd87344be790465ef984a972fd539dc83bd4f61d4242c607ef1ee",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
@@ -644,7 +653,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.file.name": "filenameofobject.txt",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
@@ -704,7 +714,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
         "threat.indicator.type": "unknown",
@@ -762,7 +773,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.file.hash.sha256": "567caa7653723f8818ec9eb6f2e27f6d9d8c0aca0c96fc457659340e7bbdc666",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
@@ -821,7 +833,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.file.name": "filenameinmispobject.txt",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
@@ -881,7 +894,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
         "threat.indicator.type": "unknown",
@@ -940,7 +954,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
         "threat.indicator.type": "unknown",
@@ -999,7 +1014,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
         "threat.indicator.type": "unknown",
@@ -1057,7 +1073,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.file.hash.sha256": "567caa7653723f8818ec9eb6f2e27f6d9d8c0aca0c96fc457659340e7bbdc665",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
@@ -1116,7 +1133,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.file.name": "object5.txt",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
@@ -1190,7 +1208,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
         "threat.indicator.type": "unknown",
@@ -1263,7 +1282,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
         "threat.indicator.type": "unknown",
@@ -1336,7 +1356,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
         "threat.indicator.type": "unknown",
@@ -1409,7 +1430,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
         "threat.indicator.type": "unknown",
@@ -1482,7 +1504,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
         "threat.indicator.type": "unknown",
@@ -1554,7 +1577,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.file.hash.md5": "7392463caf95534d56460bc9f360adc1",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
@@ -1627,7 +1651,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.file.hash.md5": "7295463caf95534d56460bc9f360adc1",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,
@@ -1700,7 +1725,8 @@
             "forwarded",
             "threatintel-misp"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.file.name": "badmojopipe.exe",
         "threat.indicator.provider": "misp",
         "threat.indicator.scanner_stats": 0,

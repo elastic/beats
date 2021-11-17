@@ -14,6 +14,8 @@
             "forwarded",
             "threatintel-threatq"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] ThreatQuotient",
         "threat.indicator.confidence": "Low",
         "threat.indicator.ip": "69.44.202.220",
         "threat.indicator.type": "ipv4-addr",
@@ -56,6 +58,8 @@
             "forwarded",
             "threatintel-threatq"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] ThreatQuotient",
         "threat.indicator.confidence": "Low",
         "threat.indicator.ip": "69.94.155.176",
         "threat.indicator.type": "ipv4-addr",
@@ -98,6 +102,8 @@
             "forwarded",
             "threatintel-threatq"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] ThreatQuotient",
         "threat.indicator.confidence": "Low",
         "threat.indicator.ip": "69.42.81.68",
         "threat.indicator.type": "ipv4-addr",
@@ -140,6 +146,8 @@
             "forwarded",
             "threatintel-threatq"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] ThreatQuotient",
         "threat.indicator.confidence": "Low",
         "threat.indicator.ip": "37.17.250.101",
         "threat.indicator.type": "ipv4-addr",
@@ -176,6 +184,8 @@
             "forwarded",
             "threatintel-threatq"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] ThreatQuotient",
         "threat.indicator.confidence": "Low",
         "threat.indicator.ip": "69.94.129.203",
         "threat.indicator.type": "ipv4-addr",
@@ -218,6 +228,8 @@
             "forwarded",
             "threatintel-threatq"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] ThreatQuotient",
         "threat.indicator.confidence": "Low",
         "threat.indicator.ip": "69.216.117.22",
         "threat.indicator.type": "ipv4-addr",
@@ -260,6 +272,8 @@
             "forwarded",
             "threatintel-threatq"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] ThreatQuotient",
         "threat.indicator.confidence": "Low",
         "threat.indicator.ip": "69.80.70.115",
         "threat.indicator.type": "ipv4-addr",
@@ -302,6 +316,8 @@
             "forwarded",
             "threatintel-threatq"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] ThreatQuotient",
         "threat.indicator.confidence": "Low",
         "threat.indicator.ip": "69.65.79.99",
         "threat.indicator.type": "ipv4-addr",
@@ -344,6 +360,8 @@
             "forwarded",
             "threatintel-threatq"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] ThreatQuotient",
         "threat.indicator.confidence": "Low",
         "threat.indicator.ip": "69.199.22.46",
         "threat.indicator.type": "ipv4-addr",

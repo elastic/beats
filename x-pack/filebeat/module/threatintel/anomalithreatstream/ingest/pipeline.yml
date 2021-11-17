@@ -26,6 +26,13 @@ processors:
       field: event.type
       value: indicator
 
+  - set:
+      field: threat.feed.name
+      value: "[Filebeat] Anomali ThreatStream"
+  - set:
+      field: threat.feed.dashboard_id
+      value: "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f"
+
   #
   # Map itype field to STIX 2.0 Cyber Observable values (threat.indicator.type).
   #

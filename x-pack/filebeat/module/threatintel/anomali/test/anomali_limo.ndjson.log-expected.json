@@ -31,6 +31,8 @@
             "threatstream-confidence-76",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T02:58:57.431Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -73,6 +75,8 @@
             "threatstream-confidence-68",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T02:58:57.503Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -115,6 +119,8 @@
             "threatstream-confidence-71",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T02:58:57.570Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -156,6 +162,8 @@
             "threatstream-confidence-50",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T02:58:59.366Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -197,6 +205,8 @@
             "threatstream-confidence-66",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T02:58:59.457Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -239,6 +249,8 @@
             "threatstream-confidence-93",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T02:59:06.402Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -281,6 +293,8 @@
             "threatstream-confidence-49",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T02:59:19.990Z",
         "threat.indicator.ip": "162.144.128.116",
         "threat.indicator.provider": "CyberCrime",
@@ -318,6 +332,8 @@
             "threatstream-confidence-79",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T02:59:20.155Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -360,6 +376,8 @@
             "threatstream-confidence-76",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T02:59:25.521Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -402,6 +420,8 @@
             "threatstream-confidence-68",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T02:59:25.626Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -443,6 +463,8 @@
             "threatstream-confidence-85",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T02:59:36.461Z",
         "threat.indicator.ip": "45.143.138.39",
         "threat.indicator.provider": "CyberCrime",
@@ -480,6 +502,8 @@
             "threatstream-confidence-82",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T02:59:41.193Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -522,6 +546,8 @@
             "threatstream-confidence-61",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T02:59:41.228Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -563,6 +589,8 @@
             "threatstream-confidence-62",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T02:59:51.313Z",
         "threat.indicator.ip": "198.54.115.121",
         "threat.indicator.provider": "CyberCrime",
@@ -600,6 +628,8 @@
             "threatstream-confidence-38",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T02:59:51.372Z",
         "threat.indicator.ip": "192.185.119.172",
         "threat.indicator.provider": "CyberCrime",
@@ -637,6 +667,8 @@
             "threatstream-confidence-61",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T02:59:51.442Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -678,6 +710,8 @@
             "threatstream-confidence-66",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:00:01.563Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -720,6 +754,8 @@
             "threatstream-confidence-93",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:00:03.138Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -762,6 +798,8 @@
             "threatstream-confidence-76",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:00:03.396Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -804,6 +842,8 @@
             "threatstream-confidence-87",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:00:03.642Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -846,6 +886,8 @@
             "threatstream-confidence-76",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:00:27.534Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -888,6 +930,8 @@
             "threatstream-confidence-78",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:00:27.591Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -930,6 +974,8 @@
             "threatstream-confidence-68",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:00:45.787Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -972,6 +1018,8 @@
             "threatstream-confidence-91",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:00:45.841Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1014,6 +1062,8 @@
             "threatstream-confidence-64",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:00:45.959Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1056,6 +1106,8 @@
             "threatstream-confidence-30",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:00:46.025Z",
         "threat.indicator.ip": "74.116.84.20",
         "threat.indicator.provider": "CyberCrime",
@@ -1093,6 +1145,8 @@
             "threatstream-confidence-43",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:00:57.729Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1134,6 +1188,8 @@
             "threatstream-confidence-36",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:01:02.696Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1176,6 +1232,8 @@
             "threatstream-confidence-65",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:01:02.807Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1218,6 +1276,8 @@
             "threatstream-confidence-93",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:01:24.810Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1260,6 +1320,8 @@
             "threatstream-confidence-87",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:01:41.158Z",
         "threat.indicator.ip": "194.87.147.80",
         "threat.indicator.provider": "CyberCrime",
@@ -1297,6 +1359,8 @@
             "threatstream-confidence-85",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:01:57.189Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1339,6 +1403,8 @@
             "threatstream-confidence-42",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:01:57.279Z",
         "threat.indicator.ip": "45.95.168.70",
         "threat.indicator.provider": "CyberCrime",
@@ -1376,6 +1442,8 @@
             "threatstream-confidence-76",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:02:50.570Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1418,6 +1486,8 @@
             "threatstream-confidence-26",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:02:52.496Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1459,6 +1529,8 @@
             "threatstream-confidence-94",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:03:42.819Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1501,6 +1573,8 @@
             "threatstream-confidence-87",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:03:52.044Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1543,6 +1617,8 @@
             "threatstream-confidence-68",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:04:01.650Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1585,6 +1661,8 @@
             "threatstream-confidence-92",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:04:32.717Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1626,6 +1704,8 @@
             "threatstream-confidence-84",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:04:56.858Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1667,6 +1747,8 @@
             "threatstream-confidence-76",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-22T03:04:59.245Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1709,6 +1791,8 @@
             "threatstream-confidence-57",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-23T03:00:22.287Z",
         "threat.indicator.ip": "192.185.214.199",
         "threat.indicator.provider": "CyberCrime",
@@ -1746,6 +1830,8 @@
             "threatstream-confidence-24",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-23T03:01:11.329Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1788,6 +1874,8 @@
             "threatstream-confidence-61",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-23T03:01:36.682Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1830,6 +1918,8 @@
             "threatstream-confidence-93",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-23T03:02:15.854Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1872,6 +1962,8 @@
             "threatstream-confidence-62",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-23T03:02:47.364Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1913,6 +2005,8 @@
             "threatstream-confidence-80",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-23T03:03:05.048Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1955,6 +2049,8 @@
             "threatstream-confidence-69",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-23T03:03:15.734Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -1997,6 +2093,8 @@
             "threatstream-confidence-72",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-23T03:03:42.599Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2039,6 +2137,8 @@
             "threatstream-confidence-74",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:57:04.821Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2081,6 +2181,8 @@
             "threatstream-confidence-83",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:57:04.857Z",
         "threat.indicator.ip": "91.215.170.249",
         "threat.indicator.provider": "CyberCrime",
@@ -2118,6 +2220,8 @@
             "threatstream-confidence-79",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:57:04.883Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2159,6 +2263,8 @@
             "threatstream-confidence-93",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:57:12.997Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2201,6 +2307,8 @@
             "threatstream-confidence-87",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:57:13.025Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2243,6 +2351,8 @@
             "threatstream-confidence-82",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:57:32.901Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2285,6 +2395,8 @@
             "threatstream-confidence-93",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:57:32.929Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2326,6 +2438,8 @@
             "threatstream-confidence-83",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:57:49.028Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2368,6 +2482,8 @@
             "threatstream-confidence-94",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:58:03.345Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2410,6 +2526,8 @@
             "threatstream-confidence-81",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:58:16.318Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2452,6 +2570,8 @@
             "threatstream-confidence-66",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:58:16.358Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2494,6 +2614,8 @@
             "threatstream-confidence-82",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:58:32.126Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2535,6 +2657,8 @@
             "threatstream-confidence-82",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:58:37.603Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2576,6 +2700,8 @@
             "threatstream-confidence-71",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:58:37.643Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2617,6 +2743,8 @@
             "threatstream-confidence-84",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:58:39.465Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2658,6 +2786,8 @@
             "threatstream-confidence-81",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:59:02.031Z",
         "threat.indicator.ip": "206.217.131.245",
         "threat.indicator.provider": "CyberCrime",
@@ -2695,6 +2825,8 @@
             "threatstream-confidence-52",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:59:15.878Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2737,6 +2869,8 @@
             "threatstream-confidence-58",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:59:29.155Z",
         "threat.indicator.ip": "162.241.73.163",
         "threat.indicator.provider": "CyberCrime",
@@ -2774,6 +2908,8 @@
             "threatstream-confidence-78",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:59:50.233Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2815,6 +2951,8 @@
             "threatstream-confidence-25",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:59:50.255Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2857,6 +2995,8 @@
             "threatstream-confidence-78",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:59:52.536Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2898,6 +3038,8 @@
             "threatstream-confidence-85",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:59:54.784Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -2939,6 +3081,8 @@
             "threatstream-confidence-82",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T02:59:54.815Z",
         "threat.indicator.ip": "217.8.117.8",
         "threat.indicator.provider": "CyberCrime",
@@ -2976,6 +3120,8 @@
             "threatstream-confidence-83",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T03:00:01.726Z",
         "threat.indicator.ip": "104.223.170.113",
         "threat.indicator.provider": "CyberCrime",
@@ -3013,6 +3159,8 @@
             "threatstream-confidence-58",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T03:00:01.762Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3055,6 +3203,8 @@
             "threatstream-confidence-84",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T03:00:10.928Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3096,6 +3246,8 @@
             "threatstream-confidence-81",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T03:00:20.166Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3138,6 +3290,8 @@
             "threatstream-confidence-90",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T03:00:24.048Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3179,6 +3333,8 @@
             "threatstream-confidence-58",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T03:00:55.816Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3221,6 +3377,8 @@
             "threatstream-confidence-80",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T03:01:10.501Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3262,6 +3420,8 @@
             "threatstream-confidence-83",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T03:01:10.518Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3303,6 +3463,8 @@
             "threatstream-confidence-76",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-24T03:01:14.843Z",
         "threat.indicator.ip": "217.8.117.47",
         "threat.indicator.provider": "CyberCrime",
@@ -3340,6 +3502,8 @@
             "threatstream-confidence-67",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:57:12.699Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3381,6 +3545,8 @@
             "threatstream-confidence-90",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:57:28.034Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3422,6 +3588,8 @@
             "threatstream-confidence-89",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:57:38.187Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3464,6 +3632,8 @@
             "threatstream-confidence-65",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:57:38.214Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3505,6 +3675,8 @@
             "threatstream-confidence-67",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:57:47.281Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3547,6 +3719,8 @@
             "threatstream-confidence-79",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:57:51.296Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3588,6 +3762,8 @@
             "threatstream-confidence-87",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:57:56.007Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3630,6 +3806,8 @@
             "threatstream-confidence-89",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:57:56.044Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3671,6 +3849,8 @@
             "threatstream-confidence-86",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:58:11.038Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3713,6 +3893,8 @@
             "threatstream-confidence-64",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:58:20.420Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3754,6 +3936,8 @@
             "threatstream-confidence-84",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:58:20.448Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3796,6 +3980,8 @@
             "threatstream-confidence-87",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:58:33.189Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3838,6 +4024,8 @@
             "threatstream-confidence-47",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:58:49.056Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3879,6 +4067,8 @@
             "threatstream-confidence-89",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:58:59.472Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3921,6 +4111,8 @@
             "threatstream-confidence-89",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:59:27.070Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -3963,6 +4155,8 @@
             "threatstream-confidence-89",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:59:28.967Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -4005,6 +4199,8 @@
             "threatstream-confidence-81",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:59:37.661Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",
@@ -4047,6 +4243,8 @@
             "threatstream-confidence-53",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:59:37.692Z",
         "threat.indicator.ip": "192.64.118.56",
         "threat.indicator.provider": "CyberCrime",
@@ -4084,6 +4282,8 @@
             "threatstream-confidence-87",
             "threatstream-severity-medium"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] Anomali Limo",
         "threat.indicator.first_seen": "2020-01-25T02:59:54.296Z",
         "threat.indicator.provider": "CyberCrime",
         "threat.indicator.type": "url",

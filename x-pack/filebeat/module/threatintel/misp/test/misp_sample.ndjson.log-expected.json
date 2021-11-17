@@ -50,7 +50,8 @@
             "tlp:white",
             "type:OSINT"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.file.hash.md5": "f2679bdabe46e10edc6352fff3c829bc",
         "threat.indicator.marking.tlp": [
             "white"
@@ -110,7 +111,8 @@
             "tlp:white",
             "type:OSINT"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.ip": "178.128.103.74",
         "threat.indicator.marking.tlp": [
             "white"
@@ -168,7 +170,8 @@
             "misp-galaxy:tool=Turla",
             "tlp:white"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.marking.tlp": [
             "white"
         ],
@@ -229,7 +232,8 @@
             "tlp:green",
             "type:OSINT"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.file.hash.sha256": "0a1103bc90725d4665b932f88e81d39eafa5823b0de3ab146e2d4548b7da79a0",
         "threat.indicator.marking.tlp": [
             "green"
@@ -286,7 +290,8 @@
             "tlp:green",
             "type:OSINT"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.ip": "223.25.233.248",
         "threat.indicator.marking.tlp": [
             "green"
@@ -343,7 +348,8 @@
             "tlp:green",
             "type:OSINT"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.marking.tlp": [
             "green"
         ],
@@ -401,7 +407,8 @@
             "tlp:green",
             "type:OSINT"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.marking.tlp": [
             "green"
         ],
@@ -457,7 +464,8 @@
             "tlp:green",
             "type:OSINT"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.file.hash.sha1": "0ea76f1586c008932d90c991dfdd5042f3aac8ea",
         "threat.indicator.marking.tlp": [
             "green"
@@ -514,7 +522,8 @@
             "tlp:green",
             "type:OSINT"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.marking.tlp": [
             "green"
         ],
@@ -572,7 +581,8 @@
             "misp-galaxy:threat-actor=Turla Group",
             "tlp:white"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.marking.tlp": [
             "white"
         ],
@@ -635,7 +645,8 @@
             "misp-galaxy:threat-actor=Turla Group",
             "tlp:white"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.marking.tlp": [
             "white"
         ],
@@ -692,7 +703,8 @@
             "misp-galaxy:threat-actor=Turla Group",
             "tlp:white"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.file.hash.sha1": "c51d288469df9f25e2fb7ac491918b3e579282ea",
         "threat.indicator.file.name": "google_update_checker.js",
         "threat.indicator.marking.tlp": [
@@ -749,7 +761,8 @@
         "tags": [
             "tlp:white"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.email.address": "claudiobonadio88@gmail.com",
         "threat.indicator.marking.tlp": [
             "white"
@@ -805,7 +818,8 @@
         "tags": [
             "tlp:white"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.marking.tlp": [
             "white"
         ],
@@ -862,7 +876,8 @@
             "misp-galaxy:banker=Qakbot",
             "tlp:white"
         ],
-        "threat.feed.name": "MISP",
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] MISP",
         "threat.indicator.ip": "62.38.114.12",
         "threat.indicator.marking.tlp": [
             "white"

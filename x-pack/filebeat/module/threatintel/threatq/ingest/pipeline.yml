@@ -75,6 +75,12 @@ processors:
   #####################
   # Threat ECS Fields #
   #####################
+  - set:
+      field: threat.feed.name
+      value: "[Filebeat] ThreatQuotient"
+  - set:
+      field: threat.feed.dashboard_id
+      value: "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f"
   - rename:
       field: json.type.name
       target_field: threat.indicator.type

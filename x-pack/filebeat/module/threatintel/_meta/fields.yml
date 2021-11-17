@@ -19,5 +19,6 @@
 
         - name: threat.feed.name
           type: keyword
-          description: >
-            The file's sha384 hash, if available.
+
+        - name: threat.feed.dashboard_id
+          type: keyword

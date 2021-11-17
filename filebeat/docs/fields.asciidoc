@@ -150665,9 +150665,13 @@ type: keyword
 *`threat.feed.name`*::
 +
 --
-The file's sha384 hash, if available.
+type: keyword
 
+--
 
+*`threat.feed.dashboard_id`*::
++
+--
 type: keyword
 
 --

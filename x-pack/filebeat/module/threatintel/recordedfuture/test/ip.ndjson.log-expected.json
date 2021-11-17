@@ -26,6 +26,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.as.number": 31287,
         "threat.indicator.as.organization.name": "IPACCT CABLE Ltd",
         "threat.indicator.first_seen": "2021-04-18T00:11:48.512Z",
@@ -62,6 +64,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.as.number": 197207,
         "threat.indicator.as.organization.name": "Mobile Communication Company of Iran PLC",
         "threat.indicator.first_seen": "2021-06-19T17:55:58.019Z",
@@ -98,6 +102,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.first_seen": "2021-06-19T19:40:30.596Z",
         "threat.indicator.ip": "203.0.113.55",
         "threat.indicator.last_seen": "2021-06-19T19:40:30.596Z",
@@ -130,6 +136,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.as.number": 17622,
         "threat.indicator.as.organization.name": "China Unicom Guangzhou network",
         "threat.indicator.first_seen": "2021-06-19T19:40:20.534Z",
@@ -167,6 +175,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.as.number": 7713,
         "threat.indicator.as.organization.name": "PT Telekomunikasi Indonesia",
         "threat.indicator.first_seen": "2016-06-23T07:39:06.418Z",
@@ -203,6 +213,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.as.number": 17622,
         "threat.indicator.as.organization.name": "China Unicom Guangzhou network",
         "threat.indicator.first_seen": "2021-06-19T19:40:02.557Z",
@@ -240,6 +252,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.as.number": 4837,
         "threat.indicator.as.organization.name": "CHINA UNICOM China169 Backbone",
         "threat.indicator.first_seen": "2017-12-20T02:21:07.734Z",
@@ -286,6 +300,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.as.number": 9829,
         "threat.indicator.as.organization.name": "National Internet Backbone",
         "threat.indicator.first_seen": "2019-12-24T09:54:02.935Z",
@@ -348,6 +364,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.as.number": 9829,
         "threat.indicator.as.organization.name": "National Internet Backbone",
         "threat.indicator.first_seen": "2020-03-03T08:10:28.489Z",
@@ -394,6 +412,8 @@
             "forwarded",
             "threatintel-recordedfuture"
         ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
         "threat.indicator.as.number": 45899,
         "threat.indicator.as.organization.name": "VNPT Corp",
         "threat.indicator.first_seen": "2021-06-19T19:38:57.372Z",
