@@ -58924,7 +58924,7 @@ type: keyword
 *`system.filesystem.type`*::
 +
 --
-The disk type. For example: `ext4`
+The disk type. For example: `ext4`. In some case for Windows OS the value will be `unavailable` as access to this information is not allowed (ex. external disks).
 
 
 type: keyword
