@@ -10,8 +10,6 @@ import (
 	// Import packages that need to register themselves.
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/activemq"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/airflow"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/appsearch"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/appsearch/stats"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/billing"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch"

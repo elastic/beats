@@ -16,7 +16,7 @@
     - name: type
       type: keyword
       description: >
-        The disk type. For example: `ext4`
+        The disk type. For example: `ext4`. In some case for Windows OS the value will be `unavailable` as access to this information is not allowed (ex. external disks).
     - name: mount_point
       type: keyword
       description: >

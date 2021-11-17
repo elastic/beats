@@ -112,7 +112,7 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
-			output: p.text(&mapping.Field{Type: "text", Analyzer: "autocomplete"}),
+			output: fieldsOnly(p.text(&mapping.Field{Type: "text", Analyzer: mapping.Analyzer{Name: "autocomplete"}}, nil)),
 			expected: common.MapStr{
 				"type":     "text",
 				"analyzer": "autocomplete",
@@ -120,21 +120,21 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
-			output: p.text(&mapping.Field{Type: "text", Analyzer: "autocomplete", Norms: true}),
+			output: fieldsOnly(p.text(&mapping.Field{Type: "text", Analyzer: mapping.Analyzer{Name: "autocomplete"}, Norms: true}, nil)),
 			expected: common.MapStr{
 				"type":     "text",
 				"analyzer": "autocomplete",
 			},
 		},
 		{
-			output: p.text(&mapping.Field{Type: "text", SearchAnalyzer: "standard", Norms: true}),
+			output: fieldsOnly(p.text(&mapping.Field{Type: "text", SearchAnalyzer: mapping.Analyzer{Name: "standard"}, Norms: true}, nil)),
 			expected: common.MapStr{
 				"type":            "text",
 				"search_analyzer": "standard",
 			},
 		},
 		{
-			output: p.text(&mapping.Field{Type: "text", Analyzer: "autocomplete", SearchAnalyzer: "standard", Norms: true}),
+			output: fieldsOnly(p.text(&mapping.Field{Type: "text", Analyzer: mapping.Analyzer{Name: "autocomplete"}, SearchAnalyzer: mapping.Analyzer{Name: "standard"}, Norms: true}, nil)),
 			expected: common.MapStr{
 				"type":            "text",
 				"analyzer":        "autocomplete",
@@ -142,7 +142,7 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
-			output: p.text(&mapping.Field{Type: "text", MultiFields: mapping.Fields{mapping.Field{Name: "raw", Type: "keyword"}}, Norms: true}),
+			output: fieldsOnly(p.text(&mapping.Field{Type: "text", MultiFields: mapping.Fields{mapping.Field{Name: "raw", Type: "keyword"}}, Norms: true}, nil)),
 			expected: common.MapStr{
 				"type": "text",
 				"fields": common.MapStr{
@@ -154,7 +154,7 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
-			output: p.keyword(&mapping.Field{Type: "keyword", MultiFields: mapping.Fields{mapping.Field{Name: "analyzed", Type: "text", Norms: true}}}),
+			output: p.keyword(&mapping.Field{Type: "keyword", MultiFields: mapping.Fields{mapping.Field{Name: "analyzed", Type: "text", Norms: true}}}, nil),
 			expected: common.MapStr{
 				"type":         "keyword",
 				"ignore_above": 1024,
@@ -166,30 +166,30 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
-			output: p.keyword(&mapping.Field{Type: "keyword", IgnoreAbove: 256}),
+			output: p.keyword(&mapping.Field{Type: "keyword", IgnoreAbove: 256}, nil),
 			expected: common.MapStr{
 				"type":         "keyword",
 				"ignore_above": 256,
 			},
 		},
 		{
-			output: p.keyword(&mapping.Field{Type: "keyword", IgnoreAbove: -1}),
+			output: p.keyword(&mapping.Field{Type: "keyword", IgnoreAbove: -1}, nil),
 			expected: common.MapStr{
 				"type": "keyword",
 			},
 		},
 		{
-			output: p.keyword(&mapping.Field{Type: "keyword"}),
+			output: p.keyword(&mapping.Field{Type: "keyword"}, nil),
 			expected: common.MapStr{
 				"type":         "keyword",
 				"ignore_above": 1024,
 			},
 		},
 		{
-			output: p.text(&mapping.Field{Type: "text", MultiFields: mapping.Fields{
+			output: fieldsOnly(p.text(&mapping.Field{Type: "text", MultiFields: mapping.Fields{
 				mapping.Field{Name: "raw", Type: "keyword"},
 				mapping.Field{Name: "indexed", Type: "text"},
-			}, Norms: true}),
+			}, Norms: true}, nil)),
 			expected: common.MapStr{
 				"type": "text",
 				"fields": common.MapStr{
@@ -205,10 +205,10 @@ func TestProcessor(t *testing.T) {
 			},
 		},
 		{
-			output: p.text(&mapping.Field{Type: "text", MultiFields: mapping.Fields{
+			output: fieldsOnly(p.text(&mapping.Field{Type: "text", MultiFields: mapping.Fields{
 				mapping.Field{Name: "raw", Type: "keyword"},
 				mapping.Field{Name: "indexed", Type: "text"},
-			}, Norms: true}),
+			}, Norms: true}, nil)),
 			expected: common.MapStr{
 				"type": "text",
 				"fields": common.MapStr{
@@ -317,6 +317,10 @@ func TestProcessor(t *testing.T) {
 	for _, test := range tests {
 		assert.Equal(t, test.expected, test.output)
 	}
+}
+
+func fieldsOnly(f common.MapStr, _, _ mapping.Analyzer) common.MapStr {
+	return f
 }
 
 func TestDynamicTemplates(t *testing.T) {
@@ -510,11 +514,12 @@ func TestDynamicTemplates(t *testing.T) {
 
 	for _, test := range tests {
 		output := make(common.MapStr)
+		analyzers := make(common.MapStr)
 		p := &Processor{EsVersion: *common.MustNewVersion("8.0.0")}
 		err := p.Process(mapping.Fields{
 			test.field,
 			test.field, // should not be added twice
-		}, &fieldState{Path: test.field.Path}, output)
+		}, &fieldState{Path: test.field.Path}, output, analyzers)
 		require.NoError(t, err)
 		assert.Equal(t, test.expected, p.dynamicTemplates)
 	}
@@ -546,13 +551,14 @@ func TestPropertiesCombine(t *testing.T) {
 	}
 
 	output := common.MapStr{}
+	analyzers := common.MapStr{}
 	version, err := common.NewVersion("6.0.0")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	p := Processor{EsVersion: *version}
-	err = p.Process(fields, nil, output)
+	err = p.Process(fields, nil, output, analyzers)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -594,13 +600,14 @@ func TestProcessNoName(t *testing.T) {
 	}
 
 	output := common.MapStr{}
+	analyzers := common.MapStr{}
 	version, err := common.NewVersion("6.0.0")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	p := Processor{EsVersion: *version}
-	err = p.Process(fields, nil, output)
+	err = p.Process(fields, nil, output, analyzers)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -630,7 +637,7 @@ func TestProcessDefaultField(t *testing.T) {
 	)
 
 	fields := mapping.Fields{
-		// By default foo will be included in default_field.
+		// By default foo will be excluded in default_field.
 		mapping.Field{
 			Name: "foo",
 			Type: "keyword",
@@ -678,8 +685,9 @@ func TestProcessDefaultField(t *testing.T) {
 		},
 		// Check that multi_fields are correctly stored in defaultFields.
 		mapping.Field{
-			Name: "qux",
-			Type: "keyword",
+			Name:         "qux",
+			Type:         "keyword",
+			DefaultField: &enableDefaultField,
 			MultiFields: []mapping.Field{
 				{
 					Name: "text",
@@ -720,13 +728,13 @@ func TestProcessDefaultField(t *testing.T) {
 
 	p := Processor{EsVersion: *version}
 	output := common.MapStr{}
-	if err = p.Process(fields, nil, output); err != nil {
+	analyzers := common.MapStr{}
+	if err = p.Process(fields, nil, output, analyzers); err != nil {
 		t.Fatal(err)
 	}
 
 	expectedFields := []string{
 		"bar",
-		"foo",
 		"nested.bar",
 		"nested.foo",
 		"qux",
@@ -736,7 +744,7 @@ func TestProcessDefaultField(t *testing.T) {
 	}
 	sort.Strings(defaultFields)
 	sort.Strings(expectedFields)
-	assert.Equal(t, defaultFields, expectedFields)
+	assert.Equal(t, expectedFields, defaultFields)
 }
 
 func TestProcessWildcardOSS(t *testing.T) {
@@ -755,13 +763,14 @@ func TestProcessWildcardOSS(t *testing.T) {
 	}
 
 	output := common.MapStr{}
+	analyzers := common.MapStr{}
 	version, err := common.NewVersion("8.0.0")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	p := Processor{EsVersion: *version}
-	err = p.Process(fields, nil, output)
+	err = p.Process(fields, nil, output, analyzers)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -797,13 +806,14 @@ func TestProcessWildcardElastic(t *testing.T) {
 	}
 
 	output := common.MapStr{}
+	analyzers := common.MapStr{}
 	version, err := common.NewVersion("8.0.0")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	p := Processor{EsVersion: *version, ElasticLicensed: true}
-	err = p.Process(fields, nil, output)
+	err = p.Process(fields, nil, output, analyzers)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -839,13 +849,14 @@ func TestProcessWildcardPreSupport(t *testing.T) {
 	}
 
 	output := common.MapStr{}
+	analyzers := common.MapStr{}
 	version, err := common.NewVersion("7.8.0")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	p := Processor{EsVersion: *version, ElasticLicensed: true}
-	err = p.Process(fields, nil, output)
+	err = p.Process(fields, nil, output, analyzers)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -880,13 +891,14 @@ func TestProcessNestedSupport(t *testing.T) {
 	}
 
 	output := common.MapStr{}
+	analyzers := common.MapStr{}
 	version, err := common.NewVersion("7.8.0")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	p := Processor{EsVersion: *version, ElasticLicensed: true}
-	err = p.Process(fields, nil, output)
+	err = p.Process(fields, nil, output, analyzers)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -915,13 +927,14 @@ func TestProcessNestedSupportNoSubfields(t *testing.T) {
 	}
 
 	output := common.MapStr{}
+	analyzers := common.MapStr{}
 	version, err := common.NewVersion("7.8.0")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	p := Processor{EsVersion: *version, ElasticLicensed: true}
-	err = p.Process(fields, nil, output)
+	err = p.Process(fields, nil, output, analyzers)
 	if err != nil {
 		t.Fatal(err)
 	}

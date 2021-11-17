@@ -2,7 +2,6 @@
   type: group
   description: >
     Fields for Anomali ThreatStream
-  default_field: false
   fields:
 
   - name: classification

@@ -184,6 +184,16 @@ func TestSqsProcessor_getS3Notifications(t *testing.T) {
 		require.NoError(t, err)
 		assert.Len(t, events, 0)
 	})
+
+	t.Run("sns-sqs notification", func(t *testing.T) {
+		msg := newSNSSQSMessage()
+		events, err := p.getS3Notifications(*msg.Body)
+		require.NoError(t, err)
+		assert.Len(t, events, 1)
+		assert.Equal(t, "test-object-key", events[0].S3.Object.Key)
+		assert.Equal(t, "arn:aws:s3:::vpc-flow-logs-ks", events[0].S3.Bucket.ARN)
+		assert.Equal(t, "vpc-flow-logs-ks", events[0].S3.Bucket.Name)
+	})
 }
 
 func TestNonRecoverableError(t *testing.T) {

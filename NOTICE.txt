@@ -832,11 +832,11 @@ Contents of probable licence file $GOMODCACHE/code.cloudfoundry.org/go-loggregat
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-event-hubs-go/v3
-Version: v3.1.2
+Version: v3.3.15
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-event-hubs-go/v3@v3.1.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-event-hubs-go/v3@v3.3.15/LICENSE:
 
     MIT License
 
@@ -863,15 +863,15 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-event-hubs
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go
-Version: v57.0.0+incompatible
+Version: v59.0.0+incompatible
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go@v57.0.0+incompatible/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go@v59.0.0+incompatible/LICENSE.txt:
 
 The MIT License (MIT)
 
-Copyright (c) 2021 Microsoft
+Copyright (c) Microsoft Corporation.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -890,6 +890,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-storage-blob-go
@@ -8276,11 +8277,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-windows@v1.0
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/gosigar
-Version: v0.14.1
+Version: v0.14.2
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/gosigar@v0.14.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/gosigar@v0.14.2/LICENSE:
 
                               Apache License
                         Version 2.0, January 2004
@@ -10108,11 +10109,11 @@ Contents of probable licence file $GOMODCACHE/github.com/gomodule/redigo@v1.8.3/
 
 --------------------------------------------------------------------------------
 Dependency : github.com/google/flatbuffers
-Version: v1.12.0
+Version: v1.12.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/google/flatbuffers@v1.12.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/google/flatbuffers@v1.12.1/LICENSE.txt:
 
 
                                  Apache License
@@ -20250,11 +20251,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-amqp-common-go/v3
-Version: v3.0.0
+Version: v3.2.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-amqp-common-go/v3@v3.0.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-amqp-common-go/v3@v3.2.1/LICENSE:
 
     MIT License
 
@@ -20311,15 +20312,16 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-pipeline-g
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/go-amqp
-Version: v0.12.6
+Version: v0.16.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/go-amqp@v0.12.6/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/go-amqp@v0.16.0/LICENSE:
 
     MIT License
 
-    Copyright (c) Microsoft Corporation.
+    Copyright (C) 2017 Kale Blankenship
+    Portions Copyright (C) Microsoft Corporation
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal

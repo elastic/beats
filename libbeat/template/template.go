@@ -157,12 +157,13 @@ func (t *Template) load(fields mapping.Fields) (common.MapStr, error) {
 
 	// Start processing at the root
 	properties := common.MapStr{}
+	analyzers := common.MapStr{}
 	processor := Processor{EsVersion: t.esVersion, ElasticLicensed: t.elasticLicensed, Migration: t.migration}
-	if err := processor.Process(fields, nil, properties); err != nil {
+	if err := processor.Process(fields, nil, properties, analyzers); err != nil {
 		return nil, err
 	}
 
-	output := t.Generate(properties, processor.dynamicTemplates)
+	output := t.Generate(properties, analyzers, processor.dynamicTemplates)
 
 	return output, nil
 }
@@ -218,16 +219,17 @@ func (t *Template) GetPattern() string {
 
 // Generate generates the full template
 // The default values are taken from the default variable.
-func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
-	tmpl := t.generateComponent(properties, dynamicTemplates)
+func (t *Template) Generate(properties, analyzers common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
+	tmpl := t.generateComponent(properties, analyzers, dynamicTemplates)
 	tmpl["data_stream"] = struct{}{}
 	tmpl["priority"] = t.priority
 	tmpl["index_patterns"] = []string{t.GetPattern()}
 	return tmpl
+
 }
 
-func (t *Template) generateComponent(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
-	return common.MapStr{
+func (t *Template) generateComponent(properties, analyzers common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
+	m := common.MapStr{
 		"template": common.MapStr{
 			"mappings": buildMappings(
 				t.beatVersion, t.beatName,
@@ -242,6 +244,10 @@ func (t *Template) generateComponent(properties common.MapStr, dynamicTemplates 
 			},
 		},
 	}
+	if len(analyzers) != 0 {
+		m.Put("settings.analysis.analyzer", analyzers)
+	}
+	return m
 }
 
 func buildMappings(
