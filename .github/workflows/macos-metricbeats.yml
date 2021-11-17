@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - 'metricbeat/**'
+      - '.github/workflows/macos-metricbeats.yml'
+
+env:
+  BEAT_MODULE: 'metricbeat'
 
 jobs:
   build:
@@ -14,9 +18,9 @@ jobs:
       with:
         go-version: '1.17.2'
     - name: Install dependencies
-      run: go get -u github.com/magefile/mage
+      run:  go get -u github.com/magefile/mage
     - uses: actions/checkout@v2
     - name: Run build
-      run: cd metricbeat && mage build
+      run: cd ${{ env.BEAT_MODULE }} && mage build
     - name: Run test
-      run: cd metricbeat && mage unitTest
+      run: cd ${{ env.BEAT_MODULE }} && mage unitTest
