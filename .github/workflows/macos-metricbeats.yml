@@ -1,8 +1,5 @@
 name: build
 
-env:
-  GO111MODULE: off
-
 on:
   pull_request:
     paths:
