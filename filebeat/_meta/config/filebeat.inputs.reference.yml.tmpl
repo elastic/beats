@@ -559,3 +559,12 @@ filebeat.inputs:
   # Configure stream to filter to a specific stream: stdout, stderr or all (default)
   #stream: all
 
+#------------------------------ Journald input --------------------------------
+#- type: journald
+  #enabled: true
+
+  #parsers:
+  #- multiline:
+    #type: count
+    #count_lines: 3
+
