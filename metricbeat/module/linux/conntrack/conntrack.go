@@ -50,12 +50,11 @@ type MetricSet struct {
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The linux conntrack metricset is beta.")
-	linuxModule, ok := base.Module().(*linux.Module)
-	if !ok {
-		return nil, errors.New("unexpected module type")
-	}
 
-	path := filepath.Join(linuxModule.HostFS, "proc")
+	sys := base.Module().(linux.LinuxModule)
+	hostfs := sys.GetHostFS()
+
+	path := filepath.Join(hostfs, "proc")
 	newFS, err := procfs.NewFS(path)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error creating new Host FS at %s", path)

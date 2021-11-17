@@ -6,6 +6,7 @@
   anchor: kubernetes-processor
   fields:
     - name: kubernetes
+      default_field: true
       type: group
       fields:
         - name: pod.name

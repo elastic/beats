@@ -5,7 +5,6 @@
   fields:
     - name: netflow
       type: group
-      default_field: false
       description: >
         Fields from NetFlow and IPFIX.
       fields:

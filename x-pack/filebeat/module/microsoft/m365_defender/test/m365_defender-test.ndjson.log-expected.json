@@ -574,8 +574,6 @@
         "event.start": "2020-07-27T15:47:22.088Z",
         "event.timezone": "UTC",
         "fileset.name": "m365_defender",
-        "host.user.id": "8e24c50a-a77c-4782-813f-965009b5ddf3",
-        "host.user.name": "brent@elasticbv.onmicrosoft.com",
         "input.type": "log",
         "log.offset": 15990,
         "message": "Activity from infrequent country",

@@ -3,7 +3,6 @@
   description: >
     Meta data fields for each event that include type and timestamp.
   type: group
-  default_field: false
   fields:
     - name: eventType
       type: keyword
@@ -35,7 +34,6 @@
   description: >
     Event data fields for each event and alert.
   type: group
-  default_field: false
   fields:
     - name: ProcessStartTime
       type: date
