@@ -26,7 +26,8 @@ import (
 func ConfigFileParams() devtools.ConfigFileParams {
 	p := devtools.DefaultConfigFileParams()
 	p.Templates = append(p.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"))
-	p.ExtraVars = map[string]interface{}{}
+	//	p.ExtraVars = map[string]interface{}{}
+	//  used to include extra vars not in _meta/config/*.tmpl
 	return p
 	// Todo kubebeat fill out according to kubebeats required config.
 }

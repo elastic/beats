@@ -1,3 +1,4 @@
+//go:build mage
 // +build mage
 
 package main
@@ -17,26 +18,34 @@ import (
 )
 
 func init() {
-	devtools.SetBuildVariableSources(devtools.DefaultBeatBuildVariableSources)
-
-	devtools.BeatDescription = "One sentence description of the Beat."
-	devtools.BeatVendor = "Eyal Kraft"
-	devtools.BeatProjectType = devtools.CommunityProject
-	devtools.CrossBuildMountModcache = true
+	common.RegisterCheckDeps(Update)
+	unittest.RegisterPythonTestDeps(Fields)
+	integtest.RegisterPythonTestDeps(Fields)
 }
 
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
+// Use VERSION_QUALIFIER to control the version qualifier.
 func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	devtools.UseCommunityBeatPackaging()
+	if v, found := os.LookupEnv("AGENT_PACKAGING"); found && v != "" {
+		devtools.UseElasticBeatXPackReducedPackaging()
+	} else {
+		devtools.UseElasticBeatXPackPackaging()
+	}
+
+	//	devtools.UseElasticBeatOSSPackaging()
+	// community beat package
+	// ToDo decide whenther kubebeat should move to x-pack dir & adjust accordingly
+
+	devtools.PackageKibanaDashboardsFromBuildDir()
 
 	mg.Deps(Update)
 	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
-	mg.SerialDeps(devtools.Package, pkg.PackageTest)
+	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
 // Update updates the generated files (aka make update).
@@ -79,7 +88,21 @@ func Test() {
 
 // Build builds the Beat binary.
 func Build() error {
-	return build.Build()
+	params := devtools.DefaultBuildArgs()
+
+	// Building kubebeat
+	err := devtools.Build(params)
+	if err != nil {
+		return err
+	}
+
+	err = devtools.Build(params)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
