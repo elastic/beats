@@ -16,8 +16,7 @@
             },
             "metrics": {
                 "up": 1
-            },
-            "type":"gauge"
+            }
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -35,43 +34,15 @@
             "period": 10000
         },
         "openmetrics": {
-            "help": "Total number of connections opened to the listener of a given name.",
             "labels": {
                 "instance": "127.0.0.1:55922",
                 "job": "openmetrics",
                 "listener_name": "http"
             },
             "metrics": {
-                "net_conntrack_listener_conn_accepted_total": 3
-            },
-            "type":"counter"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "openmetrics"
-        }
-    },
-    {
-        "event": {
-            "dataset": "openmetrics.collector",
-            "duration": 115000,
-            "module": "openmetrics"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "openmetrics": {
-            "help": "Total number of connections closed that were made to the listener of a given name.",
-            "labels": {
-                "instance": "127.0.0.1:55922",
-                "job": "openmetrics",
-                "listener_name": "http"
-            },
-            "metrics": {
+                "net_conntrack_listener_conn_accepted_total": 3,
                 "net_conntrack_listener_conn_closed_total": 0
-            },
-            "type":"counter"
+            }
         },
         "service": {
             "address": "127.0.0.1:55555",
