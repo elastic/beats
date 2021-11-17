@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
+	"go.elastic.co/apm"
 )
 
 var downloadPath = getAbsPath("tests/downloads")
@@ -63,7 +64,8 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 	if err != nil {
 		t.Fatal(err)
 	}
-	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{})
+	tracer := apm.DefaultTracer
+	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{}, tracer)
 	if err != nil {
 		t.Fatal(err)
 	}
