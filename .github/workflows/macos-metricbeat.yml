@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - 'metricbeat/**'
-      - '.github/workflows/macos-metricbeats.yml'
+      - '.github/workflows/macos-metricbeat.yml'
 
 env:
   BEAT_MODULE: 'metricbeat'
