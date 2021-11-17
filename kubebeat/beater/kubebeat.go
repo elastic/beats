@@ -3,11 +3,15 @@ package beater
 import (
 	"bytes"
 	"context"
+	"embed"
 	"fmt"
-	"time"
-
 	"github.com/elastic/beats/v7/kubebeat/bundle"
 	"github.com/mitchellh/mapstructure"
+	"io/fs"
+	"log"
+	"os"
+	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/kubebeat/config"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -26,6 +30,11 @@ type kubebeat struct {
 	bundleServer *sdktest.Server
 	data         *Data
 }
+
+
+
+//go:embed opa-policy-test
+var opaPolicyTestContent embed.FS
 
 // New creates an instance of kubebeat.
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
@@ -48,9 +57,10 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	}
 
 	data.RegisterFetcher("kube_api", kubef)
+	policies := CreateCISPolicy(bundle.EmbeddedPolicy)
 
 	// create a mock HTTP bundle bundleServer
-	bundleServer, err := sdktest.NewServer(sdktest.MockBundle("/bundles/bundle.tar.gz", bundle.Policies))
+	bundleServer, err := sdktest.NewServer(sdktest.MockBundle("/bundles/bundle.tar.gz", policies))
 	if err != nil {
 		return nil, fmt.Errorf("fail to init bundle server: %s", err.Error())
 	}
@@ -76,6 +86,27 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		data:         data,
 	}
 	return bt, nil
+}
+
+func CreateCISPolicy(fileSystem embed.FS) map[string]string {
+
+	policies := make(map[string]string)
+
+	fs.WalkDir(fileSystem, ".", func(filepath string, info os.DirEntry, err error) error {
+		if err != nil {
+			log.Fatal(err)
+		}
+		if info.IsDir() == false && strings.HasSuffix(info.Name(), ".rego"){
+
+			data,err := fs.ReadFile(fileSystem, filepath)
+			if err == nil{
+				policies[filepath] = string(data)
+			}
+		}
+		return nil
+	})
+
+	return policies
 }
 
 type PolicyResult map[string]RuleResult
@@ -167,7 +198,7 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 func (bt *kubebeat) Decision(input interface{}) (interface{}, error) {
 	// get the named policy decision for the specified input
 	result, err := bt.opa.Decision(context.Background(), sdk.DecisionOptions{
-		Path:  "/compliance",
+		Path:  "main/findings",
 		Input: input,
 	})
 	if err != nil {
