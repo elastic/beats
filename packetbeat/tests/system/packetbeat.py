@@ -90,7 +90,7 @@ class BaseTest(TestCase):
     def start_packetbeat(self,
                          cmd=None,
                          config="packetbeat.yml",
-                         output="packetbeat.log",
+                         output=None,
                          extra_args=[],
                          debug_selectors=[]):
         """
@@ -98,6 +98,9 @@ class BaseTest(TestCase):
         caller is responsible for stopping / waiting for the
         Proc instance.
         """
+        if output is None:
+            output = "packetbeat-" + self.today + ".ndjson"
+
         if cmd is None:
             cmd = self.beat_path + "/packetbeat.test"
 

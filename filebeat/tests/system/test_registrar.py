@@ -486,11 +486,11 @@ class Test(BaseTest):
 
         # Output file was rotated
         self.wait_until(
-            lambda: self.output_has(lines=1, output_file="output/filebeat-" + self.today + "-1.ndjson"),
+            lambda: self.output_has(lines=1, output_file="output/filebeat-" + self.today + ".ndjson"),
             max_timeout=10)
 
         self.wait_until(
-            lambda: self.output_has(lines=1),
+            lambda: self.output_has(lines=1, output_file="output/filebeat-" + self.today + "-1.ndjson"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait()
@@ -505,7 +505,7 @@ class Test(BaseTest):
         # should never have been detected
         assert len(data) == 1
 
-        output = self.read_output()
+        output = self.read_output(output_file="output/filebeat-" + self.today + "-1.ndjson")
 
         # Check that output file has the same number of lines as the log file
         assert len(output) == 1
@@ -951,8 +951,8 @@ class Test(BaseTest):
             clean_inactive="3s",
         )
 
-        filebeat = self.start_beat(output="filebeat2.log")
-        logs = self.log_access("filebeat2.log")
+        filebeat = self.start_beat(output="filebeat-"+self.today+"-1.ndjson")
+        logs = self.log_access("filebeat-"+self.today+"-1.ndjson")
 
         # Write additional file
         for name in restart_files:
