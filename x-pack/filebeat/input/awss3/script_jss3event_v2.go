@@ -26,10 +26,6 @@ func (e *s3EventV2) SetAWSRegion(v string) {
 	e.AWSRegion = v
 }
 
-func (e *s3EventV2) SetProvider(v string) {
-	e.Provider = v
-}
-
 func (e *s3EventV2) SetEventName(v string) {
 	e.EventName = v
 }

@@ -5,6 +5,7 @@
 package awss3
 
 import (
+	"errors"
 	"fmt"
 	"time"
 

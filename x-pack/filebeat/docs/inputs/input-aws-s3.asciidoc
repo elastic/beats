@@ -525,11 +525,6 @@ The `S3EventV2` object returned by the `parse` method.
 
 *Example*: `evt.SetAWSRegion("us-east-1");`
 
-|`SetProvider(string)`
-|Sets the provider.
-
-*Example*: `evt.SetProvider("provider");`
-
 |`SetEventName(string)`
 |Sets the event name.
 

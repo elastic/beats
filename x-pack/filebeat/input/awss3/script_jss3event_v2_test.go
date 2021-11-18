@@ -27,7 +27,6 @@ func TestJSS3EventV2(t *testing.T) {
 	var evts = [];
 	var evt = new S3EventV2();
 	evt.SetAWSRegion("region");
-	evt.SetProvider("provider");
 	evt.SetEventName("name");
 	evt.SetEventSource("source");
 	evt.SetS3BucketName("bucket");
@@ -48,7 +47,6 @@ func TestJSS3EventV2(t *testing.T) {
 
 	exp := s3EventV2{
 		AWSRegion:   "region",
-		Provider:    "provider",
 		EventName:   "name",
 		EventSource: "source",
 	}
