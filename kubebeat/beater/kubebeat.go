@@ -48,17 +48,18 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	data := NewData(ctx, c.Period)
 
 
-	kubef, err := NewKubeFetcher(c.KubeConfig, c.Period)
-	if err != nil {
-		return nil, err
-	}
-
-	data.RegisterFetcher("kube_api", kubef)
-	data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir))
+	//kubef, err := NewKubeFetcher(c.KubeConfig, c.Period)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//data.RegisterFetcher("kube_api", kubef)
+	//data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir))
 	data.RegisterFetcher("file_system", NewFileFetcher(c.Files))
 
+	policies := CreateCISPolicy(bundle.EmbeddedPolicy)
 	// create a mock HTTP bundle bundleServer
-	bundleServer, err := sdktest.NewServer(sdktest.MockBundle("/bundles/bundle.tar.gz", bundle.Policies))
+	bundleServer, err := sdktest.NewServer(sdktest.MockBundle("/bundles/bundle.tar.gz", policies))
 	if err != nil {
 		return nil, fmt.Errorf("fail to init bundle server: %s", err.Error())
 	}
