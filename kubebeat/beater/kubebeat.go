@@ -40,7 +40,6 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 
 	data := NewData(ctx, c.Period)
 
-
 	kubef, err := NewKubeFetcher(c.KubeConfig, c.Period)
 	if err != nil {
 		return nil, err
@@ -99,6 +98,7 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 	if err != nil {
 		return err
 	}
+	defer bt.data.Stop()
 
 	if bt.client, err = b.Publisher.Connect(); err != nil {
 		return err
