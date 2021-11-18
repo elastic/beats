@@ -6,6 +6,7 @@ import (
 	"embed"
 	"fmt"
 	"github.com/elastic/beats/v7/kubebeat/bundle"
+	"github.com/gofrs/uuid"
 	"github.com/mitchellh/mapstructure"
 	"io/fs"
 	"log"
@@ -46,7 +47,6 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	logp.Info("Config initiated.")
 
 	data := NewData(ctx, c.Period)
-
 
 	//kubef, err := NewKubeFetcher(c.KubeConfig, c.Period)
 	//if err != nil {
@@ -95,7 +95,7 @@ func CreateCISPolicy(fileSystem embed.FS) map[string]string {
 		if err != nil {
 			log.Fatal(err)
 		}
-		if info.IsDir() == false && strings.HasSuffix(info.Name(), ".rego") {
+		if info.IsDir() == false && strings.HasSuffix(info.Name(), ".rego") && !strings.HasSuffix(info.Name(), "test.rego") {
 
 			data, err := fs.ReadFile(fileSystem, filepath)
 			if err == nil {
@@ -112,12 +112,12 @@ type PolicyResult map[string]RuleResult
 
 type RuleResult struct {
 	Findings []Finding `json:"findings"`
+	Resource  interface{} `json:"resource"`
 }
 
 type Finding struct {
-	Compliant bool        `json:"compliant"`
-	Message   string      `json:"message"`
-	Resource  interface{} `json:"resource"`
+	Result  interface{} `json:"result"`
+	Rule  interface{} `json:"rule"`
 }
 
 // Run starts kubebeat.
@@ -135,6 +135,7 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 
 	// ticker := time.NewTicker(bt.config.Period)
 	output := bt.data.Output()
+	runId, err := uuid.NewV4()
 
 	for {
 		select {
@@ -170,16 +171,15 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 					}
 					events = append(events, errEvent)
 				} else {
-					for ruleName, ruleResult := range decoded {
+					for _, ruleResult := range decoded {
 						for _, Finding := range ruleResult.Findings {
 							event := beat.Event{
 								Timestamp: timestamp,
 								Fields: common.MapStr{
-									"type":      b.Info.Name,
-									"rule_id":   ruleName,
-									"compliant": Finding.Compliant,
-									"resource":  Finding.Resource,
-									"message":   Finding.Message,
+									"run_id":    runId,
+									"result": Finding.Result,
+									"resource":  ruleResult.Resource,
+									"rule": Finding.Rule,
 								},
 							}
 							events = append(events, event)
