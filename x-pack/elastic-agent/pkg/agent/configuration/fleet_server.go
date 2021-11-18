@@ -18,7 +18,6 @@ type FleetServerConfig struct {
 	Output       FleetServerOutputConfig  `config:"output" yaml:"output,omitempty"`
 	Host         string                   `config:"host" yaml:"host,omitempty"`
 	Port         uint16                   `config:"port" yaml:"port,omitempty"`
-	InternalHost string                   `config:"internal_host" yaml:"internal_host,omitempty"`
 	InternalPort uint16                   `config:"internal_port" yaml:"internal_port,omitempty"`
 	TLS          *tlscommon.Config        `config:"ssl" yaml:"ssl,omitempty"`
 }

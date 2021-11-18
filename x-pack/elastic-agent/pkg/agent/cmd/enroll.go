@@ -7,7 +7,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"net"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -292,7 +291,6 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	fPolicy, _ := cmd.Flags().GetString("fleet-server-policy")
 	fHost, _ := cmd.Flags().GetString("fleet-server-host")
 	fPort, _ := cmd.Flags().GetUint16("fleet-server-port")
-	fInternalHost, _ := cmd.Flags().GetString("fleet-server-internal-host")
 	fInternalPort, _ := cmd.Flags().GetUint16("fleet-server-internal-port")
 	fCert, _ := cmd.Flags().GetString("fleet-server-cert")
 	fCertKey, _ := cmd.Flags().GetString("fleet-server-cert-key")
@@ -310,24 +308,6 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	caSHA256 := cli.StringToSlice(caSHA256str)
 
 	ctx := handleSignal(context.Background())
-
-	if localFleetServer := fServer != ""; localFleetServer {
-		if fInternalHost == "" {
-			fInternalHost = "localhost"
-		}
-
-		if fInternalPort <= 0 {
-			randomPort, err := getRandomPort()
-			if err != nil {
-				return err
-			}
-			fInternalPort = randomPort
-		}
-	} else {
-		// don't use without local fleet server
-		fInternalHost = ""
-		fInternalPort = 0
-	}
 
 	options := enrollCmdOption{
 		EnrollAPIKey:         enrollmentToken,
@@ -357,7 +337,6 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 			SpawnAgent:            !fromInstall,
 			Headers:               mapFromEnvList(fHeaders),
 			Timeout:               fTimeout,
-			InternalHost:          fInternalHost,
 			InternalPort:          fInternalPort,
 		},
 	}
@@ -406,20 +385,4 @@ func mapFromEnvList(envList []string) map[string]string {
 		m[keyValue[0]] = keyValue[1]
 	}
 	return m
-}
-
-func getRandomPort() (uint16, error) {
-	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
-	if err != nil {
-		return 0, err
-	}
-
-	l, err := net.ListenTCP("tcp", addr)
-	if err != nil {
-		return 0, err
-	}
-	port := l.Addr().(*net.TCPAddr).Port
-	l.Close()
-
-	return uint16(port), nil
 }

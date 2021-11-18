@@ -44,11 +44,13 @@ import (
 )
 
 const (
-	maxRetriesstoreAgentInfo = 5
-	waitingForAgent          = "Waiting for Elastic Agent to start"
-	waitingForFleetServer    = "Waiting for Elastic Agent to start Fleet Server"
-	defaultFleetServerHost   = "0.0.0.0"
-	defaultFleetServerPort   = 8220
+	maxRetriesstoreAgentInfo       = 5
+	waitingForAgent                = "Waiting for Elastic Agent to start"
+	waitingForFleetServer          = "Waiting for Elastic Agent to start Fleet Server"
+	defaultFleetServerHost         = "0.0.0.0"
+	defaultFleetServerPort         = 8220
+	defaultFleetServerInternalHost = "localhost"
+	defaultFleetServerInternalPort = 8221
 )
 
 var (
@@ -80,7 +82,6 @@ type enrollCmdFleetServerOption struct {
 	PolicyID              string
 	Host                  string
 	Port                  uint16
-	InternalHost          string
 	InternalPort          uint16
 	Cert                  string
 	CertKey               string
@@ -309,8 +310,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context, persistentConfig m
 	fleetConfig, err := createFleetServerBootstrapConfig(
 		c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
 		c.options.FleetServer.PolicyID,
-		c.options.FleetServer.Host, c.options.FleetServer.Port,
-		c.options.FleetServer.InternalHost, c.options.FleetServer.InternalPort,
+		c.options.FleetServer.Host, c.options.FleetServer.Port, c.options.FleetServer.InternalPort,
 		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
 		c.options.FleetServer.Headers,
 		c.options.ProxyURL,
@@ -407,7 +407,7 @@ func (c *enrollCmd) prepareFleetTLS() error {
 	}
 
 	if c.options.FleetServer.InternalPort > 0 {
-		c.options.InternalURL = fmt.Sprintf("%s:%d", c.options.FleetServer.InternalHost, c.options.FleetServer.InternalPort)
+		c.options.InternalURL = fmt.Sprintf("%s:%d", defaultFleetServerInternalHost, c.options.FleetServer.InternalPort)
 	}
 
 	return nil
@@ -513,8 +513,7 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 		serverConfig, err := createFleetServerBootstrapConfig(
 			c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
 			c.options.FleetServer.PolicyID,
-			c.options.FleetServer.Host, c.options.FleetServer.Port,
-			c.options.FleetServer.InternalHost, c.options.FleetServer.InternalPort,
+			c.options.FleetServer.Host, c.options.FleetServer.Port, c.options.FleetServer.InternalPort,
 			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
 			c.options.FleetServer.Headers,
 			c.options.ProxyURL, c.options.ProxyDisabled, c.options.ProxyHeaders,
@@ -850,8 +849,7 @@ func storeAgentInfo(s saver, reader io.Reader) error {
 
 func createFleetServerBootstrapConfig(
 	connStr, serviceToken, policyID, host string,
-	port uint16,
-	internalHost string, internalPort uint16,
+	port uint16, internalPort uint16,
 	cert, key, esCA string,
 	headers map[string]string,
 	proxyURL string,
@@ -880,6 +878,9 @@ func createFleetServerBootstrapConfig(
 	if port == 0 {
 		port = defaultFleetServerPort
 	}
+	if internalPort <= 0 {
+		port = defaultFleetServerInternalPort
+	}
 	if len(headers) > 0 {
 		if es.Headers == nil {
 			es.Headers = make(map[string]string)
@@ -903,10 +904,6 @@ func createFleetServerBootstrapConfig(
 		Host: host,
 		Port: port,
 	}
-	if localFleetServer {
-		cfg.Server.InternalHost = internalHost
-		cfg.Server.InternalPort = internalPort
-	}
 
 	if policyID != "" {
 		cfg.Server.Policy = &configuration.FleetServerPolicyConfig{ID: policyID}
@@ -925,6 +922,7 @@ func createFleetServerBootstrapConfig(
 
 	if localFleetServer {
 		cfg.Client.Transport.Proxy.Disable = true
+		cfg.Server.InternalPort = internalPort
 	}
 
 	if err := cfg.Valid(); err != nil {
