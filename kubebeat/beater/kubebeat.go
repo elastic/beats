@@ -40,7 +40,6 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 
 	data := NewData(ctx, c.Period)
 
-	data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir))
 
 	kubef, err := NewKubeFetcher(c.KubeConfig, c.Period)
 	if err != nil {
@@ -48,6 +47,8 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	}
 
 	data.RegisterFetcher("kube_api", kubef)
+	data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir))
+	data.RegisterFetcher("file_system", NewFileFetcher(c.Files))
 
 	// create a mock HTTP bundle bundleServer
 	bundleServer, err := sdktest.NewServer(sdktest.MockBundle("/bundles/bundle.tar.gz", bundle.Policies))

@@ -8,6 +8,7 @@ import "time"
 type Config struct {
 	KubeConfig string        `config:"kube_config"`
 	Period     time.Duration `config:"period"`
+	Files      []string      `config:"files"`
 }
 
 var DefaultConfig = Config{
