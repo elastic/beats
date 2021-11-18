@@ -125,6 +125,7 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 	if err != nil {
 		return err
 	}
+	defer bt.data.Stop()
 
 	if bt.client, err = b.Publisher.Connect(); err != nil {
 		return err
