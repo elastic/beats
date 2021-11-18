@@ -84,7 +84,7 @@ var uniqueMonitorIDs sync.Map
 type ErrDuplicateMonitorID struct{ ID string }
 
 func (e ErrDuplicateMonitorID) Error() string {
-	return fmt.Sprintf("monitor ID %s is configured for multiple monitors! IDs must be unique values.", e.ID)
+	return fmt.Sprintf("monitor ID %s is configured for multiple monitors! IDs should be unique values.", e.ID)
 }
 
 // newMonitor Creates a new monitor, without leaking resources in the event of an error.
@@ -139,8 +139,13 @@ func newMonitorUnsafe(
 
 	if m.stdFields.ID != "" {
 		// Ensure we don't have duplicate IDs
-		if _, loaded := uniqueMonitorIDs.LoadOrStore(m.stdFields.ID, m); loaded {
-			return m, ErrDuplicateMonitorID{m.stdFields.ID}
+		if existingMIface, loaded := uniqueMonitorIDs.LoadOrStore(m.stdFields.ID, m); loaded {
+			// We now only log duplicate monitor id errors, there are too many
+			// odd situations that can happen where users might temporarily have duplicate
+			// IDs for a short time when changing things.
+			logp.Warn("monitor ID %s is configured for multiple monitors! IDs should be unique values, last seen config will win", m.stdFields.ID)
+			existingMIface.(*Monitor).close()
+			uniqueMonitorIDs.Store(m.stdFields.ID, m)
 		}
 	} else {
 		// If there's no explicit ID generate one

@@ -100,19 +100,21 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	// Would fail if the previous newMonitor didn't free the monitor.id
 	m1, m1Err := makeTestMon()
 	require.NoError(t, m1Err)
-	_, m2Err := makeTestMon()
-	require.Error(t, m2Err)
-	m1.Stop()
-	m3, m3Err := makeTestMon()
-	require.NoError(t, m3Err)
-	m3.Stop()
+	m2, m2Err := makeTestMon()
+	// Change the name so we can ensure that this is the currently active monitor
+	m2.stdFields.Name = "MON2!!!"
+	// This used to trigger an error, but shouldn't any longer, we just log
+	// the error, and ensure the last monitor wins
+	require.NoError(t, m2Err)
 
-	// We count 3 because built doesn't count successful builds,
-	// just attempted creations of monitors
+	m, ok := uniqueMonitorIDs.Load(m2.stdFields.ID)
+	require.True(t, ok)
+	require.Equal(t, m2.stdFields.Name, m.(*Monitor).stdFields.Name)
+	m1.Stop()
+	m2.Stop()
+
 	require.Equal(t, 3, built.Load())
-	// Only one stops because the others errored on create
-	require.Equal(t, 2, closed.Load())
-	require.NoError(t, m3Err)
+	require.Equal(t, 3, closed.Load())
 }
 
 func TestCheckInvalidConfig(t *testing.T) {
