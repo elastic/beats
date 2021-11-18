@@ -1,34 +1,25 @@
 package beater
 
 import (
-	"bytes"
 	"context"
-	"embed"
 	"fmt"
-	"github.com/elastic/beats/v7/kubebeat/bundle"
-	"github.com/gofrs/uuid"
-	"io/fs"
-	"log"
-	"os"
-	"strings"
 	"time"
+
+	"github.com/gofrs/uuid"
 
 	"github.com/elastic/beats/v7/kubebeat/config"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/open-policy-agent/opa/sdk"
-	sdktest "github.com/open-policy-agent/opa/sdk/test"
 )
 
 // kubebeat configuration.
 type kubebeat struct {
-	done         chan struct{}
-	config       config.Config
-	client       beat.Client
-	opa          *sdk.OPA
-	bundleServer *sdktest.Server
-	data         *Data
+	done   chan struct{}
+	config config.Config
+	client beat.Client
+	eval   *evaluator
+	data   *Data
 }
 
 // New creates an instance of kubebeat.
@@ -43,6 +34,10 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	logp.Info("Config initiated.")
 
 	data := NewData(ctx, c.Period)
+	evaluator, err := NewEvaluator()
+	if err != nil {
+		return nil, err
+	}
 
 	kubef, err := NewKubeFetcher(c.KubeConfig, c.Period)
 	if err != nil {
@@ -53,55 +48,13 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir))
 	data.RegisterFetcher("file_system", NewFileFetcher(c.Files))
 
-	policies := CreateCISPolicy(bundle.EmbeddedPolicy)
-	// create a mock HTTP bundle bundleServer
-	bundleServer, err := sdktest.NewServer(sdktest.MockBundle("/bundles/bundle.tar.gz", policies))
-	if err != nil {
-		return nil, fmt.Errorf("fail to init bundle server: %s", err.Error())
-	}
-
-	// provide the OPA configuration which specifies
-	// fetching policy bundles from the mock bundleServer
-	// and logging decisions locally to the console
-	config := []byte(fmt.Sprintf(bundle.Config, bundleServer.URL()))
-
-	// create an instance of the OPA object
-	opa, err := sdk.New(context.Background(), sdk.Options{
-		Config: bytes.NewReader(config),
-	})
-	if err != nil {
-		return nil, fmt.Errorf("fail to init opa: %s", err.Error())
-	}
-
 	bt := &kubebeat{
-		done:         make(chan struct{}),
-		config:       c,
-		opa:          opa,
-		bundleServer: bundleServer,
-		data:         data,
+		done:   make(chan struct{}),
+		config: c,
+		eval:   evaluator,
+		data:   data,
 	}
 	return bt, nil
-}
-
-func CreateCISPolicy(fileSystem embed.FS) map[string]string {
-
-	policies := make(map[string]string)
-
-	fs.WalkDir(fileSystem, ".", func(filepath string, info os.DirEntry, err error) error {
-		if err != nil {
-			log.Fatal(err)
-		}
-		if info.IsDir() == false && strings.HasSuffix(info.Name(), ".rego") && !strings.HasSuffix(info.Name(), "test.rego") {
-
-			data, err := fs.ReadFile(fileSystem, filepath)
-			if err == nil {
-				policies[filepath] = string(data)
-			}
-		}
-		return nil
-	})
-
-	return policies
 }
 
 type PolicyResult map[string]RuleResult
@@ -139,69 +92,64 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 		case <-bt.done:
 			return nil
 		case o := <-output:
-			runId, _ := uuid.NewV4()
-			events := make([]beat.Event, 0)
-			timestamp := time.Now()
+		}
+	}
+}
 
-			result, err := bt.Decision(o)
-			if err != nil {
-				logp.Error(err)
-			} else {
-				var opaResult = result.(map[string]interface{})
+func (bt *kubebeat) resourceIteration(runId uuid.UUID, resource interface{}) {
+	events := make([]beat.Event, 0)
+	timestamp := time.Now()
 
-				if findings, ok := opaResult["findings"].([]interface{}); ok {
-					for _, findingRaw := range findings {
-						if finding, ok := findingRaw.(map[string]interface{}); ok {
-							event := beat.Event{
-								Timestamp: timestamp,
-								Fields: common.MapStr{
-									"run_id":   runId,
-									"result":   finding["result"],
-									"resource": opaResult["resource"],
-									"rule":     finding["rule"],
-								},
-							}
-							events = append(events, event)
+	result, err := bt.eval.Decision(resource)
+	if err != nil {
+		errEvent := beat.Event{
+			"err":      fmt.Errorf("error running the policy: %v", err.Error()),
+			"resource": o,
 
-						}
-					}
-				}
+			var opaResult = result.(map[string]interface{})
+			"err":        fmt.Errorf("error parsing the policy result: %v", err.Error()),
+			"resource":   o,
 
-			}
+			if findings, ok := opaResult["findings"].([]interface{}); ok{
+			for _, findingRaw := range findings{
+			if finding, ok := findingRaw.(map[string]interface{}); ok{
+			event := beat.Event{
+			Timestamp: timestamp,
+			Fields: common.MapStr{
+			"run_id":   runId,
+			"result":   finding["result"],
+			"resource": opaResult["resource"],
+			"rule":     finding["rule"],
+		},
+		}
+			events = append(events, event)
+		}
+		}
+
 
 			bt.client.PublishAll(events)
 			logp.Info("%v events sent", len(events))
 		}
-	}
-}
 
-func (bt *kubebeat) Decision(input interface{}) (interface{}, error) {
-	// get the named policy decision for the specified input
-	allFile, canParse := input.(map[string]interface{})
-	if canParse == true {
-		if _, ok := allFile["file_system"]; !ok {
+			allFile, canParse := input.(map[string]interface{})
+			if canParse == true{
+			if _, ok := allFile["file_system"]; !ok{
 			return nil, nil
 		}
-		opaInputArray := allFile["file_system"].([]interface{})
+			opaInputArray := allFile["file_system"].([]interface{})
 
-		result, err := bt.opa.Decision(context.Background(), sdk.DecisionOptions{
-			Path:  "main",
-			Input: opaInputArray[0].(FileSystemResourceData),
-		})
-		if err != nil {
-			return nil, err
+			Input: input,
+		}
+			return nil, nil
+		}
+		// Stop stops kubebeat.
+		func(bt *kubebeat) Stop()
+		{
+			bt.client.Close()
+			bt.eval.Stop()
+
+			close(bt.done)
 		}
 
-		return result.Result, nil
 	}
-	return nil, nil
-}
-
-// Stop stops kubebeat.
-func (bt *kubebeat) Stop() {
-	bt.client.Close()
-	bt.opa.Stop(context.Background())
-	bt.bundleServer.Stop()
-
-	close(bt.done)
 }
