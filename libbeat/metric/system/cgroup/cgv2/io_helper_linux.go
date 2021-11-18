@@ -58,7 +58,7 @@ func fetchDeviceName(major uint64, minor uint64) (bool, string, error) {
 		// see bits/sysmacros.h
 		curMajor = ((devID & 0xfffff00000000000) >> 32) | ((devID & 0x00000000000fff00) >> 8)
 		curMinor = ((devID & 0x00000000000000ff) >> 0) | ((devID & 0x00000ffffff00000) >> 12)
-		if uint64(curMajor) == uint64(major) && uint64(curMinor) == uint64(minor) {
+		if curMajor == major && curMinor == minor {
 			found = true
 			devName = d.Name()
 		}
