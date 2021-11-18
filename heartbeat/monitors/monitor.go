@@ -80,13 +80,6 @@ func checkMonitorConfig(config *common.Config, registrar *plugin.PluginsReg) err
 // given heartbeat instance.
 var uniqueMonitorIDs sync.Map
 
-// ErrDuplicateMonitorID is returned when a monitor attempts to start using an ID already in use by another monitor.
-type ErrDuplicateMonitorID struct{ ID string }
-
-func (e ErrDuplicateMonitorID) Error() string {
-	return fmt.Sprintf("monitor ID %s is configured for multiple monitors! IDs should be unique values.", e.ID)
-}
-
 // newMonitor Creates a new monitor, without leaking resources in the event of an error.
 func newMonitor(
 	config *common.Config,
