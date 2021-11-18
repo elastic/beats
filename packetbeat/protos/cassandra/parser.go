@@ -44,14 +44,7 @@ type parserConfig struct {
 
 // check whether this ops is enabled or not
 func (p *parser) CheckFrameOpsIgnored() bool {
-	if p.config.ignoredOps != nil && len(p.config.ignoredOps) > 0 {
-		// default map value is false
-		v := p.config.ignoredOps[p.framer.Header.Op]
-		if v {
-			return true
-		}
-	}
-	return false
+	return p.config.ignoredOps[p.framer.Header.Op]
 }
 
 type message struct {
