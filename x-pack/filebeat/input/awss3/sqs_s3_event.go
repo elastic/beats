@@ -86,9 +86,10 @@ type sqsS3EventProcessor struct {
 	log                  *logp.Logger
 	warnOnce             sync.Once
 	metrics              *inputMetrics
+	script               *script
 }
 
-func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, sqsVisibilityTimeout time.Duration, maxReceiveCount int, s3 s3ObjectHandlerFactory) *sqsS3EventProcessor {
+func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, script *script, sqsVisibilityTimeout time.Duration, maxReceiveCount int, s3 s3ObjectHandlerFactory) *sqsS3EventProcessor {
 	if metrics == nil {
 		metrics = newInputMetrics(monitoring.NewRegistry(), "")
 	}
@@ -99,6 +100,7 @@ func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI,
 		sqs:                  sqs,
 		log:                  log,
 		metrics:              metrics,
+		script:               script,
 	}
 }
 
@@ -185,6 +187,12 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 }
 
 func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, error) {
+	// Check if a parsing script is defined. If so, it takes precedence over
+	// format autodetection.
+	if p.script != nil {
+		return p.script.run(body)
+	}
+
 	// NOTE: If AWS introduces a V3 schema this will need updated to handle that schema.
 	var events s3EventsV2
 	dec := json.NewDecoder(strings.NewReader(body))
@@ -201,6 +209,12 @@ func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, erro
 			return nil, fmt.Errorf("failed to decode SQS message body as an S3 notification: %w", err)
 		}
 	}
+
+	if events.Records == nil {
+		p.log.Debugw("Invalid SQS message body: missing Records field", "sqs_message_body", body)
+		return nil, errors.New("the message is an invalid S3 notification: missing Records field")
+	}
+
 	return p.getS3Info(events)
 }
 
