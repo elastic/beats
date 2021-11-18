@@ -42,13 +42,13 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	// kubef, err := NewKubeFetcher(c.KubeConfig, c.Period)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	kubef, err := NewKubeFetcher(c.KubeConfig, c.Period)
+	if err != nil {
+		return nil, err
+	}
 
-	// data.RegisterFetcher("kube_api", kubef)
-	// data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir))
+	data.RegisterFetcher("kube_api", kubef)
+	data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir))
 	data.RegisterFetcher("file_system", NewFileFetcher(c.Files))
 
 	bt := &kubebeat{
