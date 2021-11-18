@@ -18,9 +18,8 @@ import (
 )
 
 func init() {
-	common.RegisterCheckDeps(Update)
-	unittest.RegisterPythonTestDeps(Fields)
-	integtest.RegisterPythonTestDeps(Fields)
+	devtools.BeatDescription = "kubeat cis k8s benchmark."
+	devtools.BeatLicense = "Elastic License"
 }
 
 // Package packages the Beat for distribution.
