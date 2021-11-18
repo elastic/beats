@@ -312,37 +312,36 @@ func TestIndexManager_Setup(t *testing.T) {
 		}
 		return &s
 	}
-	defaultCfg := template.DefaultConfig()
+	info := beat.Info{Beat: "test", Version: "9.9.9"}
+	defaultCfg := template.DefaultConfig(info)
 
 	cases := map[string]struct {
 		cfg                   common.MapStr
 		loadTemplate, loadILM LoadMode
 
-		err           bool
-		tmplCfg       *template.TemplateConfig
-		alias, policy string
+		err     bool
+		tmplCfg *template.TemplateConfig
+		policy  string
 	}{
 		"template default ilm default": {
-			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
+			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
 				"overwrite":                     "true",
 				"name":                          "test-9.9.9",
 				"pattern":                       "test-9.9.9*",
 				"settings.index.lifecycle.name": "test",
 			}),
-			alias:  "test-9.9.9",
 			policy: "test",
 		},
-		"template default ilm default with alias and policy changed": {
+		"template default ilm default with policy changed": {
 			cfg: common.MapStr{
 				"setup.ilm.policy_name": "policy-keep",
 			},
-			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
+			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
 				"overwrite":                     "true",
-				"name":                          "mocktest",
-				"pattern":                       "mocktest*",
+				"name":                          "test-9.9.9",
+				"pattern":                       "test-9.9.9*",
 				"settings.index.lifecycle.name": "policy-keep",
 			}),
-			alias:  "mocktest",
 			policy: "policy-keep",
 		},
 		"template default ilm disabled": {
@@ -357,16 +356,20 @@ func TestIndexManager_Setup(t *testing.T) {
 				"setup.ilm.enabled": false,
 			},
 			loadTemplate: LoadModeOverwrite,
-			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
+			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
 				"overwrite": "true",
+				"name":      "test-9.9.9",
+				"pattern":   "test-9.9.9*",
 			}),
 		},
 		"template default loadMode Force ilm disabled": {
 			cfg: common.MapStr{
 				"setup.ilm.enabled": false,
+				"name":              "test-9.9.9",
+				"pattern":           "test-9.9.9*",
 			},
 			loadTemplate: LoadModeForce,
-			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
+			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
 				"overwrite": "true",
 			}),
 		},
@@ -380,7 +383,6 @@ func TestIndexManager_Setup(t *testing.T) {
 			cfg: common.MapStr{
 				"setup.template.enabled": false,
 			},
-			alias:  "test-9.9.9",
 			policy: "test",
 		},
 		"template disabled ilm disabled, loadMode Overwrite": {
@@ -396,18 +398,16 @@ func TestIndexManager_Setup(t *testing.T) {
 				"setup.ilm.enabled":      false,
 			},
 			loadILM: LoadModeForce,
-			alias:   "test-9.9.9",
 			policy:  "test",
 		},
 		"template loadmode disabled ilm loadMode enabled": {
 			loadTemplate: LoadModeDisabled,
 			loadILM:      LoadModeEnabled,
-			alias:        "test-9.9.9",
 			policy:       "test",
 		},
 		"template default ilm loadMode disabled": {
 			loadILM: LoadModeDisabled,
-			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
+			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
 				"name":                          "test-9.9.9",
 				"pattern":                       "test-9.9.9*",
 				"settings.index.lifecycle.name": "test",
@@ -420,7 +420,6 @@ func TestIndexManager_Setup(t *testing.T) {
 	}
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
-			info := beat.Info{Beat: "test", Version: "9.9.9"}
 			factory := MakeDefaultSupport(ilm.StdSupport)
 			im, err := factory(nil, info, common.MustNewConfigFrom(test.cfg))
 			require.NoError(t, err)
@@ -446,7 +445,7 @@ func TestIndexManager_Setup(t *testing.T) {
 }
 
 func (op mockCreateOp) String() string {
-	names := []string{"create-policy", "create-template", "create-alias"}
+	names := []string{"create-policy", "create-template"}
 	if int(op) > len(names) {
 		return "unknown"
 	}

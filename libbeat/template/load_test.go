@@ -32,7 +32,7 @@ import (
 func TestFileLoader_Load(t *testing.T) {
 	ver := "7.0.0"
 	prefix := "mock"
-	info := beat.Info{Version: ver, IndexPrefix: prefix}
+	info := beat.Info{Beat: "mock", Version: ver, IndexPrefix: prefix}
 	tmplName := fmt.Sprintf("%s-%s", prefix, ver)
 
 	for name, test := range map[string]struct {
@@ -212,7 +212,7 @@ func TestFileLoader_Load(t *testing.T) {
 			require.NoError(t, err)
 			fl := NewFileLoader(fc)
 
-			cfg := DefaultConfig()
+			cfg := DefaultConfig(info)
 			cfg.Settings = test.settings
 
 			err = fl.Load(cfg, info, test.fields, false)

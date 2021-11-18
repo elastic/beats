@@ -26,6 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/version"
 )
@@ -91,16 +92,17 @@ func TestNumberOfRoutingShards(t *testing.T) {
 
 func TestTemplate(t *testing.T) {
 	currentVersion := getVersion("")
+	info := beat.Info{Beat: "testbeat", Version: currentVersion}
 
 	t.Run("for ES 7.x", func(t *testing.T) {
-		template := createTestTemplate(t, currentVersion, "7.10.0", DefaultConfig())
+		template := createTestTemplate(t, currentVersion, "7.10.0", DefaultConfig(info))
 		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "*"})
 		template.Assert("template.mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
 		template.Assert("template.settings.index.max_docvalue_fields_search", 200)
 	})
 
 	t.Run("for ES 8.x", func(t *testing.T) {
-		template := createTestTemplate(t, currentVersion, "8.0.0", DefaultConfig())
+		template := createTestTemplate(t, currentVersion, "8.0.0", DefaultConfig(info))
 		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "*"})
 		template.Assert("template.mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
 		template.Assert("template.settings.index.max_docvalue_fields_search", 200)

@@ -18,6 +18,7 @@
 package template
 
 import (
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 )
 
@@ -45,8 +46,10 @@ type TemplateSettings struct {
 }
 
 // DefaultConfig for index template
-func DefaultConfig() TemplateConfig {
+func DefaultConfig(info beat.Info) TemplateConfig {
 	return TemplateConfig{
+		Name:     info.Beat + "-" + info.Version,
+		Pattern:  info.Beat + "-" + info.Version + "*",
 		Enabled:  true,
 		Fields:   "",
 		Priority: 150,

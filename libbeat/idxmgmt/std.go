@@ -111,7 +111,7 @@ func newIndexSupport(
 		return nil, err
 	}
 
-	tmplCfg, err := unpackTemplateConfig(tmplConfig)
+	tmplCfg, err := unpackTemplateConfig(info, tmplConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -330,8 +330,9 @@ func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 	return ""
 }
 
-func unpackTemplateConfig(cfg *common.Config) (config template.TemplateConfig, err error) {
-	config = template.DefaultConfig()
+func unpackTemplateConfig(info beat.Info, cfg *common.Config) (config template.TemplateConfig, err error) {
+	config = template.DefaultConfig(info)
+
 	if cfg != nil {
 		err = cfg.Unpack(&config)
 	}
