@@ -405,7 +405,6 @@ func (d *decoder) readByte() (byte, error) {
 
 func (d *decoder) readInt32() (int, error) {
 	b, err := d.readBytes(4)
-
 	if err != nil {
 		return 0, err
 	}
@@ -418,7 +417,6 @@ func (d *decoder) readInt32() (int, error) {
 
 func (d *decoder) readInt64() (int, error) {
 	b, err := d.readBytes(8)
-
 	if err != nil {
 		return 0, err
 	}

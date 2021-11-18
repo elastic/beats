@@ -59,9 +59,7 @@ type dnsPlugin struct {
 	watcher procs.ProcessesWatcher
 }
 
-var (
-	debugf = logp.MakeDebug("dns")
-)
+var debugf = logp.MakeDebug("dns")
 
 const maxDNSTupleRawSize = 16 + 16 + 2 + 2 + 4 + 1
 

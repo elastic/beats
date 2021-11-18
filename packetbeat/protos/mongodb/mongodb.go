@@ -55,9 +55,7 @@ type transactionKey struct {
 	id  int
 }
 
-var (
-	unmatchedRequests = monitoring.NewInt(nil, "mongodb.unmatched_requests")
-)
+var unmatchedRequests = monitoring.NewInt(nil, "mongodb.unmatched_requests")
 
 func init() {
 	protos.Register("mongodb", New)
@@ -218,7 +216,6 @@ func (mongodb *mongodbPlugin) handleMongodb(
 	tcptuple *common.TCPTuple,
 	dir uint8,
 ) {
-
 	m.tcpTuple = *tcptuple
 	m.direction = dir
 	m.cmdlineTuple = mongodb.watcher.FindProcessesTupleTCP(tcptuple.IPPort())

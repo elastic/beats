@@ -56,10 +56,12 @@ var binStatsValue = argDef{
 	serialize: serializeStats,
 }
 
-var extraValue = makeValueExtra("value")
-var extraDelta = makeValueExtra("delta")
-var extraInitial = makeValue2Extra("initial")
-var extraVerbosity = make32ValueExtra("verbosity")
+var (
+	extraValue     = makeValueExtra("value")
+	extraDelta     = makeValueExtra("delta")
+	extraInitial   = makeValue2Extra("initial")
+	extraVerbosity = make32ValueExtra("verbosity")
+)
 
 func init() {
 	// define all memcache opcode commands:

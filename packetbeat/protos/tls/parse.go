@@ -169,8 +169,10 @@ func readHandshakeHeader(buf *streambuf.Buffer) (*handshakeHeader, error) {
 	if len16, err = buf.ReadNetUint16At(2); err != nil {
 		return nil, err
 	}
-	return &handshakeHeader{handshakeType(typ),
-		int(len16) | (int(len8) << 16)}, nil
+	return &handshakeHeader{
+		handshakeType(typ),
+		int(len16) | (int(len8) << 16),
+	}, nil
 }
 
 func (header *recordHeader) String() string {
@@ -215,7 +217,6 @@ func (hello *helloMessage) supportedCiphers() []string {
 }
 
 func (parser *parser) parse(buf *streambuf.Buffer) parserResult {
-
 	for buf.Avail(recordHeaderSize) {
 
 		header, err := readRecordHeader(buf)

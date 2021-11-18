@@ -42,10 +42,10 @@ func (amqp *amqpPlugin) amqpMessageParser(s *amqpStream) (ok bool, complete bool
 
 		f, err := readFrameHeader(s.data[s.parseOffset:])
 		if err {
-			//incorrect header
+			// incorrect header
 			return false, false
 		} else if f == nil {
-			//header not complete
+			// header not complete
 			return true, false
 		}
 
@@ -85,7 +85,7 @@ func isProtocolHeader(data []byte) (isHeader bool, version string) {
 	return false, ""
 }
 
-//func to read a frame header and check if it is valid and complete
+// func to read a frame header and check if it is valid and complete
 func readFrameHeader(data []byte) (ret *amqpFrame, err bool) {
 	var frame amqpFrame
 	if len(data) < 8 {
@@ -103,7 +103,7 @@ func readFrameHeader(data []byte) (ret *amqpFrame, err bool) {
 	}
 	frame.Type = frameType(data[0])
 	if frame.size == 0 {
-		//frame content is nil with heartbeat frames
+		// frame content is nil with heartbeat frames
 		frame.content = nil
 	} else {
 		frame.content = data[7 : frame.size+7]
@@ -180,7 +180,7 @@ func (s *amqpStream) decodeBodyFrame(buf []byte) (ok bool, complete bool) {
 
 	debugf("A body frame of %d bytes long has been transmitted",
 		len(buf))
-	//is the message complete ? If yes, let's publish it
+	// is the message complete ? If yes, let's publish it
 
 	complete = uint64(len(s.message.body)) >= s.message.bodySize
 	return true, complete
@@ -190,16 +190,16 @@ func hasProperty(prop, flag byte) bool {
 	return (prop & flag) == flag
 }
 
-//function to get message content-type and content-encoding
+// function to get message content-type and content-encoding
 func getMessageProperties(s *amqpStream, data []byte) bool {
 	m := s.message
 
-	//properties are coded in the two first bytes
+	// properties are coded in the two first bytes
 	prop1 := data[0]
 	prop2 := data[1]
 	var offset uint32 = 2
 
-	//while last bit set, we have another property flag field
+	// while last bit set, we have another property flag field
 	for lastbit := 1; data[lastbit]&1 == 1; {
 		lastbit += 2
 		offset += 2

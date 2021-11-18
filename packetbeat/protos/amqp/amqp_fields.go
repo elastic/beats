@@ -78,16 +78,16 @@ func getArray(fields common.MapStr, data []byte, offset uint32) (next uint32, er
 	return length + 4 + offset, false, exists
 }
 
-//The index parameter, when set at -1, indicates that the entry is a field table.
-//If it's set at 0, it is an array.
+// The index parameter, when set at -1, indicates that the entry is a field table.
+// If it's set at 0, it is an array.
 func fieldUnmarshal(table common.MapStr, data []byte, offset uint32, length uint32, index int) (err bool) {
 	var name string
 
 	if offset >= length {
 		return false
 	}
-	//get name of the field. If it's an array, it will be the index parameter as a
-	//string. If it's a table, it will be the name of the field.
+	// get name of the field. If it's an array, it will be the index parameter as a
+	// string. If it's a table, it will be the name of the field.
 	if index < 0 {
 		fieldName, offsetTemp, err := getShortString(data, offset+1, uint32(data[offset]))
 		if err {
@@ -199,10 +199,10 @@ func fieldUnmarshal(table common.MapStr, data []byte, offset uint32, length uint
 		table[name] = bodyToByteArray(data[offset+1+size : offset+5+size])
 		offset += 5 + size
 	default:
-		//unknown field
+		// unknown field
 		return true
 	}
-	//advance to next field recursively
+	// advance to next field recursively
 	return fieldUnmarshal(table, data, offset, length, index)
 }
 

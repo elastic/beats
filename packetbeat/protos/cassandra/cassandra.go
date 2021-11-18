@@ -50,9 +50,7 @@ type stream struct {
 	parser parser
 }
 
-var (
-	debugf = logp.MakeDebug("cassandra")
-)
+var debugf = logp.MakeDebug("cassandra")
 
 func init() {
 	protos.Register("cassandra", New)

@@ -109,12 +109,14 @@ var argStat = argDef{
 	serialize: serializeStats,
 }
 
-var argDelta = makeValueArg("delta")
-var argSleepUs = makeValueArg("sleep_us")
-var argValue = makeValueArg("value")
-var argVerbosity = makeValueArg("verbosity")
-var argSourceClass = makeIValueArg("source_class")
-var argDestClass = makeIValue2Arg("dest_class")
+var (
+	argDelta       = makeValueArg("delta")
+	argSleepUs     = makeValueArg("sleep_us")
+	argValue       = makeValueArg("value")
+	argVerbosity   = makeValueArg("verbosity")
+	argSourceClass = makeIValueArg("source_class")
+	argDestClass   = makeIValue2Arg("dest_class")
+)
 
 var argNoReply = argDef{
 	parse: func(parser *parser, hdr, buf *streambuf.Buffer) error {
@@ -297,8 +299,10 @@ func makeDefTextDataMessage(
 	}
 }
 
-var defTextDataRequest = makeDefTextDataMessage(true)
-var defTextDataResponse = makeDefTextDataMessage(false)
+var (
+	defTextDataRequest  = makeDefTextDataMessage(true)
+	defTextDataResponse = makeDefTextDataMessage(false)
+)
 
 func loadCommand(name string, code commandCode) textCommandType {
 	return defTextMessage(name, memcacheLoadMsg, code, argMultiKeys)
@@ -592,7 +596,7 @@ func parseNoReplyArg(buf *streambuf.Buffer) (bool, error) {
 		return false, textArgError(err)
 	}
 
-	var noreplyArg = []byte("noreply")
+	noreplyArg := []byte("noreply")
 	noreply := bytes.HasPrefix(buf.Bytes(), noreplyArg)
 	if !noreply {
 		return false, errExpectedNoReply

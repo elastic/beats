@@ -234,11 +234,11 @@ func TestPgsqlParser_threeResponses(t *testing.T) {
 	}
 	var tuple common.TCPTuple
 	var private pgsqlPrivateData
-	var countHandlePgsql = 0
+	countHandlePgsql := 0
 
 	pgsql.handlePgsql = func(pgsql *pgsqlPlugin, m *pgsqlMessage, tcptuple *common.TCPTuple,
-		dir uint8, raw_msg []byte) {
-
+		dir uint8, raw_msg []byte,
+	) {
 		countHandlePgsql++
 	}
 

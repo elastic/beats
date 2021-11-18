@@ -729,7 +729,6 @@ func TestEatBodyChunkedWaitCRLF(t *testing.T) {
 	ok, complete = parser.parseBodyChunkedWaitFinalCRLF(st, msg)
 	if ok != true || complete != false {
 		t.Error("Wrong return values", ok, complete)
-
 	}
 	st.data = append(st.data, msgs[1]...)
 
@@ -817,13 +816,12 @@ func TestHttpParser_censorPasswordPOST(t *testing.T) {
 	http.parserConfig.sendHeaders = true
 	http.parserConfig.sendAllHeaders = true
 
-	data1 :=
-		"POST /users/login HTTP/1.1\r\n" +
-			"HOST: www.example.com\r\n" +
-			"Content-Type: application/x-www-form-urlencoded\r\n" +
-			"Content-Length: 28\r\n" +
-			"\r\n" +
-			"username=ME&password=secret\r\n"
+	data1 := "POST /users/login HTTP/1.1\r\n" +
+		"HOST: www.example.com\r\n" +
+		"Content-Type: application/x-www-form-urlencoded\r\n" +
+		"Content-Length: 28\r\n" +
+		"\r\n" +
+		"username=ME&password=secret\r\n"
 	tp := newTestParser(http, data1)
 
 	msg, ok, complete := tp.parse()
@@ -1511,7 +1509,8 @@ func TestHTTP_Encodings(t *testing.T) {
 	gzipDeflateBody := string([]byte{
 		0x1f, 0x8b, 0x08, 0x00, 0x65, 0xdb, 0x6a, 0x5b, 0x00, 0x03, 0x3b, 0x7d,
 		0xe2, 0xbc, 0xe7, 0x13, 0x26, 0x06, 0x00, 0x95, 0xfa, 0x49, 0xbf, 0x07,
-		0x00, 0x00, 0x00})
+		0x00, 0x00, 0x00,
+	})
 
 	var store eventStore
 	http := httpModForTests(&store)

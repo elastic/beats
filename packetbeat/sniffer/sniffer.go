@@ -60,7 +60,6 @@ type Worker interface {
 
 type snifferHandle interface {
 	gopacket.PacketDataSource
-
 	LinkType() layers.LinkType
 	Close()
 }

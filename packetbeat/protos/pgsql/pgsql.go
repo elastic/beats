@@ -126,13 +126,9 @@ const (
 	cancelRequest
 )
 
-var (
-	errInvalidLength = errors.New("invalid length")
-)
+var errInvalidLength = errors.New("invalid length")
 
-var (
-	unmatchedResponses = monitoring.NewInt(nil, "pgsql.unmatched_responses")
-)
+var unmatchedResponses = monitoring.NewInt(nil, "pgsql.unmatched_responses")
 
 func init() {
 	protos.Register("pgsql", New)
@@ -240,8 +236,8 @@ func (pgsql *pgsqlPlugin) ConnectionTimeout() time.Duration {
 }
 
 func (pgsql *pgsqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
-	dir uint8, private protos.ProtocolData) protos.ProtocolData {
-
+	dir uint8, private protos.ProtocolData,
+) protos.ProtocolData {
 	defer logp.Recover("ParsePgsql exception")
 
 	priv := pgsqlPrivateData{}
@@ -334,8 +330,8 @@ func messageHasEnoughData(msg *pgsqlMessage) bool {
 
 // Called when there's a drop packet
 func (pgsql *pgsqlPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
-	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
-
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
+) {
 	defer logp.Recover("GapInPgsqlStream exception")
 
 	if private == nil {
@@ -378,8 +374,8 @@ func (pgsql *pgsqlPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 }
 
 var handlePgsql = func(pgsql *pgsqlPlugin, m *pgsqlMessage, tcptuple *common.TCPTuple,
-	dir uint8, raw_msg []byte) {
-
+	dir uint8, raw_msg []byte,
+) {
 	m.tcpTuple = *tcptuple
 	m.direction = dir
 	m.cmdlineTuple = pgsql.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
@@ -511,8 +507,8 @@ func (pgsql *pgsqlPlugin) publishTransaction(t *pgsqlTransaction) {
 }
 
 func (pgsql *pgsqlPlugin) removeTransaction(transList []*pgsqlTransaction,
-	tuple common.TCPTuple, index int) *pgsqlTransaction {
-
+	tuple common.TCPTuple, index int,
+) *pgsqlTransaction {
 	trans := transList[index]
 	transList = append(transList[:index], transList[index+1:]...)
 	if len(transList) == 0 {

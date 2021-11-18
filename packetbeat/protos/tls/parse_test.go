@@ -202,7 +202,6 @@ func TestParserParse(t *testing.T) {
 	// Certificate request
 	assert.Equal(t, resultOK, parser.parse(sBuf(t, "16030300040d000000")))
 	assert.True(t, parser.certRequested)
-
 }
 
 func TestParserHello(t *testing.T) {

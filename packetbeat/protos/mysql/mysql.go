@@ -337,7 +337,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				return true, false
 			}
 
-			s.parseOffset += 4 //header
+			s.parseOffset += 4 // header
 			s.parseOffset += int(m.packetLength)
 			m.end = s.parseOffset
 			if m.isRequest {
@@ -347,7 +347,6 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				} else {
 					m.query = string(s.data[m.start+5 : m.end])
 				}
-
 			} else if m.isOK {
 				// affected rows
 				affectedRows, off, complete, err := readLinteger(s.data, m.start+5)
@@ -475,7 +474,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				return true, false
 			}
 
-			s.parseOffset += 4 //header
+			s.parseOffset += 4 // header
 
 			if s.data[s.parseOffset] == 0xfe {
 				logp.Debug("mysqldetailed", "Received EOF packet")
@@ -553,8 +552,8 @@ func (mysql *mysqlPlugin) ConnectionTimeout() time.Duration {
 }
 
 func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
-	dir uint8, private protos.ProtocolData) protos.ProtocolData {
-
+	dir uint8, private protos.ProtocolData,
+) protos.ProtocolData {
 	defer logp.Recover("ParseMysql exception")
 
 	priv := mysqlPrivateData{}
@@ -613,8 +612,8 @@ func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 }
 
 func (mysql *mysqlPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
-	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
-
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
+) {
 	defer logp.Recover("GapInStream(mysql) exception")
 
 	if private == nil {
@@ -642,16 +641,16 @@ func (mysql *mysqlPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 }
 
 func (mysql *mysqlPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
-
+	private protos.ProtocolData,
+) protos.ProtocolData {
 	// TODO: check if we have data pending and either drop it to free
 	// memory or send it up the stack.
 	return private
 }
 
 func handleMysql(mysql *mysqlPlugin, m *mysqlMessage, tcptuple *common.TCPTuple,
-	dir uint8, rawMsg []byte) {
-
+	dir uint8, rawMsg []byte,
+) {
 	m.tcpTuple = *tcptuple
 	m.direction = dir
 	m.cmdlineTuple = mysql.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
@@ -899,7 +898,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			valueString := strconv.Itoa(int(binary.LittleEndian.Uint32(data[paramOffset:])))
 			paramString = append(paramString, valueString)
 			paramOffset += 4
-		//FIELD_TYPE_FLOAT
+		// FIELD_TYPE_FLOAT
 		case 0x04:
 			paramString = append(paramString, "TYPE_FLOAT")
 			paramOffset += 4

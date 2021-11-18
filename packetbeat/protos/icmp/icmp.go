@@ -102,7 +102,7 @@ func (icmp *icmpPlugin) init(results protos.Reporter, watcher procs.ProcessesWat
 	}
 	logp.Debug("icmp", "Local IP addresses: %s", icmp.localIps)
 
-	var removalListener = func(k common.Key, v common.Value) {
+	removalListener := func(k common.Key, v common.Value) {
 		icmp.expireTransaction(k.(hashableIcmpTuple), v.(*icmpTransaction))
 	}
 
