@@ -32,9 +32,6 @@ type kubebeat struct {
 	data         *Data
 }
 
-//go:embed opa-policy-test
-var opaPolicyTestContent embed.FS
-
 // New creates an instance of kubebeat.
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	ctx := context.Background()
@@ -48,13 +45,13 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 
 	data := NewData(ctx, c.Period)
 
-	//kubef, err := NewKubeFetcher(c.KubeConfig, c.Period)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//data.RegisterFetcher("kube_api", kubef)
-	//data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir))
+	kubef, err := NewKubeFetcher(c.KubeConfig, c.Period)
+	if err != nil {
+		return nil, err
+	}
+
+	data.RegisterFetcher("kube_api", kubef)
+	data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir))
 	data.RegisterFetcher("file_system", NewFileFetcher(c.Files))
 
 	policies := CreateCISPolicy(bundle.EmbeddedPolicy)
@@ -111,13 +108,13 @@ func CreateCISPolicy(fileSystem embed.FS) map[string]string {
 type PolicyResult map[string]RuleResult
 
 type RuleResult struct {
-	Findings []Finding `json:"findings"`
-	Resource  interface{} `json:"resource"`
+	Findings []Finding   `json:"findings"`
+	Resource interface{} `json:"resource"`
 }
 
 type Finding struct {
-	Result  interface{} `json:"result"`
-	Rule  interface{} `json:"rule"`
+	Result interface{} `json:"result"`
+	Rule   interface{} `json:"rule"`
 }
 
 // Run starts kubebeat.
@@ -176,10 +173,10 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 							event := beat.Event{
 								Timestamp: timestamp,
 								Fields: common.MapStr{
-									"run_id":    runId,
-									"result": Finding.Result,
-									"resource":  ruleResult.Resource,
-									"rule": Finding.Rule,
+									"run_id":   runId,
+									"result":   Finding.Result,
+									"resource": ruleResult.Resource,
+									"rule":     Finding.Rule,
 								},
 							}
 							events = append(events, event)
@@ -197,7 +194,7 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 func (bt *kubebeat) Decision(input interface{}) (interface{}, error) {
 	// get the named policy decision for the specified input
 	result, err := bt.opa.Decision(context.Background(), sdk.DecisionOptions{
-		Path:  "main/findings",
+		Path:  "main",
 		Input: input,
 	})
 	if err != nil {
