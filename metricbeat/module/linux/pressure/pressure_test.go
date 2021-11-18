@@ -15,10 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-<<<<<<< HEAD
 //go:build linux
-=======
->>>>>>> e49f2579c ([Metricbeat] Add Linux pressure metricset (#27355))
 // +build linux
 
 package pressure

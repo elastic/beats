@@ -63,19 +63,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("the %v/%v metricset is only supported on Linux", moduleName, metricsetName)
 	}
 
-<<<<<<< HEAD
 	sys := base.Module().(linux.LinuxModule)
 	hostfs := sys.GetHostFS()
 
 	path := filepath.Join(hostfs, "proc")
-=======
-	linuxModule, ok := base.Module().(*linux.Module)
-	if !ok {
-		return nil, errors.New("unexpected module type")
-	}
-
-	path := filepath.Join(linuxModule.HostFS, "proc")
->>>>>>> e49f2579c ([Metricbeat] Add Linux pressure metricset (#27355))
 	procfs, err := procfs.NewFS(path)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error creating new Host FS at %s", path)
@@ -83,11 +74,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-<<<<<<< HEAD
-		fs:            hostfs,
-=======
-		fs:            linuxModule.HostFS,
->>>>>>> e49f2579c ([Metricbeat] Add Linux pressure metricset (#27355))
 		procfs:        procfs,
 	}, nil
 }

@@ -45972,7 +45972,6 @@ type: long
 
 --
 
-<<<<<<< HEAD
 [float]
 === rapl
 
@@ -46070,8 +46069,6 @@ type: float
 
 --
 
-=======
->>>>>>> e49f2579c ([Metricbeat] Add Linux pressure metricset (#27355))
 [[exported-fields-logstash]]
 == Logstash fields
 
