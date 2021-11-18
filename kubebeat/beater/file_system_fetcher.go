@@ -1,11 +1,12 @@
 package beater
 
 import (
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"os"
 	"os/user"
 	"strconv"
 	"syscall"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // FileSystemFetcher implement the Fetcher interface
@@ -36,8 +37,8 @@ func NewFileFetcher(filesPaths []string) Fetcher {
 	}
 }
 
-func (f *FileSystemFetcher) Fetch() (interface{}, error) {
-	results := make([]FileSystemResourceData, 0)
+func (f *FileSystemFetcher) Fetch() ([]interface{}, error) {
+	results := make([]interface{}, 0)
 
 	for _, filePath := range f.filesPaths {
 		info, err := os.Stat(filePath)

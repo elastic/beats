@@ -5,13 +5,15 @@ import (
 )
 
 const (
-	procfsdir = "/hostfs"
+	procfsdir        = "/hostfs"
+	ProcessInputType = "process"
 )
 
 type Process struct {
-	PID  string        `json:"pid"`
-	Cmd  string        `json:"cmd"`
-	Stat proc.ProcStat `json:"stat"`
+	InputType string        `json:"inputType"`
+	PID       string        `json:"pid"`
+	Cmd       string        `json:"cmd"`
+	Stat      proc.ProcStat `json:"stat"`
 }
 
 type ProcessesFetcher struct {
@@ -24,13 +26,13 @@ func NewProcessesFetcher(dir string) Fetcher {
 	}
 }
 
-func (f *ProcessesFetcher) Fetch() (interface{}, error) {
+func (f *ProcessesFetcher) Fetch() ([]interface{}, error) {
 	pids, err := proc.List(f.directory)
 	if err != nil {
 		return nil, err
 	}
 
-	ret := make(map[string]Process)
+	ret := make([]interface{}, 0)
 
 	// If errors occur during read, then return what we have till now
 	// without reporting errors.
@@ -45,7 +47,7 @@ func (f *ProcessesFetcher) Fetch() (interface{}, error) {
 			return ret, nil
 		}
 
-		ret[p] = Process{p, cmd, stat}
+		ret = append(ret, Process{ProcessInputType, p, cmd, stat})
 	}
 
 	return ret, nil
