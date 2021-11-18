@@ -15,7 +15,7 @@
                                 "73cdbb81-57ca-4474-a86c-bca60a527d29": {
                                     "dataType": "string",
                                     "isBucketed": true,
-                                    "label": "Top values of threatintel.indicator.type",
+                                    "label": "Top values of threat.indicator.type",
                                     "operationType": "terms",
                                     "params": {
                                         "missingBucket": false,
@@ -28,7 +28,7 @@
                                         "size": 15
                                     },
                                     "scale": "ordinal",
-                                    "sourceField": "threatintel.indicator.type"
+                                    "sourceField": "threat.indicator.type"
                                 },
                                 "89f18519-9360-4d37-ae52-134604ac6cfc": {
                                     "customLabel": true,

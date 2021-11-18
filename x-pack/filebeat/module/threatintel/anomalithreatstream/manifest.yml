@@ -8,13 +8,15 @@ var:
   - name: listen_port
     default: 8080
   - name: secret
-  - name: ssl_certificate
-  - name: ssl_key
+  - name: ssl
   - name: paths
     default: /path/to/testing.log
   - name: tags
     default:
       - threatintel-anomalithreatstream
+      - forwarded
+  - name: preserve_original_event
+    default: false
 ingest_pipeline:
   - ingest/pipeline.yml
 input: config/config.yml

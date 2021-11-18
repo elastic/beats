@@ -30,13 +30,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.misp.published"
+                            "field": "misp.published"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                            "key": "threatintel.misp.published",
+                            "key": "misp.published",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -72,7 +72,7 @@
                     "enabled": true,
                     "id": "2",
                     "params": {
-                        "field": "threatintel.misp.published",
+                        "field": "misp.published",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",
