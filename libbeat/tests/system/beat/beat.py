@@ -403,7 +403,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
         Returns true if the give logfile contains the given message.
         Note that the msg must be present in a single line.
         """
-        print("bu")
 
         return self.log_contains_count(msg, logfile, ignore_case=ignore_case) > 0
 

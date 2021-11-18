@@ -486,7 +486,7 @@ class Test(BaseTest):
 
         # Output file was rotated
         self.wait_until(
-            lambda: self.output_has(lines=1, output_file="output/filebeat.1"),
+            lambda: self.output_has(lines=1, output_file="output/filebeat-" + self.today + "-1.ndjson"),
             max_timeout=10)
 
         self.wait_until(
@@ -596,7 +596,7 @@ class Test(BaseTest):
 
         # Output file was rotated
         self.wait_until(
-            lambda: self.output_has(lines=2, output_file="output/filebeat.1"),
+            lambda: self.output_has(lines=2, output_file="output/filebeat-" + self.today + "-1.ndjson"),
             max_timeout=10)
 
         self.wait_until(
