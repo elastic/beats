@@ -22,11 +22,13 @@ import (
 	"fmt"
 )
 
-type cipherSuite uint16
-type signatureScheme uint16
-type pointsGroup uint16
-type compressionMethod uint8
-type ecPointsFormat uint8
+type (
+	cipherSuite       uint16
+	signatureScheme   uint16
+	pointsGroup       uint16
+	compressionMethod uint8
+	ecPointsFormat    uint8
+)
 
 // from https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4
 var cipherSuites = map[cipherSuite]string{
@@ -440,26 +442,26 @@ var supportedGroups = map[pointsGroup]string{
 }
 
 var signatureSchemes = map[signatureScheme]string{
-	/* RSASSA-PKCS1-v1_5 algorithms */
+	// RSASSA-PKCS1-v1_5 algorithms
 	0x0401: "rsa_pkcs1_sha256",
 	0x0501: "rsa_pkcs1_sha384",
 	0x0601: "rsa_pkcs1_sha512",
 
-	/* ECDSA algorithms */
+	// ECDSA algorithms
 	0x0403: "ecdsa_secp256r1_sha256",
 	0x0503: "ecdsa_secp384r1_sha384",
 	0x0603: "ecdsa_secp521r1_sha512",
 
-	/* RSASSA-PSS algorithms */
+	// RSASSA-PSS algorithms
 	0x0804: "rsa_pss_sha256",
 	0x0805: "rsa_pss_sha384",
 	0x0806: "rsa_pss_sha512",
 
-	/* EdDSA algorithms */
+	// EdDSA algorithms
 	0x0807: "ed25519",
 	0x0808: "ed448",
 
-	/* Legacy algorithms */
+	// Legacy algorithms
 	0x0201: "rsa_pkcs1_sha1",
 	0x0203: "ecdsa_sha1",
 }
