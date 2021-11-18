@@ -10,7 +10,7 @@ require (
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
 	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
 	github.com/Azure/azure-event-hubs-go/v3 v3.3.15
-	github.com/Azure/azure-sdk-for-go v57.0.0+incompatible
+	github.com/Azure/azure-sdk-for-go v59.0.0+incompatible
 	github.com/Azure/azure-storage-blob-go v0.8.0
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/Azure/go-autorest/autorest v0.11.19
@@ -75,7 +75,7 @@ require (
 	github.com/elastic/go-txfile v0.0.8
 	github.com/elastic/go-ucfg v0.8.3
 	github.com/elastic/go-windows v1.0.1
-	github.com/elastic/gosigar v0.14.1
+	github.com/elastic/gosigar v0.14.2
 	github.com/fatih/color v1.9.0
 	github.com/fearful-symmetry/gorapl v0.0.4
 	github.com/fsnotify/fsevents v0.1.1

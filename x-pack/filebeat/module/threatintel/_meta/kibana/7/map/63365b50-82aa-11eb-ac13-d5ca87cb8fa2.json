@@ -35,7 +35,7 @@
                                     "type": "count"
                                 }
                             ],
-                            "term": "threatintel.indicator.geo.country_iso_code",
+                            "term": "threat.indicator.geo.country_iso_code",
                             "type": "ES_TERM_SOURCE"
                         }
                     }

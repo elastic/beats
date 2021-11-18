@@ -62,6 +62,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - All modules: Replace usages of deprecated ECS fields `process.ppid` and `log.original` with `process.parent.pid` and `event.original`. {pull}28620[28620]
 - Replace usages of `host.user.*` fields with `user.*` in `cisco`, `microsoft` and `oracle` modules. {pull}28620[28620]
 - Remove `docker` input. Please use `filestream` input with `container` parser or `container` input. {pull}28817[28817]
+- Change `threatintel` module to use new `threat.*` ECS fields. {pull}29014[29014]
 
 *Heartbeat*
 
@@ -138,6 +139,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Periodic metrics in logs will now report `libbeat.output.events.active` and `beat.memstats.rss`
 - Allows disable pod events enrichment with deployment name {pull}28521[28521]
 - Fix `fingerprint` processor to give it access to the `@timestamp` field. {issue}28683[28683]
+- Fix the wrong beat name on monitoring and state endpoint {issue}27755[27755]
 
 *Auditbeat*
 
@@ -180,7 +182,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Relax time parsing and capture group and session type in Cisco ASA module {issue}24710[24710] {pull}28325[28325]
 - Correctly track bytes read when max_bytes is exceeded. {issue}28317[28317] {pull}28352[28352]
 - Upgrade azure-eventhub sdk reference, contains potential checkpoint fixes. {pull}28919[28919]
+- Revert usageDetails api version to 2019-01-01. {pull}28995[28995]
 - Fix in `aws-s3` input regarding provider discovery through endpoint {pull}28963[28963]
+- Fix `threatintel.misp` filters configuration. {issue}27970[27970]
 
 *Heartbeat*
 
@@ -236,6 +240,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add source.ip validation for event ID 4778 in the Security module. {issue}19627[19627]
 - Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
 - Add ECS 1.9 new users fields {pull}26509[26509]
+- Don't split hyphenated tokens {pull}28483[28483]
 
 *Functionbeat*
 
@@ -333,6 +338,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for '/var/log/pods/' path for add_kubernetes_metadata processor with `resource_type: pod`. {pull}28868[28868]
 - Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
 - Add support in aws-s3 input for s3 notification from SNS to SQS. {pull}28800[28800]
+- Add support in aws-s3 input for custom script parsing of s3 notifications. {pull}28946[28946]
+- Improve error handling in aws-s3 input for malformed s3 notifications. {issue}28828[28828] {pull}28946[28946]
 
 *Heartbeat*
 
@@ -357,6 +364,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added a new beta `enterprisesearch` module for Elastic Enterprise Search {pull}27549[27549]
 - Preliminary AIX support {pull}27954[27954]
 - Register additional name for `storage` metricset in the azure module. {pull}28447[28447]
+- Update reference to gosigar pacakge for filesystem windows fix. {pull}28909[28909]
 
 *Packetbeat*
 
