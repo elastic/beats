@@ -108,6 +108,7 @@ pull_request_rules:
       - author=mergify[bot]
       - "#check-success>0"
       - schedule=Mon-Mon 06:00-10:00[Europe/Paris]
+      - "#assignee>=1"
     actions:
       comment:
         message: |
