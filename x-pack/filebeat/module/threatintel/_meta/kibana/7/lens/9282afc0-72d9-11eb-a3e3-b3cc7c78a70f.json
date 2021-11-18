@@ -22,7 +22,7 @@
                                 "a6319ec8-2ec8-4d3a-bc54-efe0a306786f": {
                                     "dataType": "string",
                                     "isBucketed": true,
-                                    "label": "Top values of threatintel.indicator.type",
+                                    "label": "Top values of threat.indicator.type",
                                     "operationType": "terms",
                                     "params": {
                                         "missingBucket": false,
@@ -35,7 +35,7 @@
                                         "size": 10
                                     },
                                     "scale": "ordinal",
-                                    "sourceField": "threatintel.indicator.type"
+                                    "sourceField": "threat.indicator.type"
                                 }
                             },
                             "incompleteColumns": {}
@@ -70,13 +70,13 @@
                         "store": "appState"
                     },
                     "exists": {
-                        "field": "threatintel.indicator.type"
+                        "field": "threat.indicator.type"
                     },
                     "meta": {
                         "alias": null,
                         "disabled": false,
                         "indexRefName": "filter-index-pattern-1",
-                        "key": "threatintel.indicator.type",
+                        "key": "threat.indicator.type",
                         "negate": false,
                         "type": "exists",
                         "value": "exists"
