@@ -16,11 +16,12 @@ import (
 
 // kubebeat configuration.
 type kubebeat struct {
-	done   chan struct{}
-	config config.Config
-	client beat.Client
-	eval   *evaluator
-	data   *Data
+	done      chan struct{}
+	config    config.Config
+	client    beat.Client
+	eval      *evaluator
+	data      *Data
+	scheduler ResourceScheduler
 }
 
 // New creates an instance of kubebeat.
@@ -35,25 +36,27 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	logp.Info("Config initiated.")
 
 	data := NewData(ctx, c.Period)
+	scheduler := NewSynchronousScheduler()
 	evaluator, err := NewEvaluator()
 	if err != nil {
 		return nil, err
 	}
 
-	kubef, err := NewKubeFetcher(c.KubeConfig, c.Period)
-	if err != nil {
-		return nil, err
-	}
+	// kubef, err := NewKubeFetcher(c.KubeConfig, c.Period)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	data.RegisterFetcher("kube_api", kubef)
-	data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir))
+	// data.RegisterFetcher("kube_api", kubef)
+	// data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir))
 	data.RegisterFetcher("file_system", NewFileFetcher(c.Files))
 
 	bt := &kubebeat{
-		done:   make(chan struct{}),
-		config: c,
-		eval:   evaluator,
-		data:   data,
+		done:      make(chan struct{}),
+		config:    c,
+		eval:      evaluator,
+		data:      data,
+		scheduler: scheduler,
 	}
 	return bt, nil
 }
@@ -86,19 +89,27 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 
 	// ticker := time.NewTicker(bt.config.Period)
 	output := bt.data.Output()
-	runId, err := uuid.NewV4()
 
 	for {
 		select {
 		case <-bt.done:
 			return nil
 		case o := <-output:
-			bt.resourceIteration(runId, o)
+			runId, _ := uuid.NewV4()
+			omap := o.(map[string][]interface{})
+
+			func1 := func(r interface{}) {
+				bt.resourceIteration(runId, r)
+			}
+
+			bt.scheduler.RunResource(omap, func1)
 		}
 	}
 }
 
 func (bt *kubebeat) resourceIteration(runId uuid.UUID, resource interface{}) {
+	// logp.Info("resourceIteration trace runId: %v resource: %+v", runId, resource)
+
 	events := make([]beat.Event, 0)
 	timestamp := time.Now()
 
