@@ -39,7 +39,7 @@ func NewKubeFetcher(kubeconfig string, interval time.Duration) (Fetcher, error) 
 	}, nil
 }
 
-func (f *KubeFetcher) Fetch() (interface{}, error) {
+func (f *KubeFetcher) Fetch() ([]interface{}, error) {
 	pods := f.watcher.Store().List()
 
 	for _, p := range pods {
