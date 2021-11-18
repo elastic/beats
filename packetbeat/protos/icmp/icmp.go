@@ -145,7 +145,7 @@ func (icmp *icmpPlugin) ProcessICMPv4(
 		ts:     pkt.Ts,
 		Type:   typ,
 		code:   code,
-		length: len(icmp4.BaseLayer.Payload),
+		length: len(icmp4.Payload),
 	}
 
 	if isRequest(tuple, msg) {
@@ -180,7 +180,7 @@ func (icmp *icmpPlugin) ProcessICMPv6(
 		ts:     pkt.Ts,
 		Type:   typ,
 		code:   code,
-		length: len(icmp6.BaseLayer.Payload),
+		length: len(icmp6.Payload),
 	}
 
 	if isRequest(tuple, msg) {
