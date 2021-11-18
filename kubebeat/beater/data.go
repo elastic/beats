@@ -78,10 +78,13 @@ func (d *Data) fetchWorker(updates chan update, k string, f Fetcher) {
 		default:
 			val, err := f.Fetch()
 			if err != nil {
-				logp.L().Errorf("error running fetcher for key %q: %w", k, err)
+				logp.L().Errorf("error running fetcher for key %q: %v", k, err)
 			}
 
 			updates <- update{k, val}
+
+			// Go to sleep after fetching.
+			time.Sleep(d.interval)
 		}
 	}
 }
@@ -96,7 +99,7 @@ func (d *Data) fetchManager(updates chan update) {
 
 			c, err := copy(d.state)
 			if err != nil {
-				logp.L().Errorf("could not copy data state: %w", err)
+				logp.L().Errorf("could not copy data state: %v", err)
 				return
 			}
 
