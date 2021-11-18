@@ -202,6 +202,7 @@ func (t *Template) LoadMinimal() common.MapStr {
 	}
 	return common.MapStr{
 		"template":       templ,
+		"data_stream":    struct{}{},
 		"priority":       t.priority,
 		"index_patterns": []string{t.GetPattern()},
 	}
@@ -245,7 +246,7 @@ func (t *Template) generateComponent(properties, analyzers common.MapStr, dynami
 		},
 	}
 	if len(analyzers) != 0 {
-		m.Put("settings.analysis.analyzer", analyzers)
+		m.Put("template.settings.analysis.analyzer", analyzers)
 	}
 	return m
 }

@@ -45,6 +45,8 @@ func TestFileLoader_Load(t *testing.T) {
 		"load minimal config info": {
 			body: common.MapStr{
 				"index_patterns": []string{"mock-7.0.0*"},
+				"data_stream":    struct{}{},
+				"priority":       150,
 				"template": common.MapStr{
 					"settings": common.MapStr{"index": nil}},
 			},
@@ -53,6 +55,8 @@ func TestFileLoader_Load(t *testing.T) {
 			settings: TemplateSettings{Index: common.MapStr{"code": "best_compression"}},
 			body: common.MapStr{
 				"index_patterns": []string{"mock-7.0.0*"},
+				"data_stream":    struct{}{},
+				"priority":       150,
 				"template": common.MapStr{
 					"settings": common.MapStr{"index": common.MapStr{"code": "best_compression"}}},
 			},
@@ -61,6 +65,7 @@ func TestFileLoader_Load(t *testing.T) {
 			settings: TemplateSettings{Source: common.MapStr{"enabled": false}},
 			body: common.MapStr{
 				"index_patterns": []string{"mock-7.0.0*"},
+				"data_stream":    struct{}{},
 				"priority":       150,
 				"template": common.MapStr{
 					"settings": common.MapStr{"index": nil},
@@ -76,6 +81,8 @@ func TestFileLoader_Load(t *testing.T) {
 		"load config and in-line analyzer fields": {
 			body: common.MapStr{
 				"index_patterns": []string{"mock-7.0.0*"},
+				"data_stream":    struct{}{},
+				"priority":       150,
 				"template": common.MapStr{
 					"settings": common.MapStr{"index": nil}},
 			},
@@ -103,65 +110,66 @@ func TestFileLoader_Load(t *testing.T) {
       analyzer: simple
 `),
 			want: common.MapStr{
-				"index_patterns": []string{
-					"mock-7.0.0-*",
-				},
-				"order": 1,
-				"mappings": common.MapStr{
-					"_meta": common.MapStr{
-						"version": "7.0.0",
-						"beat":    "mock",
-					},
-					"date_detection": false,
-					"dynamic_templates": []common.MapStr{
-						{
-							"strings_as_keyword": common.MapStr{
-								"mapping": common.MapStr{
-									"ignore_above": 1024,
-									"type":         "keyword",
+				"index_patterns": []string{"mock-7.0.0*"},
+				"data_stream":    struct{}{},
+				"priority":       150,
+				"template": common.MapStr{
+					"mappings": common.MapStr{
+						"_meta": common.MapStr{
+							"version": "7.0.0",
+							"beat":    "mock",
+						},
+						"date_detection": false,
+						"dynamic_templates": []common.MapStr{
+							{
+								"strings_as_keyword": common.MapStr{
+									"mapping": common.MapStr{
+										"ignore_above": 1024,
+										"type":         "keyword",
+									},
+									"match_mapping_type": "string",
 								},
-								"match_mapping_type": "string",
+							},
+						},
+						"properties": common.MapStr{
+							"code_block_text": common.MapStr{
+								"type":     "text",
+								"norms":    false,
+								"analyzer": "test_powershell",
+							},
+							"script_block_text": common.MapStr{
+								"type":     "text",
+								"norms":    false,
+								"analyzer": "test_powershell",
+							},
+							"standard_text": common.MapStr{
+								"type":     "text",
+								"norms":    false,
+								"analyzer": "simple",
 							},
 						},
 					},
-					"properties": common.MapStr{
-						"code_block_text": common.MapStr{
-							"type":     "text",
-							"norms":    false,
-							"analyzer": "test_powershell",
-						},
-						"script_block_text": common.MapStr{
-							"type":     "text",
-							"norms":    false,
-							"analyzer": "test_powershell",
-						},
-						"standard_text": common.MapStr{
-							"type":     "text",
-							"norms":    false,
-							"analyzer": "simple",
-						},
-					},
-				},
-				"settings": common.MapStr{
-					"index": common.MapStr{
-						"refresh_interval": "5s",
-						"mapping": common.MapStr{
-							"total_fields": common.MapStr{
-								"limit": 10000,
+					"settings": common.MapStr{
+						"index": common.MapStr{
+							"refresh_interval": "5s",
+							"mapping": common.MapStr{
+								"total_fields": common.MapStr{
+									"limit": 10000,
+								},
 							},
-						},
-						"query": common.MapStr{
-							"default_field": []string{
-								"fields.*",
+							"query": common.MapStr{
+								"default_field": []string{
+									"fields.*",
+								},
 							},
+							"max_docvalue_fields_search": 200,
 						},
-						"max_docvalue_fields_search": 200,
-					},
-					"analysis": common.MapStr{
-						"analyzer": common.MapStr{
-							"test_powershell": map[string]interface{}{
-								"type":    "pattern",
-								"pattern": "[\\W&&[^-]]+",
+						"analysis": common.MapStr{
+							"analyzer": common.MapStr{
+								"test_powershell": map[string]interface{}{
+									"type":    "pattern",
+									"pattern": "[\\W&&[^-]]+",
+								},
 							},
 						},
 					},
@@ -171,7 +179,6 @@ func TestFileLoader_Load(t *testing.T) {
 		"load config and in-line analyzer fields with name collision": {
 			body: common.MapStr{
 				"index_patterns": []string{"mock-7.0.0-*"},
-				"order":          order,
 				"settings":       common.MapStr{"index": nil},
 			},
 			fields: []byte(`- key: test
