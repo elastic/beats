@@ -349,8 +349,8 @@ const (
 	errUnprepared      ErrType = 0x2500
 )
 
-func (this ErrType) String() string {
-	switch this {
+func (e ErrType) String() string {
+	switch e {
 	case errUnavailable:
 		return "errUnavailable"
 	case errWriteTimeout:

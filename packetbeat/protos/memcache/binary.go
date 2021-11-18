@@ -28,8 +28,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
 )
 
-type memcacheMagic uint8
-
 const (
 	memcacheMagicRequest  = 0x80
 	memcacheMagicResponse = 0x81
@@ -57,7 +55,6 @@ var binStatsValue = argDef{
 }
 
 var (
-	extraValue     = makeValueExtra("value")
 	extraDelta     = makeValueExtra("delta")
 	extraInitial   = makeValue2Extra("initial")
 	extraVerbosity = make32ValueExtra("verbosity")

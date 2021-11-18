@@ -429,7 +429,7 @@ func (pgsql *pgsqlPlugin) receivedPgsqlRequest(msg *pgsqlMessage) {
 func (pgsql *pgsqlPlugin) receivedPgsqlResponse(msg *pgsqlMessage) {
 	tuple := msg.tcpTuple
 	transList := pgsql.getTransaction(tuple.Hashable())
-	if transList == nil || len(transList) == 0 {
+	if len(transList) == 0 {
 		pgsql.debugf("Response from unknown transaction. Ignoring.")
 		unmatchedResponses.Add(1)
 		return

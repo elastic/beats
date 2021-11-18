@@ -172,7 +172,7 @@ func (plugin *tlsPlugin) doParse(
 ) *tlsConnectionData {
 	// Ignore further traffic after the handshake is completed (encrypted connection)
 	// TODO: request/response analysis
-	if 0 != conn.handshakeCompleted&(1<<dir) {
+	if conn.handshakeCompleted&(1<<dir) != 0 {
 		return conn
 	}
 

@@ -926,10 +926,6 @@ func (ml *messageList) pop() *message {
 	return msg
 }
 
-func (ml *messageList) last() *message {
-	return ml.tail
-}
-
 func extractBasicAuthUser(headers map[string]common.NetString) string {
 	const prefix = "Basic "
 

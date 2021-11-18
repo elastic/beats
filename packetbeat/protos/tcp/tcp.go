@@ -288,10 +288,6 @@ func tcpSeqCompare(seq1, seq2 uint32) seqCompare {
 	}
 }
 
-func tcpSeqBefore(seq1 uint32, seq2 uint32) bool {
-	return int32(seq1-seq2) < 0
-}
-
 func tcpSeqBeforeEq(seq1 uint32, seq2 uint32) bool {
 	return int32(seq1-seq2) <= 0
 }

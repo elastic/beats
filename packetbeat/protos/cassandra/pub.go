@@ -33,7 +33,6 @@ type transPub struct {
 	sendResponse       bool
 	sendRequestHeader  bool
 	sendResponseHeader bool
-	ignoredOps         string
 
 	results protos.Reporter
 }

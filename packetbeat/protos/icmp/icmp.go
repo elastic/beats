@@ -257,14 +257,6 @@ func (icmp *icmpPlugin) isLocalIP(ip net.IP) bool {
 	return false
 }
 
-func (icmp *icmpPlugin) getTransaction(k hashableIcmpTuple) *icmpTransaction {
-	v := icmp.transactions.Get(k)
-	if v != nil {
-		return v.(*icmpTransaction)
-	}
-	return nil
-}
-
 func (icmp *icmpPlugin) deleteTransaction(k hashableIcmpTuple) *icmpTransaction {
 	v := icmp.transactions.Delete(k)
 	if v != nil {

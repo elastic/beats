@@ -54,9 +54,9 @@ type recordType uint8
 
 const (
 	recordTypeChangeCipherSpec recordType = 20
-	recordTypeAlert                       = 21
-	recordTypeHandshake                   = 22
-	recordTypeApplicationData             = 23
+	recordTypeAlert            recordType = 21
+	recordTypeHandshake        recordType = 22
+	recordTypeApplicationData  recordType = 23
 )
 
 type handshakeType uint8

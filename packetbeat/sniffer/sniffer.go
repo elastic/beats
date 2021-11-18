@@ -39,7 +39,6 @@ import (
 // to a Worker.
 type Sniffer struct {
 	config config.InterfacesConfig
-	dumper *pcap.Dumper
 
 	state atomic.Int32 // store snifferState
 

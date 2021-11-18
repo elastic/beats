@@ -26,10 +26,6 @@ type ByteArrayDecoder struct {
 	Data *[]byte
 }
 
-func readInt(p []byte) int32 {
-	return int32(p[0])<<24 | int32(p[1])<<16 | int32(p[2])<<8 | int32(p[3])
-}
-
 func (f ByteArrayDecoder) ReadByte() (byte, error) {
 	data := *f.Data
 	if len(data) < 1 {

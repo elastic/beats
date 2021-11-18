@@ -407,13 +407,6 @@ func makeValueArg(name string) argDef {
 	}
 }
 
-func makeValue2Arg(name string) argDef {
-	return argDef{
-		parse:     textUint64Arg(setValue2),
-		serialize: serializeValue2(name),
-	}
-}
-
 func makeIValueArg(name string) argDef {
 	return argDef{
 		parse: func(parser *parser, hdr, buf *streambuf.Buffer) error {

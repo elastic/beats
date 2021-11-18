@@ -200,11 +200,6 @@ func (cassandra *cassandra) ensureConnection(private protos.ProtocolData) *conne
 	return conn
 }
 
-func (conn *connection) dropStreams() {
-	conn.streams[0] = nil
-	conn.streams[1] = nil
-}
-
 func getConnection(private protos.ProtocolData) *connection {
 	if private == nil {
 		return nil

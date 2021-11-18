@@ -87,7 +87,7 @@ func (amqp *amqpPlugin) init(results protos.Reporter, watcher procs.ProcessesWat
 	amqp.initMethodMap()
 	amqp.setFromConfig(config)
 
-	if amqp.hideConnectionInformation == false {
+	if !amqp.hideConnectionInformation {
 		amqp.addConnectionMethods()
 	}
 	amqp.transactions = common.NewCache(

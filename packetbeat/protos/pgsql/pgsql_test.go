@@ -46,10 +46,6 @@ func (e *eventStore) publish(event beat.Event) {
 	e.events = append(e.events, event)
 }
 
-func (e *eventStore) empty() bool {
-	return len(e.events) == 0
-}
-
 func pgsqlModForTests(store *eventStore) *pgsqlPlugin {
 	callback := func(beat.Event) {}
 	if store != nil {

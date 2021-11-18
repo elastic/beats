@@ -74,10 +74,6 @@ func (amqp *amqpPlugin) amqpMessageParser(s *amqpStream) (ok bool, complete bool
 	return ok, complete
 }
 
-func (s *amqpStream) prepareForNewMessage() {
-	s.message = nil
-}
-
 func isProtocolHeader(data []byte) (isHeader bool, version string) {
 	if (string(data[:4]) == "AMQP") && data[4] == 0 {
 		return true, string(data[5:8])
@@ -159,7 +155,7 @@ func (amqp *amqpPlugin) decodeHeaderFrame(s *amqpStream, buf []byte) bool {
 	s.message.bodySize = binary.BigEndian.Uint64(buf[4:12])
 	debugf("Received Header frame. A message of %d bytes is expected", s.message.bodySize)
 
-	if amqp.parseHeaders == true {
+	if amqp.parseHeaders {
 		err := getMessageProperties(s, buf[12:])
 		if err {
 			return false
@@ -337,20 +333,20 @@ func (amqp *amqpPlugin) handleAmqp(m *amqpMessage, tcptuple *common.TCPTuple, di
 	m.direction = dir
 	m.cmdlineTuple = amqp.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
 
-	if m.method == "basic.publish" {
+	switch {
+	case m.method == "basic.publish":
 		amqp.handlePublishing(m)
-	} else if m.method == "basic.deliver" || m.method == "basic.return" ||
-		m.method == "basic.get-ok" {
+	case m.method == "basic.deliver" || m.method == "basic.return" || m.method == "basic.get-ok":
 		amqp.handleDelivering(m)
-	} else if m.isRequest == true {
+	case m.isRequest:
 		amqp.handleAmqpRequest(m)
-	} else if m.isRequest == false {
+	default: // !m.isRequest
 		amqp.handleAmqpResponse(m)
 	}
 }
 
 func (amqp *amqpPlugin) mustHideCloseMethod(m *amqpMessage) bool {
-	return amqp.hideConnectionInformation == true &&
+	return amqp.hideConnectionInformation &&
 		(m.method == "connection.close" || m.method == "channel.close") &&
-		getReplyCode(m.fields) < uint16(300)
+		getReplyCode(m.fields) < 300
 }

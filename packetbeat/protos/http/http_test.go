@@ -56,10 +56,6 @@ func (e *eventStore) publish(event beat.Event) {
 	e.events = append(e.events, event)
 }
 
-func (e *eventStore) empty() bool {
-	return len(e.events) == 0
-}
-
 func newTestParser(http *httpPlugin, payloads ...string) *testParser {
 	if http == nil {
 		http = httpModForTests(nil)
@@ -538,7 +534,7 @@ func TestHttpParser_RequestResponseBody(t *testing.T) {
 
 	tp.stream.PrepareForNewMessage()
 	tp.stream.message = &message{ts: time.Now()}
-	msg, ok, complete = tp.parse()
+	_, ok, complete = tp.parse()
 	assert.True(t, ok)
 	assert.True(t, complete)
 }
@@ -646,17 +642,23 @@ func TestEatBodyChunked(t *testing.T) {
 	st.data = append(st.data, msgs[1]...)
 	cont, ok, complete = parser.parseBodyChunkedStart(st, msg)
 	assert.True(t, cont)
+	assert.True(t, ok)
+	assert.False(t, complete)
 	assert.Equal(t, 3, msg.chunkedLength)
 	assert.Equal(t, 0, len(msg.body))
 	assert.Equal(t, stateBodyChunked, st.parseState)
 
 	cont, ok, complete = parser.parseBodyChunked(st, msg)
 	assert.True(t, cont)
+	assert.True(t, ok)
+	assert.False(t, complete)
 	assert.Equal(t, stateBodyChunkedStart, st.parseState)
 	assert.Equal(t, 3, msg.contentLength)
 
 	cont, ok, complete = parser.parseBodyChunkedStart(st, msg)
 	assert.True(t, cont)
+	assert.True(t, ok)
+	assert.False(t, complete)
 	assert.Equal(t, 3, msg.chunkedLength)
 	assert.Equal(t, 3, msg.contentLength)
 	assert.Equal(t, stateBodyChunked, st.parseState)
@@ -672,6 +674,8 @@ func TestEatBodyChunked(t *testing.T) {
 	st.data = append(st.data, msgs[2]...)
 	cont, ok, complete = parser.parseBodyChunked(st, msg)
 	assert.True(t, cont)
+	assert.True(t, ok)
+	assert.False(t, complete)
 	assert.Equal(t, 6, msg.contentLength)
 	assert.Equal(t, stateBodyChunkedStart, st.parseState)
 

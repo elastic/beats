@@ -49,10 +49,6 @@ func (e *eventStore) publish(event beat.Event) {
 	e.events = append(e.events, event)
 }
 
-func (e *eventStore) empty() bool {
-	return len(e.events) == 0
-}
-
 func mysqlModForTests(store *eventStore) *mysqlPlugin {
 	callback := func(beat.Event) {}
 	if store != nil {
@@ -676,7 +672,7 @@ func Test_PreparedStatement(t *testing.T) {
 		packet := protos.Packet{Payload: rawData}
 
 		var private protos.ProtocolData
-		private = mysql.Parse(&packet, tcpTuple, dir, private)
+		mysql.Parse(&packet, tcpTuple, dir, private)
 	}
 
 	send(tcp.TCPDirectionOriginal, "c00000001673656c6563742064697374696e637420636f756e742864697374696e63742070757263686173656465305f2e69642920617320636f6c5f305f305f2066726f6d2070757263686173655f64656d616e642070757263686173656465305f2077686572652070757263686173656465305f2e636861696e5f6d61737465723d3f20616e642070757263686173656465305f2e6372656174655f74696d653e3d3f20616e642070757263686173656465305f2e6372656174655f74696d653c3d3f")

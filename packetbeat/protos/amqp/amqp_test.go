@@ -669,7 +669,7 @@ func TestAmqp_MaxBodyLength(t *testing.T) {
 	private := protos.ProtocolData(new(amqpPrivateData))
 
 	// method frame
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans := expectTransaction(t, results)
 
@@ -736,7 +736,7 @@ func TestAmqp_HideArguments(t *testing.T) {
 	tcptuple := testTCPTuple()
 	req := protos.Packet{Payload: data}
 	private := protos.ProtocolData(new(amqpPrivateData))
-	private = amqp.Parse(&req, tcptuple, 0, private)
+	amqp.Parse(&req, tcptuple, 0, private)
 
 	trans := expectTransaction(t, results)
 	assert.Equal(t, "queue.declare", trans["method"])

@@ -62,7 +62,7 @@ func ListDeviceNames(withDescription bool, withIP bool) ([]string, error) {
 						ips += " "
 					}
 
-					ips += fmt.Sprintf("%s", address.IP.String())
+					ips += address.IP.String()
 				}
 			}
 			r += fmt.Sprintf(" (%s)", ips)

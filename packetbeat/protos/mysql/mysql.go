@@ -62,8 +62,6 @@ type mysqlMessage struct {
 	numberOfRows   int
 	numberOfFields int
 	size           uint64
-	fields         []string
-	rows           [][]string
 	tables         string
 	isOK           bool
 	affectedRows   uint64
@@ -83,7 +81,6 @@ type mysqlMessage struct {
 
 	statementID    int
 	numberOfParams int
-	params         []string
 }
 
 type mysqlTransaction struct {
@@ -1011,19 +1008,19 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 		return []string{}, [][]string{}
 	}
 
-	fields := []string{}
-	rows := [][]string{}
-
 	if len(data) < 5 {
-		logp.Warn("Invalid response: data less than 4 bytes")
+		logp.Warn("Invalid response: data less than 5 bytes")
 		return []string{}, [][]string{}
 	}
 
-	if data[4] == 0x00 {
+	fields := []string{}
+	rows := [][]string{}
+	switch data[4] {
+	case 0x00:
 		// OK response
-	} else if data[4] == 0xff {
+	case 0xff:
 		// Error response
-	} else {
+	default:
 		offset := 5
 
 		logp.Debug("mysql", "Data len: %d", len(data))
@@ -1099,7 +1096,7 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 
 			if data[offset+4] == 0xfe {
 				// EOF
-				offset += length + 4
+				offset += length + 4 // ineffassign
 				break
 			}
 

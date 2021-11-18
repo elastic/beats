@@ -69,8 +69,6 @@ type message struct {
 	// list element use by 'transactions' for correlation
 	next *message
 
-	transactionTimeout time.Duration
-
 	results transactions
 }
 

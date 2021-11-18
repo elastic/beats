@@ -197,7 +197,7 @@ func (p protocols) GetUDP(proto protos.Protocol) protos.UDPPlugin        { retur
 func (p protocols) GetAll() map[protos.Protocol]protos.Plugin            { return nil }
 func (p protocols) GetAllTCP() map[protos.Protocol]protos.TCPPlugin      { return p.tcp }
 func (p protocols) GetAllUDP() map[protos.Protocol]protos.UDPPlugin      { return nil }
-func (p protocols) Register(proto protos.Protocol, plugin protos.Plugin) { return }
+func (p protocols) Register(proto protos.Protocol, plugin protos.Plugin) {}
 
 func TestTCSeqPayload(t *testing.T) {
 	type segment struct {
