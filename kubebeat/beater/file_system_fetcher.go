@@ -23,11 +23,11 @@ const (
 // FileSystemResourceData represents a struct for a system resource data
 // This struct is being used by the fileSystemFetcher when
 type FileSystemResourceData struct {
-	FileName  string `json:"fileName"`
-	FileMode  string `json:"fileMode"`
+	FileName  string `json:"filename"`
+	FileMode  string `json:"mode"`
 	Gid       string `json:"gid"`
 	Uid       string `json:"uid"`
-	InputType string `json:"inputType"`
+	InputType string `json:"type"`
 	Path      string `json:"path"`
 }
 

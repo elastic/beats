@@ -1,5 +1,10 @@
 package bundle
 
+import "embed"
+
+//go:embed csp-security-policies
+var EmbeddedPolicy embed.FS
+
 var Policies = map[string]string{
     "compliance/CIS.1.2.1.rego": `
 package compliance.cis_1_2_1

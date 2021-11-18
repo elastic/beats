@@ -3,11 +3,16 @@ package beater
 import (
 	"bytes"
 	"context"
+	"embed"
 	"fmt"
-	"time"
-
 	"github.com/elastic/beats/v7/kubebeat/bundle"
+	"github.com/gofrs/uuid"
 	"github.com/mitchellh/mapstructure"
+	"io/fs"
+	"log"
+	"os"
+	"strings"
+	"time"
 
 	"github.com/elastic/beats/v7/kubebeat/config"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -49,8 +54,9 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir))
 	data.RegisterFetcher("file_system", NewFileFetcher(c.Files))
 
+	policies := CreateCISPolicy(bundle.EmbeddedPolicy)
 	// create a mock HTTP bundle bundleServer
-	bundleServer, err := sdktest.NewServer(sdktest.MockBundle("/bundles/bundle.tar.gz", bundle.Policies))
+	bundleServer, err := sdktest.NewServer(sdktest.MockBundle("/bundles/bundle.tar.gz", policies))
 	if err != nil {
 		return nil, fmt.Errorf("fail to init bundle server: %s", err.Error())
 	}
@@ -78,16 +84,37 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	return bt, nil
 }
 
+func CreateCISPolicy(fileSystem embed.FS) map[string]string {
+
+	policies := make(map[string]string)
+
+	fs.WalkDir(fileSystem, ".", func(filepath string, info os.DirEntry, err error) error {
+		if err != nil {
+			log.Fatal(err)
+		}
+		if info.IsDir() == false && strings.HasSuffix(info.Name(), ".rego") && !strings.HasSuffix(info.Name(), "test.rego") {
+
+			data, err := fs.ReadFile(fileSystem, filepath)
+			if err == nil {
+				policies[filepath] = string(data)
+			}
+		}
+		return nil
+	})
+
+	return policies
+}
+
 type PolicyResult map[string]RuleResult
 
 type RuleResult struct {
-	Findings []Finding `json:"findings"`
+	Findings []Finding   `json:"findings"`
+	Resource interface{} `json:"resource"`
 }
 
 type Finding struct {
-	Compliant bool        `json:"compliant"`
-	Message   string      `json:"message"`
-	Resource  interface{} `json:"resource"`
+	Result interface{} `json:"result"`
+	Rule   interface{} `json:"rule"`
 }
 
 // Run starts kubebeat.
@@ -106,6 +133,7 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 
 	// ticker := time.NewTicker(bt.config.Period)
 	output := bt.data.Output()
+	runId, err := uuid.NewV4()
 
 	for {
 		select {
@@ -141,16 +169,15 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 					}
 					events = append(events, errEvent)
 				} else {
-					for ruleName, ruleResult := range decoded {
+					for _, ruleResult := range decoded {
 						for _, Finding := range ruleResult.Findings {
 							event := beat.Event{
 								Timestamp: timestamp,
 								Fields: common.MapStr{
-									"type":      b.Info.Name,
-									"rule_id":   ruleName,
-									"compliant": Finding.Compliant,
-									"resource":  Finding.Resource,
-									"message":   Finding.Message,
+									"run_id":   runId,
+									"result":   Finding.Result,
+									"resource": ruleResult.Resource,
+									"rule":     Finding.Rule,
 								},
 							}
 							events = append(events, event)
@@ -168,7 +195,7 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 func (bt *kubebeat) Decision(input interface{}) (interface{}, error) {
 	// get the named policy decision for the specified input
 	result, err := bt.opa.Decision(context.Background(), sdk.DecisionOptions{
-		Path:  "/compliance",
+		Path:  "main",
 		Input: input,
 	})
 	if err != nil {
