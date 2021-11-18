@@ -12,6 +12,8 @@ import (
 	"testing"
 	"time"
 
+	"go.elastic.co/apm"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
@@ -28,7 +30,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
-	"go.elastic.co/apm"
 )
 
 var downloadPath = getAbsPath("tests/downloads")

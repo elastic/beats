@@ -8,6 +8,8 @@ import (
 	"context"
 	"strings"
 
+	"go.elastic.co/apm"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
@@ -18,7 +20,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/snapshot"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
-	"go.elastic.co/apm"
 )
 
 func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI string) (_ string, err error) {

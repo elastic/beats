@@ -7,6 +7,8 @@ package application
 import (
 	"context"
 
+	"go.elastic.co/apm"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -31,7 +33,6 @@ import (
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
-	"go.elastic.co/apm"
 )
 
 type discoverFunc func() ([]string, error)

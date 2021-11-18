@@ -8,8 +8,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/go-sysinfo"
 	"go.elastic.co/apm"
+
+	"github.com/elastic/go-sysinfo"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/gateway"

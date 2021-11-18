@@ -14,9 +14,10 @@ import (
 	"path"
 	"strings"
 
+	"go.elastic.co/apm/module/apmhttp"
+
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
-	"go.elastic.co/apm/module/apmhttp"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"

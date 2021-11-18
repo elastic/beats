@@ -8,8 +8,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"go.elastic.co/apm"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
