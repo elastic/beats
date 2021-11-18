@@ -265,7 +265,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
@@ -289,7 +289,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
@@ -381,7 +381,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         Returns the log lines as a list of strings
         """
         if logfile is None:
-            logfile = self.beat_name + ".log"
+            logfile = self.beat_name + "-" + self.today + ".ndjson"
 
         with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
             data = f.readlines()
@@ -446,7 +446,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         counts = {}
 
         if logfile is None:
-            logfile = self.beat_name + ".log"
+            logfile = self.beat_name + "-" + self.today + ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, logfile), "r", encoding="utf_8") as f:
@@ -481,7 +481,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as f:
@@ -496,7 +496,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as f:
@@ -660,7 +660,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
