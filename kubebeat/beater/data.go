@@ -18,7 +18,7 @@ type Data struct {
 
 	ctx      context.Context
 	cancel   context.CancelFunc
-	state    map[string]interface{}
+	state    map[string][]interface{}
 	fetchers map[string]Fetcher
 }
 
@@ -31,7 +31,7 @@ func NewData(ctx context.Context, interval time.Duration) *Data {
 		output:   make(chan interface{}),
 		ctx:      ctx,
 		cancel:   cancel,
-		state:    make(map[string]interface{}),
+		state:    make(map[string][]interface{}),
 		fetchers: make(map[string]Fetcher),
 	}
 }
@@ -67,7 +67,7 @@ func (d *Data) Run() error {
 // update is a sigle update sent from a worker to a manager.
 type update struct {
 	key string
-	val interface{}
+	val []interface{}
 }
 
 func (d *Data) fetchWorker(updates chan update, k string, f Fetcher) {
@@ -125,7 +125,7 @@ func (d *Data) Stop() {
 }
 
 // copy makes a copy of the given map.
-func copy(m map[string]interface{}) (map[string]interface{}, error) {
+func copy(m map[string][]interface{}) (map[string][]interface{}, error) {
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
 	dec := gob.NewDecoder(&buf)
@@ -133,7 +133,7 @@ func copy(m map[string]interface{}) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	var copy map[string]interface{}
+	var copy map[string][]interface{}
 	err = dec.Decode(&copy)
 	if err != nil {
 		return nil, err
