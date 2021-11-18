@@ -141,4 +141,5 @@ func copy(m map[string]interface{}) (map[string]interface{}, error) {
 func init() {
 	gob.Register([]interface{}{})
 	gob.Register(map[string]Process{})
+	gob.Register([]FileSystemResourceData{})
 }
