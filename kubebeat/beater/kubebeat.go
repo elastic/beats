@@ -5,22 +5,21 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gofrs/uuid"
-	"github.com/mitchellh/mapstructure"
-
 	"github.com/elastic/beats/v7/kubebeat/config"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/gofrs/uuid"
 )
 
 // kubebeat configuration.
 type kubebeat struct {
-	done      chan struct{}
-	config    config.Config
-	client    beat.Client
-	eval      *evaluator
-	data      *Data
+	done           chan struct{}
+	config         config.Config
+	client         beat.Client
+	eval           *evaluator
+	data           *Data
+	opaEventParser *opaEventParser
 	scheduler ResourceScheduler
 }
 
@@ -42,6 +41,11 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
+	eventParser, err := NewOpaEventParser()
+	if err != nil {
+		return nil, err
+	}
+
 	kubef, err := NewKubeFetcher(c.KubeConfig, c.Period)
 	if err != nil {
 		return nil, err
@@ -52,10 +56,11 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	data.RegisterFetcher("file_system", NewFileFetcher(c.Files))
 
 	bt := &kubebeat{
-		done:      make(chan struct{}),
-		config:    c,
-		eval:      evaluator,
-		data:      data,
+		done:           make(chan struct{}),
+		config:         c,
+		eval:           evaluator,
+		data:           data,
+		opaEventParser: eventParser,
 		scheduler: scheduler,
 	}
 	return bt, nil
@@ -107,10 +112,7 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 	}
 }
 
-func (bt *kubebeat) resourceIteration(runId uuid.UUID, resource interface{}) {
-	// logp.Info("resourceIteration trace runId: %v resource: %+v", runId, resource)
-
-	events := make([]beat.Event, 0)
+func (bt *kubebeat) resourceIteration(resource interface{}, runId uuid.UUID) {
 	timestamp := time.Now()
 
 	result, err := bt.eval.Decision(resource)
@@ -119,30 +121,14 @@ func (bt *kubebeat) resourceIteration(runId uuid.UUID, resource interface{}) {
 		return
 	}
 
-	var decoded PolicyResult
-	err = mapstructure.Decode(result, &decoded)
+	events, err := bt.opaEventParser.ParseResult(result, runId, timestamp)
+
 	if err != nil {
-		logp.Error(fmt.Errorf("error parsing the policy result: %w", err))
+		logp.Error(fmt.Errorf("error running the policy: %w", err))
 		return
 	}
 
-	for _, ruleResult := range decoded {
-		for _, Finding := range ruleResult.Findings {
-			event := beat.Event{
-				Timestamp: timestamp,
-				Fields: common.MapStr{
-					"run_id":   runId,
-					"result":   Finding.Result,
-					"resource": ruleResult.Resource,
-					"rule":     Finding.Rule,
-				},
-			}
-			events = append(events, event)
-		}
-	}
-
 	bt.client.PublishAll(events)
-	logp.Info("%v events sent", len(events))
 }
 
 // Stop stops kubebeat.
