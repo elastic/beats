@@ -685,9 +685,10 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 		trans.statementID = msg.statementID
 		stmts := mysql.getStmtsMap(msg.tcpTuple.Hashable())
 		if stmts == nil {
-			if msg.typ == mysqlCmdStmtExecute {
+			switch msg.typ {
+			case mysqlCmdStmtExecute:
 				trans.query = "Request Execute Statement"
-			} else if msg.typ == mysqlCmdStmtClose {
+			case mysqlCmdStmtClose:
 				trans.query = "Request Close Statement"
 			}
 			trans.notes = append(trans.notes, "The actual query being used is unknown")
@@ -695,7 +696,8 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 			trans.bytesIn = msg.size
 			return
 		}
-		if msg.typ == mysqlCmdStmtExecute {
+		switch msg.typ {
+		case mysqlCmdStmtExecute:
 			if value, ok := stmts[trans.statementID]; ok {
 				trans.query = value.query
 				// parse parameters
@@ -707,7 +709,7 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 				trans.bytesIn = msg.size
 				return
 			}
-		} else if msg.typ == mysqlCmdStmtClose {
+		case mysqlCmdStmtClose:
 			delete(stmts, trans.statementID)
 			trans.query = "CmdStmtClose"
 			mysql.transactions.Delete(tuple.Hashable())

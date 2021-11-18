@@ -163,7 +163,7 @@ func (f ByteArrayDecoder) ReadInet() (net.IP, int) {
 	size := data[0]
 	*f.Data = data[1:]
 
-	if !(size == 4 || size == 16) {
+	if size != 4 && size != 16 {
 		panic(fmt.Errorf("invalid IP size: %d", size))
 	}
 

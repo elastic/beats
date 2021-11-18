@@ -45,7 +45,7 @@ var defaultConfig = cassandraConfig{
 }
 
 func (c *cassandraConfig) Validate() error {
-	if !(c.Compressor == "" || c.Compressor == "snappy") {
+	if c.Compressor != "" && c.Compressor != "snappy" {
 		return fmt.Errorf("invalid compressor config: %s, only snappy supported", c.Compressor)
 	}
 	return nil
