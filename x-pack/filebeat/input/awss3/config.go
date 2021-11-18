@@ -5,6 +5,7 @@
 package awss3
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -24,6 +25,7 @@ type config struct {
 	VisibilityTimeout   time.Duration        `config:"visibility_timeout"`
 	SQSWaitTime         time.Duration        `config:"sqs.wait_time"`         // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
 	SQSMaxReceiveCount  int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
+	SQSScript           *scriptConfig        `config:"sqs.notification_parsing_script"`
 	FIPSEnabled         bool                 `config:"fips_enabled"`
 	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
 	QueueURL            string               `config:"queue_url"`
@@ -129,6 +131,36 @@ func (rc *readerConfig) Validate() error {
 	_, found := encoding.FindEncoding(rc.Encoding)
 	if !found {
 		return fmt.Errorf("encoding type <%v> not found", rc.Encoding)
+	}
+
+	return nil
+}
+
+type scriptConfig struct {
+	Source            string                 `config:"source"`                               // Inline script to execute.
+	File              string                 `config:"file"`                                 // Source file.
+	Files             []string               `config:"files"`                                // Multiple source files.
+	Params            map[string]interface{} `config:"params"`                               // Parameters to pass to script.
+	Timeout           time.Duration          `config:"timeout" validate:"min=0"`             // Execution timeout.
+	MaxCachedSessions int                    `config:"max_cached_sessions" validate:"min=0"` // Max. number of cached VM sessions.
+}
+
+// Validate returns an error if one (and only one) option is not set.
+func (c scriptConfig) Validate() error {
+	numConfigured := 0
+	for _, set := range []bool{c.Source != "", c.File != "", len(c.Files) > 0} {
+		if set {
+			numConfigured++
+		}
+	}
+
+	switch {
+	case numConfigured == 0:
+		return errors.New("javascript must be defined via 'file', " +
+			"'files', or inline as 'source'")
+	case numConfigured > 1:
+		return errors.New("javascript can be defined in only one of " +
+			"'file', 'files', or inline as 'source'")
 	}
 
 	return nil
