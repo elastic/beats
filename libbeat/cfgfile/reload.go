@@ -173,16 +173,15 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 	gw := NewGlobWatcher(rl.path)
 
-	// If reloading is disable, config files should be loaded immediately
-	if !rl.config.Reload.Enabled {
-		rl.config.Reload.Period = 0
-	}
-
 	// If forceReload is set, the configuration should be reloaded
 	// even if there are no changes. It is set on the first iteration,
 	// and whenever an attempted reload fails. It is unset whenever
 	// a reload succeeds.
 	forceReload := true
+
+	// Allow the config files to be loaded immediately
+	// on the first run or reloading is disable
+	reloadPeriod := time.Duration(0)
 
 	for {
 		select {
@@ -190,9 +189,13 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			logp.Info("Dynamic config reloader stopped")
 			return
 
-		case <-time.After(rl.config.Reload.Period):
+		case <-time.After(reloadPeriod):
 			debugf("Scan for new config files")
 			configScans.Add(1)
+
+			if rl.config.Reload.Enabled && reloadPeriod == 0 {
+				reloadPeriod = rl.config.Reload.Period
+			}
 
 			files, updated, err := gw.Scan()
 			if err != nil {
