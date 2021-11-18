@@ -67,7 +67,8 @@ func (amqp *amqpPlugin) amqpMessageParser(s *amqpStream) (ok bool, complete bool
 		s.parseOffset += 8 + int(f.size)
 		if !ok {
 			return false, false
-		} else if complete {
+		}
+		if complete {
 			return true, true
 		}
 	}
@@ -234,9 +235,10 @@ func getMessageProperties(s *amqpStream, data []byte) bool {
 	}
 
 	if hasProperty(prop1, deliveryModeProp) {
-		if data[offset] == 1 {
+		switch data[offset] {
+		case 1:
 			m.fields["delivery-mode"] = "non-persistent"
-		} else if data[offset] == 2 {
+		case 2:
 			m.fields["delivery-mode"] = "persistent"
 		}
 		offset++
