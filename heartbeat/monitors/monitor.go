@@ -214,9 +214,15 @@ func (m *Monitor) Start() {
 // Stop stops the Monitor's execution in its configured scheduler.
 // This is safe to call even if the Monitor was never started.
 func (m *Monitor) Stop() {
+	defer globalDedup.unregister(m)
+	m.stopUnsafe()
+}
+
+// stopUnsafe stops the monitor without freeing it in global dedup
+// needed by dedup itself to avoid a reentrant lock.
+func (m *Monitor) stopUnsafe() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
-	defer m.freeID()
 
 	for _, t := range m.configuredJobs {
 		t.Stop()
@@ -230,9 +236,4 @@ func (m *Monitor) Stop() {
 	}
 
 	m.stats.StopMonitor(int64(m.endpoints))
-}
-
-func (m *Monitor) freeID() {
-	// Free up the monitor ID for reuse
-	globalDedup.unregister(m)
 }

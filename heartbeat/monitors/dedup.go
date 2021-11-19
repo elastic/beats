@@ -39,8 +39,8 @@ func (um dedup) register(m *Monitor) {
 	um.mtx.Lock()
 	defer um.mtx.Unlock()
 
-	closed := um.stopUnsafe(m)
-	if closed {
+	stopped := um.stopUnsafe(m)
+	if stopped {
 		logp.Warn("monitor ID %s is configured for multiple monitors! IDs should be unique values, last seen config will win", m.stdFields.ID)
 	}
 
@@ -58,7 +58,7 @@ func (um dedup) unregister(m *Monitor) {
 
 func (um dedup) stopUnsafe(m *Monitor) bool {
 	if existing, ok := um.byId[m.stdFields.ID]; ok {
-		existing.Stop()
+		existing.stopUnsafe()
 		return ok
 	}
 	return false
