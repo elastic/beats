@@ -207,14 +207,6 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 			continue
 		}
 
-		err = a.factory.CheckConfig(config)
-		if err != nil {
-			a.logger.Error(errors.Wrap(err, fmt.Sprintf(
-				"Auto discover config check failed for config '%s', won't start runner",
-				common.DebugString(config, true))))
-			continue
-		}
-
 		// Update meta no matter what
 		dynFields := a.meta.Store(hash, meta)
 
@@ -222,11 +214,18 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 			a.logger.Debugf("Config %v is already running", common.DebugString(config, true))
 			newCfg[hash] = cfg
 			continue
-		} else {
-			newCfg[hash] = &reload.ConfigWithMeta{
-				Config: config,
-				Meta:   &dynFields,
-			}
+		}
+
+		err = a.factory.CheckConfig(config)
+		if err != nil {
+			a.logger.Error(errors.Wrap(err, fmt.Sprintf(
+				"Auto discover config check failed for config '%s', won't start runner",
+				common.DebugString(config, true))))
+			continue
+		}
+		newCfg[hash] = &reload.ConfigWithMeta{
+			Config: config,
+			Meta:   &dynFields,
 		}
 
 		updated = true
