@@ -87,6 +87,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated fields in Redis module. {issue}11835[11835] {pull}28246[28246]
 - Align fields to Beats naming conventions in GCP module. {issue}27231[27231] {pull}27974[27974]
 - system/process metricset: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
+- Make use of secure port when accessing Kubelet API {pull}16063[16063]
+- Add Tomcat overview dashboard {pull}14026[14026]
+- Move service config under metrics and simplify metric types. {pull}18691[18691]
+- Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
+- Remove "invalid zero" metrics on Windows and Darwin, don't report linux-only memory and diskio metrics when running under agent. {pull}21457[21457]
+- Added `statsd.mappings` configuration for Statsd module {pull}26220[26220]
+- Added Airflow lightweight module {pull}26220[26220]
+- Add state_job metricset to Kubernetes module{pull}26479[26479]
+- Bump AWS SDK version to v0.24.0 for WebIdentity authentication flow {issue}19393[19393] {pull}27126[27126]
+- Add Linux pressure metricset {pull}27355[27355]
 
 *Packetbeat*
 

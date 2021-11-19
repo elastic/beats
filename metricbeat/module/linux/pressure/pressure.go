@@ -74,7 +74,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		fs:            hostfs,
 		procfs:        procfs,
 	}, nil
 }
