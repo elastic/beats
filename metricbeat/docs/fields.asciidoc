@@ -6736,7 +6736,7 @@ alias to: beat.stats.apm_server.acm.response.errors.unauthorized
 --
 type: alias
 
-alias to: beat.stats.beat.host
+alias to: beat.stats.info.host
 
 --
 
@@ -6745,7 +6745,7 @@ alias to: beat.stats.beat.host
 --
 type: alias
 
-alias to: beat.stats.beat.name
+alias to: beat.stats.info.name
 
 --
 
@@ -6754,7 +6754,7 @@ alias to: beat.stats.beat.name
 --
 type: alias
 
-alias to: beat.stats.beat.type
+alias to: beat.stats.info.type
 
 --
 
@@ -6763,7 +6763,7 @@ alias to: beat.stats.beat.type
 --
 type: alias
 
-alias to: beat.stats.beat.uuid
+alias to: beat.stats.info.uuid
 
 --
 
@@ -6772,7 +6772,7 @@ alias to: beat.stats.beat.uuid
 --
 type: alias
 
-alias to: beat.stats.beat.version
+alias to: beat.stats.info.version
 
 --
 
@@ -8273,35 +8273,35 @@ type: long
 --
 
 
-*`beat.stats.beat.name`*::
+*`beat.stats.info.name`*::
 +
 --
 type: keyword
 
 --
 
-*`beat.stats.beat.host`*::
+*`beat.stats.info.host`*::
 +
 --
 type: keyword
 
 --
 
-*`beat.stats.beat.type`*::
+*`beat.stats.info.type`*::
 +
 --
 type: keyword
 
 --
 
-*`beat.stats.beat.uuid`*::
+*`beat.stats.info.uuid`*::
 +
 --
 type: keyword
 
 --
 
-*`beat.stats.beat.version`*::
+*`beat.stats.info.version`*::
 +
 --
 type: keyword
