@@ -69,14 +69,10 @@ func (m *Monitor) String() string {
 }
 
 func checkMonitorConfig(config *common.Config, registrar *plugin.PluginsReg) error {
-	_, err := newMonitor(config, registrar, nil, nil)
+	_, err := newMonitor(config, registrar, nil, nil, nil)
 
 	return err
 }
-
-// globalDedup is used to keep track of explicitly configured monitor IDs and ensure no duplication within a
-// given heartbeat instance.
-var globalDedup = newDedup()
 
 // newMonitor creates a new monitor, without leaking resources in the event of an error.
 // you do not need to call Stop(), it will be safely garbage collected unless Start is called.
@@ -85,8 +81,9 @@ func newMonitor(
 	registrar *plugin.PluginsReg,
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
+	onStop func(*Monitor),
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, scheduler)
+	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, scheduler, onStop)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -100,6 +97,7 @@ func newMonitorUnsafe(
 	registrar *plugin.PluginsReg,
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
+	onStop func(*Monitor),
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
@@ -139,7 +137,14 @@ func newMonitorUnsafe(
 	}
 
 	p, err := pluginFactory.Create(config)
-	m.close = p.Close
+
+	m.close = func() error {
+		if onStop != nil {
+			onStop(m)
+		}
+		return p.Close()
+	}
+
 	wrappedJobs := wrappers.WrapCommon(p.Jobs, m.stdFields)
 	m.endpoints = p.Endpoints
 
@@ -198,11 +203,6 @@ func (m *Monitor) makeTasks(config *common.Config, jobs []jobs.Job) ([]*configur
 func (m *Monitor) Start() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
-
-	// De-duplicate monitors with identical IDs
-	// last write wins
-	globalDedup.register(m)
-
 	for _, t := range m.configuredJobs {
 		t.Start()
 	}
@@ -210,16 +210,9 @@ func (m *Monitor) Start() {
 	m.stats.StartMonitor(int64(m.endpoints))
 }
 
-// Stop stops the Monitor's execution in its configured scheduler.
-// This is safe to call even if the Monitor was never started.
-func (m *Monitor) Stop() {
-	// later calls stopUnsafe
-	globalDedup.unregister(m)
-}
-
 // stopUnsafe stops the monitor without freeing it in global dedup
 // needed by dedup itself to avoid a reentrant lock.
-func (m *Monitor) stopUnsafe() {
+func (m *Monitor) Stop() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
 
