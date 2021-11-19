@@ -35,6 +35,7 @@ const (
 var (
 	DefaultSettings = WinlogbeatConfig{
 		RegistryFile: DefaultRegistryFile,
+		RegistryFlush: 5*time.Second,
 	}
 )
 
@@ -42,6 +43,7 @@ var (
 type WinlogbeatConfig struct {
 	EventLogs       []*common.Config `config:"event_logs"`
 	RegistryFile    string           `config:"registry_file"`
+	RegistryFlush   time.Duration    `config:"registry_flush"`
 	ShutdownTimeout time.Duration    `config:"shutdown_timeout"`
 }
 

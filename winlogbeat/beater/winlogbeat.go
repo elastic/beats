@@ -110,7 +110,7 @@ func (eb *Winlogbeat) setup(b *beat.Beat) error {
 	config := &eb.config
 
 	var err error
-	eb.checkpoint, err = checkpoint.NewCheckpoint(config.RegistryFile, 10, 5*time.Second)
+	eb.checkpoint, err = checkpoint.NewCheckpoint(config.RegistryFile, 10, config.RegistryFlush)
 	if err != nil {
 		return err
 	}
