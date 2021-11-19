@@ -1,8 +1,18 @@
 {{ if eq .input "syslog" }}
 
 type: syslog
+
+{{ if eq .syslog_protocol "tcp"}}
+protocol.tcp:
+  host: "{{.syslog_host}}:{{.syslog_port}}"
+  {{ if .syslog_tcp_ssl.enabled }}
+  ssl.certificate: "{{.syslog_tcp_ssl.certificate}}"
+  ssl.key: "{{.syslog_tcp_ssl.key}}"
+  {{ end }}
+{{ else }}
 protocol.udp:
   host: "{{.syslog_host}}:{{.syslog_port}}"
+{{ end }}
 
 {{ else if eq .input "file" }}
 
