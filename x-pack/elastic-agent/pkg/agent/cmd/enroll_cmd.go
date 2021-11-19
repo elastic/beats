@@ -878,8 +878,8 @@ func createFleetServerBootstrapConfig(
 	if port == 0 {
 		port = defaultFleetServerPort
 	}
-	if internalPort <= 0 {
-		port = defaultFleetServerInternalPort
+	if internalPort == 0 {
+		internalPort = defaultFleetServerInternalPort
 	}
 	if len(headers) > 0 {
 		if es.Headers == nil {
