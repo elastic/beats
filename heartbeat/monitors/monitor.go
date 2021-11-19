@@ -69,10 +69,8 @@ func (m *Monitor) String() string {
 }
 
 func checkMonitorConfig(config *common.Config, registrar *plugin.PluginsReg) error {
-	m, err := newMonitor(config, registrar, nil, nil)
-	if m != nil {
-		m.Stop() // Stop the monitor to free up the ID from uniqueness checks
-	}
+	_, err := newMonitor(config, registrar, nil, nil)
+
 	return err
 }
 
@@ -80,7 +78,8 @@ func checkMonitorConfig(config *common.Config, registrar *plugin.PluginsReg) err
 // given heartbeat instance.
 var globalDedup = newDedup()
 
-// newMonitor Creates a new monitor, without leaking resources in the event of an error.
+// newMonitor creates a new monitor, without leaking resources in the event of an error.
+// you do not need to call Stop(), it will be safely garbage collected unless Start is called.
 func newMonitor(
 	config *common.Config,
 	registrar *plugin.PluginsReg,
@@ -138,10 +137,6 @@ func newMonitorUnsafe(
 		}
 		m.stdFields.ID = fmt.Sprintf("auto-%s-%#X", m.stdFields.Type, hash)
 	}
-
-	// De-duplicate monitors with identical IDs
-	// last write wins
-	globalDedup.register(m)
 
 	p, err := pluginFactory.Create(config)
 	m.close = p.Close
@@ -203,6 +198,10 @@ func (m *Monitor) makeTasks(config *common.Config, jobs []jobs.Job) ([]*configur
 func (m *Monitor) Start() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
+
+	// De-duplicate monitors with identical IDs
+	// last write wins
+	globalDedup.register(m)
 
 	for _, t := range m.configuredJobs {
 		t.Start()

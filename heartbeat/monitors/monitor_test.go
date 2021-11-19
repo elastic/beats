@@ -99,8 +99,10 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 
 	// Would fail if the previous newMonitor didn't free the monitor.id
 	m1, m1Err := makeTestMon()
+	m1.Start()
 	require.NoError(t, m1Err)
 	m2, m2Err := makeTestMon()
+	m2.Start()
 	// Change the name so we can ensure that this is the currently active monitor
 	m2.stdFields.Name = "MON2!!!"
 	// This used to trigger an error, but shouldn't any longer, we just log
@@ -131,6 +133,7 @@ func TestCheckInvalidConfig(t *testing.T) {
 	defer sched.Stop()
 
 	m, err := newMonitor(serverMonConf, reg, pipelineConnector, sched)
+	require.Error(t, err)
 	// This could change if we decide the contract for newMonitor should always return a monitor
 	require.Nil(t, m, "For this test to work we need a nil value for the monitor.")
 
