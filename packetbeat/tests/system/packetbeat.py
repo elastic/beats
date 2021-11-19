@@ -131,6 +131,7 @@ class BaseTest(TestCase):
 
         if output_file is None:
             output_file = "output/packetbeat-"+self.today+".ndjson"
+        print(output_file)
 
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r", encoding='utf_8') as f:
