@@ -407,6 +407,7 @@ func (c *enrollCmd) prepareFleetTLS() error {
 	}
 
 	if c.options.FleetServer.InternalPort > 0 {
+		c.log.Debugf("Internal endpoint configured to: %d. Changing this value is not supported.", c.options.FleetServer.InternalPort)
 		c.options.InternalURL = fmt.Sprintf("%s:%d", defaultFleetServerInternalHost, c.options.FleetServer.InternalPort)
 	}
 
