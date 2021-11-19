@@ -214,8 +214,8 @@ func (m *Monitor) Start() {
 // Stop stops the Monitor's execution in its configured scheduler.
 // This is safe to call even if the Monitor was never started.
 func (m *Monitor) Stop() {
-	defer globalDedup.unregister(m)
-	m.stopUnsafe()
+	// later calls stopUnsafe
+	globalDedup.unregister(m)
 }
 
 // stopUnsafe stops the monitor without freeing it in global dedup

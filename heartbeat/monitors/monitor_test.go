@@ -113,9 +113,11 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	m1.Stop()
 	m2.Stop()
 
+	// 3 are counted as built, even the bad config
 	require.Equal(t, 3, built.Load())
 	// Make sure each is closed at least once
-	require.GreaterOrEqual(t, closed.Load(), 3)
+	// the bad config doesn't need to be closed
+	require.Equal(t, closed.Load(), 2)
 }
 
 func TestCheckInvalidConfig(t *testing.T) {
