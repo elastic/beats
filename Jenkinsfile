@@ -291,13 +291,13 @@ def generateStages(Map args = [:]) {
 def cloud(Map args = [:]) {
   withGithubNotify(context: args.context) {
     withNode(labels: args.label, forceWorkspace: true){
-      startCloudTestEnv(name: args.directory, dirs: args.dirs)
+      startCloudTestEnv(name: args.directory, dirs: args.dirs, cloudAWS: args.cloudAWS)
     }
-    withCloudTestEnv() {
+    withCloudTestEnv(args) {
       try {
         target(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id)
       } finally {
-        terraformCleanup(name: args.directory, dir: args.directory)
+        terraformCleanup(name: args.directory, dir: args.directory, cloudAWS: args.cloudAWS)
       }
     }
   }
@@ -868,14 +868,15 @@ def tarAndUploadArtifacts(Map args = [:]) {
 * This method executes a closure with credentials for cloud test
 * environments.
 */
-def withCloudTestEnv(Closure body) {
+def withCloudTestEnv(Map args = [:], Closure body) {
   def maskedVars = []
   def testTags = "${env.TEST_TAGS}"
 
   // Allow AWS credentials when the build was configured to do so with:
   //   - the cloudtests build parameters
   //   - the aws github label
-  if (params.allCloudTests || params.awsCloudTests || matchesPrLabel(label: 'aws')) {
+  //   - forced with the cloud argument aws github label
+  if (params.allCloudTests || params.awsCloudTests || matchesPrLabel(label: 'aws') || args.get('cloudAWS', false)) {
     testTags = "${testTags},aws"
     def aws = getVaultSecret(secret: "${AWS_ACCOUNT_SECRET}").data
     if (!aws.containsKey('access_key')) {
@@ -914,7 +915,7 @@ def startCloudTestEnv(Map args = [:]) {
   String name = normalise(args.name)
   def dirs = args.get('dirs',[])
   stage("${name}-prepare-cloud-env"){
-    withCloudTestEnv() {
+    withCloudTestEnv(args) {
       withBeatsEnv(archive: false, withModule: false) {
         try {
           dirs?.each { folder ->
@@ -957,7 +958,7 @@ def terraformCleanup(Map args = [:]) {
   String name = normalise(args.name)
   String directory = args.dir
   stage("${name}-tear-down-cloud-env"){
-    withCloudTestEnv() {
+    withCloudTestEnv(args) {
       withBeatsEnv(archive: false, withModule: false) {
         unstash("terraform-${name}")
         retryWithSleep(retries: 2, seconds: 5, backoff: true) {
@@ -1141,6 +1142,9 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
       }
       if(args?.content?.containsKey('cloud')) {
         steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id)
+      }
+      if(args?.content?.containsKey('cloudAWS')) {
+        steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id, cloudAWS: true)
       }
     }
   }
