@@ -198,11 +198,9 @@ func runRunOnceSingleConfig(cfg *common.Config, publishClient *core.SyncClient, 
 
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
-	factory := monitors.NewFactory(b.Info, bt.scheduler, plugin.GlobalPluginsReg)
-
 	var runners []cfgfile.Runner
 	for _, cfg := range bt.config.Monitors {
-		created, err := factory.Create(b.Publisher, cfg)
+		created, err := bt.dynamicFactory.Create(b.Publisher, cfg)
 		if err != nil {
 			if errors.Is(err, monitors.ErrMonitorDisabled) {
 				logp.Info("skipping disabled monitor: %s", err)
