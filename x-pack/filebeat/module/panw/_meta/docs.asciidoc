@@ -65,6 +65,22 @@ The UDP port to listen for syslog traffic. Defaults to `9001`
 
 NOTE: Ports below 1024 require {beatname_uc} to run as root.
 
+*`var.syslog_protocol`*::
+
+The protocol to receive syslog traffic on. Acceptable values: udp|tcp Defaults to `udp`
+
+*`var.syslog_tcp_ssl.enabled`*::
+
+Enable SSL/TLS for TCP traffic. Defaults to `false`
+
+*`var.syslog_tcp_ssl.certificate`*::
+
+Path to certificate for ssl/tls for TCP traffic
+
+*`var.syslog_tcp_ssl.key`*::
+
+Path to key for ssl/tls for TCP traffic
+
 include::../include/timezone-support.asciidoc[]
 
 [float]
