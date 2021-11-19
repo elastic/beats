@@ -26,12 +26,12 @@ func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI stri
 	// TODO: span type?
 	span, ctx := apm.StartSpan(ctx, "Upgrader.downloadArtifact()", "custom")
 	defer func() {
-		span.End()
 		// TODO: do we want to capture the errors at this top-level, in
 		// the lower levels, or at each level?
 		if err != nil {
 			apm.CaptureError(ctx, err).Send()
 		}
+		span.End()
 	}()
 	// do not update source config
 	settings := *u.settings
