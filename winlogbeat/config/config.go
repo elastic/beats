@@ -34,8 +34,8 @@ const (
 
 var (
 	DefaultSettings = WinlogbeatConfig{
-		RegistryFile: DefaultRegistryFile,
-		RegistryFlush: 5*time.Second,
+		RegistryFile:  DefaultRegistryFile,
+		RegistryFlush: 5 * time.Second,
 	}
 )
 
