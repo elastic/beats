@@ -130,12 +130,14 @@ func newMonitorUnsafe(
 		stats:             pluginFactory.Stats,
 	}
 
-	// If there's no explicit ID generate one
-	hash, err := m.configHash()
-	if err != nil {
-		return m, err
+	if m.stdFields.ID == "" {
+		// If there's no explicit ID generate one
+		hash, err := m.configHash()
+		if err != nil {
+			return m, err
+		}
+		m.stdFields.ID = fmt.Sprintf("auto-%s-%#X", m.stdFields.Type, hash)
 	}
-	m.stdFields.ID = fmt.Sprintf("auto-%s-%#X", m.stdFields.Type, hash)
 
 	// De-duplicate monitors with identical IDs
 	// last write wins
