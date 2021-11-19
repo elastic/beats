@@ -21,8 +21,11 @@ pipeline {
     stage('Nighly beats builds') {
       steps {
         runBuild(quietPeriod: 0, job: 'Beats/beats/master')
-        runBuild(quietPeriod: 2000, job: 'Beats/beats/7.16')
-        runBuild(quietPeriod: 4000, job: 'Beats/beats/7.15')
+        // This should be `current_8` bump.getCurrentMinorReleaseFor8
+        runBuild(quietPeriod: 2000, job: 'Beats/beats/8.0')
+        // This should be `current_7` bump.getCurrentMinorReleaseFor7 or
+        // `next_minor_7`  bump.getNextMinorReleaseFor7
+        runBuild(quietPeriod: 4000, job: 'Beats/beats/7.16')
       }
     }
   }
