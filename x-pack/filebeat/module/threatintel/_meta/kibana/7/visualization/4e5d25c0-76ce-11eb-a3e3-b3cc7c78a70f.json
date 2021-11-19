@@ -30,13 +30,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.indicator.file.hash.sha256"
+                            "field": "threat.indicator.file.hash.sha256"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                            "key": "threatintel.indicator.file.hash.sha256",
+                            "key": "threat.indicator.file.hash.sha256",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -67,7 +67,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "AlienVault OTX SHA256 Hash Indicator",
-                        "field": "threatintel.indicator.file.hash.sha256",
+                        "field": "threat.indicator.file.hash.sha256",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",
