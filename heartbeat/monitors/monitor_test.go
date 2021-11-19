@@ -107,14 +107,15 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	// the error, and ensure the last monitor wins
 	require.NoError(t, m2Err)
 
-	m, ok := uniqueMonitorIDs.Load(m2.stdFields.ID)
+	m, ok := globalDedup.byId[m2.stdFields.ID]
 	require.True(t, ok)
-	require.Equal(t, m2.stdFields.Name, m.(*Monitor).stdFields.Name)
+	require.Equal(t, m2.stdFields.Name, m.stdFields.Name)
 	m1.Stop()
 	m2.Stop()
 
 	require.Equal(t, 3, built.Load())
-	require.Equal(t, 3, closed.Load())
+	// Make sure each is closed at least once
+	require.GreaterOrEqual(t, closed.Load(), 3)
 }
 
 func TestCheckInvalidConfig(t *testing.T) {

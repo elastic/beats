@@ -76,9 +76,9 @@ func checkMonitorConfig(config *common.Config, registrar *plugin.PluginsReg) err
 	return err
 }
 
-// uniqueMonitorIDs is used to keep track of explicitly configured monitor IDs and ensure no duplication within a
+// globalDedup is used to keep track of explicitly configured monitor IDs and ensure no duplication within a
 // given heartbeat instance.
-var uniqueMonitorIDs sync.Map
+var globalDedup = newDedup()
 
 // newMonitor Creates a new monitor, without leaking resources in the event of an error.
 func newMonitor(
@@ -130,24 +130,16 @@ func newMonitorUnsafe(
 		stats:             pluginFactory.Stats,
 	}
 
-	if m.stdFields.ID != "" {
-		// Ensure we don't have duplicate IDs
-		if existingMIface, loaded := uniqueMonitorIDs.LoadOrStore(m.stdFields.ID, m); loaded {
-			// We now only log duplicate monitor id errors, there are too many
-			// odd situations that can happen where users might temporarily have duplicate
-			// IDs for a short time when changing things.
-			logp.Warn("monitor ID %s is configured for multiple monitors! IDs should be unique values, last seen config will win", m.stdFields.ID)
-			existingMIface.(*Monitor).close()
-			uniqueMonitorIDs.Store(m.stdFields.ID, m)
-		}
-	} else {
-		// If there's no explicit ID generate one
-		hash, err := m.configHash()
-		if err != nil {
-			return m, err
-		}
-		m.stdFields.ID = fmt.Sprintf("auto-%s-%#X", m.stdFields.Type, hash)
+	// If there's no explicit ID generate one
+	hash, err := m.configHash()
+	if err != nil {
+		return m, err
 	}
+	m.stdFields.ID = fmt.Sprintf("auto-%s-%#X", m.stdFields.Type, hash)
+
+	// De-duplicate monitors with identical IDs
+	// last write wins
+	globalDedup.register(m)
 
 	p, err := pluginFactory.Create(config)
 	m.close = p.Close
@@ -240,5 +232,5 @@ func (m *Monitor) Stop() {
 
 func (m *Monitor) freeID() {
 	// Free up the monitor ID for reuse
-	uniqueMonitorIDs.Delete(m.stdFields.ID)
+	globalDedup.unregister(m)
 }
