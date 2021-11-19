@@ -23,8 +23,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TODO benchmarks?
-
 func Test_ringBuffer(t *testing.T) {
 	t.Run("Len 2 buffer", func(t *testing.T) {
 		r := newBuffer(2)
@@ -81,4 +79,68 @@ func Test_ringBuffer(t *testing.T) {
 		r.add("6")
 		assert.ElementsMatch(t, []string{"4", "5", "6"}, r.getAll())
 	})
+}
+
+func Benchmark_ringBuffer_add(b *testing.B) {
+	b.Run("size 6", func(b *testing.B) {
+		r := newBuffer(6)
+		for i := 0; i < b.N; i++ {
+			r.add(i)
+		}
+	})
+	b.Run("size 60", func(b *testing.B) {
+		r := newBuffer(60)
+		for i := 0; i < b.N; i++ {
+			r.add(i)
+		}
+	})
+	b.Run("size 600", func(b *testing.B) {
+		r := newBuffer(600)
+		for i := 0; i < b.N; i++ {
+			r.add(i)
+		}
+	})
+	b.Run("size 6000", func(b *testing.B) {
+		r := newBuffer(6000)
+		for i := 0; i < b.N; i++ {
+			r.add(i)
+		}
+	})
+}
+
+func Benchmark_ringBuffer_add_filled(b *testing.B) {
+	b.Run("size 6", func(b *testing.B) {
+		r := newFullBuffer(b, 6)
+		for i := 0; i < b.N; i++ {
+			r.add(i)
+		}
+	})
+	b.Run("size 60", func(b *testing.B) {
+		r := newFullBuffer(b, 60)
+		for i := 0; i < b.N; i++ {
+			r.add(i)
+		}
+	})
+	b.Run("size 600", func(b *testing.B) {
+		r := newFullBuffer(b, 600)
+		for i := 0; i < b.N; i++ {
+			r.add(i)
+		}
+	})
+	b.Run("size 6000", func(b *testing.B) {
+		r := newFullBuffer(b, 6000)
+		for i := 0; i < b.N; i++ {
+			r.add(i)
+		}
+	})
+}
+
+func newFullBuffer(b *testing.B, size int) *ringBuffer {
+	b.Helper()
+	r := newBuffer(size)
+	// fill size +1 so full flag is toggled
+	for i := 0; i < size+1; i++ {
+		r.add(-1)
+	}
+	return r
 }
