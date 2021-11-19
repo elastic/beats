@@ -20,15 +20,15 @@ package decoder
 import (
 	"fmt"
 
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/icmp"
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 	"github.com/elastic/beats/v7/packetbeat/protos/udp"
-
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/layers"
 )
 
 var debugf = logp.MakeDebug("decoder")

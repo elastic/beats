@@ -26,11 +26,11 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/afpacket"
+	"github.com/google/gopacket/layers"
 
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/afpacket"
-	"github.com/tsg/gopacket/layers"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type afpacketHandle struct {
