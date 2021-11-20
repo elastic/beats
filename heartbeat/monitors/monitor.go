@@ -37,14 +37,18 @@ import (
 // ErrMonitorDisabled is returned when the monitor plugin is marked as disabled.
 var ErrMonitorDisabled = errors.New("monitor not loaded, plugin is disabled")
 
+const (
+	MON_INIT = iota
+	MON_STARTED
+	MON_STOPPED
+)
+
 // Monitor represents a configured recurring monitoring configuredJob loaded from a config file. Starting it
 // will cause it to run with the given scheduler until Stop() is called.
 type Monitor struct {
 	stdFields      stdfields.StdMonitorFields
 	pluginName     string
 	config         *common.Config
-	registrar      *plugin.PluginsReg
-	uniqueName     string
 	scheduler      *scheduler.Scheduler
 	configuredJobs []*configuredJob
 	enabled        bool
@@ -60,6 +64,8 @@ type Monitor struct {
 	// stats is the countersRecorder used to record lifecycle events
 	// for global metrics + telemetry
 	stats plugin.RegistryRecorder
+
+	state int
 }
 
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
@@ -125,6 +131,7 @@ func newMonitorUnsafe(
 		internalsMtx:      sync.Mutex{},
 		config:            config,
 		stats:             pluginFactory.Stats,
+		state:             MON_INIT,
 	}
 
 	if m.stdFields.ID == "" {
@@ -203,11 +210,13 @@ func (m *Monitor) makeTasks(config *common.Config, jobs []jobs.Job) ([]*configur
 func (m *Monitor) Start() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
+
 	for _, t := range m.configuredJobs {
 		t.Start()
 	}
 
 	m.stats.StartMonitor(int64(m.endpoints))
+	m.state = MON_STARTED
 }
 
 // stopUnsafe stops the monitor without freeing it in global dedup
@@ -215,6 +224,10 @@ func (m *Monitor) Start() {
 func (m *Monitor) Stop() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
+
+	if m.state == MON_STOPPED {
+		return
+	}
 
 	for _, t := range m.configuredJobs {
 		t.Stop()
@@ -228,4 +241,5 @@ func (m *Monitor) Stop() {
 	}
 
 	m.stats.StopMonitor(int64(m.endpoints))
+	m.state = MON_STOPPED
 }

@@ -39,7 +39,6 @@ var binfo = beat.Info{
 }
 
 func TestPreProcessors(t *testing.T) {
-
 	tests := map[string]struct {
 		settings           publishSettings
 		expectedIndex      string
@@ -181,7 +180,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	require.NoError(t, m2Err)
 	m2.Start()
 	// Change the name so we can ensure that this is the currently active monitor
-	m2.stdFields.Name = "MON2!!!"
+	m2.stdFields.Name = "mon2"
 	// This used to trigger an error, but shouldn't any longer, we just log
 	// the error, and ensure the last monitor wins
 	require.NoError(t, m2Err)
@@ -194,5 +193,6 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 
 	// 3 are counted as built, even the bad config
 	require.Equal(t, 3, built.Load())
-	require.Equal(t, closed.Load(), 3)
+	// Only 2 closes, because the bad config isn't closed
+	require.Equal(t, 2, closed.Load())
 }

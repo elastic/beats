@@ -95,10 +95,14 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *common.Config) (cfgfile.Runne
 	f.mtx.Lock()
 	defer f.mtx.Unlock()
 
-	// Handle the problem of this function being occasionally invoked from within
-	// f.mtx being locked given that golang does not support reentrant locks.
+	// This is a callback executed on stop of a monitor, it ensures we delete the entry in
+	// byId.
+	// It's a little tricky, because it handles the problem of this function being
+	// occasionally invoked twice in one stack.
+	// f.mtx would be locked given that golang does not support reentrant locks.
 	// The important thing is clearing the map, not ensuring it stops exactly on time
-	// so we can defer its removal from the map with a goroutine.
+	// so we can defer its removal from the map with a goroutine, thus breaking out of the current stack
+	// and ensuring the cleanup happen soon enough.
 	safeStop := func(m *Monitor) {
 		go func() {
 			// We can safely relock now, since we're in a new goroutine.
@@ -106,7 +110,7 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *common.Config) (cfgfile.Runne
 			defer f.mtx.Unlock()
 
 			// If this element hasn't already been removed or replaced with a new
-			// instance delete it from the map.
+			// instance delete it from the map. Check monitor identity via pointer equality.
 			if curM, ok := f.byId[m.stdFields.ID]; ok && curM == m {
 				delete(f.byId, m.stdFields.ID)
 			}
@@ -116,8 +120,10 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *common.Config) (cfgfile.Runne
 	if err != nil {
 		return nil, err
 	}
+
 	if mon, ok := f.byId[monitor.stdFields.ID]; ok {
 		f.logger.Warnf("monitor ID %s is configured for multiple monitors! IDs should be unique values, last seen config will win", monitor.stdFields.ID)
+		// Stop the old monitor, since we'll swap our new one in place
 		mon.Stop()
 	}
 
