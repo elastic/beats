@@ -52,6 +52,7 @@ type Monitor struct {
 	scheduler      *scheduler.Scheduler
 	configuredJobs []*configuredJob
 	enabled        bool
+	state          int
 	// endpoints is a count of endpoints this monitor measures.
 	endpoints int
 	// internalsMtx is used to synchronize access to critical
@@ -64,8 +65,6 @@ type Monitor struct {
 	// stats is the countersRecorder used to record lifecycle events
 	// for global metrics + telemetry
 	stats plugin.RegistryRecorder
-
-	state int
 }
 
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
