@@ -241,6 +241,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
 - Add ECS 1.9 new users fields {pull}26509[26509]
 - Don't split hyphenated tokens {pull}28483[28483]
+- Correctly handle AccessMask if it is an integer or list of masks. {pull}29016[29016]
 
 *Functionbeat*
 
