@@ -17,57 +17,34 @@
 
 package mage
 
-import (
-	"os"
-
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-)
-
-func init() {
-	devtools.BeatDescription = "Run K8s CIS benchmark" +
-		"results to Elasticsearch or send to Logstash."
-	devtools.BeatServiceName = "kubebeat-elastic"
-}
+// "github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 
 // CustomizePackaging modifies the package specs to add the modules and
 // modules.d directory. You must declare a dependency on either
 // PrepareModulePackagingOSS or PrepareModulePackagingXPack.
+
 // func CustomizePackaging() {
-// 	mg.Deps(dashboards)
-
-// 	monitorsDTarget := "monitors.d"
-// 	unixMonitorsDir := "/etc/{{.BeatName}}/monitors.d"
-// 	monitorsD := devtools.PackageFile{
-// 		Mode:   0644,
-// 		Source: devtools.OSSBeatDir("monitors.d"),
-// 	}
-
 // 	for _, args := range devtools.Packages {
-// 		pkgType := args.Types[0]
-// 		switch pkgType {
-// 		case devtools.Docker:
-// 			args.Spec.ExtraVar("linux_capabilities", "cap_net_raw+eip")
-// 			args.Spec.Files[monitorsDTarget] = monitorsD
-// 		case devtools.TarGz, devtools.Zip:
-// 			args.Spec.Files[monitorsDTarget] = monitorsD
-// 		case devtools.Deb, devtools.RPM, devtools.DMG:
-// 			args.Spec.Files[unixMonitorsDir] = monitorsD
+// 		distFile := distro.OsquerydDistroPlatformFilename(args.OS)
+
+// 		// The minimal change to fix the issue for 7.13
+// 		// https://github.com/elastic/beats/issues/25762
+// 		// TODO: this could be moved to dev-tools/packaging/packages.yml for the next release
+// 		var mode os.FileMode = 0644
+// 		// If distFile is osqueryd binary then it should be executable
+// 		if distFile == distro.OsquerydFilename() {
+// 			mode = 0750
 // 		}
+// 		arch := defaultArch
+// 		if args.Arch != "" {
+// 			arch = args.Arch
+// 		}
+// 		packFile := devtools.PackageFile{
+// 			Mode:   mode,
+// 			Source: filepath.Join(distro.GetDataInstallDir(distro.OSArch{OS: args.OS, Arch: arch}), distFile),
+// 		}
+// 		args.Spec.Files[distFile] = packFile
 // 	}
 // }
 
-func dashboards() error {
-	// kubebeat doesn't have any dashboards so just create the empty directory.
-	return os.MkdirAll("build/kibana", 0755)
-}
-
-// Fields generates a fields.yml for the Beat.
-func Fields() error {
-	err := devtools.GenerateFieldsYAML(devtools.OSSBeatDir())
-	if err != nil {
-		return err
-	}
-	return devtools.GenerateFieldsGo("fields.yml", "include/fields.go")
-}
-
-// Todo kubebeat write mage script to package beat with agent
+// // Todo kubebeat write mage script to package beat with agent

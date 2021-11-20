@@ -23,7 +23,7 @@ import (
 
 // ConfigFileParams returns the default ConfigFileParams for generating
 // kubebeat*.yml files.
-func ConfigFileParams() devtools.ConfigFileParams {
+func XPackConfigFileParams() devtools.ConfigFileParams {
 	p := devtools.DefaultConfigFileParams()
 	p.Templates = append(p.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"))
 	//	p.ExtraVars = map[string]interface{}{}

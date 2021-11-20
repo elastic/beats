@@ -6,6 +6,7 @@ kubebeat:
   # Defines how often an event is sent to the output
 <<<<<<< HEAD
   period: 1s
+<<<<<<< HEAD
   files: [
       "/hostfs/etc/kubernetes/scheduler.conf",
       "/hostfs/etc/kubernetes/controller-manager.conf",
@@ -23,6 +24,8 @@ kubebeat:
 =======
   period: 5s
 >>>>>>> 41c4da8de4 (Added kubebeat agent packaging dependencies)
+=======
+>>>>>>> e9da5e2bbd (kubebeat sym link xpack + magefile update)
 
 # ================================== General ===================================
 
@@ -58,16 +61,20 @@ kubebeat:
 setup.kibana:
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Kibana Host
 # Scheme and port can be left out and will be set to the default (http and 5601)
 # In case you specify and additional path, the scheme is required: http://localhost:5601/path
 # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
 #host: "localhost:5601"
 =======
+=======
+>>>>>>> e9da5e2bbd (kubebeat sym link xpack + magefile update)
   # Kibana Host
   # Scheme and port can be left out and will be set to the default (http and 5601)
   # In case you specify and additional path, the scheme is required: http://localhost:5601/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
+<<<<<<< HEAD
   host: "http://host.minikube.internal:5601"
 >>>>>>> 41c4da8de4 (Added kubebeat agent packaging dependencies)
 
@@ -75,6 +82,14 @@ setup.kibana:
 # ID of the Kibana Space into which the dashboards should be loaded. By default,
 # the Default Space will be used.
 #space.id:
+=======
+  #host: "localhost:5601"
+
+  # Kibana Space ID
+  # ID of the Kibana Space into which the dashboards should be loaded. By default,
+  # the Default Space will be used.
+  #space.id:
+>>>>>>> e9da5e2bbd (kubebeat sym link xpack + magefile update)
 
 # =============================== Elastic Cloud ================================
 
@@ -96,18 +111,18 @@ setup.kibana:
 # ---------------------------- Elasticsearch Output ----------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["host.minikube.internal:9200"]
+  hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
 
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-  username: "elastic"
-  password: "changeme"
+  #username: "elastic"
+  #password: "changeme"
 
-  # ------------------------------ Logstash Output -------------------------------
-  #output.logstash:
+# ------------------------------ Logstash Output -------------------------------
+#output.logstash:
   # The Logstash hosts
   #hosts: ["localhost:5044"]
 
@@ -131,43 +146,43 @@ processors:
   - add_docker_metadata: ~
 
 
-    # ================================== Logging ===================================
+# ================================== Logging ===================================
 
-    # Sets log level. The default log level is info.
-    # Available log levels are: error, warning, info, debug
-    #logging.level: debug
+# Sets log level. The default log level is info.
+# Available log levels are: error, warning, info, debug
+#logging.level: debug
 
-    # At debug level, you can selectively enable logging only for some components.
-    # To enable all selectors use ["*"]. Examples of other selectors are "beat",
-    # "publisher", "service".
-    #logging.selectors: ["*"]
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publisher", "service".
+#logging.selectors: ["*"]
 
-    # ============================= X-Pack Monitoring ==============================
-    # Kubebeat can export internal metrics to a central Elasticsearch monitoring
-    # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
-    # reporting is disabled by default.
+# ============================= X-Pack Monitoring ==============================
+# Kubebeat can export internal metrics to a central Elasticsearch monitoring
+# cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
+# reporting is disabled by default.
 
-    # Set to true to enable the monitoring reporter.
-    #monitoring.enabled: false
+# Set to true to enable the monitoring reporter.
+#monitoring.enabled: false
 
-    # Sets the UUID of the Elasticsearch cluster under which monitoring data for this
-    # Kubebeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
-    # is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
-    #monitoring.cluster_uuid:
+# Sets the UUID of the Elasticsearch cluster under which monitoring data for this
+# Kubebeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
+#monitoring.cluster_uuid:
 
-    # Uncomment to send the metrics to Elasticsearch. Most settings from the
-    # Elasticsearch output are accepted here as well.
-    # Note that the settings should point to your Elasticsearch *monitoring* cluster.
-    # Any setting that is not set is automatically inherited from the Elasticsearch
-    # output configuration, so if you have the Elasticsearch output configured such
-    # that it is pointing to your Elasticsearch monitoring cluster, you can simply
-    # uncomment the following line.
-    #monitoring.elasticsearch:
+# Uncomment to send the metrics to Elasticsearch. Most settings from the
+# Elasticsearch output are accepted here as well.
+# Note that the settings should point to your Elasticsearch *monitoring* cluster.
+# Any setting that is not set is automatically inherited from the Elasticsearch
+# output configuration, so if you have the Elasticsearch output configured such
+# that it is pointing to your Elasticsearch monitoring cluster, you can simply
+# uncomment the following line.
+#monitoring.elasticsearch:
 
-    # ============================== Instrumentation ===============================
+# ============================== Instrumentation ===============================
 
-    # Instrumentation support for the kubebeat.
-    #instrumentation:
+# Instrumentation support for the kubebeat.
+#instrumentation:
     # Set to true to enable instrumentation of kubebeat.
     #enabled: false
 
@@ -190,3 +205,4 @@ processors:
 
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: true
+
