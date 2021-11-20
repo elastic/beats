@@ -1595,6 +1595,32 @@ var security = (function () {
         [0x00010000, 'Delete']
     ];
 
+    // https://docs.microsoft.com/en-us/windows/win32/secauthz/access-rights-and-access-masks
+    var accessMaskDescriptions = [
+        [0x00000001, 'Create Child'],
+        [0x00000002, 'Delete Child'],
+        [0x00000004, 'List Contents'],
+        [0x00000008, 'SELF'],
+        [0x00000010, 'Read Property'],
+        [0x00000020, 'Write Property'],
+        [0x00000040, 'Delete Treee'],
+        [0x00000080, 'List Object'],
+        [0x00000100, 'Control Access'],
+        [0x00010000, 'DELETE'],
+        [0x00020000, 'READ_CONTROL'],
+        [0x00040000, 'WRITE_DAC'],
+        [0x00080000, 'WRITE_OWNER'],
+        [0x00100000, 'SYNCHRONIZE'],
+        [0x00F00000, 'STANDARD_RIGHTS_REQUIRED'],
+        [0x001F0000, 'STANDARD_RIGHTS_ALL'],
+        [0x0000FFFF, 'SPECIFIC_RIGHTS_ALL'],
+        [0x01000000, 'ADS_RIGHT_ACCESS_SYSTEM_SECURITY'],
+        [0x10000000, 'ADS_RIGHT_GENERIC_ALL'],
+        [0x20000000, 'ADS_RIGHT_GENERIC_EXECUTE'],
+        [0x40000000, 'ADS_RIGHT_GENERIC_WRITE'],
+        [0x80000000, 'ADS_RIGHT_GENERIC_READ']
+    ];
+
     // lookupMessageCode returns the string associated with the code. key should
     // be the name of the field in evt containing the code (e.g. %%2313).
     var lookupMessageCode = function (evt, key) {
@@ -1841,6 +1867,22 @@ var security = (function () {
                     }
                 }
             }
+        }
+    };
+
+    var translateAccessMask = function(mask) {
+        if (!mask) {
+            return;
+        }
+        var accessCode = parseInt(mask);
+        var accessResult = [];
+        for (var i = 0; i < accessMaskDescriptions.length; i++) {
+            if ((accessCode | accessMaskDescriptions[i][0]) === accessCode) {
+                accessResult.push(accessMaskDescriptions[i][1]);
+            }
+        }
+        if (accessResult) {
+            return accessResult;
         }
     };
 
@@ -2389,22 +2431,44 @@ var security = (function () {
             evt.Put("winlog.event_data.PrivilegeList", privs.split(/\s+/));
         })
         .Add(function(evt){
-            var maskCodes = evt.Get("winlog.event_data.AccessMask");
-            if (!maskCodes) {
+            var accessMask = evt.Get("winlog.event_data.AccessMask");
+            if (!accessMask) {
                 return;
             }
-            var maskList = maskCodes.replace(/\s+/g, '').split("%%").filter(String);
-            evt.Put("winlog.event_data.AccessMask", maskList);
-            var maskResults = [];
-            for (var j = 0; j < maskList.length; j++) {
-                var description = msobjsMessageTable[maskList[j]];
-                if (description === undefined) {
-                    return;
-                }
-                maskResults.push(description);
+            var accessDescriptions = translateAccessMask(accessMask);
+            if (!accessDescriptions) {
+                return;
             }
-            evt.Put("winlog.event_data.AccessMaskDescription", maskResults);
+            if (accessDescriptions.length > 0) {
+                evt.Put("winlog.event_data.AccessMaskDescription", accessDescriptions);
+            }
         })
+        .Add(function(evt){
+            var listNames = ["AccessList", "AccessMask"]
+            for (var i = 0; i < listNames.length; i++) {
+                var listContents = evt.Get("winlog.event_data." + listNames[i])
+                if (!listContents) {
+                    continue;
+                }
+                var listDescription = evt.Get("winlog.event_data." + listNames[i] + "Description")
+                if (listDescription) {
+                    continue;
+                }
+
+                var items = listContents.replace(/\s+/g, '').split("%%").filter(String);
+                evt.Put("winlog.event_data." + listNames[i], items)
+                var results = [];
+                for (var j = 0; j < items.length; j++) {
+                    var description = msobjsMessageTable[items[j]];
+                    if (description === undefined) {
+                        continue;
+                    }
+                    results.push(description);
+                }
+                evt.Put("winlog.event_data." + listNames[i] + "Description", results);
+            }
+        })
+
         .Build();
 
     var trustDomainMgmtEvts = new processor.Chain()
