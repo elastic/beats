@@ -44,6 +44,7 @@ type RunnerFactory struct {
 	byId       map[string]*Monitor
 	mtx        *sync.Mutex
 	pluginsReg *plugin.PluginsReg
+	logger     *logp.Logger
 }
 
 type publishSettings struct {
@@ -73,6 +74,7 @@ func NewFactory(info beat.Info, sched *scheduler.Scheduler, pluginsReg *plugin.P
 		byId:       map[string]*Monitor{},
 		mtx:        &sync.Mutex{},
 		pluginsReg: pluginsReg,
+		logger:     logp.NewLogger("monitor-factory"),
 	}
 }
 
@@ -115,7 +117,7 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *common.Config) (cfgfile.Runne
 		return nil, err
 	}
 	if mon, ok := f.byId[monitor.stdFields.ID]; ok {
-		logp.Warn("monitor ID %s is configured for multiple monitors! IDs should be unique values, last seen config will win", monitor.stdFields.ID)
+		f.logger.Warnf("monitor ID %s is configured for multiple monitors! IDs should be unique values, last seen config will win", monitor.stdFields.ID)
 		mon.Stop()
 	}
 
