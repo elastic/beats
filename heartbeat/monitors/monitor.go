@@ -219,7 +219,7 @@ func (m *Monitor) Start() {
 	m.state = MON_STARTED
 }
 
-// stopUnsafe stops the monitor without freeing it in global dedup
+// Stop stops the monitor without freeing it in global dedup
 // needed by dedup itself to avoid a reentrant lock.
 func (m *Monitor) Stop() {
 	m.internalsMtx.Lock()
