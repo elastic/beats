@@ -17,7 +17,7 @@ This example assumes you have:
 2. Kibana with running on the default port (`http://localhost:5601`)
 3. Minikube cluster running locally (`minikube start`)
 
-Please make sure that you run the following instructions within the `kubebeat` directory.
+**Please make sure that you run the following instructions within the `kubebeat` directory.**
 
 Clone the git submodule of the CIS rules:
 
@@ -27,7 +27,7 @@ Comment the Rego code that uses data.yaml (Temporary fix) - go to compliance/cis
 
     data.activated_rules.cis_k8s[rule_id]
 
-First compile the application for Linux:
+Compile the application for Linux:
 
     GOOS=linux go build
 
@@ -80,9 +80,22 @@ Build binary:
 
     GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -gcflags "all=-N -l"
 
-Build docker image:
+Then use the patch file to change the configuration for Minikube (Only Once):
 
+    patch kubebeat.yml kubebeat_minikube.yml.patch
+
+Then package it to a docker image using the provided Dockerfile to run it on Kubernetes:
+
+Running a [Minikube](https://minikube.sigs.k8s.io/docs/) cluster, you can build this image directly on the Docker engine of the Minikube node without pushing it to a registry. To build the image on Minikube:
+
+    eval $(minikube docker-env)
     docker build -f Dockerfile.debug -t kubebeat .
+
+If you are not using Minikube, you should build this image and push it to a registry that your Kubernetes cluster can pull from.
+
+If you have RBAC enabled on your cluster, use the following snippet to create role binding which will grant the default service account view permissions(Only Once):
+
+    kubectl create clusterrolebinding default-view --clusterrole=view --serviceaccount=default:default
 
 After running the pod, expose the relevant ports:
 
