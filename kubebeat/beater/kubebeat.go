@@ -107,7 +107,7 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 				bt.resourceIteration(resource, runId)
 			}
 
-			bt.scheduler.RunResource(omap, resourceCallback)
+			bt.scheduler.ScheduleResources(omap, resourceCallback)
 		}
 	}
 }
