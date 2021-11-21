@@ -10,30 +10,43 @@ The interesting files are:
 * `pod.yaml` - deploy the beat
 
 
-## Running this example
+## Table of contents
+- [Prerequisites](#prerequisites)
+- [Running the Kubebeat](#running-the-kubebeat)
+- [Clean up](#clean-up)
+- [Open questions](#open-questions)
+- [Remote Debugging](#remote-debugging)
 
-This example assumes you have:
+
+## Prerequisites
+**Please make sure that you run the following instructions within the `kubebeat` directory.**
+
 1. Elasticsearch with the default username & password (`elastic` & `changeme`) running on the default port (`http://localhost:9200`)
 2. Kibana with running on the default port (`http://localhost:5601`)
 3. Minikube cluster running locally (`minikube start`)
 
-**Please make sure that you run the following instructions within the `kubebeat` directory.**
 
-Clone the git submodule of the CIS rules:
+4. Clone the git submodule of the CIS rules:
 
     git submodule init && git submodule update
 
-Comment the Rego code that uses data.yaml (Temporary fix) - go to compliance/cis_k8s/cis_k8s.rego and comment the following line of code:
+5. Comment the Rego code that uses data.yaml (Temporary fix) - go to compliance/cis_k8s/cis_k8s.rego and comment the following line of code:
 
+    ```
     data.activated_rules.cis_k8s[rule_id]
+   ```
+
+6. Use the patch file to change the configuration for Minikube (or change the configuration according to your setup):
+
+    ```
+    patch kubebeat.yml kubebeat_minikube.yml.patch
+   ```
+
+## Running the Kubebeat
 
 Compile the application for Linux:
 
     GOOS=linux go build
-
-Then use the patch file to change the configuration for Minikube (or change the configuration according to your setup):
-
-    patch kubebeat.yml kubebeat_minikube.yml.patch
 
 Then package it to a docker image using the provided Dockerfile to run it on Kubernetes:
 
