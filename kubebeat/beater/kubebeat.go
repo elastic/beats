@@ -138,3 +138,5 @@ func (bt *kubebeat) Stop() {
 
 	close(bt.done)
 }
+
+// Todo Add registeraction handlers see x-pack/osquerybeat/beater/osquerybeat.go for example
