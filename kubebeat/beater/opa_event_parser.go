@@ -7,15 +7,15 @@ import (
 	"time"
 )
 
-type opaEventParser struct {
+type EvaluationResultParser struct {
 }
 
-func NewOpaEventParser() (*opaEventParser, error) {
+func NewEvaluationResultParser() (*EvaluationResultParser, error) {
 
-	return &opaEventParser{}, nil
+	return &EvaluationResultParser{}, nil
 }
 
-func (parser *opaEventParser) ParseResult(result interface{}, uuid uuid.UUID, timestamp time.Time) ([]beat.Event, error) {
+func (parser *EvaluationResultParser) ParseResult(result interface{}, uuid uuid.UUID, timestamp time.Time) ([]beat.Event, error) {
 
 	events := make([]beat.Event, 0)
 	var opaResult = result.(map[string]interface{})

@@ -19,9 +19,7 @@ func TestFileFetcherFetchFilesFromFileSystem(t *testing.T) {
 	defer os.RemoveAll(dir)
 	file := filepath.Join(dir, "file.txt")
 	if err = ioutil.WriteFile(file, []byte("test txt\n"), 0600); err != nil {
-		// TODO(ofir): Used Go native *testing.T for this error, but the testify
-		// assert before. Should use the same in both places.
-		t.Fatal(err)
+		assert.Fail(t, "Fetcher did not work", err)
 	}
 
 	filePaths := []string{file}
@@ -29,8 +27,7 @@ func TestFileFetcherFetchFilesFromFileSystem(t *testing.T) {
 	results, err := fileFetcher.Fetch()
 
 	if err != nil {
-		// TODO(ofir): The error err should be included in the failure output.
-		assert.Fail(t, "Fetcher did not work")
+		assert.Fail(t, "Fetcher did not work", err)
 	}
 	result := results[0].(FileSystemResourceData)
 
