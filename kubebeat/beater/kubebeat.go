@@ -19,7 +19,7 @@ type kubebeat struct {
 	client           beat.Client
 	eval             *evaluator
 	data             *Data
-	evaluationParser *EvaluationResultParser
+	evaluationParser *evaluationResultParser
 	scheduler        ResourceScheduler
 }
 

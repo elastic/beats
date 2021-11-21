@@ -7,15 +7,15 @@ import (
 	"time"
 )
 
-type EvaluationResultParser struct {
+type evaluationResultParser struct {
 }
 
-func NewEvaluationResultParser() (*EvaluationResultParser, error) {
+func NewEvaluationResultParser() (*evaluationResultParser, error) {
 
-	return &EvaluationResultParser{}, nil
+	return &evaluationResultParser{}, nil
 }
 
-func (parser *EvaluationResultParser) ParseResult(result interface{}, uuid uuid.UUID, timestamp time.Time) ([]beat.Event, error) {
+func (parser *evaluationResultParser) ParseResult(result interface{}, uuid uuid.UUID, timestamp time.Time) ([]beat.Event, error) {
 
 	events := make([]beat.Event, 0)
 	var opaResult = result.(map[string]interface{})
