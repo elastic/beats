@@ -3,8 +3,6 @@ cmd: kubebeat
 args: ["-e", "-d", "*"]
 restart_on_output_change: true
 artifact: beats/kubebeat
-action_input_types:
-- kubebeat
 
 rules:
 - fix_stream: {}
@@ -28,6 +26,6 @@ rules:
     - inputs
     - output
 
-when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch', 'logstash')
+when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
 
 # TODO kubebeat needs to be filled up relevant Needs to  be filled according to kubebeat config
