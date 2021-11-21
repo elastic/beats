@@ -102,10 +102,9 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 		case o := <-output:
 			runId, _ := uuid.NewV4()
 			omap := o.(map[string][]interface{})
-			for _, resources := range omap {
-				for _, r := range resources {
-					bt.resourceIteration(r, runId)
-				}
+
+			resourceCallback := func(resource interface{}) {
+				bt.resourceIteration(resource, runId)
 			}
 
 			bt.scheduler.ScheduleResources(omap, resourceCallback)
