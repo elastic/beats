@@ -17,6 +17,16 @@ This example assumes you have:
 2. Kibana with running on the default port (`http://localhost:5601`)
 3. Minikube cluster running locally (`minikube start`)
 
+Please make sure that you run the following instructions within the `kubebeat` directory.
+
+Clone the git submodule of the CIS rules:
+
+    git submodule init && git submodule update
+
+Comment the Rego code that uses data.yaml (Temporary fix) - go to compliance/cis_k8s/cis_k8s.rego and comment the following line of code:
+
+    data.activated_rules.cis_k8s[rule_id]
+
 First compile the application for Linux:
 
     GOOS=linux go build
