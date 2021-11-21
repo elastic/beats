@@ -102,9 +102,10 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 		case o := <-output:
 			runId, _ := uuid.NewV4()
 			omap := o.(map[string][]interface{})
-
-			resourceCallback := func(resource interface{}) {
-				bt.resourceIteration(resource, runId)
+			for _, resources := range omap {
+				for _, r := range resources {
+					bt.resourceIteration(r, runId)
+				}
 			}
 
 			bt.scheduler.ScheduleResources(omap, resourceCallback)
@@ -138,3 +139,5 @@ func (bt *kubebeat) Stop() {
 
 	close(bt.done)
 }
+
+// Todo Add registeraction handlers see x-pack/osquerybeat/beater/osquerybeat.go for example
