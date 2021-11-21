@@ -14,8 +14,8 @@ The interesting files are:
 - [Prerequisites](#prerequisites)
 - [Running the Kubebeat](#running-the-kubebeat)
 - [Clean up](#clean-up)
-- [Open questions](#open-questions)
 - [Remote Debugging](#remote-debugging)
+- [Open questions](#open-questions)
 
 
 ## Prerequisites
@@ -81,12 +81,6 @@ To stop this example and clean up the pod, run:
 
     kubectl delete pod kubebeat-demo
 
-### Open questions
-
-1. Could we use some code from `kube-mgmt`/`gatekeeper`/`metricbeat` to do the kube-api querying and data management?
-2. How should we integrate this to the agent?
-3. ... many more
-
 ### Remote Debugging
 
 Build binary:
@@ -120,6 +114,12 @@ The app will wait for the debugger to connect before starting
 
     API server listening at: [::]:40000
 Use your favorite IDE to connect to the debugger on `localhost:40000` (for example [Goland](https://www.jetbrains.com/help/go/attach-to-running-go-processes-with-debugger.html#step-3-create-the-remote-run-debug-configuration-on-the-client-computer))
+
+### Open questions
+
+1. Could we use some code from `kube-mgmt`/`gatekeeper`/`metricbeat` to do the kube-api querying and data management?
+2. How should we integrate this to the agent?
+3. ... many more
 
 # {Beat}
 
