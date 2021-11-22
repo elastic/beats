@@ -10,20 +10,43 @@ The interesting files are:
 * `pod.yaml` - deploy the beat
 
 
-## Running this example
+## Table of contents
+- [Prerequisites](#prerequisites)
+- [Running the Kubebeat](#running-the-kubebeat)
+- [Clean up](#clean-up)
+- [Remote Debugging](#remote-debugging)
+- [Open questions](#open-questions)
 
-This example assumes you have:
+
+## Prerequisites
+**Please make sure that you run the following instructions within the `kubebeat` directory.**
+
 1. Elasticsearch with the default username & password (`elastic` & `changeme`) running on the default port (`http://localhost:9200`)
 2. Kibana with running on the default port (`http://localhost:5601`)
 3. Minikube cluster running locally (`minikube start`)
 
-First compile the application for Linux:
+
+4. Clone the git submodule of the CIS rules:
+```
+    $ git submodule update --init
+```
+5. Comment the Rego code that uses data.yaml (Temporary fix) - go to compliance/cis_k8s/cis_k8s.rego and comment the following line of code:
+
+    ```
+    data.activated_rules.cis_k8s[rule_id]
+   ```
+
+6. Use the patch file to change the configuration for Minikube (or change the configuration according to your setup):
+
+    ```
+    patch kubebeat.yml kubebeat_minikube.yml.patch
+   ```
+
+## Running the Kubebeat
+
+Compile the application for Linux:
 
     GOOS=linux go build
-
-Then use the patch file to change the configuration for Minikube (or change the configuration according to your setup):
-
-    patch kubebeat.yml kubebeat_minikube.yml.patch
 
 Then package it to a docker image using the provided Dockerfile to run it on Kubernetes:
 
@@ -58,21 +81,28 @@ To stop this example and clean up the pod, run:
 
     kubectl delete pod kubebeat-demo
 
-### Open questions
-
-1. Could we use some code from `kube-mgmt`/`gatekeeper`/`metricbeat` to do the kube-api querying and data management?
-2. How should we integrate this to the agent?
-3. ... many more
-
 ### Remote Debugging
 
 Build binary:
 
     GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -gcflags "all=-N -l"
 
-Build docker image:
+Then use the patch file to change the configuration for Minikube (Only Once):
 
+    patch kubebeat.yml kubebeat_minikube.yml.patch
+
+Then package it to a docker image using the provided Dockerfile to run it on Kubernetes:
+
+Running a [Minikube](https://minikube.sigs.k8s.io/docs/) cluster, you can build this image directly on the Docker engine of the Minikube node without pushing it to a registry. To build the image on Minikube:
+
+    eval $(minikube docker-env)
     docker build -f Dockerfile.debug -t kubebeat .
+
+If you are not using Minikube, you should build this image and push it to a registry that your Kubernetes cluster can pull from.
+
+If you have RBAC enabled on your cluster, use the following snippet to create role binding which will grant the default service account view permissions(Only Once):
+
+    kubectl create clusterrolebinding default-view --clusterrole=view --serviceaccount=default:default
 
 After running the pod, expose the relevant ports:
 
@@ -84,6 +114,12 @@ The app will wait for the debugger to connect before starting
 
     API server listening at: [::]:40000
 Use your favorite IDE to connect to the debugger on `localhost:40000` (for example [Goland](https://www.jetbrains.com/help/go/attach-to-running-go-processes-with-debugger.html#step-3-create-the-remote-run-debug-configuration-on-the-client-computer))
+
+### Open questions
+
+1. Could we use some code from `kube-mgmt`/`gatekeeper`/`metricbeat` to do the kube-api querying and data management?
+2. How should we integrate this to the agent?
+3. ... many more
 
 # {Beat}
 

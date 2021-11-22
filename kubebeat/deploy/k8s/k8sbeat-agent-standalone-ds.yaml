@@ -16,31 +16,36 @@ data:
         username: ${ES_USERNAME}
         password: ${ES_PASSWORD}
     output_permissions:
-    default:
-      osquery-manager-spec:
-        indices:
-          - names:
-              - logs-kubebeat.findings-default
-            privileges:
-              - auto_configure
-              - create_doc
+      default:
+        kubebeat-test:
+          indices:
+            - names:
+                - logs-kubebeat.result-default
+              privileges:
+                - auto_configure
+                - create_doc
+        _elastic_agent_checks:
+          cluster:
+            - monitor    
+    inputs:
+      - name: kubebeat-test
+        revision: 1
+        type: kubebeat
+        use_output: default
+        meta:
+          package:
+            name: kubebeat
+            version: 0.5.3
+        data_stream:
+          namespace: default
     agent:
       monitoring:
         enabled: false
         use_output: default
         logs: false
         metrics: false
-      inputs:
-        - name: osquery-manager-spec
-          revision: 1
-          type: kubebeat
-          use_output: default
-          meta:
-            package:
-              name: kubebeat
-              version: 0.5.3
-          data_stream:
-            namespace: default
+      logging:
+        level: debug
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -67,6 +72,7 @@ spec:
       containers:
         - name: elastic-agent
           image: docker.elastic.co/beats/elastic-agent:8.1.0-SNAPSHOT
+          imagePullPolicy: IfNotPresent
           args: [
             "-c", "/etc/agent.yml",
             "-e",
@@ -75,9 +81,9 @@ spec:
             - name: ES_USERNAME
               value: "elastic"
             - name: ES_PASSWORD
-              value: "<Insert_here"
+              value: "<Insert_here>"
             - name: ES_HOST
-              value: "<insert_here"
+              value: "<insert_here>"
             - name: NODE_NAME
               valueFrom:
                 fieldRef:
