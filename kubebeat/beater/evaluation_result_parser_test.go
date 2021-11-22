@@ -10,12 +10,12 @@ import (
 
 func TestEvaluationResultParserParseResult(t *testing.T) {
 
-	parser, _ := NewEvaluationResultParser()
-	jsonResponse := jsonExample
+	var result map[string]interface{}
+	json.Unmarshal([]byte(jsonExample), &result)
 	runId, _ := uuid.NewV4()
 	timestamp := time.Now()
-	var result map[string]interface{}
-	json.Unmarshal([]byte(jsonResponse), &result)
+	//Creating a new evaluation parser
+	parser, _ := NewEvaluationResultParser()
 
 	parsedResult, err := parser.ParseResult(result, runId, timestamp)
 	if err != nil {
