@@ -15,6 +15,7 @@ type MonitoringConfig struct {
 	LogMetrics     bool                  `yaml:"-" config:"-"`
 	HTTP           *MonitoringHTTPConfig `yaml:"http" config:"http"`
 	Namespace      string                `yaml:"namespace" config:"namespace"`
+	Pprof          bool                  `yaml:"pprof" config:"pprof"`
 }
 
 // MonitoringHTTPConfig is a config defining HTTP endpoint published by agent
@@ -38,5 +39,6 @@ func DefaultConfig() *MonitoringConfig {
 			Port:    defaultPort,
 		},
 		Namespace: defaultNamespace,
+		Pprof:     true,
 	}
 }
