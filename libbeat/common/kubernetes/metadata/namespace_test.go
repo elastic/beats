@@ -61,20 +61,29 @@ func TestNamespace_Generate(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{
-				"kubernetes": common.MapStr{
-					"namespace": common.MapStr{
-						"name": name,
-						"uid":  uid,
-						"labels": common.MapStr{
-							"foo": "bar",
-						},
-						"annotations": common.MapStr{
-							"spam": "baz",
+			// Use this for 8.0
+			/*
+				output: common.MapStr{
+					"kubernetes": common.MapStr{
+						"namespace": common.MapStr{
+							"name": name,
+							"uid":  uid,
+							"labels": common.MapStr{
+								"foo": "bar",
+							},
 						},
 					},
+				},*/
+			output: common.MapStr{"kubernetes": common.MapStr{
+				"namespace":     name,
+				"namespace_uid": uid,
+				"namespace_labels": common.MapStr{
+					"foo": "bar",
 				},
-			},
+				"namespace_annotations": common.MapStr{
+					"spam": "baz",
+				},
+			}},
 		},
 	}
 
@@ -120,16 +129,25 @@ func TestNamespace_GenerateFromName(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
+			// Use this for 8.0
+			/*
+				output: common.MapStr{
+					"namespace": common.MapStr{
+						"name": name,
+						"uid":  uid,
+						"labels": common.MapStr{
+							"foo": "bar",
+						},
+					},
+				},*/
 			output: common.MapStr{
-				"namespace": common.MapStr{
-					"name": name,
-					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
-					"annotations": common.MapStr{
-						"spam": "baz",
-					},
+				"namespace":     name,
+				"namespace_uid": uid,
+				"namespace_labels": common.MapStr{
+					"foo": "bar",
+				},
+				"namespace_annotations": common.MapStr{
+					"spam": "baz",
 				},
 			},
 		},
