@@ -371,11 +371,7 @@ func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 }
 
 func unpackTemplateConfig(cfg *common.Config) (config template.TemplateConfig, err error) {
-	config = template.DefaultConfig()
-	if cfg != nil {
-		err = cfg.Unpack(&config)
-	}
-	return config, err
+	return template.Unpack(cfg)
 }
 
 func applyILMSettings(
