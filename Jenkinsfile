@@ -890,6 +890,7 @@ def withCloudTestEnv(Map args = [:], Closure body) {
       [var: "AWS_ACCESS_KEY_ID", password: aws.access_key],
       [var: "AWS_SECRET_ACCESS_KEY", password: aws.secret_key],
     ])
+    log(level: 'INFO', text: 'withCloudTestEnv: it has been configured to run in AWS.')
   }
 
   withEnv([
