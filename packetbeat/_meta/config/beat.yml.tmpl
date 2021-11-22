@@ -23,6 +23,7 @@ packetbeat.interfaces.device: {{ call .device .GOOS }}
 packetbeat.interfaces.internal_networks:
   - private
 
+{{template "windows_npcap.yml.tmpl" .}}
 {{header "Flows"}}
 
 # Set `enabled: false` or comment out all options to disable flows reporting.
