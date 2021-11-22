@@ -28,7 +28,7 @@
                                         "size": 5
                                     },
                                     "scale": "ordinal",
-                                    "sourceField": "threatintel.indicator.marking.tlp"
+                                    "sourceField": "threat.indicator.marking.tlp"
                                 },
                                 "9afb1b09-0f20-488c-9242-a94f7d11800b": {
                                     "dataType": "number",

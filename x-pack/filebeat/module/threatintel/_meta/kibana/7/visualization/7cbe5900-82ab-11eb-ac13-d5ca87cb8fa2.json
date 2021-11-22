@@ -30,13 +30,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.indicator.first_seen"
+                            "field": "threat.indicator.first_seen"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                            "key": "threatintel.indicator.first_seen",
+                            "key": "threat.indicator.first_seen",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -76,7 +76,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "Indicator First Seen",
-                        "field": "threatintel.indicator.first_seen",
+                        "field": "threat.indicator.first_seen",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

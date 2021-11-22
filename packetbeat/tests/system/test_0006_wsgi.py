@@ -100,7 +100,7 @@ class Test(BaseTest):
         )
         self.run_packetbeat(pcap="wsgi_loopback.pcap")
 
-        objs = self.read_output()
+        objs = self.read_output(output_file="output/packetbeat-" + self.today + "-1.ndjson")
         assert len(objs) == 1
         o = objs[0]
 
@@ -119,7 +119,7 @@ class Test(BaseTest):
         )
         self.run_packetbeat(pcap="wsgi_loopback.pcap")
 
-        objs = self.read_output()
+        objs = self.read_output(output_file="output/packetbeat-" + self.today + "-2.ndjson")
         assert len(objs) == 1
         o = objs[0]
 

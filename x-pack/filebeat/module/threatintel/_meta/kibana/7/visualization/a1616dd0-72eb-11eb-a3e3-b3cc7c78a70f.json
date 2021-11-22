@@ -30,13 +30,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.abuseurl.blacklists.spamhaus_dbl"
+                            "field": "abusech.url.blacklists.spamhaus_dbl"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                            "key": "threatintel.abuseurl.blacklists.spamhaus_dbl",
+                            "key": "abusech.url.blacklists.spamhaus_dbl",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -47,13 +47,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.abuseurl.blacklists.surbl"
+                            "field": "abusech.url.blacklists.surbl"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
-                            "key": "threatintel.abuseurl.blacklists.surbl",
+                            "key": "abusech.url.blacklists.surbl",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -84,7 +84,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "Spamhaus DBL Blacklist Status",
-                        "field": "threatintel.abuseurl.blacklists.spamhaus_dbl",
+                        "field": "abusech.url.blacklists.spamhaus_dbl",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",
@@ -101,7 +101,7 @@
                     "id": "3",
                     "params": {
                         "customLabel": "SURBL Blacklist Status",
-                        "field": "threatintel.abuseurl.blacklists.surbl",
+                        "field": "abusech.url.blacklists.surbl",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",
