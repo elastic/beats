@@ -23,6 +23,7 @@ package entropy
 import (
 	"io/ioutil"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -30,8 +31,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -56,7 +57,8 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The system entropy metricset is beta.")
 
-	totalPath := paths.Resolve(paths.Hostfs, "/proc/sys/kernel/random")
+	sys := base.Module().(system.SystemModule)
+	totalPath := filepath.Join(sys.GetHostFS(), "/proc/sys/kernel/random")
 
 	return &MetricSet{
 		BaseMetricSet: base,

@@ -26,9 +26,7 @@
         "rsa.time.event_time": "2016-01-29T08:09:59.000Z",
         "service.type": "microsoft",
         "source.address": "sse3269.invalid",
-        "source.ip": [
-            "10.133.8.128"
-        ],
+        "source.ip": "10.133.8.128",
         "source.mac": "01:00:5e:ce:bf:42",
         "tags": [
             "forwarded",
@@ -60,9 +58,7 @@
         "rsa.time.event_time": "2016-02-12T03:12:33.000Z",
         "service.type": "microsoft",
         "source.address": "ciade5699.domain",
-        "source.ip": [
-            "10.124.22.221"
-        ],
+        "source.ip": "10.124.22.221",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -92,9 +88,7 @@
         "rsa.time.event_time": "2016-02-26T10:15:08.000Z",
         "service.type": "microsoft",
         "source.address": "sequa6540.www5.localhost",
-        "source.ip": [
-            "10.196.153.12"
-        ],
+        "source.ip": "10.196.153.12",
         "source.mac": "01:00:5e:3a:fe:e3",
         "tags": [
             "forwarded",
@@ -125,9 +119,7 @@
         "rsa.time.event_time": "2016-03-12T05:17:42.000Z",
         "service.type": "microsoft",
         "source.address": "orev6153.internal.domain",
-        "source.ip": [
-            "10.103.162.55"
-        ],
+        "source.ip": "10.103.162.55",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -157,9 +149,7 @@
         "rsa.time.event_time": "2016-03-26T12:20:16.000Z",
         "service.type": "microsoft",
         "source.address": "agn2581.www5.corp",
-        "source.ip": [
-            "10.162.33.193"
-        ],
+        "source.ip": "10.162.33.193",
         "source.mac": "01:00:5e:ad:16:77",
         "tags": [
             "forwarded",
@@ -190,9 +180,7 @@
         "rsa.time.event_time": "2016-04-09T07:22:51.000Z",
         "service.type": "microsoft",
         "source.address": "enatus2114.mail.home",
-        "source.ip": [
-            "10.156.15.206"
-        ],
+        "source.ip": "10.156.15.206",
         "source.mac": "01:00:5e:33:84:66",
         "tags": [
             "forwarded",
@@ -223,9 +211,7 @@
         "rsa.time.event_time": "2016-04-24T14:25:25.000Z",
         "service.type": "microsoft",
         "source.address": "proident2802.home",
-        "source.ip": [
-            "10.1.118.72"
-        ],
+        "source.ip": "10.1.118.72",
         "source.mac": "01:00:5e:69:9a:1a",
         "tags": [
             "forwarded",
@@ -259,9 +245,7 @@
         "rsa.time.event_time": "2016-05-08T09:27:59.000Z",
         "service.type": "microsoft",
         "source.address": "ofdeF7240.www.home",
-        "source.ip": [
-            "10.70.235.184"
-        ],
+        "source.ip": "10.70.235.184",
         "source.mac": "01:00:5e:a2:09:ea",
         "tags": [
             "forwarded",
@@ -301,9 +285,7 @@
         "rsa.time.event_time": "2016-05-22T04:30:33.000Z",
         "service.type": "microsoft",
         "source.address": "amco5712.www5.localdomain",
-        "source.ip": [
-            "10.86.118.154"
-        ],
+        "source.ip": "10.86.118.154",
         "source.mac": "01:00:5e:35:c0:09",
         "tags": [
             "forwarded",
@@ -335,9 +317,7 @@
         "rsa.time.event_time": "2016-06-05T11:33:08.000Z",
         "service.type": "microsoft",
         "source.address": "llu4762.mail.localdomain",
-        "source.ip": [
-            "10.5.62.63"
-        ],
+        "source.ip": "10.5.62.63",
         "source.mac": "01:00:5e:f5:8e:0d",
         "tags": [
             "forwarded",
@@ -371,9 +351,7 @@
         "rsa.time.event_time": "2016-06-20T06:35:42.000Z",
         "service.type": "microsoft",
         "source.address": "emaper2638.lan",
-        "source.ip": [
-            "10.66.3.197"
-        ],
+        "source.ip": "10.66.3.197",
         "source.mac": "01:00:5e:0b:42:ab",
         "tags": [
             "forwarded",
@@ -405,9 +383,7 @@
         "rsa.time.event_time": "2016-07-04T13:38:16.000Z",
         "service.type": "microsoft",
         "source.address": "uatDuis2964.test",
-        "source.ip": [
-            "10.58.0.245"
-        ],
+        "source.ip": "10.58.0.245",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -440,9 +416,7 @@
         "rsa.time.event_time": "2016-07-18T08:40:50.000Z",
         "service.type": "microsoft",
         "source.address": "iusmodt2597.api.domain",
-        "source.ip": [
-            "10.103.246.190"
-        ],
+        "source.ip": "10.103.246.190",
         "source.mac": "01:00:5e:8b:ba:06",
         "tags": [
             "forwarded",
@@ -476,9 +450,7 @@
         "rsa.time.event_time": "2016-08-02T03:43:25.000Z",
         "service.type": "microsoft",
         "source.address": "untNequ5075.www5.domain",
-        "source.ip": [
-            "10.163.217.10"
-        ],
+        "source.ip": "10.163.217.10",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -516,9 +488,7 @@
         "rsa.time.event_time": "2016-08-16T10:45:59.000Z",
         "service.type": "microsoft",
         "source.address": "uidolore6237.internal.local",
-        "source.ip": [
-            "10.150.193.226"
-        ],
+        "source.ip": "10.150.193.226",
         "source.mac": "01:00:5e:42:6c:b4",
         "tags": [
             "forwarded",
@@ -550,9 +520,7 @@
         "rsa.time.event_time": "2016-08-30T05:48:33.000Z",
         "service.type": "microsoft",
         "source.address": "incididu1896.example",
-        "source.ip": [
-            "10.111.61.181"
-        ],
+        "source.ip": "10.111.61.181",
         "source.mac": "01:00:5e:c9:5b:b2",
         "tags": [
             "forwarded",
@@ -583,9 +551,7 @@
         "rsa.time.event_time": "2016-09-13T12:51:07.000Z",
         "service.type": "microsoft",
         "source.address": "idexea3181.www.local",
-        "source.ip": [
-            "10.111.27.193"
-        ],
+        "source.ip": "10.111.27.193",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -617,9 +583,7 @@
         "rsa.time.event_time": "2016-09-28T07:53:42.000Z",
         "service.type": "microsoft",
         "source.address": "imav3236.mail.domain",
-        "source.ip": [
-            "10.153.112.62"
-        ],
+        "source.ip": "10.153.112.62",
         "source.mac": "01:00:5e:e7:c7:cb",
         "tags": [
             "forwarded",
@@ -656,9 +620,7 @@
         "rsa.time.event_time": "2016-10-12T14:56:16.000Z",
         "service.type": "microsoft",
         "source.address": "ercit3947.api.local",
-        "source.ip": [
-            "10.98.34.185"
-        ],
+        "source.ip": "10.98.34.185",
         "source.mac": "01:00:5e:a4:f5:60",
         "tags": [
             "forwarded",
@@ -690,9 +652,7 @@
         "rsa.time.event_time": "2016-10-26T09:58:50.000Z",
         "service.type": "microsoft",
         "source.address": "usan6343.www5.domain",
-        "source.ip": [
-            "10.252.112.103"
-        ],
+        "source.ip": "10.252.112.103",
         "source.mac": "01:00:5e:10:76:60",
         "tags": [
             "forwarded",
@@ -723,9 +683,7 @@
         "rsa.time.event_time": "2016-11-10T05:01:24.000Z",
         "service.type": "microsoft",
         "source.address": "mquaera3924.www5.home",
-        "source.ip": [
-            "10.246.117.190"
-        ],
+        "source.ip": "10.246.117.190",
         "source.mac": "01:00:5e:b9:7e:b1",
         "tags": [
             "forwarded",
@@ -759,9 +717,7 @@
         "rsa.time.event_time": "2016-11-24T12:03:59.000Z",
         "service.type": "microsoft",
         "source.address": "atuse2703.localhost",
-        "source.ip": [
-            "10.82.52.233"
-        ],
+        "source.ip": "10.82.52.233",
         "source.mac": "01:00:5e:fa:2b:37",
         "tags": [
             "forwarded",
@@ -792,9 +748,7 @@
         "rsa.time.event_time": "2016-12-08T07:06:33.000Z",
         "service.type": "microsoft",
         "source.address": "emporinc5075.internal.host",
-        "source.ip": [
-            "10.149.59.28"
-        ],
+        "source.ip": "10.149.59.28",
         "source.mac": "01:00:5e:37:14:9d",
         "tags": [
             "forwarded",
@@ -825,9 +779,7 @@
         "rsa.time.event_time": "2016-12-23T14:09:07.000Z",
         "service.type": "microsoft",
         "source.address": "onsequat2984.www5.domain",
-        "source.ip": [
-            "10.169.144.147"
-        ],
+        "source.ip": "10.169.144.147",
         "source.mac": "01:00:5e:59:a3:48",
         "tags": [
             "forwarded",
@@ -858,9 +810,7 @@
         "rsa.time.event_time": "2017-01-06T09:11:41.000Z",
         "service.type": "microsoft",
         "source.address": "omm4276.www.example",
-        "source.ip": [
-            "10.66.168.154"
-        ],
+        "source.ip": "10.66.168.154",
         "source.mac": "01:00:5e:44:c4:69",
         "tags": [
             "forwarded",
@@ -896,9 +846,7 @@
         "rsa.time.event_time": "2017-01-20T04:14:16.000Z",
         "service.type": "microsoft",
         "source.address": "ctetura4886.www5.lan",
-        "source.ip": [
-            "10.214.241.84"
-        ],
+        "source.ip": "10.214.241.84",
         "source.mac": "01:00:5e:3a:d0:86",
         "tags": [
             "forwarded",
@@ -930,9 +878,7 @@
         "rsa.time.event_time": "2017-02-03T11:16:50.000Z",
         "service.type": "microsoft",
         "source.address": "etM953.api.domain",
-        "source.ip": [
-            "10.97.38.141"
-        ],
+        "source.ip": "10.97.38.141",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -965,9 +911,7 @@
         "rsa.time.event_time": "2017-02-18T06:19:24.000Z",
         "service.type": "microsoft",
         "source.address": "umdolo7781.api.home",
-        "source.ip": [
-            "10.33.140.180"
-        ],
+        "source.ip": "10.33.140.180",
         "source.mac": "01:00:5e:24:f1:b2",
         "tags": [
             "forwarded",
@@ -1001,9 +945,7 @@
         "rsa.time.event_time": "2017-03-04T13:21:59.000Z",
         "service.type": "microsoft",
         "source.address": "imadmini2625.www5.localhost",
-        "source.ip": [
-            "10.119.185.63"
-        ],
+        "source.ip": "10.119.185.63",
         "source.mac": "01:00:5e:31:b9:65",
         "tags": [
             "forwarded",
@@ -1034,9 +976,7 @@
         "rsa.time.event_time": "2017-03-18T08:24:33.000Z",
         "service.type": "microsoft",
         "source.address": "picia6119.mail.host",
-        "source.ip": [
-            "10.95.193.186"
-        ],
+        "source.ip": "10.95.193.186",
         "source.mac": "01:00:5e:60:77:c7",
         "tags": [
             "forwarded",
@@ -1067,9 +1007,7 @@
         "rsa.time.event_time": "2017-04-02T03:27:07.000Z",
         "service.type": "microsoft",
         "source.address": "inv5716.mail.invalid",
-        "source.ip": [
-            "10.17.21.125"
-        ],
+        "source.ip": "10.17.21.125",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -1099,9 +1037,7 @@
         "rsa.time.event_time": "2017-04-16T10:29:41.000Z",
         "service.type": "microsoft",
         "source.address": "uines6355.internal.localdomain",
-        "source.ip": [
-            "10.73.69.75"
-        ],
+        "source.ip": "10.73.69.75",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -1134,9 +1070,7 @@
         "rsa.time.event_time": "2017-04-30T05:32:16.000Z",
         "service.type": "microsoft",
         "source.address": "ici3995.lan",
-        "source.ip": [
-            "10.64.70.5"
-        ],
+        "source.ip": "10.64.70.5",
         "source.mac": "01:00:5e:4e:97:83",
         "tags": [
             "forwarded",
@@ -1168,9 +1102,7 @@
         "rsa.time.event_time": "2017-05-14T12:34:50.000Z",
         "service.type": "microsoft",
         "source.address": "rehender4535.www5.test",
-        "source.ip": [
-            "10.45.25.68"
-        ],
+        "source.ip": "10.45.25.68",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -1200,9 +1132,7 @@
         "rsa.time.event_time": "2017-05-29T07:37:24.000Z",
         "service.type": "microsoft",
         "source.address": "pida2286.internal.home",
-        "source.ip": [
-            "10.28.127.218"
-        ],
+        "source.ip": "10.28.127.218",
         "source.mac": "01:00:5e:cc:0b:8f",
         "tags": [
             "forwarded",
@@ -1233,9 +1163,7 @@
         "rsa.time.event_time": "2017-06-12T14:39:58.000Z",
         "service.type": "microsoft",
         "source.address": "mporain2624.www.localhost",
-        "source.ip": [
-            "10.68.93.6"
-        ],
+        "source.ip": "10.68.93.6",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -1267,9 +1195,7 @@
         "rsa.time.event_time": "2017-06-26T09:42:33.000Z",
         "service.type": "microsoft",
         "source.address": "gnam2508.mail.example",
-        "source.ip": [
-            "10.116.104.101"
-        ],
+        "source.ip": "10.116.104.101",
         "source.mac": "01:00:5e:e1:73:47",
         "tags": [
             "forwarded",
@@ -1300,9 +1226,7 @@
         "rsa.time.event_time": "2017-07-11T04:45:07.000Z",
         "service.type": "microsoft",
         "source.address": "tutla2716.www.domain",
-        "source.ip": [
-            "10.192.110.182"
-        ],
+        "source.ip": "10.192.110.182",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -1332,9 +1256,7 @@
         "rsa.time.event_time": "2017-07-25T11:47:41.000Z",
         "service.type": "microsoft",
         "source.address": "ercit2385.internal.home",
-        "source.ip": [
-            "10.219.84.37"
-        ],
+        "source.ip": "10.219.84.37",
         "source.mac": "01:00:5e:a0:cd:2f",
         "tags": [
             "forwarded",
@@ -1365,9 +1287,7 @@
         "rsa.time.event_time": "2017-08-08T06:50:15.000Z",
         "service.type": "microsoft",
         "source.address": "conseq557.mail.lan",
-        "source.ip": [
-            "10.148.153.201"
-        ],
+        "source.ip": "10.148.153.201",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -1397,9 +1317,7 @@
         "rsa.time.event_time": "2017-08-22T13:52:50.000Z",
         "service.type": "microsoft",
         "source.address": "oei5200.www5.invalid",
-        "source.ip": [
-            "10.103.118.137"
-        ],
+        "source.ip": "10.103.118.137",
         "source.mac": "01:00:5e:c7:b7:18",
         "tags": [
             "forwarded",
@@ -1430,9 +1348,7 @@
         "rsa.time.event_time": "2017-09-06T08:55:24.000Z",
         "service.type": "microsoft",
         "source.address": "adol485.example",
-        "source.ip": [
-            "10.137.223.15"
-        ],
+        "source.ip": "10.137.223.15",
         "source.mac": "01:00:5e:81:99:6f",
         "tags": [
             "forwarded",
@@ -1463,9 +1379,7 @@
         "rsa.time.event_time": "2017-09-20T03:57:58.000Z",
         "service.type": "microsoft",
         "source.address": "etconse7424.internal.lan",
-        "source.ip": [
-            "10.213.147.241"
-        ],
+        "source.ip": "10.213.147.241",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -1497,9 +1411,7 @@
         "rsa.time.event_time": "2017-10-04T11:00:32.000Z",
         "service.type": "microsoft",
         "source.address": "tMalor7410.www.localhost",
-        "source.ip": [
-            "10.183.233.5"
-        ],
+        "source.ip": "10.183.233.5",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -1529,9 +1441,7 @@
         "rsa.time.event_time": "2017-10-19T06:03:07.000Z",
         "service.type": "microsoft",
         "source.address": "equat2243.www5.localdomain",
-        "source.ip": [
-            "10.52.186.29"
-        ],
+        "source.ip": "10.52.186.29",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -1563,9 +1473,7 @@
         "rsa.time.event_time": "2017-11-02T13:05:41.000Z",
         "service.type": "microsoft",
         "source.address": "tmo1835.test",
-        "source.ip": [
-            "10.64.199.102"
-        ],
+        "source.ip": "10.64.199.102",
         "source.mac": "01:00:5e:35:a8:83",
         "tags": [
             "forwarded",
@@ -1599,9 +1507,7 @@
         "rsa.time.event_time": "2017-11-16T08:08:15.000Z",
         "service.type": "microsoft",
         "source.address": "quatD4191.local",
-        "source.ip": [
-            "10.196.143.87"
-        ],
+        "source.ip": "10.196.143.87",
         "source.mac": "01:00:5e:3b:7a:f1",
         "tags": [
             "forwarded",
@@ -1633,9 +1539,7 @@
         "rsa.time.event_time": "2017-12-01T03:10:49.000Z",
         "service.type": "microsoft",
         "source.address": "osqui3661.mail.domain",
-        "source.ip": [
-            "10.163.5.243"
-        ],
+        "source.ip": "10.163.5.243",
         "source.mac": "01:00:5e:1e:d6:07",
         "tags": [
             "forwarded",
@@ -1666,9 +1570,7 @@
         "rsa.time.event_time": "2017-12-15T10:13:24.000Z",
         "service.type": "microsoft",
         "source.address": "ectio2175.www.localhost",
-        "source.ip": [
-            "10.194.114.58"
-        ],
+        "source.ip": "10.194.114.58",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -1698,9 +1600,7 @@
         "rsa.time.event_time": "2017-12-29T05:15:58.000Z",
         "service.type": "microsoft",
         "source.address": "liqui6106.internal.home",
-        "source.ip": [
-            "10.212.42.224"
-        ],
+        "source.ip": "10.212.42.224",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -1732,9 +1632,7 @@
         "rsa.time.event_time": "2018-01-12T12:18:32.000Z",
         "service.type": "microsoft",
         "source.address": "eratv6205.internal.lan",
-        "source.ip": [
-            "10.244.144.198"
-        ],
+        "source.ip": "10.244.144.198",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -1764,9 +1662,7 @@
         "rsa.time.event_time": "2018-01-27T07:21:06.000Z",
         "service.type": "microsoft",
         "source.address": "catc6134.localdomain",
-        "source.ip": [
-            "10.134.192.241"
-        ],
+        "source.ip": "10.134.192.241",
         "source.mac": "01:00:5e:5b:99:6c",
         "tags": [
             "forwarded",
@@ -1797,9 +1693,7 @@
         "rsa.time.event_time": "2018-02-10T14:23:41.000Z",
         "service.type": "microsoft",
         "source.address": "tevelite245.mail.local",
-        "source.ip": [
-            "10.62.191.18"
-        ],
+        "source.ip": "10.62.191.18",
         "source.mac": "01:00:5e:78:a7:55",
         "tags": [
             "forwarded",
@@ -1830,9 +1724,7 @@
         "rsa.time.event_time": "2018-02-24T09:26:15.000Z",
         "service.type": "microsoft",
         "source.address": "abo1637.mail.host",
-        "source.ip": [
-            "10.89.22.113"
-        ],
+        "source.ip": "10.89.22.113",
         "source.mac": "01:00:5e:ed:c2:f7",
         "tags": [
             "forwarded",
@@ -1863,9 +1755,7 @@
         "rsa.time.event_time": "2018-03-11T04:28:49.000Z",
         "service.type": "microsoft",
         "source.address": "piscin6866.internal.host",
-        "source.ip": [
-            "10.90.86.89"
-        ],
+        "source.ip": "10.90.86.89",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -1903,9 +1793,7 @@
         "rsa.time.event_time": "2018-03-25T11:31:24.000Z",
         "service.type": "microsoft",
         "source.address": "idex6952.www.localhost",
-        "source.ip": [
-            "10.67.38.204"
-        ],
+        "source.ip": "10.67.38.204",
         "source.mac": "01:00:5e:69:58:0e",
         "tags": [
             "forwarded",
@@ -1939,9 +1827,7 @@
         "rsa.time.event_time": "2018-04-08T06:33:58.000Z",
         "service.type": "microsoft",
         "source.address": "riosamn7650.api.test",
-        "source.ip": [
-            "10.158.237.92"
-        ],
+        "source.ip": "10.158.237.92",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -1974,9 +1860,7 @@
         "rsa.time.event_time": "2018-04-22T13:36:32.000Z",
         "service.type": "microsoft",
         "source.address": "ehen7519.www5.lan",
-        "source.ip": [
-            "10.107.168.60"
-        ],
+        "source.ip": "10.107.168.60",
         "source.mac": "01:00:5e:a7:ac:70",
         "tags": [
             "forwarded",
@@ -2011,9 +1895,7 @@
         "rsa.time.event_time": "2018-05-07T08:39:06.000Z",
         "service.type": "microsoft",
         "source.address": "boree513.www.corp",
-        "source.ip": [
-            "10.207.201.9"
-        ],
+        "source.ip": "10.207.201.9",
         "source.mac": "01:00:5e:e2:17:79",
         "tags": [
             "forwarded",
@@ -2049,9 +1931,7 @@
         "rsa.time.event_time": "2018-05-21T03:41:41.000Z",
         "service.type": "microsoft",
         "source.address": "aper5651.test",
-        "source.ip": [
-            "10.20.147.134"
-        ],
+        "source.ip": "10.20.147.134",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -2081,9 +1961,7 @@
         "rsa.time.event_time": "2018-06-04T10:44:15.000Z",
         "service.type": "microsoft",
         "source.address": "inventor6088.www.invalid",
-        "source.ip": [
-            "10.213.145.202"
-        ],
+        "source.ip": "10.213.145.202",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -2113,9 +1991,7 @@
         "rsa.time.event_time": "2018-06-19T05:46:49.000Z",
         "service.type": "microsoft",
         "source.address": "aperiame1458.www5.local",
-        "source.ip": [
-            "10.14.81.228"
-        ],
+        "source.ip": "10.14.81.228",
         "source.mac": "01:00:5e:7e:22:1b",
         "tags": [
             "forwarded",
@@ -2146,9 +2022,7 @@
         "rsa.time.event_time": "2018-07-03T12:49:23.000Z",
         "service.type": "microsoft",
         "source.address": "cipitlab6201.www5.example",
-        "source.ip": [
-            "10.76.10.73"
-        ],
+        "source.ip": "10.76.10.73",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -2183,9 +2057,7 @@
         "rsa.time.event_time": "2018-07-17T07:51:58.000Z",
         "service.type": "microsoft",
         "source.address": "com5308.api.domain",
-        "source.ip": [
-            "10.220.5.143"
-        ],
+        "source.ip": "10.220.5.143",
         "source.mac": "01:00:5e:55:ee:a4",
         "tags": [
             "forwarded",
@@ -2217,9 +2089,7 @@
         "rsa.time.event_time": "2018-08-01T14:54:32.000Z",
         "service.type": "microsoft",
         "source.address": "Nemoenim2039.api.localhost",
-        "source.ip": [
-            "10.226.199.190"
-        ],
+        "source.ip": "10.226.199.190",
         "source.mac": "01:00:5e:f6:ba:65",
         "tags": [
             "forwarded",
@@ -2250,9 +2120,7 @@
         "rsa.time.event_time": "2018-08-15T09:57:06.000Z",
         "service.type": "microsoft",
         "source.address": "iquipe2458.api.host",
-        "source.ip": [
-            "10.20.129.206"
-        ],
+        "source.ip": "10.20.129.206",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -2290,9 +2158,7 @@
         "rsa.time.event_time": "2018-08-29T04:59:40.000Z",
         "service.type": "microsoft",
         "source.address": "ovol3674.www5.host",
-        "source.ip": [
-            "10.174.176.36"
-        ],
+        "source.ip": "10.174.176.36",
         "source.mac": "01:00:5e:bb:1d:bf",
         "tags": [
             "forwarded",
@@ -2327,9 +2193,7 @@
         "rsa.time.event_time": "2018-09-12T12:02:15.000Z",
         "service.type": "microsoft",
         "source.address": "nisist2752.home",
-        "source.ip": [
-            "10.94.38.110"
-        ],
+        "source.ip": "10.94.38.110",
         "source.mac": "01:00:5e:c1:3c:48",
         "tags": [
             "forwarded",
@@ -2360,9 +2224,7 @@
         "rsa.time.event_time": "2018-09-27T07:04:49.000Z",
         "service.type": "microsoft",
         "source.address": "intoc1426.mail.lan",
-        "source.ip": [
-            "10.22.110.210"
-        ],
+        "source.ip": "10.22.110.210",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -2392,9 +2254,7 @@
         "rsa.time.event_time": "2018-10-11T14:07:23.000Z",
         "service.type": "microsoft",
         "source.address": "rsitvolu3751.mail.lan",
-        "source.ip": [
-            "10.218.87.174"
-        ],
+        "source.ip": "10.218.87.174",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -2424,9 +2284,7 @@
         "rsa.time.event_time": "2018-10-25T09:09:57.000Z",
         "service.type": "microsoft",
         "source.address": "tqu4367.www5.localhost",
-        "source.ip": [
-            "10.140.113.244"
-        ],
+        "source.ip": "10.140.113.244",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -2456,9 +2314,7 @@
         "rsa.time.event_time": "2018-11-09T04:12:32.000Z",
         "service.type": "microsoft",
         "source.address": "inci5738.www5.invalid",
-        "source.ip": [
-            "10.159.181.29"
-        ],
+        "source.ip": "10.159.181.29",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -2488,9 +2344,7 @@
         "rsa.time.event_time": "2018-11-23T11:15:06.000Z",
         "service.type": "microsoft",
         "source.address": "itecto1300.internal.corp",
-        "source.ip": [
-            "10.178.173.128"
-        ],
+        "source.ip": "10.178.173.128",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -2520,9 +2374,7 @@
         "rsa.time.event_time": "2018-12-07T06:17:40.000Z",
         "service.type": "microsoft",
         "source.address": "siut1579.www.domain",
-        "source.ip": [
-            "10.217.38.30"
-        ],
+        "source.ip": "10.217.38.30",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -2552,9 +2404,7 @@
         "rsa.time.event_time": "2018-12-21T13:20:14.000Z",
         "service.type": "microsoft",
         "source.address": "ame6223.www5.localhost",
-        "source.ip": [
-            "10.178.49.161"
-        ],
+        "source.ip": "10.178.49.161",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -2587,9 +2437,7 @@
         "rsa.time.event_time": "2019-01-05T08:22:49.000Z",
         "service.type": "microsoft",
         "source.address": "ratv5227.www.invalid",
-        "source.ip": [
-            "10.215.205.216"
-        ],
+        "source.ip": "10.215.205.216",
         "source.mac": "01:00:5e:fd:3d:c2",
         "tags": [
             "forwarded",
@@ -2620,9 +2468,7 @@
         "rsa.time.event_time": "2019-01-19T03:25:23.000Z",
         "service.type": "microsoft",
         "source.address": "aturve1647.mail.localhost",
-        "source.ip": [
-            "10.175.103.215"
-        ],
+        "source.ip": "10.175.103.215",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -2652,9 +2498,7 @@
         "rsa.time.event_time": "2019-02-02T10:27:57.000Z",
         "service.type": "microsoft",
         "source.address": "umwrit5433.www5.domain",
-        "source.ip": [
-            "10.236.150.115"
-        ],
+        "source.ip": "10.236.150.115",
         "source.mac": "01:00:5e:ba:09:4a",
         "tags": [
             "forwarded",
@@ -2690,9 +2534,7 @@
         "rsa.time.event_time": "2019-02-17T05:30:32.000Z",
         "service.type": "microsoft",
         "source.address": "llamco7206.www.home",
-        "source.ip": [
-            "10.223.90.192"
-        ],
+        "source.ip": "10.223.90.192",
         "source.mac": "01:00:5e:8f:35:71",
         "tags": [
             "forwarded",
@@ -2732,9 +2574,7 @@
         "rsa.time.event_time": "2019-03-03T12:33:06.000Z",
         "service.type": "microsoft",
         "source.address": "nBCSedut1502.www5.example",
-        "source.ip": [
-            "10.165.192.48"
-        ],
+        "source.ip": "10.165.192.48",
         "source.mac": "01:00:5e:c7:c2:10",
         "tags": [
             "forwarded",
@@ -2766,9 +2606,7 @@
         "rsa.time.event_time": "2019-03-17T07:35:40.000Z",
         "service.type": "microsoft",
         "source.address": "texpli2782.mail.domain",
-        "source.ip": [
-            "10.80.152.108"
-        ],
+        "source.ip": "10.80.152.108",
         "source.mac": "01:00:5e:27:0a:9d",
         "tags": [
             "forwarded",
@@ -2801,9 +2639,7 @@
         "rsa.time.event_time": "2019-04-01T14:38:14.000Z",
         "service.type": "microsoft",
         "source.address": "aco6894.mail.home",
-        "source.ip": [
-            "10.192.21.74"
-        ],
+        "source.ip": "10.192.21.74",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -2833,9 +2669,7 @@
         "rsa.time.event_time": "2019-04-15T09:40:49.000Z",
         "service.type": "microsoft",
         "source.address": "tetu2485.internal.invalid",
-        "source.ip": [
-            "10.142.25.100"
-        ],
+        "source.ip": "10.142.25.100",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -2868,9 +2702,7 @@
         "rsa.time.event_time": "2019-04-29T04:43:23.000Z",
         "service.type": "microsoft",
         "source.address": "doloreme60.www5.localhost",
-        "source.ip": [
-            "10.162.114.217"
-        ],
+        "source.ip": "10.162.114.217",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -2907,9 +2739,7 @@
         "rsa.time.event_time": "2019-05-13T11:45:57.000Z",
         "service.type": "microsoft",
         "source.address": "liqua6498.api.invalid",
-        "source.ip": [
-            "10.57.57.241"
-        ],
+        "source.ip": "10.57.57.241",
         "source.mac": "01:00:5e:d8:53:15",
         "tags": [
             "forwarded",
@@ -2941,9 +2771,7 @@
         "rsa.time.event_time": "2019-05-28T06:48:31.000Z",
         "service.type": "microsoft",
         "source.address": "rsita2628.www5.local",
-        "source.ip": [
-            "10.152.28.171"
-        ],
+        "source.ip": "10.152.28.171",
         "source.mac": "01:00:5e:7a:4c:6e",
         "tags": [
             "forwarded",
@@ -2974,9 +2802,7 @@
         "rsa.time.event_time": "2019-06-11T13:51:06.000Z",
         "service.type": "microsoft",
         "source.address": "luptat7214.domain",
-        "source.ip": [
-            "10.0.132.176"
-        ],
+        "source.ip": "10.0.132.176",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -3008,9 +2834,7 @@
         "rsa.time.event_time": "2019-06-25T08:53:40.000Z",
         "service.type": "microsoft",
         "source.address": "tpersp2624.mail.example",
-        "source.ip": [
-            "10.125.134.213"
-        ],
+        "source.ip": "10.125.134.213",
         "source.mac": "01:00:5e:0b:fb:4a",
         "tags": [
             "forwarded",
@@ -3041,9 +2865,7 @@
         "rsa.time.event_time": "2019-07-10T03:56:14.000Z",
         "service.type": "microsoft",
         "source.address": "aincidu2687.mail.home",
-        "source.ip": [
-            "10.206.96.56"
-        ],
+        "source.ip": "10.206.96.56",
         "source.mac": "01:00:5e:80:9d:2c",
         "tags": [
             "forwarded",
@@ -3077,9 +2899,7 @@
         "rsa.time.event_time": "2019-07-24T10:58:48.000Z",
         "service.type": "microsoft",
         "source.address": "amcor5091.internal.corp",
-        "source.ip": [
-            "10.22.187.69"
-        ],
+        "source.ip": "10.22.187.69",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -3109,9 +2929,7 @@
         "rsa.time.event_time": "2019-08-07T06:01:23.000Z",
         "service.type": "microsoft",
         "source.address": "ncidid5410.internal.domain",
-        "source.ip": [
-            "10.2.128.234"
-        ],
+        "source.ip": "10.2.128.234",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -3145,9 +2963,7 @@
         "rsa.time.event_time": "2019-08-21T13:03:57.000Z",
         "service.type": "microsoft",
         "source.address": "nofd988.api.example",
-        "source.ip": [
-            "10.223.160.140"
-        ],
+        "source.ip": "10.223.160.140",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -3177,9 +2993,7 @@
         "rsa.time.event_time": "2019-09-05T08:06:31.000Z",
         "service.type": "microsoft",
         "source.address": "borisnis6159.www5.localdomain",
-        "source.ip": [
-            "10.137.14.180"
-        ],
+        "source.ip": "10.137.14.180",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -3212,9 +3026,7 @@
         "rsa.time.event_time": "2019-09-19T03:09:05.000Z",
         "service.type": "microsoft",
         "source.address": "isetquas3096.home",
-        "source.ip": [
-            "10.106.93.26"
-        ],
+        "source.ip": "10.106.93.26",
         "source.mac": "01:00:5e:1b:92:a6",
         "tags": [
             "forwarded",
@@ -3245,9 +3057,7 @@
         "rsa.time.event_time": "2019-10-03T10:11:40.000Z",
         "service.type": "microsoft",
         "source.address": "dminima4348.mail.home",
-        "source.ip": [
-            "10.192.182.230"
-        ],
+        "source.ip": "10.192.182.230",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -3282,9 +3092,7 @@
         "rsa.time.event_time": "2019-10-18T05:14:14.000Z",
         "service.type": "microsoft",
         "source.address": "volupt2952.api.local",
-        "source.ip": [
-            "10.24.111.229"
-        ],
+        "source.ip": "10.24.111.229",
         "source.mac": "01:00:5e:64:62:d1",
         "tags": [
             "forwarded",
@@ -3319,9 +3127,7 @@
         "rsa.time.event_time": "2019-11-01T12:16:48.000Z",
         "service.type": "microsoft",
         "source.address": "uii5923.internal.home",
-        "source.ip": [
-            "10.45.253.103"
-        ],
+        "source.ip": "10.45.253.103",
         "source.mac": "01:00:5e:2f:ff:49",
         "tags": [
             "forwarded",
@@ -3357,9 +3163,7 @@
         "rsa.time.event_time": "2019-11-15T07:19:22.000Z",
         "service.type": "microsoft",
         "source.address": "oluptas6981.www5.localhost",
-        "source.ip": [
-            "10.95.241.28"
-        ],
+        "source.ip": "10.95.241.28",
         "tags": [
             "forwarded",
             "microsoft.dhcp"
@@ -3389,9 +3193,7 @@
         "rsa.time.event_time": "2019-11-30T14:21:57.000Z",
         "service.type": "microsoft",
         "source.address": "vitaed4959.example",
-        "source.ip": [
-            "10.84.32.178"
-        ],
+        "source.ip": "10.84.32.178",
         "source.mac": "01:00:5e:11:45:1e",
         "tags": [
             "forwarded",
@@ -3422,9 +3224,7 @@
         "rsa.time.event_time": "2019-12-14T09:24:31.000Z",
         "service.type": "microsoft",
         "source.address": "boreetdo1725.example",
-        "source.ip": [
-            "10.72.196.74"
-        ],
+        "source.ip": "10.72.196.74",
         "source.mac": "01:00:5e:01:2f:7d",
         "tags": [
             "forwarded",

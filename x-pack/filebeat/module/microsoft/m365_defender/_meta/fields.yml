@@ -1,7 +1,6 @@
 - name: microsoft.m365_defender
   type: group
   release: beta
-  default_field: false
   description: >
     Module for ingesting Microsoft Defender ATP.
   fields:

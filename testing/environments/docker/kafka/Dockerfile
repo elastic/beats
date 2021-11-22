@@ -18,8 +18,11 @@ RUN mkdir -p ${KAFKA_LOGS_DIR} && mkdir -p ${KAFKA_HOME} && \
 
 ADD run.sh /run.sh
 ADD healthcheck.sh /healthcheck.sh
+ADD certs/broker.keystore.jks /broker.keystore.jks
+ADD certs/client.truststore.jks /broker.truststore.jks
 
 EXPOSE 9092
+EXPOSE 9093
 EXPOSE 2181
 
 # healthcheck.sh tries to create and delete an empty kafka topic (the topic

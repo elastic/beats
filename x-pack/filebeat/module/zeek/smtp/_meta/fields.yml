@@ -1,6 +1,5 @@
 - name: smtp
   type: group
-  default_field: false
   description: >
     Fields exported by the Zeek SMTP log.
   fields:

@@ -27,6 +27,7 @@ import (
 // BuildPlatforms is a list of GOOS/GOARCH pairs supported by Go.
 // The list originated from 'go tool dist list -json'.
 var BuildPlatforms = BuildPlatformList{
+	{"aix/ppc64", CGOSupported},
 	{"android/386", CGOSupported},
 	{"android/amd64", CGOSupported},
 	{"android/arm", CGOSupported},
@@ -256,7 +257,6 @@ func (list BuildPlatformList) Remove(name string) BuildPlatformList {
 // Select returns a new list containing the platforms that match name.
 func (list BuildPlatformList) Select(name string) BuildPlatformList {
 	attrs := BuildPlatform{Name: name}.Attributes()
-
 	if attrs.Arch == "" {
 		// Filter by GOOS only.
 		return list.filter(func(bp BuildPlatform) bool {
@@ -353,8 +353,11 @@ func NewPlatformList(expr string) BuildPlatformList {
 
 	var out BuildPlatformList
 	if len(pe.Add) == 0 || (len(pe.Select) == 0 && len(pe.Remove) == 0) {
-		// Bootstrap list with default platforms when the expression is
+		// Bootstrap list with platforms when the expression is
 		// exclusively adds OR exclusively selects and removes.
+		out = BuildPlatforms
+	}
+	if len(pe.Remove) > 0 || len(pe.Add) > 0 {
 		out = BuildPlatforms.Defaults()
 	}
 
@@ -375,7 +378,6 @@ func NewPlatformList(expr string) BuildPlatformList {
 		}
 		out = selected
 	}
-
 	for _, name := range pe.Remove {
 		if name == "defaults" {
 			for _, defaultBP := range all.Defaults() {

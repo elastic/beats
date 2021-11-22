@@ -7,6 +7,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan 22 09:05:05 ubuntu-bionic kernel: [16571.459614] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=1 ",
         "event.timezone": "-02:00",
         "event.type": [
             "connection"
@@ -24,7 +25,6 @@
         "iptables.tos": 0,
         "iptables.ttl": 64,
         "log.offset": 0,
-        "log.original": "Jan 22 09:05:05 ubuntu-bionic kernel: [16571.459614] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=1 ",
         "network.community_id": "1:u2vMS3HiWth2lIMKHB1fjELshpQ=",
         "network.transport": "ipv6-icmp",
         "observer.name": "ubuntu-bionic",
@@ -47,6 +47,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan 22 09:05:05 ubuntu-bionic kernel: [16571.459695] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=1 ",
         "event.timezone": "-02:00",
         "event.type": [
             "connection"
@@ -64,7 +65,6 @@
         "iptables.tos": 0,
         "iptables.ttl": 64,
         "log.offset": 236,
-        "log.original": "Jan 22 09:05:05 ubuntu-bionic kernel: [16571.459695] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=1 ",
         "network.community_id": "1:YDcnf7YthUKAbDNo6Cs3rX4jq4w=",
         "network.transport": "ipv6-icmp",
         "observer.name": "ubuntu-bionic",
@@ -87,6 +87,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan 22 09:05:06 ubuntu-bionic kernel: [16572.482458] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=2 ",
         "event.timezone": "-02:00",
         "event.type": [
             "connection"
@@ -104,7 +105,6 @@
         "iptables.tos": 0,
         "iptables.ttl": 64,
         "log.offset": 472,
-        "log.original": "Jan 22 09:05:06 ubuntu-bionic kernel: [16572.482458] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=2 ",
         "network.community_id": "1:u2vMS3HiWth2lIMKHB1fjELshpQ=",
         "network.transport": "ipv6-icmp",
         "observer.name": "ubuntu-bionic",
@@ -127,6 +127,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan 22 09:05:06 ubuntu-bionic kernel: [16572.482476] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=2 ",
         "event.timezone": "-02:00",
         "event.type": [
             "connection"
@@ -144,7 +145,6 @@
         "iptables.tos": 0,
         "iptables.ttl": 64,
         "log.offset": 708,
-        "log.original": "Jan 22 09:05:06 ubuntu-bionic kernel: [16572.482476] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=2 ",
         "network.community_id": "1:YDcnf7YthUKAbDNo6Cs3rX4jq4w=",
         "network.transport": "ipv6-icmp",
         "observer.name": "ubuntu-bionic",
@@ -167,6 +167,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan 22 09:05:07 ubuntu-bionic kernel: [16573.506336] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=3 ",
         "event.timezone": "-02:00",
         "event.type": [
             "connection"
@@ -184,7 +185,6 @@
         "iptables.tos": 0,
         "iptables.ttl": 64,
         "log.offset": 944,
-        "log.original": "Jan 22 09:05:07 ubuntu-bionic kernel: [16573.506336] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=3 ",
         "network.community_id": "1:u2vMS3HiWth2lIMKHB1fjELshpQ=",
         "network.transport": "ipv6-icmp",
         "observer.name": "ubuntu-bionic",
@@ -207,6 +207,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan 22 09:05:07 ubuntu-bionic kernel: [16573.506356] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=3 ",
         "event.timezone": "-02:00",
         "event.type": [
             "connection"
@@ -224,7 +225,6 @@
         "iptables.tos": 0,
         "iptables.ttl": 64,
         "log.offset": 1180,
-        "log.original": "Jan 22 09:05:07 ubuntu-bionic kernel: [16573.506356] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=3 ",
         "network.community_id": "1:YDcnf7YthUKAbDNo6Cs3rX4jq4w=",
         "network.transport": "ipv6-icmp",
         "observer.name": "ubuntu-bionic",
@@ -247,6 +247,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan 22 09:05:08 ubuntu-bionic kernel: [16574.533989] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=4 ",
         "event.timezone": "-02:00",
         "event.type": [
             "connection"
@@ -264,7 +265,6 @@
         "iptables.tos": 0,
         "iptables.ttl": 64,
         "log.offset": 1416,
-        "log.original": "Jan 22 09:05:08 ubuntu-bionic kernel: [16574.533989] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=4 ",
         "network.community_id": "1:u2vMS3HiWth2lIMKHB1fjELshpQ=",
         "network.transport": "ipv6-icmp",
         "observer.name": "ubuntu-bionic",
@@ -287,6 +287,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan 22 09:05:08 ubuntu-bionic kernel: [16574.534007] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=4 ",
         "event.timezone": "-02:00",
         "event.type": [
             "connection"
@@ -304,7 +305,6 @@
         "iptables.tos": 0,
         "iptables.ttl": 64,
         "log.offset": 1652,
-        "log.original": "Jan 22 09:05:08 ubuntu-bionic kernel: [16574.534007] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=4 ",
         "network.community_id": "1:YDcnf7YthUKAbDNo6Cs3rX4jq4w=",
         "network.transport": "ipv6-icmp",
         "observer.name": "ubuntu-bionic",
@@ -327,6 +327,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan 22 09:05:09 ubuntu-bionic kernel: [16575.553704] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=5 ",
         "event.timezone": "-02:00",
         "event.type": [
             "connection"
@@ -344,7 +345,6 @@
         "iptables.tos": 0,
         "iptables.ttl": 64,
         "log.offset": 1888,
-        "log.original": "Jan 22 09:05:09 ubuntu-bionic kernel: [16575.553704] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=868225 PROTO=ICMPv6 TYPE=128 CODE=0 ID=3427 SEQ=5 ",
         "network.community_id": "1:u2vMS3HiWth2lIMKHB1fjELshpQ=",
         "network.transport": "ipv6-icmp",
         "observer.name": "ubuntu-bionic",
@@ -367,6 +367,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan 22 09:05:09 ubuntu-bionic kernel: [16575.553722] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=5 ",
         "event.timezone": "-02:00",
         "event.type": [
             "connection"
@@ -384,7 +385,6 @@
         "iptables.tos": 0,
         "iptables.ttl": 64,
         "log.offset": 2124,
-        "log.original": "Jan 22 09:05:09 ubuntu-bionic kernel: [16575.553722] IN= OUT=lo SRC=2001:0db8:0000:0000:0000:0000:0000:0001 DST=2001:0db8:0000:0000:0000:0000:0000:0002 LEN=104 TC=0 HOPLIMIT=64 FLOWLBL=770819 PROTO=ICMPv6 TYPE=129 CODE=0 ID=3427 SEQ=5 ",
         "network.community_id": "1:YDcnf7YthUKAbDNo6Cs3rX4jq4w=",
         "network.transport": "ipv6-icmp",
         "observer.name": "ubuntu-bionic",
@@ -408,6 +408,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan 22 10:52:34 ubuntu-bionic kernel: [  307.757925] IN= OUT=enp0s3 MAC=90:10:12:34:56:78:90:10:aa:bb:cc:dd:86:dd:ff:ff SRC=fe80:0000:0000:0000:0084:88ff:feae:790a DST=ff02:0000:0000:0000:0000:0000:0000:0016 LEN=96 TC=0 HOPLIMIT=1 FLOWLBL=0 PROTO=ICMPv6 TYPE=143 CODE=0 MARK=0xd4",
         "event.timezone": "-02:00",
         "event.type": [
             "connection"
@@ -424,7 +425,6 @@
         "iptables.tos": 0,
         "iptables.ttl": 1,
         "log.offset": 2360,
-        "log.original": "Jan 22 10:52:34 ubuntu-bionic kernel: [  307.757925] IN= OUT=enp0s3 MAC=90:10:12:34:56:78:90:10:aa:bb:cc:dd:86:dd:ff:ff SRC=fe80:0000:0000:0000:0084:88ff:feae:790a DST=ff02:0000:0000:0000:0000:0000:0000:0016 LEN=96 TC=0 HOPLIMIT=1 FLOWLBL=0 PROTO=ICMPv6 TYPE=143 CODE=0 MARK=0xd4",
         "network.community_id": "1:XZrSeKYMvsI3xGPWG5JqrtsD87U=",
         "network.transport": "ipv6-icmp",
         "network.type": "ipv6",
