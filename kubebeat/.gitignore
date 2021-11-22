@@ -5,3 +5,5 @@
 /kubebeat
 /kubebeat.test
 *.pyc
+*local.yaml
+*local.yml
