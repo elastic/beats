@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
-	"sort"
 	"sync"
 	"testing"
 	"time"
@@ -39,43 +37,57 @@ func TestFileRotator(t *testing.T) {
 	logp.TestingSetup()
 
 	dir := t.TempDir()
+	logname := "sample"
+	c := &testClock{time.Date(2021, 11, 11, 0, 0, 0, 0, time.Local)}
 
-	filename := filepath.Join(dir, "sample.log")
+	filename := filepath.Join(dir, logname)
 	r, err := file.NewFileRotator(filename,
 		file.MaxBackups(2),
 		file.WithLogger(logp.NewLogger("rotator").With(logp.Namespace("rotator"))),
+		file.WithClock(c),
 	)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer r.Close()
 
-	WriteMsg(t, r)
-	AssertDirContents(t, dir, "sample.log")
-
-	Rotate(t, r)
-	AssertDirContents(t, dir, "sample.log.1")
+	firstFile := fmt.Sprintf("%s-%s.ndjson", logname, c.Now().Format(file.DateFormat))
 
 	WriteMsg(t, r)
-	AssertDirContents(t, dir, "sample.log", "sample.log.1")
+	AssertDirContents(t, dir, firstFile)
+
+	c.time = time.Date(2021, 11, 12, 0, 0, 0, 0, time.Local)
 
 	Rotate(t, r)
-	AssertDirContents(t, dir, "sample.log.1", "sample.log.2")
+	AssertDirContents(t, dir, firstFile)
 
 	WriteMsg(t, r)
-	AssertDirContents(t, dir, "sample.log", "sample.log.1", "sample.log.2")
+
+	secondFile := fmt.Sprintf("%s-%s.ndjson", logname, c.Now().Format(file.DateFormat))
+	AssertDirContents(t, dir, firstFile, secondFile)
+
+	c.time = time.Date(2021, 11, 13, 0, 0, 0, 0, time.Local)
 
 	Rotate(t, r)
-	AssertDirContents(t, dir, "sample.log.1", "sample.log.2")
+	AssertDirContents(t, dir, firstFile, secondFile)
 
+	WriteMsg(t, r)
+	thirdFile := fmt.Sprintf("%s-%s.ndjson", logname, c.Now().Format(file.DateFormat))
+	AssertDirContents(t, dir, firstFile, secondFile, thirdFile)
+
+	c.time = time.Date(2021, 11, 14, 0, 0, 0, 0, time.Local)
 	Rotate(t, r)
-	AssertDirContents(t, dir, "sample.log.2", "sample.log.3")
+	AssertDirContents(t, dir, secondFile, thirdFile)
+
+	c.time = time.Date(2021, 11, 15, 0, 0, 0, 0, time.Local)
+	Rotate(t, r)
+	AssertDirContents(t, dir, secondFile, thirdFile)
 }
 
 func TestFileRotatorConcurrently(t *testing.T) {
 	dir := t.TempDir()
 
-	filename := filepath.Join(dir, "sample.log")
+	filename := filepath.Join(dir, "sample")
 	r, err := file.NewFileRotator(filename, file.MaxBackups(2))
 	if err != nil {
 		t.Fatal(err)
@@ -97,29 +109,27 @@ func TestDailyRotation(t *testing.T) {
 	dir := t.TempDir()
 
 	logname := "daily"
-	dateFormat := "2006-01-02"
-	today := time.Now().Format(dateFormat)
-	yesterday := time.Now().AddDate(0, 0, -1).Format(dateFormat)
-	twoDaysAgo := time.Now().AddDate(0, 0, -2).Format(dateFormat)
+	yesterday := time.Now().AddDate(0, 0, -1).Format(file.DateFormat)
+	twoDaysAgo := time.Now().AddDate(0, 0, -2).Format(file.DateFormat)
 
 	// seed directory with existing log files
 	files := []string{
-		logname + "-" + yesterday + "-1",
-		logname + "-" + yesterday + "-2",
-		logname + "-" + yesterday + "-3",
-		logname + "-" + yesterday + "-4",
-		logname + "-" + yesterday + "-5",
-		logname + "-" + yesterday + "-6",
-		logname + "-" + yesterday + "-7",
-		logname + "-" + yesterday + "-8",
-		logname + "-" + yesterday + "-9",
-		logname + "-" + yesterday + "-10",
-		logname + "-" + yesterday + "-11",
-		logname + "-" + yesterday + "-12",
-		logname + "-" + yesterday + "-13",
-		logname + "-" + twoDaysAgo + "-1",
-		logname + "-" + twoDaysAgo + "-2",
-		logname + "-" + twoDaysAgo + "-3",
+		logname + "-" + yesterday + "-1.ndjson",
+		logname + "-" + yesterday + "-2.ndjson",
+		logname + "-" + yesterday + "-3.ndjson",
+		logname + "-" + yesterday + "-4.ndjson",
+		logname + "-" + yesterday + "-5.ndjson",
+		logname + "-" + yesterday + "-6.ndjson",
+		logname + "-" + yesterday + "-7.ndjson",
+		logname + "-" + yesterday + "-8.ndjson",
+		logname + "-" + yesterday + "-9.ndjson",
+		logname + "-" + yesterday + "-10.ndjson",
+		logname + "-" + yesterday + "-11.ndjson",
+		logname + "-" + yesterday + "-12.ndjson",
+		logname + "-" + yesterday + "-13.ndjson",
+		logname + "-" + twoDaysAgo + "-1.ndjson",
+		logname + "-" + twoDaysAgo + "-2.ndjson",
+		logname + "-" + twoDaysAgo + "-3.ndjson",
 	}
 
 	for _, f := range files {
@@ -139,25 +149,26 @@ func TestDailyRotation(t *testing.T) {
 
 	Rotate(t, r)
 
-	AssertDirContents(t, dir, logname+"-"+yesterday+"-12", logname+"-"+yesterday+"-13")
+	AssertDirContents(t, dir, logname+"-"+yesterday+"-12.ndjson", logname+"-"+yesterday+"-13.ndjson")
 
 	WriteMsg(t, r)
 
-	AssertDirContents(t, dir, logname+"-"+yesterday+"-12", logname+"-"+yesterday+"-13", logname)
+	today := time.Now().Format(file.DateFormat)
+	AssertDirContents(t, dir, logname+"-"+yesterday+"-12.ndjson", logname+"-"+yesterday+"-13.ndjson", logname+"-"+today+".ndjson")
 
 	Rotate(t, r)
 
-	AssertDirContents(t, dir, logname+"-"+yesterday+"-13", logname+"-"+today+"-1")
+	AssertDirContents(t, dir, logname+"-"+yesterday+"-13.ndjson", logname+"-"+today+".ndjson")
 
 	WriteMsg(t, r)
 
-	AssertDirContents(t, dir, logname+"-"+yesterday+"-13", logname+"-"+today+"-1", logname)
+	AssertDirContents(t, dir, logname+"-"+yesterday+"-13.ndjson", logname+"-"+today+".ndjson", logname+"-"+today+"-1.ndjson")
 
 	for i := 0; i < (int(maxSizeBytes)/len(logMessage))+1; i++ {
 		WriteMsg(t, r)
 	}
 
-	AssertDirContents(t, dir, logname+"-"+today+"-1", logname+"-"+today+"-2", logname)
+	AssertDirContents(t, dir, logname+"-"+today+"-1.ndjson", logname+"-"+today+"-2.ndjson", logname+"-"+today+"-3.ndjson")
 }
 
 // Tests the FileConfig.RotateOnStartup parameter
@@ -165,13 +176,15 @@ func TestRotateOnStartup(t *testing.T) {
 	dir := t.TempDir()
 
 	logname := "rotate_on_open"
-	filename := filepath.Join(dir, logname)
+	c := &testClock{time.Date(2021, 11, 11, 0, 0, 0, 0, time.Local)}
+	firstFile := fmt.Sprintf("%s-%s.ndjson", logname, c.Now().Format(file.DateFormat))
+	filename := filepath.Join(dir, firstFile)
 
 	// Create an existing log file with this name.
 	CreateFile(t, filename)
-	AssertDirContents(t, dir, logname)
+	AssertDirContents(t, dir, firstFile)
 
-	r, err := file.NewFileRotator(filename, file.RotateOnStartup(false))
+	r, err := file.NewFileRotator(filepath.Join(dir, logname), file.RotateOnStartup(false), file.WithClock(c))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -179,33 +192,37 @@ func TestRotateOnStartup(t *testing.T) {
 	WriteMsg(t, r)
 
 	// The line should have been appended to the existing file without rotation.
-	AssertDirContents(t, dir, logname)
+	AssertDirContents(t, dir, firstFile)
 
 	// Close the first rotator early (the deferred close will be a no-op if
 	// we haven't hit an error by now), so it can't interfere with the second one.
 	r.Close()
 
 	// Create a second rotator with the default setting of rotateOnStartup=true
-	r, err = file.NewFileRotator(filename)
+	c = &testClock{time.Date(2021, 11, 12, 0, 0, 0, 0, time.Local)}
+	r, err = file.NewFileRotator(filepath.Join(dir, logname), file.WithClock(c))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer r.Close()
 
 	// The directory contents shouldn't change until the first Write.
-	AssertDirContents(t, dir, logname)
+	AssertDirContents(t, dir, firstFile)
+
+	secondFile := fmt.Sprintf("%s-%s.ndjson", logname, c.Now().Format(file.DateFormat))
 
 	WriteMsg(t, r)
-	AssertDirContents(t, dir, logname, logname+".1")
+	AssertDirContents(t, dir, firstFile, secondFile)
 }
 
-func TestRotateDateSuffix(t *testing.T) {
+func TestRotate(t *testing.T) {
 	dir := t.TempDir()
 
 	logname := "beatname"
 	filename := filepath.Join(dir, logname)
 
-	r, err := file.NewFileRotator(filename, file.Suffix(file.SuffixDate), file.MaxBackups(1))
+	c := &testClock{time.Date(2021, 11, 11, 0, 0, 0, 0, time.Local)}
+	r, err := file.NewFileRotator(filename, file.MaxBackups(1), file.WithClock(c))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -213,24 +230,24 @@ func TestRotateDateSuffix(t *testing.T) {
 
 	WriteMsg(t, r)
 
-	firstExpectedPattern := fmt.Sprintf("%s-%s.*", logname, time.Now().Format("20060102150405"))
-	AssertDirContentsPattern(t, dir, firstExpectedPattern)
+	firstFile := fmt.Sprintf("%s-%s.ndjson", logname, c.Now().Format(file.DateFormat))
+	AssertDirContents(t, dir, firstFile)
 
-	time.Sleep(2 * time.Second)
-	secondExpectedPattern := fmt.Sprintf("%s-%s.*", logname, time.Now().Format("20060102150405"))
-
-	Rotate(t, r)
-	WriteMsg(t, r)
-
-	AssertDirContentsPattern(t, dir, firstExpectedPattern, secondExpectedPattern)
-
-	time.Sleep(2 * time.Second)
-	thirdExpectedPattern := fmt.Sprintf("%s-%s.*", logname, time.Now().Format("20060102150405"))
+	c.time = time.Date(2021, 11, 13, 0, 0, 0, 0, time.Local)
+	secondFile := fmt.Sprintf("%s-%s.ndjson", logname, c.Now().Format(file.DateFormat))
 
 	Rotate(t, r)
 	WriteMsg(t, r)
 
-	AssertDirContentsPattern(t, dir, secondExpectedPattern, thirdExpectedPattern)
+	AssertDirContents(t, dir, firstFile, secondFile)
+
+	c.time = time.Date(2021, 11, 15, 0, 0, 0, 0, time.Local)
+	thirdFile := fmt.Sprintf("%s-%s.ndjson", logname, c.Now().Format(file.DateFormat))
+
+	Rotate(t, r)
+	WriteMsg(t, r)
+
+	AssertDirContents(t, dir, secondFile, thirdFile)
 }
 
 func CreateFile(t *testing.T, filename string) {
@@ -258,36 +275,7 @@ func AssertDirContents(t *testing.T, dir string, files ...string) {
 		t.Fatal(err)
 	}
 
-	sort.Strings(files)
-	sort.Strings(names)
-	assert.EqualValues(t, files, names)
-}
-
-func AssertDirContentsPattern(t *testing.T, dir string, patterns ...string) {
-	t.Helper()
-
-	f, err := os.Open(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	names, err := f.Readdirnames(-1)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(patterns) != len(names) {
-		t.Fatal("unexpected number of files")
-	}
-
-	sort.Strings(patterns)
-	sort.Strings(names)
-	for i := 0; i < len(patterns); i++ {
-		matches, err := regexp.MatchString(patterns[i], names[i])
-		if err != nil {
-			t.Fatal(err)
-		}
-		assert.True(t, matches, "pattern: %s name: %s", patterns[i], names[i])
-	}
+	assert.ElementsMatch(t, files, names)
 }
 
 func WriteMsg(t *testing.T, r *file.Rotator) {
@@ -306,4 +294,12 @@ func Rotate(t *testing.T, r *file.Rotator) {
 	if err := r.Rotate(); err != nil {
 		t.Fatal(err)
 	}
+}
+
+type testClock struct {
+	time time.Time
+}
+
+func (t testClock) Now() time.Time {
+	return t.time
 }

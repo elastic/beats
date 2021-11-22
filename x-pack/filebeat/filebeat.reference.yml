@@ -2489,7 +2489,8 @@ filebeat.inputs:
   #max_bytes: 10485760
 
   # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
-  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
+  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator,
+  # null_terminator
   #line_terminator: auto
 
   ### Recursive glob configuration
@@ -2743,7 +2744,8 @@ filebeat.inputs:
   #message_max_bytes: 10485760
 
   # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
-  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
+  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator,
+  # null_terminator
   #line_terminator: auto
 
   # The ingest pipeline ID associated with this input. If this is set, it
@@ -4507,11 +4509,6 @@ logging.files:
   # Rotate existing logs on startup rather than appending to the existing
   # file. Defaults to true.
   # rotateonstartup: true
-
-  # Rotated files are either suffixed with a number e.g. filebeat.1 when
-  # renamed during rotation. Or when set to date, the date is added to
-  # the end of the file. On rotation a new file is created, older files are untouched.
-  #suffix: count
 
 # ============================= X-Pack Monitoring ==============================
 # Filebeat can export internal metrics to a central Elasticsearch monitoring
