@@ -2,11 +2,11 @@ version: '2.3'
 
 services:
   enterprise_search:
-    image: docker.elastic.co/integrations-ci/beats-enterprisesearch:${ENT_VERSION:-7.16.0-SNAPSHOT}
+    image: docker.elastic.co/integrations-ci/beats-enterprisesearch:${ENT_VERSION:-8.0.0-SNAPSHOT}
     build:
       context: ./_meta
       args:
-        ENT_VERSION: ${ENT_VERSION:-7.16.0-SNAPSHOT}
+        ENT_VERSION: ${ENT_VERSION:-8.0.0-SNAPSHOT}
     depends_on:
       - "elasticsearch"
     environment:
@@ -15,8 +15,8 @@ services:
       - "elasticsearch.password=changeme"
       - "elasticsearch.host=http://elasticsearch:9200"
       - "allow_es_settings_modification=true"
-      - "ent_search.auth.native1.source=elasticsearch-native"
       - "secret_management.encryption_keys=[4a2cd3f81d39bf28738c10db0ca782095ffac07279561809eecc722e0c20eb09]"
+      - "kibana.host=http://localhost:5601"
       - "JAVA_OPTS=-Xms2g -Xmx2g"
       # Make it possible to run against slightly older ES versions
       - "elasticsearch.ignore_version_mismatch=true"

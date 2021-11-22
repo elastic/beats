@@ -196,7 +196,7 @@ func makeOptions(cfg Config) []zap.Option {
 	if cfg.development {
 		options = append(options, zap.Development())
 	}
-	if cfg.ECSEnabled {
+	if cfg.Beat != "" {
 		fields := []zap.Field{
 			zap.String("service.name", cfg.Beat),
 		}
@@ -241,7 +241,6 @@ func makeFileOutput(cfg Config) (zapcore.Core, error) {
 		file.Interval(cfg.Files.Interval),
 		file.RotateOnStartup(cfg.Files.RotateOnStartup),
 		file.RedirectStderr(cfg.Files.RedirectStderr),
-		file.Suffix(cfg.Files.Suffix),
 	)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create file rotator")
@@ -254,10 +253,7 @@ func newCore(cfg Config, enc zapcore.Encoder, ws zapcore.WriteSyncer, enab zapco
 	return wrappedCore(cfg, zapcore.NewCore(enc, ws, enab))
 }
 func wrappedCore(cfg Config, core zapcore.Core) zapcore.Core {
-	if cfg.ECSEnabled {
-		return ecszap.WrapCore(core)
-	}
-	return core
+	return ecszap.WrapCore(core)
 }
 
 func globalLogger() *zap.Logger {

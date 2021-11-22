@@ -94,7 +94,7 @@ func fileOwner(path string) (sid, owner string, err error) {
 	}
 	defer syscall.LocalFree((syscall.Handle)(unsafe.Pointer(securityDescriptor)))
 
-	// Covert SID to a string and lookup the username.
+	// Convert SID to a string and lookup the username.
 	var errs multierror.Errors
 	sid, err = securityID.String()
 	if err != nil {

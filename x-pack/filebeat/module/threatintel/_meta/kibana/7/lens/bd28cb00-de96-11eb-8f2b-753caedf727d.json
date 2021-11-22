@@ -36,7 +36,7 @@
                                         "size": 3
                                     },
                                     "scale": "ordinal",
-                                    "sourceField": "threatintel.anomalithreatstream.severity"
+                                    "sourceField": "anomali.threatstream.severity"
                                 }
                             },
                             "incompleteColumns": {}
