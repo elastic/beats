@@ -241,7 +241,6 @@ func makeFileOutput(cfg Config) (zapcore.Core, error) {
 		file.Interval(cfg.Files.Interval),
 		file.RotateOnStartup(cfg.Files.RotateOnStartup),
 		file.RedirectStderr(cfg.Files.RedirectStderr),
-		file.Suffix(cfg.Files.Suffix),
 	)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create file rotator")

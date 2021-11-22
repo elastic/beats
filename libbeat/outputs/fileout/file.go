@@ -84,7 +84,6 @@ func (out *fileOutput) init(beat beat.Info, c config) error {
 	var err error
 	out.rotator, err = file.NewFileRotator(
 		path,
-		file.Suffix(c.Suffix),
 		file.MaxSizeBytes(c.RotateEveryKb*1024),
 		file.MaxBackups(c.NumberOfFiles),
 		file.Permissions(os.FileMode(c.Permissions)),
