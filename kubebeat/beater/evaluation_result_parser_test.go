@@ -22,20 +22,14 @@ func TestEvaluationResultParserParseResult(t *testing.T) {
 		assert.Fail(t, "error during parsing of the json", err)
 	}
 
-	// Assert first event
-	firstEvent := parsedResult[0]
-	assert.Equal(t, timestamp, firstEvent.Timestamp, "event timestamp is not correct")
-	assert.Equal(t, runId, firstEvent.Fields["run_id"], "uid is not correct")
-	assert.Equal(t, runId, firstEvent.Fields["resource"], "uid is not correct")
-	assert.Equal(t, runId, firstEvent.Fields["rule"], "uid is not correct")
+	for _, event := range parsedResult {
 
-	// Assert second event
-	secondEvent := parsedResult[0]
-	assert.Equal(t, timestamp, secondEvent.Timestamp, "event timestamp is not correct")
-	assert.Equal(t, runId, secondEvent.Fields["run_id"], "uid is not correct")
-	assert.Equal(t, runId, secondEvent.Fields["resource"], "uid is not correct")
-	assert.Equal(t, runId, secondEvent.Fields["rule"], "uid is not correct")
-
+		assert.Equal(t, timestamp, event.Timestamp, `event timestamp is not correct`)
+		assert.Equal(t, runId, event.Fields["run_id"], "event run_id is not correct")
+		assert.NotEmpty(t, event.Fields["result"], "event result is missing")
+		assert.NotEmpty(t, runId, event.Fields["rule"], "event rule is missing")
+		assert.NotEmpty(t, runId, event.Fields["resource"], "event resource is missing")
+	}
 }
 
 var jsonExample = `{
