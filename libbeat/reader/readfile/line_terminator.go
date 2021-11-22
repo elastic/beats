@@ -44,6 +44,8 @@ const (
 	LineSeparator
 	// ParagraphSeparator is the unicode char PS
 	ParagraphSeparator
+	// NullTerminator
+	NullTerminator
 )
 
 var (
@@ -57,6 +59,7 @@ var (
 		"next_line":                 NextLine,
 		"line_separator":            LineSeparator,
 		"paragraph_separator":       ParagraphSeparator,
+		"null_terminator":           NullTerminator,
 	}
 
 	lineTerminatorCharacters = map[LineTerminator][]byte{
@@ -69,6 +72,7 @@ var (
 		NextLine:               []byte{'\u0085'},
 		LineSeparator:          []byte("\u2028"),
 		ParagraphSeparator:     []byte("\u2029"),
+		NullTerminator:         []byte{'\u0000'},
 	}
 )
 
