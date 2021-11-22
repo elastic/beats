@@ -66,18 +66,6 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	return bt, nil
 }
 
-type PolicyResult map[string]RuleResult
-
-type RuleResult struct {
-	Findings []Finding   `json:"findings"`
-	Resource interface{} `json:"resource"`
-}
-
-type Finding struct {
-	Result interface{} `json:"result"`
-	Rule   interface{} `json:"rule"`
-}
-
 // Run starts kubebeat.
 func (bt *kubebeat) Run(b *beat.Beat) error {
 	logp.Info("kubebeat is running! Hit CTRL-C to stop it.")
