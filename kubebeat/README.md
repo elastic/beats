@@ -27,9 +27,9 @@ The interesting files are:
 
 
 4. Clone the git submodule of the CIS rules:
-
-    git submodule init && git submodule update
-
+```
+    $ git submodule update --init
+```
 5. Comment the Rego code that uses data.yaml (Temporary fix) - go to compliance/cis_k8s/cis_k8s.rego and comment the following line of code:
 
     ```
