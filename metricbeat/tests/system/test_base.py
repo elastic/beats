@@ -100,7 +100,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
             }],
             elasticsearch={"host": self.get_elasticsearch_url()},
         )
-        exit_code = self.run_beat(extra_args=["setup", "--template",
+        exit_code = self.run_beat(extra_args=["setup", "--index-management",
                                               "-E", "setup.template.overwrite=true", "-E", "migration.6_to_7.enabled=true"])
 
         assert exit_code == 0
