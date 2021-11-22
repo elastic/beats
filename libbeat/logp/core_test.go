@@ -153,7 +153,7 @@ func TestLoggingECSFields(t *testing.T) {
 		Level:       DebugLevel,
 		development: true,
 		Files: FileConfig{
-			Name: "beat1.log",
+			Name: "beat1",
 		},
 	}
 	ToObserverOutput()(&cfg)
