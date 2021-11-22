@@ -14,13 +14,13 @@ import (
 
 // kubebeat configuration.
 type kubebeat struct {
-	done             chan struct{}
-	config           config.Config
-	client           beat.Client
-	eval             *evaluator
-	data             *Data
-	evaluationParser *evaluationResultParser
-	scheduler        ResourceScheduler
+	done         chan struct{}
+	config       config.Config
+	client       beat.Client
+	eval         *evaluator
+	data         *Data
+	resultParser *evaluationResultParser
+	scheduler    ResourceScheduler
 }
 
 // New creates an instance of kubebeat.
@@ -56,12 +56,12 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	data.RegisterFetcher("file_system", NewFileFetcher(c.Files))
 
 	bt := &kubebeat{
-		done:             make(chan struct{}),
-		config:           c,
-		eval:             evaluator,
-		data:             data,
-		evaluationParser: eventParser,
-		scheduler:        scheduler,
+		done:         make(chan struct{}),
+		config:       c,
+		eval:         evaluator,
+		data:         data,
+		resultParser: eventParser,
+		scheduler:    scheduler,
 	}
 	return bt, nil
 }
@@ -109,7 +109,7 @@ func (bt *kubebeat) resourceIteration(resource interface{}, runId uuid.UUID, tim
 		return
 	}
 
-	events, err := bt.evaluationParser.ParseResult(result, runId, timestamp)
+	events, err := bt.resultParser.ParseResult(result, runId, timestamp)
 
 	if err != nil {
 		logp.Error(fmt.Errorf("error running the policy: %w", err))
