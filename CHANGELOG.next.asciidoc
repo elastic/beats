@@ -27,6 +27,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - add_process_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
 - add_docker_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
 - Index template's default_fields setting is only populated with ECS fields. {pull}28596[28596] {issue}28215[28215]
+- Remove options `logging.files.suffix` and default to datetime endings. {pull}28927[28927]
 
 *Auditbeat*
 
@@ -62,6 +63,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - All modules: Replace usages of deprecated ECS fields `process.ppid` and `log.original` with `process.parent.pid` and `event.original`. {pull}28620[28620]
 - Replace usages of `host.user.*` fields with `user.*` in `cisco`, `microsoft` and `oracle` modules. {pull}28620[28620]
 - Remove `docker` input. Please use `filestream` input with `container` parser or `container` input. {pull}28817[28817]
+- Change `threatintel` module to use new `threat.*` ECS fields. {pull}29014[29014]
+- `filestream` and `log` inputs accept null (`\u0000`) as line terminator. {pull}28998[28998]
 
 *Heartbeat*
 
@@ -135,7 +138,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Output errors when Kibana index pattern setup fails. {pull}20121[20121]
 - Fix issue in autodiscover that kept inputs stopped after config updates. {pull}20305[20305]
 - Add service resource in k8s cluster role. {pull}20546[20546]
-- Periodic metrics in logs will now report `libbeat.output.events.active` and `beat.memstats.rss`
+- Periodic metrics in logs will now report `libbeat.output.events.active` and `beat.memstats.rss` as gauges (rather than counters). {pull}22877[22877]
+- Fix discovery of Nomad allocations with multiple events during startup. {pull}28700[28700]
 - Allows disable pod events enrichment with deployment name {pull}28521[28521]
 - Fix `fingerprint` processor to give it access to the `@timestamp` field. {issue}28683[28683]
 - Fix the wrong beat name on monitoring and state endpoint {issue}27755[27755]
@@ -183,6 +187,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Upgrade azure-eventhub sdk reference, contains potential checkpoint fixes. {pull}28919[28919]
 - Revert usageDetails api version to 2019-01-01. {pull}28995[28995]
 - Fix in `aws-s3` input regarding provider discovery through endpoint {pull}28963[28963]
+- Fix `threatintel.misp` filters configuration. {issue}27970[27970]
 
 *Heartbeat*
 
@@ -239,6 +244,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
 - Add ECS 1.9 new users fields {pull}26509[26509]
 - Don't split hyphenated tokens {pull}28483[28483]
+- Correctly handle AccessMask if it is an integer or list of masks. {pull}29016[29016]
 
 *Functionbeat*
 
@@ -336,6 +342,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for '/var/log/pods/' path for add_kubernetes_metadata processor with `resource_type: pod`. {pull}28868[28868]
 - Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
 - Add support in aws-s3 input for s3 notification from SNS to SQS. {pull}28800[28800]
+- Add support in aws-s3 input for custom script parsing of s3 notifications. {pull}28946[28946]
+- Improve error handling in aws-s3 input for malformed s3 notifications. {issue}28828[28828] {pull}28946[28946]
 
 *Heartbeat*
 
