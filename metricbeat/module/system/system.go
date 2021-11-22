@@ -18,6 +18,7 @@
 package system
 
 import (
+	"os"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
@@ -61,18 +62,25 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 
 		if partialConfig.HostFS != "" {
 			hostfs = partialConfig.HostFS
+
 		} else {
 			hostfs = "/"
 		}
 
 		logp.Info("In Fleet, using HostFS: %s", hostfs)
+		// In fleet, this will need to be set multiple times
+		// If the user has set an actual value, assume we need to update the global variable
+		// otherwise, only set if it hasn't been exported.
+		if _, exported := os.LookupEnv("HOST_PROC"); !exported || len(hostfs) > 2 {
+			initModule(hostfs)
+		}
+
 	} else {
 		hostfs = paths.Paths.Hostfs
+		once.Do(func() {
+			initModule(hostfs)
+		})
 	}
-
-	once.Do(func() {
-		initModule(hostfs)
-	})
 
 	// set the main Path,
 	if fleetmode.Enabled() && len(paths.Paths.Hostfs) < 2 {
