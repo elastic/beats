@@ -351,6 +351,7 @@ Here’s an example of a flow information sent by Packetbeat. See
   "network": {
     "bytes": 470,
     "community_id": "1:t9T66/2c66NQyftAEsr4aMZv4Hc=",
+    "tos": 0,
     "packets": 3,
     "transport": "tcp",
     "type": "ipv4"

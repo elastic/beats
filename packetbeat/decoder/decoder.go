@@ -248,7 +248,7 @@ func (d *Decoder) process(
 		d.stIP4.next()
 
 		if withFlow {
-			d.flowID.AddIPv4(ip4.SrcIP, ip4.DstIP)
+			d.flowID.AddIPv4(ip4.SrcIP, ip4.DstIP, ip4.TOS)
 		}
 
 		packet.Tuple.SrcIP = ip4.SrcIP
@@ -261,7 +261,7 @@ func (d *Decoder) process(
 		d.stIP6.next()
 
 		if withFlow {
-			d.flowID.AddIPv6(ip6.SrcIP, ip6.DstIP)
+			d.flowID.AddIPv6(ip6.SrcIP, ip6.DstIP, ip6.TrafficClass)
 		}
 
 		packet.Tuple.SrcIP = ip6.SrcIP

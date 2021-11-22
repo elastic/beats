@@ -269,6 +269,7 @@ func createEvent(
 		network["type"] = "ipv4"
 		communityID.SourceIP = srcIP
 		communityID.DestinationIP = dstIP
+		network["tos"] = f.id.tos // add IPv4 ToS (Type of Service)
 	}
 	if src, dst, ok := f.id.IPv4Addr(); ok {
 		srcIP, dstIP := net.IP(src), net.IP(dst)
@@ -283,6 +284,7 @@ func createEvent(
 			communityID.DestinationIP = dstIP
 			network["type"] = "ipv4"
 		}
+		network["tos"] = f.id.tos // add IPv4 ToS (Type of Service)
 	}
 
 	// ipv6 layer meta data
@@ -296,6 +298,7 @@ func createEvent(
 		network["type"] = "ipv6"
 		communityID.SourceIP = srcIP
 		communityID.DestinationIP = dstIP
+		network["tos"] = f.id.tos // add IPv6 ToS (Type of Service)
 	}
 	if src, dst, ok := f.id.IPv6Addr(); ok {
 		srcIP, dstIP := net.IP(src), net.IP(dst)
@@ -310,6 +313,7 @@ func createEvent(
 			communityID.DestinationIP = dstIP
 			network["type"] = "ipv6"
 		}
+		network["tos"] = f.id.tos // add IPv6 ToS (Type of Service)
 	}
 
 	// udp layer meta data

@@ -51,7 +51,8 @@ type flowIDMeta struct {
 	offUDP        uint8
 	offTCP        uint8
 	offID         uint8
-
+	tos	      uint8
+	
 	cntEth  uint8
 	cntVlan uint8
 	cntIP   uint8
@@ -117,6 +118,7 @@ var flowIDEmptyMeta = flowIDMeta{
 	offTCP:        offUnset,
 	offID:         offUnset,
 
+	tos:     0,
 	cntEth:  0,
 	cntVlan: 0,
 	cntIP:   0,
@@ -159,21 +161,23 @@ func (f *FlowID) AddEth(src, dst net.HardwareAddr) {
 	f.cntEth++
 }
 
-func (f *FlowID) AddIPv4(src, dst net.IP) {
+func (f *FlowID) AddIPv4(src, dst net.IP, tos uint8) {
 	debugf("flowid: add ipv4")
 	f.addMultLayerID(
 		&f.offIPv4, &f.offOutterIPv4,
 		IPv4Flow, OutterIPv4Flow,
 		src, dst, flowDirUnset)
+	f.tos = tos
 	f.cntIP++
 }
 
-func (f *FlowID) AddIPv6(src, dst net.IP) {
+func (f *FlowID) AddIPv6(src, dst net.IP, tos uint8) {
 	debugf("flowid: add ipv6")
 	f.addMultLayerID(
 		&f.offIPv6, &f.offOutterIPv6,
 		IPv6Flow, OutterIPv6Flow,
 		src, dst, flowDirUnset)
+	f.tos = tos
 	f.cntIP++
 }
 
