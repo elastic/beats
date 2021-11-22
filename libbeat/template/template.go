@@ -156,12 +156,13 @@ func (t *Template) load(fields mapping.Fields) (common.MapStr, error) {
 
 	// Start processing at the root
 	properties := common.MapStr{}
+	analyzers := common.MapStr{}
 	processor := Processor{EsVersion: t.esVersion, ElasticLicensed: t.elasticLicensed, Migration: t.migration}
-	if err := processor.Process(fields, nil, properties); err != nil {
+	if err := processor.Process(fields, nil, properties, analyzers); err != nil {
 		return nil, err
 	}
 
-	output := t.Generate(properties, processor.dynamicTemplates)
+	output := t.Generate(properties, analyzers, processor.dynamicTemplates)
 
 	return output, nil
 }
@@ -188,7 +189,7 @@ func (t *Template) LoadBytes(data []byte) (common.MapStr, error) {
 
 // LoadMinimal loads the template only with the given configuration
 func (t *Template) LoadMinimal() (common.MapStr, error) {
-	m := common.MapStr{}
+	var m common.MapStr
 	switch t.templateType {
 	case IndexTemplateLegacy:
 		m = t.loadMinimalLegacy()
@@ -249,21 +250,21 @@ func (t *Template) GetPattern() string {
 
 // Generate generates the full template
 // The default values are taken from the default variable.
-func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
+func (t *Template) Generate(properties, analyzers common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
 	switch t.templateType {
 	case IndexTemplateLegacy:
-		return t.generateLegacy(properties, dynamicTemplates)
+		return t.generateLegacy(properties, analyzers, dynamicTemplates)
 	case IndexTemplateComponent:
-		return t.generateComponent(properties, dynamicTemplates)
+		return t.generateComponent(properties, analyzers, dynamicTemplates)
 	case IndexTemplateIndex:
-		return t.generateIndex(properties, dynamicTemplates)
+		return t.generateIndex(properties, analyzers, dynamicTemplates)
 	}
 	return nil
 }
 
-func (t *Template) generateLegacy(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
+func (t *Template) generateLegacy(properties, analyzers common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
 	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
-	return common.MapStr{
+	m := common.MapStr{
 		keyPattern: patterns,
 		"order":    t.order,
 		"mappings": buildMappings(
@@ -278,10 +279,14 @@ func (t *Template) generateLegacy(properties common.MapStr, dynamicTemplates []c
 			),
 		},
 	}
+	if len(analyzers) != 0 {
+		m.Put("settings.analysis.analyzer", analyzers)
+	}
+	return m
 }
 
-func (t *Template) generateComponent(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
-	return common.MapStr{
+func (t *Template) generateComponent(properties, analyzers common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
+	m := common.MapStr{
 		"template": common.MapStr{
 			"mappings": buildMappings(
 				t.beatVersion, t.esVersion, t.beatName,
@@ -296,10 +301,14 @@ func (t *Template) generateComponent(properties common.MapStr, dynamicTemplates 
 			},
 		},
 	}
+	if len(analyzers) != 0 {
+		m.Put("settings.analysis.analyzer", analyzers)
+	}
+	return m
 }
 
-func (t *Template) generateIndex(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
-	tmpl := t.generateComponent(properties, dynamicTemplates)
+func (t *Template) generateIndex(properties, analyzers common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
+	tmpl := t.generateComponent(properties, analyzers, dynamicTemplates)
 	tmpl["priority"] = t.priority
 	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
 	tmpl[keyPattern] = patterns

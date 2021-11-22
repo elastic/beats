@@ -30,13 +30,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.indicator.url.original"
+                            "field": "threat.indicator.url.original"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                            "key": "threatintel.indicator.url.original",
+                            "key": "threat.indicator.url.original",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -67,7 +67,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "AlienVault OTX URL Indicator",
-                        "field": "threatintel.indicator.url.original",
+                        "field": "threat.indicator.url.original",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",
