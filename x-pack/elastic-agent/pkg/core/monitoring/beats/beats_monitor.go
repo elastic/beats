@@ -131,7 +131,7 @@ func (b *Monitor) EnrichArgs(spec program.Spec, pipelineID string, args []string
 		if isSidecar {
 			logFile += "_monitor"
 		}
-		logFile = fmt.Sprintf("%s-json.log", logFile)
+		logFile = fmt.Sprintf("%s", logFile)
 		appendix = append(appendix,
 			"-E", "logging.files.path="+loggingPath,
 			"-E", "logging.files.name="+logFile,
