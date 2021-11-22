@@ -186,14 +186,13 @@ func generateServiceData(
 		return &serviceData{}
 	}
 
-	ckMeta := kubemetaMap.(common.MapStr).Clone()
-	if len(namespaceAnnotations) != 0 {
-		ckMeta.Put("namespace.annotations", namespaceAnnotations)
-	}
 	// k8sMapping includes only the metadata that fall under kubernetes.*
 	// and these are available as dynamic vars through the provider
-	k8sMapping := map[string]interface{}(ckMeta)
+	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr).Clone())
 
+	if len(namespaceAnnotations) != 0 {
+		k8sMapping["namespace_annotations"] = namespaceAnnotations
+	}
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
 	for k, v := range service.GetObjectMeta().GetAnnotations() {
