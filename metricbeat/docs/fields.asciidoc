@@ -8309,6 +8309,42 @@ type: keyword
 --
 
 
+*`beat.stats.beat.name`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.beat.host`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.beat.type`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.beat.uuid`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.beat.version`*::
++
+--
+type: keyword
+
+--
+
+
 *`beat.stats.system.cpu.cores`*::
 +
 --
