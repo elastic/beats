@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/rds/rdsiface"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -47,31 +48,45 @@ func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, ev
 		}
 
 		if output.DBInstanceArn != nil {
-			events[identifier].RootFields.Put(metadataPrefix+"arn", *output.DBInstanceArn)
+			if _, err := events[identifier].RootFields.GetValue(metadataPrefix + "arn"); err == common.ErrKeyNotFound {
+				events[identifier].RootFields.Put(metadataPrefix+"arn", *output.DBInstanceArn)
+			}
 		}
 
 		if output.DBInstanceStatus != nil {
-			events[identifier].RootFields.Put(metadataPrefix+"status", *output.DBInstanceStatus)
+			if _, err := events[identifier].RootFields.GetValue(metadataPrefix + "status"); err == common.ErrKeyNotFound {
+				events[identifier].RootFields.Put(metadataPrefix+"status", *output.DBInstanceStatus)
+			}
 		}
 
 		if output.DBInstanceIdentifier != nil {
-			events[identifier].RootFields.Put(metadataPrefix+"identifier", *output.DBInstanceIdentifier)
+			if _, err := events[identifier].RootFields.GetValue(metadataPrefix + "identifier"); err == common.ErrKeyNotFound {
+				events[identifier].RootFields.Put(metadataPrefix+"identifier", *output.DBInstanceIdentifier)
+			}
 		}
 
 		if output.DBClusterIdentifier != nil {
-			events[identifier].RootFields.Put(metadataPrefix+"db_cluster_identifier", *output.DBClusterIdentifier)
+			if _, err := events[identifier].RootFields.GetValue(metadataPrefix + "db_cluster_identifier"); err == common.ErrKeyNotFound {
+				events[identifier].RootFields.Put(metadataPrefix+"db_cluster_identifier", *output.DBClusterIdentifier)
+			}
 		}
 
 		if output.DBInstanceClass != nil {
-			events[identifier].RootFields.Put(metadataPrefix+"class", *output.DBInstanceClass)
+			if _, err := events[identifier].RootFields.GetValue(metadataPrefix + "class"); err == common.ErrKeyNotFound {
+				events[identifier].RootFields.Put(metadataPrefix+"class", *output.DBInstanceClass)
+			}
 		}
 
 		if output.Engine != nil {
-			events[identifier].RootFields.Put(metadataPrefix+"engine_name", *output.Engine)
+			if _, err := events[identifier].RootFields.GetValue(metadataPrefix + "engine_name"); err == common.ErrKeyNotFound {
+				events[identifier].RootFields.Put(metadataPrefix+"engine_name", *output.Engine)
+			}
 		}
 
 		if output.AvailabilityZone != nil {
-			events[identifier].RootFields.Put("cloud.availability_zone", *output.AvailabilityZone)
+			if _, err := events[identifier].RootFields.GetValue("cloud.availability_zone"); err == common.ErrKeyNotFound {
+				events[identifier].RootFields.Put("cloud.availability_zone", *output.AvailabilityZone)
+			}
 		}
 	}
 	return events
