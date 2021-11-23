@@ -17,7 +17,6 @@ The interesting files are:
   - [Running the Kubebeat](#running-the-kubebeat)
     - [Clean up](#clean-up)
     - [Remote Debugging](#remote-debugging)
-    - [Open questions](#open-questions)
 - [{Beat}](#beat)
   - [Getting Started with {Beat}](#getting-started-with-beat)
     - [Requirements](#requirements)
@@ -128,12 +127,6 @@ The app will wait for the debugger to connect before starting
 
     API server listening at: [::]:40000
 Use your favorite IDE to connect to the debugger on `localhost:40000` (for example [Goland](https://www.jetbrains.com/help/go/attach-to-running-go-processes-with-debugger.html#step-3-create-the-remote-run-debug-configuration-on-the-client-computer))
-
-### Open questions
-
-1. Could we use some code from `kube-mgmt`/`gatekeeper`/`metricbeat` to do the kube-api querying and data management?
-2. How should we integrate this to the agent?
-3. ... many more
 
 # {Beat}
 
