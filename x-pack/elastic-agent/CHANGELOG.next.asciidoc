@@ -150,3 +150,4 @@
 - Add diagnostics collect command to gather beat metadata, config, policy, and logs and bundle it into an archive. {pull}28461[28461]
 - Add `KIBANA_FLEET_SERVICE_TOKEN` to Elastic Agent container. {pull}28096[28096]
 - Enable pprof endpoints for beats processes. Allow pprof endpoints for elastic-agent if enabled. {pull}28983[28983]
+- Add `--pprof` flag to `elastic-agent diagnostics` and an `elastic-agent pprof` command to allow operators to gather pprof data from the agent and beats running under it. {pull}28798[28798]
