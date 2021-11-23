@@ -30,13 +30,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.indicator.file.pe.imphash"
+                            "field": "threat.indicator.file.pe.imphash"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                            "key": "threatintel.indicator.file.pe.imphash",
+                            "key": "threat.indicator.file.pe.imphash",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -47,13 +47,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.indicator.type"
+                            "field": "threat.indicator.type"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
-                            "key": "threatintel.indicator.type",
+                            "key": "threat.indicator.type",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -84,7 +84,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "Imphash Hash",
-                        "field": "threatintel.indicator.file.pe.imphash",
+                        "field": "threat.indicator.file.pe.imphash",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",
@@ -101,7 +101,7 @@
                     "id": "3",
                     "params": {
                         "customLabel": "File Type",
-                        "field": "threatintel.indicator.file.type",
+                        "field": "threat.indicator.file.type",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

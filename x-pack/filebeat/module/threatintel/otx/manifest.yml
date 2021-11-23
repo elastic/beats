@@ -20,6 +20,8 @@ var:
   - name: tags
     default: [threatintel-otx, forwarded]
   - name: proxy_url
+  - name: preserve_original_event
+    default: false
 
 ingest_pipeline:
   - ingest/pipeline.yml

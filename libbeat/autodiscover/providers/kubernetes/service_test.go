@@ -108,15 +108,13 @@ func TestGenerateHints_Service(t *testing.T) {
 						"co.elastic.metrics/module": "prometheus",
 						"not.to.include":            "true",
 					}),
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/period": "10s",
+					}),
 					"service": common.MapStr{
 						"name": "foobar",
 					},
-					"namespace": common.MapStr{
-						"name": "ns",
-						"annotations": getNestedAnnotations(common.MapStr{
-							"co.elastic.metrics/period": "10s",
-						}),
-					},
+					"namespace": "ns",
 				},
 			},
 			result: bus.Event{
@@ -128,12 +126,10 @@ func TestGenerateHints_Service(t *testing.T) {
 					"service": common.MapStr{
 						"name": "foobar",
 					},
-					"namespace": common.MapStr{
-						"name": "ns",
-						"annotations": getNestedAnnotations(common.MapStr{
-							"co.elastic.metrics/period": "10s",
-						}),
-					},
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/period": "10s",
+					}),
+					"namespace": "ns",
 				},
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
@@ -154,13 +150,11 @@ func TestGenerateHints_Service(t *testing.T) {
 						"co.elastic.metrics/period": "10s",
 						"not.to.include":            "true",
 					}),
-					"namespace": common.MapStr{
-						"name": "ns",
-						"annotations": getNestedAnnotations(common.MapStr{
-							"co.elastic.metrics/module": "dropwizard",
-							"co.elastic.metrics/period": "60s",
-						}),
-					},
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "dropwizard",
+						"co.elastic.metrics/period": "60s",
+					}),
+					"namespace": "ns",
 					"service": common.MapStr{
 						"name": "foobar",
 					},
@@ -173,13 +167,11 @@ func TestGenerateHints_Service(t *testing.T) {
 						"co.elastic.metrics/period": "10s",
 						"not.to.include":            "true",
 					}),
-					"namespace": common.MapStr{
-						"name": "ns",
-						"annotations": getNestedAnnotations(common.MapStr{
-							"co.elastic.metrics/module": "dropwizard",
-							"co.elastic.metrics/period": "60s",
-						}),
-					},
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "dropwizard",
+						"co.elastic.metrics/period": "60s",
+					}),
+					"namespace": "ns",
 					"service": common.MapStr{
 						"name": "foobar",
 					},
@@ -198,30 +190,26 @@ func TestGenerateHints_Service(t *testing.T) {
 		{
 			event: bus.Event{
 				"kubernetes": common.MapStr{
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "prometheus",
+						"co.elastic.metrics/period": "10s",
+					}),
 					"service": common.MapStr{
 						"name": "foobar",
 					},
-					"namespace": common.MapStr{
-						"name": "ns",
-						"annotations": getNestedAnnotations(common.MapStr{
-							"co.elastic.metrics/module": "prometheus",
-							"co.elastic.metrics/period": "10s",
-						}),
-					},
+					"namespace": "ns",
 				},
 			},
 			result: bus.Event{
 				"kubernetes": common.MapStr{
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module": "prometheus",
+						"co.elastic.metrics/period": "10s",
+					}),
 					"service": common.MapStr{
 						"name": "foobar",
 					},
-					"namespace": common.MapStr{
-						"name": "ns",
-						"annotations": getNestedAnnotations(common.MapStr{
-							"co.elastic.metrics/module": "prometheus",
-							"co.elastic.metrics/period": "10s",
-						}),
-					},
+					"namespace": "ns",
 				},
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
@@ -298,16 +286,12 @@ func TestEmitEvent_Service(t *testing.T) {
 						"name": "metricbeat",
 						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 					},
-					"namespace": common.MapStr{
-						"name": "default",
-					},
+					"namespace":   "default",
 					"annotations": common.MapStr{},
 				},
 				"meta": common.MapStr{
 					"kubernetes": common.MapStr{
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace": "default",
 						"service": common.MapStr{
 							"name": "metricbeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -389,16 +373,12 @@ func TestEmitEvent_Service(t *testing.T) {
 						"name": "metricbeat",
 						"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 					},
-					"namespace": common.MapStr{
-						"name": "default",
-					},
+					"namespace":   "default",
 					"annotations": common.MapStr{},
 				},
 				"meta": common.MapStr{
 					"kubernetes": common.MapStr{
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace": "default",
 						"service": common.MapStr{
 							"name": "metricbeat",
 							"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
