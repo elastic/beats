@@ -117,7 +117,7 @@ func newDiagnosticsPprofCommandWithArgs(_ []string, streams *cli.IOStreams) *cob
 	cmd := &cobra.Command{
 		Use:   "pprof",
 		Short: "Collect pprof information from a running process.",
-		Long:  "Collect pprof information from the elastic-agent or one of its processes and write to stdout or a file.",
+		Long:  "Collect pprof information from the elastic-agent or one of its processes and write to stdout or a file.\nBy default it will gather a 30s profile of the elastic-agent and output on stdout.",
 		Args:  cobra.MaximumNArgs(5),
 		RunE: func(c *cobra.Command, args []string) error {
 			file, _ := c.Flags().GetString("file")
@@ -140,7 +140,7 @@ func newDiagnosticsPprofCommandWithArgs(_ []string, streams *cli.IOStreams) *cob
 	cmd.Flags().StringP("file", "f", "", "name of the output file, stdout if unspecified.")
 	cmd.Flags().String("pprof-type", "profile", "Collect all pprof data from all running applications. Select one of [allocs, block, cmdline, goroutine, heap, mutex, profile, threadcreate, trace]")
 	cmd.Flags().Duration("pprof-duration", time.Second*30, "The duration to collect trace and profiling data from the debug/pprof endpoints. (default: 30s)")
-	cmd.Flags().Duration("timeout", time.Second*90, "The timeout for the pprof collect command, defaults to 30s+pprof-duration by default. Should be longer then pprof-duration as the command needs time to process the response.")
+	cmd.Flags().Duration("timeout", time.Second*60, "The timeout for the pprof collect command, defaults to 30s+pprof-duration by default. Should be longer then pprof-duration as the command needs time to process the response.")
 	cmd.Flags().String("pprof-application", "elastic-agent", "Application name to collect pprof data from.")
 	cmd.Flags().String("pprof-route-key", "default", "Route key to collect pprof data from.")
 
@@ -282,8 +282,8 @@ func diagnosticsPprofCmd(streams *cli.IOStreams, dur, cmdTimeout time.Duration, 
 		fmt.Fprintf(streams.Out, "pprof data written to %s\n", outFile)
 		return nil
 	}
-	streams.Out.Write(res.Result)
-	return nil
+	_, err = streams.Out.Write(res.Result)
+	return err
 }
 
 func getDiagnostics(ctx context.Context) (DiagnosticsInfo, error) {
