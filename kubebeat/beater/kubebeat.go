@@ -14,13 +14,13 @@ import (
 
 // kubebeat configuration.
 type kubebeat struct {
-	done           chan struct{}
-	config         config.Config
-	client         beat.Client
-	eval           *evaluator
-	data           *Data
-	opaEventParser *opaEventParser
-	scheduler      ResourceScheduler
+	done         chan struct{}
+	config       config.Config
+	client       beat.Client
+	eval         *evaluator
+	data         *Data
+	resultParser *evaluationResultParser
+	scheduler    ResourceScheduler
 }
 
 // New creates an instance of kubebeat.
@@ -41,7 +41,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	eventParser, err := NewOpaEventParser()
+	eventParser, err := NewEvaluationResultParser()
 	if err != nil {
 		return nil, err
 	}
@@ -56,26 +56,14 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	data.RegisterFetcher("file_system", NewFileFetcher(c.Files))
 
 	bt := &kubebeat{
-		done:           make(chan struct{}),
-		config:         c,
-		eval:           evaluator,
-		data:           data,
-		opaEventParser: eventParser,
-		scheduler:      scheduler,
+		done:         make(chan struct{}),
+		config:       c,
+		eval:         evaluator,
+		data:         data,
+		resultParser: eventParser,
+		scheduler:    scheduler,
 	}
 	return bt, nil
-}
-
-type PolicyResult map[string]RuleResult
-
-type RuleResult struct {
-	Findings []Finding   `json:"findings"`
-	Resource interface{} `json:"resource"`
-}
-
-type Finding struct {
-	Result interface{} `json:"result"`
-	Rule   interface{} `json:"rule"`
 }
 
 // Run starts kubebeat.
@@ -100,11 +88,12 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 		case <-bt.done:
 			return nil
 		case o := <-output:
+			timestamp := time.Now()
 			runId, _ := uuid.NewV4()
 			omap := o.(map[string][]interface{})
 
 			resourceCallback := func(resource interface{}) {
-				bt.resourceIteration(resource, runId)
+				bt.resourceIteration(resource, runId, timestamp)
 			}
 
 			bt.scheduler.ScheduleResources(omap, resourceCallback)
@@ -112,8 +101,7 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 	}
 }
 
-func (bt *kubebeat) resourceIteration(resource interface{}, runId uuid.UUID) {
-	timestamp := time.Now()
+func (bt *kubebeat) resourceIteration(resource interface{}, runId uuid.UUID, timestamp time.Time) {
 
 	result, err := bt.eval.Decision(resource)
 	if err != nil {
@@ -121,7 +109,7 @@ func (bt *kubebeat) resourceIteration(resource interface{}, runId uuid.UUID) {
 		return
 	}
 
-	events, err := bt.opaEventParser.ParseResult(result, runId, timestamp)
+	events, err := bt.resultParser.ParseResult(result, runId, timestamp)
 
 	if err != nil {
 		logp.Error(fmt.Errorf("error running the policy: %w", err))
