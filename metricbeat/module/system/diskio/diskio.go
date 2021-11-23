@@ -21,13 +21,10 @@
 package diskio
 
 import (
-	"os"
-	"path/filepath"
 	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/diskio"
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
@@ -63,7 +60,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-	os.Setenv("HOST_PROC", filepath.Join(paths.Paths.Hostfs, "/proc"))
 
 	return &MetricSet{
 		BaseMetricSet:  base,

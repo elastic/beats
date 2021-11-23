@@ -9,13 +9,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.indicator.marking.tlp"
+                            "field": "threat.indicator.marking.tlp"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                            "key": "threatintel.indicator.marking.tlp",
+                            "key": "threat.indicator.marking.tlp",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -55,7 +55,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "Indicator Marking TLP",
-                        "field": "threatintel.indicator.marking.tlp",
+                        "field": "threat.indicator.marking.tlp",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",
@@ -71,7 +71,7 @@
                     "enabled": true,
                     "id": "3",
                     "params": {
-                        "field": "threatintel.indicator.marking.tlp",
+                        "field": "threat.indicator.marking.tlp",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

@@ -1,0 +1,24 @@
+############################# Mockbeat ######################################
+mockbeat:
+############################# General ############################################
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+# If this options is not defined, the hostname is used.
+
+name: TestMonitoringNameFromConfig
+
+# The tags of the shipper are included in their own field with each
+# transaction published. Tags make it easy to group servers by different
+# logical properties.
+# tags: []
+
+############################# Output ############################################
+
+# Configure what outputs to use when sending the data collected by mockbeat.
+# Multiple outputs may NOT be enabled.
+output.elasticsearch:
+    hosts: ["localhost:9200"]
+http:
+  enabled: true
+  port: 5066
