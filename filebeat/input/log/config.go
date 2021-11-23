@@ -88,6 +88,7 @@ type LogConfig struct {
 	CloseRenamed  bool          `config:"close_renamed"`
 	CloseEOF      bool          `config:"close_eof"`
 	CloseTimeout  time.Duration `config:"close_timeout" validate:"min=0"`
+	ReadInterval  time.Duration `config:"read_interval" validate:"min=0"`
 }
 
 // Contains available scan options
@@ -146,6 +147,7 @@ func defaultConfig() config {
 			CloseRenamed:  false,
 			CloseEOF:      false,
 			CloseTimeout:  0,
+			ReadInterval:  0,
 		},
 	}
 }
