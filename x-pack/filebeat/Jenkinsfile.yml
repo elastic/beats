@@ -123,7 +123,7 @@ stages:
             - "^x-pack/filebeat/input/awss3/.*"
             - "^x-pack/filebeat/module/aws/.*"
             - "^x-pack/filebeat/input/awscloudwatch/.*"
-        stage: extended
+        stage: mandatory
     #windows-7-32:  See https://github.com/elastic/beats/issues/22315
     #    mage: "mage build unitTest"
     #    platforms:             ## override default labels in this specific stage.
