@@ -18,3 +18,18 @@ CHECK_HEADERS_DISABLED=true
 .PHONY: copy-vendor
 copy-vendor:
 	mage vendorUpdate
+
+build-docker:
+	GOOS=linux go build && docker build -t kubebeat .
+
+docker-image-load-minikube: build-docker
+	minikube image load kubebeat:latest
+
+docker-image-load-kind: build-docker
+	kind load docker-image docker.elastic.co/beats/elastic-agent:8.1.0-SNAPSHOT --name single-host
+
+deploy-kubebeat:
+	kubectl apply -f deploy/k8s/kubebeat-ds.yaml -n kube-system
+
+build-deploy-docker: build-docker docker-image-load-kind deploy-kubebeat
+
