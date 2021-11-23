@@ -39,11 +39,11 @@ class TestLogging(BaseTest):
         """
         self.run_beat_with_args("Mockbeat is alive!",
                                 logging_args=[])
-        self.assert_contains_ecs_log(logfile="logs/mockbeat")
+        self.assert_contains_ecs_log(logfile="logs/mockbeat-"+self.today+".ndjson")
 
     def test_file_ecs(self):
         """
         logs to file with ECS format
         """
         self.run_beat_with_args("Mockbeat is alive!")
-        self.assert_contains_ecs_log(logfile="logs/mockbeat")
+        self.assert_contains_ecs_log(logfile="logs/mockbeat-"+self.today+".ndjson")

@@ -2,177 +2,7 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
-		},
-		"MetricSetFields": {
-			"name": "object-counts",
-			"quota": 20,
-			"resource": "replicationcontrollers",
-			"type": "hard"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.resourcequota",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
-		},
-		"MetricSetFields": {
-			"name": "object-counts",
-			"quota": 4,
-			"resource": "pods",
-			"type": "hard"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.resourcequota",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
-		},
-		"MetricSetFields": {
-			"name": "object-counts",
-			"quota": 10,
-			"resource": "configmaps",
-			"type": "hard"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.resourcequota",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
-		},
-		"MetricSetFields": {
-			"name": "object-counts",
-			"quota": 4,
-			"resource": "persistentvolumeclaims",
-			"type": "hard"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.resourcequota",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
-		},
-		"MetricSetFields": {
-			"name": "compute-resources",
-			"quota": 1073741824,
-			"resource": "requests.memory",
-			"type": "hard"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.resourcequota",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
-		},
-		"MetricSetFields": {
-			"name": "object-counts",
-			"quota": 0,
-			"resource": "persistentvolumeclaims",
-			"type": "used"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.resourcequota",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
-		},
-		"MetricSetFields": {
-			"name": "compute-resources",
-			"quota": 0,
-			"resource": "limits.memory",
-			"type": "used"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.resourcequota",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
+			"namespace": "myspace"
 		},
 		"MetricSetFields": {
 			"name": "object-counts",
@@ -194,33 +24,7 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
-		},
-		"MetricSetFields": {
-			"name": "compute-resources",
-			"quota": 0,
-			"resource": "requests.memory",
-			"type": "used"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.resourcequota",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
+			"namespace": "myspace"
 		},
 		"MetricSetFields": {
 			"name": "object-counts",
@@ -242,15 +46,13 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
+			"namespace": "myspace"
 		},
 		"MetricSetFields": {
 			"name": "compute-resources",
-			"quota": 2147483648,
-			"resource": "limits.memory",
-			"type": "hard"
+			"quota": 0,
+			"resource": "requests.memory",
+			"type": "used"
 		},
 		"Index": "",
 		"ID": "",
@@ -266,9 +68,7 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
+			"namespace": "myspace"
 		},
 		"MetricSetFields": {
 			"created": {
@@ -290,110 +90,12 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
-		},
-		"MetricSetFields": {
-			"created": {
-				"sec": 1578507217
-			},
-			"name": "object-counts"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.resourcequota",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
+			"namespace": "myspace"
 		},
 		"MetricSetFields": {
 			"name": "compute-resources",
-			"quota": 0,
-			"resource": "requests.nvidia.com/gpu",
-			"type": "used"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.resourcequota",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
-		},
-		"MetricSetFields": {
-			"name": "object-counts",
-			"quota": 1,
-			"resource": "secrets",
-			"type": "used"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.resourcequota",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
-		},
-		"MetricSetFields": {
-			"name": "object-counts",
-			"quota": 0,
-			"resource": "pods",
-			"type": "used"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.resourcequota",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {},
-		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
-		},
-		"MetricSetFields": {
-			"name": "compute-resources",
-			"quota": 1,
-			"resource": "requests.cpu",
+			"quota": 2147483648,
+			"resource": "limits.memory",
 			"type": "hard"
 		},
 		"Index": "",
@@ -410,14 +112,12 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
+			"namespace": "myspace"
 		},
 		"MetricSetFields": {
-			"name": "compute-resources",
+			"name": "object-counts",
 			"quota": 4,
-			"resource": "requests.nvidia.com/gpu",
+			"resource": "persistentvolumeclaims",
 			"type": "hard"
 		},
 		"Index": "",
@@ -434,14 +134,12 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
+			"namespace": "myspace"
 		},
 		"MetricSetFields": {
 			"name": "compute-resources",
-			"quota": 2,
-			"resource": "limits.cpu",
+			"quota": 1073741824,
+			"resource": "requests.memory",
 			"type": "hard"
 		},
 		"Index": "",
@@ -458,14 +156,12 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
+			"namespace": "myspace"
 		},
 		"MetricSetFields": {
 			"name": "object-counts",
 			"quota": 0,
-			"resource": "services.loadbalancers",
+			"resource": "persistentvolumeclaims",
 			"type": "used"
 		},
 		"Index": "",
@@ -482,14 +178,78 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
+			"namespace": "myspace"
+		},
+		"MetricSetFields": {
+			"name": "object-counts",
+			"quota": 4,
+			"resource": "pods",
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "myspace"
+		},
+		"MetricSetFields": {
+			"name": "object-counts",
+			"quota": 20,
+			"resource": "replicationcontrollers",
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "myspace"
+		},
+		"MetricSetFields": {
+			"name": "object-counts",
+			"quota": 10,
+			"resource": "configmaps",
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "myspace"
 		},
 		"MetricSetFields": {
 			"name": "compute-resources",
 			"quota": 0,
-			"resource": "requests.cpu",
+			"resource": "limits.memory",
 			"type": "used"
 		},
 		"Index": "",
@@ -506,9 +266,7 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
+			"namespace": "myspace"
 		},
 		"MetricSetFields": {
 			"name": "object-counts",
@@ -530,9 +288,7 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
+			"namespace": "myspace"
 		},
 		"MetricSetFields": {
 			"name": "object-counts",
@@ -554,9 +310,7 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
+			"namespace": "myspace"
 		},
 		"MetricSetFields": {
 			"name": "object-counts",
@@ -578,9 +332,29 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
+			"namespace": "myspace"
+		},
+		"MetricSetFields": {
+			"name": "compute-resources",
+			"quota": 0,
+			"resource": "limits.cpu",
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "myspace"
 		},
 		"MetricSetFields": {
 			"name": "object-counts",
@@ -602,15 +376,189 @@
 	{
 		"RootFields": {},
 		"ModuleFields": {
-			"namespace": {
-				"name": "myspace"
-			}
+			"namespace": "myspace"
+		},
+		"MetricSetFields": {
+			"name": "object-counts",
+			"quota": 1,
+			"resource": "secrets",
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "myspace"
+		},
+		"MetricSetFields": {
+			"name": "object-counts",
+			"quota": 0,
+			"resource": "pods",
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "myspace"
 		},
 		"MetricSetFields": {
 			"name": "compute-resources",
 			"quota": 0,
-			"resource": "limits.cpu",
+			"resource": "requests.nvidia.com/gpu",
 			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "myspace"
+		},
+		"MetricSetFields": {
+			"created": {
+				"sec": 1578507217
+			},
+			"name": "object-counts"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "myspace"
+		},
+		"MetricSetFields": {
+			"name": "object-counts",
+			"quota": 0,
+			"resource": "services.loadbalancers",
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "myspace"
+		},
+		"MetricSetFields": {
+			"name": "compute-resources",
+			"quota": 2,
+			"resource": "limits.cpu",
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "myspace"
+		},
+		"MetricSetFields": {
+			"name": "compute-resources",
+			"quota": 0,
+			"resource": "requests.cpu",
+			"type": "used"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "myspace"
+		},
+		"MetricSetFields": {
+			"name": "compute-resources",
+			"quota": 1,
+			"resource": "requests.cpu",
+			"type": "hard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.resourcequota",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {},
+		"ModuleFields": {
+			"namespace": "myspace"
+		},
+		"MetricSetFields": {
+			"name": "compute-resources",
+			"quota": 4,
+			"resource": "requests.nvidia.com/gpu",
+			"type": "hard"
 		},
 		"Index": "",
 		"ID": "",
