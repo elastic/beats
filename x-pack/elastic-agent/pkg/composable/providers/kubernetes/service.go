@@ -44,7 +44,7 @@ func NewServiceEventer(
 	logger *logp.Logger,
 	client k8s.Interface,
 	scope string) (Eventer, error) {
-	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Service{}, kubernetes.WatchOptions{
+	watcher, err := kubernetes.NewNamedWatcher("agent-service", client, &kubernetes.Service{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
 		HonorReSyncs: true,
@@ -54,7 +54,7 @@ func NewServiceEventer(
 	}
 
 	metaConf := metadata.GetDefaultResourceMetadataConfig()
-	namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+	namespaceWatcher, err := kubernetes.NewNamedWatcher("agent-namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
 		SyncTimeout: cfg.SyncPeriod,
 		Namespace:   cfg.Namespace,
 	}, nil)

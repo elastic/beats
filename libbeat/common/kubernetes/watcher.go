@@ -93,12 +93,6 @@ type watcher struct {
 	logger   *logp.Logger
 }
 
-// NewWatcher initializes the watcher client to provide a events handler for
-// resource from the cluster (filtered to the given node)
-func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers) (Watcher, error) {
-	return NewNamedWatcher("", client, resource, opts, indexers)
-}
-
 // NewNamedWatcher does the same as NewWatcher, but also allows to name the k8s
 // client's workqueue that is used by the watcher, unlike NewWatcher which sets
 // the workqueue name to "". Workqueue name is important for exposing workqueue
