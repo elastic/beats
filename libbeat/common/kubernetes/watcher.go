@@ -93,9 +93,15 @@ type watcher struct {
 	logger   *logp.Logger
 }
 
-// NewNamedWatcher does the same as NewWatcher, but also allows to name the k8s
-// client's workqueue that is used by the watcher, unlike NewWatcher which sets
-// the workqueue name to "". Workqueue name is important for exposing workqueue
+// NewWatcher initializes the watcher client to provide a events handler for
+// resource from the cluster (filtered to the given node)
+func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers) (Watcher, error) {
+	return NewNamedWatcher("", client, resource, opts, indexers)
+}
+
+// NewNamedWatcher initializes the watcher client to provide an events handler for
+// resource from the cluster (filtered to the given node) and also allows to name the k8s
+// client's workqueue that is used by the watcher. Workqueue name is important for exposing workqueue
 // metrics, if it is empty, its metrics will not be logged by the k8s client.
 func NewNamedWatcher(name string, client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers) (Watcher, error) {
 	var store cache.Store
