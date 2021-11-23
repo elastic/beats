@@ -243,7 +243,7 @@ func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.Ppr
 
 	// retrieve elastic-agent pprof data if requested or application is unspecified.
 	if req.AppName == "" || req.AppName == "elastic-agent" {
-		endpoint := beats.AgentMonitoringEndpoint(runtime.GOOS)
+		endpoint := beats.AgentMonitoringEndpoint(runtime.GOOS, nil) //TODO get monitoring conf?
 		c := newSocketRequester("elastic-agent", "", endpoint)
 		for _, opt := range req.PprofType {
 			wg.Add(1)
@@ -279,7 +279,7 @@ func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.Ppr
 				continue
 			}
 			endpoint := monitoring.MonitoringEndpoint(spec, runtime.GOOS, rk)
-			c := newSocketRequester(dur*2, n, rk, endpoint)
+			c := newSocketRequester(n, rk, endpoint)
 
 			// Launch a concurrent goroutine to gather all pprof endpoints from a socket.
 			for _, opt := range req.PprofType {

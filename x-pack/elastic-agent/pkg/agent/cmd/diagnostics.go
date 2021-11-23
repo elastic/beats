@@ -93,8 +93,14 @@ func newDiagnosticsCollectCommandWithArgs(_ []string, streams *cli.IOStreams) *c
 
 			pprof, _ := c.Flags().GetBool("pprof")
 			d, _ := c.Flags().GetDuration("pprof-duration")
+			// get the command timeout value only if one is set explicitly.
+			// otherwise a value of 30s + pprof-duration will be used.
+			var timeout time.Duration
+			if c.Flags().Changed("timeout") {
+				timeout, _ = c.Flags().GetDuration("timeout")
+			}
 
-			return diagnosticsCollectCmd(streams, file, output, pprof, d)
+			return diagnosticsCollectCmd(streams, file, output, pprof, d, timeout)
 		},
 	}
 
@@ -102,6 +108,7 @@ func newDiagnosticsCollectCommandWithArgs(_ []string, streams *cli.IOStreams) *c
 	cmd.Flags().String("output", "yaml", "Output the collected information in either json, or yaml (default: yaml)") // replace output flag with different options
 	cmd.Flags().Bool("pprof", false, "Collect all pprof data from all running applications.")
 	cmd.Flags().Duration("pprof-duration", time.Second*30, "The duration to collect trace and profiling data from the debug/pprof endpoints. (default: 30s)")
+	cmd.Flags().Duration("timeout", time.Second*30, "The timeout for the diagnostics collect command, will be either 30s or 30s+pprof-duration by default. Should be longer then pprof-duration when pprof is enabled as the command needs time to process/archive the response.")
 
 	return cmd
 }
@@ -116,16 +123,24 @@ func newDiagnosticsPprofCommandWithArgs(_ []string, streams *cli.IOStreams) *cob
 			file, _ := c.Flags().GetString("file")
 			pprofType, _ := c.Flags().GetString("pprof-type")
 			d, _ := c.Flags().GetDuration("pprof-duration")
+			// get the command timeout value only if one is set explicitly.
+			// otherwise a value of 30s + pprof-duration will be used.
+			var timeout time.Duration
+			if c.Flags().Changed("timeout") {
+				timeout, _ = c.Flags().GetDuration("timeout")
+			}
+
 			pprofApp, _ := c.Flags().GetString("pprof-application")
 			pprofRK, _ := c.Flags().GetString("pprof-route-key")
 
-			return diagnosticsPprofCmd(streams, d, file, pprofType, pprofApp, pprofRK)
+			return diagnosticsPprofCmd(streams, d, timeout, file, pprofType, pprofApp, pprofRK)
 		},
 	}
 
 	cmd.Flags().StringP("file", "f", "", "name of the output file, stdout if unspecified.")
 	cmd.Flags().String("pprof-type", "profile", "Collect all pprof data from all running applications. Select one of [allocs, block, cmdline, goroutine, heap, mutex, profile, threadcreate, trace]")
 	cmd.Flags().Duration("pprof-duration", time.Second*30, "The duration to collect trace and profiling data from the debug/pprof endpoints. (default: 30s)")
+	cmd.Flags().Duration("timeout", time.Second*90, "The timeout for the pprof collect command, defaults to 30s+pprof-duration by default. Should be longer then pprof-duration as the command needs time to process the response.")
 	cmd.Flags().String("pprof-application", "elastic-agent", "Application name to collect pprof data from.")
 	cmd.Flags().String("pprof-route-key", "default", "Route key to collect pprof data from.")
 
@@ -160,19 +175,22 @@ func diagnosticCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) er
 	return outputFunc(streams.Out, diag)
 }
 
-func diagnosticsCollectCmd(streams *cli.IOStreams, fileName, outputFormat string, pprof bool, pprofDur time.Duration) error {
+func diagnosticsCollectCmd(streams *cli.IOStreams, fileName, outputFormat string, pprof bool, pprofDur, cmdTimeout time.Duration) error {
 	err := tryContainerLoadPaths()
 	if err != nil {
 		return err
 	}
 
 	ctx := handleSignal(context.Background())
-	d := time.Second * 30
-	// Add more time to the ctx to allow profile/trace data to be gathered and processed
-	if pprof {
-		d += pprofDur
+	// set command timeout to 30s or 30s+pprofDur if no timeout is specified
+	if cmdTimeout == time.Duration(0) {
+		cmdTimeout = time.Second * 30
+		if pprof {
+			cmdTimeout += pprofDur
+		}
+
 	}
-	innerCtx, cancel := context.WithTimeout(ctx, d)
+	innerCtx, cancel := context.WithTimeout(ctx, cmdTimeout)
 	defer cancel()
 
 	diag, err := getDiagnostics(innerCtx)
@@ -206,7 +224,7 @@ func diagnosticsCollectCmd(streams *cli.IOStreams, fileName, outputFormat string
 	return nil
 }
 
-func diagnosticsPprofCmd(streams *cli.IOStreams, dur time.Duration, outFile, pType, appName, rk string) error {
+func diagnosticsPprofCmd(streams *cli.IOStreams, dur, cmdTimeout time.Duration, outFile, pType, appName, rk string) error {
 	pt, ok := proto.PprofOption_value[strings.ToUpper(pType)]
 	if !ok {
 		return fmt.Errorf("unknown pprof-type %q, select one of [allocs, block, cmdline, goroutine, heap, mutex, profile, threadcreate, trace]", pType)
@@ -218,7 +236,11 @@ func diagnosticsPprofCmd(streams *cli.IOStreams, dur time.Duration, outFile, pTy
 	}
 
 	ctx := handleSignal(context.Background())
-	innerCtx, cancel := context.WithTimeout(ctx, dur+time.Second*30)
+	// set cmdTimeout to 30s+dur if not set.
+	if cmdTimeout == time.Duration(0) {
+		cmdTimeout = time.Second*30 + dur
+	}
+	innerCtx, cancel := context.WithTimeout(ctx, cmdTimeout)
 	defer cancel()
 
 	daemon := client.New()
