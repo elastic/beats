@@ -452,8 +452,7 @@ func insertRootFields(event mb.Event, metricValue float64, labels []string) mb.E
 	dimNames := strings.Split(labels[identifierNameIdx], ",")
 	dimValues := strings.Split(labels[identifierValueIdx], ",")
 	for i := 0; i < len(dimNames); i++ {
-		value, err := event.RootFields.GetValue("aws.dimensions." + dimNames[i])
-		if err == common.ErrKeyNotFound {
+		if _, err := event.RootFields.GetValue("aws.dimensions." + dimNames[i]); err == common.ErrKeyNotFound {
 			event.RootFields.Put("aws.dimensions."+dimNames[i], dimValues[i])
 		}
 
