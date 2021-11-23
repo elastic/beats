@@ -107,7 +107,7 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 	}
 
 	if accessor.GetNamespace() != "" {
-		safemapstr.Put(meta, "namespace.name", accessor.GetNamespace())
+		safemapstr.Put(meta, "namespace", accessor.GetNamespace())
 	}
 
 	// Add controller metadata if present
