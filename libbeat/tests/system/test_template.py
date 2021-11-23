@@ -180,7 +180,7 @@ class TestCommandSetupTemplate(BaseTest):
         super(TestCommandSetupTemplate, self).setUp()
 
         # auto-derived default settings, if nothing else is set
-        self.setupCmd = "--template"
+        self.setupCmd = "--index-management"
         self.data_stream = self.beat_name + "-9.9.9"
         self.policy_name = self.beat_name
 
@@ -207,7 +207,7 @@ class TestCommandSetupTemplate(BaseTest):
         """
         self.render_config()
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-                                  extra_args=["setup", self.setupCmd, "--ilm-policy"])
+                                  extra_args=["setup", self.setupCmd])
 
         assert exit_code == 0
         self.idxmgmt.assert_index_template_loaded(self.data_stream)
