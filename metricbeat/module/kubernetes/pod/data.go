@@ -59,9 +59,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 
 		podEvent := common.MapStr{
 			mb.ModuleDataKey: common.MapStr{
-				"namespace": common.MapStr{
-					"name": pod.PodRef.Namespace,
-				},
+				"namespace": pod.PodRef.Namespace,
 				"node": common.MapStr{
 					"name": node.NodeName,
 				},
