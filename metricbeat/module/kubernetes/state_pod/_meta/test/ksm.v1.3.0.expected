@@ -2,226 +2,7 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "minikube"
-			}
-		},
-		"MetricSetFields": {
-			"host_ip": "10.0.2.15",
-			"ip": "172.17.0.5",
-			"name": "kube-state-metrics-6479d88c5c-5b6cl",
-			"status": {
-				"phase": "running",
-				"ready": "true",
-				"scheduled": "true"
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.pod",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "minikube"
-			}
-		},
-		"MetricSetFields": {
-			"host_ip": "10.0.2.15",
-			"ip": "10.0.2.15",
-			"name": "kube-proxy-znhg6",
-			"status": {
-				"phase": "running",
-				"ready": "true",
-				"scheduled": "true"
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.pod",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "minikube"
-			}
-		},
-		"MetricSetFields": {
-			"host_ip": "10.0.2.15",
-			"ip": "10.0.2.15",
-			"name": "kube-controller-manager-minikube",
-			"status": {
-				"phase": "running",
-				"ready": "true",
-				"scheduled": "true"
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.pod",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "minikube"
-			}
-		},
-		"MetricSetFields": {
-			"host_ip": "10.0.2.15",
-			"ip": "10.0.2.15",
-			"name": "storage-provisioner",
-			"status": {
-				"phase": "running",
-				"ready": "true",
-				"scheduled": "true"
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.pod",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "minikube"
-			}
-		},
-		"MetricSetFields": {
-			"host_ip": "10.0.2.15",
-			"ip": "10.0.2.15",
-			"name": "etcd-minikube",
-			"status": {
-				"phase": "running",
-				"ready": "true",
-				"scheduled": "true"
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.pod",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "minikube"
-			}
-		},
-		"MetricSetFields": {
-			"host_ip": "10.0.2.15",
-			"ip": "172.17.0.2",
-			"name": "kube-dns-6f4fd4bdf-wlmht",
-			"status": {
-				"phase": "running",
-				"ready": "true",
-				"scheduled": "true"
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.pod",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
-			"node": {
-				"name": "minikube"
-			}
-		},
-		"MetricSetFields": {
-			"host_ip": "10.0.2.15",
-			"ip": "172.17.0.3",
-			"name": "kubernetes-dashboard-77d8b98585-vqtzm",
-			"status": {
-				"phase": "running",
-				"ready": "true",
-				"scheduled": "true"
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.pod",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
+			"namespace": "kube-system",
 			"node": {
 				"name": "minikube"
 			}
@@ -250,9 +31,36 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
+			"namespace": "kube-system",
+			"node": {
+				"name": "minikube"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "10.0.2.15",
+			"ip": "10.0.2.15",
+			"name": "kube-apiserver-minikube",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
 			"node": {
 				"name": "minikube"
 			}
@@ -281,9 +89,65 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			},
+			"namespace": "kube-system",
+			"node": {
+				"name": "minikube"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "10.0.2.15",
+			"ip": "172.17.0.3",
+			"name": "kubernetes-dashboard-77d8b98585-vqtzm",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "minikube"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "10.0.2.15",
+			"ip": "172.17.0.2",
+			"name": "kube-dns-6f4fd4bdf-wlmht",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
 			"node": {
 				"name": "minikube"
 			}
@@ -291,7 +155,123 @@
 		"MetricSetFields": {
 			"host_ip": "10.0.2.15",
 			"ip": "10.0.2.15",
-			"name": "kube-apiserver-minikube",
+			"name": "kube-controller-manager-minikube",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "minikube"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "10.0.2.15",
+			"ip": "10.0.2.15",
+			"name": "storage-provisioner",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "minikube"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "10.0.2.15",
+			"ip": "10.0.2.15",
+			"name": "etcd-minikube",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "minikube"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "10.0.2.15",
+			"ip": "172.17.0.5",
+			"name": "kube-state-metrics-6479d88c5c-5b6cl",
+			"status": {
+				"phase": "running",
+				"ready": "true",
+				"scheduled": "true"
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.pod",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system",
+			"node": {
+				"name": "minikube"
+			}
+		},
+		"MetricSetFields": {
+			"host_ip": "10.0.2.15",
+			"ip": "10.0.2.15",
+			"name": "kube-proxy-znhg6",
 			"status": {
 				"phase": "running",
 				"ready": "true",

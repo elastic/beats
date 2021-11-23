@@ -70,7 +70,7 @@ func (n *namespace) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) c
 	}
 
 	meta := n.resource.GenerateK8s(resource, obj, opts...)
-	meta = unifyResourceMetadata(meta)
+	meta = flattenMetadata(meta)
 
 	// TODO: Add extra fields in here if need be
 	return meta
@@ -94,39 +94,25 @@ func (n *namespace) GenerateFromName(name string, opts ...FieldOptions) common.M
 	return nil
 }
 
-// unifyResourceMetadata moves all the resource's metadata (labels, annotations)
-// under the resource field
-// example input:
-// 				"kubernetes": common.MapStr{
-//					"labels": common.MapStr{
-//						"foo": "bar",
-//					},
-//					"annotations": common.MapStr{
-//						"spam": "baz",
-//					},
-//					"namespace": common.MapStr{
-//						"name": name,
-//						"uid":  uid,
-//					},
-//				},
-// example output:
-// 				"kubernetes": common.MapStr{
-//					"namespace": common.MapStr{
-//						"name": name,
-//						"uid":  uid,
-//						"labels": common.MapStr{
-//							"foo": "bar",
-//						},
-//						"annotations": common.MapStr{
-//							"spam": "baz",
-//						},
-//					},
-//				},
-func unifyResourceMetadata(in common.MapStr) common.MapStr {
-	resourceValues, ok := in[resource].(common.MapStr)
-	if !ok {
-		return in
+func flattenMetadata(in common.MapStr) common.MapStr {
+	out := common.MapStr{}
+	rawFields, err := in.GetValue(resource)
+	if err != nil {
+		return nil
 	}
+
+	fields, ok := rawFields.(common.MapStr)
+	if !ok {
+		return nil
+	}
+	for k, v := range fields {
+		if k == "name" {
+			out[resource] = v
+		} else {
+			out[resource+"_"+k] = v
+		}
+	}
+
 	populateFromKeys := []string{"labels", "annotations"}
 	for _, key := range populateFromKeys {
 		rawValues, err := in.GetValue(key)
@@ -135,10 +121,9 @@ func unifyResourceMetadata(in common.MapStr) common.MapStr {
 		}
 		values, ok := rawValues.(common.MapStr)
 		if ok {
-			resourceValues.Put(key, values)
-			in.Delete(key)
+			out[resource+"_"+key] = values
 		}
 	}
 
-	return in
+	return out
 }
