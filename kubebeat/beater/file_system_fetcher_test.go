@@ -36,9 +36,14 @@ func TestFileFetcherFetchFilesFromFileSystem(t *testing.T) {
 }
 
 func TestFileFetcherFetchDirectoryFromFileSystem(t *testing.T) {
+	outerDirectoryName := "file-fetcher-test-1"
+	dir, err := ioutil.TempDir("", outerDirectoryName)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	dirNamePrefix := []string{"file-fetcher-test-1"}
-	dir, err := ioutil.TempDir("", dirNamePrefix[0])
+	innerDirectoryName := "file-fetcher-test-1"
+	innerDir, err := ioutil.TempDir(dir, innerDirectoryName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,7 +52,7 @@ func TestFileFetcherFetchDirectoryFromFileSystem(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	for _, fileName := range resourcesNames {
-		file := filepath.Join(dir, fileName)
+		file := filepath.Join(innerDir, fileName)
 		if err = ioutil.WriteFile(file, []byte("test txt\n"), 0600); err != nil {
 			assert.Fail(t, "Could not able to write a new file", err)
 		}

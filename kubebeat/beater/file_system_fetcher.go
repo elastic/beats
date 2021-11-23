@@ -50,6 +50,8 @@ func (f *FileSystemFetcher) Fetch() ([]interface{}, error) {
 
 func (f *FileSystemFetcher) fetchSystemResource(filePath string) []interface{} {
 
+	dfs, _ := filepath.Glob(filePath + "/**", )
+	logp.Info("Failed to fetch %s, error", dfs)
 	results := make([]interface{}, 0)
 	info, err := os.Stat(filePath)
 
