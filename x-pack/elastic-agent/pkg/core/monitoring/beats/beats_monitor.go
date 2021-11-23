@@ -122,6 +122,7 @@ func (b *Monitor) EnrichArgs(spec program.Spec, pipelineID string, args []string
 		appendix = append(appendix,
 			"-E", "http.enabled=true",
 			"-E", "http.host="+endpoint,
+			"-E", "http.pprof.enabled=true",
 		)
 	}
 
