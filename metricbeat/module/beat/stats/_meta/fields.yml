@@ -219,6 +219,19 @@
                   type: long
                 - name: unauthorized
                   type: long
+    - name: info
+      type: group
+      fields:
+        - name: name
+          type: keyword
+        - name: host
+          type: keyword
+        - name: type
+          type: keyword
+        - name: uuid
+          type: keyword
+        - name: version
+          type: keyword
     - name: beat
       type: group
       fields:

@@ -9,24 +9,12 @@
         "fileset.name": "recordedfuture",
         "input.type": "log",
         "log.offset": 0,
-        "service.type": "threatintel",
-        "tags": [
-            "forwarded",
-            "threatintel-recordedfuture"
-        ],
-        "threatintel.indicator.file.hash.md5": "25328d1a481903f2d900479570842247",
-        "threatintel.indicator.file.hash.sha1": "d73c663e2ac0c7a14ca0e2681dd599b2e7a24f65",
-        "threatintel.indicator.file.hash.sha256": "dec3a20fa1493c8e669b26d3f8b6084b34fda9906c978f9f12fb43f76504b5d6",
-        "threatintel.indicator.first_seen": "2021-06-20T18:40:18.503Z",
-        "threatintel.indicator.last_seen": "2021-06-20T18:40:18.503Z",
-        "threatintel.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3Adec3a20fa1493c8e669b26d3f8b6084b34fda9906c978f9f12fb43f76504b5d6",
-        "threatintel.indicator.type": "file",
-        "threatintel.recordedfuture.entity.id": "hash:dec3a20fa1493c8e669b26d3f8b6084b34fda9906c978f9f12fb43f76504b5d6",
-        "threatintel.recordedfuture.entity.type": "Hash",
-        "threatintel.recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3Adec3a20fa1493c8e669b26d3f8b6084b34fda9906c978f9f12fb43f76504b5d6",
-        "threatintel.recordedfuture.risk.criticality": 3,
-        "threatintel.recordedfuture.risk.criticalityLabel": "Malicious",
-        "threatintel.recordedfuture.risk.evidenceDetails": [
+        "recordedfuture.entity.id": "hash:dec3a20fa1493c8e669b26d3f8b6084b34fda9906c978f9f12fb43f76504b5d6",
+        "recordedfuture.entity.type": "Hash",
+        "recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3Adec3a20fa1493c8e669b26d3f8b6084b34fda9906c978f9f12fb43f76504b5d6",
+        "recordedfuture.risk.criticality": 3,
+        "recordedfuture.risk.criticalityLabel": "Malicious",
+        "recordedfuture.risk.evidenceDetails": [
             {
                 "criticality": 3,
                 "criticalityLabel": "Malicious",
@@ -44,10 +32,24 @@
                 "timestamp": "2021-06-20T18:40:18.503Z"
             }
         ],
-        "threatintel.recordedfuture.risk.riskString": "2/14",
-        "threatintel.recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
-        "threatintel.recordedfuture.risk.rules": 2,
-        "threatintel.recordedfuture.risk.score": 65
+        "recordedfuture.risk.riskString": "2/14",
+        "recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
+        "recordedfuture.risk.rules": 2,
+        "recordedfuture.risk.score": 65,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.file.hash.md5": "25328d1a481903f2d900479570842247",
+        "threat.indicator.file.hash.sha1": "d73c663e2ac0c7a14ca0e2681dd599b2e7a24f65",
+        "threat.indicator.file.hash.sha256": "dec3a20fa1493c8e669b26d3f8b6084b34fda9906c978f9f12fb43f76504b5d6",
+        "threat.indicator.first_seen": "2021-06-20T18:40:18.503Z",
+        "threat.indicator.last_seen": "2021-06-20T18:40:18.503Z",
+        "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3Adec3a20fa1493c8e669b26d3f8b6084b34fda9906c978f9f12fb43f76504b5d6",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
@@ -59,24 +61,12 @@
         "fileset.name": "recordedfuture",
         "input.type": "log",
         "log.offset": 1478,
-        "service.type": "threatintel",
-        "tags": [
-            "forwarded",
-            "threatintel-recordedfuture"
-        ],
-        "threatintel.indicator.file.hash.md5": "7b8d9afd032f0c253b7dd68aca6fb50b",
-        "threatintel.indicator.file.hash.sha1": "f9ece49c249aabab29fd9c2193d897b7d131ed17",
-        "threatintel.indicator.file.hash.sha256": "4014355fdfee5fe9e01f3a84356d743c022cd75510f6c96ffe16fb332855d6f2",
-        "threatintel.indicator.first_seen": "2021-06-20T18:40:18.452Z",
-        "threatintel.indicator.last_seen": "2021-06-20T18:40:18.452Z",
-        "threatintel.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3A4014355fdfee5fe9e01f3a84356d743c022cd75510f6c96ffe16fb332855d6f2",
-        "threatintel.indicator.type": "file",
-        "threatintel.recordedfuture.entity.id": "hash:4014355fdfee5fe9e01f3a84356d743c022cd75510f6c96ffe16fb332855d6f2",
-        "threatintel.recordedfuture.entity.type": "Hash",
-        "threatintel.recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3A4014355fdfee5fe9e01f3a84356d743c022cd75510f6c96ffe16fb332855d6f2",
-        "threatintel.recordedfuture.risk.criticality": 3,
-        "threatintel.recordedfuture.risk.criticalityLabel": "Malicious",
-        "threatintel.recordedfuture.risk.evidenceDetails": [
+        "recordedfuture.entity.id": "hash:4014355fdfee5fe9e01f3a84356d743c022cd75510f6c96ffe16fb332855d6f2",
+        "recordedfuture.entity.type": "Hash",
+        "recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3A4014355fdfee5fe9e01f3a84356d743c022cd75510f6c96ffe16fb332855d6f2",
+        "recordedfuture.risk.criticality": 3,
+        "recordedfuture.risk.criticalityLabel": "Malicious",
+        "recordedfuture.risk.evidenceDetails": [
             {
                 "criticality": 3,
                 "criticalityLabel": "Malicious",
@@ -94,10 +84,24 @@
                 "timestamp": "2021-06-20T18:40:18.452Z"
             }
         ],
-        "threatintel.recordedfuture.risk.riskString": "2/14",
-        "threatintel.recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
-        "threatintel.recordedfuture.risk.rules": 2,
-        "threatintel.recordedfuture.risk.score": 65
+        "recordedfuture.risk.riskString": "2/14",
+        "recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
+        "recordedfuture.risk.rules": 2,
+        "recordedfuture.risk.score": 65,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.file.hash.md5": "7b8d9afd032f0c253b7dd68aca6fb50b",
+        "threat.indicator.file.hash.sha1": "f9ece49c249aabab29fd9c2193d897b7d131ed17",
+        "threat.indicator.file.hash.sha256": "4014355fdfee5fe9e01f3a84356d743c022cd75510f6c96ffe16fb332855d6f2",
+        "threat.indicator.first_seen": "2021-06-20T18:40:18.452Z",
+        "threat.indicator.last_seen": "2021-06-20T18:40:18.452Z",
+        "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3A4014355fdfee5fe9e01f3a84356d743c022cd75510f6c96ffe16fb332855d6f2",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
@@ -109,24 +113,12 @@
         "fileset.name": "recordedfuture",
         "input.type": "log",
         "log.offset": 2954,
-        "service.type": "threatintel",
-        "tags": [
-            "forwarded",
-            "threatintel-recordedfuture"
-        ],
-        "threatintel.indicator.file.hash.md5": "7b65b50ed4554c86cb777e35e7750209",
-        "threatintel.indicator.file.hash.sha1": "e10942ba3fbb937c90c7cb3e39c06a13324981a8",
-        "threatintel.indicator.file.hash.sha256": "299e7a30217e2137854308e7be79227635f409b0e00897cfff11806ad8449cc5",
-        "threatintel.indicator.first_seen": "2021-06-20T18:40:18.343Z",
-        "threatintel.indicator.last_seen": "2021-06-20T18:40:18.343Z",
-        "threatintel.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3A299e7a30217e2137854308e7be79227635f409b0e00897cfff11806ad8449cc5",
-        "threatintel.indicator.type": "file",
-        "threatintel.recordedfuture.entity.id": "hash:299e7a30217e2137854308e7be79227635f409b0e00897cfff11806ad8449cc5",
-        "threatintel.recordedfuture.entity.type": "Hash",
-        "threatintel.recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3A299e7a30217e2137854308e7be79227635f409b0e00897cfff11806ad8449cc5",
-        "threatintel.recordedfuture.risk.criticality": 3,
-        "threatintel.recordedfuture.risk.criticalityLabel": "Malicious",
-        "threatintel.recordedfuture.risk.evidenceDetails": [
+        "recordedfuture.entity.id": "hash:299e7a30217e2137854308e7be79227635f409b0e00897cfff11806ad8449cc5",
+        "recordedfuture.entity.type": "Hash",
+        "recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3A299e7a30217e2137854308e7be79227635f409b0e00897cfff11806ad8449cc5",
+        "recordedfuture.risk.criticality": 3,
+        "recordedfuture.risk.criticalityLabel": "Malicious",
+        "recordedfuture.risk.evidenceDetails": [
             {
                 "criticality": 3,
                 "criticalityLabel": "Malicious",
@@ -144,10 +136,24 @@
                 "timestamp": "2021-06-20T18:40:18.343Z"
             }
         ],
-        "threatintel.recordedfuture.risk.riskString": "2/14",
-        "threatintel.recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
-        "threatintel.recordedfuture.risk.rules": 2,
-        "threatintel.recordedfuture.risk.score": 65
+        "recordedfuture.risk.riskString": "2/14",
+        "recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
+        "recordedfuture.risk.rules": 2,
+        "recordedfuture.risk.score": 65,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.file.hash.md5": "7b65b50ed4554c86cb777e35e7750209",
+        "threat.indicator.file.hash.sha1": "e10942ba3fbb937c90c7cb3e39c06a13324981a8",
+        "threat.indicator.file.hash.sha256": "299e7a30217e2137854308e7be79227635f409b0e00897cfff11806ad8449cc5",
+        "threat.indicator.first_seen": "2021-06-20T18:40:18.343Z",
+        "threat.indicator.last_seen": "2021-06-20T18:40:18.343Z",
+        "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3A299e7a30217e2137854308e7be79227635f409b0e00897cfff11806ad8449cc5",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
@@ -159,24 +165,12 @@
         "fileset.name": "recordedfuture",
         "input.type": "log",
         "log.offset": 4457,
-        "service.type": "threatintel",
-        "tags": [
-            "forwarded",
-            "threatintel-recordedfuture"
-        ],
-        "threatintel.indicator.file.hash.md5": "c6353df35499ca6934da2169b7bd1635",
-        "threatintel.indicator.file.hash.sha1": "3e208c649da0a9efbde7bbde6eece2142fdac3f9",
-        "threatintel.indicator.file.hash.sha256": "e5c73c63ba71659fbb9e0670cc203532aa61e3b8fa51f70ee5ce37b66784cd61",
-        "threatintel.indicator.first_seen": "2021-06-20T18:40:18.258Z",
-        "threatintel.indicator.last_seen": "2021-06-20T18:40:18.258Z",
-        "threatintel.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3Ae5c73c63ba71659fbb9e0670cc203532aa61e3b8fa51f70ee5ce37b66784cd61",
-        "threatintel.indicator.type": "file",
-        "threatintel.recordedfuture.entity.id": "hash:e5c73c63ba71659fbb9e0670cc203532aa61e3b8fa51f70ee5ce37b66784cd61",
-        "threatintel.recordedfuture.entity.type": "Hash",
-        "threatintel.recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3Ae5c73c63ba71659fbb9e0670cc203532aa61e3b8fa51f70ee5ce37b66784cd61",
-        "threatintel.recordedfuture.risk.criticality": 3,
-        "threatintel.recordedfuture.risk.criticalityLabel": "Malicious",
-        "threatintel.recordedfuture.risk.evidenceDetails": [
+        "recordedfuture.entity.id": "hash:e5c73c63ba71659fbb9e0670cc203532aa61e3b8fa51f70ee5ce37b66784cd61",
+        "recordedfuture.entity.type": "Hash",
+        "recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3Ae5c73c63ba71659fbb9e0670cc203532aa61e3b8fa51f70ee5ce37b66784cd61",
+        "recordedfuture.risk.criticality": 3,
+        "recordedfuture.risk.criticalityLabel": "Malicious",
+        "recordedfuture.risk.evidenceDetails": [
             {
                 "criticality": 3,
                 "criticalityLabel": "Malicious",
@@ -194,10 +188,24 @@
                 "timestamp": "2021-06-20T18:40:18.257Z"
             }
         ],
-        "threatintel.recordedfuture.risk.riskString": "2/14",
-        "threatintel.recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
-        "threatintel.recordedfuture.risk.rules": 2,
-        "threatintel.recordedfuture.risk.score": 65
+        "recordedfuture.risk.riskString": "2/14",
+        "recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
+        "recordedfuture.risk.rules": 2,
+        "recordedfuture.risk.score": 65,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.file.hash.md5": "c6353df35499ca6934da2169b7bd1635",
+        "threat.indicator.file.hash.sha1": "3e208c649da0a9efbde7bbde6eece2142fdac3f9",
+        "threat.indicator.file.hash.sha256": "e5c73c63ba71659fbb9e0670cc203532aa61e3b8fa51f70ee5ce37b66784cd61",
+        "threat.indicator.first_seen": "2021-06-20T18:40:18.258Z",
+        "threat.indicator.last_seen": "2021-06-20T18:40:18.258Z",
+        "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3Ae5c73c63ba71659fbb9e0670cc203532aa61e3b8fa51f70ee5ce37b66784cd61",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
@@ -209,24 +217,12 @@
         "fileset.name": "recordedfuture",
         "input.type": "log",
         "log.offset": 5932,
-        "service.type": "threatintel",
-        "tags": [
-            "forwarded",
-            "threatintel-recordedfuture"
-        ],
-        "threatintel.indicator.file.hash.md5": "3d568bd03766a8d47c8fabb7d392c32e",
-        "threatintel.indicator.file.hash.sha1": "3ea8b08bc9ed3009a4d6a0ab5851b8e3fc10ead2",
-        "threatintel.indicator.file.hash.sha256": "184527a5436086cff0c06197330089f7964a9b6b8fc86327e6778363b7297ef1",
-        "threatintel.indicator.first_seen": "2021-06-20T18:40:18.131Z",
-        "threatintel.indicator.last_seen": "2021-06-20T18:40:18.131Z",
-        "threatintel.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3A184527a5436086cff0c06197330089f7964a9b6b8fc86327e6778363b7297ef1",
-        "threatintel.indicator.type": "file",
-        "threatintel.recordedfuture.entity.id": "hash:184527a5436086cff0c06197330089f7964a9b6b8fc86327e6778363b7297ef1",
-        "threatintel.recordedfuture.entity.type": "Hash",
-        "threatintel.recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3A184527a5436086cff0c06197330089f7964a9b6b8fc86327e6778363b7297ef1",
-        "threatintel.recordedfuture.risk.criticality": 3,
-        "threatintel.recordedfuture.risk.criticalityLabel": "Malicious",
-        "threatintel.recordedfuture.risk.evidenceDetails": [
+        "recordedfuture.entity.id": "hash:184527a5436086cff0c06197330089f7964a9b6b8fc86327e6778363b7297ef1",
+        "recordedfuture.entity.type": "Hash",
+        "recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3A184527a5436086cff0c06197330089f7964a9b6b8fc86327e6778363b7297ef1",
+        "recordedfuture.risk.criticality": 3,
+        "recordedfuture.risk.criticalityLabel": "Malicious",
+        "recordedfuture.risk.evidenceDetails": [
             {
                 "criticality": 3,
                 "criticalityLabel": "Malicious",
@@ -236,10 +232,24 @@
                 "timestamp": "2021-06-19T17:39:24.000Z"
             }
         ],
-        "threatintel.recordedfuture.risk.riskString": "1/14",
-        "threatintel.recordedfuture.risk.riskSummary": "1 of 14 Risk Rules currently observed.",
-        "threatintel.recordedfuture.risk.rules": 1,
-        "threatintel.recordedfuture.risk.score": 65
+        "recordedfuture.risk.riskString": "1/14",
+        "recordedfuture.risk.riskSummary": "1 of 14 Risk Rules currently observed.",
+        "recordedfuture.risk.rules": 1,
+        "recordedfuture.risk.score": 65,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.file.hash.md5": "3d568bd03766a8d47c8fabb7d392c32e",
+        "threat.indicator.file.hash.sha1": "3ea8b08bc9ed3009a4d6a0ab5851b8e3fc10ead2",
+        "threat.indicator.file.hash.sha256": "184527a5436086cff0c06197330089f7964a9b6b8fc86327e6778363b7297ef1",
+        "threat.indicator.first_seen": "2021-06-20T18:40:18.131Z",
+        "threat.indicator.last_seen": "2021-06-20T18:40:18.131Z",
+        "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3A184527a5436086cff0c06197330089f7964a9b6b8fc86327e6778363b7297ef1",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
@@ -251,24 +261,12 @@
         "fileset.name": "recordedfuture",
         "input.type": "log",
         "log.offset": 7054,
-        "service.type": "threatintel",
-        "tags": [
-            "forwarded",
-            "threatintel-recordedfuture"
-        ],
-        "threatintel.indicator.file.hash.md5": "a40e91f2d29616076114eea0f2a693af",
-        "threatintel.indicator.file.hash.sha1": "e38ccd47629c1b75385a83fbfbba0ea7f3b3a705",
-        "threatintel.indicator.file.hash.sha256": "1136b8991c6f180a6c67eaff7c2a998d67dbcadc2d9cf5a3f816de03503817a8",
-        "threatintel.indicator.first_seen": "2021-06-20T18:40:18.093Z",
-        "threatintel.indicator.last_seen": "2021-06-20T18:40:18.093Z",
-        "threatintel.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3A1136b8991c6f180a6c67eaff7c2a998d67dbcadc2d9cf5a3f816de03503817a8",
-        "threatintel.indicator.type": "file",
-        "threatintel.recordedfuture.entity.id": "hash:1136b8991c6f180a6c67eaff7c2a998d67dbcadc2d9cf5a3f816de03503817a8",
-        "threatintel.recordedfuture.entity.type": "Hash",
-        "threatintel.recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3A1136b8991c6f180a6c67eaff7c2a998d67dbcadc2d9cf5a3f816de03503817a8",
-        "threatintel.recordedfuture.risk.criticality": 3,
-        "threatintel.recordedfuture.risk.criticalityLabel": "Malicious",
-        "threatintel.recordedfuture.risk.evidenceDetails": [
+        "recordedfuture.entity.id": "hash:1136b8991c6f180a6c67eaff7c2a998d67dbcadc2d9cf5a3f816de03503817a8",
+        "recordedfuture.entity.type": "Hash",
+        "recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3A1136b8991c6f180a6c67eaff7c2a998d67dbcadc2d9cf5a3f816de03503817a8",
+        "recordedfuture.risk.criticality": 3,
+        "recordedfuture.risk.criticalityLabel": "Malicious",
+        "recordedfuture.risk.evidenceDetails": [
             {
                 "criticality": 3,
                 "criticalityLabel": "Malicious",
@@ -286,10 +284,24 @@
                 "timestamp": "2021-06-20T18:40:18.093Z"
             }
         ],
-        "threatintel.recordedfuture.risk.riskString": "2/14",
-        "threatintel.recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
-        "threatintel.recordedfuture.risk.rules": 2,
-        "threatintel.recordedfuture.risk.score": 65
+        "recordedfuture.risk.riskString": "2/14",
+        "recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
+        "recordedfuture.risk.rules": 2,
+        "recordedfuture.risk.score": 65,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.file.hash.md5": "a40e91f2d29616076114eea0f2a693af",
+        "threat.indicator.file.hash.sha1": "e38ccd47629c1b75385a83fbfbba0ea7f3b3a705",
+        "threat.indicator.file.hash.sha256": "1136b8991c6f180a6c67eaff7c2a998d67dbcadc2d9cf5a3f816de03503817a8",
+        "threat.indicator.first_seen": "2021-06-20T18:40:18.093Z",
+        "threat.indicator.last_seen": "2021-06-20T18:40:18.093Z",
+        "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3A1136b8991c6f180a6c67eaff7c2a998d67dbcadc2d9cf5a3f816de03503817a8",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
@@ -301,24 +313,12 @@
         "fileset.name": "recordedfuture",
         "input.type": "log",
         "log.offset": 8550,
-        "service.type": "threatintel",
-        "tags": [
-            "forwarded",
-            "threatintel-recordedfuture"
-        ],
-        "threatintel.indicator.file.hash.md5": "02062782c7eeaff185ea6966460f7c9a",
-        "threatintel.indicator.file.hash.sha1": "64355796dc38992ca5e434682ddbf63bdfabeb4e",
-        "threatintel.indicator.file.hash.sha256": "bf325093d87f746c297b2752c38a41a8f41b32aca01146b3632e24e90cdd14a1",
-        "threatintel.indicator.first_seen": "2021-06-20T18:40:18.070Z",
-        "threatintel.indicator.last_seen": "2021-06-20T18:40:18.070Z",
-        "threatintel.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3Abf325093d87f746c297b2752c38a41a8f41b32aca01146b3632e24e90cdd14a1",
-        "threatintel.indicator.type": "file",
-        "threatintel.recordedfuture.entity.id": "hash:bf325093d87f746c297b2752c38a41a8f41b32aca01146b3632e24e90cdd14a1",
-        "threatintel.recordedfuture.entity.type": "Hash",
-        "threatintel.recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3Abf325093d87f746c297b2752c38a41a8f41b32aca01146b3632e24e90cdd14a1",
-        "threatintel.recordedfuture.risk.criticality": 3,
-        "threatintel.recordedfuture.risk.criticalityLabel": "Malicious",
-        "threatintel.recordedfuture.risk.evidenceDetails": [
+        "recordedfuture.entity.id": "hash:bf325093d87f746c297b2752c38a41a8f41b32aca01146b3632e24e90cdd14a1",
+        "recordedfuture.entity.type": "Hash",
+        "recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3Abf325093d87f746c297b2752c38a41a8f41b32aca01146b3632e24e90cdd14a1",
+        "recordedfuture.risk.criticality": 3,
+        "recordedfuture.risk.criticalityLabel": "Malicious",
+        "recordedfuture.risk.evidenceDetails": [
             {
                 "criticality": 3,
                 "criticalityLabel": "Malicious",
@@ -336,10 +336,24 @@
                 "timestamp": "2021-06-20T18:40:18.070Z"
             }
         ],
-        "threatintel.recordedfuture.risk.riskString": "2/14",
-        "threatintel.recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
-        "threatintel.recordedfuture.risk.rules": 2,
-        "threatintel.recordedfuture.risk.score": 65
+        "recordedfuture.risk.riskString": "2/14",
+        "recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
+        "recordedfuture.risk.rules": 2,
+        "recordedfuture.risk.score": 65,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.file.hash.md5": "02062782c7eeaff185ea6966460f7c9a",
+        "threat.indicator.file.hash.sha1": "64355796dc38992ca5e434682ddbf63bdfabeb4e",
+        "threat.indicator.file.hash.sha256": "bf325093d87f746c297b2752c38a41a8f41b32aca01146b3632e24e90cdd14a1",
+        "threat.indicator.first_seen": "2021-06-20T18:40:18.070Z",
+        "threat.indicator.last_seen": "2021-06-20T18:40:18.070Z",
+        "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3Abf325093d87f746c297b2752c38a41a8f41b32aca01146b3632e24e90cdd14a1",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
@@ -351,24 +365,12 @@
         "fileset.name": "recordedfuture",
         "input.type": "log",
         "log.offset": 10020,
-        "service.type": "threatintel",
-        "tags": [
-            "forwarded",
-            "threatintel-recordedfuture"
-        ],
-        "threatintel.indicator.file.hash.md5": "bdd205ffc81c54e7cc1a9080cfa093e4",
-        "threatintel.indicator.file.hash.sha1": "a6b928fd6fee43495b96941ef80b25d074f6e0e2",
-        "threatintel.indicator.file.hash.sha256": "c06f58340d8e7b1f466942db18f67b5eb048c9adc45d843db370c836e125e3f9",
-        "threatintel.indicator.first_seen": "2021-06-20T18:40:18.011Z",
-        "threatintel.indicator.last_seen": "2021-06-20T18:40:18.011Z",
-        "threatintel.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3Ac06f58340d8e7b1f466942db18f67b5eb048c9adc45d843db370c836e125e3f9",
-        "threatintel.indicator.type": "file",
-        "threatintel.recordedfuture.entity.id": "hash:c06f58340d8e7b1f466942db18f67b5eb048c9adc45d843db370c836e125e3f9",
-        "threatintel.recordedfuture.entity.type": "Hash",
-        "threatintel.recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3Ac06f58340d8e7b1f466942db18f67b5eb048c9adc45d843db370c836e125e3f9",
-        "threatintel.recordedfuture.risk.criticality": 3,
-        "threatintel.recordedfuture.risk.criticalityLabel": "Malicious",
-        "threatintel.recordedfuture.risk.evidenceDetails": [
+        "recordedfuture.entity.id": "hash:c06f58340d8e7b1f466942db18f67b5eb048c9adc45d843db370c836e125e3f9",
+        "recordedfuture.entity.type": "Hash",
+        "recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3Ac06f58340d8e7b1f466942db18f67b5eb048c9adc45d843db370c836e125e3f9",
+        "recordedfuture.risk.criticality": 3,
+        "recordedfuture.risk.criticalityLabel": "Malicious",
+        "recordedfuture.risk.evidenceDetails": [
             {
                 "criticality": 3,
                 "criticalityLabel": "Malicious",
@@ -386,10 +388,24 @@
                 "timestamp": "2021-06-20T18:40:18.010Z"
             }
         ],
-        "threatintel.recordedfuture.risk.riskString": "2/14",
-        "threatintel.recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
-        "threatintel.recordedfuture.risk.rules": 2,
-        "threatintel.recordedfuture.risk.score": 65
+        "recordedfuture.risk.riskString": "2/14",
+        "recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
+        "recordedfuture.risk.rules": 2,
+        "recordedfuture.risk.score": 65,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.file.hash.md5": "bdd205ffc81c54e7cc1a9080cfa093e4",
+        "threat.indicator.file.hash.sha1": "a6b928fd6fee43495b96941ef80b25d074f6e0e2",
+        "threat.indicator.file.hash.sha256": "c06f58340d8e7b1f466942db18f67b5eb048c9adc45d843db370c836e125e3f9",
+        "threat.indicator.first_seen": "2021-06-20T18:40:18.011Z",
+        "threat.indicator.last_seen": "2021-06-20T18:40:18.011Z",
+        "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3Ac06f58340d8e7b1f466942db18f67b5eb048c9adc45d843db370c836e125e3f9",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
@@ -401,24 +417,12 @@
         "fileset.name": "recordedfuture",
         "input.type": "log",
         "log.offset": 11492,
-        "service.type": "threatintel",
-        "tags": [
-            "forwarded",
-            "threatintel-recordedfuture"
-        ],
-        "threatintel.indicator.file.hash.md5": "af45390e39574cdb037d684074e6a542",
-        "threatintel.indicator.file.hash.sha1": "f6a14c7424604cd51ba6a6d3f7594ec762f48645",
-        "threatintel.indicator.file.hash.sha256": "c878bdb6c62ace8f001f979f7c7b2c6b38d135ac1c69bfa63785bf86721619fc",
-        "threatintel.indicator.first_seen": "2021-06-20T18:40:17.964Z",
-        "threatintel.indicator.last_seen": "2021-06-20T18:40:17.964Z",
-        "threatintel.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3Ac878bdb6c62ace8f001f979f7c7b2c6b38d135ac1c69bfa63785bf86721619fc",
-        "threatintel.indicator.type": "file",
-        "threatintel.recordedfuture.entity.id": "hash:c878bdb6c62ace8f001f979f7c7b2c6b38d135ac1c69bfa63785bf86721619fc",
-        "threatintel.recordedfuture.entity.type": "Hash",
-        "threatintel.recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3Ac878bdb6c62ace8f001f979f7c7b2c6b38d135ac1c69bfa63785bf86721619fc",
-        "threatintel.recordedfuture.risk.criticality": 3,
-        "threatintel.recordedfuture.risk.criticalityLabel": "Malicious",
-        "threatintel.recordedfuture.risk.evidenceDetails": [
+        "recordedfuture.entity.id": "hash:c878bdb6c62ace8f001f979f7c7b2c6b38d135ac1c69bfa63785bf86721619fc",
+        "recordedfuture.entity.type": "Hash",
+        "recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3Ac878bdb6c62ace8f001f979f7c7b2c6b38d135ac1c69bfa63785bf86721619fc",
+        "recordedfuture.risk.criticality": 3,
+        "recordedfuture.risk.criticalityLabel": "Malicious",
+        "recordedfuture.risk.evidenceDetails": [
             {
                 "criticality": 3,
                 "criticalityLabel": "Malicious",
@@ -436,10 +440,24 @@
                 "timestamp": "2021-06-20T18:40:17.964Z"
             }
         ],
-        "threatintel.recordedfuture.risk.riskString": "2/14",
-        "threatintel.recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
-        "threatintel.recordedfuture.risk.rules": 2,
-        "threatintel.recordedfuture.risk.score": 65
+        "recordedfuture.risk.riskString": "2/14",
+        "recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
+        "recordedfuture.risk.rules": 2,
+        "recordedfuture.risk.score": 65,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.file.hash.md5": "af45390e39574cdb037d684074e6a542",
+        "threat.indicator.file.hash.sha1": "f6a14c7424604cd51ba6a6d3f7594ec762f48645",
+        "threat.indicator.file.hash.sha256": "c878bdb6c62ace8f001f979f7c7b2c6b38d135ac1c69bfa63785bf86721619fc",
+        "threat.indicator.first_seen": "2021-06-20T18:40:17.964Z",
+        "threat.indicator.last_seen": "2021-06-20T18:40:17.964Z",
+        "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3Ac878bdb6c62ace8f001f979f7c7b2c6b38d135ac1c69bfa63785bf86721619fc",
+        "threat.indicator.type": "file"
     },
     {
         "event.category": "threat",
@@ -451,24 +469,12 @@
         "fileset.name": "recordedfuture",
         "input.type": "log",
         "log.offset": 12964,
-        "service.type": "threatintel",
-        "tags": [
-            "forwarded",
-            "threatintel-recordedfuture"
-        ],
-        "threatintel.indicator.file.hash.md5": "5b8bcd367f802cd104210bb47abb3ab1",
-        "threatintel.indicator.file.hash.sha1": "b40d1796bd6974860ce6be691152ad963300c711",
-        "threatintel.indicator.file.hash.sha256": "0996575c7d2f07513d0dafe67ddde9805bbea35cf9d98edf8faf12c0e7f4334c",
-        "threatintel.indicator.first_seen": "2021-06-20T18:40:17.919Z",
-        "threatintel.indicator.last_seen": "2021-06-20T18:40:17.919Z",
-        "threatintel.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3A0996575c7d2f07513d0dafe67ddde9805bbea35cf9d98edf8faf12c0e7f4334c",
-        "threatintel.indicator.type": "file",
-        "threatintel.recordedfuture.entity.id": "hash:0996575c7d2f07513d0dafe67ddde9805bbea35cf9d98edf8faf12c0e7f4334c",
-        "threatintel.recordedfuture.entity.type": "Hash",
-        "threatintel.recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3A0996575c7d2f07513d0dafe67ddde9805bbea35cf9d98edf8faf12c0e7f4334c",
-        "threatintel.recordedfuture.risk.criticality": 3,
-        "threatintel.recordedfuture.risk.criticalityLabel": "Malicious",
-        "threatintel.recordedfuture.risk.evidenceDetails": [
+        "recordedfuture.entity.id": "hash:0996575c7d2f07513d0dafe67ddde9805bbea35cf9d98edf8faf12c0e7f4334c",
+        "recordedfuture.entity.type": "Hash",
+        "recordedfuture.intelCard": "https://app.recordedfuture.local/live/sc/entity/hash%3A0996575c7d2f07513d0dafe67ddde9805bbea35cf9d98edf8faf12c0e7f4334c",
+        "recordedfuture.risk.criticality": 3,
+        "recordedfuture.risk.criticalityLabel": "Malicious",
+        "recordedfuture.risk.evidenceDetails": [
             {
                 "criticality": 3,
                 "criticalityLabel": "Malicious",
@@ -486,9 +492,23 @@
                 "timestamp": "2021-06-20T18:40:17.919Z"
             }
         ],
-        "threatintel.recordedfuture.risk.riskString": "2/14",
-        "threatintel.recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
-        "threatintel.recordedfuture.risk.rules": 2,
-        "threatintel.recordedfuture.risk.score": 65
+        "recordedfuture.risk.riskString": "2/14",
+        "recordedfuture.risk.riskSummary": "2 of 14 Risk Rules currently observed.",
+        "recordedfuture.risk.rules": 2,
+        "recordedfuture.risk.score": 65,
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.file.hash.md5": "5b8bcd367f802cd104210bb47abb3ab1",
+        "threat.indicator.file.hash.sha1": "b40d1796bd6974860ce6be691152ad963300c711",
+        "threat.indicator.file.hash.sha256": "0996575c7d2f07513d0dafe67ddde9805bbea35cf9d98edf8faf12c0e7f4334c",
+        "threat.indicator.first_seen": "2021-06-20T18:40:17.919Z",
+        "threat.indicator.last_seen": "2021-06-20T18:40:17.919Z",
+        "threat.indicator.reference": "https://app.recordedfuture.local/live/sc/entity/hash%3A0996575c7d2f07513d0dafe67ddde9805bbea35cf9d98edf8faf12c0e7f4334c",
+        "threat.indicator.type": "file"
     }
 ]

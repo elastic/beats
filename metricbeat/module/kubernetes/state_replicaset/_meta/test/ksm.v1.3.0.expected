@@ -2,9 +2,33 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"name": "kubernetes-dashboard-77d8b98585",
+			"replicas": {
+				"available": 1,
+				"desired": 1,
+				"labeled": 1,
+				"observed": 1,
+				"ready": 1
 			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.replicaset",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
 			"name": "kube-state-metrics-6479d88c5c",
@@ -30,37 +54,7 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			}
-		},
-		"MetricSetFields": {
-			"name": "kube-state-metrics-86dd856df7",
-			"replicas": {
-				"available": 0,
-				"desired": 0,
-				"labeled": 0,
-				"observed": 2,
-				"ready": 0
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.replicaset",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			}
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
 			"name": "kube-dns-6f4fd4bdf",
@@ -86,18 +80,16 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			}
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
-			"name": "kubernetes-dashboard-77d8b98585",
+			"name": "kube-state-metrics-86dd856df7",
 			"replicas": {
-				"available": 1,
-				"desired": 1,
-				"labeled": 1,
-				"observed": 1,
-				"ready": 1
+				"available": 0,
+				"desired": 0,
+				"labeled": 0,
+				"observed": 2,
+				"ready": 0
 			}
 		},
 		"Index": "",

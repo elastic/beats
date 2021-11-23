@@ -82,7 +82,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
 
         args.extend(["test", "config"])
 
-        output = "winlogbeat.log"
+        output = "winlogbeat-" + self.today + ".ndjson"
 
         with open(os.path.join(self.working_dir, output), "wb") as outfile:
             proc = subprocess.Popen(args,

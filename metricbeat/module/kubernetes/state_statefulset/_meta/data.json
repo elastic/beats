@@ -6,20 +6,18 @@
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": {
-            "name": "default"
-        },
+        "namespace": "default",
         "statefulset": {
-            "created": 1511973651,
+            "created": 1511989697,
             "generation": {
-                "desired": 3,
-                "observed": 1
-            },
-            "name": "elasticsearch",
-            "replicas": {
                 "desired": 4,
-                "observed": 1,
-                "ready": 1
+                "observed": 2
+            },
+            "name": "mysql",
+            "replicas": {
+                "desired": 5,
+                "observed": 2,
+                "ready": 2
             }
         }
     },

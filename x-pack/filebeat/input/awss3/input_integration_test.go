@@ -444,13 +444,6 @@ func TestPaginatorListPrefix(t *testing.T) {
 	assert.Equal(t, expected, objects)
 }
 
-func TestGetProviderFromDomain(t *testing.T) {
-	assert.Equal(t, "aws", getProviderFromDomain("", ""))
-	assert.Equal(t, "aws", getProviderFromDomain("c2s.ic.gov", ""))
-	assert.Equal(t, "abc", getProviderFromDomain("abc.com", "abc"))
-	assert.Equal(t, "xyz", getProviderFromDomain("oraclecloud.com", "xyz"))
-}
-
 func TestInputRunSNS(t *testing.T) {
 	logp.TestingSetup()
 
