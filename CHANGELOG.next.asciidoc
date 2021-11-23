@@ -185,6 +185,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for username in cisco asa security negotiation logs {pull}26975[26975]
 - Relax time parsing and capture group and session type in Cisco ASA module {issue}24710[24710] {pull}28325[28325]
 - Correctly track bytes read when max_bytes is exceeded. {issue}28317[28317] {pull}28352[28352]
+- Fix parsing of apache log levels including numbers. {pull}28717[28717]
 - Upgrade azure-eventhub sdk reference, contains potential checkpoint fixes. {pull}28919[28919]
 - Revert usageDetails api version to 2019-01-01. {pull}28995[28995]
 - Fix in `aws-s3` input regarding provider discovery through endpoint {pull}28963[28963]
