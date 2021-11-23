@@ -42,6 +42,7 @@ func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, ev
 	}
 
 	for identifier, output := range dbDetailsMap {
+		fmt.Println("----- identifier = ", identifier)
 		if _, ok := events[identifier]; !ok {
 			continue
 		}
@@ -54,6 +55,7 @@ func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, ev
 			events[identifier].RootFields.Put(metadataPrefix+"status", *output.DBInstanceStatus)
 		}
 
+		fmt.Println("----- output.DBInstanceIdentifier = ", *output.DBInstanceIdentifier)
 		if output.DBInstanceIdentifier != nil {
 			events[identifier].RootFields.Put(metadataPrefix+"identifier", *output.DBInstanceIdentifier)
 		}
@@ -87,7 +89,8 @@ func getDBInstancesPerRegion(svc rdsiface.ClientAPI) (map[string]*rds.DBInstance
 
 	instancesOutputs := map[string]*rds.DBInstance{}
 	for _, dbInstance := range output.DBInstances {
-		instancesOutputs[*dbInstance.DBInstanceIdentifier] = &dbInstance
+		instance := dbInstance
+		instancesOutputs[*instance.DBInstanceIdentifier] = &instance
 	}
 	return instancesOutputs, nil
 }
