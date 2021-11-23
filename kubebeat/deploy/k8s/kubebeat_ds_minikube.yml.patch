@@ -1,0 +1,20 @@
+--- kubebeat-ds.yaml	2021-11-23 19:30:34.000000000 +0200
++++ kubebeat-ds_minikube.yaml	2021-11-23 20:24:32.000000000 +0200
+@@ -151,7 +151,7 @@
+     setup.kibana:
+ 
+       # Kibana Host
+-      host: "http://host.docker.internal:5601"
++      host: "http://host.minikube.internal:5601"
+       # Host url for kind k8s - for minikube change to  host.minikube.internal
+     # =============================== Elastic Cloud ================================
+ 
+@@ -170,7 +170,7 @@
+     output.elasticsearch:
+       # Array of hosts to connect to.
+       # Host url for kind k8s - for minikube change to  host.minikube.internal
+-      hosts: ["host.docker.internal:9200"]
++      hosts: ["host.minikube.internal:9200"]
+ 
+       # Protocol - either `http` (default) or `https`.
+       #protocol: "https"

@@ -11,11 +11,24 @@ The interesting files are:
 
 
 ## Table of contents
-- [Prerequisites](#prerequisites)
-- [Running the Kubebeat](#running-the-kubebeat)
-- [Clean up](#clean-up)
-- [Remote Debugging](#remote-debugging)
-- [Open questions](#open-questions)
+- [POC Documentation](#poc-documentation)
+  - [Table of contents](#table-of-contents)
+  - [Prerequisites](#prerequisites)
+  - [Running the Kubebeat](#running-the-kubebeat)
+    - [Clean up](#clean-up)
+    - [Remote Debugging](#remote-debugging)
+- [{Beat}](#beat)
+  - [Getting Started with {Beat}](#getting-started-with-beat)
+    - [Requirements](#requirements)
+    - [Init Project](#init-project)
+    - [Build](#build)
+    - [Run](#run)
+    - [Test](#test)
+    - [Update](#update)
+    - [Cleanup](#cleanup)
+    - [Clone](#clone)
+  - [Packaging](#packaging)
+  - [Build Elastic-Agent Docker with pre-packaged kubebeat](#build-elastic-agent-docker-with-pre-packaged-kubebeat)
 
 
 ## Prerequisites
@@ -114,12 +127,6 @@ The app will wait for the debugger to connect before starting
 
     API server listening at: [::]:40000
 Use your favorite IDE to connect to the debugger on `localhost:40000` (for example [Goland](https://www.jetbrains.com/help/go/attach-to-running-go-processes-with-debugger.html#step-3-create-the-remote-run-debug-configuration-on-the-client-computer))
-
-### Open questions
-
-1. Could we use some code from `kube-mgmt`/`gatekeeper`/`metricbeat` to do the kube-api querying and data management?
-2. How should we integrate this to the agent?
-3. ... many more
 
 # {Beat}
 
@@ -237,3 +244,64 @@ make release
 ```
 
 This will fetch and create all images required for the build process. The whole process to finish can take several minutes.
+
+## Build Elastic-Agent Docker with pre-packaged kubebeat
+
+
+**1.Build Elastic-Agent Docker**
+
+1. initialise git submodule for rego rules:
+```
+$ git submodule update --init
+```
+2. Access the Elastic-Agent dir
+```
+$ cd x-pack/elastic-agent
+```
+3. Build the elastic-agent docker( You might need to increase docker engine resources on your docker-engine)
+```
+$ DEV=true SNAPSHOT=true PLATFORMS=linux/amd64 TYPES=docker mage -v package # It takes a while on the first execution.
+```
+4. One build is finished, Verify the image is present on your machine
+
+```
+$ docker image ls | grep elastic-agent                                                                                                                          10076
+docker.elastic.co/beats/elastic-agent-complete   8.1.0-SNAPSHOT           b73bbbc00e04   6 hours ago    1.6GB
+docker.elastic.co/beats-ci/elastic-agent-cloud   8.1.0-SNAPSHOT           66f9b9d41737   6 hours ago    878MB
+docker.elastic.co/beats/elastic-agent            8.1.0-SNAPSHOT           f089c673b70b   7 hours ago    554MB
+docker.elastic.co/beats/elastic-agent-ubi8       8.1.0-SNAPSHOT           7140d1b7bc0e   7 hours ago    324MB
+docker.elastic.co/beats/elastic-agent-complete   <none>                   182ee0acd1c0   2 weeks ago    1.64GB
+docker.elastic.co/beats/elastic-agent            <none>                   e0ecbfa4a14e   2 weeks ago    595MB
+docker.elastic.co/beats/elastic-agent-complete   8.0.0-SNAPSHOT           f081a7fcdc96   2 weeks ago    1.64GB
+docker.elastic.co/beats/elastic-agent            <none>                   47584f609ed0   3 weeks ago    583MB
+docker.elastic.co/beats/elastic-agent            <none>                   a7636fffbf82   4 weeks ago    580MB
+docker.elastic.co/beats/elastic-agent-complete   7.15.1                   a0a9dfa8e527   6 weeks ago    1.61GB
+```
+
+</br>
+
+**2. Deploy on Minikube:** 
+1. Navigate to the kubebeat directory
+```
+$ cd beats/kubebeat 
+```
+2. Make a local copy of the yaml(it's set in gitignore) & insert your ES details(host,user,pass) 
+```
+$ cp  kubebeat/deploy/k8s/k8sbeat-agent-standalone-ds.yaml kubebeat/deploy/k8s/k8sbeat-agent-standalone-ds-local.yaml 
+```
+3. Load locally built image to minikube
+```
+$ minikube image load docker.elastic.co/beats/elastic-agent:8.1.0-SNAPSHOT
+```
+4. Deploy elastic-agent on minikube under kube-system namespace as a daemon set
+```
+$ kubectl apply -f kubebeat/deploy/k8s/k8sbeat-agent-standalone-ds-local.yaml 
+```
+5.  Validate agent pod is in running state
+```
+$ kubectl get po --selector="app=elastic-agent" -n kube-system 
+```
+6. Get log output from elastic-agent pod
+```
+$ kubectl logs -f  --selector="app=elastic-agent" -n kube-system 
+```
