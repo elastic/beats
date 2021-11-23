@@ -78,6 +78,10 @@ func DefaultConfig() TemplateConfig {
 }
 
 func Unpack(c *common.Config) (TemplateConfig, error) {
+	if c == nil {
+		return DefaultConfig(), nil
+	}
+
 	jsonEnabled, _ := c.Bool("json.enabled", -1)
 	config := DefaultConfig()
 	if jsonEnabled {

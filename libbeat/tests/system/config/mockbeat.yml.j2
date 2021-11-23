@@ -77,6 +77,7 @@ setup.template:
   name: {{ es_template_name }}
   pattern: {{ es_template_pattern }}
   overwrite: {{ template_overwrite|default("false") }}
+  type: {{ template_type|default("index") }}
   json:
     enabled: {{ template_json_enabled|default("false") }}
     path: {{ template_json_path }}
