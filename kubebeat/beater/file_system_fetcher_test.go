@@ -42,7 +42,7 @@ func TestFileFetcherFetchDirectoryFromFileSystem(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	innerDirectoryName := "file-fetcher-test-1"
+	innerDirectoryName := "file-fetcher-test-2"
 	innerDir, err := ioutil.TempDir(dir, innerDirectoryName)
 	if err != nil {
 		t.Fatal(err)
@@ -58,7 +58,7 @@ func TestFileFetcherFetchDirectoryFromFileSystem(t *testing.T) {
 		}
 	}
 
-	path := []string{dir}
+	path := []string{dir, dir + "/*", dir+ "/**/*"}
 	fileFetcher := NewFileFetcher(path)
 	results, err := fileFetcher.Fetch()
 
@@ -66,10 +66,10 @@ func TestFileFetcherFetchDirectoryFromFileSystem(t *testing.T) {
 		assert.Fail(t, "Fetcher was not able to fetch files from FS", err)
 	}
 
-	assert.Equal(t, len(results), 4)
+	assert.Equal(t, len(results), 5)
 
-	directoryName := filepath.Base(dir)
-	allFilesName := append(resourcesNames, directoryName)
+	directories := []string{filepath.Base(dir),filepath.Base(innerDir)}
+	allFilesName := append(resourcesNames, directories...)
 
 	//All inner files should exist in the final result
 	for i := 0; i < len(results); i++ {

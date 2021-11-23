@@ -50,34 +50,19 @@ func (f *FileSystemFetcher) Fetch() ([]interface{}, error) {
 
 func (f *FileSystemFetcher) fetchSystemResource(filePath string) []interface{} {
 
-	dfs, _ := filepath.Glob(filePath + "/**", )
-	logp.Info("Failed to fetch %s, error", dfs)
+	allFiles, _ := filepath.Glob(filePath)
 	results := make([]interface{}, 0)
-	info, err := os.Stat(filePath)
 
-	// If errors occur during file system resource, just skip on the file and log the error
-	if err != nil {
-		logp.Err("Failed to fetch %s, error - %+v", filePath, err)
-		return nil
-	}
+	for _, filePath := range allFiles {
 
-	if !info.IsDir() {
-		result := FromFileInfo(info, filePath)
-		results = append(results, result)
-		return results
-	}
-
-	//If the current path is a directory - adds all the inner files and inner directories recursively
-	err = filepath.Walk(filePath, func(path string, info os.FileInfo, err error) error {
-		file := FromFileInfo(info, path)
+		info, err := os.Stat(filePath)
+		if err != nil {
+			logp.Err("Failed to fetch %s, error - %+v", filePath, err)
+			continue
+		}
+		file := FromFileInfo(info, filePath)
 		results = append(results, file)
-		return nil
-	})
-
-	if err != nil {
-		return nil
 	}
-
 	return results
 }
 
