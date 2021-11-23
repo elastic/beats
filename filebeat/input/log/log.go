@@ -75,6 +75,9 @@ func (f *Log) Read(buf []byte) (int, error) {
 		case <-f.done:
 			return 0, ErrClosed
 		default:
+			if f.config.ReadInterval > 0 {
+				time.Sleep(f.config.ReadInterval)
+			}
 		}
 
 		err := f.checkFileDisappearedErrors()

@@ -183,7 +183,9 @@ func (s *store) Set(key string, value interface{}) error {
 	defer s.lock.Unlock()
 
 	s.mem.Set(key, tmp)
-	return s.logOperation(&opSet{K: key, V: tmp})
+	// see https://tapd.easyops.local/pages/viewpage.action?pageId=34846887
+	// return s.logOperation(&opSet{K: key, V: tmp})
+	return nil
 }
 
 // Remove removes a key from the in memory store and logs a remove operation to
