@@ -5,6 +5,8 @@ import (
 
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+
+	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 )
 
 // Name of this beat
