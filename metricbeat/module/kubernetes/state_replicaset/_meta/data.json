@@ -6,17 +6,15 @@
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": {
-            "name": "jenkins"
-        },
+        "namespace": "default",
         "replicaset": {
-            "name": "wise-lynx-jenkins-1616735317",
+            "name": "jumpy-owl-redis-3481028193",
             "replicas": {
                 "available": 1,
                 "desired": 1,
                 "labeled": 1,
                 "observed": 1,
-                "ready": 1
+                "ready": 0
             }
         }
     },

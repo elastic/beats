@@ -79,11 +79,6 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
         stage: extended
-    windows-2008:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-2008-r2"
-        stage: extended
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
