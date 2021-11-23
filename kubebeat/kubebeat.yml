@@ -4,8 +4,21 @@
 
 kubebeat:
   # Defines how often an event is sent to the output
-  period: 1s
-
+  period: 60s
+  files: [
+      "/hostfs/etc/kubernetes/scheduler.conf",
+      "/hostfs/etc/kubernetes/controller-manager.conf",
+      "/hostfs/etc/kubernetes/admin.conf",
+      "/hostfs/etc/kubernetes/kubelet.conf",
+      "/hostfs/etc/kubernetes/manifests/etcd.yaml",
+      "/hostfs/etc/kubernetes/manifests/kube-apiserver.yaml",
+      "/hostfs/etc/kubernetes/manifests/kube-controller-manager.yaml",
+      "/hostfs/etc/kubernetes/manifests/kube-scheduler.yaml",
+      "/hostfs/etc/systemd/system/kubelet.service.d/10-kubeadm.conf",
+      "/hostfs/var/lib/kubelet/config.yaml",
+      "/hostfs/var/lib/etcd",
+      "/hostfs/etc/kubernetes/pki"
+  ]
 # ================================== General ===================================
 
 # The name of the shipper that publishes the network data. It can be used to group
@@ -43,7 +56,7 @@ setup.kibana:
   # Scheme and port can be left out and will be set to the default (http and 5601)
   # In case you specify and additional path, the scheme is required: http://localhost:5601/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
-  #host: "localhost:5601"
+  host: '${KIBANA_HOST}'
 
   # Kibana Space ID
   # ID of the Kibana Space into which the dashboards should be loaded. By default,
@@ -70,15 +83,15 @@ setup.kibana:
 # ---------------------------- Elasticsearch Output ----------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
+  hosts: '${ES_HOSTS}'
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
 
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-  #username: "elastic"
-  #password: "changeme"
+  username: ${ES_USERNAME}
+  password: ${ES_PASSWORD}
 
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
