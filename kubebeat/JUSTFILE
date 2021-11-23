@@ -19,6 +19,8 @@ elastic-stack-up:
 elastic-stack-down:
   elastic-package stack down --version=8.1.0-SNAPSHOT -p csp-demo -v 
 
-elastic-kibana-source-start:
+kibana-source-start:
   cd ../../kibana && yarn start
 
+kibana-es-start:
+  cd ../../kibana && yarn es snapshot --license trial  -E http.host=0.0.0.0
