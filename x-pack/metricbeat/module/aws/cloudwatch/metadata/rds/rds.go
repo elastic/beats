@@ -42,7 +42,6 @@ func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, ev
 	}
 
 	for identifier, output := range dbDetailsMap {
-		fmt.Println("----- identifier = ", identifier)
 		if _, ok := events[identifier]; !ok {
 			continue
 		}
@@ -55,7 +54,6 @@ func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, ev
 			events[identifier].RootFields.Put(metadataPrefix+"status", *output.DBInstanceStatus)
 		}
 
-		fmt.Println("----- output.DBInstanceIdentifier = ", *output.DBInstanceIdentifier)
 		if output.DBInstanceIdentifier != nil {
 			events[identifier].RootFields.Put(metadataPrefix+"identifier", *output.DBInstanceIdentifier)
 		}
