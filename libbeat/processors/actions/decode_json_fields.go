@@ -122,6 +122,10 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		if err != nil {
 			f.logger.Debugf("Error trying to unmarshal %s", text)
 			errs = append(errs, err.Error())
+			event.SetErrorWithOption(common.MapStr{
+				"message": "parsing input as JSON: " + err.Error(),
+				"input":   text,
+			}, f.addErrorKey)
 			continue
 		}
 
