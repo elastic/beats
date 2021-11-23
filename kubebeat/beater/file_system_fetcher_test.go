@@ -34,3 +34,42 @@ func TestFileFetcherFetchFilesFromFileSystem(t *testing.T) {
 	assert.Equal(t, file, result.Path)
 	assert.Equal(t, "600", result.FileMode)
 }
+
+func TestFileFetcherFetchDirectoryFromFileSystem(t *testing.T) {
+
+	dirNamePrefix := []string{"file-fetcher-test-1"}
+	dir, err := ioutil.TempDir("", dirNamePrefix[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	resourcesNames := []string{"file1.txt", "file2.txt", "file3.txt"}
+	defer os.RemoveAll(dir)
+
+	for _, fileName := range resourcesNames {
+		file := filepath.Join(dir, fileName)
+		if err = ioutil.WriteFile(file, []byte("test txt\n"), 0600); err != nil {
+			assert.Fail(t, "Could not able to write a new file", err)
+		}
+	}
+
+	path := []string{dir}
+	fileFetcher := NewFileFetcher(path)
+	results, err := fileFetcher.Fetch()
+
+	if err != nil {
+		assert.Fail(t, "Fetcher was not able to fetch files from FS", err)
+	}
+
+	assert.Equal(t, len(results), 4)
+
+	directoryName := filepath.Base(dir)
+	allFilesName := append(resourcesNames, directoryName)
+
+	//All inner files should exist in the final result
+	for i := 0; i < len(results); i++ {
+
+		fileSystemDataResources := results[i].(FileSystemResourceData)
+		assert.Contains(t, allFilesName, fileSystemDataResources.FileName)
+	}
+}

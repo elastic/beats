@@ -1,12 +1,12 @@
 package beater
 
 import (
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"os"
 	"os/user"
+	"path/filepath"
 	"strconv"
 	"syscall"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // FileSystemFetcher implement the Fetcher interface
@@ -41,19 +41,42 @@ func (f *FileSystemFetcher) Fetch() ([]interface{}, error) {
 	results := make([]interface{}, 0)
 
 	for _, filePath := range f.filesPaths {
-		info, err := os.Stat(filePath)
-
-		// If errors occur during file system resource, just skip on the file and log the error
-		if err != nil {
-			logp.Err("Failed to fetch %s, error - %+v", filePath, err)
-			continue
-		}
-
-		result := FromFileInfo(info, filePath)
-		results = append(results, result)
+		resource := f.fetchSystemResource(filePath)
+		results = append(results, resource...)
 	}
 
 	return results, nil
+}
+
+func (f *FileSystemFetcher) fetchSystemResource(filePath string) []interface{} {
+
+	results := make([]interface{}, 0)
+	info, err := os.Stat(filePath)
+
+	// If errors occur during file system resource, just skip on the file and log the error
+	if err != nil {
+		logp.Err("Failed to fetch %s, error - %+v", filePath, err)
+		return nil
+	}
+
+	if !info.IsDir() {
+		result := FromFileInfo(info, filePath)
+		results = append(results, result)
+		return results
+	}
+
+	//If the current path is a directory - adds all the inner files and inner directories recursively
+	err = filepath.Walk(filePath, func(path string, info os.FileInfo, err error) error {
+		file := FromFileInfo(info, path)
+		results = append(results, file)
+		return nil
+	})
+
+	if err != nil {
+		return nil
+	}
+
+	return results
 }
 
 func (f *FileSystemFetcher) Stop() {
