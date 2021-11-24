@@ -175,22 +175,13 @@ func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName
 //Create AWS service name based on Region and FIPS
 func CreateServiceName(serviceName string, fipsEnabled bool, region string) string {
 	if fipsEnabled {
-		OptionalGovCloudFIPS := []string{"s3"}
-		_, found := Find(OptionalGovCloudFIPS, serviceName)
+		OptionalGovCloudFIPS := map[string]bool{
+			"s3": true,
+		}
+		_, found := OptionalGovCloudFIPS[serviceName]
 		if !strings.HasPrefix(region, "us-gov-") || found {
 			return serviceName + "-fips"
 		}
 	}
 	return serviceName
-}
-
-// Find takes a slice and looks for an element in it. If found it will
-// return it's key, otherwise it will return -1 and a bool of false.
-func Find(slice []string, val string) (int, bool) {
-	for i, item := range slice {
-		if item == val {
-			return i, true
-		}
-	}
-	return -1, false
 }
