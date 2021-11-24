@@ -167,7 +167,7 @@ func (f *FlowID) AddIPv4(src, dst net.IP, tos uint8) {
 		&f.offIPv4, &f.offOutterIPv4,
 		IPv4Flow, OutterIPv4Flow,
 		src, dst, flowDirUnset)
-	f.tos = tos
+	f.tos |= tos
 	f.cntIP++
 }
 
@@ -177,7 +177,7 @@ func (f *FlowID) AddIPv6(src, dst net.IP, tos uint8) {
 		&f.offIPv6, &f.offOutterIPv6,
 		IPv6Flow, OutterIPv6Flow,
 		src, dst, flowDirUnset)
-	f.tos = tos
+	f.tos |= tos
 	f.cntIP++
 }
 

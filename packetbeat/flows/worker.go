@@ -398,6 +398,16 @@ func createEvent(
 	network["packets"] = totalPackets
 	fields["network"] = network
 
+	// nic.it
+	  switch f.id.tos {
+	    case 40:
+	    network["origin"] = "Peering"
+	    case 48:
+	    network["origin"] = "Transit"
+	    default:
+	    network["origin"] = "Other"
+        } 
+	
 	// Set process information if it's available
 	if tuple.IPLength != 0 && tuple.SrcPort != 0 {
 		if proc := watcher.FindProcessesTuple(&tuple, proto); proc != nil {
