@@ -87,7 +87,8 @@ func getDBInstancesPerRegion(svc rdsiface.ClientAPI) (map[string]*rds.DBInstance
 
 	instancesOutputs := map[string]*rds.DBInstance{}
 	for _, dbInstance := range output.DBInstances {
-		instancesOutputs[*dbInstance.DBInstanceIdentifier] = &dbInstance
+		instance := dbInstance
+		instancesOutputs[*instance.DBInstanceIdentifier] = &instance
 	}
 	return instancesOutputs, nil
 }
