@@ -56,7 +56,7 @@ stages:
             - "^x-pack/metricbeat/module/aws/.*"
             - "^x-pack/metricbeat/Jenkinsfile.yml"
             - "^x-pack/libbeat/common/aws/.*"
-        stage: mandatory
+        stage: extended
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
