@@ -1,10 +1,40 @@
 - name: cpu
   type: group
-  release: beta
   description: >
-    cpu
+    Containerd Runtime CPU metrics.
+  release: beta
   fields:
-    - name: example
-      type: keyword
+    - name: containerd
+      type: group
       description: >
-        Example field
+      fields:
+        - name: kernel.pct
+          type: scaled_float
+          format: percent
+          description: >
+            Percentage of time in kernel space.
+        - name: kernel.norm.pct
+          type: scaled_float
+          format: percent
+          description: >
+            Percentage of time in kernel space normalized by the number of CPU cores.
+        - name: total.pct
+          type: scaled_float
+          format: percent
+          description: >
+            Total CPU usage.
+        - name: total.norm.pct
+          type: scaled_float
+          format: percent
+          description: >
+            Total CPU usage normalized by the number of CPU cores.
+        - name: user.pct
+          type: scaled_float
+          format: percent
+          description: >
+            Percentage of time in user space.
+        - name: user.norm.pct
+          type: scaled_float
+          format: percent
+          description: >
+            Percentage of time in user space normalized by the number of CPU cores.

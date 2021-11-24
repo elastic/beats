@@ -1,10 +1,11 @@
 - key: containerd
-  title: "containerd"
+  title: "Containerd"
   release: beta
   description: >
-    containerd module
+    Containerd stats collected from containerd
   fields:
     - name: containerd
       type: group
       description: >
+        Information and statistics about containerd's running containers.
       fields:
