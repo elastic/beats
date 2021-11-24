@@ -1,0 +1,31 @@
+name: fileat release
+
+on:
+  push:
+    branches: [ easyops ]
+    paths:
+      - 'filebeat/**'
+      
+jobs:
+  build:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        include:
+          - goarch: amd64
+            goos: linux
+          - goarch: arm64
+            goos: linux
+    steps:
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.17.2'
+    - name: Install dependencies
+      run:  go get -u github.com/magefile/mage
+    - uses: actions/checkout@v2
+    - name: Run build
+      run: cd filebeat && mage build && ls -ahl build/
+      env:
+        GOOS: ${{ matrix.goos }}
+        GOARCH: ${{ matrix.goarch }}
