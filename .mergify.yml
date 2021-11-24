@@ -14,6 +14,8 @@ pull_request_rules:
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: ask to resolve conflict
     conditions:
+      - -merged
+      - -closed
       - conflict
     actions:
         comment:
