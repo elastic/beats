@@ -22,6 +22,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+const AuthStyleInParams = 1
+
 type authConfig struct {
 	Basic  *basicAuthConfig `config:"basic"`
 	OAuth2 *oAuth2Config    `config:"oauth2"`
@@ -82,12 +84,12 @@ type oAuth2Config struct {
 	// common oauth fields
 	ClientID       string              `config:"client.id"`
 	ClientSecret   string              `config:"client.secret"`
-	User           string              `config:"user"`
-	Password       string              `config:"password"`
 	EndpointParams map[string][]string `config:"endpoint_params"`
+	Password       string              `config:"password"`
 	Provider       oAuth2Provider      `config:"provider"`
 	Scopes         []string            `config:"scopes"`
 	TokenURL       string              `config:"token_url"`
+	User           string              `config:"user"`
 
 	// google specific
 	GoogleCredentialsFile  string          `config:"google.credentials_file"`
@@ -117,12 +119,12 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 				ClientSecret: o.ClientSecret,
 				Endpoint: oauth2.Endpoint{
 					TokenURL:  o.TokenURL,
-					AuthStyle: 1,
+					AuthStyle: AuthStyleInParams,
 				},
 			}
 			token, err := conf.PasswordCredentialsToken(ctx, o.User, o.Password)
 			if err != nil {
-				return nil, fmt.Errorf("oauth2 client: error loading credentials: %w", err)
+				return nil, fmt.Errorf("oauth2 client: error loading credentials using user and password: %w", err)
 			}
 			return conf.Client(ctx, token), nil
 		} else {
@@ -201,6 +203,9 @@ func (o *oAuth2Config) Validate() error {
 	case oAuth2ProviderDefault:
 		if o.TokenURL == "" || o.ClientID == "" || o.ClientSecret == "" {
 			return errors.New("both token_url and client credentials must be provided")
+		}
+		if (o.User != "" && o.Password == "") || (o.User == "" && o.Password != "") {
+			return errors.New("both user and password credentials must be provided")
 		}
 	default:
 		return fmt.Errorf("unknown provider %q", o.getProvider())
