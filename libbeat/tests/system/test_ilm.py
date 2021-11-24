@@ -193,23 +193,6 @@ class TestCommandSetupILMPolicy(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
-    def test_setup_ilm_policy_and_template(self):
-        """
-        Test combination of ilm policy and template setup
-        """
-        self.render_config()
-
-        # NOTE: --template is deprecated for 8.0.0./
-        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-                                  extra_args=["setup", self.setupCmd, "--template"])
-
-        assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
-        self.idxmgmt.assert_alias_created(self.alias_name)
-        self.idxmgmt.assert_policy_created(self.policy_name)
-
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.tag('integration')
     def test_setup_ilm_default(self):
         """
         Test ilm policy setup with default config

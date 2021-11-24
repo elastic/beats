@@ -313,6 +313,10 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 	}
 	s.Start()
 
+	if cfg.Pprof {
+		s.AttachPprof()
+	}
+
 	// return server stopper
 	return s.Stop, nil
 }

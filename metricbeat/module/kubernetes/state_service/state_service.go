@@ -75,7 +75,7 @@ func NewServiceMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				"kube_service_status_load_balancer_ingress": p.InfoMetric(),
 			},
 			Labels: map[string]p.LabelMap{
-				"namespace":        p.KeyLabel(mb.ModuleDataKey + ".namespace.name"),
+				"namespace":        p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 				"service":          p.KeyLabel("name"),
 				"cluster_ip":       p.Label("cluster_ip"),
 				"external_name":    p.Label("external_name"),

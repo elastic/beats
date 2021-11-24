@@ -19,7 +19,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated config option aws_partition. {pull}28120[28120]
 - Improve stats API {pull}27963[27963]
 - Enable IMDSv2 support for `add_cloud_metadata` processor on AWS. {issue}22101[22101] {pull}28285[28285]
-- Update kubernetes.namespace from keyword to group field and add name, labels, annotations, uuid as its fields {pull}27917[27917]
 - Libbeat: logp package forces ECS compliant logs. Logs are JSON formatted. Options to enable ECS/JSON have been removed. {issue}15544[15544] {pull}28573[28573]
 - Previously, RE2 and thus Golang had a bug where `(|a)*` matched more characters than `(|a)+`. To stay consistent with PCRE, the bug was fixed. Configurations that rely on the old, buggy behaviour has to be adjusted. See more about Golang bug: https://github.com/golang/go/issues/46123 {pull}27543[27543]
 - Update docker client. {pull}28716[28716]
@@ -27,6 +26,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - add_process_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
 - add_docker_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
 - Index template's default_fields setting is only populated with ECS fields. {pull}28596[28596] {issue}28215[28215]
+- Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
 - Remove options `logging.files.suffix` and default to datetime endings. {pull}28927[28927]
 
 *Auditbeat*
@@ -67,6 +67,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - `filestream` and `log` inputs accept null (`\u0000`) as line terminator. {pull}28998[28998]
 
 *Heartbeat*
+- Change behavior in case of duplicate monitor IDs in configs to be last monitor wins. {pull}29041[29041]
 
 *Journalbeat*
 
@@ -143,6 +144,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allows disable pod events enrichment with deployment name {pull}28521[28521]
 - Fix `fingerprint` processor to give it access to the `@timestamp` field. {issue}28683[28683]
 - Fix the wrong beat name on monitoring and state endpoint {issue}27755[27755]
+- Skip configuration checks in autodiscover for configurations that are already running {pull}29048[29048]
 
 *Auditbeat*
 
@@ -184,6 +186,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for username in cisco asa security negotiation logs {pull}26975[26975]
 - Relax time parsing and capture group and session type in Cisco ASA module {issue}24710[24710] {pull}28325[28325]
 - Correctly track bytes read when max_bytes is exceeded. {issue}28317[28317] {pull}28352[28352]
+- Fix parsing of apache log levels including numbers. {pull}28717[28717]
 - Upgrade azure-eventhub sdk reference, contains potential checkpoint fixes. {pull}28919[28919]
 - Revert usageDetails api version to 2019-01-01. {pull}28995[28995]
 - Fix in `aws-s3` input regarding provider discovery through endpoint {pull}28963[28963]
@@ -369,6 +372,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Preliminary AIX support {pull}27954[27954]
 - Register additional name for `storage` metricset in the azure module. {pull}28447[28447]
 - Update reference to gosigar pacakge for filesystem windows fix. {pull}28909[28909]
+- Override `Host()` on statsd MetricSet {pull}29103[29103]
 
 *Packetbeat*
 
