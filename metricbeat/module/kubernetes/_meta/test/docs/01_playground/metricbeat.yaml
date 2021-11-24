@@ -64,6 +64,7 @@ data:
       hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
+    logging.level: debug
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -107,6 +108,8 @@ data:
         - pod
         - container
         - volume
+      add_resource_metadata:
+        deployment: false
       period: 10s
       host: ${NODE_NAME}
       hosts: ["https://${NODE_NAME}:10250"]
@@ -147,7 +150,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: metricbeat
-          image: docker.elastic.co/beats/metricbeat:8.0.0-SNAPSHOT
+          image: docker.elastic.co/beats/metricbeat:8.1.0-SNAPSHOT
           command: [ "sleep" ]
           args: [ "infinity" ]
           env:
