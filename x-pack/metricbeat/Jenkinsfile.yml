@@ -55,6 +55,7 @@ stages:
           changeset:         ## when PR contains any of those entries in the changeset
             - "^x-pack/metricbeat/module/aws/.*"
             - "^x-pack/metricbeat/Jenkinsfile.yml"
+            - "^x-pack/libbeat/common/aws/.*"
         stage: mandatory
     macos:
         mage: "mage build unitTest"

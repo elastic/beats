@@ -125,6 +125,7 @@ stages:
             - "^x-pack/filebeat/module/aws/.*"
             - "^x-pack/filebeat/input/awscloudwatch/.*"
             - "^x-pack/filebeat/Jenkinsfile.yml"
+            - "^x-pack/libbeat/common/aws/.*"
         stage: mandatory
     #windows-7-32:  See https://github.com/elastic/beats/issues/22315
     #    mage: "mage build unitTest"
