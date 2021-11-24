@@ -291,13 +291,13 @@ def generateStages(Map args = [:]) {
 def cloud(Map args = [:]) {
   withGithubNotify(context: args.context) {
     withNode(labels: args.label, forceWorkspace: true){
-      startCloudTestEnv(name: args.directory, dirs: args.dirs, cloudAWS: args.cloudAWS)
+      startCloudTestEnv(name: args.directory, dirs: args.dirs, withAWS: args.withAWS)
     }
     withCloudTestEnv(args) {
       try {
         target(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id)
       } finally {
-        terraformCleanup(name: args.directory, dir: args.directory, cloudAWS: args.cloudAWS)
+        terraformCleanup(name: args.directory, dir: args.directory, withAWS: args.withAWS)
       }
     }
   }
@@ -876,7 +876,7 @@ def withCloudTestEnv(Map args = [:], Closure body) {
   //   - the cloudtests build parameters
   //   - the aws github label
   //   - forced with the cloud argument aws github label
-  if (params.allCloudTests || params.awsCloudTests || matchesPrLabel(label: 'aws') || args.get('cloudAWS', false)) {
+  if (params.allCloudTests || params.awsCloudTests || matchesPrLabel(label: 'aws') || args.get('withAWS', false)) {
     testTags = "${testTags},aws"
     def aws = getVaultSecret(secret: "${AWS_ACCOUNT_SECRET}").data
     if (!aws.containsKey('access_key')) {
@@ -1084,6 +1084,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
   public run(Map args = [:]){
     steps.stageStatusCache(args){
       def withModule = args.content.get('withModule', false)
+      def withAWS = args.content.get('withAWS', false)
       //
       // What's the retry policy for fighting the flakiness:
       //   1) Lint/Packaging/Cloud/k8sTest stages don't retry, since their failures are normally legitim
@@ -1142,10 +1143,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
         steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
       }
       if(args?.content?.containsKey('cloud')) {
-        steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id)
-      }
-      if(args?.content?.containsKey('cloudAWS')) {
-        steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id, cloudAWS: true)
+        steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id, withAWS: withAWS)
       }
     }
   }

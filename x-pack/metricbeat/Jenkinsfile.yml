@@ -46,7 +46,8 @@ stages:
                 - "aws"
         stage: extended
     cloudAWS:
-        cloudAWS: "mage build test"
+        cloud: "mage build test"
+        withAWS: true          ## Enable the tests to run in AWS
         withModule: true       ## run the ITs only if the changeset affects a specific module.
         dirs:                  ## run the cloud tests for the given modules.
           - "x-pack/metricbeat/module/aws"
