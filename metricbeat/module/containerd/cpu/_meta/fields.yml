@@ -1,0 +1,10 @@
+- name: cpu
+  type: group
+  release: beta
+  description: >
+    cpu
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field

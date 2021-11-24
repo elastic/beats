@@ -27,6 +27,7 @@ grouped in the following categories:
 * <<exported-fields-cockroachdb>>
 * <<exported-fields-common>>
 * <<exported-fields-consul>>
+* <<exported-fields-containerd>>
 * <<exported-fields-coredns>>
 * <<exported-fields-couchbase>>
 * <<exported-fields-couchdb>>
@@ -10250,6 +10251,36 @@ type: long
 Nanoseconds consumed by stop-the-world garbage collection pauses since Consul started.
 
 type: long
+
+--
+
+[[exported-fields-containerd]]
+== containerd fields
+
+containerd module
+
+
+
+[float]
+=== containerd
+
+
+
+
+[float]
+=== cpu
+
+cpu
+
+
+
+*`containerd.cpu.example`*::
++
+--
+Example field
+
+
+type: keyword
 
 --
 

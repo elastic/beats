@@ -210,6 +210,14 @@ metricbeat.modules:
   hosts: ["localhost:8500"]
 
 
+#------------------------------ Containerd Module ------------------------------
+- module: containerd
+  metricsets: ["cpu"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+
+
 #------------------------------ Couchbase Module ------------------------------
 - module: couchbase
   metricsets: ["bucket", "cluster", "node"]

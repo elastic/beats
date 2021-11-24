@@ -1,0 +1,41 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+:modulename: containerd
+
+[[metricbeat-module-containerd]]
+== containerd module
+
+beta[]
+
+This is the containerd module.
+
+
+
+[float]
+=== Example configuration
+
+The containerd module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: containerd
+  metricsets: ["cpu"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-containerd-cpu,cpu>>
+
+include::containerd/cpu.asciidoc[]
+
