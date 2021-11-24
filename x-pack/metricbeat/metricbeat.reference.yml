@@ -2553,10 +2553,9 @@ output.elasticsearch:
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
 #setup.template.name: "metricbeat-%{[agent.version]}"
 
-# Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
-# The first part is the version of the beat and then -* is used to match all daily indices.
+# Template pattern. By default the template pattern is "-%{[agent.version]}*" to apply to the default index settings.
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.pattern: "metricbeat-%{[agent.version]}-*"
+#setup.template.pattern: "metricbeat-%{[agent.version]}*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
