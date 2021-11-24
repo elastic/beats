@@ -19,8 +19,10 @@ package beater
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"time"
@@ -39,33 +41,40 @@ func installNpcap(cfg *common.Config) error {
 	if err != nil {
 		return err
 	}
-	if !npcap.Upgradeable() && !reinstall {
-		return nil
-	}
-
 	timeout, err := configDuration(cfg, "npcap.install_timeout")
 	if err != nil {
 		return err
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
 	rawURI, err := configString(cfg, "npcap.installer_location")
 	if err != nil {
 		return err
 	}
 	if rawURI == "" {
-		rawURI = npcap.InstallerURL
+		rawURI = npcap.Registry
 	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	log := logp.NewLogger("npcap_install")
+
 	uri, err := url.Parse(rawURI)
 	if err != nil {
 		return err
 	}
-
-	log := logp.NewLogger("npcap_install")
-
+	// If a file or bare path is specified, go ahead and install it.
 	if uri.Scheme == "" || uri.Scheme == "file" {
 		return npcap.Install(ctx, log, uri.Path, false)
+	}
+
+	version, download, wantHash, err := npcap.CurrentVersion(ctx, log, rawURI)
+	if err != nil {
+		return err
+	}
+
+	// Is a more recent version available or are we forcing install.
+	if !npcap.Upgradeable(version) && !reinstall {
+		return nil
 	}
 
 	retain, err := configBool(cfg, "npcap.retain_download")
@@ -82,16 +91,17 @@ func installNpcap(cfg *common.Config) error {
 	} else {
 		defer os.RemoveAll(dir)
 	}
-	path := filepath.Join(dir, npcap.CurrentVersion)
+	path := filepath.Join(dir, path.Base(download))
 
-	h, err := npcap.Fetch(ctx, log, uri.String(), path)
+	gotHash, err := npcap.Fetch(ctx, log, download, path)
 	if err != nil {
 		return err
 	}
-	err = npcap.Verify(path, h)
-	if err != nil {
-		return err
+
+	if gotHash != wantHash {
+		return fmt.Errorf("npcap: hash mismatch for %s: want:%s got:%s", download, wantHash, gotHash)
 	}
+
 	return npcap.Install(ctx, log, path, false)
 }
 

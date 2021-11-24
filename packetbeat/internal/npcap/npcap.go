@@ -16,6 +16,18 @@
 // under the License.
 
 // Package npcap handles fetching and installing Npcap fow Windows.
+//
+// The npcap package interacts with a registry and download server that
+// provides a current_version end point that serves a JSON message that
+// corresponds to the this Go type:
+//
+//  struct {
+//  	Version string // The semverish version of the Npcap installer.
+//  	URL     string // The location of the Npcap installer.
+//  	Hash    string // The sha256 hash of the Npcap installer.
+//  }
+//
+// The URL field will point to the location of anb Npcap installer.
 package npcap
 
 import (
@@ -23,6 +35,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -30,7 +43,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -40,48 +52,71 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-// TODO: Currently the latest version is statically defined. When we have
-// a location to serve from, we can make this dynamically defined with a
-// function find the URL to the latest version and update Npcap for users
-// without updating the beat version.
+// Registry is the location of current Npcap version information.
+const Registry = "https://artifacts.elastic.co/downloads/npcap/current_version"
 
-const (
-	// CurrentVersion is the current version to install.
-	CurrentVersion = "1.55"
-
-	// CurrentInstaller is the executable name of the current versions installer.
-	CurrentInstaller = "npcap-" + CurrentVersion + "-oem.exe"
-
-	//  InstallerURL is the URL for the current Npcap version installer.
-	InstallerURL = "https://artifacts.elastic.co/downloads/npcap/" + CurrentInstaller // FIXME: This is a placeholder.
-)
-
-func init() {
-	// This is included to ensure that if NMAP.org change their versioning
-	// approach we get a signal to change our ordering implementation to match.
-	if !semver.IsValid("v" + CurrentVersion) {
-		panic(fmt.Sprintf("npcap: invalid version for semver: %s", CurrentVersion))
+// Fetch downloads the Npcap installer, writes the content to the given filepath
+// and returns the sha256 hash of the downloaded object.
+func CurrentVersion(ctx context.Context, log *logp.Logger, registry string) (version, url, hash string, err error) {
+	if runtime.GOOS != "windows" {
+		return "", "", "", errors.New("npcap: called Fetch on non-Windows platform")
 	}
+
+	req, err := http.NewRequestWithContext(ctx, "GET", registry, nil)
+	if err != nil {
+		return "", "", "", err
+	}
+
+	var client http.Client
+	res, err := client.Do(req)
+	if err != nil {
+		return "", "", "", err
+	}
+	defer res.Body.Close()
+
+	b, err := ioutil.ReadAll(res.Body)
+	if res.StatusCode != http.StatusOK {
+		if err != nil {
+			log.Errorf("failed to read the error response body: %v", err)
+		}
+		b = bytes.TrimSpace(b)
+		if len(b) == 0 {
+			return "", "", "", fmt.Errorf("npcap: failed to fetch %s, status: %d, message: empty", url, res.StatusCode)
+		}
+		return "", "", "", fmt.Errorf("npcap: failed to fetch %s, status: %d, message: %s", url, res.StatusCode, b)
+	}
+
+	var info struct {
+		Version string
+		URL     string
+		Hash    string
+	}
+	err = json.Unmarshal(b, &info)
+	if err != nil {
+		return "", "", "", err
+	}
+
+	return info.Version, info.URL, info.Hash, nil
 }
 
 // Fetch downloads the Npcap installer, writes the content to the given filepath
 // and returns the sha256 hash of the downloaded object.
-func Fetch(ctx context.Context, log *logp.Logger, url, path string) (hash []byte, err error) {
+func Fetch(ctx context.Context, log *logp.Logger, url, path string) (hash string, err error) {
 	if runtime.GOOS != "windows" {
-		return nil, errors.New("npcap: called Fetch on non-Windows platform")
+		return "", errors.New("npcap: called Fetch on non-Windows platform")
 	}
 
 	log.Infof("download %s to %s", url, path)
 
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		return
+		return "", err
 	}
 
 	var client http.Client
 	res, err := client.Do(req)
 	if err != nil {
-		return
+		return "", err
 	}
 	defer res.Body.Close()
 
@@ -92,43 +127,23 @@ func Fetch(ctx context.Context, log *logp.Logger, url, path string) (hash []byte
 		}
 		b = bytes.TrimSpace(b)
 		if len(b) == 0 {
-			return nil, fmt.Errorf("npcap: failed to fetch %s, status: %d, message: empty", url, res.StatusCode)
+			return "", fmt.Errorf("npcap: failed to fetch %s, status: %d, message: empty", url, res.StatusCode)
 		}
-		return nil, fmt.Errorf("npcap: failed to fetch %s, status: %d, message: %s", url, res.StatusCode, b)
+		return "", fmt.Errorf("npcap: failed to fetch %s, status: %d, message: %s", url, res.StatusCode, b)
 	}
 
 	dst, err := os.Create(path)
 	if err != nil {
-		return
+		return "", err
 	}
 	defer dst.Close()
 
 	h := sha256.New()
 	_, err = io.Copy(io.MultiWriter(h, dst), res.Body)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return h.Sum(nil), nil
-}
-
-// Verify compares the provided hash against the expected hash for the
-// installer at the given path.
-func Verify(path string, hash []byte) error {
-	base := filepath.Base(path)
-	h := hex.EncodeToString(hash)
-	want, ok := hashes[base]
-	if !ok {
-		return fmt.Errorf("npcap: unknown Npcap installer version: %s", base)
-	}
-	if want != h {
-		return fmt.Errorf("npcap: hash mismatch for %s: want:%s got:%s", path, want, h)
-	}
-	return nil
-}
-
-// hashes is the mapping of Npcap installer versions to their sha256 hash.
-var hashes = map[string]string{
-	"npcap-1.55-oem.exe": "1f035c0498863b41b64df87099ec20f80c6db26b12d27b5afef1c1ad3fa28690",
+	return hex.EncodeToString(h.Sum(nil)), nil
 }
 
 // Install runs the Npcap installer at the provided path.
@@ -172,7 +187,7 @@ func Install(ctx context.Context, log *logp.Logger, path string, compat bool) er
 	return err
 }
 
-func Upgradeable() bool {
+func Upgradeable(version string) bool {
 	// pcap.Version() returns a string in the form:
 	//
 	//  Npcap version 1.55, based on libpcap version 1.10.2-PRE-GIT
@@ -188,7 +203,7 @@ func Upgradeable() bool {
 		return true
 	}
 	installed = installed[:idx]
-	return semver.Compare("v"+installed, "v"+CurrentVersion) < 0
+	return semver.Compare("v"+installed, "v"+version) < 0
 }
 
 // Uninstall uninstalls the Npcap tools.
