@@ -124,7 +124,8 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 			errs = append(errs, err.Error())
 			event.SetErrorWithOption(common.MapStr{
 				"message": "parsing input as JSON: " + err.Error(),
-				"input":   text,
+				"data":    text,
+				"field":   field,
 			}, f.addErrorKey)
 			continue
 		}
