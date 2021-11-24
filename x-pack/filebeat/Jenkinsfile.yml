@@ -114,7 +114,7 @@ stages:
           - "aws"
       stage: extended
     cloudAWS:
-        cloud: "mage build test"
+        cloudAWS: "mage build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.
         dirs:                  ## run the cloud tests for the given modules.
           - "x-pack/filebeat/input/awss3/_meta/terraform"
@@ -123,6 +123,7 @@ stages:
             - "^x-pack/filebeat/input/awss3/.*"
             - "^x-pack/filebeat/module/aws/.*"
             - "^x-pack/filebeat/input/awscloudwatch/.*"
+            - "^x-pack/filebeat/Jenkinsfile.yml"
         stage: mandatory
     #windows-7-32:  See https://github.com/elastic/beats/issues/22315
     #    mage: "mage build unitTest"
