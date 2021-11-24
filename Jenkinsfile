@@ -346,20 +346,30 @@ def k8sTest(Map args = [:]) {
 def githubAction(Map args = [:]) {
   // We don't support branches/tags for the time being.
   if (!isPR()) { return }
-
   // Notify the status with a specific GitHub Check
   withGithubNotify(context: args.context) {
     // Provision a worker with the given labels. For the time being, let's provision a worker.
     // We can revisit this to maybe use the async mode when triggering the github action.
     withNode(labels: args.label, forceWorkspace: true){
-
       // TODO: This is the section regarding how to run the GitHub actions.
       // Just calling the step from https://github.com/elastic/apm-pipeline-library/pull/1358
       // Environment variables:
       //   env.GIT_BASE_COMMIT, this environment variable points to the git ref commit.
       //   env.TARGET_BRANCH, this environment variable points to the target branch in a Pull Request.
       //   env.GO_VERSION, this environment variable points to the Golang version.
-
+      def result = githubWorkflowRun(
+        repo: repo,
+        workflow: "build.yml",
+        ref: env.GIT_BRANCH.replaceFirst(/^[^\/]+\//,""),
+          parameters: [
+            pr: env.CHANGE_ID,
+            path: args.directory,
+            command: args.command,
+            go_version: env.GO_VERSION,
+          ],
+        credentialsId: "unlim2-workflow-token-1")
+      log(level: 'INFO', text: "Github build link: ${$result.html_url}")
+      log(level: 'INFO', text: "Github build status: ${result.conclusion}")
     }
   }
 }
