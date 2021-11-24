@@ -49,7 +49,7 @@ type TemplateSettings struct {
 func DefaultConfig(info beat.Info) TemplateConfig {
 	return TemplateConfig{
 		Name:     info.Beat + "-" + info.Version,
-		Pattern:  info.Beat + "-" + info.Version + "*",
+		Pattern:  info.Beat + "-" + info.Version,
 		Enabled:  true,
 		Fields:   "",
 		Priority: 150,

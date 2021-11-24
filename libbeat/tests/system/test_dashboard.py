@@ -229,7 +229,6 @@ class Test(BaseTest):
 
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         content, err = p.communicate()
-        print(content, err)
 
         assert p.returncode == 0
 

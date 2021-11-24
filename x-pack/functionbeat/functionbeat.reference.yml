@@ -1003,9 +1003,9 @@ output.elasticsearch:
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
 #setup.template.name: "functionbeat-%{[agent.version]}"
 
-# Template pattern. By default the template pattern is "-%{[agent.version]}*" to apply to the default index settings.
+# Template pattern. By default the template pattern is "functionbeat-%{[agent.version]}" to apply to the default index settings.
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.pattern: "functionbeat-%{[agent.version]}*"
+#setup.template.pattern: "functionbeat-%{[agent.version]}"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
