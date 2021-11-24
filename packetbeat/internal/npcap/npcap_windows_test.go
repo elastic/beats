@@ -25,6 +25,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -34,23 +35,66 @@ import (
 )
 
 func TestNpcap(t *testing.T) {
-	const installer = "This is an installer. Honest!\n"
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	// Elements of truth.
+	const (
+		registryEndPoint    = "/npcap/latest_installer"
+		latestVersion       = "0.0"
+		latestInstaller     = "npcap-0.0-oem.exe"
+		latestHash          = "bc3e42210a58873b55554af5100db1f9439b606efde4fd20c98d7af2d6c5419b"
+		latestInstallerPath = "/npcap/" + latestInstaller
+		installer           = "This is an installer. Honest!\n"
+	)
+	var latestVersionInfo string
+
+	// Mock registry and download server.
+	mux := http.NewServeMux()
+	mux.HandleFunc(registryEndPoint, func(w http.ResponseWriter, req *http.Request) {
+		io.WriteString(w, latestVersionInfo)
+	})
+	mux.HandleFunc(latestInstallerPath, func(w http.ResponseWriter, req *http.Request) {
 		io.WriteString(w, installer)
-	}))
+	})
+	srv := httptest.NewServer(mux)
+	u, err := url.Parse(srv.URL)
+	if err != nil {
+		t.Fatalf("failed to parse server root URL: %v", err)
+	}
+	u.Path = latestInstallerPath
+	latestInstallerURL := u.String()
+	latestVersionInfo = `{"url":"` + latestInstallerURL + `","version":"` + latestVersion + `","hash":"` + latestHash + `"}`
 	defer srv.Close()
 
+	// Working space.
 	dir, err := os.MkdirTemp("", "packetbeat-npcap-*")
 	if err != nil {
 		t.Fatalf("failed to create working directory: %v", err)
 	}
 	defer os.RemoveAll(dir)
-	path := filepath.Join(dir, CurrentInstaller)
+	path := filepath.Join(dir, latestVersion)
 
-	var hash []byte
+	t.Run("Query Version", func(t *testing.T) {
+		u.Path = registryEndPoint
+
+		log := logp.NewLogger("npcap_test_query_version")
+		gotVersion, gotURL, gotHash, err := CurrentVersion(context.Background(), log, u.String())
+		if err != nil {
+			t.Fatalf("failed to fetch installer: %v", err)
+		}
+
+		if gotVersion != latestVersion {
+			t.Errorf("unexpected version: got:%q want:%q", gotVersion, latestVersion)
+		}
+		if gotURL != latestInstallerURL {
+			t.Errorf("unexpected download location: got:%q want:%q", gotURL, latestInstallerURL)
+		}
+		if gotHash != latestHash {
+			t.Errorf("unexpected hash: got:%q want:%q", gotHash, latestHash)
+		}
+	})
+
 	t.Run("Fetch", func(t *testing.T) {
 		log := logp.NewLogger("npcap_test_fetch")
-		hash, err = Fetch(context.Background(), log, srv.URL, path)
+		hash, err := Fetch(context.Background(), log, latestInstallerURL, path)
 		if err != nil {
 			t.Fatalf("failed to fetch installer: %v", err)
 		}
@@ -62,16 +106,8 @@ func TestNpcap(t *testing.T) {
 		if string(got) != installer {
 			t.Errorf("unexpected download: got:%q want:%q", got, installer)
 		}
-	})
-
-	t.Run("Verify", func(t *testing.T) {
-		// Dirty global manipulation. Tests may not be run in parallel.
-		hashes["test-artifact"] = "bc3e42210a58873b55554af5100db1f9439b606efde4fd20c98d7af2d6c5419b"
-		defer delete(hashes, "test-artifact")
-
-		err = Verify("test-artifact", hash)
-		if err != nil {
-			t.Errorf("failed to verify download: %v", err)
+		if hash != latestHash {
+			t.Errorf("unexpected download hash: got:%s want:%s", hash, latestHash)
 		}
 	})
 
