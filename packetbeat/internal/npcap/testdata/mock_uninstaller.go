@@ -20,25 +20,15 @@ package main
 import (
 	"log"
 	"os"
-	"strings"
 )
 
 func main() {
 	log.SetFlags(0)
-	log.SetPrefix("installer message: ")
-	switch len(os.Args) {
-	case 3, 4:
-		// OK
-	default:
-		log.Fatalf("unexpected number of argument: want 3 or 4 but got:%q", os.Args)
+	log.SetPrefix("uninstaller message: ")
+	if len(os.Args) != 2 {
+		log.Fatalf("unexpected number of argument: want 2 but got:%q", os.Args)
 	}
 	if os.Args[1] != "/S" {
 		log.Fatalf(`unexpected first argument: want:"/S" got:%q`, os.Args[1])
-	}
-	if os.Args[2] != "/winpcap_mode=yes" && os.Args[2] != "/winpcap_mode=no" {
-		log.Fatalf(`unexpected second argument: want:"/winpcap_mode={yes,no}" got:%q`, os.Args[2])
-	}
-	if len(os.Args) > 3 && !strings.HasPrefix(os.Args[len(os.Args)-1], "/D=") {
-		log.Fatalf(`unexpected final argument: want:"/D=<path>" got:%#q`, os.Args[3])
 	}
 }

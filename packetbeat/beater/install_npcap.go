@@ -49,6 +49,10 @@ func installNpcap(cfg *common.Config) error {
 	if err != nil {
 		return err
 	}
+	installDst, err := configString(cfg, "npcap.install_destination")
+	if err != nil {
+		return err
+	}
 	if rawURI == "" {
 		rawURI = npcap.Registry
 	}
@@ -62,9 +66,10 @@ func installNpcap(cfg *common.Config) error {
 	if err != nil {
 		return err
 	}
+
 	// If a file or bare path is specified, go ahead and install it.
 	if uri.Scheme == "" || uri.Scheme == "file" {
-		return npcap.Install(ctx, log, uri.Path, false)
+		return npcap.Install(ctx, log, uri.Path, installDst, false)
 	}
 
 	version, download, wantHash, err := npcap.CurrentVersion(ctx, log, rawURI)
@@ -91,9 +96,9 @@ func installNpcap(cfg *common.Config) error {
 	} else {
 		defer os.RemoveAll(dir)
 	}
-	path := filepath.Join(dir, path.Base(download))
+	pth := filepath.Join(dir, path.Base(download))
 
-	gotHash, err := npcap.Fetch(ctx, log, download, path)
+	gotHash, err := npcap.Fetch(ctx, log, download, pth)
 	if err != nil {
 		return err
 	}
@@ -102,7 +107,7 @@ func installNpcap(cfg *common.Config) error {
 		return fmt.Errorf("npcap: hash mismatch for %s: want:%s got:%s", download, wantHash, gotHash)
 	}
 
-	return npcap.Install(ctx, log, path, false)
+	return npcap.Install(ctx, log, pth, installDst, false)
 }
 
 func configBool(cfg *common.Config, path string) (bool, error) {

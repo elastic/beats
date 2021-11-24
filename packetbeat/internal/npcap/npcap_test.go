@@ -15,9 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build windows
-// +build windows
-
 package npcap
 
 import (
@@ -45,6 +42,12 @@ func TestNpcap(t *testing.T) {
 		installer           = "This is an installer. Honest!\n"
 	)
 	var latestVersionInfo string
+
+	// Ugh.
+	var lcfg logp.Config
+	logp.ToObserverOutput()(&lcfg)
+	logp.Configure(lcfg)
+	obs := logp.ObserverLogs()
 
 	// Mock registry and download server.
 	mux := http.NewServeMux()
@@ -76,9 +79,13 @@ func TestNpcap(t *testing.T) {
 		u.Path = registryEndPoint
 
 		log := logp.NewLogger("npcap_test_query_version")
-		gotVersion, gotURL, gotHash, err := CurrentVersion(context.Background(), log, u.String())
+		gotVersion, gotURL, gotHash, err := currentVersion(context.Background(), log, u.String())
+		messages := obs.TakeAll()
 		if err != nil {
 			t.Fatalf("failed to fetch installer: %v", err)
+			for _, e := range messages {
+				t.Log(e.Message)
+			}
 		}
 
 		if gotVersion != latestVersion {
@@ -94,9 +101,13 @@ func TestNpcap(t *testing.T) {
 
 	t.Run("Fetch", func(t *testing.T) {
 		log := logp.NewLogger("npcap_test_fetch")
-		hash, err := Fetch(context.Background(), log, latestInstallerURL, path)
+		hash, err := fetch(context.Background(), log, latestInstallerURL, path)
+		messages := obs.TakeAll()
 		if err != nil {
 			t.Fatalf("failed to fetch installer: %v", err)
+			for _, e := range messages {
+				t.Log(e.Message)
+			}
 		}
 
 		got, err := os.ReadFile(path)
@@ -122,9 +133,41 @@ func TestNpcap(t *testing.T) {
 			t.Fatalf("failed to build mock installer: %v\n%s", err, b)
 		}
 		log := logp.NewLogger("npcap_test_install")
-		err = Install(context.Background(), log, path, false)
+		for _, compat := range []bool{false, true} {
+			for _, dst := range []string{
+				"", // Default.
+				`C:\some\other\location`,
+			} {
+				err = install(context.Background(), log, path, dst, compat)
+				messages := obs.TakeAll()
+				if err != nil {
+					if dst == "" {
+						dst = "default location"
+					}
+					t.Errorf("unexpected error running installer to %s with compat=%t: %v", dst, compat, err)
+					for _, e := range messages {
+						t.Log(e.Message)
+					}
+				}
+			}
+		}
+	})
+
+	t.Run("Uninstall", func(t *testing.T) {
+		path = filepath.Join(filepath.Dir(path), "Uninstall.exe")
+		build := exec.Command("go", "build", "-o", path, filepath.FromSlash("testdata/mock_uninstaller.go"))
+		b, err := build.CombinedOutput()
 		if err != nil {
-			t.Errorf("unexpected error running installer: %v", err)
+			t.Fatalf("failed to build mock uninstaller: %v\n%s", err, b)
+		}
+		log := logp.NewLogger("npcap_test_uninstall")
+		err = uninstall(context.Background(), log, path)
+		messages := obs.TakeAll()
+		if err != nil {
+			t.Errorf("unexpected error running uninstaller: %v", err)
+			for _, e := range messages {
+				t.Log(e.Message)
+			}
 		}
 	})
 }
