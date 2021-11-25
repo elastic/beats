@@ -50,6 +50,12 @@ type specer interface {
 	Specs() map[string]program.Spec
 }
 
+type specInfo struct {
+	spec program.Spec
+	app  string
+	rk   string
+}
+
 // New creates a new control protocol server.
 func New(log *logger.Logger, rex reexec.ExecManager, statusCtrl status.Controller, up *upgrade.Upgrader) *Server {
 	return &Server{
@@ -197,29 +203,16 @@ func (s *Server) ProcMeta(ctx context.Context, _ *proto.Empty) (*proto.ProcMetaR
 		Procs: []*proto.ProcMeta{},
 	}
 
-	routes := s.routeFn()
-	for _, rk := range routes.Keys() {
-		programs, ok := routes.Get(rk)
-		if !ok {
-			s.logger.With("route_key", rk).Warn("Unable to retrieve route.")
-			continue
-		}
+	// gather spec data for all rk/apps running
+	specs := s.getSpecInfo("", "")
+	for _, si := range specs {
+		endpoint := monitoring.MonitoringEndpoint(si.spec, runtime.GOOS, si.rk)
+		client := newSocketRequester(si.app, si.rk, endpoint)
 
-		sp, ok := programs.(specer)
-		if !ok {
-			s.logger.With("route_key", rk, "route", programs).Warn("Unable to cast route as specer.")
-			continue
-		}
-		specs := sp.Specs()
-
-		for n, spec := range specs {
-			endpoint := monitoring.MonitoringEndpoint(spec, runtime.GOOS, rk)
-			client := newSocketRequester(n, rk, endpoint)
-
-			procMeta := client.procMeta(ctx)
-			resp.Procs = append(resp.Procs, procMeta)
-		}
+		procMeta := client.procMeta(ctx)
+		resp.Procs = append(resp.Procs, procMeta)
 	}
+
 	return resp, nil
 }
 
@@ -255,41 +248,19 @@ func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.Ppr
 		}
 	}
 
-	routes := s.routeFn()
-	for _, rk := range routes.Keys() {
-		// Skip the rk if it does not match and one has been requested.
-		if req.RouteKey != "" && req.RouteKey != rk {
-			continue
-		}
-		programs, ok := routes.Get(rk)
-		if !ok {
-			s.logger.With("route_key", rk).Warn("Unable to retrieve route.")
-			continue
-		}
-
-		sp, ok := programs.(specer)
-		if !ok {
-			s.logger.With("route_key", rk, "route", programs).Warn("Unable to cast route as specer.")
-			continue
-		}
-		specs := sp.Specs()
-		for n, spec := range specs {
-			// Skip the app if it does not match and one has been requested.
-			if req.AppName != "" && req.AppName != n {
-				continue
-			}
-			endpoint := monitoring.MonitoringEndpoint(spec, runtime.GOOS, rk)
-			c := newSocketRequester(n, rk, endpoint)
-
-			// Launch a concurrent goroutine to gather all pprof endpoints from a socket.
-			for _, opt := range req.PprofType {
-				wg.Add(1)
-				go func(opt proto.PprofOption) {
-					res := c.getPprof(ctx, opt, dur)
-					ch <- res
-					wg.Done()
-				}(opt)
-			}
+	// get requested rk/appname spec or all specs
+	specs := s.getSpecInfo(req.RouteKey, req.AppName)
+	for _, si := range specs {
+		endpoint := monitoring.MonitoringEndpoint(si.spec, runtime.GOOS, si.rk)
+		c := newSocketRequester(si.app, si.rk, endpoint)
+		// Launch a concurrent goroutine to gather all pprof endpoints from a socket.
+		for _, opt := range req.PprofType {
+			wg.Add(1)
+			go func(opt proto.PprofOption) {
+				res := c.getPprof(ctx, opt, dur)
+				ch <- res
+				wg.Done()
+			}(opt)
 		}
 	}
 
@@ -304,6 +275,60 @@ func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.Ppr
 		resp.Results = append(resp.Results, res)
 	}
 	return resp, nil
+}
+
+// getSpecs will return the specs for the program associated with the specified route key/app name, or all programs if no key(s) are specified.
+// if matchRK or matchApp are empty all results will be returned.
+func (s *Server) getSpecInfo(matchRK, matchApp string) []specInfo {
+	routes := s.routeFn()
+
+	// find specInfo for a specified rk/app
+	if matchRK != "" && matchApp != "" {
+		programs, ok := routes.Get(matchRK)
+		if !ok {
+			s.logger.With("route_key", matchRK).Debug("No matching route key found.")
+			return []specInfo{}
+		}
+		sp, ok := programs.(specer)
+		if !ok {
+			s.logger.With("route_key", matchRK, "route", programs).Warn("Unable to cast route as specer.")
+			return []specInfo{}
+		}
+		specs := sp.Specs()
+
+		spec, ok := specs[matchApp]
+		if !ok {
+			s.logger.With("route_key", matchRK, "application_name", matchApp).Debug("No matching route key/application name found.")
+			return []specInfo{}
+		}
+		return []specInfo{specInfo{spec: spec, app: matchApp, rk: matchRK}}
+	}
+
+	// gather specInfo for all rk/app values
+	res := make([]specInfo, 0)
+	for _, rk := range routes.Keys() {
+		programs, ok := routes.Get(rk)
+		if !ok {
+			// we do not expect to ever hit this code path
+			// if this log message occurs then the agent is unable to access one of the keys that is returned by the route function
+			// might be a race condition if someone tries to update the policy to remove an output?
+			s.logger.With("route_key", rk).Warn("Unable to retrieve route.")
+			continue
+		}
+		sp, ok := programs.(specer)
+		if !ok {
+			s.logger.With("route_key", matchRK, "route", programs).Warn("Unable to cast route as specer.")
+			continue
+		}
+		for n, spec := range sp.Specs() {
+			res = append(res, specInfo{
+				rk:   rk,
+				app:  n,
+				spec: spec,
+			})
+		}
+	}
+	return res
 }
 
 // socketRequester is a struct to gather (diagnostics) data from a socket opened by elastic-agent or one if it's processes
