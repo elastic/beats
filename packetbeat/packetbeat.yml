@@ -39,6 +39,9 @@ packetbeat.interfaces.internal_networks:
 #  # retain_download specifies that a downloaded installer will be kept on the host
 #  # filesystem and its location will be recorded in the logs.
 #  retain_download: false
+#  # ignore_missing_registry specifies that failure to query the registry server
+#  # will be ignored with a logged warning.
+#  ignore_missing_registry: false
 #  # By default Npcap will be installed only when a newer version of Npcap is available.
 #  # force_reinstall forces a new installation of Npcap in all cases.
 #  force_reinstall: false

@@ -19,6 +19,7 @@ package beater
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -72,8 +73,16 @@ func installNpcap(cfg *common.Config) error {
 		return npcap.Install(ctx, log, uri.Path, installDst, false)
 	}
 
+	canFail, err := configBool(cfg, "npcap.ignore_misssing_registry")
+	if err != nil {
+		return err
+	}
 	version, download, wantHash, err := npcap.CurrentVersion(ctx, log, rawURI)
 	if err != nil {
+		if canFail && errors.Is(err, npcap.RegistryNotFound) {
+			log.Warnf("%v: did not install Npcap", err)
+			return nil
+		}
 		return err
 	}
 
