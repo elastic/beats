@@ -327,7 +327,7 @@ func TestIndexManager_Setup(t *testing.T) {
 			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
 				"overwrite":                     "true",
 				"name":                          "test-9.9.9",
-				"pattern":                       "test-9.9.9*",
+				"pattern":                       "test-9.9.9",
 				"settings.index.lifecycle.name": "test",
 			}),
 			policy: "test",
@@ -339,7 +339,7 @@ func TestIndexManager_Setup(t *testing.T) {
 			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
 				"overwrite":                     "true",
 				"name":                          "test-9.9.9",
-				"pattern":                       "test-9.9.9*",
+				"pattern":                       "test-9.9.9",
 				"settings.index.lifecycle.name": "policy-keep",
 			}),
 			policy: "policy-keep",
@@ -359,14 +359,14 @@ func TestIndexManager_Setup(t *testing.T) {
 			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
 				"overwrite": "true",
 				"name":      "test-9.9.9",
-				"pattern":   "test-9.9.9*",
+				"pattern":   "test-9.9.9",
 			}),
 		},
 		"template default loadMode Force ilm disabled": {
 			cfg: common.MapStr{
 				"setup.ilm.enabled": false,
 				"name":              "test-9.9.9",
-				"pattern":           "test-9.9.9*",
+				"pattern":           "test-9.9.9",
 			},
 			loadTemplate: LoadModeForce,
 			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
@@ -409,7 +409,7 @@ func TestIndexManager_Setup(t *testing.T) {
 			loadILM: LoadModeDisabled,
 			tmplCfg: cfgWith(template.DefaultConfig(info), map[string]interface{}{
 				"name":                          "test-9.9.9",
-				"pattern":                       "test-9.9.9*",
+				"pattern":                       "test-9.9.9",
 				"settings.index.lifecycle.name": "test",
 			}),
 		},

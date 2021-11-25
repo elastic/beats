@@ -44,7 +44,7 @@ func TestFileLoader_Load(t *testing.T) {
 	}{
 		"load minimal config info": {
 			body: common.MapStr{
-				"index_patterns": []string{"mock-7.0.0*"},
+				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
 				"priority":       150,
 				"template": common.MapStr{
@@ -54,7 +54,7 @@ func TestFileLoader_Load(t *testing.T) {
 		"load minimal config with index settings": {
 			settings: TemplateSettings{Index: common.MapStr{"code": "best_compression"}},
 			body: common.MapStr{
-				"index_patterns": []string{"mock-7.0.0*"},
+				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
 				"priority":       150,
 				"template": common.MapStr{
@@ -64,7 +64,7 @@ func TestFileLoader_Load(t *testing.T) {
 		"load minimal config with source settings": {
 			settings: TemplateSettings{Source: common.MapStr{"enabled": false}},
 			body: common.MapStr{
-				"index_patterns": []string{"mock-7.0.0*"},
+				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
 				"priority":       150,
 				"template": common.MapStr{
@@ -80,7 +80,7 @@ func TestFileLoader_Load(t *testing.T) {
 		},
 		"load config and in-line analyzer fields": {
 			body: common.MapStr{
-				"index_patterns": []string{"mock-7.0.0*"},
+				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
 				"priority":       150,
 				"template": common.MapStr{
@@ -110,7 +110,7 @@ func TestFileLoader_Load(t *testing.T) {
       analyzer: simple
 `),
 			want: common.MapStr{
-				"index_patterns": []string{"mock-7.0.0*"},
+				"index_patterns": []string{"mock-7.0.0"},
 				"data_stream":    struct{}{},
 				"priority":       150,
 				"template": common.MapStr{
@@ -178,7 +178,7 @@ func TestFileLoader_Load(t *testing.T) {
 		},
 		"load config and in-line analyzer fields with name collision": {
 			body: common.MapStr{
-				"index_patterns": []string{"mock-7.0.0-*"},
+				"index_patterns": []string{"mock-7.0.0"},
 				"settings":       common.MapStr{"index": nil},
 			},
 			fields: []byte(`- key: test

@@ -96,14 +96,14 @@ func TestTemplate(t *testing.T) {
 
 	t.Run("for ES 7.x", func(t *testing.T) {
 		template := createTestTemplate(t, currentVersion, "7.10.0", DefaultConfig(info))
-		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "*"})
+		template.Assert("index_patterns", []string{"testbeat-" + currentVersion})
 		template.Assert("template.mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
 		template.Assert("template.settings.index.max_docvalue_fields_search", 200)
 	})
 
 	t.Run("for ES 8.x", func(t *testing.T) {
 		template := createTestTemplate(t, currentVersion, "8.0.0", DefaultConfig(info))
-		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "*"})
+		template.Assert("index_patterns", []string{"testbeat-" + currentVersion})
 		template.Assert("template.mappings._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
 		template.Assert("template.settings.index.max_docvalue_fields_search", 200)
 	})
