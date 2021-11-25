@@ -647,7 +647,7 @@ func TestPod_GenerateWithNodeNamespaceWithAddResourceConfig(t *testing.T) {
 					UID:       types.UID(uid),
 					Namespace: namespace,
 					Labels: map[string]string{
-						"foo": "bar",
+						"app.kubernetes.io/component": "exporter",
 					},
 					Annotations: map[string]string{
 						"app": "production",
@@ -695,8 +695,8 @@ func TestPod_GenerateWithNodeNamespaceWithAddResourceConfig(t *testing.T) {
 					Name: namespace,
 					UID:  types.UID(uid),
 					Labels: map[string]string{
-						"nskey":  "nsvalue",
-						"nskey2": "nsvalue2",
+						"app.kubernetes.io/name": "kube-state-metrics",
+						"nskey2":                 "nsvalue2",
 					},
 					Annotations: map[string]string{},
 				},
@@ -714,7 +714,7 @@ func TestPod_GenerateWithNodeNamespaceWithAddResourceConfig(t *testing.T) {
 				"namespace":     "default",
 				"namespace_uid": uid,
 				"namespace_labels": common.MapStr{
-					"nskey2": "nsvalue2",
+					"app_kubernetes_io/name": "kube-state-metrics",
 				},
 				"node": common.MapStr{
 					"name": "testnode",
@@ -725,7 +725,7 @@ func TestPod_GenerateWithNodeNamespaceWithAddResourceConfig(t *testing.T) {
 					"hostname": "node1",
 				},
 				"labels": common.MapStr{
-					"foo": "bar",
+					"app_kubernetes_io/component": "exporter",
 				},
 				"annotations": common.MapStr{
 					"app": "production",
@@ -745,7 +745,7 @@ func TestPod_GenerateWithNodeNamespaceWithAddResourceConfig(t *testing.T) {
 		assert.NoError(t, err)
 
 		namespaceConfig, _ := common.NewConfigFrom(map[string]interface{}{
-			"include_labels": []string{"nskey2"},
+			"include_labels": []string{"app.kubernetes.io/name"},
 		})
 		nodeConfig, _ := common.NewConfigFrom(map[string]interface{}{
 			"include_labels": []string{"nodekey2"},

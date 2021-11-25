@@ -89,7 +89,7 @@ func NewResourceMetadataEnricher(
 
 	// GetPodMetaGen requires cfg of type Config
 	commonMetaConfig := metadata.Config{}
-	if err := base.Module().UnpackConfig(&config); err != nil {
+	if err := base.Module().UnpackConfig(&commonMetaConfig); err != nil {
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
 	}
@@ -177,7 +177,7 @@ func NewContainerMetadataEnricher(
 	watcher, nodeWatcher, namespaceWatcher := getPodMetadataWatchers(config, &kubernetes.Pod{}, nodeScope)
 
 	commonMetaConfig := metadata.Config{}
-	if err := base.Module().UnpackConfig(&config); err != nil {
+	if err := base.Module().UnpackConfig(&commonMetaConfig); err != nil {
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
 	}
@@ -373,7 +373,6 @@ func (m *enricher) Start() {
 		}
 		m.watcherStarted = true
 	}
-
 }
 
 func (m *enricher) Stop() {
@@ -382,6 +381,13 @@ func (m *enricher) Stop() {
 	if m.watcherStarted {
 		m.watcher.Stop()
 		m.watcherStarted = false
+	}
+	if m.namespaceWatcher != nil {
+		m.namespaceWatcher.Stop()
+	}
+
+	if m.nodeWatcher != nil {
+		m.nodeWatcher.Stop()
 	}
 }
 
