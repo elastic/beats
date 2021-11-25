@@ -360,7 +360,7 @@ def githubAction(Map args = [:]) {
       def result = githubWorkflowRun(
         repo: repo,
         workflow: "build",
-        ref: env.GIT_BRANCH.replaceFirst(/^[^\/]+\//,""),
+        ref: env.TARGET_BRANCH,
           parameters: [
             pr: env.CHANGE_ID,
             path: args.directory,
