@@ -4,37 +4,52 @@
     Containerd Runtime CPU metrics.
   release: beta
   fields:
-    - name: containerd
+    - name: usage
       type: group
-      description: >
       fields:
-        - name: kernel.pct
-          type: scaled_float
-          format: percent
-          description: >
-            Percentage of time in kernel space.
-        - name: kernel.norm.pct
-          type: scaled_float
-          format: percent
-          description: >
-            Percentage of time in kernel space normalized by the number of CPU cores.
-        - name: total.pct
-          type: scaled_float
-          format: percent
-          description: >
-            Total CPU usage.
-        - name: total.norm.pct
-          type: scaled_float
-          format: percent
-          description: >
-            Total CPU usage normalized by the number of CPU cores.
-        - name: user.pct
-          type: scaled_float
-          format: percent
-          description: >
-            Percentage of time in user space.
-        - name: user.norm.pct
-          type: scaled_float
-          format: percent
-          description: >
-            Percentage of time in user space normalized by the number of CPU cores.
+        - name: kernel
+          type: group
+          fields:
+            - name: ns
+              type: double
+              description: >
+                CPU Kernel usage nanoseconds
+        - name: user
+          type: group
+          fields:
+            - name: ns
+              type: double
+              description: >
+                CPU User usage nanoseconds
+        - name: total
+          type: group
+          fields:
+            - name: ns
+              type: double
+              description: >
+                CPU total usage nanoseconds
+#    - name: kernel.norm.pct
+#      type: scaled_float
+#      format: percent
+#      description: >
+#        Percentage of time in kernel space normalized by the number of CPU cores.
+#    - name: total.pct
+#      type: scaled_float
+#      format: percent
+#      description: >
+#        Total CPU usage.
+#    - name: total.norm.pct
+#      type: scaled_float
+#      format: percent
+#      description: >
+#        Total CPU usage normalized by the number of CPU cores.
+#    - name: user.pct
+#      type: scaled_float
+#      format: percent
+#      description: >
+#        Percentage of time in user space.
+#    - name: user.norm.pct
+#      type: scaled_float
+#      format: percent
+#      description: >
+#        Percentage of time in user space normalized by the number of CPU cores.

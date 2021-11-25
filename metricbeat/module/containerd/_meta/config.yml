@@ -2,5 +2,5 @@
   metricsets: ["cpu"]
   enabled: false
   period: 10s
-  hosts: ["localhost"]
+  hosts: ["localhost:1338"]
 
