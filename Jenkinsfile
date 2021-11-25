@@ -358,7 +358,7 @@ def githubAction(Map args = [:]) {
       //   env.TARGET_BRANCH, this environment variable points to the target branch in a Pull Request.
       //   env.GO_VERSION, this environment variable points to the Golang version.
       def result = githubWorkflowRun(
-        repo: repo,
+        repo: "elastic/beats",
         workflow: "build",
         ref: env.TARGET_BRANCH,
           parameters: [
