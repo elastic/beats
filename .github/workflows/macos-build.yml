@@ -15,7 +15,7 @@ on:
         required: true
       runner:
         description: 'Github actions runner'
-        required: true
+        required: false
         default: 'macos-latest'
       path:
         description: 'Directory where to run command'
