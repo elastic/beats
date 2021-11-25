@@ -1,6 +1,7 @@
 name: macos-build
 env:
   GOPATH: /home/runner/work/beats/beats
+  GO111MODULE: off
   REPO_PATH: src/beats
   MACOS_GOPATH: /Users/runner/work/beats/beats
   GITHUB_TOKEN: ${{ github.token }}
