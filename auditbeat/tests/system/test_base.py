@@ -35,9 +35,9 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
             assert self.log_contains("auditbeat stopped")
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    def test_template(self):
+    def test_index_management(self):
         """
-        Test that the template can be loaded with `setup --template`
+        Test that the template can be loaded with `setup --index-management`
         """
         dirs = [self.temp_dir("auditbeat_test")]
         with PathCleanup(dirs):
@@ -51,7 +51,7 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
                     }
                 }],
                 elasticsearch={"host": self.get_elasticsearch_url()})
-            self.run_beat(extra_args=["setup", "--template"], exit_code=0)
+            self.run_beat(extra_args=["setup", "--index-management"], exit_code=0)
 
             assert self.log_contains('Loaded index template')
             assert len(es.cat.templates(name='auditbeat-*', h='name')) > 0

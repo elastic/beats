@@ -104,6 +104,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
+// Host returns the hostname or other module specific value that identifies a
+// specific host or service instance from which to collect metrics.
+func (b *MetricSet) Host() string {
+	return b.server.(*udp.UdpServer).GetHost()
+}
+
 func buildMappings(config []StatsdMapping) (map[string]StatsdMapping, error) {
 	mappings := make(map[string]StatsdMapping, len(config))
 	replacer := strings.NewReplacer(".", `\.`, "<", "(?P<", ">", ">[^.]+)")

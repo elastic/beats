@@ -49,7 +49,7 @@ var (
 
 		Labels: map[string]p.LabelMap{
 			"pod":       p.KeyLabel("name"),
-			"namespace": p.KeyLabel(mb.ModuleDataKey + ".namespace.name"),
+			"namespace": p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 
 			"node":    p.Label(mb.ModuleDataKey + ".node.name"),
 			"pod_ip":  p.Label("ip"),

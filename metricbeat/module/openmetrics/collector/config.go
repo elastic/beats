@@ -15,58 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package spool
+package collector
 
-import (
-	"time"
-)
-
-type timer struct {
-	// flush timer
-	timer    *time.Timer
-	C        <-chan time.Time
-	duration time.Duration
+type metricsetConfig struct {
+	MetricsFilters  MetricFilters `config:"metrics_filters" yaml:"metrics_filters,omitempty"`
+	EnableExemplars bool          `config:"enable_exemplars" yaml:"enable_exemplars,omitempty"`
+	EnableMetadata  bool          `config:"enable_metadata" yaml:"enable_metadata,omitempty"`
 }
 
-func newTimer(duration time.Duration) *timer {
-	stdtimer := time.NewTimer(duration)
-	if !stdtimer.Stop() {
-		<-stdtimer.C
-	}
-
-	return &timer{
-		timer:    stdtimer,
-		C:        nil,
-		duration: duration,
-	}
+type MetricFilters struct {
+	IncludeMetrics *[]string `config:"include" yaml:"include,omitempty"`
+	ExcludeMetrics *[]string `config:"exclude" yaml:"exclude,omitempty"`
 }
 
-func (t *timer) Zero() bool {
-	return t.duration == 0
+var defaultConfig = metricsetConfig{
+	MetricsFilters: MetricFilters{
+		IncludeMetrics: nil,
+		ExcludeMetrics: nil},
+	EnableExemplars: false,
+	EnableMetadata:  false,
 }
 
-func (t *timer) Restart() {
-	t.Stop(false)
-	t.Start()
-}
-
-func (t *timer) Start() {
-	if t.C != nil {
-		return
-	}
-
-	t.timer.Reset(t.duration)
-	t.C = t.timer.C
-}
-
-func (t *timer) Stop(triggered bool) {
-	if t.C == nil {
-		return
-	}
-
-	if !triggered && !t.timer.Stop() {
-		<-t.C
-	}
-
-	t.C = nil
+func (c *metricsetConfig) Validate() error {
+	// validate configuration here
+	return nil
 }

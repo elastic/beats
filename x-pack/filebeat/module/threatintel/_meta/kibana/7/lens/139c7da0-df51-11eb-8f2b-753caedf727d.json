@@ -36,7 +36,7 @@
                                         "size": 10
                                     },
                                     "scale": "ordinal",
-                                    "sourceField": "threatintel.indicator.file.hash.sha256"
+                                    "sourceField": "threat.indicator.file.hash.sha256"
                                 }
                             },
                             "incompleteColumns": {}

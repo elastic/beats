@@ -52,14 +52,14 @@ type trigger interface {
 	TriggerRotation(dataLen uint) rotateReason
 }
 
-func newTriggers(rotateOnStartup bool, interval time.Duration, maxSizeBytes uint) []trigger {
+func newTriggers(rotateOnStartup bool, interval time.Duration, maxSizeBytes uint, clock clock) []trigger {
 	triggers := make([]trigger, 0)
 
 	if rotateOnStartup {
 		triggers = append(triggers, &initTrigger{})
 	}
 	if interval > 0 {
-		triggers = append(triggers, newIntervalTrigger(interval))
+		triggers = append(triggers, newIntervalTrigger(interval, clock))
 	}
 	if maxSizeBytes > 0 {
 		triggers = append(triggers, &sizeTrigger{maxSizeBytes: maxSizeBytes, size: 0})
@@ -113,8 +113,8 @@ func (realClock) Now() time.Time {
 	return time.Now()
 }
 
-func newIntervalTrigger(interval time.Duration) trigger {
-	t := intervalTrigger{interval: interval, clock: realClock{}}
+func newIntervalTrigger(interval time.Duration, clock clock) trigger {
+	t := intervalTrigger{interval: interval, clock: clock}
 
 	switch interval {
 	case time.Second:

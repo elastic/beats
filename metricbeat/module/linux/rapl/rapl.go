@@ -37,8 +37,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/linux"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -83,14 +83,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	CPUList, err := getMSRCPUs()
+	sys := base.Module().(linux.LinuxModule)
+	hostfs := sys.GetHostFS()
+	CPUList, err := getMSRCPUs(hostfs)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting list of CPUs to query")
 	}
 
 	// check to see if msr-safe is installed
 	if config.UseMSRSafe {
-		queryPath := filepath.Join(paths.Paths.Hostfs, "/dev/cpu/", fmt.Sprint(CPUList[0]), "msr_safe")
+		queryPath := filepath.Join(hostfs, "/dev/cpu/", fmt.Sprint(CPUList[0]), "msr_safe")
 		_, err := os.Stat(queryPath)
 		if errors.Is(err, os.ErrNotExist) {
 			return nil, errors.New("no msr_safe device found. Is the kernel module loaded?")
@@ -110,7 +112,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	handlers := map[int]rapl.RAPLHandler{}
 	for _, cpu := range CPUList {
-		formatPath := filepath.Join(paths.Paths.Hostfs, "/dev/cpu/%d")
+		formatPath := filepath.Join(hostfs, "/dev/cpu/%d")
 		if config.UseMSRSafe {
 			formatPath = filepath.Join(formatPath, "/msr_safe")
 		} else {
@@ -203,8 +205,8 @@ func (m *MetricSet) updatePower() map[int]map[rapl.RAPLDomain]energyUsage {
 
 // getMSRCPUs forms a list of CPU cores to query
 // For multi-processor systems, this will be more than 1.
-func getMSRCPUs() ([]int, error) {
-	CPUs, err := topoPkgCPUMap()
+func getMSRCPUs(hostfs string) ([]int, error) {
+	CPUs, err := topoPkgCPUMap(hostfs)
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching CPU topology")
 	}
@@ -225,12 +227,12 @@ func getMSRCPUs() ([]int, error) {
 //it is, however, the simplest way to do this. The intel power gadget iterates through each CPU using affinity masks, and runs `cpuid` in a loop to
 //figure things out
 //This uses /sys/devices/system/cpu/cpu*/topology/physical_package_id, which is what lscpu does. I *think* geopm does something similar to this.
-func topoPkgCPUMap() (map[int][]int, error) {
+func topoPkgCPUMap(hostfs string) (map[int][]int, error) {
 
 	sysdir := "/sys/devices/system/cpu/"
 	cpuMap := make(map[int][]int)
 
-	files, err := ioutil.ReadDir(filepath.Join(paths.Paths.Hostfs, sysdir))
+	files, err := ioutil.ReadDir(filepath.Join(hostfs, sysdir))
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +242,7 @@ func topoPkgCPUMap() (map[int][]int, error) {
 	for _, file := range files {
 		if file.IsDir() && re.MatchString(file.Name()) {
 
-			fullPkg := filepath.Join(paths.Paths.Hostfs, sysdir, file.Name(), "/topology/physical_package_id")
+			fullPkg := filepath.Join(hostfs, sysdir, file.Name(), "/topology/physical_package_id")
 			dat, err := ioutil.ReadFile(fullPkg)
 			if err != nil {
 				return nil, errors.Wrapf(err, "error reading file %s", fullPkg)

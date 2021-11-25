@@ -9,8 +9,8 @@ require (
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
 	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
-	github.com/Azure/azure-event-hubs-go/v3 v3.1.2
-	github.com/Azure/azure-sdk-for-go v57.0.0+incompatible
+	github.com/Azure/azure-event-hubs-go/v3 v3.3.15
+	github.com/Azure/azure-sdk-for-go v59.0.0+incompatible
 	github.com/Azure/azure-storage-blob-go v0.8.0
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/Azure/go-autorest/autorest v0.11.19
@@ -72,10 +72,9 @@ require (
 	github.com/elastic/go-seccomp-bpf v1.2.0
 	github.com/elastic/go-structform v0.0.9
 	github.com/elastic/go-sysinfo v1.7.1
-	github.com/elastic/go-txfile v0.0.8
 	github.com/elastic/go-ucfg v0.8.3
 	github.com/elastic/go-windows v1.0.1
-	github.com/elastic/gosigar v0.14.1
+	github.com/elastic/gosigar v0.14.2
 	github.com/fatih/color v1.9.0
 	github.com/fearful-symmetry/gorapl v0.0.4
 	github.com/fsnotify/fsevents v0.1.1
@@ -151,7 +150,6 @@ require (
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/tsg/gopacket v0.0.0-20200626092518-2ab8e397a786
 	github.com/ugorji/go/codec v1.1.8
-	github.com/urso/magetools v0.0.0-20200125210132-c2e338f92f3a // indirect
 	github.com/urso/sderr v0.0.0-20210525210834-52b04e8f5c71
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/xdg/scram v1.0.3
@@ -197,9 +195,9 @@ require (
 
 require (
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
-	github.com/Azure/azure-amqp-common-go/v3 v3.0.0 // indirect
+	github.com/Azure/azure-amqp-common-go/v3 v3.2.1 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.1 // indirect
-	github.com/Azure/go-amqp v0.12.6 // indirect
+	github.com/Azure/go-amqp v0.16.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/azure/cli v0.3.1 // indirect
 	github.com/Azure/go-autorest/autorest/to v0.4.0 // indirect
@@ -268,7 +266,6 @@ require (
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797 // indirect
-	github.com/urso/go-bin v0.0.0-20180220135811-781c575c9f0e // indirect
 	github.com/xdg/stringprep v1.0.3 // indirect
 	go.elastic.co/fastjson v1.1.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
