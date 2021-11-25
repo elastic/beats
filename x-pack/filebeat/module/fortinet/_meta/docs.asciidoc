@@ -275,8 +275,8 @@ This is a list of FortiOS fields that are mapped to ECS.
 | qclass                     | dns.question.class             |
 | qname                      | dns.question.name              |
 | qtype                      | dns.question.type              |
-| rcvdbyte                   | source.bytes                   |
-| rcvdpkt                    | source.packets                 |
+| rcvdbyte                   | destination.bytes              |
+| rcvdpkt                    | destination.packets            |
 | recipient                  | destination.user.email         |
 | ref                        | event.reference                |
 | remip                      | destination.ip                 |
