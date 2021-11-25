@@ -13,7 +13,7 @@ import (
 // The FileSystemFetcher meant to fetch file/directories from the file system and ship it
 // to the Kubebeat
 type FileSystemFetcher struct {
-	filesPaths []string // Files and directories paths for the fetcher to extract info from
+	inputFiles []string // Files and directories paths for the fetcher to extract info from
 }
 
 const (
@@ -33,40 +33,52 @@ type FileSystemResourceData struct {
 
 func NewFileFetcher(filesPaths []string) Fetcher {
 	return &FileSystemFetcher{
-		filesPaths: filesPaths,
+		inputFiles: filesPaths,
 	}
 }
 
 func (f *FileSystemFetcher) Fetch() ([]interface{}, error) {
 	results := make([]interface{}, 0)
 
-	for _, filePath := range f.filesPaths {
-		resource := f.fetchSystemResource(filePath)
-		results = append(results, resource...)
+	// Input files can contain glob pattern
+	for _, filePattern := range f.inputFiles {
+		filesMatched, err := Glob(filePattern)
+		if err != nil {
+			logp.Err("Failed to find matched glob for %s, error - %+v", filePattern, err)
+		}
+		for _, file := range filesMatched {
+			resource := f.fetchSystemResource(file)
+			results = append(results, resource)
+		}
 	}
-
 	return results, nil
 }
 
-func (f *FileSystemFetcher) fetchSystemResource(filePath string) []interface{} {
+func (f *FileSystemFetcher) fetchSystemResource(filePath string) interface{} {
 
-	allFiles, _ := filepath.Glob(filePath)
-	results := make([]interface{}, 0)
-
-	for _, filePath := range allFiles {
-
-		info, err := os.Stat(filePath)
-		if err != nil {
-			logp.Err("Failed to fetch %s, error - %+v", filePath, err)
-			continue
-		}
-		file := FromFileInfo(info, filePath)
-		results = append(results, file)
+	info, err := os.Stat(filePath)
+	if err != nil {
+		logp.Err("Failed to fetch %s, error - %+v", filePath, err)
+		return nil
 	}
-	return results
+	file := FromFileInfo(info, filePath)
+
+	return file
 }
 
-func (f *FileSystemFetcher) Stop() {
+func (f *FileSystemFetcher) fetchAllFileSystemRecursively(filePath string) ([]interface{}, error) {
+	results := make([]interface{}, 0)
+	//If the current path is a directory - adds all the inner files and inner directories recursively
+	err := filepath.Walk(filePath, func(path string, info os.FileInfo, err error) error {
+		file := FromFileInfo(info, path)
+		results = append(results, file)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
 
 func FromFileInfo(info os.FileInfo, path string) FileSystemResourceData {
@@ -94,4 +106,7 @@ func FromFileInfo(info os.FileInfo, path string) FileSystemResourceData {
 	}
 
 	return data
+}
+
+func (f *FileSystemFetcher) Stop() {
 }
