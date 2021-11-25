@@ -195,6 +195,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Add automated OEM Npcap installation handling. {pull}29112[29112]
+
 *Functionbeat*
 
 
