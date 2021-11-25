@@ -366,8 +366,7 @@ def githubAction(Map args = [:]) {
             path: args.directory,
             command: args.command,
             go_version: env.GO_VERSION,
-          ],
-        credentialsId: "unlim2-workflow-token-1")
+          ])
       log(level: 'INFO', text: "Github build link: ${$result.html_url}")
       log(level: 'INFO', text: "Github build status: ${result.conclusion}")
     }
