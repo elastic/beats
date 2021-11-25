@@ -22,12 +22,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-<<<<<<< HEAD
 // authStyleInParams sends the "client_id" and "client_secret" in the POST body as application/x-www-form-urlencoded parameters.
 const authStyleInParams = 1
-=======
-const AuthStyleInParams = 1
->>>>>>> 8e10984a75 (refactor code and add new properties tests in config_test.go)
 
 type authConfig struct {
 	Basic  *basicAuthConfig `config:"basic"`
@@ -136,11 +132,7 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 				ClientSecret: o.ClientSecret,
 				Endpoint: oauth2.Endpoint{
 					TokenURL:  o.TokenURL,
-<<<<<<< HEAD
 					AuthStyle: authStyleInParams,
-=======
-					AuthStyle: AuthStyleInParams,
->>>>>>> 8e10984a75 (refactor code and add new properties tests in config_test.go)
 				},
 			}
 			token, err := conf.PasswordCredentialsToken(ctx, o.User, o.Password)
