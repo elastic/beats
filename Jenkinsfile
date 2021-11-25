@@ -359,7 +359,7 @@ def githubAction(Map args = [:]) {
       //   env.GO_VERSION, this environment variable points to the Golang version.
       def result = githubWorkflowRun(
         repo: repo,
-        workflow: "build.yml",
+        workflow: "build",
         ref: env.GIT_BRANCH.replaceFirst(/^[^\/]+\//,""),
           parameters: [
             pr: env.CHANGE_ID,
