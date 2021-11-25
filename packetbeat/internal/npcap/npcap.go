@@ -52,11 +52,16 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+// RegistryNotFound is returned by CurrentVersion if the network request
+// returns a 404 status code.
+var RegistryNotFound = errors.New("npcap: registry not found")
+
 // Registry is the location of current Npcap version information.
 const Registry = "https://artifacts.elastic.co/downloads/npcap/current_version"
 
 // Fetch downloads the Npcap installer, writes the content to the given filepath
-// and returns the sha256 hash of the downloaded object.
+// and returns the sha256 hash of the downloaded object. If the registry is not
+// found RegistryNotFound is returned.
 func CurrentVersion(ctx context.Context, log *logp.Logger, registry string) (version, url, hash string, err error) {
 	if runtime.GOOS != "windows" {
 		return "", "", "", errors.New("npcap: called Fetch on non-Windows platform")
@@ -78,15 +83,21 @@ func currentVersion(ctx context.Context, log *logp.Logger, registry string) (ver
 	defer res.Body.Close()
 
 	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Errorf("failed to read the error response body: %v", err)
+	}
+	b = bytes.TrimSpace(b)
+	if len(b) == 0 {
+		b = []byte("empty")
+	}
 	if res.StatusCode != http.StatusOK {
-		if err != nil {
-			log.Errorf("failed to read the error response body: %v", err)
+		if res.StatusCode == http.StatusNotFound {
+			return "", "", "", fmt.Errorf("%w: %s", RegistryNotFound, registry)
 		}
-		b = bytes.TrimSpace(b)
-		if len(b) == 0 {
-			return "", "", "", fmt.Errorf("npcap: failed to fetch %s, status: %d, message: empty", url, res.StatusCode)
+		if registry == "" {
+			registry = `""`
 		}
-		return "", "", "", fmt.Errorf("npcap: failed to fetch %s, status: %d, message: %s", url, res.StatusCode, b)
+		return "", "", "", fmt.Errorf("npcap: failed to fetch version info at %s, status: %d, message: %s", registry, res.StatusCode, b)
 	}
 
 	var info struct {
@@ -133,9 +144,12 @@ func fetch(ctx context.Context, log *logp.Logger, url, path string) (hash string
 		}
 		b = bytes.TrimSpace(b)
 		if len(b) == 0 {
-			return "", fmt.Errorf("npcap: failed to fetch %s, status: %d, message: empty", url, res.StatusCode)
+			b = []byte("empty")
 		}
-		return "", fmt.Errorf("npcap: failed to fetch %s, status: %d, message: %s", url, res.StatusCode, b)
+		if url == "" {
+			url = `""`
+		}
+		return "", fmt.Errorf("npcap: failed to fetch installer at %s, status: %d, message: %s", url, res.StatusCode, b)
 	}
 
 	dst, err := os.Create(path)
