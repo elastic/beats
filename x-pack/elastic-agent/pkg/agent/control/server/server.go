@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
 	monitoring "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
+	monitoringCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/socket"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
@@ -36,14 +37,15 @@ import (
 
 // Server is the daemon side of the control protocol.
 type Server struct {
-	logger     *logger.Logger
-	rex        reexec.ExecManager
-	statusCtrl status.Controller
-	up         *upgrade.Upgrader
-	routeFn    func() *sorted.Set
-	listener   net.Listener
-	server     *grpc.Server
-	lock       sync.RWMutex
+	logger        *logger.Logger
+	rex           reexec.ExecManager
+	statusCtrl    status.Controller
+	up            *upgrade.Upgrader
+	routeFn       func() *sorted.Set
+	monitoringCfg *monitoringCfg.MonitoringConfig
+	listener      net.Listener
+	server        *grpc.Server
+	lock          sync.RWMutex
 }
 
 type specer interface {
@@ -78,6 +80,14 @@ func (s *Server) SetRouteFn(routesFetchFn func() *sorted.Set) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	s.routeFn = routesFetchFn
+}
+
+// SetMonitoringCfg sets a reference to the monitoring config used by the running agent.
+// the controller references this config to find out if pprof is enabled for the agent or not
+func (s *Server) SetMonitoringCfg(cfg *monitoringCfg.MonitoringConfig) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+	s.monitoringCfg = cfg
 }
 
 // Start starts the GRPC endpoint and accepts new connections.
@@ -236,7 +246,10 @@ func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.Ppr
 
 	// retrieve elastic-agent pprof data if requested or application is unspecified.
 	if req.AppName == "" || req.AppName == "elastic-agent" {
-		endpoint := beats.AgentMonitoringEndpoint(runtime.GOOS, nil) //TODO get monitoring conf?
+		if !s.monitoringCfg.Pprof {
+			return nil, fmt.Errorf("elastic-agent pprof disabled")
+		}
+		endpoint := beats.AgentMonitoringEndpoint(runtime.GOOS, s.monitoringCfg.HTTP)
 		c := newSocketRequester("elastic-agent", "", endpoint)
 		for _, opt := range req.PprofType {
 			wg.Add(1)

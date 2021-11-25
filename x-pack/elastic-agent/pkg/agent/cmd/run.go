@@ -148,6 +148,7 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 	}
 
 	control.SetRouteFn(app.Routes)
+	control.SetMonitoringCfg(cfg.Settings.MonitoringConfig)
 
 	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS(), cfg.Settings.MonitoringConfig, app)
 	if err != nil {
