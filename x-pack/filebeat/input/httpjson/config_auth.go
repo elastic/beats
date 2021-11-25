@@ -22,7 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-const AuthStyleInParams = 1
+const authStyleInParams = 1
 
 type authConfig struct {
 	Basic  *basicAuthConfig `config:"basic"`
@@ -107,19 +107,31 @@ func (o *oAuth2Config) isEnabled() bool {
 	return o != nil && (o.Enabled == nil || *o.Enabled)
 }
 
+// clientCredentialsGrant creates http client from token_url and client credentials
+func (o *oAuth2Config) clientCredentialsGrant(ctx context.Context, client *http.Client) *http.Client {
+	creds := clientcredentials.Config{
+		ClientID:       o.ClientID,
+		ClientSecret:   o.ClientSecret,
+		TokenURL:       o.getTokenURL(),
+		Scopes:         o.Scopes,
+		EndpointParams: o.getEndpointParams(),
+	}
+	return creds.Client(ctx)
+}
+
 // Client wraps the given http.Client and returns a new one that will use the oauth authentication.
 func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.Client, error) {
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
 
 	switch o.getProvider() {
-	case oAuth2ProviderAzure, oAuth2ProviderDefault:
+	case oAuth2ProviderDefault:
 		if o.User != "" || o.Password != "" {
 			conf := &oauth2.Config{
 				ClientID:     o.ClientID,
 				ClientSecret: o.ClientSecret,
 				Endpoint: oauth2.Endpoint{
 					TokenURL:  o.TokenURL,
-					AuthStyle: AuthStyleInParams,
+					AuthStyle: authStyleInParams,
 				},
 			}
 			token, err := conf.PasswordCredentialsToken(ctx, o.User, o.Password)
@@ -128,15 +140,10 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 			}
 			return conf.Client(ctx, token), nil
 		} else {
-			creds := clientcredentials.Config{
-				ClientID:       o.ClientID,
-				ClientSecret:   o.ClientSecret,
-				TokenURL:       o.getTokenURL(),
-				Scopes:         o.Scopes,
-				EndpointParams: o.getEndpointParams(),
-			}
-			return creds.Client(ctx), nil
+			return o.clientCredentialsGrant(ctx, client), nil
 		}
+	case oAuth2ProviderAzure:
+		return o.clientCredentialsGrant(ctx, client), nil
 	case oAuth2ProviderGoogle:
 		if o.GoogleJWTFile != "" {
 			cfg, err := google.JWTConfigFromJSON(o.GoogleCredentialsJSON, o.Scopes...)
