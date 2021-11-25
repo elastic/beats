@@ -18,6 +18,7 @@
 package resources
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -25,53 +26,44 @@ import (
 )
 
 func TestGoroutinesChecker(t *testing.T) {
-	block := make(chan struct{})
-	defer close(block)
-
 	cases := []struct {
 		title   string
-		test    func()
+		test    func(ctl *goroutineTesterControl)
 		timeout time.Duration
 		fail    bool
 	}{
 		{
 			title: "no goroutines",
-			test:  func() {},
+			test:  func(ctl *goroutineTesterControl) {},
 		},
 		{
 			title: "fast goroutine",
-			test: func() {
-				started := make(chan struct{})
-				go func() {
-					started <- struct{}{}
-				}()
-				<-started
+			test: func(ctl *goroutineTesterControl) {
+				ctl.startGoroutine(func() {})
 			},
 		},
-		/* Skipped due to flakyness: https://github.com/elastic/beats/issues/12692
 		{
 			title: "blocked goroutine",
-			test: func() {
-				started := make(chan struct{})
-				go func() {
-					started <- struct{}{}
-					<-block
-				}()
-				<-started
+			test: func(ctl *goroutineTesterControl) {
+				ctl.startGoroutine(func() {
+					ctl.block()
+				})
 			},
 			timeout: 500 * time.Millisecond,
 			fail:    true,
 		},
-		*/
 	}
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
+			ctl := newControl()
+			defer ctl.cleanup()
+
 			goroutines := NewGoroutinesChecker()
 			if c.timeout > 0 {
 				goroutines.FinalizationTimeout = c.timeout
 			}
-			c.test()
+			c.test(ctl)
 			err := goroutines.check(t)
 			if c.fail {
 				assert.Error(t, err)
@@ -80,4 +72,39 @@ func TestGoroutinesChecker(t *testing.T) {
 			}
 		})
 	}
+}
+
+// goroutineTesterControl helps keeping track of goroutines started for each test case.
+type goroutineTesterControl struct {
+	blocker chan struct{}
+	wg      sync.WaitGroup
+}
+
+func newControl() *goroutineTesterControl {
+	return &goroutineTesterControl{
+		blocker: make(chan struct{}),
+	}
+}
+
+// startGoroutine ensures that a goroutine is started before continuing.
+func (c *goroutineTesterControl) startGoroutine(f func()) {
+	started := make(chan struct{})
+	c.wg.Add(1)
+	go func() {
+		defer c.wg.Done()
+		started <- struct{}{}
+		f()
+	}()
+	<-started
+}
+
+// block blocks forever (being "ever" the life of the test).
+func (c *goroutineTesterControl) block() {
+	<-c.blocker
+}
+
+// cleanup ensures that all started goroutines are finished.
+func (c *goroutineTesterControl) cleanup() {
+	close(c.blocker)
+	c.wg.Wait()
 }
