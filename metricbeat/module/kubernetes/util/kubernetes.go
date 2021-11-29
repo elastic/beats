@@ -85,7 +85,7 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	watcher, nodeWatcher, namespaceWatcher := getPodMetadataWatchers(config, res, nodeScope)
+	watcher, nodeWatcher, namespaceWatcher := getResourceMetadataWatchers(config, res, nodeScope)
 
 	if watcher == nil {
 		return &nilEnricher{}
@@ -178,7 +178,7 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	watcher, nodeWatcher, namespaceWatcher := getPodMetadataWatchers(config, &kubernetes.Pod{}, nodeScope)
+	watcher, nodeWatcher, namespaceWatcher := getResourceMetadataWatchers(config, &kubernetes.Pod{}, nodeScope)
 	if watcher == nil {
 		return &nilEnricher{}
 	}
@@ -234,7 +234,7 @@ func NewContainerMetadataEnricher(
 	return enricher
 }
 
-func getPodMetadataWatchers(config *kubernetesConfig, resource kubernetes.Resource, nodeScope bool) (kubernetes.Watcher, kubernetes.Watcher, kubernetes.Watcher) {
+func getResourceMetadataWatchers(config *kubernetesConfig, resource kubernetes.Resource, nodeScope bool) (kubernetes.Watcher, kubernetes.Watcher, kubernetes.Watcher) {
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
 		logp.Err("Error creating Kubernetes client: %s", err)
@@ -257,7 +257,7 @@ func getPodMetadataWatchers(config *kubernetesConfig, resource kubernetes.Resour
 		}
 		options.Node, err = kubernetes.DiscoverKubernetesNode(log, nd)
 		if err != nil {
-			logp.Err("Couldn't discover kubernetes node: %w", err)
+			logp.Err("Couldn't discover kubernetes node: %s", err)
 			return nil, nil, nil
 		}
 	}
@@ -273,7 +273,7 @@ func getPodMetadataWatchers(config *kubernetesConfig, resource kubernetes.Resour
 	nodeWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_node", client, &kubernetes.Node{}, options, nil)
 	if err != nil {
 		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Node{}, err)
-		return nil, nil, nil
+		return watcher, nil, nil
 	}
 
 	namespaceWatcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher_namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
@@ -281,7 +281,7 @@ func getPodMetadataWatchers(config *kubernetesConfig, resource kubernetes.Resour
 	}, nil)
 	if err != nil {
 		logp.Err("Error creating watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
-		return nil, nil, nil
+		return watcher, nodeWatcher, nil
 	}
 
 	return watcher, nodeWatcher, namespaceWatcher
