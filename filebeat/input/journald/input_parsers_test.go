@@ -28,6 +28,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+// TestInputParsers ensures journald input support parsers,
+// it only tests a single parser, but that is enough to ensure
+// we're correctly using the parsers
 func TestInputParsers(t *testing.T) {
 	inputParsersExpected := []string{"1st line\n2nd line\n3rd line", "4th line\n5th line\n6th line"}
 	env := newInputTestingEnvironment(t)
