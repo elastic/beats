@@ -88,6 +88,7 @@ func currentVersion(ctx context.Context, log *logp.Logger, registry string) (ver
 	}
 	b = bytes.TrimSpace(b)
 	if len(b) == 0 {
+		// Give a meaningful error message and make json error if we have no body.
 		b = []byte("empty")
 	}
 	if res.StatusCode != http.StatusOK {
@@ -107,7 +108,7 @@ func currentVersion(ctx context.Context, log *logp.Logger, registry string) (ver
 	}
 	err = json.Unmarshal(b, &info)
 	if err != nil {
-		return "", "", "", err
+		return "", "", "", fmt.Errorf("%w: %#q", err, b)
 	}
 
 	return info.Version, info.URL, info.Hash, nil
