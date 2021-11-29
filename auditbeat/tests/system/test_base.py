@@ -52,7 +52,7 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
                         "paths": dirs,
                     }
                 }],
-            elasticsearch={"host": self.get_elasticsearch_url(), "user": es_user, "pass": es_pass})
+                elasticsearch={"host": self.get_elasticsearch_url(), "user": es_user, "pass": es_pass})
             self.run_beat(extra_args=["setup", "--index-management"], exit_code=0)
 
             assert self.log_contains('Loaded index template')
