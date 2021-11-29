@@ -154,6 +154,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `fingerprint` processor to give it access to the `@timestamp` field. {issue}28683[28683]
 - Fix the wrong beat name on monitoring and state endpoint {issue}27755[27755]
 - Skip configuration checks in autodiscover for configurations that are already running {pull}29048[29048]
+- Fix `decode_json_processor` to always respect `add_error_key` {pull}29107[29107]
 
 *Auditbeat*
 
