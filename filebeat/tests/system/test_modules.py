@@ -91,7 +91,7 @@ class Test(BaseTest):
                 "hosts": self.elasticsearch_url,
                 "user": "admin",
                 "pass": os.getenv('ES_PASS'),
-                }
+            }
         )
 
         self.run_on_file(

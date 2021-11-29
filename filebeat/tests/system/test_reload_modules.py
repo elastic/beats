@@ -75,7 +75,7 @@ class Test(BaseTest):
                 "host": self.get_elasticsearch_url(),
                 "user": "filebeat_user",
                 "pass": os.getenv('ES_PASS')
-                }
+            }
         )
 
         proc = self.start_beat()
