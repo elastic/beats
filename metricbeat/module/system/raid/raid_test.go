@@ -48,8 +48,8 @@ func TestFetch(t *testing.T) {
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":           "system",
-		"metricsets":       []string{"raid"},
-		"raid.mount_point": "./_meta/testdata",
+		"module":     "system",
+		"metricsets": []string{"raid"},
+		"hostfs":     "./_meta/testdata",
 	}
 }
