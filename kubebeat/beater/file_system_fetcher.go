@@ -41,11 +41,11 @@ func (f *FileSystemFetcher) Fetch() ([]interface{}, error) {
 
 	// Input files might contain glob pattern
 	for _, filePattern := range f.inputFiles {
-		filesMatched, err := Glob(filePattern)
+		matchedFiles, err := Glob(filePattern)
 		if err != nil {
 			logp.Err("Failed to find matched glob for %s, error - %+v", filePattern, err)
 		}
-		for _, file := range filesMatched {
+		for _, file := range matchedFiles {
 			resource := f.fetchSystemResource(file)
 			results = append(results, resource)
 		}
