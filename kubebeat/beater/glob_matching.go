@@ -15,7 +15,7 @@ type Globs []string
 // It's useful when your globs might have double-stars, but you're not sure.
 func Glob(pattern string) ([]string, error) {
 	if !strings.Contains(pattern, "**") {
-		// passthru to core package if no double-star
+		// pass to core package if no double-star
 		return filepath.Glob(pattern)
 	}
 	return Globs(strings.Split(pattern, "**")).Expand()

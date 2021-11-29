@@ -4,7 +4,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"os"
 	"os/user"
-	"path/filepath"
 	"strconv"
 	"syscall"
 )
@@ -40,7 +39,7 @@ func NewFileFetcher(filesPaths []string) Fetcher {
 func (f *FileSystemFetcher) Fetch() ([]interface{}, error) {
 	results := make([]interface{}, 0)
 
-	// Input files can contain glob pattern
+	// Input files might contain glob pattern
 	for _, filePattern := range f.inputFiles {
 		filesMatched, err := Glob(filePattern)
 		if err != nil {
@@ -64,21 +63,6 @@ func (f *FileSystemFetcher) fetchSystemResource(filePath string) interface{} {
 	file := FromFileInfo(info, filePath)
 
 	return file
-}
-
-func (f *FileSystemFetcher) fetchAllFileSystemRecursively(filePath string) ([]interface{}, error) {
-	results := make([]interface{}, 0)
-	//If the current path is a directory - adds all the inner files and inner directories recursively
-	err := filepath.Walk(filePath, func(path string, info os.FileInfo, err error) error {
-		file := FromFileInfo(info, path)
-		results = append(results, file)
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return results, nil
 }
 
 func FromFileInfo(info os.FileInfo, path string) FileSystemResourceData {
