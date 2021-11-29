@@ -104,5 +104,7 @@ func (c *goroutineTesterControl) block() {
 // cleanup ensures that all started goroutines are finished.
 func (c *goroutineTesterControl) cleanup(t *testing.T) {
 	close(c.blocker)
-	c.checker.WaitUntilOriginalCount()
+	if c.checker.WaitUntilOriginalCount() != 0 {
+		t.Fatal("goroutines in test cases should be started using startGoroutine")
+	}
 }
