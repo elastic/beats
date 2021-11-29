@@ -112,7 +112,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 	}()
 
 	// Install Npcap if needed.
-	err := installNpcap(b.BeatConfig)
+	err := installNpcap(b)
 	if err != nil {
 		return err
 	}
