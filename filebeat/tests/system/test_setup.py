@@ -28,6 +28,8 @@ class Test(BaseTest):
             modules=True,
             elasticsearch={
                 "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS'),
             },
         )
 
