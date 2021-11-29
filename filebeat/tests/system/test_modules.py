@@ -61,8 +61,7 @@ class Test(BaseTest):
 
     def init(self):
         self.elasticsearch_url = self.get_elasticsearch_url()
-        print("Using elasticsearch: {}".format(self.elasticsearch_url))
-        self.es = self.get_elasticsearch_instance(url=self.elasticsearch_url)
+        self.es = self.get_elasticsearch_instance(url=self.elasticsearch_url, user='admin')
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
@@ -88,7 +87,11 @@ class Test(BaseTest):
             template_name="filebeat_modules",
             output=cfgfile,
             index_name=self.index_name,
-            elasticsearch_url=self.elasticsearch_url,
+            elasticsearch={
+                "hosts": self.elasticsearch_url,
+                "user": "admin",
+                "pass": os.getenv('ES_PASS'),
+                }
         )
 
         self.run_on_file(

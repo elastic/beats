@@ -71,7 +71,11 @@ class Test(BaseTest):
             reload_path=self.working_dir + "/configs/*.yml",
             reload_type="modules",
             inputs=False,
-            elasticsearch={"host": self.get_elasticsearch_url()}
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+                }
         )
 
         proc = self.start_beat()

@@ -699,7 +699,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 url = self.get_elasticsearch_url()
 
         if security:
-            username = os.getenv("ES_USER", user)
+            username = user or os.getenv("ES_USER", user)
             password = os.getenv("ES_PASS", "")
             es_instance = Elasticsearch([url], http_auth=(username, password))
         else:

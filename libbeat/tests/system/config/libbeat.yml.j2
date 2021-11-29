@@ -63,6 +63,8 @@ queue.mem:
 
 {% if kibana -%}
 setup.kibana.host: "{{ kibana.host }}"
+setup.kibana.username: "{{ kibana.user }}"
+setup.kibana.password: "{{ kibana.pass }}"
 {%- endif %}
 
 #================================ Outputs =====================================

@@ -45,21 +45,13 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
         es_url = self.get_elasticsearch_url()
         es = self.get_elasticsearch_instance(url=es_url)
         self.render_config_template(
-            elasticsearch={"host": es_url},
+            elasticsearch={
+                "host": es_url,
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS'),
+            }
         )
         exit_code = self.run_beat(extra_args=["setup", "--index-management"])
-
-        assert exit_code == 0
-        assert self.log_contains('Loaded index template')
-        assert len(self.es.cat.templates(name='filebeat-*', h='name')) > 0
-
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    def test_template_migration(self):
-        """
-        Test that the template can be loaded with `setup --template`
-        """
-        exit_code = self.run_beat(extra_args=["setup", "--template",
-                                              "-E", "setup.template.overwrite=true", "-E", "migration.6_to_7.enabled=true"])
 
         assert exit_code == 0
         assert self.log_contains('Loaded index template')

@@ -46,10 +46,13 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            elasticsearch=dict(
-                host=self.elasticsearch_url,
-                pipeline="estest",
-                index=index_name),
+            elasticsearch={
+                'host': self.elasticsearch_url,
+                'pipeline': "estest",
+                'index': index_name,
+                'user': "filebeat_user",
+                'pass': os.getenv("ES_PASS")
+            },
             pipeline="test",
             setup_template_name=index_name,
             setup_template_pattern=index_name + "*",
