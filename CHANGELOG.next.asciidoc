@@ -147,6 +147,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allows disable pod events enrichment with deployment name {pull}28521[28521]
 - Fix `fingerprint` processor to give it access to the `@timestamp` field. {issue}28683[28683]
 - Fix the wrong beat name on monitoring and state endpoint {issue}27755[27755]
+- Skip configuration checks in autodiscover for configurations that are already running {pull}29048[29048]
+- Fix `decode_json_processor` to always respect `add_error_key` {pull}29107[29107]
 
 *Auditbeat*
 
@@ -239,6 +241,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix list_docker.go {pull}28374[28374]
 - Use xpack.enabled on SM modules to write into .monitoring indices when using Metricbeat standalone {pull}28365[28365]
 - Fix in rename processor to ingest metrics for `write.iops` to proper field instead of `write_iops` in rds metricset. {pull}28960[28960]
+- Fix rds metadata in cloudwatch metricset. {pull}29106[29106]
 
 *Packetbeat*
 
@@ -374,6 +377,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Preliminary AIX support {pull}27954[27954]
 - Register additional name for `storage` metricset in the azure module. {pull}28447[28447]
 - Update reference to gosigar pacakge for filesystem windows fix. {pull}28909[28909]
+- Override `Host()` on statsd MetricSet {pull}29103[29103]
 
 *Packetbeat*
 
