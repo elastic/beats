@@ -285,9 +285,6 @@ func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath s
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("kbn-xsrf", "1")
 
-	log := logp.NewLogger("kibana_conn")
-	log.Infof("kibana headers: %s", req)
-
 	return conn.RoundTrip(req)
 }
 
@@ -354,8 +351,6 @@ func (client *Client) readVersion() error {
 func (client *Client) GetVersion() common.Version { return client.Version }
 
 func (client *Client) ImportMultiPartFormFile(url string, params url.Values, filename string, contents string) error {
-	log := logp.NewLogger("kibana_foo")
-	log.Infof("starting import multiport form")
 	buf := &bytes.Buffer{}
 	w := multipart.NewWriter(buf)
 
@@ -375,9 +370,7 @@ func (client *Client) ImportMultiPartFormFile(url string, params url.Values, fil
 
 	headers := http.Header{}
 	headers.Add("Content-Type", w.FormDataContentType())
-	log.Infof("starting conn")
 	statusCode, response, err := client.Connection.Request("POST", url, params, headers, buf)
-	log.Infof("finished conn")
 	if err != nil || statusCode >= 300 {
 		return fmt.Errorf("returned %d to import file: %v. Response: %s", statusCode, err, response)
 	}
