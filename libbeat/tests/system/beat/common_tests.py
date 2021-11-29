@@ -120,7 +120,7 @@ class TestDashboardMixin:
                 "host": self.get_kibana_url(),
                 "user": "beats",
                 "pass": "testing",
-                },
+            },
         )
         exit_code = self.run_beat(extra_args=["setup", "--dashboards"])
 
