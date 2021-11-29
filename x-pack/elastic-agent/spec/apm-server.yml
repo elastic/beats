@@ -3,7 +3,6 @@ cmd: apm-server
 artifact: apm-server
 args: [
   "-E", "management.enabled=true",
-  "-E", "apm-server.data_streams.enabled=true",
   "-E", "gc_percent=${APMSERVER_GOGC:100}"
 ]
 exported_metrics: [
