@@ -232,6 +232,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Prevent incorrect use of AMQP protocol parsing from causing silent failure. {pull}29017[29017]
+- Fix error handling in MongoDB protocol parsing. {pull}29017[29017]
 
 *Winlogbeat*
 
