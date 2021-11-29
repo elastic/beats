@@ -18,10 +18,11 @@
 package memory
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system"
 	"github.com/elastic/beats/v7/libbeat/opt"
-	"github.com/pkg/errors"
 )
 
 // Memory holds os-specifc memory usage data

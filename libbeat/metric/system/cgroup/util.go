@@ -271,7 +271,7 @@ func (r Reader) ProcessCgroupPaths(pid int) (PathList, error) {
 				logp.L().Debugf(`PID %d contains a cgroups V2 path (%s) but no V2 mountpoint was found.
 This may be because metricbeat is running inside a container on a hybrid system.
 To monitor cgroups V2 processess in this way, mount the unified (V2) hierarchy inside
-the container as /sys/fs/cgroup/unified and start metricbeat with --system.hostfs.`, pid, line)
+the container as /sys/fs/cgroup/unified and start the system module with the hostfs setting.`, pid, line)
 				continue
 			} else if r.cgroupMountpoints.V2Loc == "" && r.rootfsMountpoint.IsSet() {
 				controllerPath = r.rootfsMountpoint.ResolveHostFS(filepath.Join("/sys/fs/cgroup/unified", path))

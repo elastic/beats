@@ -24,6 +24,7 @@ import (
 	"github.com/shirou/gopsutil/net"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 //a stub function for non-linux systems

@@ -28,8 +28,6 @@
 //
 // path.config - Configuration files and Elasticsearch template default location
 //
-// system.hostfs - supplies an alternate filesystem root for containerized environments
-//
 // These settings can be set via the configuration file or via command line flags.
 // The CLI flags overwrite the configuration file options.
 //

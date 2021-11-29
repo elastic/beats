@@ -21,6 +21,7 @@ import (
 	"path/filepath"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -34,7 +35,7 @@ func init() {
 }
 
 type HostFSConfig struct {
-	HostFS string `config:"system.hostfs"`
+	HostFS string `config:"hostfs"`
 }
 
 // Module represents the system module
@@ -49,6 +50,7 @@ type SystemModule interface {
 }
 
 func NewModule(base mb.BaseModule) (mb.Module, error) {
+	logger := logp.L()
 	var hostfs string
 
 	partialConfig := HostFSConfig{}
@@ -62,8 +64,16 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	}
 
 	once.Do(func() {
-		initModule(hostfs)
+		logger.Infof("hostfs initializing with %s", hostfs)
+		InitModule(hostfs)
+
 	})
+
+	// We want at least one initModule() call, but in cases where we're running under agent, we might need to set and update this multiple times, as the value isn't set globally and can be updated.
+	if userSet {
+		logger.Infof("hostfs re-initializing with %s", hostfs)
+		InitModule(hostfs)
+	}
 
 	return &Module{BaseModule: base, HostFS: hostfs, UserSetHostFS: userSet}, nil
 }

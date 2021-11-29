@@ -25,8 +25,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/metric/system"
 )
 
 const dockerTestData = "testdata/docker.zip"

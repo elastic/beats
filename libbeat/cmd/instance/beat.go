@@ -1129,17 +1129,12 @@ func initPaths(cfg *common.Config) error {
 	// the paths field. After we will unpack the complete configuration and keystore reference
 	// will be correctly replaced.
 	partialConfig := struct {
-		Path   paths.Path `config:"path"`
-		Hostfs string     `config:"system.hostfs"`
+		Path paths.Path `config:"path"`
 	}{}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
 		return fmt.Errorf("error extracting default paths: %+v", err)
 	}
-
-	// Read the value for hostfs as `system.hostfs`
-	// In the config, there is no `path.hostfs`, as we're merely using the path struct to carry the hostfs variable.
-	partialConfig.Path.Hostfs = partialConfig.Hostfs
 
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
 		return fmt.Errorf("error setting default paths: %+v", err)

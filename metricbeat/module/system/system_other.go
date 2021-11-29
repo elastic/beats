@@ -20,6 +20,6 @@
 
 package system
 
-func initModule(config string) {
+func InitModule(config string) {
 	// Stub method for non-linux.
 }

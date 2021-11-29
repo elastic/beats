@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 func init() {
@@ -70,15 +71,13 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 // In the case of a few vendored libraries, we need to set hostfs globally.
 // On the off chance that the user is doing something particularly weird
 func trySetHostfsEnv(path string) {
+	// Making a decision here to treat the linux module as secondary to the system module.
 	_, isSet := os.LookupEnv("HOST_PROC")
 	if isSet {
 		return
 	}
 
-	// environment variables for gopsutil.
-	os.Setenv("HOST_PROC", filepath.Join(path, "/proc"))
-	os.Setenv("HOST_SYS", filepath.Join(path, "/sys"))
-	os.Setenv("HOST_ETC", filepath.Join(path, "/etc"))
+	system.InitModule(path)
 
 }
 

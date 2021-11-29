@@ -36,7 +36,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system"
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 

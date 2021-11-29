@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/gosigar"
 )
 
-func initModule(config string) {
+func InitModule(config string) {
 	configureHostFS(config)
 }
 

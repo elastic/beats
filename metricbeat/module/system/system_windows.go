@@ -22,7 +22,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper"
 )
 
-func initModule(config string) {
+func InitModule(config string) {
 	if err := helper.CheckAndEnableSeDebugPrivilege(); err != nil {
 		logp.Warn("%v", err)
 	}

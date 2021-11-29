@@ -56,7 +56,7 @@ func TestFetch(t *testing.T) {
 						"pct": 1.10,
 					},
 					"300": common.MapStr{
-						"pct": 0.23,
+						// "pct": 0.23,
 					},
 					"total": common.MapStr{
 						"time": common.MapStr{

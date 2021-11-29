@@ -25,8 +25,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/metric/system"
 )
 
 // ParseMeminfo parses the contents of /proc/meminfo into a hashmap

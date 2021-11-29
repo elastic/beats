@@ -25,8 +25,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/metric/system"
 )
 
 // Get returns a metrics object for CPU data
