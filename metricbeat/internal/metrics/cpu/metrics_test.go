@@ -44,7 +44,7 @@ func TestCoresMonitorSample(t *testing.T) {
 	cpuMetrics, err := Get(system.NewTestResolver(""))
 	assert.NoError(t, err, "error in Get()")
 
-	cores := &Monitor{lastSample: CPUMetrics{list: make([]CPU, len(cpuMetrics.list))}}
+	cores := &Monitor{lastSample: CPUMetrics{list: make([]CPU, len(cpuMetrics.list))}, Hostfs: system.NewTestResolver("")}
 	sample, err := cores.FetchCores()
 	if err != nil {
 		t.Fatal(err)
