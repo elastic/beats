@@ -18,7 +18,6 @@
 package resources
 
 import (
-	"sync"
 	"testing"
 	"time"
 
@@ -49,7 +48,7 @@ func TestGoroutinesChecker(t *testing.T) {
 					ctl.block()
 				})
 			},
-			timeout: 500 * time.Millisecond,
+			timeout: 10 * time.Millisecond,
 			fail:    true,
 		},
 	}
@@ -57,14 +56,14 @@ func TestGoroutinesChecker(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
 			ctl := newControl()
-			defer ctl.cleanup()
+			defer ctl.cleanup(t)
 
 			goroutines := NewGoroutinesChecker()
 			if c.timeout > 0 {
 				goroutines.FinalizationTimeout = c.timeout
 			}
 			c.test(ctl)
-			err := goroutines.check(t)
+			err := goroutines.check()
 			if c.fail {
 				assert.Error(t, err)
 			} else {
@@ -76,12 +75,13 @@ func TestGoroutinesChecker(t *testing.T) {
 
 // goroutineTesterControl helps keeping track of goroutines started for each test case.
 type goroutineTesterControl struct {
+	checker GoroutinesChecker
 	blocker chan struct{}
-	wg      sync.WaitGroup
 }
 
 func newControl() *goroutineTesterControl {
 	return &goroutineTesterControl{
+		checker: NewGoroutinesChecker(),
 		blocker: make(chan struct{}),
 	}
 }
@@ -89,9 +89,7 @@ func newControl() *goroutineTesterControl {
 // startGoroutine ensures that a goroutine is started before continuing.
 func (c *goroutineTesterControl) startGoroutine(f func()) {
 	started := make(chan struct{})
-	c.wg.Add(1)
 	go func() {
-		defer c.wg.Done()
 		started <- struct{}{}
 		f()
 	}()
@@ -104,7 +102,7 @@ func (c *goroutineTesterControl) block() {
 }
 
 // cleanup ensures that all started goroutines are finished.
-func (c *goroutineTesterControl) cleanup() {
+func (c *goroutineTesterControl) cleanup(t *testing.T) {
 	close(c.blocker)
-	c.wg.Wait()
+	c.checker.WaitUntilOriginalCount()
 }

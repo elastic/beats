@@ -52,13 +52,13 @@ func NewGoroutinesChecker() GoroutinesChecker {
 // was created
 func (c GoroutinesChecker) Check(t testing.TB) {
 	t.Helper()
-	err := c.check(t)
+	err := c.check()
 	if err != nil {
 		t.Error(err)
 	}
 }
 
-func (c GoroutinesChecker) check(t testing.TB) error {
+func (c GoroutinesChecker) check() error {
 	after := c.WaitUntilOriginalCount()
 	if after == 0 {
 		return nil
