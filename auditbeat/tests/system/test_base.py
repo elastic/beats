@@ -79,8 +79,15 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
                         "paths": dirs,
                     }
                 }],
-                elasticsearch={"host": self.get_elasticsearch_url(), "user": es_user, "pass": es_pass},
-                kibana={"host": self.get_kibana_url()},
+                elasticsearch={
+                    "host": self.get_elasticsearch_url(),
+                    "user": es_user,
+                    "pass": es_pass},
+                kibana={
+                    "host": self.get_kibana_url(),
+                    "user": es_user,
+                    "pass": es_pass,
+                },
             )
             self.run_beat(extra_args=["setup", "--dashboards"], exit_code=0)
 
