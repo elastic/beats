@@ -143,7 +143,7 @@ class TestCommandSetupILMPolicy(BaseTest):
                                   extra_args=["setup", self.setupCmd])
 
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_index_pattern(self.data_stream, [self.data_stream + "*"])
+        self.idxmgmt.assert_index_template_index_pattern(self.data_stream, [self.data_stream])
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")

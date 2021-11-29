@@ -225,7 +225,7 @@ class TestCommandSetupTemplate(BaseTest):
 
         assert exit_code == 0
         self.idxmgmt.assert_index_template_loaded(self.data_stream)
-        self.idxmgmt.assert_index_template_index_pattern(self.data_stream, [self.data_stream + "*"])
+        self.idxmgmt.assert_index_template_index_pattern(self.data_stream, [self.data_stream])
 
         self.idxmgmt.assert_policy_created(self.policy_name)
 
@@ -321,7 +321,7 @@ class TestCommandExportTemplate(BaseTest):
             config=self.config)
 
         assert exit_code == 0
-        self.assert_log_contains_template(self.template_name + "*")
+        self.assert_log_contains_template(self.template_name)
 
     def test_load_disabled(self):
         """
@@ -334,7 +334,7 @@ class TestCommandExportTemplate(BaseTest):
             config=self.config)
 
         assert exit_code == 0
-        self.assert_log_contains_template(self.template_name + "*")
+        self.assert_log_contains_template(self.template_name)
 
     def test_export_to_file_absolute_path(self):
         """
@@ -354,7 +354,7 @@ class TestCommandExportTemplate(BaseTest):
         with open(file) as f:
             template = json.load(f)
         assert 'index_patterns' in template
-        assert template['index_patterns'] == [self.template_name + '*'], template
+        assert template['index_patterns'] == [self.template_name], template
 
         os.remove(file)
 
@@ -377,6 +377,6 @@ class TestCommandExportTemplate(BaseTest):
         with open(file) as f:
             template = json.load(f)
         assert 'index_patterns' in template
-        assert template['index_patterns'] == [self.template_name + '*'], template
+        assert template['index_patterns'] == [self.template_name], template
 
         os.remove(file)
