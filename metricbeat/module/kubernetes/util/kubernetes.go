@@ -87,6 +87,10 @@ func NewResourceMetadataEnricher(
 
 	watcher, nodeWatcher, namespaceWatcher := getPodMetadataWatchers(config, res, nodeScope)
 
+	if watcher == nil {
+		return &nilEnricher{}
+	}
+
 	// GetPodMetaGen requires cfg of type Config
 	commonMetaConfig := metadata.Config{}
 	if err := base.Module().UnpackConfig(&commonMetaConfig); err != nil {
@@ -175,6 +179,9 @@ func NewContainerMetadataEnricher(
 	}
 
 	watcher, nodeWatcher, namespaceWatcher := getPodMetadataWatchers(config, &kubernetes.Pod{}, nodeScope)
+	if watcher == nil {
+		return &nilEnricher{}
+	}
 
 	commonMetaConfig := metadata.Config{}
 	if err := base.Module().UnpackConfig(&commonMetaConfig); err != nil {
@@ -230,6 +237,7 @@ func NewContainerMetadataEnricher(
 func getPodMetadataWatchers(config *kubernetesConfig, resource kubernetes.Resource, nodeScope bool) (kubernetes.Watcher, kubernetes.Watcher, kubernetes.Watcher) {
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
+		logp.Err("Error creating Kubernetes client: %s", err)
 		return nil, nil, nil
 	}
 
@@ -249,6 +257,7 @@ func getPodMetadataWatchers(config *kubernetesConfig, resource kubernetes.Resour
 		}
 		options.Node, err = kubernetes.DiscoverKubernetesNode(log, nd)
 		if err != nil {
+			logp.Err("Couldn't discover kubernetes node: %w", err)
 			return nil, nil, nil
 		}
 	}
@@ -257,12 +266,7 @@ func getPodMetadataWatchers(config *kubernetesConfig, resource kubernetes.Resour
 
 	watcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher", client, resource, options, nil)
 	if err != nil {
-		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
-		return nil, nil, nil
-	}
-
-	if watcher == nil {
-		logp.Info("Kubernetes metricset enriching is disabled")
+		logp.Err("Error initializing Kubernetes watcher: %s", err)
 		return nil, nil, nil
 	}
 
