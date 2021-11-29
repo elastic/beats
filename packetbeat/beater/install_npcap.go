@@ -28,16 +28,21 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/internal/npcap"
 )
 
-func installNpcap(cfg *common.Config) error {
+func installNpcap(b *beat.Beat) error {
+	if !b.Info.ElasticLicensed {
+		return nil
+	}
 	if runtime.GOOS != "windows" {
 		return nil
 	}
 
+	cfg := b.BeatConfig
 	reinstall, err := configBool(cfg, "npcap.force_reinstall")
 	if err != nil {
 		return err
