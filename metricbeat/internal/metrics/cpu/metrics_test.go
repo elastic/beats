@@ -28,7 +28,7 @@ import (
 )
 
 func TestMonitorSample(t *testing.T) {
-	cpu := &Monitor{lastSample: CPUMetrics{}}
+	cpu := &Monitor{lastSample: CPUMetrics{}, Hostfs: system.NewTestResolver("")}
 	s, err := cpu.Fetch()
 	if err != nil {
 		t.Fatal(err)
