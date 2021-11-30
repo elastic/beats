@@ -53,8 +53,6 @@ type inputTestingEnvironment struct {
 	grp unison.TaskGroup
 }
 
-//TODO(Tiago): clean up un-used suff like the temp dir
-
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 	return &inputTestingEnvironment{
 		t:          t,
@@ -129,24 +127,6 @@ func (e *inputTestingEnvironment) mustWriteFile(filename string, lines []byte) {
 		e.t.Fatalf("failed to write file '%s': %+v", path, err)
 	}
 }
-
-// requireOffsetInRegistry checks if the expected offset is set for a file.
-// func (e *inputTestingEnvironment) requireOffsetInRegistry(filename string, expectedOffset int) {
-// 	e.t.Helper()
-// 	filepath := e.abspath(filename)
-// 	fi, err := os.Stat(filepath)
-// 	if err != nil {
-// 		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
-// 	}
-
-// 	id := getIDFromPath(filepath, fi)
-// 	entry, err := e.getRegistryState(id)
-// 	if err != nil {
-// 		e.t.Fatalf(err.Error())
-// 	}
-
-// 	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
-// }
 
 type testInputStore struct {
 	registry *statestore.Registry
