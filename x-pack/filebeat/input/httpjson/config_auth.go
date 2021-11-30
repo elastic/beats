@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+// authStyleInParams sends the "client_id" and "client_secret" in the POST body as application/x-www-form-urlencoded parameters.
 const authStyleInParams = 1
 
 type authConfig struct {
