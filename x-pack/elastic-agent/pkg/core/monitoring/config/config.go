@@ -39,6 +39,6 @@ func DefaultConfig() *MonitoringConfig {
 			Port:    defaultPort,
 		},
 		Namespace: defaultNamespace,
-		Pprof:     true,
+		Pprof:     false,
 	}
 }
