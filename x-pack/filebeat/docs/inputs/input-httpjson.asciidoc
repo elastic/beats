@@ -82,7 +82,7 @@ filebeat.inputs:
     client.id: 12345678901234567890abcdef
     client.secret: abcdef12345678901234567890
     token_url: http://localhost/oauth2/token
-    user: abc.xyz@mail.com
+    user: user@domain.tld
     password: P@$$W0₹D
   request.url: http://localhost
 ----
