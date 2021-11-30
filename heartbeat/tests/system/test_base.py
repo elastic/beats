@@ -197,20 +197,13 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         """
         Test that the template can be loaded with `setup --index-management`
         """
-        es_url = self.get_elasticsearch_url()
-        es_user = os.getenv('ES_USER')
-        es_pass = os.getenv('ES_PASS')
-        es = self.get_elasticsearch_instance(url=es_url, user='beats')
+        es = self.get_elasticsearch_instance()
         self.render_config_template(
             monitors=[{
                 "type": "http",
                 "urls": ["http://localhost:9200"],
             }],
-            elasticsearch={
-                "host": es_url,
-                "user": es_user,
-                "pass": es_pass,
-            }
+            elasticsearch=self.get_elasticsearch_template_config()
         )
         exit_code = self.run_beat(extra_args=["setup", "--index-management"])
 
