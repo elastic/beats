@@ -687,7 +687,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
             port=os.getenv("ES_PORT_SSL", "9205"),
         )
 
-
     def get_elasticsearch_template_config(self, security=True, user=None):
         """
         Returns a template suitable for a Beats config
