@@ -189,6 +189,7 @@ type tcpAcceptResult struct {
 }
 
 func (e *tcpAcceptResult) asFlow() flow {
+	evTime := kernelTime(e.Meta.Timestamp)
 	f := flow{
 		sock:     e.Sock,
 		pid:      e.Meta.PID,
@@ -196,7 +197,8 @@ func (e *tcpAcceptResult) asFlow() flow {
 		proto:    protoTCP,
 		dir:      directionIngress,
 		complete: true,
-		lastSeen: kernelTime(e.Meta.Timestamp),
+		lastSeen: evTime,
+		created:  evTime,
 	}
 	if e.Af == unix.AF_INET {
 		f.local = newEndpointIPv4(e.LAddr, e.LPort, 0, 0)
@@ -217,7 +219,7 @@ func (e *tcpAcceptResult) String() string {
 // Update the state with the contents of this event.
 func (e *tcpAcceptResult) Update(s *state) error {
 	if e.Sock != 0 {
-		return s.UpdateFlow(e.asFlow())
+		return s.CreateSocket(e.asFlow())
 	}
 	return nil
 }
@@ -233,6 +235,7 @@ type tcpAcceptResult4 struct {
 }
 
 func (e *tcpAcceptResult4) asFlow() flow {
+	evTime := kernelTime(e.Meta.Timestamp)
 	f := flow{
 		sock:     e.Sock,
 		pid:      e.Meta.PID,
@@ -240,7 +243,8 @@ func (e *tcpAcceptResult4) asFlow() flow {
 		proto:    protoTCP,
 		dir:      directionIngress,
 		complete: true,
-		lastSeen: kernelTime(e.Meta.Timestamp),
+		lastSeen: evTime,
+		created:  evTime,
 	}
 	f.local = newEndpointIPv4(e.LAddr, e.LPort, 0, 0)
 	f.remote = newEndpointIPv4(e.RAddr, e.RPort, 0, 0)
@@ -256,7 +260,7 @@ func (e *tcpAcceptResult4) String() string {
 // Update the state with the contents of this event.
 func (e *tcpAcceptResult4) Update(s *state) error {
 	if e.Sock != 0 {
-		return s.UpdateFlow(e.asFlow())
+		return s.CreateSocket(e.asFlow())
 	}
 	return nil
 }
