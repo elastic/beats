@@ -30,8 +30,10 @@ import (
 // Metricset for apiserver is a prometheus based metricset
 type metricset struct {
 	mb.BaseMetricSet
-	prometheusClient   prometheus.Prometheus
-	prometheusMappings *prometheus.MetricsMapping
+	prometheusClient     prometheus.Prometheus
+	prometheusMappings   *prometheus.MetricsMapping
+	preSystemCpuUsage    float64
+	preContainerCpuUsage map[string]float64
 }
 
 var _ mb.ReportingMetricSetV2Error = (*metricset)(nil)
@@ -44,9 +46,11 @@ func getMetricsetFactory(prometheusMappings *prometheus.MetricsMapping) mb.Metri
 			return nil, err
 		}
 		return &metricset{
-			BaseMetricSet:      base,
-			prometheusClient:   pc,
-			prometheusMappings: prometheusMappings,
+			BaseMetricSet:        base,
+			prometheusClient:     pc,
+			prometheusMappings:   prometheusMappings,
+			preSystemCpuUsage:    0.0,
+			preContainerCpuUsage: map[string]float64{},
 		}, nil
 	}
 }
@@ -57,19 +61,34 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 	if err != nil {
 		return errors.Wrap(err, "error getting metrics")
 	}
-	m.Logger().Debugf("Events from containerd are %+v", events)
+	var systemTotalNs int64
+	elToDel := -1
+	for i, event := range events {
+		systemTotalSeconds, err := event.GetValue("system.total")
+		if err == nil {
+			systemTotalNs = systemTotalSeconds.(int64) * 1000000000
+			elToDel = i
+			break
+		}
+	}
+	if elToDel != -1 {
+		events[elToDel] = events[len(events)-1] // Copy last element to index i.
+		events[len(events)-1] = common.MapStr{} // Erase last element (write empty value).
+		events = events[:len(events)-1]
+	}
+
 	for _, event := range events {
 		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
 		// copy to ECS fields the kubernetes.container.image, kubernetes.container.name
 		containerFields := common.MapStr{}
+		var cID string
 		if containerID, ok := event["id"]; ok {
 			// we don't expect errors here, but if any we would obtain an
 			// empty string
-			cID := (containerID).(string)
+			cID = (containerID).(string)
 			containerFields.Put("id", cID)
 			event.Delete("id")
 		}
-
 		e, err := util.CreateEvent(event, "containerd.cpu")
 		if err != nil {
 			m.Logger().Error(err)
@@ -86,11 +105,37 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 				}
 			}
 		}
-
+		cpuUsageTotal, err := event.GetValue("usage.total.ns")
+		if err == nil {
+			var contUsageDelta, systemUsageDelta, cpuUsagePct float64
+			if cpuPreval, ok := m.preContainerCpuUsage[cID]; ok {
+				contUsageDelta = cpuUsageTotal.(float64) - cpuPreval
+				systemUsageDelta = float64(systemTotalNs) - m.preSystemCpuUsage
+				m.Logger().Infof("contUsageDelta is %+v - %+v == %+v", cpuUsageTotal, cpuPreval, contUsageDelta)
+				m.Logger().Infof("systemUsageDelta is %+v - %+v == %+v", systemTotalNs, m.preSystemCpuUsage, systemUsageDelta)
+			} else {
+				contUsageDelta = cpuUsageTotal.(float64)
+				systemUsageDelta = float64(systemTotalNs)
+				m.Logger().Infof("contUsageDelta is %+v - %+v == %+v", cpuUsageTotal, cpuPreval, contUsageDelta)
+				m.Logger().Infof("systemUsageDelta is %+v - %+v == %+v", systemTotalNs, m.preSystemCpuUsage, systemUsageDelta)
+			}
+			if contUsageDelta == 0.0 || systemUsageDelta == 0.0 {
+				m.Logger().Infof("SOMETHING IS ZERO")
+				cpuUsagePct = 0.0
+			} else {
+				cpuUsagePct = (contUsageDelta / systemUsageDelta) * 100
+			}
+			m.Logger().Infof("cpuUsagePct for %+v is %+v", cID, cpuUsagePct)
+			e.MetricSetFields.Put("usage.total.pct", cpuUsagePct)
+			//Update values
+			m.preContainerCpuUsage[cID] = cpuUsageTotal.(float64)
+		}
 		if reported := reporter.Event(e); !reported {
 			return nil
 		}
 	}
-
+	m.preSystemCpuUsage = float64(systemTotalNs)
+	m.Logger().Infof("preContainerCpuUsage is %+v", m.preContainerCpuUsage)
+	m.Logger().Infof("preSystemCpuUsage is %+v", m.preSystemCpuUsage)
 	return nil
 }
