@@ -663,8 +663,16 @@ func (s *state) CreateSocket(ref flow) error {
 	defer s.Unlock()
 	ref.createdTime = s.kernTimestampToTime(ref.created)
 	ref.lastSeenTime = s.kernTimestampToTime(ref.lastSeen)
-	// terminate existing if sock ptr is reused
 	if prev, found := s.socks[ref.sock]; found {
+		// Fetch existing flow in case of TCP negotiation
+		if initial, found := prev.flows[ref.remote.String()]; found && ref.local.String() == initial.local.String() {
+			initial.dir = ref.dir
+			initial.pid = ref.pid
+			initial.process = ref.process
+			ref.updateWith(*initial, s)
+			delete(prev.flows, ref.remote.String())
+		}
+		// terminate existing if sock ptr is reused
 		s.onSockTerminated(prev)
 	}
 	return s.createFlow(ref)
@@ -694,22 +702,21 @@ func (s *state) mutualEnrich(sock *socket, f *flow) {
 			f.dir = sock.dir
 		}
 	}
-	if sockNoPID := sock.pid == 0; sockNoPID != (f.pid == 0) {
-		if sockNoPID {
-			sock.pid = f.pid
-		} else {
-			f.pid = sock.pid
-		}
+	if sock.pid == 0 {
+		sock.pid = f.pid
+		sock.process = f.process
 	}
-	if sockNoProcess := sock.process == nil; sockNoProcess != (f.process == nil) {
-		if sockNoProcess {
-			sock.process = f.process
-		} else {
+	if sock.pid == f.pid && sock.pid != 0 {
+		if sockNoProcess := sock.process == nil; sockNoProcess != (f.process == nil) {
+			if sockNoProcess {
+				sock.process = f.process
+			} else {
+				f.process = sock.process
+			}
+		} else if sock.process == nil && sock.pid != 0 {
+			sock.process = s.getProcess(sock.pid)
 			f.process = sock.process
 		}
-	} else if sock.process == nil && sock.pid != 0 {
-		sock.process = s.getProcess(sock.pid)
-		f.process = sock.process
 	}
 	if !sock.closing {
 		sock.lastSeenTime = s.clock()
@@ -796,6 +803,11 @@ func (s *state) UpdateFlowWithCondition(ref flow, cond func(*flow) bool) error {
 	}
 	prev, found := sock.flows[ref.remote.addr.String()]
 	if !found {
+		// Sock has been already closed and it may be receiving a SYN for a different
+		// flow.
+		if sock.closing {
+			return nil
+		}
 		return s.createFlow(ref)
 	}
 	if cond != nil && !cond(prev) {
