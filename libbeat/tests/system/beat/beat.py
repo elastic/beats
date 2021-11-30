@@ -687,12 +687,20 @@ class TestCase(unittest.TestCase, ComposeMixin):
             port=os.getenv("ES_PORT_SSL", "9205"),
         )
 
-    def get_elasticsearch_template_config(self):
-        return {
+
+    def get_elasticsearch_template_config(self, security=True):
+        """
+        Returns a template suitable for a Beats config
+        """
+        template = {
             "host": self.get_elasticsearch_url(),
-            "user": os.getenv("ES_USER", ""),
-            "pass": os.getenv("ES_PASS", "")
         }
+
+        if security:
+            template["user"] = os.getenv("ES_USER", "")
+            template["pass"] = os.getenv("ES_PASS", "")
+
+        return template
 
     def get_elasticsearch_instance(self, security=True, ssl=False, url=None, user=None):
         """
@@ -721,6 +729,20 @@ class TestCase(unittest.TestCase, ComposeMixin):
             host=os.getenv("KIBANA_HOST", "localhost"),
             port=os.getenv("KIBANA_PORT", "5601"),
         )
+
+    def get_kibana_template_config(self, security=True):
+        """
+        Returns a Kibana template suitable for a Beat
+        """
+        template = {
+            "host": self.get_kibana_url()
+        }
+
+        if security:
+            template["user"] = os.getenv("ES_USER", "")
+            template["pass"] = os.getenv("ES_PASS", "")
+
+        return template
 
     def assert_fields_are_documented(self, evt):
         """

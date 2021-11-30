@@ -50,7 +50,7 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
                         "paths": dirs,
                     }
                 }],
-                elasticsearch=self.get_elasticsearch_template_config()
+                elasticsearch = self.get_elasticsearch_template_config()
             )
             self.run_beat(extra_args=["setup", "--index-management"], exit_code=0)
 
@@ -68,9 +68,6 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
             kibana_dir = os.path.join(self.beat_path, "build", "kibana")
             shutil.copytree(kibana_dir, os.path.join(self.working_dir, "kibana"))
 
-            es_user = os.getenv('ES_USER')
-            es_pass = os.getenv('ES_PASS')
-            es = self.get_elasticsearch_instance(url=self.get_elasticsearch_url(), user=es_user)
             self.render_config_template(
                 modules=[{
                     "name": "file_integrity",
@@ -78,15 +75,8 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
                         "paths": dirs,
                     }
                 }],
-                elasticsearch={
-                    "host": self.get_elasticsearch_url(),
-                    "user": es_user,
-                    "pass": es_pass},
-                kibana={
-                    "host": self.get_kibana_url(),
-                    "user": es_user,
-                    "pass": es_pass,
-                },
+                elasticsearch = self.get_elasticsearch_template_config(),
+                kibana = self.get_kibana_template_config(),
             )
             self.run_beat(extra_args=["setup", "--dashboards"], exit_code=0)
 
