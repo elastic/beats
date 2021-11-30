@@ -126,7 +126,6 @@ func (r *rpc) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-
 	defer logp.Recover("ParseRPC exception")
 
 	conn := ensureRPCConnection(private)
@@ -140,8 +139,8 @@ func (r *rpc) Parse(
 
 // Called when the FIN flag is seen in the TCP stream.
 func (r *rpc) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
-
+	private protos.ProtocolData,
+) protos.ProtocolData {
 	defer logp.Recover("ReceivedFinRpc exception")
 
 	// forced by TCP interface
@@ -151,8 +150,8 @@ func (r *rpc) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 // Called when a packets are missing from the tcp
 // stream.
 func (r *rpc) GapInStream(tcptuple *common.TCPTuple, dir uint8,
-	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
-
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
+) {
 	defer logp.Recover("GapInRpcStream exception")
 
 	// forced by TCP interface
@@ -199,7 +198,6 @@ func (r *rpc) handleRPCFragment(
 	tcptuple *common.TCPTuple,
 	dir uint8,
 ) *rpcConnectionData {
-
 	st := conn.streams[dir]
 	if st == nil {
 		st = newStream(pkt, tcptuple)

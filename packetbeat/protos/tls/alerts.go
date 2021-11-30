@@ -25,8 +25,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type alertSeverity uint8
-type alertCode uint8
+type (
+	alertSeverity uint8
+	alertCode     uint8
+)
 
 type alert struct {
 	severity alertSeverity
@@ -67,9 +69,7 @@ var alertNames = map[alertCode]string{
 	115: "unknown_psk_identity",
 }
 
-var (
-	errRead = errors.New("Buffer read error")
-)
+var errRead = errors.New("Buffer read error")
 
 func (severity alertSeverity) String() string {
 	switch severity {

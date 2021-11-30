@@ -35,12 +35,14 @@ type Extensions struct {
 	InOrder []ExtensionID
 }
 
-type extensionParser func(reader bufferView) interface{}
-type extension struct {
-	label   string
-	parser  extensionParser
-	saveRaw bool
-}
+type (
+	extensionParser func(reader bufferView) interface{}
+	extension       struct {
+		label   string
+		parser  extensionParser
+		saveRaw bool
+	}
+)
 
 const (
 	// ExtensionSupportedGroups identifies the supported group extension
@@ -72,7 +74,6 @@ var extensionMap = map[uint16]extension{
 
 // ParseExtensions returns an Extensions object parsed from the supplied buffer
 func ParseExtensions(buffer bufferView) Extensions {
-
 	var extensionsLength uint16
 	if !buffer.read16Net(0, &extensionsLength) || extensionsLength == 0 {
 		// No extensions
