@@ -28,7 +28,7 @@
                                         "size": 10
                                     },
                                     "scale": "ordinal",
-                                    "sourceField": "threatintel.indicator.file.hash.sha1"
+                                    "sourceField": "threat.indicator.file.hash.sha1"
                                 },
                                 "9afb1b09-0f20-488c-9242-a94f7d11800b": {
                                     "dataType": "number",

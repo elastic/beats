@@ -6736,7 +6736,7 @@ alias to: beat.stats.apm_server.acm.response.errors.unauthorized
 --
 type: alias
 
-alias to: beat.stats.beat.host
+alias to: beat.stats.info.host
 
 --
 
@@ -6745,7 +6745,7 @@ alias to: beat.stats.beat.host
 --
 type: alias
 
-alias to: beat.stats.beat.name
+alias to: beat.stats.info.name
 
 --
 
@@ -6754,7 +6754,7 @@ alias to: beat.stats.beat.name
 --
 type: alias
 
-alias to: beat.stats.beat.type
+alias to: beat.stats.info.type
 
 --
 
@@ -6763,7 +6763,7 @@ alias to: beat.stats.beat.type
 --
 type: alias
 
-alias to: beat.stats.beat.uuid
+alias to: beat.stats.info.uuid
 
 --
 
@@ -6772,7 +6772,7 @@ alias to: beat.stats.beat.uuid
 --
 type: alias
 
-alias to: beat.stats.beat.version
+alias to: beat.stats.info.version
 
 --
 
@@ -8269,6 +8269,42 @@ type: long
 +
 --
 type: long
+
+--
+
+
+*`beat.stats.info.name`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.info.host`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.info.type`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.info.uuid`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.info.version`*::
++
+--
+type: keyword
 
 --
 
@@ -41165,44 +41201,13 @@ type: ip
 
 --
 
-
-*`kubernetes.namespace.name`*::
+*`kubernetes.namespace`*::
 +
 --
-Kubernetes namespace name
+Kubernetes namespace
 
 
 type: keyword
-
---
-
-*`kubernetes.namespace.uuid`*::
-+
---
-Kubernetes namespace uuid
-
-
-type: keyword
-
---
-
-*`kubernetes.namespace.labels.*`*::
-+
---
-Kubernetes namespace labels map
-
-
-type: object
-
---
-
-*`kubernetes.namespace.annotations.*`*::
-+
---
-Kubernetes namespace annotations map
-
-
-type: object
 
 --
 
@@ -52790,10 +52795,40 @@ Openmetrics module
 
 
 
+*`openmetrics.help`*::
++
+--
+Brief description of the MetricFamily
+
+
+type: keyword
+
+--
+
+*`openmetrics.type`*::
++
+--
+Metric type
+
+
+type: keyword
+
+--
+
+*`openmetrics.unit`*::
++
+--
+Metric unit
+
+
+type: keyword
+
+--
+
 *`openmetrics.labels.*`*::
 +
 --
-Prometheus metric labels
+Openmetrics metric labels
 
 
 type: object
@@ -52803,7 +52838,27 @@ type: object
 *`openmetrics.metrics.*`*::
 +
 --
-Prometheus metric
+Openmetrics metric
+
+
+type: object
+
+--
+
+*`openmetrics.exemplar.*`*::
++
+--
+Openmetrics exemplars
+
+
+type: object
+
+--
+
+*`openmetrics.exemplar.labels.*`*::
++
+--
+Openmetrics metric exemplar labels
 
 
 type: object

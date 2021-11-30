@@ -74,7 +74,7 @@ func NewPodEventer(
 	logger *logp.Logger,
 	client k8s.Interface,
 	scope string) (Eventer, error) {
-	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
+	watcher, err := kubernetes.NewNamedWatcher("agent-pod", client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
 		Namespace:    cfg.Namespace,
@@ -92,11 +92,11 @@ func NewPodEventer(
 	if metaConf == nil {
 		metaConf = metadata.GetDefaultResourceMetadataConfig()
 	}
-	nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
+	nodeWatcher, err := kubernetes.NewNamedWatcher("agent-node", client, &kubernetes.Node{}, options, nil)
 	if err != nil {
 		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
 	}
-	namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+	namespaceWatcher, err := kubernetes.NewNamedWatcher("agent-namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
 		SyncTimeout: cfg.SyncPeriod,
 	}, nil)
 	if err != nil {
@@ -247,14 +247,13 @@ func generatePodData(
 		return providerData{}
 	}
 
-	ckMeta := kubemetaMap.(common.MapStr).Clone()
-	if len(namespaceAnnotations) != 0 {
-		ckMeta.Put("namespace.annotations", namespaceAnnotations)
-	}
 	// k8sMapping includes only the metadata that fall under kubernetes.*
 	// and these are available as dynamic vars through the provider
-	k8sMapping := map[string]interface{}(ckMeta)
+	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr).Clone())
 
+	if len(namespaceAnnotations) != 0 {
+		k8sMapping["namespace_annotations"] = namespaceAnnotations
+	}
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
 	for k, v := range pod.GetObjectMeta().GetAnnotations() {
@@ -314,14 +313,13 @@ func generateContainerData(
 			continue
 		}
 
-		ckMeta := kubemetaMap.(common.MapStr).Clone()
-		if len(namespaceAnnotations) != 0 {
-			ckMeta.Put("namespace.annotations", namespaceAnnotations)
-		}
 		// k8sMapping includes only the metadata that fall under kubernetes.*
 		// and these are available as dynamic vars through the provider
-		k8sMapping := map[string]interface{}(ckMeta)
+		k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr).Clone())
 
+		if len(namespaceAnnotations) != 0 {
+			k8sMapping["namespace_annotations"] = namespaceAnnotations
+		}
 		// add annotations to be discoverable by templates
 		k8sMapping["annotations"] = annotations
 

@@ -1,9 +1,11 @@
 import os
+from datetime import datetime
 from beat.beat import TestCase
 from elasticsearch import Elasticsearch, NotFoundError
 
 
 class BaseTest(TestCase):
+    today = datetime.now().strftime("%Y%m%d")
 
     @classmethod
     def setUpClass(self):

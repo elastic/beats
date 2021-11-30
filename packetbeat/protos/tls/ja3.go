@@ -25,7 +25,6 @@ import (
 )
 
 func getJa3Fingerprint(hello *helloMessage) (hash string, ja3str string) {
-
 	// build the array of arrays of numbers
 
 	data := make([][]uint16, 5)

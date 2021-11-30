@@ -7,7 +7,7 @@
         },
         "kubernetes": {
             "deployment": {
-                "name": "springboot-cr-applier",
+                "name": "metricbeat",
                 "paused": false,
                 "replicas": {
                     "available": 1,
@@ -16,129 +16,7 @@
                     "updated": 1
                 }
             },
-            "namespace": {
-                "name": "telenet-cluster-ops"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "namespace-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "telenet-operators"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "jenkins-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "devops-playground"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "kube-state-metrics",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "openshift-monitoring"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "webconsole",
-                "paused": false,
-                "replicas": {
-                    "available": 3,
-                    "desired": 3,
-                    "unavailable": 0,
-                    "updated": 3
-                }
-            },
-            "namespace": {
-                "name": "openshift-web-console"
-            }
+            "namespace": "openshift-logging"
         },
         "metricset": {
             "name": "state_deployment",
@@ -166,819 +44,7 @@
                     "updated": 1
                 }
             },
-            "namespace": {
-                "name": "gdpr"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "springboot-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "edev-communication"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "jenkins-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "telenet-baseimages"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "jenkins-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "bi"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "dynatrace-oneagent-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "dynatrace"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "jenkins-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "darwin-integrations"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "springboot-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "paas-demo"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "prometheus-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "openshift-monitoring"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "jenkins-cr-applier",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "telenet-cluster-ops"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "tiller-deploy",
-                "paused": false,
-                "replicas": {
-                    "available": 0,
-                    "desired": 1,
-                    "unavailable": 1,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "tiller"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "elasticsearch",
-                "paused": false,
-                "replicas": {
-                    "available": 0,
-                    "desired": 1,
-                    "unavailable": 1,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "test-config"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "jenkins-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 0,
-                    "desired": 0,
-                    "unavailable": 0,
-                    "updated": 0
-                }
-            },
-            "namespace": {
-                "name": "adc-vault"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "springboot-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "edev-tools"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "springboot-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "devops-playground"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "cluster-monitoring-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "openshift-monitoring"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "jenkins-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "paas-demo"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "springboot-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "bi"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "console",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "openshift-console"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "kibana-kibana",
-                "paused": false,
-                "replicas": {
-                    "available": 0,
-                    "desired": 0,
-                    "unavailable": 0,
-                    "updated": 0
-                }
-            },
-            "namespace": {
-                "name": "kibana-tst"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "jenkins-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "edev-tools"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "jenkins-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "edev-communication"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "kube-state-metrics",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "openshift-logging"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "grafana",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "openshift-monitoring"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "weblogic-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "weblogic-poc"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "jenkins-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "gdpr"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "sonarqube-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "devops-playground"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "kibana",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "test-config"
-            }
-        },
-        "metricset": {
-            "name": "state_deployment",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.deployment",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "deployment": {
-                "name": "springboot-operator",
-                "paused": false,
-                "replicas": {
-                    "available": 1,
-                    "desired": 1,
-                    "unavailable": 0,
-                    "updated": 1
-                }
-            },
-            "namespace": {
-                "name": "darwin-integrations"
-            }
+            "namespace": "bi"
         },
         "metricset": {
             "name": "state_deployment",
@@ -1006,9 +72,7 @@
                     "updated": 1
                 }
             },
-            "namespace": {
-                "name": "tiller"
-            }
+            "namespace": "tiller"
         },
         "metricset": {
             "name": "state_deployment",
@@ -1027,7 +91,35 @@
         },
         "kubernetes": {
             "deployment": {
-                "name": "metricbeat",
+                "name": "jenkins-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 0,
+                    "desired": 0,
+                    "unavailable": 0,
+                    "updated": 0
+                }
+            },
+            "namespace": "adc-vault"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "jenkins-operator",
                 "paused": false,
                 "replicas": {
                     "available": 1,
@@ -1036,9 +128,847 @@
                     "updated": 1
                 }
             },
-            "namespace": {
-                "name": "openshift-logging"
-            }
+            "namespace": "paas-demo"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "springboot-cr-applier",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "telenet-cluster-ops"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "springboot-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "paas-demo"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "springboot-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "edev-communication"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "kube-state-metrics",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "openshift-logging"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "jenkins-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "devops-playground"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "jenkins-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "edev-tools"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "springboot-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "devops-playground"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "prometheus-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "openshift-monitoring"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "tiller-deploy",
+                "paused": false,
+                "replicas": {
+                    "available": 0,
+                    "desired": 1,
+                    "unavailable": 1,
+                    "updated": 1
+                }
+            },
+            "namespace": "tiller"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "jenkins-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "darwin-integrations"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "jenkins-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "edev-communication"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "webconsole",
+                "paused": false,
+                "replicas": {
+                    "available": 3,
+                    "desired": 3,
+                    "unavailable": 0,
+                    "updated": 3
+                }
+            },
+            "namespace": "openshift-web-console"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "console",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "openshift-console"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "jenkins-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "gdpr"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "jenkins-cr-applier",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "telenet-cluster-ops"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "namespace-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "telenet-operators"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "jenkins-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "telenet-baseimages"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "cluster-monitoring-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "openshift-monitoring"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "springboot-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "darwin-integrations"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "kibana",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "test-config"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "dynatrace-oneagent-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "dynatrace"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "springboot-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "edev-tools"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "sonarqube-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "devops-playground"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "grafana",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "openshift-monitoring"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "kibana-kibana",
+                "paused": false,
+                "replicas": {
+                    "available": 0,
+                    "desired": 0,
+                    "unavailable": 0,
+                    "updated": 0
+                }
+            },
+            "namespace": "kibana-tst"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "kube-state-metrics",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "openshift-monitoring"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "elasticsearch",
+                "paused": false,
+                "replicas": {
+                    "available": 0,
+                    "desired": 1,
+                    "unavailable": 1,
+                    "updated": 1
+                }
+            },
+            "namespace": "test-config"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "springboot-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "gdpr"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "jenkins-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "bi"
+        },
+        "metricset": {
+            "name": "state_deployment",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.deployment",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "deployment": {
+                "name": "weblogic-operator",
+                "paused": false,
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "unavailable": 0,
+                    "updated": 1
+                }
+            },
+            "namespace": "weblogic-poc"
         },
         "metricset": {
             "name": "state_deployment",
