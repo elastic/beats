@@ -27,7 +27,7 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.custom_policy = self.beat_name + "_bar"
         self.custom_template = self.beat_name + "_foobar"
 
-        self.es = self.es_client()
+        self.es = self.get_elasticsearch_instance()
         self.idxmgmt = IdxMgmt(self.es, self.index_name)
         self.idxmgmt.delete(indices=[self.custom_alias, self.index_name, self.custom_policy],
                             policies=[self.policy_name, self.custom_policy])
@@ -40,12 +40,10 @@ class TestCommandSetupIndexManagement(BaseTest):
                             policies=[self.policy_name, self.custom_policy])
 
     def render_config(self, **kwargs):
-        print('OS ES USER: {}'.format(os.getenv('ES_USER')))
-        print('OS ES pass: {}'.format(os.getenv('ES_PASS')))
         self.render_config_template(
             # Note that the template is such that we need to pass in 'username' as opposed to 'user' and
             # 'password' instead of 'pass'.
-            elasticsearch={"hosts": self.get_elasticsearch_url(), "username": "admin", "password": "testing"},
+            elasticsearch=self.get_elasticsearch_template_config(),
             es_template_name=self.index_name,
             **kwargs
         )

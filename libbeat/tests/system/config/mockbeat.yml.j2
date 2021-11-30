@@ -37,12 +37,32 @@ output:
     {% endfor -%}
   {%- endif %}
 
-  {% if elasticsearch -%}
+{% if elasticsearch -%}
+output:
   elasticsearch:
-    {% for k, v in elasticsearch.items() -%}
-    {{ k }}: {{ v }}
-    {% endfor -%}
-  {%- endif %}
+    hosts: ["{{ elasticsearch.host }}"]
+    username: {{ elasticsearch.user }}
+    password: {{ elasticsearch.pass }}
+  {% if elasticsearch.pipeline %}
+    pipeline: {{elasticsearch.pipeline}}
+  {% endif %}
+  {% if elasticsearch.index %}
+    index: {{elasticsearch.index}}
+  {% endif %}
+  {% if elasticsearch.ilm %}
+    ilm.enabled: {{elasticsearch.ilm}}
+  {% endif %}
+  {% if elasticsearch.timeout %}
+    timeout: {{elasticsearch.timeout}}
+  {% endif %}
+  {% if elasticsearch.ssl_certificate_authorities %}
+    ssl.certificate_authorities: {{elasticsearch.ssl_certificate_authorities}}
+  {% endif %}
+  {% if elasticsearch.ssl_ca_sha256 %}
+    ssl.ca_sha256: {{ elasticsearch.ssl_ca_sha256 }}
+  {% endif %}
+{%- endif %}
+
 
   # Redis as output
   # Options:

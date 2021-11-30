@@ -21,7 +21,7 @@ services:
       - KIBANA_PASS=testing
       - ES_HOST=elasticsearch
       - ES_PORT=9200
-      - ES_USER=admin
+      - ES_USER=beats
       - ES_PASS=testing
       - ES_MONITORING_HOST=elasticsearch_monitoring
       - ES_MONITORING_PORT=9200

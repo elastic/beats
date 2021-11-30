@@ -102,15 +102,12 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 
 	// read json file
 	reader, err := ioutil.ReadFile(file)
-	loader.statusMsg("Finished file read for %s", file)
 	if err != nil {
 		return fmt.Errorf("fail to read index-pattern from file %s: %v", file, err)
 	}
 
 	var indexContent common.MapStr
 	err = json.Unmarshal(reader, &indexContent)
-
-	loader.statusMsg("Finished json unmarshal for %s", file)
 	if err != nil {
 		return fmt.Errorf("fail to unmarshal the index content from file %s: %v", file, err)
 	}
@@ -142,9 +139,7 @@ func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
 
 // ImportDashboard imports the dashboard file
 func (loader KibanaLoader) ImportDashboard(file string) error {
-	loader.statusMsg("dashboard attempt starting")
 	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
-		loader.statusMsg("loader version mismatch fail")
 		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
 	}
 

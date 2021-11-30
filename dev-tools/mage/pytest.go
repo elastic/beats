@@ -134,7 +134,7 @@ func PythonTest(params PythonTestArgs) error {
 	pytestOptions := []string{
 		"--timeout=90",
 		"--durations=20",
-		// "-x",
+		"-x",
 		"--tb=long",
 		"-v",
 		"-s",

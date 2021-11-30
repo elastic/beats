@@ -111,16 +111,8 @@ class TestDashboardMixin:
 
         es = Elasticsearch([self.get_elasticsearch_url()])
         self.render_config_template(
-            elasticsearch={
-                "host": self.get_elasticsearch_url(),
-                "user": "filebeat_user",
-                "pass": os.getenv('ES_PASS')
-            },
-            kibana={
-                "host": self.get_kibana_url(),
-                "user": "beats",
-                "pass": "testing",
-            },
+            elasticsearch=self.get_elasticsearch_template_config(),
+            kibana=self.get_kibana_template_config(),
         )
         exit_code = self.run_beat(extra_args=["setup", "--dashboards"])
 
