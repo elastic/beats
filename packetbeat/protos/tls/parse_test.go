@@ -125,12 +125,6 @@ func mapGet(t *testing.T, m common.MapStr, key string) interface{} {
 	return value
 }
 
-func mapInt(t *testing.T, m common.MapStr, key string) uint32 {
-	value, err := m.GetValue(key)
-	assert.NoError(t, err)
-	return value.(uint32)
-}
-
 func TestParseRecordHeader(t *testing.T) {
 	if testing.Verbose() {
 		isDebug = true
@@ -173,6 +167,7 @@ func TestParseHandshakeHeader(t *testing.T) {
 	_, err = readHandshakeHeader(sBuf(t, "112233"))
 	assert.Error(t, err)
 	header, err := readHandshakeHeader(sBuf(t, "11223344"))
+	assert.NoError(t, err)
 	assert.Equal(t, handshakeType(0x11), header.handshakeType)
 	assert.Equal(t, 0x223344, header.length)
 }
@@ -202,7 +197,6 @@ func TestParserParse(t *testing.T) {
 	// Certificate request
 	assert.Equal(t, resultOK, parser.parse(sBuf(t, "16030300040d000000")))
 	assert.True(t, parser.certRequested)
-
 }
 
 func TestParserHello(t *testing.T) {

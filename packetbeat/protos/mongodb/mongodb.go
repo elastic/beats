@@ -55,9 +55,7 @@ type transactionKey struct {
 	id  int
 }
 
-var (
-	unmatchedRequests = monitoring.NewInt(nil, "mongodb.unmatched_requests")
-)
+var unmatchedRequests = monitoring.NewInt(nil, "mongodb.unmatched_requests")
 
 func init() {
 	protos.Register("mongodb", New)
@@ -218,7 +216,6 @@ func (mongodb *mongodbPlugin) handleMongodb(
 	tcptuple *common.TCPTuple,
 	dir uint8,
 ) {
-
 	m.tcpTuple = *tcptuple
 	m.direction = dir
 	m.cmdlineTuple = mongodb.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
@@ -345,11 +342,12 @@ func reconstructQuery(t *transaction, full bool) (query string) {
 		if !full {
 			// remove the actual data.
 			// TODO: review if we need to add other commands here
-			if t.method == "insert" {
+			switch t.method {
+			case "insert":
 				params, err = doc2str(copyMapWithoutKey(t.params, "documents"))
-			} else if t.method == "update" {
+			case "update":
 				params, err = doc2str(copyMapWithoutKey(t.params, "updates"))
-			} else if t.method == "findandmodify" {
+			case "findandmodify":
 				params, err = doc2str(copyMapWithoutKey(t.params, "update"))
 			}
 		} else {
