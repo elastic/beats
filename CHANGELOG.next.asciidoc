@@ -29,6 +29,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove `auto` from the available options of `setup.ilm.enabled` and set the default value to `true`. {pull}28671[28671]
 - Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
 - Remove options `logging.files.suffix` and default to datetime endings. {pull}28927[28927]
+- Remove Journalbeat. Use `journald` input of Filebeat instead. {pull}29131[29131]
 
 *Auditbeat*
 
@@ -69,11 +70,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 - Change behavior in case of duplicate monitor IDs in configs to be last monitor wins. {pull}29041[29041]
-
-*Journalbeat*
-
-- Rename field `journald.process.capabilites` to `journald.process.capabilities` to fix spelling. {pull}28065[28065]
-- Rename field `log.syslog.facility.name` to `log.syslog.facility.code` because the value is numeric rather than the facility name. {pull}28065[28065]
 
 *Metricbeat*
 
@@ -211,9 +207,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Stop logging params values. {pull}28774[28774]
 - Remove accidentally included cups library in docker images. {pull}28853[pull]
 - Fix broken monitors with newer versions of image relying on dup3. {pull}28938[pull]
-
-*Journalbeat*
-
 
 *Metricbeat*
 
@@ -361,8 +354,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Experimental 'run once' mode. {pull}25972[25972]
 - Add `keyword` multi-field mapping for `synthetics.step.name`. {pull}28452[28452]
 
-*Journalbeat*
-
 *Metricbeat*
 
 - Move the windows pdh implementation from perfmon to a shared location in order for future modules/metricsets to make use of. {pull}15503[15503]
@@ -405,8 +396,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Deprecate `log` input in favour of `filestream` input. {pull}28623[28623]
 
 *Heartbeat*
-
-*Journalbeat*
 
 *Metricbeat*
 

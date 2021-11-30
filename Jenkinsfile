@@ -433,8 +433,6 @@ def pushCIDockerImages(Map args = [:]) {
       tagAndPush(beatName: 'filebeat', arch: arch)
     } else if (beatsFolder.endsWith('heartbeat')) {
       tagAndPush(beatName: 'heartbeat', arch: arch)
-    } else if ("${beatsFolder}" == "journalbeat"){
-      tagAndPush(beatName: 'journalbeat', arch: arch)
     } else if (beatsFolder.endsWith('metricbeat')) {
       tagAndPush(beatName: 'metricbeat', arch: arch)
     } else if ("${beatsFolder}" == "packetbeat"){
