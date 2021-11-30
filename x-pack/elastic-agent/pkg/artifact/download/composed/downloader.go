@@ -36,7 +36,7 @@ func NewDownloader(downloaders ...download.Downloader) *Downloader {
 // Returns absolute path to downloaded package and an error.
 func (e *Downloader) Download(ctx context.Context, spec program.Spec, version string) (string, error) {
 	var err error
-	span, ctx := apm.StartSpan(ctx, "composedDownloader.Download()", "custom")
+	span, ctx := apm.StartSpan(ctx, "upgrade", "app.internal")
 	defer span.End()
 
 	for _, d := range e.dd {

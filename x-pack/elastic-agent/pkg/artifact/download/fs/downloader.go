@@ -41,7 +41,7 @@ func NewDownloader(config *artifact.Config) *Downloader {
 // Download fetches the package from configured source.
 // Returns absolute path to downloaded package and an error.
 func (e *Downloader) Download(ctx context.Context, spec program.Spec, version string) (_ string, err error) {
-	span, ctx := apm.StartSpan(ctx, "fs.Downloader.Download()", "custom")
+	span, ctx := apm.StartSpan(ctx, "upgrade", "app.internal")
 	defer span.End()
 	downloadedFiles := make([]string, 0, 2)
 	defer func() {
