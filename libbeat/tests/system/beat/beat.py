@@ -687,6 +687,13 @@ class TestCase(unittest.TestCase, ComposeMixin):
             port=os.getenv("ES_PORT_SSL", "9205"),
         )
 
+    def get_elasticsearch_template_config(self):
+        return {
+            "host": self.get_elasticsearch_url(),
+            "user": os.getenv("ES_USER", ""),
+            "pass": os.getenv("ES_PASS", "")
+        }
+
     def get_elasticsearch_instance(self, security=True, ssl=False, url=None, user=None):
         """
         Returns an elasticsearch.Elasticsearch instance built from the
@@ -699,7 +706,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 url = self.get_elasticsearch_url()
 
         if security:
-            username = user or os.getenv("ES_USER", user)
+            username = user or os.getenv("ES_USER", "")
             password = os.getenv("ES_PASS", "")
             es_instance = Elasticsearch([url], http_auth=(username, password))
         else:
