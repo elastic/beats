@@ -945,8 +945,16 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 	}
 
 	src, dst := local, remote
-	if f.dir == directionIngress {
+	switch f.dir {
+	case directionIngress:
 		src, dst = dst, src
+	case directionUnknown:
+		// For some flows we can miss information to determine the source (dir=unknown).
+		// As a last resort, assume that the client side uses a higher port number
+		// than the server.
+		if localAddr.Port < remoteAddr.Port {
+			src, dst = dst, src
+		}
 	}
 
 	inetType := f.inetType
