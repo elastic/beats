@@ -350,13 +350,7 @@ def githubAction(Map args = [:]) {
   withGithubNotify(context: args.context) {
     // Provision a worker with the given labels. For the time being, let's provision a worker.
     // We can revisit this to maybe use the async mode when triggering the github action.
-    withNode(labels: args.label, forceWorkspace: true){
-      // TODO: This is the section regarding how to run the GitHub actions.
-      // Just calling the step from https://github.com/elastic/apm-pipeline-library/pull/1358
-      // Environment variables:
-      //   env.GIT_BASE_COMMIT, this environment variable points to the git ref commit.
-      //   env.TARGET_BRANCH, this environment variable points to the target branch in a Pull Request.
-      //   env.GO_VERSION, this environment variable points to the Golang version.
+    withNode(labels: args.label, forceWorkspace: true) {
       def result = githubWorkflowRun(
         workflow: "macos-build",
         ref: env.TARGET_BRANCH,
@@ -366,7 +360,7 @@ def githubAction(Map args = [:]) {
             command: args.command,
             go_version: env.GO_VERSION,
           ])
-      log(level: 'INFO', text: "Github build link: ${$result.html_url}")
+      log(level: 'INFO', text: "Github build link: ${result.html_url}")
       log(level: 'INFO', text: "Github build status: ${result.conclusion}")
     }
   }
