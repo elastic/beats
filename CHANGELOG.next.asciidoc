@@ -96,6 +96,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - `event.category` no longer contains the value `network_traffic` because this is not a valid ECS event category value. {pull}20556[20556]
 - Remove deprecated TLS fields in favor of tls.server.x509 and tls.client.x509 ECS fields. {pull}28487[28487]
 - HTTP: The field `http.request.method` will maintain its original case. {pull}28620[28620]
+- Unify gopacket dependencies. {pull}29167[29167]
 
 *Winlogbeat*
 
