@@ -104,6 +104,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `okta` geoip lookup in pipeline for `destination.ip` {pull}20454[20454]
 - Fix mapping exception in the `googlecloud/audit` dataset pipeline. {issue}18465[18465] {pull}20465[20465]
 - Fix `cisco` asa and ftd parsing of messages 106102 and 106103. {pull}20469[20469]
+- Update indentation for azure filebeat configuration. {pull}26604[26604]
+- Add support for passing a prefix on S3 bucket list mode for AWS-S3 input {pull}28252[28252] {issue}27965[27965]
+- Resolve issue with @timestamp for defender_atp. {pull}28272[28272]
+- Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
+- Add support for username in cisco asa security negotiation logs {pull}26975[26975]
+- Relax time parsing and capture group and session type in Cisco ASA module {issue}24710[24710] {pull}28325[28325]
+- Correctly track bytes read when max_bytes is exceeded. {issue}28317[28317] {pull}28352[28352]
+- Fix parsing of apache log levels including numbers. {pull}28717[28717]
+- Upgrade azure-eventhub sdk reference, contains potential checkpoint fixes. {pull}28919[28919]
+- Revert usageDetails api version to 2019-01-01. {pull}28995[28995]
+- Fix in `aws-s3` input regarding provider discovery through endpoint {pull}28963[28963]
+- Fix `threatintel.misp` filters configuration. {issue}27970[27970]
+- Fix opening files on Windows in filestream so open files can be deleted. {issue}29113[29113] {pull}29180[29180] 
 
 *Heartbeat*
 
