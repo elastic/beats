@@ -30,13 +30,11 @@ type tlsConfig struct {
 	Fingerprints           []string `config:"fingerprints"`
 }
 
-var (
-	defaultConfig = tlsConfig{
-		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionExpiration,
-		},
-		SendCertificates:      true,
-		IncludeDetailedFields: true,
-		Fingerprints:          []string{"sha1"},
-	}
-)
+var defaultConfig = tlsConfig{
+	ProtocolCommon: config.ProtocolCommon{
+		TransactionTimeout: protos.DefaultTransactionExpiration,
+	},
+	SendCertificates:      true,
+	IncludeDetailedFields: true,
+	Fingerprints:          []string{"sha1"},
+}

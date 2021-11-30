@@ -45,7 +45,7 @@ type message struct {
 	cmdlineTuple *common.ProcessTuple
 	direction    uint8
 
-	//Request Info
+	// Request Info
 	requestURI   common.NetString
 	method       common.NetString
 	statusCode   uint16
@@ -187,7 +187,7 @@ func (*parser) parseHTTPLine(s *stream, m *message) (cont, ok, complete bool) {
 		return false, false, false
 	}
 	if bytes.Equal(fline[0:5], constHTTPVersion) {
-		//RESPONSE
+		// RESPONSE
 		m.isRequest = false
 		version = fline[5:8]
 		m.statusCode, m.statusPhrase, err = parseResponseStatus(fline[9:])
@@ -289,7 +289,7 @@ func (parser *parser) parseHeaders(s *stream, m *message) (cont, ok, complete bo
 		s.parseOffset = 0
 
 		if !m.isRequest && ((100 <= m.statusCode && m.statusCode < 200) || m.statusCode == 204 || m.statusCode == 304) {
-			//response with a 1xx, 204 , or 304 status  code is always terminated
+			// response with a 1xx, 204 , or 304 status  code is always terminated
 			// by the first empty line after the  header fields
 			if isDebug {
 				debugf("Terminate response, status code %d", m.statusCode)
