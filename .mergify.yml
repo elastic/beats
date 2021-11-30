@@ -44,10 +44,10 @@ pull_request_rules:
         message: Automatically approving mergify
   - name: automatic squash and merge with success checks and the files matching the regex ^testing/environments/snapshot* are modified.
     conditions:
+      - check-success=beats-ci/pr-merge
       - label=automation
       - files~=^testing/environments/snapshot.*\.yml$
       - "#approved-reviews-by>=1"
-      - check-success=beats-ci/pr-merge
     actions:
       queue:
         method: squash
@@ -87,11 +87,11 @@ pull_request_rules:
         message: Automatically approving mergify
   - name: automatic squash and merge with success checks and the files matching the regex ^.mergify.yml is modified.
     conditions:
+      - check-success=beats-ci/pr-merge
       - label=automation
       - files~=^\.mergify\.yml$
       - head~=^add-backport-next.*
       - "#approved-reviews-by>=1"
-      - check-success=beats-ci/pr-merge
     actions:
       queue:
         method: squash
