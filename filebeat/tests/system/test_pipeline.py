@@ -11,8 +11,7 @@ class Test(BaseTest):
     def init(self):
         self.elasticsearch_url = self.get_elasticsearch_url()
         self.kibana_url = self.get_kibana_url()
-        print("Using elasticsearch: {}".format(self.elasticsearch_url))
-        self.es = self.get_elasticsearch_instance(url=self.elasticsearch_url)
+        self.es = self.get_elasticsearch_instance()
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
@@ -50,7 +49,7 @@ class Test(BaseTest):
                 'host': self.elasticsearch_url,
                 'pipeline': "estest",
                 'index': index_name,
-                'user': "filebeat_user",
+                'user': os.getenv("ES_USER"),
                 'pass': os.getenv("ES_PASS")
             },
             pipeline="test",

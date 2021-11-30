@@ -10,13 +10,9 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
     def setUp(self):
         super(Test, self).setUp()
         self.render_config_template(
-            elasticsearch={
-                "host": self.get_elasticsearch_url(),
-                "user": "filebeat_user",
-                "pass": os.getenv('ES_PASS')
-            },
+            elasticsearch=self.get_elasticsearch_template_config(),
         )
-        self.es = self.get_elasticsearch_instance(url=self.get_elasticsearch_url(), user='filebeat_user')
+        self.es = self.get_elasticsearch_instance()
 
     def test_base(self):
         """
@@ -42,14 +38,8 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
         """
         Test that the template can be loaded with `setup --index-management`
         """
-        es_url = self.get_elasticsearch_url()
-        es = self.get_elasticsearch_instance(url=es_url)
         self.render_config_template(
-            elasticsearch={
-                "host": es_url,
-                "user": "filebeat_user",
-                "pass": os.getenv('ES_PASS'),
-            }
+            elasticsearch=self.get_elasticsearch_template_config(),
         )
         exit_code = self.run_beat(extra_args=["setup", "--index-management"])
 

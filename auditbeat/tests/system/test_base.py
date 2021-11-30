@@ -41,7 +41,7 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
         """
         dirs = [self.temp_dir("auditbeat_test")]
         with PathCleanup(dirs):
-            es = self.get_elasticsearch_instance(url=self.get_elasticsearch_url())
+            es = self.get_elasticsearch_instance()
 
             self.render_config_template(
                 modules=[{

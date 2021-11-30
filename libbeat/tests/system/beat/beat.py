@@ -688,7 +688,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         )
 
 
-    def get_elasticsearch_template_config(self, security=True):
+    def get_elasticsearch_template_config(self, security=True, user=None):
         """
         Returns a template suitable for a Beats config
         """
@@ -697,7 +697,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         }
 
         if security:
-            template["user"] = os.getenv("ES_USER", "")
+            template["user"] = user or os.getenv("ES_USER", "")
             template["pass"] = os.getenv("ES_PASS", "")
 
         return template
@@ -730,7 +730,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             port=os.getenv("KIBANA_PORT", "5601"),
         )
 
-    def get_kibana_template_config(self, security=True):
+    def get_kibana_template_config(self, security=True, user=None):
         """
         Returns a Kibana template suitable for a Beat
         """
@@ -739,7 +739,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         }
 
         if security:
-            template["user"] = os.getenv("ES_USER", "")
+            template["user"] = user or os.getenv("ES_USER", "")
             template["pass"] = os.getenv("ES_PASS", "")
 
         return template

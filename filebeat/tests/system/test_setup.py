@@ -13,7 +13,7 @@ class Test(BaseTest):
     def init(self):
         self.elasticsearch_url = self.get_elasticsearch_url()
         print("Using elasticsearch: {}".format(self.elasticsearch_url))
-        self.es = self.get_elasticsearch_instance(url=self.elasticsearch_url)
+        self.es = self.get_elasticsearch_instance()
 
     @unittest.skipIf(not INTEGRATION_TESTS,
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
@@ -26,11 +26,7 @@ class Test(BaseTest):
         self.init()
         self.render_config_template(
             modules=True,
-            elasticsearch={
-                "host": self.get_elasticsearch_url(),
-                "user": "filebeat_user",
-                "pass": os.getenv('ES_PASS'),
-            },
+            elasticsearch=self.get_elasticsearch_template_config(),
         )
 
         self._setup_dummy_module()

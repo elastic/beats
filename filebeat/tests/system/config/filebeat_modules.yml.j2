@@ -12,7 +12,7 @@ filebeat.overwrite_pipelines: true
 filebeat.config.modules:
   path: {{ beat.working_dir + '/modules.d/*.yml' }}
 
-output.elasticsearch.hosts: ["{{ elasticsearch.hosts }}"]
+output.elasticsearch.hosts: ["{{ elasticsearch.host }}"]
 output.elasticsearch.index: {{ index_name }}
 output.elasticsearch.username: {{ elasticsearch.user }}
 output.elasticsearch.password: {{ elasticsearch.pass }}
