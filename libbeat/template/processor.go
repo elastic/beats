@@ -20,11 +20,15 @@ package template
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 )
+
+// DefaultField controls the default value for the default_field flag.
+const DefaultField = false
 
 var (
 	minVersionAlias                   = common.MustNewVersion("6.4.0")
@@ -32,6 +36,7 @@ var (
 	minVersionHistogram               = common.MustNewVersion("7.6.0")
 	minVersionWildcard                = common.MustNewVersion("7.9.0")
 	minVersionExplicitDynamicTemplate = common.MustNewVersion("7.13.0")
+	minVersionMatchOnlyText           = common.MustNewVersion("7.14.0")
 )
 
 // Processor struct to process fields to template
@@ -59,10 +64,10 @@ type fieldState struct {
 }
 
 // Process recursively processes the given fields and writes the template in the given output
-func (p *Processor) Process(fields mapping.Fields, state *fieldState, output common.MapStr) error {
+func (p *Processor) Process(fields mapping.Fields, state *fieldState, output, analyzers common.MapStr) error {
 	if state == nil {
 		// Set the defaults.
-		state = &fieldState{DefaultField: true}
+		state = &fieldState{DefaultField: DefaultField}
 	}
 
 	for _, field := range fields {
@@ -74,7 +79,10 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 		if field.DefaultField == nil {
 			field.DefaultField = &state.DefaultField
 		}
-		var indexMapping common.MapStr
+		var (
+			indexMapping             common.MapStr
+			analyzer, searchAnalyzer mapping.Analyzer
+		)
 
 		switch field.Type {
 		case "ip":
@@ -86,16 +94,23 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 		case "integer":
 			indexMapping = p.integer(&field)
 		case "text":
-			indexMapping = p.text(&field)
+			indexMapping, analyzer, searchAnalyzer = p.text(&field, analyzers)
+		case "match_only_text":
+			noMatchOnlyText := p.EsVersion.LessThan(minVersionMatchOnlyText)
+			if !p.ElasticLicensed || noMatchOnlyText {
+				indexMapping, analyzer, searchAnalyzer = p.text(&field, analyzers)
+			} else {
+				indexMapping, analyzer, searchAnalyzer = p.matchOnlyText(&field, analyzers)
+			}
 		case "wildcard":
 			noWildcards := p.EsVersion.LessThan(minVersionWildcard)
 			if !p.ElasticLicensed || noWildcards {
-				indexMapping = p.keyword(&field)
+				indexMapping = p.keyword(&field, analyzers)
 			} else {
-				indexMapping = p.wildcard(&field)
+				indexMapping = p.wildcard(&field, analyzers)
 			}
 		case "", "keyword":
-			indexMapping = p.keyword(&field)
+			indexMapping = p.keyword(&field, analyzers)
 		case "object":
 			indexMapping = p.object(&field)
 		case "array":
@@ -105,13 +120,13 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 		case "histogram":
 			indexMapping = p.histogram(&field)
 		case "nested":
-			mapping, err := p.nested(&field, output)
+			mapping, err := p.nested(&field, output, analyzers)
 			if err != nil {
 				return err
 			}
 			indexMapping = mapping
 		case "group":
-			mapping, err := p.group(&field, output)
+			mapping, err := p.group(&field, output, analyzers)
 			if err != nil {
 				return err
 			}
@@ -136,6 +151,23 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 				}
 			} else {
 				output.Put(mapping.GenerateKey(field.Name), indexMapping)
+			}
+		}
+
+		for _, a := range []mapping.Analyzer{
+			analyzer, searchAnalyzer,
+		} {
+			if a.Definition != nil {
+				prev, err := analyzers.Put(a.Name, a.Definition)
+				if err != nil {
+					// Should never happen.
+					return err
+				}
+				if prev != nil {
+					if !reflect.DeepEqual(prev, a.Definition) {
+						return fmt.Errorf("inconsistent definitions for analyzers with the name %q", a.Name)
+					}
+				}
 			}
 		}
 	}
@@ -193,8 +225,8 @@ func (p *Processor) scaledFloat(f *mapping.Field, params ...common.MapStr) commo
 	return property
 }
 
-func (p *Processor) nested(f *mapping.Field, output common.MapStr) (common.MapStr, error) {
-	mapping, err := p.group(f, output)
+func (p *Processor) nested(f *mapping.Field, output, analyzers common.MapStr) (common.MapStr, error) {
+	mapping, err := p.group(f, output, analyzers)
 	if err != nil {
 		return nil, err
 	}
@@ -202,7 +234,7 @@ func (p *Processor) nested(f *mapping.Field, output common.MapStr) (common.MapSt
 	return mapping, nil
 }
 
-func (p *Processor) group(f *mapping.Field, output common.MapStr) (common.MapStr, error) {
+func (p *Processor) group(f *mapping.Field, output, analyzers common.MapStr) (common.MapStr, error) {
 	indexMapping := common.MapStr{}
 	if f.Dynamic.Value != nil {
 		indexMapping["dynamic"] = f.Dynamic.Value
@@ -225,7 +257,7 @@ func (p *Processor) group(f *mapping.Field, output common.MapStr) (common.MapStr
 	if f.Path != "" {
 		groupState.Path = f.Path + "." + f.Name
 	}
-	if err := p.Process(f.Fields, groupState, properties); err != nil {
+	if err := p.Process(f.Fields, groupState, properties, analyzers); err != nil {
 		return nil, err
 	}
 	if len(properties) != 0 {
@@ -257,7 +289,24 @@ func (p *Processor) ip(f *mapping.Field) common.MapStr {
 	return property
 }
 
-func (p *Processor) keyword(f *mapping.Field) common.MapStr {
+func stateFromField(f *mapping.Field) *fieldState {
+	if f == nil {
+		return nil
+	}
+	st := &fieldState{
+		DefaultField: DefaultField,
+		Path:         f.Name,
+	}
+	if f.DefaultField != nil {
+		st.DefaultField = *f.DefaultField
+	}
+	if f.Path != "" {
+		st.Path = f.Path + "." + f.Name
+	}
+	return st
+}
+
+func (p *Processor) keyword(f *mapping.Field, analyzers common.MapStr) common.MapStr {
 	property := p.getDefaultProperties(f)
 
 	property["type"] = "keyword"
@@ -277,14 +326,14 @@ func (p *Processor) keyword(f *mapping.Field) common.MapStr {
 
 	if len(f.MultiFields) > 0 {
 		fields := common.MapStr{}
-		p.Process(f.MultiFields, nil, fields)
+		p.Process(f.MultiFields, stateFromField(f), fields, analyzers)
 		property["fields"] = fields
 	}
 
 	return property
 }
 
-func (p *Processor) wildcard(f *mapping.Field) common.MapStr {
+func (p *Processor) wildcard(f *mapping.Field, analyzers common.MapStr) common.MapStr {
 	property := p.getDefaultProperties(f)
 
 	property["type"] = "wildcard"
@@ -299,15 +348,15 @@ func (p *Processor) wildcard(f *mapping.Field) common.MapStr {
 
 	if len(f.MultiFields) > 0 {
 		fields := common.MapStr{}
-		p.Process(f.MultiFields, nil, fields)
+		p.Process(f.MultiFields, stateFromField(f), fields, analyzers)
 		property["fields"] = fields
 	}
 
 	return property
 }
 
-func (p *Processor) text(f *mapping.Field) common.MapStr {
-	properties := p.getDefaultProperties(f)
+func (p *Processor) text(f *mapping.Field, analyzers common.MapStr) (properties common.MapStr, analyzer, searchAnalyzer mapping.Analyzer) {
+	properties = p.getDefaultProperties(f)
 
 	properties["type"] = "text"
 
@@ -325,21 +374,47 @@ func (p *Processor) text(f *mapping.Field) common.MapStr {
 		}
 	}
 
-	if f.Analyzer != "" {
-		properties["analyzer"] = f.Analyzer
+	if f.Analyzer.Name != "" {
+		properties["analyzer"] = f.Analyzer.Name
+		analyzer = f.Analyzer
 	}
 
-	if f.SearchAnalyzer != "" {
-		properties["search_analyzer"] = f.SearchAnalyzer
+	if f.SearchAnalyzer.Name != "" {
+		properties["search_analyzer"] = f.SearchAnalyzer.Name
+		searchAnalyzer = f.SearchAnalyzer
 	}
 
 	if len(f.MultiFields) > 0 {
 		fields := common.MapStr{}
-		p.Process(f.MultiFields, nil, fields)
+		p.Process(f.MultiFields, stateFromField(f), fields, analyzers)
 		properties["fields"] = fields
 	}
 
-	return properties
+	return properties, analyzer, searchAnalyzer
+}
+
+func (p *Processor) matchOnlyText(f *mapping.Field, analyzers common.MapStr) (properties common.MapStr, analyzer, searchAnalyzer mapping.Analyzer) {
+	properties = p.getDefaultProperties(f)
+
+	properties["type"] = "match_only_text"
+
+	if f.Analyzer.Name != "" {
+		properties["analyzer"] = f.Analyzer
+		analyzer = f.Analyzer
+	}
+
+	if f.SearchAnalyzer.Name != "" {
+		properties["search_analyzer"] = f.SearchAnalyzer
+		searchAnalyzer = f.SearchAnalyzer
+	}
+
+	if len(f.MultiFields) > 0 {
+		fields := common.MapStr{}
+		p.Process(f.MultiFields, nil, fields, analyzers)
+		properties["fields"] = fields
+	}
+
+	return properties, analyzer, searchAnalyzer
 }
 
 func (p *Processor) array(f *mapping.Field) common.MapStr {

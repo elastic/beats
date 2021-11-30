@@ -12,6 +12,8 @@ This file is generated! See scripts/docs_collector.py
 
 experimental[]
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for receiving Barracuda Web Application Firewall logs over Syslog or a file.
 
 include::../include/gs-link.asciidoc[]
@@ -31,7 +33,7 @@ NOTE: This was converted from RSA NetWitness log parser XML "barracudawaf" devic
 
 *`var.input`*::
 
-The input from which messages are read. One of `file`, `tcp` or `udp`.
+The input from which messages are read. One of `file`, `tcp` or `udp`. Defaults to `udp`.
 
 *`var.syslog_host`*::
 
@@ -76,7 +78,7 @@ NOTE: This was converted from RSA NetWitness log parser XML "barracudasf" device
 
 *`var.input`*::
 
-The input from which messages are read. One of `file`, `tcp` or `udp`.
+The input from which messages are read. One of `file`, `tcp` or `udp`. Defaults to `udp`.
 
 *`var.syslog_host`*::
 

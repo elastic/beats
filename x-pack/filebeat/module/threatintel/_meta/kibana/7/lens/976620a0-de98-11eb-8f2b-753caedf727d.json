@@ -1,0 +1,94 @@
+{
+    "attributes": {
+        "description": "Anomali indicator MD5 hash ingested by the threat intel Filebeat module.",
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "41f41086-8875-4d18-8844-b51b9c9cb8bc": {
+                            "columnOrder": [
+                                "3ae42baf-5685-4f7d-94d3-66ff57b4febd",
+                                "9afb1b09-0f20-488c-9242-a94f7d11800b"
+                            ],
+                            "columns": {
+                                "3ae42baf-5685-4f7d-94d3-66ff57b4febd": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Anomali MD5 File Hash",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "9afb1b09-0f20-488c-9242-a94f7d11800b",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "threat.indicator.file.hash.md5"
+                                },
+                                "9afb1b09-0f20-488c-9242-a94f7d11800b": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Count of records",
+                                    "operationType": "count",
+                                    "scale": "ratio",
+                                    "sourceField": "Records"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": "event.dataset:(threatintel.anomalithreatstream or threatintel.anomali)"
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "columnId": "3ae42baf-5685-4f7d-94d3-66ff57b4febd",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "9afb1b09-0f20-488c-9242-a94f7d11800b",
+                        "isTransposed": false
+                    }
+                ],
+                "layerId": "41f41086-8875-4d18-8844-b51b9c9cb8bc"
+            }
+        },
+        "title": "Anomali MD5 Hash Indicators [Filebeat Threat Intel]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "976620a0-de98-11eb-8f2b-753caedf727d",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-41f41086-8875-4d18-8844-b51b9c9cb8bc",
+            "type": "index-pattern"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-ref-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:34:28.102Z",
+    "version": "WzQ1OTMsMV0="
+}

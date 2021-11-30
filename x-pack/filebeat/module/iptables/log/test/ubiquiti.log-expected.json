@@ -10,6 +10,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan  5 20:17:05 MainFirewall kernel: [LAN_LOCAL-default-A]IN=eth0.90 OUT= MAC=90:10:92:6e:ea:a7:90:10:73:ba:d6:77:08:00:45:fc:02:1c SRC=192.168.48.137 DST=255.55.174.225 LEN=540 TOS=0x1C PREC=0xE0 TTL=64 ID=27223 PROTO=UDP SPT=48689 DPT=48689 LEN=520",
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -29,7 +30,6 @@
         "iptables.ubiquiti.rule_set": "LAN_LOCAL",
         "iptables.udp.length": 520,
         "log.offset": 0,
-        "log.original": "Jan  5 20:17:05 MainFirewall kernel: [LAN_LOCAL-default-A]IN=eth0.90 OUT= MAC=90:10:92:6e:ea:a7:90:10:73:ba:d6:77:08:00:45:fc:02:1c SRC=192.168.48.137 DST=255.55.174.225 LEN=540 TOS=0x1C PREC=0xE0 TTL=64 ID=27223 PROTO=UDP SPT=48689 DPT=48689 LEN=520",
         "network.community_id": "1:3qoibVBmc9hsnHpP4Ms5HO6ls7Q=",
         "network.transport": "udp",
         "network.type": "ipv4",
@@ -60,6 +60,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan  5 20:17:01 MainFirewall kernel: [WAN_OUT-2000-A]IN=eth0 OUT=eth2 MAC=90:10:20:76:8d:20:90:10:24:67:f4:89:08:00 SRC=192.168.134.158 DST=192.0.2.25 LEN=265 TOS=0x00 PREC=0x00 TTL=63 ID=51768 DF PROTO=TCP SPT=43189 DPT=443 WINDOW=159 RES=0x00 ACK PSH URGP=0",
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -87,7 +88,6 @@
         "iptables.ubiquiti.rule_number": "2000",
         "iptables.ubiquiti.rule_set": "WAN_OUT",
         "log.offset": 251,
-        "log.original": "Jan  5 20:17:01 MainFirewall kernel: [WAN_OUT-2000-A]IN=eth0 OUT=eth2 MAC=90:10:20:76:8d:20:90:10:24:67:f4:89:08:00 SRC=192.168.134.158 DST=192.0.2.25 LEN=265 TOS=0x00 PREC=0x00 TTL=63 ID=51768 DF PROTO=TCP SPT=43189 DPT=443 WINDOW=159 RES=0x00 ACK PSH URGP=0",
         "network.community_id": "1:7bPQdYPL4yePwQJZt0I1dvVXLHc=",
         "network.transport": "tcp",
         "network.type": "ipv4",
@@ -118,6 +118,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan  5 20:17:01 MainFirewall kernel: [source-dest-default-D]IN=eth0 OUT=eth2 MAC=90:10:20:76:8d:20:90:10:65:29:b6:2a:08:00 SRC=192.168.110.116 DST=192.0.2.25 LEN=52 TOS=0x00 PREC=0x00 TTL=63 ID=0 DF PROTO=TCP SPT=50093 DPT=1443 WINDOW=2857 RES=0x00 ACK URGP=0",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -146,7 +147,6 @@
         "iptables.ubiquiti.rule_number": "default",
         "iptables.ubiquiti.rule_set": "source-dest",
         "log.offset": 511,
-        "log.original": "Jan  5 20:17:01 MainFirewall kernel: [source-dest-default-D]IN=eth0 OUT=eth2 MAC=90:10:20:76:8d:20:90:10:65:29:b6:2a:08:00 SRC=192.168.110.116 DST=192.0.2.25 LEN=52 TOS=0x00 PREC=0x00 TTL=63 ID=0 DF PROTO=TCP SPT=50093 DPT=1443 WINDOW=2857 RES=0x00 ACK URGP=0",
         "network.community_id": "1:6BwNFzns3BNljtYZJCwhPO5Qoq0=",
         "network.transport": "tcp",
         "network.type": "ipv4",
@@ -179,6 +179,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan  5 20:17:01 MainFirewall kernel: [WAN_OUT-2000-A]IN=eth0 OUT=eth2 MAC=90:10:20:76:8d:20:90:10:65:29:b6:2a:08:00 SRC=192.168.110.116 DST=192.0.2.25 LEN=52 TOS=0x00 PREC=0x00 TTL=63 ID=0 DF PROTO=TCP SPT=50093 DPT=1443 WINDOW=2853 RES=0x00 ACK URGP=0",
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -205,7 +206,6 @@
         "iptables.ubiquiti.rule_number": "2000",
         "iptables.ubiquiti.rule_set": "WAN_OUT",
         "log.offset": 771,
-        "log.original": "Jan  5 20:17:01 MainFirewall kernel: [WAN_OUT-2000-A]IN=eth0 OUT=eth2 MAC=90:10:20:76:8d:20:90:10:65:29:b6:2a:08:00 SRC=192.168.110.116 DST=192.0.2.25 LEN=52 TOS=0x00 PREC=0x00 TTL=63 ID=0 DF PROTO=TCP SPT=50093 DPT=1443 WINDOW=2853 RES=0x00 ACK URGP=0",
         "network.community_id": "1:6BwNFzns3BNljtYZJCwhPO5Qoq0=",
         "network.transport": "tcp",
         "network.type": "ipv4",
@@ -236,6 +236,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "Jan  5 20:17:01 MainFirewall kernel: [WAN_OUT-2000-A]IN=eth0 OUT=eth2 MAC=90:10:20:76:8d:20:90:10:65:29:b6:2a:08:00 SRC=192.168.110.116 DST=192.0.2.25 LEN=52 TOS=0x00 PREC=0x00 TTL=63 ID=0 DF PROTO=TCP SPT=50093 DPT=1443 WINDOW=2850 RES=0x00 ACK URGP=0",
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
@@ -262,7 +263,6 @@
         "iptables.ubiquiti.rule_number": "2000",
         "iptables.ubiquiti.rule_set": "WAN_OUT",
         "log.offset": 1024,
-        "log.original": "Jan  5 20:17:01 MainFirewall kernel: [WAN_OUT-2000-A]IN=eth0 OUT=eth2 MAC=90:10:20:76:8d:20:90:10:65:29:b6:2a:08:00 SRC=192.168.110.116 DST=192.0.2.25 LEN=52 TOS=0x00 PREC=0x00 TTL=63 ID=0 DF PROTO=TCP SPT=50093 DPT=1443 WINDOW=2850 RES=0x00 ACK URGP=0",
         "network.community_id": "1:6BwNFzns3BNljtYZJCwhPO5Qoq0=",
         "network.transport": "tcp",
         "network.type": "ipv4",
@@ -290,6 +290,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "May  5 20:46:45 My-Office-Gateway user.info kernel: TTL=126 ID=15317 DF PROTO=TCP SPT=59344 DPT=443 WINDOW=8212 RES=0x00 ACK PSH URGP=0",
         "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
@@ -302,14 +303,13 @@
         "iptables.tcp.window": 8212,
         "iptables.ttl": 126,
         "log.offset": 1277,
-        "log.original": "May  5 20:46:45 My-Office-Gateway user.info kernel: TTL=126 ID=15317 DF PROTO=TCP SPT=59344 DPT=443 WINDOW=8212 RES=0x00 ACK PSH URGP=0",
         "network.transport": "tcp",
         "observer.name": "My-Office-Gateway",
         "service.type": "iptables",
         "source.port": 59344,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -320,6 +320,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "May  5 20:46:46 My-Office-Gateway user.info kernel:  TTL=126 ID=51392 DF PROTO=TCP SPT=51653 DPT=7914 WINDOW=1024 RES=0x00 ACK PSH URGP=0",
         "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
@@ -332,14 +333,13 @@
         "iptables.tcp.window": 1024,
         "iptables.ttl": 126,
         "log.offset": 1413,
-        "log.original": "May  5 20:46:46 My-Office-Gateway user.info kernel:  TTL=126 ID=51392 DF PROTO=TCP SPT=51653 DPT=7914 WINDOW=1024 RES=0x00 ACK PSH URGP=0",
         "network.transport": "tcp",
         "observer.name": "My-Office-Gateway",
         "service.type": "iptables",
         "source.port": 51653,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -350,6 +350,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "May  5 20:46:46 My-Office-Gateway user.info kernel: L=126 ID=8698 DF PROTO=TCP SPT=88 DPT=51179 WINDOW=2053 RES=0x00 ACK URGP=0",
         "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
@@ -361,14 +362,13 @@
         "iptables.tcp.window": 2053,
         "iptables.ttl": 126,
         "log.offset": 1551,
-        "log.original": "May  5 20:46:46 My-Office-Gateway user.info kernel: L=126 ID=8698 DF PROTO=TCP SPT=88 DPT=51179 WINDOW=2053 RES=0x00 ACK URGP=0",
         "network.transport": "tcp",
         "observer.name": "My-Office-Gateway",
         "service.type": "iptables",
         "source.port": 88,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -379,6 +379,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "May  5 20:47:09 My-Office-Gateway user.info kernel: 0 TTL=126 ID=15461 DF PROTO=TCP SPT=59289 DPT=443 WINDOW=8208 RES=0x00 ACK PSH URGP=0",
         "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
@@ -391,14 +392,13 @@
         "iptables.tcp.window": 8208,
         "iptables.ttl": 126,
         "log.offset": 1679,
-        "log.original": "May  5 20:47:09 My-Office-Gateway user.info kernel: 0 TTL=126 ID=15461 DF PROTO=TCP SPT=59289 DPT=443 WINDOW=8208 RES=0x00 ACK PSH URGP=0",
         "network.transport": "tcp",
         "observer.name": "My-Office-Gateway",
         "service.type": "iptables",
         "source.port": 59289,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -409,6 +409,7 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "May  5 20:46:56 My-Office-Gateway user.info kernel: L=126 ID=8702 DF PROTO=TCP SPT=88 DPT=51182 WINDOW=2053 RES=0x00 ACK URGP=0",
         "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
@@ -420,14 +421,13 @@
         "iptables.tcp.window": 2053,
         "iptables.ttl": 126,
         "log.offset": 1817,
-        "log.original": "May  5 20:46:56 My-Office-Gateway user.info kernel: L=126 ID=8702 DF PROTO=TCP SPT=88 DPT=51182 WINDOW=2053 RES=0x00 ACK URGP=0",
         "network.transport": "tcp",
         "observer.name": "My-Office-Gateway",
         "service.type": "iptables",
         "source.port": 88,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -438,27 +438,27 @@
         "event.dataset": "iptables.log",
         "event.kind": "event",
         "event.module": "iptables",
+        "event.original": "May  5 20:45:44 My-Office-Gateway user.info kernel: TL=126 ID=4622 DF PROTO=TCP SPT=389 DPT=49209 WINDOW=8192 RES=0x00 ECE ACK SYN URGP=0",
         "event.timezone": "-02:00",
         "fileset.name": "log",
         "input.type": "log",
         "iptables.id": 4622,
         "iptables.tcp.flags": [
-            "ECE",
             "ACK",
+            "ECE",
             "SYN"
         ],
         "iptables.tcp.reserved_bits": 0,
         "iptables.tcp.window": 8192,
         "iptables.ttl": 126,
         "log.offset": 1945,
-        "log.original": "May  5 20:45:44 My-Office-Gateway user.info kernel: TL=126 ID=4622 DF PROTO=TCP SPT=389 DPT=49209 WINDOW=8192 RES=0x00 ECE ACK SYN URGP=0",
         "network.transport": "tcp",
         "observer.name": "My-Office-Gateway",
         "service.type": "iptables",
         "source.port": 389,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     }
 ]

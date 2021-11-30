@@ -16,6 +16,7 @@ import (
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -134,6 +135,9 @@ func decodeJSON(body io.Reader) (objs []common.MapStr, rawMessages []json.RawMes
 		default:
 			return nil, nil, errUnsupportedType
 		}
+	}
+	for i := range objs {
+		jsontransform.TransformNumbers(objs[i])
 	}
 	return objs, rawMessages, nil
 }

@@ -1,0 +1,90 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Alert Notifications [Metricbeat Prometheus]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "b1741ab0-b307-11e9-95cd-c3f5589dc7d2",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(211,49,21,1)",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "b1741ab1-b307-11e9-95cd-c3f5589dc7d2",
+                        "label": "Capacity of the alert notifications queue",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "prometheus.metrics.prometheus_notifications_queue_capacity",
+                                "id": "b1741ab2-b307-11e9-95cd-c3f5589dc7d2",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(176,188,0,1)",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "b1741ab3-b307-11e9-95cd-c3f5589dc7d2",
+                        "label": "Alert notifications in the queue",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "prometheus.metrics.prometheus_notifications_queue_length",
+                                "id": "b1741ab4-b307-11e9-95cd-c3f5589dc7d2",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Alert Notifications [Metricbeat Prometheus]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0b356630-b308-11e9-9a23-67ee28886a4b",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:46.559Z",
+    "version": "WzQxMjAsMV0="
+}

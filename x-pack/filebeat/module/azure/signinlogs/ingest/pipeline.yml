@@ -1,354 +1,273 @@
-description: Pipeline for parsing azure signin logs.
+---
+description: Pipeline for parsing Azure sign-in logs.
 processors:
-- set:
-    field: event.ingested
-    value: '{{_ingest.timestamp}}'
-- rename:
-    field: azure
-    target_field: azure-eventhub
-    ignore_missing: true
-- json:
-    field: message
-    target_field: azure.signinlogs
-- drop:
-    if: ctx.azure.signinlogs.category != 'SignInLogs'
-- date:
-    field: azure.signinlogs.time
-    target_field: '@timestamp'
-    ignore_failure: false
-    formats:
-    - ISO8601
-- rename:
-    field: message
-    target_field: event.original
-- remove:
-    field: azure.signinlogs.time
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.resourceId
-    target_field: azure.resource_id
-    ignore_missing: true
-- grok:
-    field: azure.signinlogs.callerIpAddress
-    patterns:
-      - \[%{IPORHOST:source.ip}\]:%{INT:source.port:int}
-      - "%{IPORHOST:source.ip}:%{INT:source.port:int}"
-      - "%{IPORHOST:source.ip}"
-    ignore_missing: true
-    ignore_failure: true
-- remove:
-    field: azure.signinlogs.callerIpAddress
-    if: 'ctx.source?.ip != null'
-    ignore_missing: true
-- set:
-    field: client.ip
-    value: '{{source.ip}}'
-    ignore_empty_value: true
-- append:
-    field: related.ip
-    value: '{{source.ip}}'
-    allow_duplicates: false
-    if: 'ctx.source?.ip != null'
-- rename:
-    field: azure.signinlogs.Level
-    target_field: log.level
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.durationMs
-    target_field: event.duration
-    ignore_missing: true
-- script:
-    lang: painless
-    source: ctx.event.duration = ctx.event.duration * params.param_nano
-    params:
-      param_nano: 1000000
-- rename:
-    field: azure.signinlogs.location
-    target_field: geo.country_iso_code
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.resultType
-    target_field: azure.signinlogs.result_type
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.operationName
-    target_field: azure.signinlogs.operation_name
-    ignore_missing: true
-- convert:
-    field: azure.signinlogs.operation_name
-    target_field: event.action
-    type: string
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.resultSignature
-    target_field: azure.signinlogs.result_signature
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.resultDescription
-    target_field: azure.signinlogs.result_description
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.operationVersion
-    target_field: azure.signinlogs.operation_version
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.tenantId
-    target_field: azure.tenant_id
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.correlationId
-    target_field: azure.correlation_id
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.networkLocationDetails
-    target_field: azure.signinlogs.properties.network_location_details
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.resourceId
-    target_field: azure.signinlogs.properties.resource_id
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.appliedConditionalAccessPolicies
-    target_field: azure.signinlogs.properties.applied_conditional_access_policies
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.authenticationDetails
-    target_field: azure.signinlogs.properties.authentication_details
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.authenticationRequirementPolicies
-    target_field: azure.signinlogs.properties.authentication_requirement_policies
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.authenticationProcessingDetails
-    target_field: azure.signinlogs.properties.authentication_processing_details
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.deviceDetail
-    target_field: azure.signinlogs.properties.device_detail
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.device_detail.deviceId
-    target_field: azure.signinlogs.properties.device_detail.device_id
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.device_detail.operatingSystem
-    target_field: azure.signinlogs.properties.device_detail.operating_system
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.device_detail.displayName
-    target_field: azure.signinlogs.properties.device_detail.display_name
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.device_detail.trustType
-    target_field: azure.signinlogs.properties.device_detail.trust_type
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.createdDateTime
-    target_field: azure.signinlogs.properties.created_at
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.userDisplayName
-    target_field: azure.signinlogs.properties.user_display_name
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.correlationId
-    target_field: azure.signinlogs.properties.correlation_id
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.userPrincipalName
-    target_field: azure.signinlogs.properties.user_principal_name
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.userId
-    target_field: azure.signinlogs.properties.user_id
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.userType
-    target_field: azure.signinlogs.properties.user_type
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.appId
-    target_field: azure.signinlogs.properties.app_id
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.appDisplayName
-    target_field: azure.signinlogs.properties.app_display_name
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.ipAddress
-    target_field: azure.signinlogs.properties.ip_address
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.clientAppUsed
-    target_field: azure.signinlogs.properties.client_app_used
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.conditionalAccessStatus
-    target_field: azure.signinlogs.properties.conditional_access_status
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.originalRequestId
-    target_field: azure.signinlogs.properties.original_request_id
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.isInteractive
-    target_field: azure.signinlogs.properties.is_interactive
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.tokenIssuerName
-    target_field: azure.signinlogs.properties.token_issuer_name
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.tokenIssuerType
-    target_field: azure.signinlogs.properties.token_issuer_type
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.processingTimeInMilliseconds
-    target_field: azure.signinlogs.properties.processing_time_ms
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.riskDetail
-    target_field: azure.signinlogs.properties.risk_detail
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.riskLevelAggregated
-    target_field: azure.signinlogs.properties.risk_level_aggregated
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.riskLevelDuringSignIn
-    target_field: azure.signinlogs.properties.risk_level_during_signin
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.riskState
-    target_field: azure.signinlogs.properties.risk_state
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.resourceDisplayName
-    target_field: azure.signinlogs.properties.resource_display_name
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.status.errorCode
-    target_field: azure.signinlogs.properties.status.error_code
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.status.failureReason
-    target_field: message
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.status.additionalDetails
-    target_field: message
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.location.city
-    target_field: geo.city_name
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.location.state
-    target_field: geo.country_name
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.location.geoCoordinates.latitude
-    target_field: geo.location.lat
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.location.geoCoordinates.longitude
-    target_field: geo.location.lon
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.servicePrincipalId
-    target_field: azure.signinlogs.properties.service_principal_id
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.resourceTenantId
-    target_field: azure.signinlogs.properties.resource_tenant_id
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.flaggedForReview
-    target_field: azure.signinlogs.properties.flagged_for_review
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.riskEventTypes
-    target_field: azure.signinlogs.properties.risk_event_types
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.riskEventTypes_v2
-    target_field: azure.signinlogs.properties.risk_event_types_v2
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.authenticationRequirement
-    target_field: azure.signinlogs.properties.authentication_requirement
-    ignore_missing: true
-- rename:
-    field: azure.signinlogs.properties.userAgent
-    target_field: user_agent.original
-    ignore_missing: true
-- remove:
-    field:
-    - azure.signinlogs.properties.location
-    ignore_missing: true
-- set:
-    field: event.kind
-    value: event
-- set:
-    field: event.category
-    value:
-      - authentication
-- set:
-    field: event.type
-    value:
-      - info
-- set:
-    field: event.outcome
-    value: success
-    if: "ctx?.azure?.signinlogs?.properties?.status?.error_code == null || ctx.azure.signinlogs.properties.status.error_code == 0"
-- set:
-    field: event.outcome
-    value: failure
-    if: "ctx?.azure?.signinlogs?.properties?.status?.error_code != null && ctx.azure.signinlogs.properties.status.error_code > 0"
-- grok:
-    field: azure.signinlogs.properties.user_principal_name
-    patterns:
-      - '%{USERNAME:user.name}@%{HOSTNAME:user.domain}'
-      - '%{GREEDYDATA:user.name}'
-    ignore_missing: true
-    ignore_failure: true
-- convert:
-    field: azure.signinlogs.properties.user_display_name
-    target_field: user.full_name
-    ignore_missing: true
-    type: string
-- convert:
-    field: azure.signinlogs.properties.user_id
-    target_field: user.id
-    ignore_missing: true
-    type: string
-- geoip:
-    field: source.ip
-    target_field: source.geo
-    ignore_missing: true
-- geoip:
-    database_file: GeoLite2-ASN.mmdb
-    field: source.ip
-    target_field: source.as
-    properties:
-    - asn
-    - organization_name
-    ignore_missing: true
-- rename:
-    field: source.as.asn
-    target_field: source.as.number
-    ignore_missing: true
-- rename:
-    field: source.as.organization_name
-    target_field: source.as.organization.name
-    ignore_missing: true
-- user_agent:
-    field: user_agent.original
-    ignore_missing: true
-- pipeline:
-    name: '{< IngestPipeline "azure-shared-pipeline" >}'
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+  - rename:
+      field: azure
+      target_field: azure-eventhub
+      ignore_missing: true
+  - json:
+      field: message
+      target_field: azure.signinlogs
+  - script:
+      description: Convert Azure JSON keys to snake case.
+      tag: azure-json-keys-to-snake-case
+      lang: painless
+      source: |
+        Map keysToSnakeCase(Map m) {
+          def regex = /([a-z])([A-Z]+)/;
+          def out = [:];
+
+          for (entry in m.entrySet()) {
+            def k = entry.getKey();
+            def v = entry.getValue();
+
+            if (v instanceof Map) {
+              v = keysToSnakeCase(v);
+            } else if (v instanceof List) {
+              for (int i = 0; i < v.size(); i++) {
+                def item = v.get(i);
+                if (item instanceof Map) {
+                  v.set(i, keysToSnakeCase(item));
+                }
+              }
+            }
+
+            k = regex.matcher(k).replaceAll('$1_$2').toLowerCase();
+            out.put(k, v);
+          }
+
+          return out;
+        }
+
+        ctx.azure['signinlogs'] = keysToSnakeCase(ctx.azure.signinlogs);
+  - drop:
+      description: Drop non-SignInLogs.
+      if: ctx?.azure?.signinlogs?.category == null || !ctx.azure.signinlogs.category.endsWith('SignInLogs')
+  - date:
+      field: azure.signinlogs.time
+      formats:
+          - ISO8601
+  - remove:
+      field: azure.signinlogs.time
+  - rename:
+      field: message
+      target_field: event.original
+  - rename:
+      field: azure.signinlogs.resource_id
+      target_field: azure.resource_id
+      ignore_missing: true
+
+  #
+  # Sign-in logs use a few different fields for the source IP so try them all.
+  # This assumes that they contain the same value if more than one is populated.
+  #
+  - set:
+      if: ctx?.source?.address == null
+      field: source.address
+      value: '{{{azure.signinlogs.properties.ipaddress}}}'
+      ignore_empty_value: true
+  - set:
+      if: ctx?.source?.address == null
+      field: source.address
+      value: '{{{azure.signinlogs.properties.ip_address}}}'
+      ignore_empty_value: true
+  - set:
+      if: ctx?.source?.address == null
+      field: source.address
+      value: '{{{azure.signinlogs.caller_ip_address}}}'
+      ignore_empty_value: true
+  - convert:
+      field: source.address
+      target_field: source.ip
+      type: ip
+      ignore_missing: true
+      ignore_failure: true
+  - remove:
+      field:
+        - azure.signinlogs.properties.ipaddress
+        - azure.signinlogs.properties.ip_address
+        - azure.signinlogs.caller_ip_address
+      ignore_missing: true
+  - append:
+      if: ctx?.source?.ip != null
+      field: related.ip
+      value: '{{{source.ip}}}'
+      allow_duplicates: false
+  - set:
+      field: client.ip
+      value: '{{{source.ip}}}'
+      ignore_empty_value: true
+
+  - convert:
+      field: azure.signinlogs.level
+      target_field: log.level
+      type: string
+      ignore_missing: true
+  - remove:
+      field: azure.signinlogs.level
+      ignore_missing: true
+  - rename:
+      field: azure.signinlogs.duration_ms
+      target_field: event.duration
+      ignore_missing: true
+  - script:
+      if: ctx?.event?.duration != null
+      lang: painless
+      source: ctx.event.duration = ctx.event.duration * 1000000
+  - rename:
+      field: azure.signinlogs.location
+      target_field: geo.country_iso_code
+      ignore_missing: true
+  - convert:
+      field: azure.signinlogs.operation_name
+      target_field: event.action
+      type: string
+      ignore_missing: true
+  - rename:
+      field: azure.signinlogs.tenant_id
+      target_field: azure.tenant_id
+      ignore_missing: true
+  - rename:
+      field: azure.signinlogs.correlation_id
+      target_field: azure.correlation_id
+      ignore_missing: true
+  - rename:
+      field: azure.signinlogs.properties.created_date_time
+      target_field: azure.signinlogs.properties.created_at
+      ignore_missing: true
+  - rename:
+      field: azure.signinlogs.properties.processing_time_in_milliseconds
+      target_field: azure.signinlogs.properties.processing_time_ms
+      ignore_missing: true
+  - rename:
+      field: azure.signinlogs.properties.risk_level_during_sign_in
+      target_field: azure.signinlogs.properties.risk_level_during_signin
+      ignore_missing: true
+  - rename:
+      field: azure.signinlogs.properties.status.failure_reason
+      target_field: message
+      ignore_missing: true
+  - rename:
+      field: azure.signinlogs.properties.status.additional_details
+      target_field: message
+      ignore_missing: true
+  - rename:
+      field: azure.signinlogs.properties.location.city
+      target_field: geo.city_name
+      ignore_missing: true
+  - rename:
+      field: azure.signinlogs.properties.location.state
+      target_field: geo.country_name
+      ignore_missing: true
+  - rename:
+      field: azure.signinlogs.properties.location.geo_coordinates.latitude
+      target_field: geo.location.lat
+      ignore_missing: true
+  - rename:
+      field: azure.signinlogs.properties.location.geo_coordinates.longitude
+      target_field: geo.location.lon
+      ignore_missing: true
+  - remove:
+      field:
+        - azure.signinlogs.properties.location
+      ignore_missing: true
+  - foreach:
+      field: azure.signinlogs.properties.authentication_processing_details
+      ignore_missing: true
+      processor:
+        set:
+          field: '_tmp.{{{_ingest._value.key}}}'
+          copy_from: _ingest._value.value
+  - set:
+      if: ctx?._tmp != null
+      field: azure.signinlogs.properties.authentication_processing_details
+      copy_from: _tmp
+  - remove:
+      field: _tmp
+      ignore_missing: true
+  - set:
+      field: event.kind
+      value: event
+  - set:
+      field: event.category
+      value:
+        - authentication
+  - set:
+      field: event.type
+      value:
+        - info
+  - set:
+      field: event.outcome
+      value: success
+      if: "ctx?.azure?.signinlogs?.properties?.status?.error_code == null || ctx.azure.signinlogs.properties.status.error_code == 0"
+  - set:
+      field: event.outcome
+      value: failure
+      if: "ctx?.azure?.signinlogs?.properties?.status?.error_code != null && ctx.azure.signinlogs.properties.status.error_code > 0"
+  - set:
+      field: event.id
+      value: '{{{azure.signinlogs.properties.id}}}'
+      ignore_empty_value: true
+  - grok:
+      field: azure.signinlogs.properties.user_principal_name
+      patterns:
+        - '%{USERNAME:user.name}@%{HOSTNAME:user.domain}'
+        - '%{GREEDYDATA:user.name}'
+      ignore_missing: true
+      ignore_failure: true
+  - convert:
+      field: azure.signinlogs.properties.user_display_name
+      target_field: user.full_name
+      ignore_missing: true
+      type: string
+  - remove:
+      description: Drop user_id field if value is null.
+      if: ctx?.azure?.signinlogs?.properties?.user_id == null
+      field: azure.signinlogs.properties.user_id
+      ignore_missing: true
+  - convert:
+      field: azure.signinlogs.properties.user_id
+      target_field: user.id
+      ignore_missing: true
+      type: string
+  - geoip:
+      field: source.ip
+      target_field: source.geo
+      ignore_missing: true
+  - geoip:
+      database_file: GeoLite2-ASN.mmdb
+      field: source.ip
+      target_field: source.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+  - rename:
+      field: source.as.asn
+      target_field: source.as.number
+      ignore_missing: true
+  - rename:
+      field: source.as.organization_name
+      target_field: source.as.organization.name
+      ignore_missing: true
+
+  #
+  # User Agent
+  #
+  - rename:
+      field: azure.signinlogs.properties.user_agent
+      target_field: user_agent.original
+      ignore_missing: true
+  - user_agent:
+      field: user_agent.original
+      ignore_missing: true
+
+  - pipeline:
+      name: '{< IngestPipeline "azure-shared-pipeline" >}'
 on_failure:
-- set:
-    field: error.message
-    value: '{{ _ingest.on_failure_message }}'
+  - set:
+      field: error.message
+      value: '{{ _ingest.on_failure_message }}'

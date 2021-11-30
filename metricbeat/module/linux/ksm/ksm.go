@@ -50,14 +50,13 @@ type MetricSet struct {
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The linux pageinfo metricset is beta.")
-	linuxModule, ok := base.Module().(*linux.Module)
-	if !ok {
-		return nil, errors.New("unexpected module type")
-	}
+
+	sys := base.Module().(linux.LinuxModule)
+	hostfs := sys.GetHostFS()
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		fs:            filepath.Join(linuxModule.HostFS, "/sys/kernel/mm/ksm"),
+		fs:            filepath.Join(hostfs, "/sys/kernel/mm/ksm"),
 	}, nil
 }
 

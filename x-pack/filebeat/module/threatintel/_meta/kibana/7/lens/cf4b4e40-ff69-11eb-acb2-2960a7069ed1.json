@@ -1,0 +1,121 @@
+{
+    "attributes": {
+        "description": "This is a timeline of the number of indicators created broken down by their indicator type.",
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "b1380bee-020c-420b-91c0-cde04cbd0ac9": {
+                            "columnOrder": [
+                                "73cdbb81-57ca-4474-a86c-bca60a527d29",
+                                "931c70a2-8f37-4c91-9cab-cac91c472ea8",
+                                "89f18519-9360-4d37-ae52-134604ac6cfc"
+                            ],
+                            "columns": {
+                                "73cdbb81-57ca-4474-a86c-bca60a527d29": {
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top values of threat.indicator.type",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "89f18519-9360-4d37-ae52-134604ac6cfc",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "size": 15
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "threat.indicator.type"
+                                },
+                                "89f18519-9360-4d37-ae52-134604ac6cfc": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": ""
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Number of Indicators Created",
+                                    "operationType": "count",
+                                    "scale": "ratio",
+                                    "sourceField": "Records"
+                                },
+                                "931c70a2-8f37-4c91-9cab-cac91c472ea8": {
+                                    "customLabel": true,
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "Date Created",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "auto"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "layers": [
+                    {
+                        "accessors": [
+                            "89f18519-9360-4d37-ae52-134604ac6cfc"
+                        ],
+                        "layerId": "b1380bee-020c-420b-91c0-cde04cbd0ac9",
+                        "layerType": "data",
+                        "position": "top",
+                        "seriesType": "bar_stacked",
+                        "showGridlines": false,
+                        "splitAccessor": "73cdbb81-57ca-4474-a86c-bca60a527d29",
+                        "xAccessor": "931c70a2-8f37-4c91-9cab-cac91c472ea8"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "bar_stacked",
+                "title": "Empty XY chart",
+                "valueLabels": "hide"
+            }
+        },
+        "title": "ThreatQ Indicator Created Timeline [Filebeat Threat Intel]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "cf4b4e40-ff69-11eb-acb2-2960a7069ed1",
+    "migrationVersion": {
+        "lens": "7.15.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-b1380bee-020c-420b-91c0-cde04cbd0ac9",
+            "type": "index-pattern"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-ref-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-10-11T08:02:55.512Z",
+    "version": "WzUyOCwxXQ=="
+}

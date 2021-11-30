@@ -88,7 +88,6 @@ func (p EnrollType) MarshalJSON() ([]byte, error) {
 type EnrollRequest struct {
 	EnrollAPIKey string     `json:"-"`
 	Type         EnrollType `json:"type"`
-	SharedID     string     `json:"sharedId,omitempty"`
 	Metadata     Metadata   `json:"metadata"`
 }
 

@@ -54,9 +54,9 @@ type recordType uint8
 
 const (
 	recordTypeChangeCipherSpec recordType = 20
-	recordTypeAlert                       = 21
-	recordTypeHandshake                   = 22
-	recordTypeApplicationData             = 23
+	recordTypeAlert            recordType = 21
+	recordTypeHandshake        recordType = 22
+	recordTypeApplicationData  recordType = 23
 )
 
 type handshakeType uint8
@@ -169,8 +169,10 @@ func readHandshakeHeader(buf *streambuf.Buffer) (*handshakeHeader, error) {
 	if len16, err = buf.ReadNetUint16At(2); err != nil {
 		return nil, err
 	}
-	return &handshakeHeader{handshakeType(typ),
-		int(len16) | (int(len8) << 16)}, nil
+	return &handshakeHeader{
+		handshakeType(typ),
+		int(len16) | (int(len8) << 16),
+	}, nil
 }
 
 func (header *recordHeader) String() string {
@@ -215,7 +217,6 @@ func (hello *helloMessage) supportedCiphers() []string {
 }
 
 func (parser *parser) parse(buf *streambuf.Buffer) parserResult {
-
 	for buf.Avail(recordHeaderSize) {
 
 		header, err := readRecordHeader(buf)
@@ -571,14 +572,12 @@ func certToMap(cert *x509.Certificate) common.MapStr {
 	certMap := common.MapStr{
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
 		"public_key_algorithm": toString(cert.PublicKeyAlgorithm),
-		// remove this in 8.x
-		"version":        cert.Version,
-		"serial_number":  cert.SerialNumber.Text(10),
-		"issuer":         toMap(&cert.Issuer),
-		"subject":        toMap(&cert.Subject),
-		"not_before":     cert.NotBefore,
-		"not_after":      cert.NotAfter,
-		"version_number": cert.Version,
+		"serial_number":        cert.SerialNumber.Text(10),
+		"issuer":               toMap(&cert.Issuer),
+		"subject":              toMap(&cert.Subject),
+		"not_before":           cert.NotBefore,
+		"not_after":            cert.NotAfter,
+		"version_number":       cert.Version,
 	}
 	if keySize := getKeySize(cert.PublicKey); keySize > 0 {
 		certMap["public_key_size"] = keySize
@@ -604,8 +603,6 @@ func toMap(name *pkix.Name) common.MapStr {
 		{"organization", name.Organization},
 		{"organizational_unit", name.OrganizationalUnit},
 		{"locality", name.Locality},
-		// remove this in 8.x
-		{"province", name.Province},
 		{"postal_code", name.PostalCode},
 		{"serial_number", name.SerialNumber},
 		{"common_name", name.CommonName},

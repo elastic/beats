@@ -30,9 +30,7 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("kubernetes", "event", New); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("kubernetes", "event", New)
 }
 
 // MetricSet type defines all fields of the MetricSet
@@ -64,7 +62,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("fail to unpack the kubernetes event configuration: %s", err)
 	}
 
-	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
 		return nil, fmt.Errorf("fail to get kubernetes client: %s", err.Error())
 	}
@@ -74,7 +72,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		Namespace:   config.Namespace,
 	}
 
-	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Event{}, watchOptions, nil)
+	watcher, err := kubernetes.NewNamedWatcher("event", client, &kubernetes.Event{}, watchOptions, nil)
 	if err != nil {
 		return nil, fmt.Errorf("fail to init kubernetes watcher: %s", err.Error())
 	}

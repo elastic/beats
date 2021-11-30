@@ -32,6 +32,75 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 )
 
+func TestParsersConfigSuffix(t *testing.T) {
+	tests := map[string]struct {
+		parsers        map[string]interface{}
+		expectedSuffix string
+		expectedError  string
+	}{
+		"parsers with no suffix config": {
+			parsers: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"container": map[string]interface{}{
+							"stream": "all",
+						},
+					},
+				},
+			},
+		},
+		"parsers with correct suffix config": {
+			parsers: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"container": map[string]interface{}{
+							"stream": "stdout",
+						},
+					},
+				},
+			},
+			expectedSuffix: "stdout",
+		},
+		"parsers with multiple suffix config": {
+			parsers: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"container": map[string]interface{}{
+							"stream": "stdout",
+						},
+					},
+					map[string]interface{}{
+						"container": map[string]interface{}{
+							"stream": "stderr",
+						},
+					},
+				},
+			},
+			expectedError: "only one stream selection is allowed",
+		},
+	}
+
+	for name, test := range tests {
+		test := test
+		t.Run(name, func(t *testing.T) {
+			cfg := common.MustNewConfigFrom(test.parsers)
+			var parsersConfig testParsersConfig
+			err := cfg.Unpack(&parsersConfig)
+			require.NoError(t, err)
+			c, err := NewConfig(CommonConfig{MaxBytes: 1024, LineTerminator: readfile.AutoLineTerminator}, parsersConfig.Parsers)
+
+			if test.expectedError == "" {
+				require.NoError(t, err)
+			} else {
+				require.Contains(t, err.Error(), test.expectedError)
+				return
+			}
+			require.Equal(t, c.Suffix, test.expectedSuffix)
+		})
+	}
+
+}
+
 func TestParsersConfigAndReading(t *testing.T) {
 	tests := map[string]struct {
 		lines            string

@@ -1,0 +1,115 @@
+{
+    "attributes": {
+        "description": null,
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "41f41086-8875-4d18-8844-b51b9c9cb8bc": {
+                            "columnOrder": [
+                                "8cd1203c-8d1a-4a49-b97f-bc5a011119b0",
+                                "9afb1b09-0f20-488c-9242-a94f7d11800b"
+                            ],
+                            "columns": {
+                                "8cd1203c-8d1a-4a49-b97f-bc5a011119b0": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Anomali Indicator TLP Marking",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "9afb1b09-0f20-488c-9242-a94f7d11800b",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "size": 5
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "threat.indicator.marking.tlp"
+                                },
+                                "9afb1b09-0f20-488c-9242-a94f7d11800b": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Count of records",
+                                    "operationType": "count",
+                                    "scale": "ratio",
+                                    "sourceField": "Records"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": "event.dataset:(threatintel.anomalithreatstream or threatintel.anomali)"
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "fittingFunction": "None",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "9afb1b09-0f20-488c-9242-a94f7d11800b"
+                        ],
+                        "layerId": "41f41086-8875-4d18-8844-b51b9c9cb8bc",
+                        "seriesType": "bar_horizontal",
+                        "xAccessor": "8cd1203c-8d1a-4a49-b97f-bc5a011119b0"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "bar_horizontal",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "valueLabels": "hide"
+            }
+        },
+        "title": "Anomali Indicator TLP Marking [Filebeat Threat Intel]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f5f18940-de96-11eb-8f2b-753caedf727d",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-41f41086-8875-4d18-8844-b51b9c9cb8bc",
+            "type": "index-pattern"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-ref-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:34:28.102Z",
+    "version": "WzQ1ODMsMV0="
+}

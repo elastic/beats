@@ -6,7 +6,9 @@ package cmd
 
 import (
 	"flag"
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -15,7 +17,14 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/basecmd"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
+
+func troubleshootMessage() string {
+	v := strings.Split(release.Version(), ".")
+	version := strings.Join(v[:2], ".")
+	return fmt.Sprintf("For help, please see our troubleshooting guide at https://www.elastic.co/guide/en/fleet/%s/fleet-troubleshooting.html", version)
+}
 
 // NewCommand returns the default command for the agent.
 func NewCommand() *cobra.Command {
@@ -35,6 +44,8 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.config"))
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("c"))
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.logs"))
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.downloads"))
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.install"))
 
 	// logging flags
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("v"))
@@ -54,6 +65,7 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 	cmd.AddCommand(newWatchCommandWithArgs(args, streams))
 	cmd.AddCommand(newContainerCommand(args, streams))
 	cmd.AddCommand(newStatusCommand(args, streams))
+	cmd.AddCommand(newDiagnosticsCommand(args, streams))
 
 	// windows special hidden sub-command (only added on windows)
 	reexec := newReExecWindowsCommand(args, streams)

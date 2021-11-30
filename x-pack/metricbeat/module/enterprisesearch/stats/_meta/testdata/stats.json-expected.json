@@ -1,0 +1,154 @@
+[
+    {
+        "enterprisesearch": {
+            "cluster_uuid": "s7QHFAuAQmqeqnGZmAqXIA",
+            "stats": {
+                "connectors": {
+                    "job_store": {
+                        "job_types": {
+                            "delete": 5,
+                            "full": 3,
+                            "incremental": 4,
+                            "permissions": 6
+                        },
+                        "waiting": 1,
+                        "working": 2
+                    },
+                    "pool": {
+                        "extract_worker_pool": {
+                            "busy": 3,
+                            "idle": 4,
+                            "queue_depth": 1,
+                            "size": 2,
+                            "total_completed": 5,
+                            "total_scheduled": 5
+                        },
+                        "publish_worker_pool": {
+                            "busy": 15,
+                            "idle": 16,
+                            "queue_depth": 13,
+                            "size": 14,
+                            "total_completed": 17,
+                            "total_scheduled": 17
+                        },
+                        "subextract_worker_pool": {
+                            "busy": 9,
+                            "idle": 10,
+                            "queue_depth": 7,
+                            "size": 8,
+                            "total_completed": 11,
+                            "total_scheduled": 11
+                        }
+                    }
+                },
+                "crawler": {
+                    "global": {
+                        "crawl_requests": {
+                            "active": 2,
+                            "failed": 0,
+                            "pending": 0,
+                            "successful": 2
+                        }
+                    },
+                    "node": {
+                        "active_threads": 18,
+                        "pages_visited": 385,
+                        "queue_size": {
+                            "primary": 91,
+                            "purge": 0
+                        },
+                        "status_codes": {
+                            "200": 367,
+                            "301": 18
+                        },
+                        "urls_allowed": 478,
+                        "urls_denied": {
+                            "already_seen": 8466,
+                            "domain_filter_denied": 5286,
+                            "incorrect_protocol": 23,
+                            "link_too_deep": 45,
+                            "nofollow": 98,
+                            "unsupported_content_type": 4
+                        },
+                        "workers": {
+                            "active": 2,
+                            "available": 14,
+                            "pool_size": 16
+                        }
+                    }
+                },
+                "http": {
+                    "connections": {
+                        "current": 1,
+                        "max": 3,
+                        "total": 29
+                    },
+                    "network": {
+                        "received": {
+                            "bytes": 231403,
+                            "bytes_per_sec": 42
+                        },
+                        "sent": {
+                            "bytes": 704357,
+                            "bytes_per_sec": 5
+                        }
+                    },
+                    "request_duration": {
+                        "max": {
+                            "ms": 3528004
+                        },
+                        "mean": {
+                            "ms": 922170
+                        },
+                        "std_dev": {
+                            "ms": 1068785
+                        }
+                    },
+                    "responses": {
+                        "1xx": 1,
+                        "2xx": 2,
+                        "3xx": 3,
+                        "4xx": 4,
+                        "5xx": 5
+                    }
+                },
+                "product_usage": {
+                    "app_search": {
+                        "total_engines": 1
+                    },
+                    "workplace_search": {
+                        "total_org_sources": 2,
+                        "total_private_sources": 3
+                    }
+                },
+                "queues": {
+                    "engine_destroyer": {
+                        "count": 1
+                    },
+                    "failed": {
+                        "count": 1
+                    },
+                    "mailer": {
+                        "count": 3
+                    },
+                    "process_crawl": {
+                        "count": 2
+                    }
+                }
+            }
+        },
+        "event": {
+            "dataset": "enterprisesearch.stats",
+            "duration": 115000,
+            "module": "enterprisesearch"
+        },
+        "metricset": {
+            "name": "stats",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "enterprisesearch"
+        }
+    }
+]

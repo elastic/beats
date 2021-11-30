@@ -1,0 +1,68 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Document Replicas [Metricbeat Couchbase] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "2658bfa0-b9f4-11e9-ac89-cd269ee83e5f",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#3185FC",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "2658bfa1-b9f4-11e9-ac89-cd269ee83e5f",
+                        "label": "replicas",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "couchbase.node.vb_replica_curr_items",
+                                "id": "2658bfa2-b9f4-11e9-ac89-cd269ee83e5f",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "couchbase.node.hostname",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Document Replicas [Metricbeat Couchbase] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "63efced0-b9f4-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:05.507Z",
+    "version": "WzM3NDcsMV0="
+}

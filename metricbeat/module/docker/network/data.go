@@ -33,20 +33,6 @@ func eventMapping(r mb.ReporterV2, stats *NetStats) {
 		RootFields: stats.Container.ToMapStr(),
 		MetricSetFields: common.MapStr{
 			"interface": stats.NameInterface,
-			// Deprecated
-			"in": common.MapStr{
-				"bytes":   stats.RxBytes,
-				"dropped": stats.RxDropped,
-				"errors":  stats.RxErrors,
-				"packets": stats.RxPackets,
-			},
-			// Deprecated
-			"out": common.MapStr{
-				"bytes":   stats.TxBytes,
-				"dropped": stats.TxDropped,
-				"errors":  stats.TxErrors,
-				"packets": stats.TxPackets,
-			},
 			"inbound": common.MapStr{
 				"bytes":   stats.Total.RxBytes,
 				"dropped": stats.Total.RxDropped,

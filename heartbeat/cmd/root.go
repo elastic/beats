@@ -18,16 +18,15 @@
 package cmd
 
 import (
-	"fmt"
-
-	"github.com/elastic/beats/v7/heartbeat/beater"
 
 	// include all heartbeat specific autodiscovery builders
 	_ "github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
 
+	"github.com/elastic/beats/v7/heartbeat/beater"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 
 	// Import packages that need to register themselves.
@@ -39,9 +38,6 @@ import (
 const (
 	// Name of the beat
 	Name = "heartbeat"
-
-	// ecsVersion specifies the version of ECS that this beat is implementing.
-	ecsVersion = "1.10.0"
 )
 
 // RootCmd to handle beats cli
@@ -50,7 +46,7 @@ var RootCmd *cmd.BeatsRootCmd
 // withECSVersion is a modifier that adds ecs.version to events.
 var withECSVersion = processing.WithFields(common.MapStr{
 	"ecs": common.MapStr{
-		"version": ecsVersion,
+		"version": ecs.Version,
 	},
 })
 
@@ -83,10 +79,6 @@ func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 `
 	setup.ResetFlags()
 	setup.Flags().Bool(cmd.IndexManagementKey, false, "Setup all components related to Elasticsearch index management, including template, ilm policy and rollover alias")
-	setup.Flags().MarkDeprecated(cmd.TemplateKey, fmt.Sprintf("use --%s instead", cmd.IndexManagementKey))
-	setup.Flags().MarkDeprecated(cmd.ILMPolicyKey, fmt.Sprintf("use --%s instead", cmd.IndexManagementKey))
-	setup.Flags().Bool(cmd.TemplateKey, false, "Setup index template")
-	setup.Flags().Bool(cmd.ILMPolicyKey, false, "Setup ILM policy")
 
 	return rootCmd
 }

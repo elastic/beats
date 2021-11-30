@@ -1,2136 +1,289 @@
 {
-  "objects": [
-    {
-      "attributes": {
+    "attributes": {
         "description": "Abuse URL indicators ingested by the threat intel Filebeat module.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
             }
-          }
         },
         "optionsJSON": {
-          "hidePanelTitles": false,
-          "useMargins": true
+            "hidePanelTitles": false,
+            "useMargins": true
         },
         "panelsJSON": [
-          {
-            "embeddableConfig": {
-              "enhancements": {}
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "166a6654-675d-4802-b1bf-05a9b95e6547",
+                    "w": 12,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "166a6654-675d-4802-b1bf-05a9b95e6547",
+                "panelRefName": "panel_0",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 18,
-              "i": "166a6654-675d-4802-b1bf-05a9b95e6547",
-              "w": 12,
-              "x": 0,
-              "y": 0
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "92819fb6-a0a3-4831-881f-de6e9203f3ee",
+                    "w": 14,
+                    "x": 12,
+                    "y": 0
+                },
+                "panelIndex": "92819fb6-a0a3-4831-881f-de6e9203f3ee",
+                "panelRefName": "panel_1",
+                "version": "7.11.0"
             },
-            "panelIndex": "166a6654-675d-4802-b1bf-05a9b95e6547",
-            "panelRefName": "panel_0",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "0d49c092-01ba-4213-b3f4-05f939796184",
+                    "w": 10,
+                    "x": 26,
+                    "y": 0
+                },
+                "panelIndex": "0d49c092-01ba-4213-b3f4-05f939796184",
+                "panelRefName": "panel_2",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 18,
-              "i": "92819fb6-a0a3-4831-881f-de6e9203f3ee",
-              "w": 14,
-              "x": 12,
-              "y": 0
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "ac111656-d2ad-4b02-8c4f-b07ae92cf3f5",
+                    "w": 12,
+                    "x": 36,
+                    "y": 0
+                },
+                "panelIndex": "ac111656-d2ad-4b02-8c4f-b07ae92cf3f5",
+                "panelRefName": "panel_3",
+                "version": "7.11.0"
             },
-            "panelIndex": "92819fb6-a0a3-4831-881f-de6e9203f3ee",
-            "panelRefName": "panel_1",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
-            },
-            "gridData": {
-              "h": 18,
-              "i": "0d49c092-01ba-4213-b3f4-05f939796184",
-              "w": 10,
-              "x": 26,
-              "y": 0
-            },
-            "panelIndex": "0d49c092-01ba-4213-b3f4-05f939796184",
-            "panelRefName": "panel_2",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
-            },
-            "gridData": {
-              "h": 18,
-              "i": "ac111656-d2ad-4b02-8c4f-b07ae92cf3f5",
-              "w": 12,
-              "x": 36,
-              "y": 0
-            },
-            "panelIndex": "ac111656-d2ad-4b02-8c4f-b07ae92cf3f5",
-            "panelRefName": "panel_3",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "vis": {
-                "params": {
-                  "colWidth": [
-                    {
-                      "colIndex": 0,
-                      "width": 690.5
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 690.5
+                                }
+                            ]
+                        }
                     }
-                  ]
-                }
-              }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "0fbd766f-a11e-4287-ab1d-2239068f4aa9",
+                    "w": 16,
+                    "x": 0,
+                    "y": 18
+                },
+                "panelIndex": "0fbd766f-a11e-4287-ab1d-2239068f4aa9",
+                "panelRefName": "panel_4",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 18,
-              "i": "0fbd766f-a11e-4287-ab1d-2239068f4aa9",
-              "w": 16,
-              "x": 0,
-              "y": 18
-            },
-            "panelIndex": "0fbd766f-a11e-4287-ab1d-2239068f4aa9",
-            "panelRefName": "panel_4",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "vis": {
-                "params": {
-                  "colWidth": [
-                    {
-                      "colIndex": 0,
-                      "width": 494.5
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 494.5
+                                }
+                            ]
+                        }
                     }
-                  ]
-                }
-              }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "9b7733e0-a86a-4721-a456-2f394577025a",
+                    "w": 12,
+                    "x": 16,
+                    "y": 18
+                },
+                "panelIndex": "9b7733e0-a86a-4721-a456-2f394577025a",
+                "panelRefName": "panel_5",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 18,
-              "i": "9b7733e0-a86a-4721-a456-2f394577025a",
-              "w": 12,
-              "x": 16,
-              "y": 18
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "4bce30b1-9606-4fc7-91af-1890ad0578bd",
+                    "w": 12,
+                    "x": 28,
+                    "y": 18
+                },
+                "panelIndex": "4bce30b1-9606-4fc7-91af-1890ad0578bd",
+                "panelRefName": "panel_6",
+                "version": "7.11.0"
             },
-            "panelIndex": "9b7733e0-a86a-4721-a456-2f394577025a",
-            "panelRefName": "panel_5",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "2e7f876d-4e18-4dc6-a57f-51c651f90b4c",
+                    "w": 8,
+                    "x": 40,
+                    "y": 18
+                },
+                "panelIndex": "2e7f876d-4e18-4dc6-a57f-51c651f90b4c",
+                "panelRefName": "panel_7",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 18,
-              "i": "4bce30b1-9606-4fc7-91af-1890ad0578bd",
-              "w": 12,
-              "x": 28,
-              "y": 18
-            },
-            "panelIndex": "4bce30b1-9606-4fc7-91af-1890ad0578bd",
-            "panelRefName": "panel_6",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
-            },
-            "gridData": {
-              "h": 18,
-              "i": "2e7f876d-4e18-4dc6-a57f-51c651f90b4c",
-              "w": 8,
-              "x": 40,
-              "y": 18
-            },
-            "panelIndex": "2e7f876d-4e18-4dc6-a57f-51c651f90b4c",
-            "panelRefName": "panel_7",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "vis": {
-                "params": {
-                  "colWidth": [
-                    {
-                      "colIndex": 0,
-                      "width": 467.5
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 467.5
+                                }
+                            ]
+                        }
                     }
-                  ]
-                }
-              }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "a824f293-41a3-46bf-83c9-1d17fa840fde",
+                    "w": 13,
+                    "x": 0,
+                    "y": 36
+                },
+                "panelIndex": "a824f293-41a3-46bf-83c9-1d17fa840fde",
+                "panelRefName": "panel_8",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 18,
-              "i": "a824f293-41a3-46bf-83c9-1d17fa840fde",
-              "w": 13,
-              "x": 0,
-              "y": 36
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "91d7b4bf-4a43-4747-91ad-3e2fd201468e",
+                    "w": 11,
+                    "x": 13,
+                    "y": 36
+                },
+                "panelIndex": "91d7b4bf-4a43-4747-91ad-3e2fd201468e",
+                "panelRefName": "panel_9",
+                "version": "7.11.0"
             },
-            "panelIndex": "a824f293-41a3-46bf-83c9-1d17fa840fde",
-            "panelRefName": "panel_8",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
-            },
-            "gridData": {
-              "h": 18,
-              "i": "91d7b4bf-4a43-4747-91ad-3e2fd201468e",
-              "w": 11,
-              "x": 13,
-              "y": 36
-            },
-            "panelIndex": "91d7b4bf-4a43-4747-91ad-3e2fd201468e",
-            "panelRefName": "panel_9",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
-            },
-            "gridData": {
-              "h": 18,
-              "i": "f597f182-0cf4-4fab-b0ab-af4e7c74a897",
-              "w": 24,
-              "x": 24,
-              "y": 36
-            },
-            "panelIndex": "f597f182-0cf4-4fab-b0ab-af4e7c74a897",
-            "panelRefName": "panel_10",
-            "version": "7.11.0"
-          }
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "f597f182-0cf4-4fab-b0ab-af4e7c74a897",
+                    "w": 24,
+                    "x": 24,
+                    "y": 36
+                },
+                "panelIndex": "f597f182-0cf4-4fab-b0ab-af4e7c74a897",
+                "panelRefName": "panel_10",
+                "version": "7.11.0"
+            }
         ],
         "timeRestore": false,
         "title": "[Filebeat Threat Intel] Abuse URL",
         "version": 1
-      },
-      "id": "65fa6bc0-72f0-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "dashboard": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "87980f70-72ec-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_0",
-          "type": "visualization"
-        },
-        {
-          "id": "98d42ee0-76b6-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_1",
-          "type": "visualization"
-        },
-        {
-          "id": "a7b6e910-72ed-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_2",
-          "type": "visualization"
-        },
-        {
-          "id": "eba4ec60-72ea-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_3",
-          "type": "visualization"
-        },
-        {
-          "id": "1adff580-72ee-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_4",
-          "type": "visualization"
-        },
-        {
-          "id": "62f6daa0-72ee-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_5",
-          "type": "visualization"
-        },
-        {
-          "id": "ecf74b10-72ec-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_6",
-          "type": "visualization"
-        },
-        {
-          "id": "44020830-7394-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_7",
-          "type": "visualization"
-        },
-        {
-          "id": "d5d76c60-72ee-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_8",
-          "type": "visualization"
-        },
-        {
-          "id": "ea5879c0-72eb-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_9",
-          "type": "visualization"
-        },
-        {
-          "id": "a1616dd0-72eb-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_10",
-          "type": "visualization"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "dashboard",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNzUsMl0="
     },
-    {
-      "attributes": {
-        "description": "Abuse URL threat of indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.abuseurl"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.abuseurl"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.abuseurl.threat"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.abuseurl.threat",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Abuse URL Threat [Filebeat Threat Intel]",
-        "uiStateJSON": {
-          "vis": {
-            "colors": {
-              "Count": "#E24D42"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Abuse URL Threat",
-                "field": "threatintel.abuseurl.threat",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 200
-                },
-                "position": "left",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "grid": {
-              "categoryLines": false
-            },
-            "labels": {
-              "show": true
-            },
-            "legendPosition": "right",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Count"
-                },
-                "drawLinesBetweenPoints": true,
-                "lineWidth": 2,
-                "mode": "normal",
-                "show": true,
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "thresholdLine": {
-              "color": "#E7664C",
-              "show": false,
-              "style": "full",
-              "value": 10,
-              "width": 1
-            },
-            "times": [],
-            "type": "histogram",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": true,
-                  "rotate": 75,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "bottom",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Count"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "Abuse URL Threat [Filebeat Threat Intel]",
-          "type": "horizontal_bar"
-        }
-      },
-      "id": "87980f70-72ec-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNjQsMl0="
+    "coreMigrationVersion": "8.0.0",
+    "id": "65fa6bc0-72f0-11eb-a3e3-b3cc7c78a70f",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
     },
-    {
-      "attributes": {
-        "description": "Tags for Abuse URL indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.abuseurl"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.abuseurl"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.abuseurl.tags"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.abuseurl.tags",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+    "references": [
+        {
+            "id": "87980f70-72ec-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_0",
+            "type": "visualization"
         },
-        "savedSearchRefName": "search_0",
-        "title": "Abuse URL Tags [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Abuse URL Tags",
-                "field": "threatintel.abuseurl.tags",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "Abuse URL Tags [Filebeat Threat Intel]",
-          "type": "table"
+        {
+            "id": "98d42ee0-76b6-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "a7b6e910-72ed-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "eba4ec60-72ea-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "1adff580-72ee-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "62f6daa0-72ee-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "ecf74b10-72ec-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "44020830-7394-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "d5d76c60-72ee-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "ea5879c0-72eb-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "a1616dd0-72eb-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_10",
+            "type": "visualization"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
         }
-      },
-      "id": "98d42ee0-76b6-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNjUsMl0="
-    },
-    {
-      "attributes": {
-        "description": "Abuse URL scheme of indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.abuseurl"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.abuseurl"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.url.scheme"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.url.scheme",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Abuse URL Scheme [Filebeat Threat Intel]",
-        "uiStateJSON": {
-          "vis": {
-            "colors": {
-              "http": "#65C5DB",
-              "https": "#F9934E"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "URL Scheme",
-                "field": "threatintel.indicator.url.scheme",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": true,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "field": "threatintel.indicator.url.scheme",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "group",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "filter": true,
-                  "show": true,
-                  "truncate": 100
-                },
-                "position": "bottom",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "grid": {
-              "categoryLines": false
-            },
-            "labels": {
-              "show": false
-            },
-            "legendPosition": "right",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Count"
-                },
-                "drawLinesBetweenPoints": true,
-                "lineWidth": 2,
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "thresholdLine": {
-              "color": "#E7664C",
-              "show": false,
-              "style": "full",
-              "value": 10,
-              "width": 1
-            },
-            "times": [],
-            "type": "histogram",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "left",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Count"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "Abuse URL Scheme [Filebeat Threat Intel]",
-          "type": "histogram"
-        }
-      },
-      "id": "a7b6e910-72ed-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNjYsMl0="
-    },
-    {
-      "attributes": {
-        "description": "Hosting provider notified for indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.abuseurl"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.abuseurl"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.abuseurl.larted"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.abuseurl.larted",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Abuse URL Hosting Provider Notified [Filebeat Threat Intel]",
-        "uiStateJSON": {
-          "vis": {
-            "colors": {
-              "false": "#E24D42"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Hosting Provider Notified",
-                "field": "threatintel.abuseurl.larted",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 2
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": true,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "Abuse URL Hosting Provider Notified [Filebeat Threat Intel]",
-          "type": "pie"
-        }
-      },
-      "id": "eba4ec60-72ea-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNjcsMl0="
-    },
-    {
-      "attributes": {
-        "description": "Abuse URL domain indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.abuseurl"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.abuseurl"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.domain"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.domain",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Abuse URL Indicator Domain [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Threat Indicator Domain",
-                "field": "threatintel.indicator.domain",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "Abuse URL Indicator Domain [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "1adff580-72ee-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNjgsMl0="
-    },
-    {
-      "attributes": {
-        "description": "Abuse URL full URL indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.abuseurl"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.abuseurl"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.url.full"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.url.full",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Abuse URL Indicator URLs [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Threat Indicator URL",
-                "field": "threatintel.indicator.url.full",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "Abuse URL Indicator URLs [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "62f6daa0-72ee-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNjksMl0="
-    },
-    {
-      "attributes": {
-        "description": "Abuse URL provider of indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.abuseurl"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.abuseurl"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.abuseurl.threat"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.abuseurl.threat",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Abuse URL Indicator Provider [Filebeat Threat Intel]",
-        "uiStateJSON": {
-          "vis": {
-            "colors": {
-              "Count": "#705DA0"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "threatintel.indicator.provider",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "group",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 200
-                },
-                "position": "left",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "grid": {
-              "categoryLines": false
-            },
-            "labels": {
-              "show": true
-            },
-            "legendPosition": "right",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Count"
-                },
-                "drawLinesBetweenPoints": true,
-                "lineWidth": 2,
-                "mode": "normal",
-                "show": true,
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "thresholdLine": {
-              "color": "#E7664C",
-              "show": false,
-              "style": "full",
-              "value": 10,
-              "width": 1
-            },
-            "times": [],
-            "type": "histogram",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": true,
-                  "rotate": 75,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "bottom",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Count"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "Abuse URL Indicator Provider [Filebeat Threat Intel]",
-          "type": "horizontal_bar"
-        }
-      },
-      "id": "ecf74b10-72ec-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNzAsMl0="
-    },
-    {
-      "attributes": {
-        "description": "Total number of Abuse URL indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.abuseurl"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.abuseurl"
-                  }
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Abuse URL Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Abuse URL Indicators"
-              },
-              "schema": "metric",
-              "type": "count"
-            }
-          ],
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "metric": {
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 10000
-                }
-              ],
-              "invertColors": false,
-              "labels": {
-                "show": true
-              },
-              "metricColorMode": "None",
-              "percentageMode": false,
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": 60,
-                "labelColor": false,
-                "subText": ""
-              },
-              "useRanges": false
-            },
-            "type": "metric"
-          },
-          "title": "Abuse URL Indicators [Filebeat Threat Intel]",
-          "type": "metric"
-        }
-      },
-      "id": "44020830-7394-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNzEsMl0="
-    },
-    {
-      "attributes": {
-        "description": "Abuse URL event references ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.abuseurl"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.abuseurl"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.url.full"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.url.full",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Abuse URL Event Reference [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Abuse URL Reference URL",
-                "field": "event.reference",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "Abuse URL Event Reference [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "d5d76c60-72ee-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNzIsMl0="
-    },
-    {
-      "attributes": {
-        "description": "Status of URLs ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.abuseurl"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.abuseurl"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.abuseurl.url_status"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.abuseurl.url_status",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Abuse URL URL Status [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "URL Status",
-                "field": "threatintel.abuseurl.url_status",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "Abuse URL URL Status [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "ea5879c0-72eb-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNzMsMl0="
-    },
-    {
-      "attributes": {
-        "description": "Blacklist status of URLs ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.abuseurl"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.abuseurl"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.abuseurl.blacklists.spamhaus_dbl"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.abuseurl.blacklists.spamhaus_dbl",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.abuseurl.blacklists.surbl"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
-                  "key": "threatintel.abuseurl.blacklists.surbl",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Abuse URL Blacklist Status [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Spamhaus DBL Blacklist Status",
-                "field": "threatintel.abuseurl.blacklists.spamhaus_dbl",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "customLabel": "SURBL Blacklist Status",
-                "field": "threatintel.abuseurl.blacklists.surbl",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "Abuse URL Blacklist Status [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "a1616dd0-72eb-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNzQsMl0="
-    },
-    {
-      "attributes": {
-        "color": "#a548ae",
-        "description": "Tag for indicators ingested by the Threat Intel Filebeat module.",
-        "name": "threat intel"
-      },
-      "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-      "namespaces": [
-        "default"
-      ],
-      "references": [],
-      "type": "tag",
-      "updated_at": "2021-03-10T19:01:18.125Z",
-      "version": "WzIyMTcsMl0="
-    },
-    {
-      "attributes": {
-        "columns": [
-          "_source"
-        ],
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.module",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.module": "threatintel"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "event.category",
-                  "negate": false,
-                  "params": {
-                    "query": "threat"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.category": "threat"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
-                  "key": "event.kind",
-                  "negate": false,
-                  "params": {
-                    "query": "enrichment"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.kind": "enrichment"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[3].meta.index",
-                  "key": "event.type",
-                  "negate": false,
-                  "params": {
-                    "query": "indicator"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.type": "indicator"
-                  }
-                }
-              }
-            ],
-            "highlightAll": true,
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            },
-            "version": true
-          }
-        },
-        "sort": [],
-        "title": "All Logs [Filebeat Threat Intel] ECS",
-        "version": 1
-      },
-      "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "search": "7.9.3"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[3].meta.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "search",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyMTksMl0="
-    }
-  ],
-  "version": "7.11.1"
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:25.974Z",
+    "version": "WzQ1NDksMV0="
 }

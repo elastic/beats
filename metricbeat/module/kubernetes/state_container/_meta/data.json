@@ -16,7 +16,7 @@
       "name": "ubuntu",
       "cpu": {
         "request": {
-          "nanocores": 200000000
+            "cores": 0.15
         }
       },
       "id": "docker://5f8ce416d10ab0b28ce5c7d521de2264aa03ff4d001e1194076f6a02a330139f",

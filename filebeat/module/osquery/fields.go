@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetOsquery returns asset data.
-// This is the base64 encoded gzipped contents of module/osquery.
+// This is the base64 encoded zlib format compressed contents of module/osquery.
 func AssetOsquery() string {
 	return "eJyslMFu2zAMhu95ih8+p3mAHIYBAwrssh22nhtVYmwhEulJdBO//SDZSZM0GbCiOuRAkT//L6T8gB2Na0j+M1AaF4B6DbRG83OKNAvAUbbJ9+qF1/iyAIBHT8Fl0KGXpOTwMkI7wmbW2SCKGwItgG3NXNeqB7CJdN6tHB17WqNNMvRz5EbDS6FzsUR5CHoK39K7qzmdbxKj8NzgHdOkj0iavM2kq7Paa0/nvsrvxcXR2Y7GvSR3dfcPf+X87qgqQrbVVf0DoZ1RtMSUTHGsnc+gV+ILk2+WjC3yn2fqURI820SRWE2AM2qWiCbtMvYdaUepmiXWNGJvMoxzdN0EkIREUV7JrfBdYQ3jhSBcaZta0yzRzDnNshQ0mU2fO9HmNmsnWZ+9I1a/9ZQ+dxJvutjKxFj6QRj7ztuuRuYth2mJFT4jDcye29U7yR+SoglhPAkVhNtYA/vDs/o7qxWE2/+jeWJ/QNHLamJ/3K66Q0t4RiYr7DKyZ0vTXS+2W+Epk6vwVmI/qOd2+gJ8PYltYCUMkW+DWBOInUn3YT40nV+aipVEfaJctrIkHrGshED1DVTkJUwuCNHo/N7nka0WfwMAAP//gwp0AA=="
 }

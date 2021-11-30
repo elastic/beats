@@ -1,0 +1,108 @@
+{
+    "attributes": {
+        "columns": [
+            "aws.s3access.http_status",
+            "aws.s3access.error_code",
+            "aws.s3access.operation",
+            "aws.s3access.request_uri"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "aws.s3access.http_status",
+                            "negate": true,
+                            "params": {
+                                "query": "200"
+                            },
+                            "type": "phrase",
+                            "value": "200"
+                        },
+                        "query": {
+                            "match": {
+                                "aws.s3access.http_status": {
+                                    "query": "200",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "fileset.name",
+                            "negate": false,
+                            "params": {
+                                "query": "s3access"
+                            },
+                            "type": "phrase",
+                            "value": "s3access"
+                        },
+                        "query": {
+                            "match": {
+                                "fileset.name": {
+                                    "query": "s3access",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Error Logs [Filebeat AWS]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "5e5a3c90-bac0-11e9-9f70-1f7bda85a5eb",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:33:59.495Z",
+    "version": "WzQzNzIsMV0="
+}

@@ -44,9 +44,9 @@ func newMockHandler(calls ...onCall) *mockHandler {
 	return m
 }
 
-func onCheckILMEnabled(m Mode) onCall { return makeOnCall("CheckILMEnabled", m) }
-func (h *mockHandler) CheckILMEnabled(mode Mode) (bool, error) {
-	args := h.Called(mode)
+func onCheckILMEnabled(enabled bool) onCall { return makeOnCall("CheckILMEnabled", enabled) }
+func (h *mockHandler) CheckILMEnabled(enabled bool) (bool, error) {
+	args := h.Called(enabled)
 	return args.Bool(0), args.Error(1)
 }
 

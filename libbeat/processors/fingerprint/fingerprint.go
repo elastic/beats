@@ -18,8 +18,10 @@
 package fingerprint
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -28,12 +30,14 @@ import (
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
-func init() {
-	processors.RegisterPlugin("fingerprint", New)
-	jsprocessor.RegisterPlugin("Fingerprint", New)
-}
+const (
+	procName = "fingerprint"
+)
 
-const processorName = "fingerprint"
+func init() {
+	processors.RegisterPlugin(procName, New)
+	jsprocessor.RegisterPlugin(strings.Title(procName), New)
+}
 
 type fingerprint struct {
 	config Config
@@ -62,19 +66,17 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	return p, nil
 }
 
-// Run enriches the given event with fingerprint information
+// Run enriches the given event with a fingerprint.
 func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
 	hashFn := p.hash()
 
-	err := p.writeFields(hashFn, event.Fields)
-	if err != nil {
+	if err := p.writeFields(hashFn, event); err != nil {
 		return nil, makeErrComputeFingerprint(err)
 	}
 
-	hash := hashFn.Sum(nil)
-	encodedHash := p.config.Encoding(hash)
+	encodedHash := p.config.Encoding(hashFn.Sum(nil))
 
-	if _, err = event.PutValue(p.config.TargetField, encodedHash); err != nil {
+	if _, err := event.PutValue(p.config.TargetField, encodedHash); err != nil {
 		return nil, makeErrComputeFingerprint(err)
 	}
 
@@ -82,12 +84,13 @@ func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (p *fingerprint) String() string {
-	return fmt.Sprintf("%v=[method=[%v]]", processorName, p.config.Method)
+	json, _ := json.Marshal(p.config)
+	return procName + "=" + string(json)
 }
 
-func (p *fingerprint) writeFields(to io.Writer, eventFields common.MapStr) error {
+func (p *fingerprint) writeFields(to io.Writer, event *beat.Event) error {
 	for _, k := range p.fields {
-		v, err := eventFields.GetValue(k)
+		v, err := event.GetValue(k)
 		if err != nil {
 			if p.config.IgnoreMissing {
 				continue
@@ -95,16 +98,15 @@ func (p *fingerprint) writeFields(to io.Writer, eventFields common.MapStr) error
 			return makeErrMissingField(k, err)
 		}
 
-		i := v
 		switch vv := v.(type) {
 		case map[string]interface{}, []interface{}, common.MapStr:
 			return makeErrNonScalarField(k)
 		case time.Time:
 			// Ensure we consistently hash times in UTC.
-			i = vv.UTC()
+			v = vv.UTC()
 		}
 
-		fmt.Fprintf(to, "|%v|%v", k, i)
+		fmt.Fprintf(to, "|%v|%v", k, v)
 	}
 
 	io.WriteString(to, "|")

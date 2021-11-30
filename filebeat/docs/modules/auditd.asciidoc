@@ -8,6 +8,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Auditd module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module collects and parses logs from the audit daemon
 (`auditd`).
 

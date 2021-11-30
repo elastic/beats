@@ -3,7 +3,7 @@
 
 - module: cisco
   asa:
-    enabled: true
+    enabled: false
 
     # Set which input to use between syslog (default) or file.
     #var.input: syslog
@@ -29,7 +29,7 @@
     #var.external_zones: [ "External" ]
 
   ftd:
-    enabled: true
+    enabled: false
 
     # Set which input to use between syslog (default) or file.
     #var.input: syslog
@@ -55,7 +55,7 @@
     #var.external_zones: [ "External" ]
 
   ios:
-    enabled: true
+    enabled: false
 
     # Set which input to use between syslog (default) or file.
     #var.input: syslog
@@ -72,7 +72,7 @@
     #var.paths:
 
   nexus:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -91,7 +91,7 @@
     # var.tz_offset: local
 
   meraki:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -110,7 +110,7 @@
     # var.tz_offset: local
 
   umbrella:
-    enabled: true
+    enabled: false
 
     #var.input: aws-s3
     # AWS SQS queue url
@@ -125,7 +125,7 @@
     #var.api_timeout: 120s
 
   amp:
-    enabled: true
+    enabled: false
 
     # Set which input to use between httpjson (default) or file.
     #var.input: httpjson

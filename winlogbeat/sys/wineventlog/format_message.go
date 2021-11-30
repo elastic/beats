@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
 // +build windows
 
 package wineventlog
@@ -45,7 +46,7 @@ func getMessageString(metadata *PublisherMetadata, eventHandle EvtHandle, messag
 	var flags EvtFormatMessageFlag
 	if eventHandle > 0 {
 		flags = EvtFormatMessageEvent
-	} else if messageID > 0 {
+	} else {
 		flags = EvtFormatMessageId
 	}
 

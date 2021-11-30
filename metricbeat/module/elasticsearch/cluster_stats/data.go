@@ -212,7 +212,7 @@ func getClusterMetadataSettings(httpClient *helper.HTTP) (common.MapStr, error) 
 	return clusterSettings, nil
 }
 
-func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte) error {
+func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte, isXpack bool) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -326,6 +326,13 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 	}
 
 	event.MetricSetFields = metricSetFields
+
+	// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+	// When using Agent, the index name is overwritten anyways.
+	if isXpack {
+		index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+		event.Index = index
+	}
 
 	r.Event(event)
 

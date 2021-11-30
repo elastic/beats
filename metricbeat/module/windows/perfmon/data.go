@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
 // +build windows
 
 package perfmon
@@ -47,11 +48,6 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 			// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 			// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 			if val.Err.Error != nil {
-				if !re.executed {
-					re.log.Debugw("Ignoring the first measurement because the data isn't ready",
-						"error", val.Err.Error, logp.Namespace("perfmon"), "query", counterPath)
-					continue
-				}
 				// The counter has a negative value or the counter was successfully found, but the data returned is not valid.
 				// This error can occur if the counter value is less than the previous value. (Because counter values always increment, the counter value rolls over to zero when it reaches its maximum value.)
 				// This is not an error that stops the application from running successfully and a positive counter value should be retrieved in the later calls.
@@ -118,11 +114,6 @@ func (re *Reader) groupToSingleEvent(counters map[string][]pdh.CounterValue) mb.
 				// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 				// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 				if val.Err.Error != nil {
-					if !re.executed {
-						re.log.Debugw("Ignoring the first measurement because the data isn't ready",
-							"error", val.Err, logp.Namespace("perfmon"), "query", counterPath)
-						continue
-					}
 					if val.Err.Error == pdh.PDH_CALC_NEGATIVE_VALUE || val.Err.Error == pdh.PDH_INVALID_DATA {
 						re.log.Debugw("Counter value retrieval returned",
 							"error", val.Err.Error, "cstatus", pdh.PdhErrno(val.Err.CStatus), logp.Namespace("perfmon"), "query", counterPath)

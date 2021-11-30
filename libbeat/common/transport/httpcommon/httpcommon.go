@@ -134,6 +134,20 @@ type extraOptionFunc func(*extraSettings)
 func (extraOptionFunc) sealTransportOption()           {}
 func (fn extraOptionFunc) applyExtra(s *extraSettings) { fn(s) }
 
+type headerRoundTripper struct {
+	headers map[string]string
+	rt      http.RoundTripper
+}
+
+func (rt *headerRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	for k, v := range rt.headers {
+		if len(req.Header.Get(k)) == 0 {
+			req.Header.Set(k, v)
+		}
+	}
+	return rt.rt.RoundTrip(req)
+}
+
 // DefaultHTTPTransportSettings returns the default HTTP transport setting.
 func DefaultHTTPTransportSettings() HTTPTransportSettings {
 	return HTTPTransportSettings{
@@ -241,7 +255,7 @@ func (settings *HTTPTransportSettings) httpRoundTripper(
 	t.TLSClientConfig = tls.ToConfig()
 	t.ForceAttemptHTTP2 = false
 	t.Proxy = settings.Proxy.ProxyFunc()
-	t.ProxyConnectHeader = settings.Proxy.Headers
+	t.ProxyConnectHeader = settings.Proxy.Headers.Headers()
 
 	//  reset some internal timeouts to not change old Beats defaults
 	t.TLSHandshakeTimeout = 0
@@ -371,6 +385,19 @@ var withAPMHTTPRountTripper = WithModRoundtripper(func(rt http.RoundTripper) htt
 // Custom APM round tripper wrappers can be configured via WithModRoundtripper.
 func WithAPMHTTPInstrumentation() TransportOption {
 	return withAPMHTTPRountTripper
+}
+
+// HeaderRoundTripper will return a RoundTripper that sets header KVs if the key is not present.
+func HeaderRoundTripper(rt http.RoundTripper, headers map[string]string) http.RoundTripper {
+	return &headerRoundTripper{headers, rt}
+}
+
+// WithHeaderRoundTripper instuments the HTTP client via a custom http.RoundTripper.
+// This RoundTripper will add headers to each request if the key is not present.
+func WithHeaderRoundTripper(headers map[string]string) TransportOption {
+	return WithModRoundtripper(func(rt http.RoundTripper) http.RoundTripper {
+		return HeaderRoundTripper(rt, headers)
+	})
 }
 
 // WithLogger sets the internal logger that will be used to log dial or TCP level errors.

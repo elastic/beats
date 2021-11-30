@@ -198,9 +198,11 @@ func doClientPing(t *testing.T) {
 		Index: outil.MakeSelector(outil.ConstSelectorExpr("test", outil.SelectorLowerCase)),
 	}
 	if proxy != "" {
-		proxyURL, err := url.Parse(proxy)
+		u, err := url.Parse(proxy)
 		require.NoError(t, err)
-		clientSettings.Transport.Proxy.URL = proxyURL
+		proxyURL := httpcommon.ProxyURI(*u)
+
+		clientSettings.Transport.Proxy.URL = &proxyURL
 	}
 	client, err := NewClient(clientSettings, nil)
 	require.NoError(t, err)

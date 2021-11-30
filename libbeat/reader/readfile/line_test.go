@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package readfile
@@ -365,7 +366,7 @@ func TestMaxBytesLimit(t *testing.T) {
 	// Read decodec lines and test
 	var idx int
 	for i := 0; ; i++ {
-		b, n, err := reader.Next()
+		b, _, err := reader.Next()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -386,12 +387,7 @@ func TestMaxBytesLimit(t *testing.T) {
 			break
 		}
 
-		gotLen := n - len(nl)
 		s := string(b[:len(b)-len(nl)])
-		if len(line) != gotLen {
-			t.Fatalf("invalid line length, expected: %d got: %d", len(line), gotLen)
-		}
-
 		if line != s {
 			t.Fatalf("lines do not match, expected: %s got: %s", line, s)
 		}

@@ -10,23 +10,25 @@ This file is generated! See scripts/docs_collector.py
 
 == Sophos module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for Sophos Products, currently it accepts
 logs in syslog format or from a file for the following devices:
 
 - `xg` fileset: supports Sophos XG SFOS logs.
 - `utm` fileset: supports Sophos UTM logs.
 
-To configure a remote syslog destination, please reference the https://community.sophos.com/kb/en-us/123184[SophosXG/SFOS Documentation].
+To configure a remote syslog destination, please reference the https://docs.sophos.com/nsg/sophos-firewall/18.5/Help/en-us/webhelp/onlinehelp/nsg/tasks/SyslogServerAdd.html[SophosXG/SFOS Documentation].
 
-The syslog format choosen should be `Default`.
+The syslog format choosen in Sophos configuration should be `Central Reporting Format`.
 
 include::../include/gs-link.asciidoc[]
 
 [float]
 === Compatibility
 
-This module has been tested against SFOS version 17.5.x and 18.0.x.
-Versions above this are expected to work but have not been tested.
+This module has been tested against SFOS version 17.5.x, 18.0.x, and 18.5.x.
+Versions above this and between 18.0 - 18.5 are expected to work but have not been tested.
 
 include::../include/configuring-intro.asciidoc[]
 
@@ -154,7 +156,7 @@ NOTE: This was converted from RSA NetWitness log parser XML "astarosg" device re
 
 *`var.input`*::
 
-The input from which messages are read. One of `file`, `tcp` or `udp`.
+The input from which messages are read. One of `file`, `tcp` or `udp`. Defaults to `udp`.
 
 *`var.syslog_host`*::
 

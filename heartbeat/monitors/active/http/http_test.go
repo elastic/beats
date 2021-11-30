@@ -18,6 +18,8 @@
 package http
 
 import (
+	"bytes"
+	"compress/gzip"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
@@ -36,6 +38,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
@@ -340,6 +343,138 @@ func TestLargeResponse(t *testing.T) {
 	)
 }
 
+func TestJsonBody(t *testing.T) {
+	type testCase struct {
+		name                string
+		responseBody        string
+		expression          string
+		condition           common.MapStr
+		expectedErrMsg      string
+		expectedContentType string
+	}
+
+	testCases := []testCase{
+		{
+			"expression simple match",
+			"{\"foo\": \"bar\"}",
+			"foo == \"bar\"",
+			nil,
+			"",
+			"application/json",
+		},
+		{
+			"expression simple mismatch",
+			"{\"foo\": \"bar\"}",
+			"foo == \"bot\"",
+			nil,
+			"JSON body did not match 1 expressions or conditions",
+			"application/json",
+		},
+		{
+			"simple condition match",
+			"{\"foo\": \"bar\"}",
+			"",
+			common.MapStr{
+				"equals": common.MapStr{"foo": "bar"},
+			},
+			"",
+			"application/json",
+		},
+		{
+			"condition mismatch",
+			"{\"foo\": \"bar\"}",
+			"",
+			common.MapStr{
+				"equals": common.MapStr{"baz": "bot"},
+			},
+			"JSON body did not match",
+			"application/json",
+		},
+		{
+			"condition invalid json",
+			"notjson",
+			"",
+			common.MapStr{
+				"equals": common.MapStr{"foo": "bar"},
+			},
+			"could not parse JSON",
+			"text/plain; charset=utf-8",
+		},
+		{
+			"condition complex type match json",
+			"{\"number\": 3, \"bool\": true}",
+			"",
+			common.MapStr{
+				"equals": common.MapStr{"number": 3, "bool": true},
+			},
+			"",
+			"application/json",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			server := httptest.NewServer(hbtest.CustomResponseHandler([]byte(tc.responseBody), 200, nil))
+			defer server.Close()
+
+			jsonCheck := common.MapStr{"description": tc.name}
+			if tc.expression != "" {
+				jsonCheck["expression"] = tc.expression
+			}
+			if tc.condition != nil {
+				jsonCheck["condition"] = tc.condition
+			}
+
+			configSrc := map[string]interface{}{
+				"hosts":                 server.URL,
+				"timeout":               "1s",
+				"response.include_body": "never",
+				"check.response.json": []common.MapStr{
+					jsonCheck,
+				},
+			}
+
+			config, err := common.NewConfigFrom(configSrc)
+			require.NoError(t, err)
+
+			p, err := create("largeresp", config)
+			require.NoError(t, err)
+
+			sched, _ := schedule.Parse("@every 1s")
+			job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+
+			event := &beat.Event{}
+			_, err = job(event)
+			require.NoError(t, err)
+
+			if tc.expectedErrMsg == "" {
+				testslike.Test(
+					t,
+					lookslike.Strict(lookslike.Compose(
+						hbtest.BaseChecks("127.0.0.1", "up", "http"),
+						hbtest.RespondingTCPChecks(),
+						hbtest.SummaryChecks(1, 0),
+						respondingHTTPChecks(server.URL, tc.expectedContentType, 200),
+					)),
+					event.Fields,
+				)
+			} else {
+				testslike.Test(
+					t,
+					lookslike.Strict(lookslike.Compose(
+						hbtest.BaseChecks("127.0.0.1", "down", "http"),
+						hbtest.RespondingTCPChecks(),
+						hbtest.SummaryChecks(0, 1),
+						hbtest.ErrorChecks(tc.expectedErrMsg, "validate"),
+						respondingHTTPChecks(server.URL, tc.expectedContentType, 200),
+					)),
+					event.Fields,
+				)
+			}
+		})
+	}
+}
+
 func runHTTPSServerCheck(
 	t *testing.T,
 	server *httptest.Server,
@@ -402,9 +537,6 @@ func runHTTPSServerCheck(
 }
 
 func TestHTTPSServer(t *testing.T) {
-	if runtime.GOOS == "windows" && bits.UintSize == 32 {
-		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
-	}
 	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
 	runHTTPSServerCheck(t, server, nil)
 }
@@ -676,4 +808,110 @@ func mustParseURL(t *testing.T, url string) *url.URL {
 		t.Fatal(err)
 	}
 	return parsed
+}
+
+// helper that compresses some content as gzip
+func gzipBuffer(t *testing.T, toZip string) *bytes.Buffer {
+	var gzipBuffer bytes.Buffer
+	gzipWriter := gzip.NewWriter(&gzipBuffer)
+	defer gzipWriter.Close()
+	_, err := gzipWriter.Write([]byte(toZip))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return &gzipBuffer
+}
+
+/*
+ * This test ensures Heartbeat will decode the response body if the server specifies
+ * that it is gzip encoded. This is a test of the happy path where client/server behave as expected. */
+func TestDecodesGzip(t *testing.T) {
+	gzBuffer := gzipBuffer(t, "TestEncodingAccept")
+
+	server := httptest.NewServer(hbtest.CustomResponseHandler(gzBuffer.Bytes(), 200, map[string]string{
+		"Content-Encoding": "gzip",
+	}))
+	defer server.Close()
+
+	evt := sendTLSRequest(t, server.URL, false, map[string]interface{}{
+		"response.include_body": "always",
+		"check.request.headers": map[string]interface{}{"Accept-Encoding": "gzip"},
+	})
+
+	content, err := evt.Fields.GetValue("http.response.body.content")
+
+	assert.NoError(t, err)
+	assert.Exactly(t, content, "TestEncodingAccept")
+}
+
+/*
+ * This test verifies that, in the absence of the response header `Content-Encoding: gzip`, Heartbeat
+ * will not decode the response body. */
+func TestNoGzipDecodeWithoutHeader(t *testing.T) {
+	gzBuffer := gzipBuffer(t, "TestEncodingAccept")
+
+	// here Heartbeat asks the server for a `gzip` body, but the server omits the appropriate response header
+	server := httptest.NewServer(hbtest.CustomResponseHandler(gzBuffer.Bytes(), 200, map[string]string{}))
+	defer server.Close()
+
+	evt := sendTLSRequest(t, server.URL, false, map[string]interface{}{
+		"response.include_body": "always",
+		"check.request.headers": map[string]interface{}{"Accept-Encoding": "gzip"},
+	})
+
+	content, err := evt.Fields.GetValue("http.response.body.content")
+
+	assert.NoError(t, err)
+
+	// doesn't decode gzip text without content header
+	assert.Exactly(t, content, "\x1f\x8b\b\x00\x00\x00\x00\x00\x00\xff\nI-.q\xcdK\xceO\xc9\xccKwLNN-(\x01\x04\x00\x00\xff\xffW\xbeE\x0e\x12\x00\x00\x00")
+}
+
+/* When Heartbeat doesn't request `gzip`, and the server responds with a `gzip` body/header anyway,
+ * Heartbeat will still decode it gracefully. This is a case where the server behaved inappropriately,
+ * but as long as the header is included Heartbeat tries to do the right thing. */
+func TestGzipDecodeWithoutRequestHeader(t *testing.T) {
+	gzBuffer := gzipBuffer(t, "TestEncodingAccept")
+
+	server := httptest.NewServer(hbtest.CustomResponseHandler(gzBuffer.Bytes(), 200, map[string]string{
+		"Content-Encoding": "gzip",
+	}))
+	defer server.Close()
+
+	evt := sendTLSRequest(t, server.URL, false, map[string]interface{}{
+		// no header here from Heartbeat asking the server for `gzip`
+		"response.include_body": "always",
+	})
+
+	content, err := evt.Fields.GetValue("http.response.body.content")
+
+	assert.NoError(t, err)
+
+	// Heartbeat decoded the `gzip` even without requesting it
+	assert.Exactly(t, content, "TestEncodingAccept")
+}
+
+func TestUserAgentInject(t *testing.T) {
+	ua := ""
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ua = r.Header.Get("User-Agent")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer ts.Close()
+
+	cfg, err := common.NewConfigFrom(map[string]interface{}{
+		"urls": ts.URL,
+	})
+	require.NoError(t, err)
+
+	p, err := create("ua", cfg)
+	require.NoError(t, err)
+
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+
+	event := &beat.Event{}
+	_, err = job(event)
+	require.NoError(t, err)
+	assert.Contains(t, ua, "Heartbeat")
 }

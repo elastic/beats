@@ -2,22 +2,22 @@
     {
         "@timestamp": "2020-08-26T20:32:46.000Z",
         "cisco.umbrella.categories": "Test Category",
-        "destination.address": "8.8.8.8",
-        "destination.ip": "8.8.8.8",
+        "destination.address": "175.16.199.1",
+        "destination.ip": "175.16.199.1",
         "destination.port": "0",
         "event.dataset": "cisco.umbrella",
         "event.module": "cisco",
-        "event.original": "\\\"2020-08-26 20:32:46\\\",\\\"elasticuser\\\",\\\"192.168.1.1\\\",\\\"0\\\",\\\"8.8.8.8\\\",\\\"0\\\",\\\"Test Category\\\"",
+        "event.original": "\\\"2020-08-26 20:32:46\\\",\\\"elasticuser\\\",\\\"192.168.1.1\\\",\\\"0\\\",\\\"175.16.199.1\\\",\\\"0\\\",\\\"Test Category\\\"",
         "fileset.name": "umbrella",
         "input.type": "log",
         "log.offset": 0,
-        "message": "\"2020-08-26 20:32:46\",\"elasticuser\",\"192.168.1.1\",\"0\",\"8.8.8.8\",\"0\",\"Test Category\"",
+        "message": "\"2020-08-26 20:32:46\",\"elasticuser\",\"192.168.1.1\",\"0\",\"175.16.199.1\",\"0\",\"Test Category\"",
         "observer.product": "Umbrella",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.168.1.1",
-            "8.8.8.8"
+            "175.16.199.1",
+            "192.168.1.1"
         ],
         "related.user": [
             "elasticuser"
@@ -31,22 +31,22 @@
     {
         "@timestamp": "2020-08-26T20:32:45.000Z",
         "cisco.umbrella.categories": "Test Category",
-        "destination.address": "8.8.8.8",
-        "destination.ip": "8.8.8.8",
+        "destination.address": "175.16.199.1",
+        "destination.ip": "175.16.199.1",
         "destination.port": "445",
         "event.dataset": "cisco.umbrella",
         "event.module": "cisco",
-        "event.original": "\\\"2020-08-26 20:32:45\\\",\\\"elasticuser\\\",\\\"192.168.1.1\\\",\\\"61095\\\",\\\"8.8.8.8\\\",\\\"445\\\",\\\"Test Category\\\"",
+        "event.original": "\\\"2020-08-26 20:32:45\\\",\\\"elasticuser\\\",\\\"192.168.1.1\\\",\\\"61095\\\",\\\"175.16.199.1\\\",\\\"445\\\",\\\"Test Category\\\"",
         "fileset.name": "umbrella",
         "input.type": "log",
-        "log.offset": 84,
-        "message": "\"2020-08-26 20:32:45\",\"elasticuser\",\"192.168.1.1\",\"61095\",\"8.8.8.8\",\"445\",\"Test Category\"",
+        "log.offset": 89,
+        "message": "\"2020-08-26 20:32:45\",\"elasticuser\",\"192.168.1.1\",\"61095\",\"175.16.199.1\",\"445\",\"Test Category\"",
         "observer.product": "Umbrella",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.168.1.1",
-            "8.8.8.8"
+            "175.16.199.1",
+            "192.168.1.1"
         ],
         "related.user": [
             "elasticuser"

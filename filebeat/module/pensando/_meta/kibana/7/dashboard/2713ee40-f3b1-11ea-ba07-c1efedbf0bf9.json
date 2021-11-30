@@ -1,0 +1,302 @@
+{
+    "attributes": {
+        "description": "Overview of events coming from Pensando DSC distributed firewall system.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "85119076-2756-4415-8917-14c9d46732a5",
+                    "w": 41,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "85119076-2756-4415-8917-14c9d46732a5",
+                "panelRefName": "panel_85119076-2756-4415-8917-14c9d46732a5",
+                "title": "",
+                "type": "visualization",
+                "version": "7.8.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "9215c2be-bca5-4b21-8042-0e0be99e38c0",
+                    "w": 7,
+                    "x": 41,
+                    "y": 0
+                },
+                "panelIndex": "9215c2be-bca5-4b21-8042-0e0be99e38c0",
+                "panelRefName": "panel_9215c2be-bca5-4b21-8042-0e0be99e38c0",
+                "title": "",
+                "type": "visualization",
+                "version": "7.8.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "81013c87-76c2-4ff0-9545-1295babad06e",
+                    "w": 8,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "81013c87-76c2-4ff0-9545-1295babad06e",
+                "panelRefName": "panel_81013c87-76c2-4ff0-9545-1295babad06e",
+                "title": "Active Workloads",
+                "type": "visualization",
+                "version": "7.8.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "3ee01275-08dd-4d3f-9834-d844f5550365",
+                    "w": 8,
+                    "x": 8,
+                    "y": 5
+                },
+                "panelIndex": "3ee01275-08dd-4d3f-9834-d844f5550365",
+                "panelRefName": "panel_3ee01275-08dd-4d3f-9834-d844f5550365",
+                "title": "DFW Allowed Count",
+                "type": "visualization",
+                "version": "7.8.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "9628e969-1f18-4659-a8d9-e9409f11f3a9",
+                    "w": 8,
+                    "x": 16,
+                    "y": 5
+                },
+                "panelIndex": "9628e969-1f18-4659-a8d9-e9409f11f3a9",
+                "panelRefName": "panel_9628e969-1f18-4659-a8d9-e9409f11f3a9",
+                "title": "DFW Denied Count",
+                "type": "visualization",
+                "version": "7.8.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "37787af1-b5ef-467e-8c5e-b0dfba56c9f9",
+                    "w": 24,
+                    "x": 24,
+                    "y": 5
+                },
+                "panelIndex": "37787af1-b5ef-467e-8c5e-b0dfba56c9f9",
+                "panelRefName": "panel_37787af1-b5ef-467e-8c5e-b0dfba56c9f9",
+                "title": "Denied Destination IPs",
+                "type": "visualization",
+                "version": "7.8.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "efafcbff-a163-4475-8d12-59f716e5a3ef",
+                    "w": 12,
+                    "x": 0,
+                    "y": 14
+                },
+                "panelIndex": "efafcbff-a163-4475-8d12-59f716e5a3ef",
+                "panelRefName": "panel_efafcbff-a163-4475-8d12-59f716e5a3ef",
+                "title": "Traffic by Workload",
+                "type": "visualization",
+                "version": "7.8.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "52506949-eb15-4b23-b50c-2e5083df5e0f",
+                    "w": 12,
+                    "x": 12,
+                    "y": 14
+                },
+                "panelIndex": "52506949-eb15-4b23-b50c-2e5083df5e0f",
+                "panelRefName": "panel_52506949-eb15-4b23-b50c-2e5083df5e0f",
+                "title": "Client to Server FW Action",
+                "type": "visualization",
+                "version": "7.8.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "077406bd-aa47-4dc9-b1f6-04cae0ae34b6",
+                    "w": 24,
+                    "x": 24,
+                    "y": 16
+                },
+                "panelIndex": "077406bd-aa47-4dc9-b1f6-04cae0ae34b6",
+                "panelRefName": "panel_077406bd-aa47-4dc9-b1f6-04cae0ae34b6",
+                "type": "visualization",
+                "version": "7.8.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "58e763b7-a23a-480a-a984-24dd115aba2c",
+                    "w": 12,
+                    "x": 0,
+                    "y": 28
+                },
+                "panelIndex": "58e763b7-a23a-480a-a984-24dd115aba2c",
+                "panelRefName": "panel_58e763b7-a23a-480a-a984-24dd115aba2c",
+                "type": "visualization",
+                "version": "7.8.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "table": null,
+                    "vis": {
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "36fc48c8-0044-4af6-a8b2-da8023806f32",
+                    "w": 12,
+                    "x": 12,
+                    "y": 28
+                },
+                "panelIndex": "36fc48c8-0044-4af6-a8b2-da8023806f32",
+                "panelRefName": "panel_36fc48c8-0044-4af6-a8b2-da8023806f32",
+                "title": "Dest Port by DSC",
+                "type": "visualization",
+                "version": "7.8.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "a1d34501-4d64-4213-b192-1b4ca2d88793",
+                    "w": 24,
+                    "x": 24,
+                    "y": 29
+                },
+                "panelIndex": "a1d34501-4d64-4213-b192-1b4ca2d88793",
+                "panelRefName": "panel_a1d34501-4d64-4213-b192-1b4ca2d88793",
+                "type": "visualization",
+                "version": "7.8.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Pensando] DFW Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "2713ee40-f3b1-11ea-ba07-c1efedbf0bf9",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "a73c8dc0-cc8d-11ea-918e-c778f7abe5d7",
+            "name": "85119076-2756-4415-8917-14c9d46732a5:panel_85119076-2756-4415-8917-14c9d46732a5",
+            "type": "visualization"
+        },
+        {
+            "id": "39e26d70-cc4d-11ea-918e-c778f7abe5d7",
+            "name": "9215c2be-bca5-4b21-8042-0e0be99e38c0:panel_9215c2be-bca5-4b21-8042-0e0be99e38c0",
+            "type": "visualization"
+        },
+        {
+            "id": "bc6a36b0-cdba-11ea-a0ef-8f5241e594be",
+            "name": "81013c87-76c2-4ff0-9545-1295babad06e:panel_81013c87-76c2-4ff0-9545-1295babad06e",
+            "type": "visualization"
+        },
+        {
+            "id": "fa745d10-cc88-11ea-918e-c778f7abe5d7",
+            "name": "3ee01275-08dd-4d3f-9834-d844f5550365:panel_3ee01275-08dd-4d3f-9834-d844f5550365",
+            "type": "visualization"
+        },
+        {
+            "id": "1d2d5f00-cc89-11ea-918e-c778f7abe5d7",
+            "name": "9628e969-1f18-4659-a8d9-e9409f11f3a9:panel_9628e969-1f18-4659-a8d9-e9409f11f3a9",
+            "type": "visualization"
+        },
+        {
+            "id": "bf9d4650-cc8a-11ea-918e-c778f7abe5d7",
+            "name": "37787af1-b5ef-467e-8c5e-b0dfba56c9f9:panel_37787af1-b5ef-467e-8c5e-b0dfba56c9f9",
+            "type": "visualization"
+        },
+        {
+            "id": "07983660-cd38-11ea-a0ef-8f5241e594be",
+            "name": "efafcbff-a163-4475-8d12-59f716e5a3ef:panel_efafcbff-a163-4475-8d12-59f716e5a3ef",
+            "type": "visualization"
+        },
+        {
+            "id": "fd2202d0-cc86-11ea-918e-c778f7abe5d7",
+            "name": "52506949-eb15-4b23-b50c-2e5083df5e0f:panel_52506949-eb15-4b23-b50c-2e5083df5e0f",
+            "type": "visualization"
+        },
+        {
+            "id": "2aa5d850-cc85-11ea-918e-c778f7abe5d7",
+            "name": "077406bd-aa47-4dc9-b1f6-04cae0ae34b6:panel_077406bd-aa47-4dc9-b1f6-04cae0ae34b6",
+            "type": "visualization"
+        },
+        {
+            "id": "b8bfd3e0-e8b7-11ea-ba07-c1efedbf0bf9",
+            "name": "58e763b7-a23a-480a-a984-24dd115aba2c:panel_58e763b7-a23a-480a-a984-24dd115aba2c",
+            "type": "visualization"
+        },
+        {
+            "id": "c6188140-cdb9-11ea-a0ef-8f5241e594be",
+            "name": "36fc48c8-0044-4af6-a8b2-da8023806f32:panel_36fc48c8-0044-4af6-a8b2-da8023806f32",
+            "type": "visualization"
+        },
+        {
+            "id": "0583e120-cc8f-11ea-918e-c778f7abe5d7",
+            "name": "a1d34501-4d64-4213-b192-1b4ca2d88793:panel_a1d34501-4d64-4213-b192-1b4ca2d88793",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:56.763Z",
+    "version": "WzQ5MzksMV0="
+}

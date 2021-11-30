@@ -138,7 +138,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
             max_timeout=2)
         proc.check_kill_and_wait()
         self.wait_until(
-            lambda: self.log_contains("Total non-zero metrics"),
+            lambda: self.log_contains("Total metrics"),
             max_timeout=2)
 
     def test_persistent_uuid(self):
@@ -165,8 +165,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
 
         # remove log, restart beat and check meta file did not change
         # and same UUID is used in log output.
-
-        os.remove(os.path.join(self.working_dir, "mockbeat.log"))
+        os.remove(os.path.join(self.working_dir, "mockbeat-" + self.today + ".ndjson"))
         meta1 = run()
         assert self.log_contains("Beat ID: {}".format(meta1["uuid"]))
 

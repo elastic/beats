@@ -1,6 +1,6 @@
 BUILD_DIR=$(CURDIR)/build
 COVERAGE_DIR=$(BUILD_DIR)/coverage
-BEATS?=auditbeat filebeat heartbeat journalbeat metricbeat packetbeat winlogbeat x-pack/functionbeat x-pack/elastic-agent x-pack/osquerybeat
+BEATS?=auditbeat filebeat heartbeat metricbeat packetbeat winlogbeat x-pack/functionbeat x-pack/elastic-agent x-pack/osquerybeat
 PROJECTS=libbeat $(BEATS)
 PROJECTS_ENV=libbeat filebeat metricbeat
 PYTHON_ENV?=$(BUILD_DIR)/python-env
@@ -98,6 +98,16 @@ check:
 	[ ! -d vendor ]
 	# Validate that all updates were committed
 	@$(MAKE) update
+	@$(MAKE) check-headers
+	@$(MAKE) check-go
+	@$(MAKE) check-no-changes
+
+## check : Run some checks similar to what the default check validation runs in the CI.
+.PHONY: check-default
+check-default:
+	@$(MAKE) check-python
+	@echo "The update goal is skipped to speed up the checks in the CI on a PR basis."
+	@$(MAKE) notice
 	@$(MAKE) check-headers
 	@$(MAKE) check-go
 	@$(MAKE) check-no-changes

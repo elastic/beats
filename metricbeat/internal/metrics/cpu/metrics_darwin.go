@@ -21,7 +21,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/cpu"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
+	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 // Get is the Darwin implementation of Get
@@ -48,10 +48,10 @@ func Get(_ string) (CPUMetrics, error) {
 
 func fillCPU(raw cpu.TimesStat) CPU {
 	totalCPU := CPU{
-		Sys:  metrics.OptUintWith(uint64(raw.System)),
-		User: metrics.OptUintWith(uint64(raw.User)),
-		Idle: metrics.OptUintWith(uint64(raw.Idle)),
-		Nice: metrics.OptUintWith(uint64(raw.Nice)),
+		Sys:  opt.UintWith(uint64(raw.System)),
+		User: opt.UintWith(uint64(raw.User)),
+		Idle: opt.UintWith(uint64(raw.Idle)),
+		Nice: opt.UintWith(uint64(raw.Nice)),
 	}
 	return totalCPU
 }

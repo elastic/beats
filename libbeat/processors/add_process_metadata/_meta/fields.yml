@@ -4,9 +4,28 @@
     Process metadata fields
   fields:
     - name: process
+      default_field: true
       type: group
       fields:
         - name: exe
           type: alias
           path: process.executable
           migration: true
+        - name: owner
+          type: group
+          description: Process owner information.
+          fields:
+            - name: id
+              type: keyword
+              ignore_above: 1024
+              description: Unique identifier of the user.
+            - name: name
+              type: keyword
+              ignore_above: 1024
+              multi_fields:
+              - name: text
+                type: text
+                norms: false
+              description: Short name or login of the user.
+              example: albert
+

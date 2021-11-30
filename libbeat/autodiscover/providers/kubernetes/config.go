@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || darwin || windows
 // +build linux darwin windows
 
 package kubernetes
@@ -23,6 +24,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -33,7 +35,9 @@ import (
 
 // Config for kubernetes autodiscover provider
 type Config struct {
-	KubeConfig     string        `config:"kube_config"`
+	KubeConfig        string                       `config:"kube_config"`
+	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
+
 	Namespace      string        `config:"namespace"`
 	SyncPeriod     time.Duration `config:"sync_period"`
 	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`

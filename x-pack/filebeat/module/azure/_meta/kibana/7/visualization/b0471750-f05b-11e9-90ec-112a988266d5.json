@@ -1,0 +1,77 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "User Filters [Filebeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "azure.subscription_id",
+                        "id": "1517598395667",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "Subscription",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 100,
+                            "type": "terms"
+                        },
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "azure.activitylogs.identity.claims_initiated_by_user.name",
+                        "id": "1518843942322",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "User Email",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 100,
+                            "type": "terms"
+                        },
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": false,
+                "updateFiltersOnChange": true,
+                "useTimeFilter": false
+            },
+            "title": "User Filters [Filebeat Azure]",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b0471750-f05b-11e9-90ec-112a988266d5",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "control_1_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:03.514Z",
+    "version": "WzQ0MDEsMV0="
+}

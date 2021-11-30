@@ -5,6 +5,9 @@
 package state
 
 import (
+	"context"
+	"strings"
+
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
@@ -36,6 +39,10 @@ const (
 	// Stopping is status describing application is stopping.
 	Stopping = Status(proto.StateObserved_STOPPING)
 )
+
+var filteredErrors = []string{
+	context.Canceled.Error(),
+}
 
 // IsInternal returns true if the status is an internal status and not something that should be reported
 // over the protocol as an actual status.
@@ -78,4 +85,15 @@ type State struct {
 type Reporter interface {
 	// OnStateChange is called when state changes.
 	OnStateChange(id string, name string, state State)
+}
+
+// IsStateFiltered returns true if state message contains error out of predefined
+// collection of ignored errors.
+func IsStateFiltered(msg string, payload map[string]interface{}) bool {
+	for _, e := range filteredErrors {
+		if strings.Contains(msg, e) {
+			return true
+		}
+	}
+	return false
 }

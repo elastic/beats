@@ -1,0 +1,134 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Ranges [Metricbeat CockroachDB]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=10s",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(254,146,0,1)",
+                        "fill": "0",
+                        "formatter": "number",
+                        "id": "e4489e50-976b-11e9-b3d5-07b0ab7d6354",
+                        "label": "Underreplicated",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": "prometheus.metrics.ranges_underreplicated",
+                                "id": "e4489e51-976b-11e9-b3d5-07b0ab7d6354",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": "2",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": null
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(252,220,0,1)",
+                        "fill": "0",
+                        "formatter": "number",
+                        "id": "c938f9c0-976b-11e9-b3d5-07b0ab7d6354",
+                        "label": "Overreplicated",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": "prometheus.metrics.ranges_overreplicated",
+                                "id": "c938f9c1-976b-11e9-b3d5-07b0ab7d6354",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": "2",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": null
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(244,78,59,1)",
+                        "fill": "0",
+                        "formatter": "number",
+                        "id": "0ed1bf80-976c-11e9-b3d5-07b0ab7d6354",
+                        "label": "Unavailable",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": "prometheus.metrics.ranges_unavailable",
+                                "id": "0ed1bf81-976c-11e9-b3d5-07b0ab7d6354",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": "2",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": null
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(204,204,204,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Total",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "prometheus.metrics.ranges",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": null
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "tooltip_mode": "show_all",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Ranges [Metricbeat CockroachDB]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "2af19b90-976c-11e9-9eea-6f554992ec1f",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:00.377Z",
+    "version": "WzM2OTgsMV0="
+}

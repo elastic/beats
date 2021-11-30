@@ -1,0 +1,17 @@
+.Prefer to use {agent} for this use case?
+****
+Refer to the
+https://docs.elastic.co/en/integrations/{modulename}[Elastic Integrations documentation].
+
+[%collapsible]
+.Learn more
+====
+{agent} is a single, unified agent that you can deploy to hosts or containers to
+collect data and send it to the {stack}. {agent} uses integrations to connect
+your data to the {stack}. Behind the scenes, {agent} runs the {beats} shippers
+required for your configuration. Refer to the documentation for a detailed
+{fleet-guide}/beats-agent-comparison.html[comparison of {beats} and {agent}]. 
+
+====
+
+****

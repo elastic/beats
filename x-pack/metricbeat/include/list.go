@@ -10,8 +10,6 @@ import (
 	// Import packages that need to register themselves.
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/activemq"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/airflow"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/appsearch"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/appsearch/stats"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/billing"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch"
@@ -29,6 +27,9 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/cockroachdb"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/coredns"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/coredns/stats"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/enterprisesearch"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/enterprisesearch/health"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/enterprisesearch/stats"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/billing"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics"

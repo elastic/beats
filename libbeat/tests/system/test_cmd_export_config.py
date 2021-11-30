@@ -19,22 +19,22 @@ class TestCommandExportConfig(BaseTest):
         """
         Test export config works
         """
-        self.render_config_template(self.beat_name, self.output, metrics_period='1234')
+        self.render_config_template(self.beat_name, self.output, file_name='some-file')
         exit_code = self.run_beat(extra_args=["export", "config"], config=self.config)
 
         assert exit_code == 0
         assert self.log_contains("filename: mockbeat")
-        assert self.log_contains("period: 1234")
+        assert self.log_contains("name: some-file")
 
     def test_config_environment_variable(self):
         """
         Test export config works but doesn"t expose environment variable.
         """
         self.render_config_template(self.beat_name, self.output,
-                                    metrics_period="${METRIC_PERIOD}")
+                                    file_name="${FILE_NAME}")
         exit_code = self.run_beat(extra_args=["export", "config"], config=self.config,
-                                  env={'METRIC_PERIOD': '1234'})
+                                  env={'FILE_NAME': 'some-file'})
 
         assert exit_code == 0
         assert self.log_contains("filename: mockbeat")
-        assert self.log_contains("period: ${METRIC_PERIOD}")
+        assert self.log_contains("name: ${FILE_NAME}")

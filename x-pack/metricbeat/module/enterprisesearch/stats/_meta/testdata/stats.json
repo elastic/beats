@@ -1,0 +1,154 @@
+{
+  "cluster_uuid": "s7QHFAuAQmqeqnGZmAqXIA",
+  "http": {
+    "connections": {
+      "current": 1,
+      "max": 3,
+      "total": 29
+    },
+    "request_duration_ms": {
+      "max": 3528004,
+      "mean": 922170.1785714285,
+      "std_dev": 1068785.5936706674
+    },
+    "network_bytes": {
+      "received_total": 231403,
+      "received_rate": 42,
+      "sent_total": 704357,
+      "sent_rate": 5
+    },
+    "responses": {
+      "1xx": 1,
+      "2xx": 2,
+      "3xx": 3,
+      "4xx": 4,
+      "5xx": 5
+    }
+  },
+  "app": {
+    "pid": 41556,
+    "start": "2021-09-23T21:55:53+00:00",
+    "end": "2021-09-23T21:56:53+00:00",
+    "metrics": {
+      "timers.cron.local.cron-refresh_elasticsearch_license.total_job_time": {
+        "sum": 114.21483382582664,
+        "max": 1140.21,
+        "mean": 555.1
+      },
+      "timers.actastic.relation.search": {
+        "sum": 51.183209056034684,
+        "max": 35.318125039339066,
+        "mean": 25.591604528017342
+      },
+      "timers.cron.local.cron-keep_filebeat_alive.total_job_time": {
+        "sum": 52.856332855299115,
+        "max": 52.856332855299115,
+        "mean": 52.856332855299115
+      }
+    }
+  },
+  "queues": {
+    "engine_destroyer": {
+      "pending": 1
+    },
+    "process_crawl": {
+      "pending": 2
+    },
+    "mailer": {
+      "pending": 3
+    },
+    "failed": [
+      {
+        "foo": 123
+      }
+    ]
+  },
+  "connectors": {
+    "alive": false,
+    "pool": {
+      "extract_worker_pool": {
+        "running": true,
+        "queue_depth": 1,
+        "size": 2,
+        "busy": 3,
+        "idle": 4,
+        "total_scheduled": 5,
+        "total_completed": 6
+      },
+      "subextract_worker_pool": {
+        "running": true,
+        "queue_depth": 7,
+        "size": 8,
+        "busy": 9,
+        "idle": 10,
+        "total_scheduled": 11,
+        "total_completed": 12
+      },
+      "publish_worker_pool": {
+        "running": true,
+        "queue_depth": 13,
+        "size": 14,
+        "busy": 15,
+        "idle": 16,
+        "total_scheduled": 17,
+        "total_completed": 18
+      }
+    },
+    "job_store": {
+      "waiting": 1,
+      "working": 2,
+      "job_types": {
+        "full": 3,
+        "incremental": 4,
+        "delete": 5,
+        "permissions": 6
+      }
+    }
+  },
+  "crawler": {
+    "global": {
+      "crawl_requests": {
+        "pending": 0,
+        "active": 2,
+        "successful": 2,
+        "failed": 0
+      }
+    },
+    "node": {
+      "pages_visited": 385,
+      "urls_allowed": 478,
+      "urls_denied": {
+        "nofollow": 98,
+        "already_seen": 8466,
+        "domain_filter_denied": 5286,
+        "incorrect_protocol": 23,
+        "unsupported_content_type": 4,
+        "link_too_deep": 45
+      },
+      "status_codes": {
+        "200": 367,
+        "301": 18
+      },
+      "queue_size": {
+        "primary": 91,
+        "purge": 0
+      },
+      "active_threads": 18,
+      "workers": {
+        "pool_size": 16,
+        "active": 2,
+        "available": 14
+      }
+    }
+  },
+  "product_usage": {
+    "app_search": {
+      "total_engines": 1
+    },
+    "workplace_search": {
+      "total_org_sources": 2,
+      "total_private_sources": 3,
+      "total_queries_last_30_days": 4
+    }
+  }
+}

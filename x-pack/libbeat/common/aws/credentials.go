@@ -5,6 +5,9 @@
 package aws
 
 import (
+	"net/http"
+	"net/url"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/defaults"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
@@ -12,7 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -25,7 +28,26 @@ type ConfigAWS struct {
 	SharedCredentialFile string `config:"shared_credential_file"`
 	Endpoint             string `config:"endpoint"`
 	RoleArn              string `config:"role_arn"`
-	AWSPartition         string `config:"aws_partition"` // Deprecated.
+	ProxyUrl             string `config:"proxy_url"`
+}
+
+// InitializeAWSConfig function creates the awssdk.Config object from the provided config
+func InitializeAWSConfig(config ConfigAWS) (awssdk.Config, error) {
+	AWSConfig, _ := GetAWSCredentials(config)
+	if config.ProxyUrl != "" {
+		proxyUrl, err := httpcommon.NewProxyURIFromString(config.ProxyUrl)
+		if err != nil {
+			return AWSConfig, err
+		}
+
+		httpClient := &http.Client{
+			Transport: &http.Transport{
+				Proxy: http.ProxyURL(proxyUrl.URI()),
+			},
+		}
+		AWSConfig.HTTPClient = httpClient
+	}
+	return AWSConfig, nil
 }
 
 // GetAWSCredentials function gets aws credentials from the config.
@@ -38,6 +60,7 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 	if config.AccessKeyID != "" || config.SecretAccessKey != "" || config.SessionToken != "" {
 		return getAccessKeys(config), nil
 	}
+
 	return getSharedCredentialProfile(config)
 }
 
@@ -57,8 +80,10 @@ func getAccessKeys(config ConfigAWS) awssdk.Config {
 		Value: awsCredentials,
 	}
 
-	// Set default region to make initial aws api call
-	awsConfig.Region = "us-east-1"
+	// Set default region if empty to make initial aws api call
+	if awsConfig.Region == "" {
+		awsConfig.Region = "us-east-1"
+	}
 
 	// Assume IAM role if iam_role config parameter is given
 	if config.RoleArn != "" {
@@ -66,7 +91,6 @@ func getAccessKeys(config ConfigAWS) awssdk.Config {
 		return getRoleArn(config, awsConfig)
 	}
 
-	logger.Debug("Using access keys for AWS credential")
 	return awsConfig
 }
 
@@ -94,8 +118,10 @@ func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 		return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed with shared credential profile given")
 	}
 
-	// Set default region to make initial aws api call
-	awsConfig.Region = "us-east-1"
+	// Set default region if empty to make initial aws api call
+	if awsConfig.Region == "" {
+		awsConfig.Region = "us-east-1"
+	}
 
 	// Assume IAM role if iam_role config parameter is given
 	if config.RoleArn != "" {
@@ -118,19 +144,16 @@ func getRoleArn(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
 // service clients when endpoint is given in config.
 func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName string, awsConfig awssdk.Config) awssdk.Config {
 	if endpoint != "" {
-		if regionName == "" {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + endpoint)
+		parsedEndpoint, _ := url.Parse(endpoint)
+		if parsedEndpoint.Scheme != "" {
+			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL(endpoint)
 		} else {
-			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + regionName + "." + endpoint)
+			if regionName == "" {
+				awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + endpoint)
+			} else {
+				awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + regionName + "." + endpoint)
+			}
 		}
 	}
 	return awsConfig
-}
-
-// Validate checks for deprecated config option
-func (c ConfigAWS) Validate() error {
-	if c.AWSPartition != "" {
-		cfgwarn.Deprecate("8.0.0", "aws_partition is deprecated. Please use endpoint instead.")
-	}
-	return nil
 }

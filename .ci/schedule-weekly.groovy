@@ -15,13 +15,17 @@ pipeline {
     durabilityHint('PERFORMANCE_OPTIMIZED')
   }
   triggers {
-    cron('H H(1-4) * * 0')
+    cron('H H(1-2) * * 0')
   }
   stages {
-    stage('Nighly beats builds') {
+    stage('Weekly beats builds') {
       steps {
-        build(quietPeriod: 0, job: 'Beats/beats/master', parameters: [booleanParam(name: 'awsCloudTests', value: true)], wait: false, propagate: false)
-        build(quietPeriod: 1000, job: 'Beats/beats/7.x', parameters: [booleanParam(name: 'awsCloudTests', value: true)], wait: false, propagate: false)
+        runBuild(quietPeriod: 0, job: 'Beats/beats/master')
+        // This should be `current_8` bump.getCurrentMinorReleaseFor8
+        runBuild(quietPeriod: 1000, job: 'Beats/beats/8.0')
+        // This should be `current_7` bump.getCurrentMinorReleaseFor7 or
+        // `next_minor_7`  bump.getNextMinorReleaseFor7
+        runBuild(quietPeriod: 2000, job: 'Beats/beats/7.16')
       }
     }
   }
@@ -30,4 +34,9 @@ pipeline {
       notifyBuildResult(prComment: false)
     }
   }
+}
+
+def runBuild(Map args = [:]) {
+  def jobName = args.job
+  build(quietPeriod: args.quietPeriod, job: jobName, parameters: [booleanParam(name: 'awsCloudTests', value: true)], wait: false, propagate: false)
 }

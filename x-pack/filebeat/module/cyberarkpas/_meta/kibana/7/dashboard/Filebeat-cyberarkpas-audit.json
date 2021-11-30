@@ -1,1574 +1,1774 @@
 {
-  "objects": [
-    {
-      "attributes": {
+    "attributes": {
         "description": "Dashboard for CyberArk Privileged Access Security events.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "cyberarkpas.audit"
-                  },
-                  "type": "phrase"
-                },
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "cyberarkpas.audit"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.dataset": "cyberarkpas.audit"
+                            }
+                        }
+                    }
+                ],
                 "query": {
-                  "match_phrase": {
-                    "event.dataset": "cyberarkpas.audit"
-                  }
+                    "language": "kuery",
+                    "query": ""
                 }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
             }
-          }
         },
         "optionsJSON": {
-          "hidePanelTitles": false,
-          "useMargins": true
+            "hidePanelTitles": false,
+            "useMargins": true
         },
         "panelsJSON": [
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "hidePanelTitles": false,
-              "savedVis": {
-                "data": {
-                  "aggs": [],
-                  "searchSource": {
-                    "filter": [],
-                    "query": {
-                      "language": "kuery",
-                      "query": ""
-                    }
-                  }
-                },
-                "description": "",
-                "params": {
-                  "controls": [
-                    {
-                      "fieldName": "observer.hostname",
-                      "id": "1617726994032",
-                      "indexPattern": "filebeat-*",
-                      "indexPatternRefName": "control_0_index_pattern",
-                      "label": " By Vault host",
-                      "options": {
-                        "dynamicOptions": true,
-                        "multiselect": true,
-                        "order": "desc",
-                        "size": 5,
-                        "type": "terms"
-                      },
-                      "parent": "",
-                      "type": "list"
-                    },
-                    {
-                      "fieldName": "event.code",
-                      "id": "1617811797137",
-                      "indexPattern": "filebeat-*",
-                      "indexPatternRefName": "control_1_index_pattern",
-                      "label": "By event code",
-                      "options": {
-                        "dynamicOptions": true,
-                        "multiselect": true,
-                        "order": "desc",
-                        "size": 5,
-                        "type": "terms"
-                      },
-                      "parent": "",
-                      "type": "list"
-                    }
-                  ],
-                  "pinFilters": false,
-                  "updateFiltersOnChange": true,
-                  "useTimeFilter": false
-                },
-                "title": "",
-                "type": "input_control_vis",
-                "uiState": {}
-              }
-            },
-            "gridData": {
-              "h": 9,
-              "i": "1007fa0d-a6a1-4682-a346-a90acc179da5",
-              "w": 10,
-              "x": 0,
-              "y": 0
-            },
-            "panelIndex": "1007fa0d-a6a1-4682-a346-a90acc179da5",
-            "title": "Filters",
-            "type": "visualization",
-            "version": "7.12.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "hidePanelTitles": false,
-              "savedVis": {
-                "data": {
-                  "aggs": [],
-                  "searchSource": {
-                    "filter": [],
-                    "query": {
-                      "language": "kuery",
-                      "query": ""
-                    }
-                  }
-                },
-                "description": "",
-                "params": {
-                  "axis_formatter": "number",
-                  "axis_position": "left",
-                  "axis_scale": "normal",
-                  "default_index_pattern": "filebeat-*",
-                  "default_timefield": "@timestamp",
-                  "filter": {
-                    "language": "kuery",
-                    "query": "event.dataset:\"cyberarkpas.audit\" "
-                  },
-                  "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-                  "index_pattern": "",
-                  "interval": "",
-                  "isModelInvalid": false,
-                  "series": [
-                    {
-                      "axis_position": "right",
-                      "chart_type": "bar",
-                      "color": "#68BC00",
-                      "fill": 0.5,
-                      "formatter": "number",
-                      "hide_in_legend": 0,
-                      "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                      "label": "",
-                      "line_width": 1,
-                      "metrics": [
-                        {
-                          "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                          "type": "count"
-                        }
-                      ],
-                      "override_index_pattern": 0,
-                      "palette": {
-                        "name": "rainbow",
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false,
+                    "savedVis": {
+                        "data": {
+                            "aggs": [],
+                            "searchSource": {
+                                "filter": [],
+                                "query": {
+                                    "language": "kuery",
+                                    "query": ""
+                                }
+                            }
+                        },
+                        "description": "",
                         "params": {
-                          "colors": [
-                            "#68BC00",
-                            "#009CE0",
-                            "#B0BC00",
-                            "#16A5A5",
-                            "#D33115",
-                            "#E27300",
-                            "#FCC400",
-                            "#7B64FF",
-                            "#FA28FF",
-                            "#333333",
-                            "#808080",
-                            "#194D33",
-                            "#0062B1",
-                            "#808900",
-                            "#0C797D",
-                            "#9F0500",
-                            "#C45100",
-                            "#FB9E00",
-                            "#653294",
-                            "#AB149E",
-                            "#0F1419",
-                            "#666666"
-                          ],
-                          "gradient": false
+                            "controls": [
+                                {
+                                    "fieldName": "observer.hostname",
+                                    "id": "1617726994032",
+                                    "indexPattern": "filebeat-*",
+                                    "indexPatternRefName": "control_0_index_pattern",
+                                    "label": " By Vault host",
+                                    "options": {
+                                        "dynamicOptions": true,
+                                        "multiselect": true,
+                                        "order": "desc",
+                                        "size": 5,
+                                        "type": "terms"
+                                    },
+                                    "parent": "",
+                                    "type": "list"
+                                },
+                                {
+                                    "fieldName": "event.code",
+                                    "id": "1617811797137",
+                                    "indexPattern": "filebeat-*",
+                                    "indexPatternRefName": "control_1_index_pattern",
+                                    "label": "By event code",
+                                    "options": {
+                                        "dynamicOptions": true,
+                                        "multiselect": true,
+                                        "order": "desc",
+                                        "size": 5,
+                                        "type": "terms"
+                                    },
+                                    "parent": "",
+                                    "type": "list"
+                                }
+                            ],
+                            "pinFilters": false,
+                            "updateFiltersOnChange": true,
+                            "useTimeFilter": false
                         },
-                        "type": "palette"
-                      },
-                      "point_size": 1,
-                      "separate_axis": 0,
-                      "split_color_mode": null,
-                      "split_mode": "terms",
-                      "stacked": "stacked",
-                      "terms_field": "cyberarkpas.audit.desc",
-                      "type": "timeseries"
-                    }
-                  ],
-                  "show_grid": 1,
-                  "show_legend": 1,
-                  "time_field": "",
-                  "time_range_mode": "entire_time_range",
-                  "tooltip_mode": "show_all",
-                  "type": "timeseries",
-                  "use_kibana_indexes": true
+                        "title": "",
+                        "type": "input_control_vis",
+                        "uiState": {}
+                    },
+                    "type": "visualization"
                 },
-                "title": "",
-                "type": "metrics",
-                "uiState": {}
-              }
-            },
-            "gridData": {
-              "h": 13,
-              "i": "f2dc3750-9b7c-4b0e-a45d-3d3b08f74f3e",
-              "w": 38,
-              "x": 10,
-              "y": 0
-            },
-            "panelIndex": "f2dc3750-9b7c-4b0e-a45d-3d3b08f74f3e",
-            "title": "event types by time",
-            "type": "visualization",
-            "version": "7.12.0"
-          },
-          {
-            "embeddableConfig": {
-              "attributes": {
-                "references": [
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-current-indexpattern",
-                    "type": "index-pattern"
-                  },
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-layer-33bc0096-e418-4f81-9c7c-7fdd16cc5203",
-                    "type": "index-pattern"
-                  }
-                ],
-                "state": {
-                  "datasourceStates": {
-                    "indexpattern": {
-                      "layers": {
-                        "33bc0096-e418-4f81-9c7c-7fdd16cc5203": {
-                          "columnOrder": [
-                            "eedd5aa8-a7c4-466a-b10b-3a8cba3bac12"
-                          ],
-                          "columns": {
-                            "eedd5aa8-a7c4-466a-b10b-3a8cba3bac12": {
-                              "customLabel": true,
-                              "dataType": "number",
-                              "isBucketed": false,
-                              "label": " ",
-                              "operationType": "count",
-                              "scale": "ratio",
-                              "sourceField": "Records"
-                            }
-                          },
-                          "incompleteColumns": {}
-                        }
-                      }
-                    }
-                  },
-                  "filters": [],
-                  "query": {
-                    "language": "kuery",
-                    "query": ""
-                  },
-                  "visualization": {
-                    "accessor": "eedd5aa8-a7c4-466a-b10b-3a8cba3bac12",
-                    "layerId": "33bc0096-e418-4f81-9c7c-7fdd16cc5203"
-                  }
+                "gridData": {
+                    "h": 9,
+                    "i": "1007fa0d-a6a1-4682-a346-a90acc179da5",
+                    "w": 10,
+                    "x": 0,
+                    "y": 0
                 },
-                "title": "",
-                "type": "lens",
-                "visualizationType": "lnsMetric"
-              },
-              "enhancements": {},
-              "hidePanelTitles": false
+                "panelIndex": "1007fa0d-a6a1-4682-a346-a90acc179da5",
+                "title": "Filters",
+                "type": "visualization",
+                "version": "7.14.0"
             },
-            "gridData": {
-              "h": 4,
-              "i": "af9e9f0b-a40c-411e-b441-2a779983ed24",
-              "w": 10,
-              "x": 0,
-              "y": 9
-            },
-            "panelIndex": "af9e9f0b-a40c-411e-b441-2a779983ed24",
-            "title": "Count of events",
-            "type": "lens",
-            "version": "7.12.0"
-          },
-          {
-            "embeddableConfig": {
-              "attributes": {
-                "references": [
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-current-indexpattern",
-                    "type": "index-pattern"
-                  },
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-layer-de047c06-a965-47aa-8a15-8b0266d5abc3",
-                    "type": "index-pattern"
-                  }
-                ],
-                "state": {
-                  "datasourceStates": {
-                    "indexpattern": {
-                      "layers": {
-                        "de047c06-a965-47aa-8a15-8b0266d5abc3": {
-                          "columnOrder": [
-                            "b916e5f5-a64a-49f1-b37a-ee1825fc61a4",
-                            "3effd03e-0ed9-4e2d-ba8e-d77ae505092e"
-                          ],
-                          "columns": {
-                            "3effd03e-0ed9-4e2d-ba8e-d77ae505092e": {
-                              "dataType": "number",
-                              "isBucketed": false,
-                              "label": "Count of records",
-                              "operationType": "count",
-                              "scale": "ratio",
-                              "sourceField": "Records"
-                            },
-                            "b916e5f5-a64a-49f1-b37a-ee1825fc61a4": {
-                              "dataType": "string",
-                              "isBucketed": true,
-                              "label": "Top values of event.outcome",
-                              "operationType": "terms",
-                              "params": {
-                                "missingBucket": false,
-                                "orderBy": {
-                                  "columnId": "3effd03e-0ed9-4e2d-ba8e-d77ae505092e",
-                                  "type": "column"
-                                },
-                                "orderDirection": "desc",
-                                "otherBucket": true,
-                                "size": 5
-                              },
-                              "scale": "ordinal",
-                              "sourceField": "event.outcome"
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false,
+                    "savedVis": {
+                        "data": {
+                            "aggs": [],
+                            "searchSource": {
+                                "filter": [],
+                                "query": {
+                                    "language": "kuery",
+                                    "query": ""
+                                }
                             }
-                          },
-                          "incompleteColumns": {}
-                        }
-                      }
-                    }
-                  },
-                  "filters": [],
-                  "query": {
-                    "language": "kuery",
-                    "query": ""
-                  },
-                  "visualization": {
-                    "layers": [
-                      {
-                        "categoryDisplay": "default",
-                        "groups": [
-                          "b916e5f5-a64a-49f1-b37a-ee1825fc61a4"
-                        ],
-                        "layerId": "de047c06-a965-47aa-8a15-8b0266d5abc3",
-                        "legendDisplay": "default",
-                        "metric": "3effd03e-0ed9-4e2d-ba8e-d77ae505092e",
-                        "nestedLegend": false,
-                        "numberDisplay": "percent"
-                      }
-                    ],
-                    "shape": "donut"
-                  }
-                },
-                "title": "",
-                "type": "lens",
-                "visualizationType": "lnsPie"
-              },
-              "enhancements": {},
-              "hidePanelTitles": false
-            },
-            "gridData": {
-              "h": 13,
-              "i": "7031905a-92ab-4e0e-aa58-72f1c07ff409",
-              "w": 10,
-              "x": 0,
-              "y": 13
-            },
-            "panelIndex": "7031905a-92ab-4e0e-aa58-72f1c07ff409",
-            "title": "Breakdown by outcome",
-            "type": "lens",
-            "version": "7.12.0"
-          },
-          {
-            "embeddableConfig": {
-              "attributes": {
-                "references": [
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-current-indexpattern",
-                    "type": "index-pattern"
-                  },
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-layer-19858811-84d1-4f50-901c-dc1451972324",
-                    "type": "index-pattern"
-                  },
-                  {
-                    "id": "filebeat-*",
-                    "name": "filter-index-pattern-0",
-                    "type": "index-pattern"
-                  },
-                  {
-                    "id": "filebeat-*",
-                    "name": "filter-index-pattern-1",
-                    "type": "index-pattern"
-                  }
-                ],
-                "state": {
-                  "datasourceStates": {
-                    "indexpattern": {
-                      "layers": {
-                        "19858811-84d1-4f50-901c-dc1451972324": {
-                          "columnOrder": [
-                            "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
-                            "e3526253-18e0-4122-b112-ee5b4b9e23d7"
-                          ],
-                          "columns": {
-                            "81dcff19-b14a-4e4b-999e-dbbcbdfdf816": {
-                              "dataType": "string",
-                              "isBucketed": true,
-                              "label": "Top values of destination.user.name",
-                              "operationType": "terms",
-                              "params": {
-                                "missingBucket": false,
-                                "orderBy": {
-                                  "type": "alphabetical"
-                                },
-                                "orderDirection": "asc",
-                                "otherBucket": true,
-                                "size": 10
-                              },
-                              "scale": "ordinal",
-                              "sourceField": "destination.user.name"
-                            },
-                            "e3526253-18e0-4122-b112-ee5b4b9e23d7": {
-                              "dataType": "number",
-                              "isBucketed": false,
-                              "label": "Count of records",
-                              "operationType": "count",
-                              "scale": "ratio",
-                              "sourceField": "Records"
-                            }
-                          },
-                          "incompleteColumns": {}
-                        }
-                      }
-                    }
-                  },
-                  "filters": [
-                    {
-                      "$state": {
-                        "store": "appState"
-                      },
-                      "meta": {
-                        "alias": null,
-                        "disabled": false,
-                        "indexRefName": "filter-index-pattern-0",
-                        "key": "event.dataset",
-                        "negate": false,
+                        },
+                        "description": "",
                         "params": {
-                          "query": "cyberarkpas.audit"
+                            "axis_formatter": "number",
+                            "axis_position": "left",
+                            "axis_scale": "normal",
+                            "filter": {
+                                "language": "kuery",
+                                "query": "event.dataset:\"cyberarkpas.audit\" "
+                            },
+                            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                            "index_pattern": "",
+                            "interval": "",
+                            "isModelInvalid": false,
+                            "series": [
+                                {
+                                    "axis_position": "right",
+                                    "chart_type": "bar",
+                                    "color": "#68BC00",
+                                    "fill": 0.5,
+                                    "formatter": "number",
+                                    "hide_in_legend": 0,
+                                    "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                                    "label": "",
+                                    "line_width": 1,
+                                    "metrics": [
+                                        {
+                                            "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                            "type": "count"
+                                        }
+                                    ],
+                                    "override_index_pattern": 0,
+                                    "palette": {
+                                        "name": "rainbow",
+                                        "params": {
+                                            "colors": [
+                                                "#68BC00",
+                                                "#009CE0",
+                                                "#B0BC00",
+                                                "#16A5A5",
+                                                "#D33115",
+                                                "#E27300",
+                                                "#FCC400",
+                                                "#7B64FF",
+                                                "#FA28FF",
+                                                "#333333",
+                                                "#808080",
+                                                "#194D33",
+                                                "#0062B1",
+                                                "#808900",
+                                                "#0C797D",
+                                                "#9F0500",
+                                                "#C45100",
+                                                "#FB9E00",
+                                                "#653294",
+                                                "#AB149E",
+                                                "#0F1419",
+                                                "#666666"
+                                            ],
+                                            "gradient": false
+                                        },
+                                        "type": "palette"
+                                    },
+                                    "point_size": 1,
+                                    "separate_axis": 0,
+                                    "split_color_mode": null,
+                                    "split_mode": "terms",
+                                    "stacked": "stacked",
+                                    "terms_field": "cyberarkpas.audit.desc",
+                                    "type": "timeseries"
+                                }
+                            ],
+                            "show_grid": 1,
+                            "show_legend": 1,
+                            "time_field": "",
+                            "time_range_mode": "entire_time_range",
+                            "tooltip_mode": "show_all",
+                            "type": "timeseries",
+                            "use_kibana_indexes": false
                         },
-                        "type": "phrase"
-                      },
-                      "query": {
-                        "match_phrase": {
-                          "event.dataset": "cyberarkpas.audit"
-                        }
-                      }
+                        "title": "",
+                        "type": "metrics",
+                        "uiState": {}
                     },
-                    {
-                      "$state": {
-                        "store": "appState"
-                      },
-                      "meta": {
-                        "alias": null,
-                        "disabled": false,
-                        "indexRefName": "filter-index-pattern-1",
-                        "key": "event.code",
-                        "negate": false,
-                        "params": [
-                          "308",
-                          "22",
-                          "319",
-                          "295"
-                        ],
-                        "type": "phrases"
-                      },
-                      "query": {
-                        "bool": {
-                          "minimum_should_match": 1,
-                          "should": [
-                            {
-                              "match_phrase": {
-                                "event.code": "308"
-                              }
-                            },
-                            {
-                              "match_phrase": {
-                                "event.code": "22"
-                              }
-                            },
-                            {
-                              "match_phrase": {
-                                "event.code": "319"
-                              }
-                            },
-                            {
-                              "match_phrase": {
-                                "event.code": "295"
-                              }
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ],
-                  "query": {
-                    "language": "kuery",
-                    "query": ""
-                  },
-                  "visualization": {
-                    "layers": [
-                      {
-                        "categoryDisplay": "default",
-                        "groups": [
-                          "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
-                          "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
-                          "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
-                          "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
-                          "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
-                          "81dcff19-b14a-4e4b-999e-dbbcbdfdf816"
-                        ],
-                        "layerId": "19858811-84d1-4f50-901c-dc1451972324",
-                        "legendDisplay": "default",
-                        "metric": "e3526253-18e0-4122-b112-ee5b4b9e23d7",
-                        "nestedLegend": false,
-                        "numberDisplay": "percent"
-                      }
-                    ],
-                    "shape": "donut"
-                  }
+                    "type": "visualization"
                 },
-                "title": "",
-                "type": "lens",
-                "visualizationType": "lnsPie"
-              },
-              "enhancements": {},
-              "hidePanelTitles": false
-            },
-            "gridData": {
-              "h": 13,
-              "i": "a24b9c0c-da95-4016-9fe5-2c0d34005832",
-              "w": 11,
-              "x": 10,
-              "y": 13
-            },
-            "panelIndex": "a24b9c0c-da95-4016-9fe5-2c0d34005832",
-            "title": "Top 10 user credentials accessed",
-            "type": "lens",
-            "version": "7.12.0"
-          },
-          {
-            "embeddableConfig": {
-              "attributes": {
-                "references": [
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-current-indexpattern",
-                    "type": "index-pattern"
-                  },
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-layer-50325938-6a9e-4a26-946e-4468e68c6591",
-                    "type": "index-pattern"
-                  },
-                  {
-                    "id": "filebeat-*",
-                    "name": "filter-index-pattern-0",
-                    "type": "index-pattern"
-                  },
-                  {
-                    "id": "filebeat-*",
-                    "name": "filter-index-pattern-1",
-                    "type": "index-pattern"
-                  }
-                ],
-                "state": {
-                  "datasourceStates": {
-                    "indexpattern": {
-                      "layers": {
-                        "50325938-6a9e-4a26-946e-4468e68c6591": {
-                          "columnOrder": [
-                            "8a965540-daa1-4848-80bb-96ddf53a328f",
-                            "c05a39ad-2983-4f4a-900d-a939ecbda504",
-                            "a808a872-71b5-4a76-a939-354f68991881"
-                          ],
-                          "columns": {
-                            "8a965540-daa1-4848-80bb-96ddf53a328f": {
-                              "dataType": "string",
-                              "isBucketed": true,
-                              "label": "Top values of event.outcome",
-                              "operationType": "terms",
-                              "params": {
-                                "missingBucket": false,
-                                "orderBy": {
-                                  "columnId": "a808a872-71b5-4a76-a939-354f68991881",
-                                  "type": "column"
-                                },
-                                "orderDirection": "desc",
-                                "otherBucket": true,
-                                "size": 2
-                              },
-                              "scale": "ordinal",
-                              "sourceField": "event.outcome"
-                            },
-                            "a808a872-71b5-4a76-a939-354f68991881": {
-                              "customLabel": true,
-                              "dataType": "number",
-                              "isBucketed": false,
-                              "label": "Credentials accessed",
-                              "operationType": "count",
-                              "scale": "ratio",
-                              "sourceField": "Records"
-                            },
-                            "c05a39ad-2983-4f4a-900d-a939ecbda504": {
-                              "dataType": "date",
-                              "isBucketed": true,
-                              "label": "@timestamp",
-                              "operationType": "date_histogram",
-                              "params": {
-                                "interval": "auto"
-                              },
-                              "scale": "interval",
-                              "sourceField": "@timestamp"
-                            }
-                          },
-                          "incompleteColumns": {}
-                        }
-                      }
-                    }
-                  },
-                  "filters": [
-                    {
-                      "$state": {
-                        "store": "appState"
-                      },
-                      "meta": {
-                        "alias": null,
-                        "disabled": false,
-                        "indexRefName": "filter-index-pattern-0",
-                        "key": "event.dataset",
-                        "negate": false,
-                        "params": {
-                          "query": "cyberarkpas.audit"
-                        },
-                        "type": "phrase"
-                      },
-                      "query": {
-                        "match_phrase": {
-                          "event.dataset": "cyberarkpas.audit"
-                        }
-                      }
-                    },
-                    {
-                      "$state": {
-                        "store": "appState"
-                      },
-                      "meta": {
-                        "alias": null,
-                        "disabled": false,
-                        "indexRefName": "filter-index-pattern-1",
-                        "key": "event.code",
-                        "negate": false,
-                        "params": [
-                          "308",
-                          "22",
-                          "319",
-                          "295",
-                          "38"
-                        ],
-                        "type": "phrases"
-                      },
-                      "query": {
-                        "bool": {
-                          "minimum_should_match": 1,
-                          "should": [
-                            {
-                              "match_phrase": {
-                                "event.code": "308"
-                              }
-                            },
-                            {
-                              "match_phrase": {
-                                "event.code": "22"
-                              }
-                            },
-                            {
-                              "match_phrase": {
-                                "event.code": "319"
-                              }
-                            },
-                            {
-                              "match_phrase": {
-                                "event.code": "295"
-                              }
-                            },
-                            {
-                              "match_phrase": {
-                                "event.code": "38"
-                              }
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ],
-                  "query": {
-                    "language": "kuery",
-                    "query": ""
-                  },
-                  "visualization": {
-                    "axisTitlesVisibilitySettings": {
-                      "x": true,
-                      "yLeft": true,
-                      "yRight": true
-                    },
-                    "fittingFunction": "None",
-                    "gridlinesVisibilitySettings": {
-                      "x": true,
-                      "yLeft": true,
-                      "yRight": true
-                    },
-                    "layers": [
-                      {
-                        "accessors": [
-                          "a808a872-71b5-4a76-a939-354f68991881"
-                        ],
-                        "layerId": "50325938-6a9e-4a26-946e-4468e68c6591",
-                        "position": "top",
-                        "seriesType": "area_stacked",
-                        "showGridlines": false,
-                        "splitAccessor": "8a965540-daa1-4848-80bb-96ddf53a328f",
-                        "xAccessor": "c05a39ad-2983-4f4a-900d-a939ecbda504"
-                      }
-                    ],
-                    "legend": {
-                      "isVisible": true,
-                      "position": "right"
-                    },
-                    "preferredSeriesType": "area_stacked",
-                    "tickLabelsVisibilitySettings": {
-                      "x": true,
-                      "yLeft": true,
-                      "yRight": true
-                    },
-                    "valueLabels": "hide"
-                  }
+                "gridData": {
+                    "h": 13,
+                    "i": "f2dc3750-9b7c-4b0e-a45d-3d3b08f74f3e",
+                    "w": 38,
+                    "x": 10,
+                    "y": 0
                 },
-                "title": "",
-                "type": "lens",
-                "visualizationType": "lnsXY"
-              },
-              "enhancements": {},
-              "hidePanelTitles": false
+                "panelIndex": "f2dc3750-9b7c-4b0e-a45d-3d3b08f74f3e",
+                "title": "event types by time",
+                "type": "visualization",
+                "version": "7.14.0"
             },
-            "gridData": {
-              "h": 13,
-              "i": "1dc68cc6-e1b3-43ea-9b0e-f423d194b99a",
-              "w": 27,
-              "x": 21,
-              "y": 13
-            },
-            "panelIndex": "1dc68cc6-e1b3-43ea-9b0e-f423d194b99a",
-            "title": "Credential access by time",
-            "type": "lens",
-            "version": "7.12.0"
-          },
-          {
-            "embeddableConfig": {
-              "attributes": {
-                "references": [
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-current-indexpattern",
-                    "type": "index-pattern"
-                  },
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-layer-105faf70-8330-46b3-a82a-573a383068fa",
-                    "type": "index-pattern"
-                  },
-                  {
-                    "id": "filebeat-*",
-                    "name": "filter-index-pattern-0",
-                    "type": "index-pattern"
-                  }
-                ],
-                "state": {
-                  "datasourceStates": {
-                    "indexpattern": {
-                      "layers": {
-                        "105faf70-8330-46b3-a82a-573a383068fa": {
-                          "columnOrder": [
-                            "c51d6847-2fcc-4d13-a44f-49786cb979ed",
-                            "d73b823b-ae68-4e73-bbe2-90a35bc825e7",
-                            "c0147524-accc-4dee-a4fc-44199e3459f1"
-                          ],
-                          "columns": {
-                            "c0147524-accc-4dee-a4fc-44199e3459f1": {
-                              "customLabel": true,
-                              "dataType": "number",
-                              "isBucketed": false,
-                              "label": "Authentications",
-                              "operationType": "count",
-                              "scale": "ratio",
-                              "sourceField": "Records"
-                            },
-                            "c51d6847-2fcc-4d13-a44f-49786cb979ed": {
-                              "customLabel": true,
-                              "dataType": "string",
-                              "isBucketed": true,
-                              "label": "Users",
-                              "operationType": "terms",
-                              "params": {
-                                "missingBucket": false,
-                                "orderBy": {
-                                  "columnId": "c0147524-accc-4dee-a4fc-44199e3459f1",
-                                  "type": "column"
-                                },
-                                "orderDirection": "desc",
-                                "otherBucket": true,
-                                "size": 8
-                              },
-                              "scale": "ordinal",
-                              "sourceField": "user.name"
-                            },
-                            "d73b823b-ae68-4e73-bbe2-90a35bc825e7": {
-                              "dataType": "string",
-                              "isBucketed": true,
-                              "label": "Top values of event.outcome",
-                              "operationType": "terms",
-                              "params": {
-                                "missingBucket": false,
-                                "orderBy": {
-                                  "type": "alphabetical"
-                                },
-                                "orderDirection": "desc",
-                                "otherBucket": true,
-                                "size": 2
-                              },
-                              "scale": "ordinal",
-                              "sourceField": "event.outcome"
-                            }
-                          },
-                          "incompleteColumns": {}
-                        }
-                      }
-                    }
-                  },
-                  "filters": [
-                    {
-                      "$state": {
-                        "store": "appState"
-                      },
-                      "meta": {
-                        "alias": null,
-                        "disabled": false,
-                        "indexRefName": "filter-index-pattern-0",
-                        "key": "event.category",
-                        "negate": false,
-                        "params": [
-                          "authentication"
-                        ],
-                        "type": "phrases"
-                      },
-                      "query": {
-                        "bool": {
-                          "minimum_should_match": 1,
-                          "should": [
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
                             {
-                              "match_phrase": {
-                                "event.category": "authentication"
-                              }
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ],
-                  "query": {
-                    "language": "kuery",
-                    "query": ""
-                  },
-                  "visualization": {
-                    "axisTitlesVisibilitySettings": {
-                      "x": true,
-                      "yLeft": true,
-                      "yRight": true
-                    },
-                    "fittingFunction": "None",
-                    "gridlinesVisibilitySettings": {
-                      "x": true,
-                      "yLeft": true,
-                      "yRight": true
-                    },
-                    "layers": [
-                      {
-                        "accessors": [
-                          "c0147524-accc-4dee-a4fc-44199e3459f1"
-                        ],
-                        "layerId": "105faf70-8330-46b3-a82a-573a383068fa",
-                        "palette": {
-                          "name": "status",
-                          "type": "palette"
-                        },
-                        "position": "top",
-                        "seriesType": "bar_horizontal_stacked",
-                        "showGridlines": false,
-                        "splitAccessor": "d73b823b-ae68-4e73-bbe2-90a35bc825e7",
-                        "xAccessor": "c51d6847-2fcc-4d13-a44f-49786cb979ed"
-                      }
-                    ],
-                    "legend": {
-                      "isVisible": true,
-                      "position": "right",
-                      "showSingleSeries": false
-                    },
-                    "preferredSeriesType": "bar_horizontal_stacked",
-                    "tickLabelsVisibilitySettings": {
-                      "x": true,
-                      "yLeft": true,
-                      "yRight": true
-                    },
-                    "valueLabels": "hide"
-                  }
-                },
-                "title": "",
-                "type": "lens",
-                "visualizationType": "lnsXY"
-              },
-              "enhancements": {},
-              "hidePanelTitles": false
-            },
-            "gridData": {
-              "h": 23,
-              "i": "c56b3e4d-bfb6-4b06-a62b-282753b85f7a",
-              "w": 15,
-              "x": 0,
-              "y": 26
-            },
-            "panelIndex": "c56b3e4d-bfb6-4b06-a62b-282753b85f7a",
-            "title": "Vault Authentication attempts",
-            "type": "lens",
-            "version": "7.12.0"
-          },
-          {
-            "embeddableConfig": {
-              "attributes": {
-                "description": "",
-                "layerListJSON": "[{\"sourceDescriptor\":{\"type\":\"EMS_TMS\",\"id\":null,\"isAutoSelect\":true},\"id\":\"a3734143-d6e1-4551-b0b1-8282a37e151b\",\"label\":null,\"minZoom\":0,\"maxZoom\":24,\"alpha\":1,\"visible\":true,\"style\":{\"type\":\"TILE\"},\"type\":\"VECTOR_TILE\"},{\"label\":\"filebeat-* | Source Point\",\"sourceDescriptor\":{\"indexPatternId\":\"filebeat-*\",\"geoField\":\"source.geo.location\",\"scalingType\":\"TOP_HITS\",\"topHitsSplitField\":\"source.ip\",\"tooltipProperties\":[\"host.name\",\"source.ip\",\"source.domain\",\"source.geo.country_iso_code\",\"source.as.organization.name\"],\"id\":\"5f2b25a1-01ea-45ca-a4a2-f1a670c3b149\",\"type\":\"ES_SEARCH\",\"applyGlobalQuery\":true,\"applyGlobalTime\":true,\"filterByMapBounds\":true,\"sortField\":\"\",\"sortOrder\":\"desc\",\"topHitsSize\":22},\"style\":{\"type\":\"VECTOR\",\"properties\":{\"icon\":{\"type\":\"STATIC\",\"options\":{\"value\":\"home\"}},\"fillColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#6092C0\"}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"lineWidth\":{\"type\":\"STATIC\",\"options\":{\"size\":2}},\"iconSize\":{\"type\":\"STATIC\",\"options\":{\"size\":8}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"STATIC\",\"options\":{\"value\":\"\"}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"symbolizeAs\":{\"options\":{\"value\":\"icon\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}}},\"isTimeAware\":true},\"id\":\"2ad8e318-4ef4-4e89-94f2-f37e395c488c\",\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"type\":\"VECTOR\",\"joins\":[]},{\"label\":\"filebeat-* | Destination point\",\"sourceDescriptor\":{\"indexPatternId\":\"filebeat-*\",\"geoField\":\"destination.geo.location\",\"scalingType\":\"TOP_HITS\",\"topHitsSplitField\":\"destination.ip\",\"tooltipProperties\":[\"host.name\",\"destination.ip\",\"destination.domain\",\"destination.geo.country_iso_code\",\"destination.as.organization.name\"],\"id\":\"bc95f479-964f-4498-be1e-376d34a01b0a\",\"type\":\"ES_SEARCH\",\"applyGlobalQuery\":true,\"applyGlobalTime\":true,\"filterByMapBounds\":true,\"sortField\":\"\",\"sortOrder\":\"desc\",\"topHitsSize\":35},\"style\":{\"type\":\"VECTOR\",\"properties\":{\"icon\":{\"type\":\"STATIC\",\"options\":{\"value\":\"marker\"}},\"fillColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#D36086\"}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"lineWidth\":{\"type\":\"STATIC\",\"options\":{\"size\":2}},\"iconSize\":{\"type\":\"STATIC\",\"options\":{\"size\":8}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"STATIC\",\"options\":{\"value\":\"\"}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"symbolizeAs\":{\"options\":{\"value\":\"icon\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}}},\"isTimeAware\":true},\"id\":\"dbb878c8-4039-49f1-b2ff-ab7fb942ba55\",\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"type\":\"VECTOR\",\"joins\":[]},{\"label\":\"filebeat-* | Line\",\"sourceDescriptor\":{\"indexPatternId\":\"filebeat-*\",\"sourceGeoField\":\"source.geo.location\",\"destGeoField\":\"destination.geo.location\",\"metrics\":[{\"type\":\"count\"},{\"type\":\"sum\",\"field\":\"destination.bytes\"}],\"id\":\"faf6884d-b7cb-41dd-ab86-95970d7c59d2\",\"type\":\"ES_PEW_PEW\",\"applyGlobalQuery\":true,\"applyGlobalTime\":true},\"style\":{\"type\":\"VECTOR\",\"properties\":{\"icon\":{\"type\":\"STATIC\",\"options\":{\"value\":\"marker\"}},\"fillColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#54B399\"}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#6092C0\"}},\"lineWidth\":{\"type\":\"DYNAMIC\",\"options\":{\"minSize\":1,\"maxSize\":8,\"field\":{\"name\":\"doc_count\",\"origin\":\"source\"},\"fieldMetaOptions\":{\"isEnabled\":true,\"sigma\":3}}},\"iconSize\":{\"type\":\"STATIC\",\"options\":{\"size\":6}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"STATIC\",\"options\":{\"value\":\"\"}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"symbolizeAs\":{\"options\":{\"value\":\"circle\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}}},\"isTimeAware\":true},\"id\":\"9c450fbf-b009-4b53-9810-2f47ca8dcfa8\",\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"type\":\"VECTOR\",\"joins\":[]}]",
-                "mapStateJSON": "{\"zoom\":1.24,\"center\":{\"lon\":-49.38072,\"lat\":7.87497},\"timeFilters\":{\"from\":\"now-15w\",\"to\":\"now\"},\"refreshConfig\":{\"isPaused\":true,\"interval\":0},\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filters\":[],\"settings\":{\"autoFitToDataBounds\":false,\"backgroundColor\":\"#ffffff\",\"disableInteractive\":false,\"disableTooltipControl\":false,\"hideToolbarOverlay\":false,\"hideLayerControl\":false,\"hideViewControl\":false,\"initialLocation\":\"LAST_SAVED_LOCATION\",\"fixedLocation\":{\"lat\":0,\"lon\":0,\"zoom\":2},\"browserLocation\":{\"zoom\":2},\"maxZoom\":24,\"minZoom\":0,\"showScaleControl\":false,\"showSpatialFilters\":true,\"spatialFiltersAlpa\":0.3,\"spatialFiltersFillColor\":\"#DA8B45\",\"spatialFiltersLineColor\":\"#DA8B45\"}}",
-                "title": "",
-                "uiStateJSON": "{\"isLayerTOCOpen\":true,\"openTOCDetails\":[]}"
-              },
-              "enhancements": {},
-              "hiddenLayers": [],
-              "hidePanelTitles": false,
-              "isLayerTOCOpen": false,
-              "mapBuffer": {
-                "maxLat": 148.88690000000003,
-                "maxLon": 438.09868,
-                "minLat": -116.68142,
-                "minLon": -417.60444
-              },
-              "mapCenter": {
-                "lat": 43.83453,
-                "lon": 10.24712,
-                "zoom": 1
-              },
-              "openTOCDetails": []
-            },
-            "gridData": {
-              "h": 23,
-              "i": "cd1e20e7-706f-4d02-949c-d9f5908bad67",
-              "w": 33,
-              "x": 15,
-              "y": 26
-            },
-            "panelIndex": "cd1e20e7-706f-4d02-949c-d9f5908bad67",
-            "title": "Network sources and destinations",
-            "type": "map",
-            "version": "7.12.0"
-          },
-          {
-            "embeddableConfig": {
-              "attributes": {
-                "references": [
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-current-indexpattern",
-                    "type": "index-pattern"
-                  },
-                  {
-                    "id": "filebeat-*",
-                    "name": "indexpattern-datasource-layer-028c5c1e-79f9-4999-8438-4889ac2b714c",
-                    "type": "index-pattern"
-                  },
-                  {
-                    "id": "filebeat-*",
-                    "name": "filter-index-pattern-0",
-                    "type": "index-pattern"
-                  },
-                  {
-                    "id": "filebeat-*",
-                    "name": "filter-index-pattern-1",
-                    "type": "index-pattern"
-                  }
-                ],
-                "state": {
-                  "datasourceStates": {
-                    "indexpattern": {
-                      "layers": {
-                        "028c5c1e-79f9-4999-8438-4889ac2b714c": {
-                          "columnOrder": [
-                            "e55346c7-87bc-49f4-9215-8a36931d05f4",
-                            "f2cd86e2-fb91-48b2-b8dd-e98395d28e00"
-                          ],
-                          "columns": {
-                            "e55346c7-87bc-49f4-9215-8a36931d05f4": {
-                              "customLabel": true,
-                              "dataType": "string",
-                              "isBucketed": true,
-                              "label": "Users",
-                              "operationType": "terms",
-                              "params": {
-                                "missingBucket": false,
-                                "orderBy": {
-                                  "columnId": "f2cd86e2-fb91-48b2-b8dd-e98395d28e00",
-                                  "type": "column"
-                                },
-                                "orderDirection": "desc",
-                                "otherBucket": false,
-                                "size": 5
-                              },
-                              "scale": "ordinal",
-                              "sourceField": "user.name"
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
                             },
-                            "f2cd86e2-fb91-48b2-b8dd-e98395d28e00": {
-                              "customLabel": true,
-                              "dataType": "number",
-                              "isBucketed": false,
-                              "label": "Failed authentications",
-                              "operationType": "count",
-                              "params": {},
-                              "scale": "ratio",
-                              "sourceField": "Records"
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-33bc0096-e418-4f81-9c7c-7fdd16cc5203",
+                                "type": "index-pattern"
                             }
-                          },
-                          "incompleteColumns": {}
-                        }
-                      }
-                    }
-                  },
-                  "filters": [
-                    {
-                      "$state": {
-                        "store": "appState"
-                      },
-                      "meta": {
-                        "alias": null,
-                        "disabled": false,
-                        "indexRefName": "filter-index-pattern-0",
-                        "key": "event.category",
-                        "negate": false,
-                        "params": {
-                          "query": "authentication"
-                        },
-                        "type": "phrase"
-                      },
-                      "query": {
-                        "match_phrase": {
-                          "event.category": "authentication"
-                        }
-                      }
-                    },
-                    {
-                      "$state": {
-                        "store": "appState"
-                      },
-                      "meta": {
-                        "alias": null,
-                        "disabled": false,
-                        "indexRefName": "filter-index-pattern-1",
-                        "key": "event.outcome",
-                        "negate": false,
-                        "params": {
-                          "query": "failure"
-                        },
-                        "type": "phrase"
-                      },
-                      "query": {
-                        "match_phrase": {
-                          "event.outcome": "failure"
-                        }
-                      }
-                    }
-                  ],
-                  "query": {
-                    "language": "kuery",
-                    "query": ""
-                  },
-                  "visualization": {
-                    "axisTitlesVisibilitySettings": {
-                      "x": true,
-                      "yLeft": true,
-                      "yRight": true
-                    },
-                    "fittingFunction": "None",
-                    "gridlinesVisibilitySettings": {
-                      "x": true,
-                      "yLeft": true,
-                      "yRight": true
-                    },
-                    "layers": [
-                      {
-                        "accessors": [
-                          "f2cd86e2-fb91-48b2-b8dd-e98395d28e00"
                         ],
-                        "layerId": "028c5c1e-79f9-4999-8438-4889ac2b714c",
-                        "position": "top",
-                        "seriesType": "bar_horizontal",
-                        "showGridlines": false,
-                        "xAccessor": "e55346c7-87bc-49f4-9215-8a36931d05f4",
-                        "yConfig": [
-                          {
-                            "color": "#d36086",
-                            "forAccessor": "f2cd86e2-fb91-48b2-b8dd-e98395d28e00"
-                          }
-                        ]
-                      }
-                    ],
-                    "legend": {
-                      "isVisible": true,
-                      "position": "right"
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "33bc0096-e418-4f81-9c7c-7fdd16cc5203": {
+                                            "columnOrder": [
+                                                "eedd5aa8-a7c4-466a-b10b-3a8cba3bac12"
+                                            ],
+                                            "columns": {
+                                                "eedd5aa8-a7c4-466a-b10b-3a8cba3bac12": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": " ",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "accessor": "eedd5aa8-a7c4-466a-b10b-3a8cba3bac12",
+                                "layerId": "33bc0096-e418-4f81-9c7c-7fdd16cc5203"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsMetric"
                     },
-                    "preferredSeriesType": "bar_horizontal",
-                    "tickLabelsVisibilitySettings": {
-                      "x": true,
-                      "yLeft": true,
-                      "yRight": true
-                    },
-                    "valueLabels": "hide"
-                  }
+                    "enhancements": {},
+                    "hidePanelTitles": false,
+                    "type": "lens"
                 },
-                "title": "",
+                "gridData": {
+                    "h": 4,
+                    "i": "af9e9f0b-a40c-411e-b441-2a779983ed24",
+                    "w": 10,
+                    "x": 0,
+                    "y": 9
+                },
+                "panelIndex": "af9e9f0b-a40c-411e-b441-2a779983ed24",
+                "title": "Count of events",
                 "type": "lens",
-                "visualizationType": "lnsXY"
-              },
-              "enhancements": {},
-              "hidePanelTitles": false
+                "version": "7.14.0"
             },
-            "gridData": {
-              "h": 15,
-              "i": "c6305b30-a7e2-4cc3-b49b-db99031f150e",
-              "w": 15,
-              "x": 0,
-              "y": 49
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-de047c06-a965-47aa-8a15-8b0266d5abc3",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "de047c06-a965-47aa-8a15-8b0266d5abc3": {
+                                            "columnOrder": [
+                                                "b916e5f5-a64a-49f1-b37a-ee1825fc61a4",
+                                                "3effd03e-0ed9-4e2d-ba8e-d77ae505092e"
+                                            ],
+                                            "columns": {
+                                                "3effd03e-0ed9-4e2d-ba8e-d77ae505092e": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Count of records",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                },
+                                                "b916e5f5-a64a-49f1-b37a-ee1825fc61a4": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top values of event.outcome",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "3effd03e-0ed9-4e2d-ba8e-d77ae505092e",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 5
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "event.outcome"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "categoryDisplay": "default",
+                                        "groups": [
+                                            "b916e5f5-a64a-49f1-b37a-ee1825fc61a4"
+                                        ],
+                                        "layerId": "de047c06-a965-47aa-8a15-8b0266d5abc3",
+                                        "legendDisplay": "default",
+                                        "metric": "3effd03e-0ed9-4e2d-ba8e-d77ae505092e",
+                                        "nestedLegend": false,
+                                        "numberDisplay": "percent"
+                                    }
+                                ],
+                                "shape": "donut"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsPie"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false,
+                    "type": "lens"
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "7031905a-92ab-4e0e-aa58-72f1c07ff409",
+                    "w": 10,
+                    "x": 0,
+                    "y": 13
+                },
+                "panelIndex": "7031905a-92ab-4e0e-aa58-72f1c07ff409",
+                "title": "Breakdown by outcome",
+                "type": "lens",
+                "version": "7.14.0"
             },
-            "panelIndex": "c6305b30-a7e2-4cc3-b49b-db99031f150e",
-            "title": "Top users by failed authentications to Vault",
-            "type": "lens",
-            "version": "7.12.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "hidePanelTitles": false
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-19858811-84d1-4f50-901c-dc1451972324",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-0",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-1",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "19858811-84d1-4f50-901c-dc1451972324": {
+                                            "columnOrder": [
+                                                "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
+                                                "e3526253-18e0-4122-b112-ee5b4b9e23d7"
+                                            ],
+                                            "columns": {
+                                                "81dcff19-b14a-4e4b-999e-dbbcbdfdf816": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top values of destination.user.name",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "type": "alphabetical"
+                                                        },
+                                                        "orderDirection": "asc",
+                                                        "otherBucket": true,
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "destination.user.name"
+                                                },
+                                                "e3526253-18e0-4122-b112-ee5b4b9e23d7": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Count of records",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "indexRefName": "filter-index-pattern-0",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "cyberarkpas.audit"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "cyberarkpas.audit"
+                                        }
+                                    }
+                                },
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "indexRefName": "filter-index-pattern-1",
+                                        "key": "event.code",
+                                        "negate": false,
+                                        "params": [
+                                            "308",
+                                            "22",
+                                            "319",
+                                            "295"
+                                        ],
+                                        "type": "phrases"
+                                    },
+                                    "query": {
+                                        "bool": {
+                                            "minimum_should_match": 1,
+                                            "should": [
+                                                {
+                                                    "match_phrase": {
+                                                        "event.code": "308"
+                                                    }
+                                                },
+                                                {
+                                                    "match_phrase": {
+                                                        "event.code": "22"
+                                                    }
+                                                },
+                                                {
+                                                    "match_phrase": {
+                                                        "event.code": "319"
+                                                    }
+                                                },
+                                                {
+                                                    "match_phrase": {
+                                                        "event.code": "295"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "categoryDisplay": "default",
+                                        "groups": [
+                                            "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
+                                            "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
+                                            "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
+                                            "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
+                                            "81dcff19-b14a-4e4b-999e-dbbcbdfdf816",
+                                            "81dcff19-b14a-4e4b-999e-dbbcbdfdf816"
+                                        ],
+                                        "layerId": "19858811-84d1-4f50-901c-dc1451972324",
+                                        "legendDisplay": "default",
+                                        "metric": "e3526253-18e0-4122-b112-ee5b4b9e23d7",
+                                        "nestedLegend": false,
+                                        "numberDisplay": "percent"
+                                    }
+                                ],
+                                "shape": "donut"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsPie"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false,
+                    "type": "lens"
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "a24b9c0c-da95-4016-9fe5-2c0d34005832",
+                    "w": 11,
+                    "x": 10,
+                    "y": 13
+                },
+                "panelIndex": "a24b9c0c-da95-4016-9fe5-2c0d34005832",
+                "title": "Top 10 user credentials accessed",
+                "type": "lens",
+                "version": "7.14.0"
             },
-            "gridData": {
-              "h": 15,
-              "i": "96a2c711-40a3-4dfc-87f5-4b193078e05a",
-              "w": 33,
-              "x": 15,
-              "y": 49
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-50325938-6a9e-4a26-946e-4468e68c6591",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-0",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-1",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "50325938-6a9e-4a26-946e-4468e68c6591": {
+                                            "columnOrder": [
+                                                "8a965540-daa1-4848-80bb-96ddf53a328f",
+                                                "c05a39ad-2983-4f4a-900d-a939ecbda504",
+                                                "a808a872-71b5-4a76-a939-354f68991881"
+                                            ],
+                                            "columns": {
+                                                "8a965540-daa1-4848-80bb-96ddf53a328f": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top values of event.outcome",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "a808a872-71b5-4a76-a939-354f68991881",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 2
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "event.outcome"
+                                                },
+                                                "a808a872-71b5-4a76-a939-354f68991881": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Credentials accessed",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                },
+                                                "c05a39ad-2983-4f4a-900d-a939ecbda504": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "indexRefName": "filter-index-pattern-0",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "cyberarkpas.audit"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "cyberarkpas.audit"
+                                        }
+                                    }
+                                },
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "indexRefName": "filter-index-pattern-1",
+                                        "key": "event.code",
+                                        "negate": false,
+                                        "params": [
+                                            "308",
+                                            "22",
+                                            "319",
+                                            "295",
+                                            "38"
+                                        ],
+                                        "type": "phrases"
+                                    },
+                                    "query": {
+                                        "bool": {
+                                            "minimum_should_match": 1,
+                                            "should": [
+                                                {
+                                                    "match_phrase": {
+                                                        "event.code": "308"
+                                                    }
+                                                },
+                                                {
+                                                    "match_phrase": {
+                                                        "event.code": "22"
+                                                    }
+                                                },
+                                                {
+                                                    "match_phrase": {
+                                                        "event.code": "319"
+                                                    }
+                                                },
+                                                {
+                                                    "match_phrase": {
+                                                        "event.code": "295"
+                                                    }
+                                                },
+                                                {
+                                                    "match_phrase": {
+                                                        "event.code": "38"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "a808a872-71b5-4a76-a939-354f68991881"
+                                        ],
+                                        "layerId": "50325938-6a9e-4a26-946e-4468e68c6591",
+                                        "position": "top",
+                                        "seriesType": "area_stacked",
+                                        "showGridlines": false,
+                                        "splitAccessor": "8a965540-daa1-4848-80bb-96ddf53a328f",
+                                        "xAccessor": "c05a39ad-2983-4f4a-900d-a939ecbda504"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "area_stacked",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false,
+                    "type": "lens"
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "1dc68cc6-e1b3-43ea-9b0e-f423d194b99a",
+                    "w": 27,
+                    "x": 21,
+                    "y": 13
+                },
+                "panelIndex": "1dc68cc6-e1b3-43ea-9b0e-f423d194b99a",
+                "title": "Credential access by time",
+                "type": "lens",
+                "version": "7.14.0"
             },
-            "panelIndex": "96a2c711-40a3-4dfc-87f5-4b193078e05a",
-            "panelRefName": "panel_9",
-            "title": "Credential Access",
-            "version": "7.12.0"
-          },
-          {
-            "embeddableConfig": {
-              "columns": [
-                "observer.hostname",
-                "cyberarkpas.audit.action",
-                "cyberarkpas.audit.issuer",
-                "cyberarkpas.audit.safe",
-                "file.path"
-              ],
-              "enhancements": {},
-              "hidePanelTitles": false
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-105faf70-8330-46b3-a82a-573a383068fa",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-0",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "105faf70-8330-46b3-a82a-573a383068fa": {
+                                            "columnOrder": [
+                                                "c51d6847-2fcc-4d13-a44f-49786cb979ed",
+                                                "d73b823b-ae68-4e73-bbe2-90a35bc825e7",
+                                                "c0147524-accc-4dee-a4fc-44199e3459f1"
+                                            ],
+                                            "columns": {
+                                                "c0147524-accc-4dee-a4fc-44199e3459f1": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Authentications",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                },
+                                                "c51d6847-2fcc-4d13-a44f-49786cb979ed": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Users",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "c0147524-accc-4dee-a4fc-44199e3459f1",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 8
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "user.name"
+                                                },
+                                                "d73b823b-ae68-4e73-bbe2-90a35bc825e7": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top values of event.outcome",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "type": "alphabetical"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 2
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "event.outcome"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "indexRefName": "filter-index-pattern-0",
+                                        "key": "event.category",
+                                        "negate": false,
+                                        "params": [
+                                            "authentication"
+                                        ],
+                                        "type": "phrases"
+                                    },
+                                    "query": {
+                                        "bool": {
+                                            "minimum_should_match": 1,
+                                            "should": [
+                                                {
+                                                    "match_phrase": {
+                                                        "event.category": "authentication"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "c0147524-accc-4dee-a4fc-44199e3459f1"
+                                        ],
+                                        "layerId": "105faf70-8330-46b3-a82a-573a383068fa",
+                                        "palette": {
+                                            "name": "status",
+                                            "type": "palette"
+                                        },
+                                        "position": "top",
+                                        "seriesType": "bar_horizontal_stacked",
+                                        "showGridlines": false,
+                                        "splitAccessor": "d73b823b-ae68-4e73-bbe2-90a35bc825e7",
+                                        "xAccessor": "c51d6847-2fcc-4d13-a44f-49786cb979ed"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right",
+                                    "showSingleSeries": false
+                                },
+                                "preferredSeriesType": "bar_horizontal_stacked",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false,
+                    "type": "lens"
+                },
+                "gridData": {
+                    "h": 23,
+                    "i": "c56b3e4d-bfb6-4b06-a62b-282753b85f7a",
+                    "w": 15,
+                    "x": 0,
+                    "y": 26
+                },
+                "panelIndex": "c56b3e4d-bfb6-4b06-a62b-282753b85f7a",
+                "title": "Vault Authentication attempts",
+                "type": "lens",
+                "version": "7.14.0"
             },
-            "gridData": {
-              "h": 18,
-              "i": "6cd62115-65e7-416f-8da7-96b0d7a9d932",
-              "w": 48,
-              "x": 0,
-              "y": 64
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "layerListJSON": [
+                            {
+                                "alpha": 1,
+                                "id": "a3734143-d6e1-4551-b0b1-8282a37e151b",
+                                "label": null,
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "sourceDescriptor": {
+                                    "id": null,
+                                    "isAutoSelect": true,
+                                    "type": "EMS_TMS"
+                                },
+                                "style": {
+                                    "type": "TILE"
+                                },
+                                "type": "VECTOR_TILE",
+                                "visible": true
+                            },
+                            {
+                                "alpha": 0.75,
+                                "id": "2ad8e318-4ef4-4e89-94f2-f37e395c488c",
+                                "joins": [],
+                                "label": "Filebeat index | Source Point",
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "sourceDescriptor": {
+                                    "applyGlobalQuery": true,
+                                    "applyGlobalTime": true,
+                                    "filterByMapBounds": true,
+                                    "geoField": "source.geo.location",
+                                    "id": "5f2b25a1-01ea-45ca-a4a2-f1a670c3b149",
+                                    "indexPatternId": "filebeat-*",
+                                    "scalingType": "TOP_HITS",
+                                    "sortField": "",
+                                    "sortOrder": "desc",
+                                    "tooltipProperties": [
+                                        "host.name",
+                                        "source.ip",
+                                        "source.domain",
+                                        "source.geo.country_iso_code",
+                                        "source.as.organization.name"
+                                    ],
+                                    "topHitsSize": 22,
+                                    "topHitsSplitField": "source.ip",
+                                    "type": "ES_SEARCH"
+                                },
+                                "style": {
+                                    "isTimeAware": true,
+                                    "properties": {
+                                        "fillColor": {
+                                            "options": {
+                                                "color": "#6092C0"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "icon": {
+                                            "options": {
+                                                "value": "home"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "iconOrientation": {
+                                            "options": {
+                                                "orientation": 0
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "iconSize": {
+                                            "options": {
+                                                "size": 8
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelBorderColor": {
+                                            "options": {
+                                                "color": "#FFFFFF"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelBorderSize": {
+                                            "options": {
+                                                "size": "SMALL"
+                                            }
+                                        },
+                                        "labelColor": {
+                                            "options": {
+                                                "color": "#000000"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelSize": {
+                                            "options": {
+                                                "size": 14
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelText": {
+                                            "options": {
+                                                "value": ""
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "lineColor": {
+                                            "options": {
+                                                "color": "#FFFFFF"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "lineWidth": {
+                                            "options": {
+                                                "size": 2
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "symbolizeAs": {
+                                            "options": {
+                                                "value": "icon"
+                                            }
+                                        }
+                                    },
+                                    "type": "VECTOR"
+                                },
+                                "type": "VECTOR",
+                                "visible": true
+                            },
+                            {
+                                "alpha": 0.75,
+                                "id": "dbb878c8-4039-49f1-b2ff-ab7fb942ba55",
+                                "joins": [],
+                                "label": "Filebeat index | Destination point",
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "sourceDescriptor": {
+                                    "applyGlobalQuery": true,
+                                    "applyGlobalTime": true,
+                                    "filterByMapBounds": true,
+                                    "geoField": "destination.geo.location",
+                                    "id": "bc95f479-964f-4498-be1e-376d34a01b0a",
+                                    "indexPatternId": "filebeat-*",
+                                    "scalingType": "TOP_HITS",
+                                    "sortField": "",
+                                    "sortOrder": "desc",
+                                    "tooltipProperties": [
+                                        "host.name",
+                                        "destination.ip",
+                                        "destination.domain",
+                                        "destination.geo.country_iso_code",
+                                        "destination.as.organization.name"
+                                    ],
+                                    "topHitsSize": 35,
+                                    "topHitsSplitField": "destination.ip",
+                                    "type": "ES_SEARCH"
+                                },
+                                "style": {
+                                    "isTimeAware": true,
+                                    "properties": {
+                                        "fillColor": {
+                                            "options": {
+                                                "color": "#D36086"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "icon": {
+                                            "options": {
+                                                "value": "marker"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "iconOrientation": {
+                                            "options": {
+                                                "orientation": 0
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "iconSize": {
+                                            "options": {
+                                                "size": 8
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelBorderColor": {
+                                            "options": {
+                                                "color": "#FFFFFF"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelBorderSize": {
+                                            "options": {
+                                                "size": "SMALL"
+                                            }
+                                        },
+                                        "labelColor": {
+                                            "options": {
+                                                "color": "#000000"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelSize": {
+                                            "options": {
+                                                "size": 14
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelText": {
+                                            "options": {
+                                                "value": ""
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "lineColor": {
+                                            "options": {
+                                                "color": "#FFFFFF"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "lineWidth": {
+                                            "options": {
+                                                "size": 2
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "symbolizeAs": {
+                                            "options": {
+                                                "value": "icon"
+                                            }
+                                        }
+                                    },
+                                    "type": "VECTOR"
+                                },
+                                "type": "VECTOR",
+                                "visible": true
+                            },
+                            {
+                                "alpha": 0.75,
+                                "id": "9c450fbf-b009-4b53-9810-2f47ca8dcfa8",
+                                "joins": [],
+                                "label": "Filebeat index | Line",
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "sourceDescriptor": {
+                                    "applyGlobalQuery": true,
+                                    "applyGlobalTime": true,
+                                    "destGeoField": "destination.geo.location",
+                                    "id": "faf6884d-b7cb-41dd-ab86-95970d7c59d2",
+                                    "indexPatternId": "filebeat-*",
+                                    "metrics": [
+                                        {
+                                            "type": "count"
+                                        },
+                                        {
+                                            "field": "destination.bytes",
+                                            "type": "sum"
+                                        }
+                                    ],
+                                    "sourceGeoField": "source.geo.location",
+                                    "type": "ES_PEW_PEW"
+                                },
+                                "style": {
+                                    "isTimeAware": true,
+                                    "properties": {
+                                        "fillColor": {
+                                            "options": {
+                                                "color": "#54B399"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "icon": {
+                                            "options": {
+                                                "value": "marker"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "iconOrientation": {
+                                            "options": {
+                                                "orientation": 0
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "iconSize": {
+                                            "options": {
+                                                "size": 6
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelBorderColor": {
+                                            "options": {
+                                                "color": "#FFFFFF"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelBorderSize": {
+                                            "options": {
+                                                "size": "SMALL"
+                                            }
+                                        },
+                                        "labelColor": {
+                                            "options": {
+                                                "color": "#000000"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelSize": {
+                                            "options": {
+                                                "size": 14
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelText": {
+                                            "options": {
+                                                "value": ""
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "lineColor": {
+                                            "options": {
+                                                "color": "#6092C0"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "lineWidth": {
+                                            "options": {
+                                                "field": {
+                                                    "name": "doc_count",
+                                                    "origin": "source"
+                                                },
+                                                "fieldMetaOptions": {
+                                                    "isEnabled": true,
+                                                    "sigma": 3
+                                                },
+                                                "maxSize": 8,
+                                                "minSize": 1
+                                            },
+                                            "type": "DYNAMIC"
+                                        },
+                                        "symbolizeAs": {
+                                            "options": {
+                                                "value": "circle"
+                                            }
+                                        }
+                                    },
+                                    "type": "VECTOR"
+                                },
+                                "type": "VECTOR",
+                                "visible": true
+                            }
+                        ],
+                        "mapStateJSON": {
+                            "center": {
+                                "lat": 7.87497,
+                                "lon": -49.38072
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "refreshConfig": {
+                                "interval": 0,
+                                "isPaused": true
+                            },
+                            "settings": {
+                                "autoFitToDataBounds": false,
+                                "backgroundColor": "#ffffff",
+                                "browserLocation": {
+                                    "zoom": 2
+                                },
+                                "disableInteractive": false,
+                                "disableTooltipControl": false,
+                                "fixedLocation": {
+                                    "lat": 0,
+                                    "lon": 0,
+                                    "zoom": 2
+                                },
+                                "hideLayerControl": false,
+                                "hideToolbarOverlay": false,
+                                "hideViewControl": false,
+                                "initialLocation": "LAST_SAVED_LOCATION",
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "showScaleControl": false,
+                                "showSpatialFilters": true,
+                                "spatialFiltersAlpa": 0.3,
+                                "spatialFiltersFillColor": "#DA8B45",
+                                "spatialFiltersLineColor": "#DA8B45"
+                            },
+                            "timeFilters": {
+                                "from": "now-15w",
+                                "to": "now"
+                            },
+                            "zoom": 1.24
+                        },
+                        "title": "",
+                        "uiStateJSON": {
+                            "isLayerTOCOpen": true,
+                            "openTOCDetails": []
+                        }
+                    },
+                    "enhancements": {},
+                    "hiddenLayers": [],
+                    "hidePanelTitles": false,
+                    "isLayerTOCOpen": false,
+                    "mapBuffer": {
+                        "maxLat": 148.88690000000003,
+                        "maxLon": 438.09868,
+                        "minLat": -116.68142,
+                        "minLon": -417.60444
+                    },
+                    "mapCenter": {
+                        "lat": 43.83453,
+                        "lon": 10.24712,
+                        "zoom": 1
+                    },
+                    "openTOCDetails": [],
+                    "type": "map"
+                },
+                "gridData": {
+                    "h": 23,
+                    "i": "cd1e20e7-706f-4d02-949c-d9f5908bad67",
+                    "w": 33,
+                    "x": 15,
+                    "y": 26
+                },
+                "panelIndex": "cd1e20e7-706f-4d02-949c-d9f5908bad67",
+                "title": "Network sources and destinations",
+                "type": "map",
+                "version": "7.14.0"
             },
-            "panelIndex": "6cd62115-65e7-416f-8da7-96b0d7a9d932",
-            "panelRefName": "panel_10",
-            "title": "All logs",
-            "version": "7.12.0"
-          }
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-028c5c1e-79f9-4999-8438-4889ac2b714c",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-0",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-1",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "028c5c1e-79f9-4999-8438-4889ac2b714c": {
+                                            "columnOrder": [
+                                                "e55346c7-87bc-49f4-9215-8a36931d05f4",
+                                                "f2cd86e2-fb91-48b2-b8dd-e98395d28e00"
+                                            ],
+                                            "columns": {
+                                                "e55346c7-87bc-49f4-9215-8a36931d05f4": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Users",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "f2cd86e2-fb91-48b2-b8dd-e98395d28e00",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "size": 5
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "user.name"
+                                                },
+                                                "f2cd86e2-fb91-48b2-b8dd-e98395d28e00": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Failed authentications",
+                                                    "operationType": "count",
+                                                    "params": {},
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "indexRefName": "filter-index-pattern-0",
+                                        "key": "event.category",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "authentication"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.category": "authentication"
+                                        }
+                                    }
+                                },
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "indexRefName": "filter-index-pattern-1",
+                                        "key": "event.outcome",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "failure"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.outcome": "failure"
+                                        }
+                                    }
+                                }
+                            ],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "f2cd86e2-fb91-48b2-b8dd-e98395d28e00"
+                                        ],
+                                        "layerId": "028c5c1e-79f9-4999-8438-4889ac2b714c",
+                                        "position": "top",
+                                        "seriesType": "bar_horizontal",
+                                        "showGridlines": false,
+                                        "xAccessor": "e55346c7-87bc-49f4-9215-8a36931d05f4",
+                                        "yConfig": [
+                                            {
+                                                "color": "#d36086",
+                                                "forAccessor": "f2cd86e2-fb91-48b2-b8dd-e98395d28e00"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar_horizontal",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false,
+                    "type": "lens"
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "c6305b30-a7e2-4cc3-b49b-db99031f150e",
+                    "w": 15,
+                    "x": 0,
+                    "y": 49
+                },
+                "panelIndex": "c6305b30-a7e2-4cc3-b49b-db99031f150e",
+                "title": "Top users by failed authentications to Vault",
+                "type": "lens",
+                "version": "7.14.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "96a2c711-40a3-4dfc-87f5-4b193078e05a",
+                    "w": 33,
+                    "x": 15,
+                    "y": 49
+                },
+                "panelIndex": "96a2c711-40a3-4dfc-87f5-4b193078e05a",
+                "panelRefName": "panel_9",
+                "title": "Credential Access",
+                "version": "7.12.0"
+            },
+            {
+                "embeddableConfig": {
+                    "columns": [
+                        "observer.hostname",
+                        "cyberarkpas.audit.action",
+                        "cyberarkpas.audit.issuer",
+                        "cyberarkpas.audit.safe",
+                        "file.path"
+                    ],
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "6cd62115-65e7-416f-8da7-96b0d7a9d932",
+                    "w": 48,
+                    "x": 0,
+                    "y": 64
+                },
+                "panelIndex": "6cd62115-65e7-416f-8da7-96b0d7a9d932",
+                "panelRefName": "panel_10",
+                "title": "All logs",
+                "version": "7.12.0"
+            }
         ],
         "timeRestore": false,
         "title": "[Filebeat CyberArk PAS] Overview",
         "version": 1
-      },
-      "coreMigrationVersion": "7.12.0",
-      "id": "eb12ef60-96f6-11eb-bbf8-d77aef8ad7a6",
-      "migrationVersion": {
-        "dashboard": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "control_0_index_pattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "control_1_index_pattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "indexpattern-datasource-layer-33bc0096-e418-4f81-9c7c-7fdd16cc5203",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "indexpattern-datasource-layer-de047c06-a965-47aa-8a15-8b0266d5abc3",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "indexpattern-datasource-layer-19858811-84d1-4f50-901c-dc1451972324",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "filter-index-pattern-0",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "filter-index-pattern-1",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "indexpattern-datasource-layer-50325938-6a9e-4a26-946e-4468e68c6591",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "filter-index-pattern-0",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "filter-index-pattern-1",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "indexpattern-datasource-layer-105faf70-8330-46b3-a82a-573a383068fa",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "filter-index-pattern-0",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "layer_1_source_index_pattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "layer_2_source_index_pattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "layer_3_source_index_pattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "indexpattern-datasource-layer-028c5c1e-79f9-4999-8438-4889ac2b714c",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "filter-index-pattern-0",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "filter-index-pattern-1",
-          "type": "index-pattern"
-        },
-        {
-          "id": "a9b82df0-97a5-11eb-bbf8-d77aef8ad7a6",
-          "name": "panel_9",
-          "type": "search"
-        },
-        {
-          "id": "fec0d170-96f7-11eb-bbf8-d77aef8ad7a6",
-          "name": "panel_10",
-          "type": "search"
-        }
-      ],
-      "type": "dashboard",
-      "updated_at": "2021-04-13T17:04:21.111Z",
-      "version": "WzM0ODYsM10="
     },
-    {
-      "attributes": {
-        "columns": [
-          "event.action",
-          "event.outcome",
-          "source.address",
-          "source.user.name",
-          "destination.address",
-          "destination.user.name",
-          "event.reason"
-        ],
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "cyberarkpas.audit"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "cyberarkpas.audit"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "event.code",
-                  "negate": false,
-                  "params": [
-                    "308",
-                    "319",
-                    "295",
-                    "22",
-                    "38",
-                    "300",
-                    "302"
-                  ],
-                  "type": "phrases",
-                  "value": "308, 319, 295, 22, 38, 300, 302"
-                },
-                "query": {
-                  "bool": {
-                    "minimum_should_match": 1,
-                    "should": [
-                      {
-                        "match_phrase": {
-                          "event.code": "308"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "319"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "295"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "22"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "38"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "300"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "302"
-                        }
-                      }
-                    ]
-                  }
-                }
-              }
-            ],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "sort": [
-          [
-            "@timestamp",
-            "desc"
-          ]
-        ],
-        "title": "Credential Access logs [Filebeat CyberArk PAS] ECS",
-        "version": 1
-      },
-      "coreMigrationVersion": "7.12.0",
-      "id": "a9b82df0-97a5-11eb-bbf8-d77aef8ad7a6",
-      "migrationVersion": {
-        "search": "7.9.3"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "search",
-      "updated_at": "2021-04-13T13:24:02.327Z",
-      "version": "WzI4NzgsM10="
+    "coreMigrationVersion": "8.0.0",
+    "id": "eb12ef60-96f6-11eb-bbf8-d77aef8ad7a6",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
     },
-    {
-      "attributes": {
-        "columns": [],
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": "event.dataset:\"cyberarkpas.audit\" "
-            }
-          }
-        },
-        "sort": [
-          [
-            "@timestamp",
-            "desc"
-          ]
-        ],
-        "title": "All logs [Filebeat CyberArk PAS] ECS",
-        "version": 1
-      },
-      "coreMigrationVersion": "7.12.0",
-      "id": "fec0d170-96f7-11eb-bbf8-d77aef8ad7a6",
-      "migrationVersion": {
-        "search": "7.9.3"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
+    "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "control_1_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-33bc0096-e418-4f81-9c7c-7fdd16cc5203",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-de047c06-a965-47aa-8a15-8b0266d5abc3",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-19858811-84d1-4f50-901c-dc1451972324",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "filter-index-pattern-0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "filter-index-pattern-1",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-50325938-6a9e-4a26-946e-4468e68c6591",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "filter-index-pattern-0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "filter-index-pattern-1",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-105faf70-8330-46b3-a82a-573a383068fa",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "filter-index-pattern-0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "layer_1_source_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "layer_2_source_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "layer_3_source_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-028c5c1e-79f9-4999-8438-4889ac2b714c",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "filter-index-pattern-0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "filter-index-pattern-1",
+            "type": "index-pattern"
+        },
+        {
+            "id": "a9b82df0-97a5-11eb-bbf8-d77aef8ad7a6",
+            "name": "panel_9",
+            "type": "search"
+        },
+        {
+            "id": "fec0d170-96f7-11eb-bbf8-d77aef8ad7a6",
+            "name": "panel_10",
+            "type": "search"
         }
-      ],
-      "type": "search",
-      "updated_at": "2021-04-13T13:24:02.327Z",
-      "version": "WzI4NzksM10="
-    }
-  ],
-  "version": "7.12.0"
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:04.520Z",
+    "version": "WzQ0MTAsMV0="
 }

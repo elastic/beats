@@ -24,9 +24,9 @@ import (
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/system"
 	"github.com/elastic/beats/v7/metricbeat/module/system/raid/blockinfo"
 )
 
@@ -54,9 +54,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-
+	sys := base.Module().(system.SystemModule)
 	if config.MountPoint == "" {
-		config.MountPoint = paths.Paths.Hostfs
+		config.MountPoint = sys.GetHostFS()
 	}
 
 	mountPoint := filepath.Join(config.MountPoint, procfs.DefaultMountPoint)

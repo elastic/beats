@@ -45,10 +45,11 @@ processors:
 - set:
     field: cloud.provider
     value: azure
-- set:
-    field: '@timestamp'
-    value: '{{json.alertUpdateTime}}'
-    if: ctx.json?.alertUpdateTime != null
+- date:
+    field: json.lastUpdateTime
+    formats:
+      - ISO8601
+    if: ctx.json?.lastUpdateTime != null
 - rename:
     field: json.aadTenantId
     target_field: cloud.account.id
@@ -263,23 +264,6 @@ processors:
     field: json.evidence.userSid
     target_field: user.id
     ignore_missing: true
-
-##############################
-##   ECS host.user Mapping  ##
-## Deprecated since ECS 1.8 ##
-##############################
-- set:
-    field: host.user.name
-    value: '{{user.name}}'
-    ignore_empty_value: true
-- set:
-    field: host.user.domain
-    value: '{{user.domain}}'
-    ignore_empty_value: true
-- set:
-    field: host.user.id
-    value: '{{user.id}}'
-    ignore_empty_value: true
 
 #########################
 ## ECS Related Mapping ##

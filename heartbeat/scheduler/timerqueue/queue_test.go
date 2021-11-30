@@ -20,6 +20,8 @@ package timerqueue
 import (
 	"context"
 	"math/rand"
+	"os"
+	"runtime/pprof"
 	"sort"
 	"testing"
 	"time"
@@ -27,11 +29,32 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestQueueRunsInOrder(t *testing.T) {
-	t.Skip("flaky test on windows: https://github.com/elastic/beats/issues/26205")
-	// Bugs can show up only occasionally
-	for i := 0; i < 100; i++ {
-		testQueueRunsInOrderOnce(t)
+func TestRunsInOrder(t *testing.T) {
+	testQueueRunsInOrderOnce(t)
+}
+
+// TestStress tries to figure out if we have any deadlocks that show up under concurrency
+func TestStress(t *testing.T) {
+	for i := 0; i < 120000; i++ {
+		failed := make(chan bool)
+		succeeded := make(chan bool)
+
+		watchdog := time.AfterFunc(time.Second*5, func() {
+			failed <- true
+		})
+
+		go func() {
+			testQueueRunsInOrderOnce(t)
+			succeeded <- true
+		}()
+
+		select {
+		case <-failed:
+			pprof.Lookup("goroutine").WriteTo(os.Stdout, 1)
+			require.FailNow(t, "Scheduler test iteration timed out, deadlock issue?")
+		case <-succeeded:
+			watchdog.Stop()
+		}
 	}
 }
 

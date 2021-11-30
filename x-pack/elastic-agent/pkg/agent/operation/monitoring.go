@@ -220,6 +220,11 @@ func (o *Operator) getMonitoringFilebeatConfig(outputType string, output interfa
 	inputs := []interface{}{
 		map[string]interface{}{
 			"type": "filestream",
+			"close": map[string]interface{}{
+				"on_state_change": map[string]interface{}{
+					"inactive": "5m",
+				},
+			},
 			"parsers": []map[string]interface{}{
 				{
 					"ndjson": map[string]interface{}{
@@ -229,10 +234,8 @@ func (o *Operator) getMonitoringFilebeatConfig(outputType string, output interfa
 				},
 			},
 			"paths": []string{
-				filepath.Join(paths.Home(), "logs", "elastic-agent-json.log"),
-				filepath.Join(paths.Home(), "logs", "elastic-agent-json.log*"),
-				filepath.Join(paths.Home(), "logs", "elastic-agent-watcher-json.log"),
-				filepath.Join(paths.Home(), "logs", "elastic-agent-watcher-json.log*"),
+				filepath.Join(paths.Home(), "logs", "elastic-agent-*.ndjson"),
+				filepath.Join(paths.Home(), "logs", "elastic-agent-watcher-*.ndjson"),
 			},
 			"index": fmt.Sprintf("logs-elastic_agent-%s", monitoringNamespace),
 			"processors": []map[string]interface{}{
@@ -265,6 +268,14 @@ func (o *Operator) getMonitoringFilebeatConfig(outputType string, output interfa
 					},
 				},
 				{
+					"add_fields": map[string]interface{}{
+						"target": "agent",
+						"fields": map[string]interface{}{
+							"id": o.agentInfo.AgentID(),
+						},
+					},
+				},
+				{
 					"drop_fields": map[string]interface{}{
 						"fields": []string{
 							"ecs.version", //coming from logger, already added by libbeat
@@ -280,6 +291,11 @@ func (o *Operator) getMonitoringFilebeatConfig(outputType string, output interfa
 		for name, paths := range logPaths {
 			inputs = append(inputs, map[string]interface{}{
 				"type": "filestream",
+				"close": map[string]interface{}{
+					"on_state_change": map[string]interface{}{
+						"inactive": "5m",
+					},
+				},
 				"parsers": []map[string]interface{}{
 					{
 						"ndjson": map[string]interface{}{
@@ -320,6 +336,14 @@ func (o *Operator) getMonitoringFilebeatConfig(outputType string, output interfa
 						},
 					},
 					{
+						"add_fields": map[string]interface{}{
+							"target": "agent",
+							"fields": map[string]interface{}{
+								"id": o.agentInfo.AgentID(),
+							},
+						},
+					},
+					{
 						"drop_fields": map[string]interface{}{
 							"fields": []string{
 								"ecs.version", //coming from logger, already added by libbeat
@@ -338,16 +362,6 @@ func (o *Operator) getMonitoringFilebeatConfig(outputType string, output interfa
 		},
 		"output": map[string]interface{}{
 			outputType: output,
-		},
-		"processors": []map[string]interface{}{
-			{
-				"add_fields": map[string]interface{}{
-					"target": "agent",
-					"fields": map[string]interface{}{
-						"id": o.agentInfo.AgentID(),
-					},
-				},
-			},
 		},
 	}
 
@@ -398,6 +412,14 @@ func (o *Operator) getMonitoringMetricbeatConfig(outputType string, output inter
 						},
 					},
 				},
+				{
+					"add_fields": map[string]interface{}{
+						"target": "agent",
+						"fields": map[string]interface{}{
+							"id": o.agentInfo.AgentID(),
+						},
+					},
+				},
 			},
 		}, map[string]interface{}{
 			"module":     "http",
@@ -438,35 +460,16 @@ func (o *Operator) getMonitoringMetricbeatConfig(outputType string, output inter
 					},
 				},
 				{
-					"copy_fields": map[string]interface{}{
-						"fields": []map[string]interface{}{
-							// I should be able to see the CPU Usage on the running machine. Am using too much CPU?
-							{
-								"from": "http.agent.beat.cpu",
-								"to":   "system.process.cpu",
-							},
-							// I should be able to see the Memory usage of Elastic Agent. Is the Elastic Agent using too much memory?
-							{
-								"from": "http.agent.beat.memstats.memory_sys",
-								"to":   "system.process.memory.size",
-							},
-							// I should be able to see the system memory. Am I running out of memory?
-							// TODO: with APM agent: total and free
-
-							// I should be able to see Disk usage on the running machine. Am I running out of disk space?
-							// TODO: with APM agent
-
-							// I should be able to see fd usage. Am I keep too many files open?
-							{
-								"from": "http.agent.beat.handles",
-								"to":   "system.process.fd",
-							},
-							// Cgroup reporting
-							{
-								"from": "http.agent.beat.cgroup",
-								"to":   "system.process.cgroup",
-							},
+					"add_fields": map[string]interface{}{
+						"target": "agent",
+						"fields": map[string]interface{}{
+							"id": o.agentInfo.AgentID(),
 						},
+					},
+				},
+				{
+					"copy_fields": map[string]interface{}{
+						"fields":         normalizeHTTPCopyRules(name),
 						"ignore_missing": true,
 					},
 				},
@@ -521,35 +524,16 @@ func (o *Operator) getMonitoringMetricbeatConfig(outputType string, output inter
 				},
 			},
 			{
-				"copy_fields": map[string]interface{}{
-					"fields": []map[string]interface{}{
-						// I should be able to see the CPU Usage on the running machine. Am using too much CPU?
-						{
-							"from": "http.agent.beat.cpu",
-							"to":   "system.process.cpu",
-						},
-						// I should be able to see the Memory usage of Elastic Agent. Is the Elastic Agent using too much memory?
-						{
-							"from": "http.agent.beat.memstats.memory_sys",
-							"to":   "system.process.memory.size",
-						},
-						// I should be able to see the system memory. Am I running out of memory?
-						// TODO: with APM agent: total and free
-
-						// I should be able to see Disk usage on the running machine. Am I running out of disk space?
-						// TODO: with APM agent
-
-						// I should be able to see fd usage. Am I keep too many files open?
-						{
-							"from": "http.agent.beat.handles",
-							"to":   "system.process.fd",
-						},
-						// Cgroup reporting
-						{
-							"from": "http.agent.beat.cgroup",
-							"to":   "system.process.cgroup",
-						},
+				"add_fields": map[string]interface{}{
+					"target": "agent",
+					"fields": map[string]interface{}{
+						"id": o.agentInfo.AgentID(),
 					},
+				},
+			},
+			{
+				"copy_fields": map[string]interface{}{
+					"fields":         normalizeHTTPCopyRules(fixedAgentName),
 					"ignore_missing": true,
 				},
 			},
@@ -570,16 +554,6 @@ func (o *Operator) getMonitoringMetricbeatConfig(outputType string, output inter
 		},
 		"output": map[string]interface{}{
 			outputType: output,
-		},
-		"processors": []map[string]interface{}{
-			{
-				"add_fields": map[string]interface{}{
-					"target": "agent",
-					"fields": map[string]interface{}{
-						"id": o.agentInfo.AgentID(),
-					},
-				},
-			},
 		},
 	}
 
@@ -657,4 +631,49 @@ func (o *Operator) isMonitoringLogs() bool {
 
 func (o *Operator) isMonitoringMetrics() bool {
 	return (o.isMonitoring & isMonitoringMetricsFlag) != 0
+}
+
+func normalizeHTTPCopyRules(name string) []map[string]interface{} {
+	fromToMap := []map[string]interface{}{
+		// I should be able to see the CPU Usage on the running machine. Am using too much CPU?
+		{
+			"from": "http.agent.beat.cpu",
+			"to":   "system.process.cpu",
+		},
+		// I should be able to see the Memory usage of Elastic Agent. Is the Elastic Agent using too much memory?
+		{
+			"from": "http.agent.beat.memstats.memory_sys",
+			"to":   "system.process.memory.size",
+		},
+		// I should be able to see the system memory. Am I running out of memory?
+		// TODO: with APM agent: total and free
+
+		// I should be able to see Disk usage on the running machine. Am I running out of disk space?
+		// TODO: with APM agent
+
+		// I should be able to see fd usage. Am I keep too many files open?
+		{
+			"from": "http.agent.beat.handles",
+			"to":   "system.process.fd",
+		},
+		// Cgroup reporting
+		{
+			"from": "http.agent.beat.cgroup",
+			"to":   "system.process.cgroup",
+		},
+	}
+
+	spec, found := program.SupportedMap[name]
+	if !found {
+		return fromToMap
+	}
+
+	for _, exportedMetric := range spec.ExprtedMetrics {
+		fromToMap = append(fromToMap, map[string]interface{}{
+			"from": fmt.Sprintf("http.agent.%s", exportedMetric),
+			"to":   exportedMetric,
+		})
+	}
+
+	return fromToMap
 }

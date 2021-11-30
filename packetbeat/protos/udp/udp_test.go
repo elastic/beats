@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package udp
@@ -76,9 +77,7 @@ func (p TestProtocols) GetAllUDP() map[protos.Protocol]protos.UDPPlugin {
 	return p.udp
 }
 
-func (p TestProtocols) Register(proto protos.Protocol, plugin protos.Plugin) {
-	return
-}
+func (p TestProtocols) Register(proto protos.Protocol, plugin protos.Plugin) {}
 
 type TestProtocol struct {
 	Ports []int          // Ports that the protocol operates on.

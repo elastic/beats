@@ -11,14 +11,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
+	prevConsumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
+	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 )
-
-// Service interface for the azure monitor service and mock for testing
-type Service interface {
-	GetForcast(filter string) (consumption.ForecastsListResult, error)
-	GetUsageDetails(scope string, expand string, filter string, skiptoken string, top *int32, apply string) (consumption.UsageDetailsListResultPage, error)
-}
 
 // MockService mock for the azure monitor services
 type MockService struct {
@@ -41,7 +36,7 @@ func (service *MockService) GetForcast(filter string) (consumption.ForecastsList
 }
 
 // GetUsageDetails is a mock function for the billing service
-func (service *MockService) GetUsageDetails(scope string, expand string, filter string, skiptoken string, top *int32, apply string) (consumption.UsageDetailsListResultPage, error) {
+func (service *MockService) GetUsageDetails(scope string, expand string, filter string, skiptoken string, top *int32, apply string) (prevConsumption.UsageDetailsListResultPage, error) {
 	args := service.Called(scope, expand, filter, skiptoken, top, apply)
-	return args.Get(0).(consumption.UsageDetailsListResultPage), args.Error(1)
+	return args.Get(0).(prevConsumption.UsageDetailsListResultPage), args.Error(1)
 }

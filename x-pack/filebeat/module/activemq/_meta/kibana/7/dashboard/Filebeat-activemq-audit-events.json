@@ -1,507 +1,97 @@
 {
-  "objects": [
-    {
-      "attributes": {
+    "attributes": {
         "description": "This dashboard shows audit logs collected by the ActiveMQ filebeat module.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
             }
-          }
         },
         "optionsJSON": {
-          "hidePanelTitles": false,
-          "useMargins": true
+            "hidePanelTitles": false,
+            "useMargins": true
         },
         "panelsJSON": [
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 15,
-              "i": "11105044-eb78-45ab-9206-571e86f5f10d",
-              "w": 24,
-              "x": 0,
-              "y": 0
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "11105044-eb78-45ab-9206-571e86f5f10d",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "11105044-eb78-45ab-9206-571e86f5f10d",
+                "panelRefName": "panel_11105044-eb78-45ab-9206-571e86f5f10d",
+                "type": "visualization",
+                "version": "7.4.0"
             },
-            "panelIndex": "11105044-eb78-45ab-9206-571e86f5f10d",
-            "panelRefName": "panel_0",
-            "version": "7.4.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 15,
-              "i": "8f349d14-40d9-4a10-b7d5-0f57c2a69f69",
-              "w": 24,
-              "x": 24,
-              "y": 0
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "8f349d14-40d9-4a10-b7d5-0f57c2a69f69",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "8f349d14-40d9-4a10-b7d5-0f57c2a69f69",
+                "panelRefName": "panel_8f349d14-40d9-4a10-b7d5-0f57c2a69f69",
+                "type": "visualization",
+                "version": "7.4.0"
             },
-            "panelIndex": "8f349d14-40d9-4a10-b7d5-0f57c2a69f69",
-            "panelRefName": "panel_1",
-            "version": "7.4.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 23,
-              "i": "f2a1e6f8-cd1a-4fbd-a0b1-da4ee9db7c54",
-              "w": 48,
-              "x": 0,
-              "y": 15
-            },
-            "panelIndex": "f2a1e6f8-cd1a-4fbd-a0b1-da4ee9db7c54",
-            "panelRefName": "panel_2",
-            "version": "7.4.0"
-          }
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 23,
+                    "i": "f2a1e6f8-cd1a-4fbd-a0b1-da4ee9db7c54",
+                    "w": 48,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "f2a1e6f8-cd1a-4fbd-a0b1-da4ee9db7c54",
+                "panelRefName": "panel_f2a1e6f8-cd1a-4fbd-a0b1-da4ee9db7c54",
+                "type": "search",
+                "version": "7.4.0"
+            }
         ],
         "timeRestore": false,
         "title": "[Filebeat ActiveMQ] Audit Events",
         "version": 1
-      },
-      "id": "ffe86390-145f-11ea-8fd8-030a13064883",
-      "migrationVersion": {
-        "dashboard": "7.3.0"
-      },
-      "references": [
-        {
-          "id": "38011a70-145a-11ea-8fd8-030a13064883",
-          "name": "panel_0",
-          "type": "visualization"
-        },
-        {
-          "id": "38874920-1454-11ea-8fd8-030a13064883",
-          "name": "panel_1",
-          "type": "visualization"
-        },
-        {
-          "id": "896ef3a0-145f-11ea-8fd8-030a13064883",
-          "name": "panel_2",
-          "type": "search"
-        }
-      ],
-      "type": "dashboard",
-      "updated_at": "2019-12-02T14:53:25.775Z",
-      "version": "WzI0MCw2XQ=="
     },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "activemq.audit"
-                  },
-                  "type": "phrase",
-                  "value": "activemq.audit"
-                },
-                "query": {
-                  "match": {
-                    "event.dataset": {
-                      "query": "activemq.audit",
-                      "type": "phrase"
-                    }
-                  }
-                }
-              }
-            ],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "Audit Event Results [Filebeat ActiveMQ]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "drop_partials": false,
-                "extended_bounds": {},
-                "field": "@timestamp",
-                "interval": "auto",
-                "min_doc_count": 1,
-                "timeRange": {
-                  "from": "now-1d",
-                  "to": "now"
-                },
-                "useNormalizedEsInterval": true
-              },
-              "schema": "segment",
-              "type": "date_histogram"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "filters": [
-                  {
-                    "input": {
-                      "language": "kuery",
-                      "query": "event.dataset : \"activemq.audit\""
-                    },
-                    "label": ""
-                  }
-                ],
-                "row": false
-              },
-              "schema": "split",
-              "type": "filters"
-            },
-            {
-              "enabled": true,
-              "id": "4",
-              "params": {
-                "field": "log.level",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 15
-              },
-              "schema": "group",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "filter": true,
-                  "show": true,
-                  "truncate": 100
-                },
-                "position": "bottom",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "dimensions": {
-              "series": [
-                {
-                  "accessor": 1,
-                  "aggType": "terms",
-                  "format": {
-                    "id": "terms",
-                    "params": {
-                      "id": "string",
-                      "missingBucketLabel": "Missing",
-                      "otherBucketLabel": "Other"
-                    }
-                  },
-                  "params": {}
-                }
-              ],
-              "x": {
-                "accessor": 0,
-                "aggType": "date_histogram",
-                "format": {
-                  "id": "date",
-                  "params": {
-                    "pattern": "HH:mm"
-                  }
-                },
-                "params": {
-                  "bounds": {
-                    "max": "2019-12-01T16:41:18.507Z",
-                    "min": "2019-11-30T16:41:18.507Z"
-                  },
-                  "date": true,
-                  "format": "HH:mm",
-                  "interval": "PT30M"
-                }
-              },
-              "y": [
-                {
-                  "accessor": 2,
-                  "aggType": "count",
-                  "format": {
-                    "id": "number"
-                  },
-                  "params": {}
-                }
-              ]
-            },
-            "grid": {
-              "categoryLines": false
-            },
-            "labels": {
-              "show": false
-            },
-            "legendPosition": "right",
-            "radiusRatio": 50,
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Count"
-                },
-                "drawLinesBetweenPoints": true,
-                "mode": "normal",
-                "show": "true",
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "thresholdLine": {
-              "color": "#34130C",
-              "show": false,
-              "style": "full",
-              "value": 10,
-              "width": 1
-            },
-            "times": [],
-            "type": "histogram",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "left",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Count"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "Audit Event Results [Filebeat ActiveMQ]",
-          "type": "histogram"
-        }
-      },
-      "id": "38011a70-145a-11ea-8fd8-030a13064883",
-      "migrationVersion": {
-        "visualization": "7.3.1"
-      },
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-12-01T17:53:57.087Z",
-      "version": "WzIyMiw0XQ=="
+    "coreMigrationVersion": "8.0.0",
+    "id": "ffe86390-145f-11ea-8fd8-030a13064883",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
     },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "activemq.audit"
-                  },
-                  "type": "phrase",
-                  "value": "activemq.audit"
-                },
-                "query": {
-                  "match": {
-                    "event.dataset": {
-                      "query": "activemq.audit",
-                      "type": "phrase"
-                    }
-                  }
-                }
-              }
-            ],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "Audit Account Tag Cloud [Filebeat ActiveMQ]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "activemq.user",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 15
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "bucket": {
-              "accessor": 0,
-              "format": {
-                "id": "terms",
-                "params": {
-                  "id": "string",
-                  "missingBucketLabel": "Missing",
-                  "otherBucketLabel": "Other"
-                }
-              },
-              "type": "vis_dimension"
-            },
-            "maxFontSize": 72,
-            "metric": {
-              "accessor": 1,
-              "format": {
-                "id": "string",
-                "params": {}
-              },
-              "type": "vis_dimension"
-            },
-            "minFontSize": 18,
-            "orientation": "single",
-            "scale": "linear",
-            "showLabel": true
-          },
-          "title": "Audit Account Tag Cloud [Filebeat ActiveMQ]",
-          "type": "tagcloud"
-        }
-      },
-      "id": "38874920-1454-11ea-8fd8-030a13064883",
-      "migrationVersion": {
-        "visualization": "7.3.1"
-      },
-      "references": [
+    "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
+            "id": "38011a70-145a-11ea-8fd8-030a13064883",
+            "name": "11105044-eb78-45ab-9206-571e86f5f10d:panel_11105044-eb78-45ab-9206-571e86f5f10d",
+            "type": "visualization"
         },
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2019-12-02T14:50:22.535Z",
-      "version": "WzIzOSw2XQ=="
-    },
-    {
-      "attributes": {
-        "columns": [
-          "log.level",
-          "activemq.user",
-          "message"
-        ],
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "highlightAll": true,
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": "event.dataset :\"activemq.audit\""
-            },
-            "version": true
-          }
+            "id": "38874920-1454-11ea-8fd8-030a13064883",
+            "name": "8f349d14-40d9-4a10-b7d5-0f57c2a69f69:panel_8f349d14-40d9-4a10-b7d5-0f57c2a69f69",
+            "type": "visualization"
         },
-        "sort": [
-          [
-            "@timestamp",
-            "desc"
-          ]
-        ],
-        "title": "Audit Events [Filebeat ActiveMQ]",
-        "version": 1
-      },
-      "id": "896ef3a0-145f-11ea-8fd8-030a13064883",
-      "migrationVersion": {
-        "search": "7.4.0"
-      },
-      "references": [
         {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
+            "id": "896ef3a0-145f-11ea-8fd8-030a13064883",
+            "name": "f2a1e6f8-cd1a-4fbd-a0b1-da4ee9db7c54:panel_f2a1e6f8-cd1a-4fbd-a0b1-da4ee9db7c54",
+            "type": "search"
         }
-      ],
-      "type": "search",
-      "updated_at": "2019-12-02T14:46:31.288Z",
-      "version": "WzIzNiw2XQ=="
-    }
-  ],
-  "version": "7.4.0"
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:33:54.354Z",
+    "version": "WzQzMzMsMV0="
 }

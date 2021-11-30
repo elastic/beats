@@ -15,7 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//+build integration
+//go:build integration
+// +build integration
 
 package ilm_test
 
@@ -47,21 +48,14 @@ const (
 func TestESClientHandler_CheckILMEnabled(t *testing.T) {
 	t.Run("no ilm if disabled", func(t *testing.T) {
 		h := newESClientHandler(t)
-		b, err := h.CheckILMEnabled(ilm.ModeDisabled)
+		b, err := h.CheckILMEnabled(false)
 		assert.NoError(t, err)
 		assert.False(t, b)
 	})
 
-	t.Run("with ilm if auto", func(t *testing.T) {
-		h := newESClientHandler(t)
-		b, err := h.CheckILMEnabled(ilm.ModeAuto)
-		assert.NoError(t, err)
-		assert.True(t, b)
-	})
-
 	t.Run("with ilm if enabled", func(t *testing.T) {
 		h := newESClientHandler(t)
-		b, err := h.CheckILMEnabled(ilm.ModeEnabled)
+		b, err := h.CheckILMEnabled(true)
 		assert.NoError(t, err)
 		assert.True(t, b)
 	})
@@ -267,38 +261,29 @@ func getEnv(name, def string) string {
 
 func TestFileClientHandler_CheckILMEnabled(t *testing.T) {
 	for name, test := range map[string]struct {
-		m       ilm.Mode
-		version string
-		enabled bool
-		err     bool
+		enabled    bool
+		version    string
+		ilmEnabled bool
+		err        bool
 	}{
 		"ilm enabled": {
-			m:       ilm.ModeEnabled,
-			enabled: true,
-		},
-		"ilm auto": {
-			m:       ilm.ModeAuto,
-			enabled: true,
+			enabled:    true,
+			ilmEnabled: true,
 		},
 		"ilm disabled": {
-			m:       ilm.ModeDisabled,
-			enabled: false,
+			enabled:    false,
+			ilmEnabled: false,
 		},
 		"ilm enabled, version too old": {
-			m:       ilm.ModeEnabled,
+			enabled: true,
 			version: "5.0.0",
 			err:     true,
-		},
-		"ilm auto, version too old": {
-			m:       ilm.ModeAuto,
-			version: "5.0.0",
-			enabled: false,
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			h := ilm.NewFileClientHandler(newMockClient(test.version))
-			b, err := h.CheckILMEnabled(test.m)
-			assert.Equal(t, test.enabled, b)
+			b, err := h.CheckILMEnabled(test.enabled)
+			assert.Equal(t, test.ilmEnabled, b)
 			if test.err {
 				assert.Error(t, err)
 			} else {

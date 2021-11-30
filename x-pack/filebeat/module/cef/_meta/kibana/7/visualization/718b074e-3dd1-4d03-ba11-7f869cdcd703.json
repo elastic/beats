@@ -1,0 +1,139 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Events by Device [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "filter": {
+                    "language": "lucene",
+                    "query": "cef.extensions.categoryDeviceGroup:\"/Operating System\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Host\" OR cef.extensions.categoryDeviceGroup:\"/Application\""
+                },
+                "id": "fd1ffeb6-678e-4163-9421-6a164fd59048",
+                "index_pattern": "filebeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(254,37,37,1)",
+                        "fill": "0",
+                        "formatter": "number",
+                        "id": "6a10f77d-4e26-4b27-9c19-f1b0029b075b",
+                        "label": "Events",
+                        "line_width": "3",
+                        "metrics": [
+                            {
+                                "id": "845b9164-65f4-4599-b9cc-8d91b6ba8d83",
+                                "type": "count"
+                            },
+                            {
+                                "alpha": 0.3,
+                                "beta": 0.1,
+                                "field": "845b9164-65f4-4599-b9cc-8d91b6ba8d83",
+                                "gamma": 0.3,
+                                "id": "59675e84-1a8e-41df-9f63-875109bd795a",
+                                "model_type": "simple",
+                                "multiplicative": false,
+                                "period": 1,
+                                "type": "moving_average",
+                                "window": "10"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 1,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "rgba(244,78,59,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "cef.extensions.categoryDeviceGroup:\"/Operating System\" "
+                                },
+                                "id": "d9a580c3-eb83-4d20-a391-0934d7df8837",
+                                "label": "Operating System"
+                            },
+                            {
+                                "color": "rgba(254,146,0,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": " cef.extensions.categoryDeviceGroup:\"/IDS/Host\""
+                                },
+                                "id": "9ce8be14-6191-4c9a-a679-e3992fdab8d2",
+                                "label": "Host IDS"
+                            },
+                            {
+                                "color": "rgba(252,220,0,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "cef.extensions.categoryDeviceGroup:\"/Application\""
+                                },
+                                "id": "262ecd54-a042-4bfb-b489-d7db8431c36e",
+                                "label": "Application"
+                            }
+                        ],
+                        "split_mode": "filters",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "left",
+                        "chart_type": "bar",
+                        "color": "rgba(0,156,224,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "92e98952-8e25-472f-abb5-05a7d9b830ea",
+                        "label": "Moving Average by Device HostNames",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "3df841a9-5997-4a1a-ad8f-69620d23e65b",
+                                "type": "count"
+                            },
+                            {
+                                "alpha": 0.3,
+                                "beta": 0.1,
+                                "field": "3df841a9-5997-4a1a-ad8f-69620d23e65b",
+                                "gamma": 0.3,
+                                "id": "9765367a-0fc2-45ba-88a8-e87991210edd",
+                                "model_type": "simple",
+                                "multiplicative": false,
+                                "period": 1,
+                                "type": "moving_average",
+                                "window": "10"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 1,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "observer.hostname"
+                    }
+                ],
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Events by Device [Filebeat CEF]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "718b074e-3dd1-4d03-ba11-7f869cdcd703",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:37.252Z",
+    "version": "WzQ3MTksMV0="
+}

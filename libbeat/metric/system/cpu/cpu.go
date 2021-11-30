@@ -15,14 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build darwin freebsd linux openbsd windows
+//go:build darwin || freebsd || linux || openbsd || windows || aix
+// +build darwin freebsd linux openbsd windows aix
 
 package cpu
 
 import (
-	"runtime"
-
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -62,7 +62,7 @@ func (m *LoadMetrics) Averages() LoadAverages {
 // NormalizedAverages return the CPU load averages normalized by the NumCPU.
 // These values should range from 0 to 1.
 func (m *LoadMetrics) NormalizedAverages() LoadAverages {
-	cpus := runtime.NumCPU()
+	cpus := numcpu.NumCPU()
 	return LoadAverages{
 		OneMinute:     common.Round(m.sample.One/float64(cpus), common.DefaultDecimalPlacesCount),
 		FiveMinute:    common.Round(m.sample.Five/float64(cpus), common.DefaultDecimalPlacesCount),

@@ -1,1378 +1,264 @@
 {
-  "objects": [
-    {
-      "attributes": {
+    "attributes": {
         "description": "Overview of Amazon Kinesis Metrics",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
             }
-          }
         },
         "optionsJSON": {
-          "hidePanelTitles": false,
-          "useMargins": true
+            "hidePanelTitles": false,
+            "useMargins": true
         },
         "panelsJSON": [
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "hidePanelTitles": false
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "0359194f-01a1-4a5b-8040-c897bdc86638",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "0359194f-01a1-4a5b-8040-c897bdc86638",
+                "panelRefName": "panel_0359194f-01a1-4a5b-8040-c897bdc86638",
+                "title": "Filters",
+                "type": "visualization",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 5,
-              "i": "0359194f-01a1-4a5b-8040-c897bdc86638",
-              "w": 48,
-              "x": 0,
-              "y": 0
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "df2dc50f-c09b-4dcd-96a8-24037c576db3",
+                    "w": 16,
+                    "x": 32,
+                    "y": 5
+                },
+                "panelIndex": "df2dc50f-c09b-4dcd-96a8-24037c576db3",
+                "panelRefName": "panel_df2dc50f-c09b-4dcd-96a8-24037c576db3",
+                "title": "GetRecords Latency",
+                "type": "lens",
+                "version": "7.11.0"
             },
-            "panelIndex": "0359194f-01a1-4a5b-8040-c897bdc86638",
-            "panelRefName": "panel_0359194f-01a1-4a5b-8040-c897bdc86638",
-            "title": "Filters",
-            "type": "visualization",
-            "version": "7.13.2"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "hidePanelTitles": false
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "5f153d11-e84a-4ac5-aec9-4fca79863744",
+                    "w": 16,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "5f153d11-e84a-4ac5-aec9-4fca79863744",
+                "panelRefName": "panel_5f153d11-e84a-4ac5-aec9-4fca79863744",
+                "title": "PutRecords Latency",
+                "type": "lens",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 15,
-              "i": "df2dc50f-c09b-4dcd-96a8-24037c576db3",
-              "w": 16,
-              "x": 32,
-              "y": 5
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "a7378b79-483c-4e99-97e2-9b49fd9e81da",
+                    "w": 16,
+                    "x": 16,
+                    "y": 5
+                },
+                "panelIndex": "a7378b79-483c-4e99-97e2-9b49fd9e81da",
+                "panelRefName": "panel_a7378b79-483c-4e99-97e2-9b49fd9e81da",
+                "title": "PutRecord Latency",
+                "type": "lens",
+                "version": "7.11.0"
             },
-            "panelIndex": "df2dc50f-c09b-4dcd-96a8-24037c576db3",
-            "panelRefName": "panel_df2dc50f-c09b-4dcd-96a8-24037c576db3",
-            "title": "GetRecords Latency",
-            "type": "lens",
-            "version": "7.13.2"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "hidePanelTitles": false
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "01a12917-ef1c-47b6-964a-26ef424dd0d3",
+                    "w": 16,
+                    "x": 32,
+                    "y": 20
+                },
+                "panelIndex": "01a12917-ef1c-47b6-964a-26ef424dd0d3",
+                "panelRefName": "panel_01a12917-ef1c-47b6-964a-26ef424dd0d3",
+                "title": "GetRecords Bytes",
+                "type": "lens",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 15,
-              "i": "5f153d11-e84a-4ac5-aec9-4fca79863744",
-              "w": 16,
-              "x": 0,
-              "y": 5
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "7e5774cb-e2e5-4f11-95bc-732ed6600757",
+                    "w": 16,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "7e5774cb-e2e5-4f11-95bc-732ed6600757",
+                "panelRefName": "panel_7e5774cb-e2e5-4f11-95bc-732ed6600757",
+                "title": "PutRecords Bytes",
+                "type": "lens",
+                "version": "7.11.0"
             },
-            "panelIndex": "5f153d11-e84a-4ac5-aec9-4fca79863744",
-            "panelRefName": "panel_5f153d11-e84a-4ac5-aec9-4fca79863744",
-            "title": "PutRecords Latency",
-            "type": "lens",
-            "version": "7.13.2"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "hidePanelTitles": false
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "e18e62e5-672a-4939-afe1-68354e76aefc",
+                    "w": 16,
+                    "x": 16,
+                    "y": 20
+                },
+                "panelIndex": "e18e62e5-672a-4939-afe1-68354e76aefc",
+                "panelRefName": "panel_e18e62e5-672a-4939-afe1-68354e76aefc",
+                "title": "PutRecord Bytes",
+                "type": "lens",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 15,
-              "i": "a7378b79-483c-4e99-97e2-9b49fd9e81da",
-              "w": 16,
-              "x": 16,
-              "y": 5
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "a1f01da7-4496-4f4e-acc8-9e6efd826f52",
+                    "w": 16,
+                    "x": 32,
+                    "y": 35
+                },
+                "panelIndex": "a1f01da7-4496-4f4e-acc8-9e6efd826f52",
+                "panelRefName": "panel_a1f01da7-4496-4f4e-acc8-9e6efd826f52",
+                "title": "GetRecords Success",
+                "type": "lens",
+                "version": "7.11.0"
             },
-            "panelIndex": "a7378b79-483c-4e99-97e2-9b49fd9e81da",
-            "panelRefName": "panel_a7378b79-483c-4e99-97e2-9b49fd9e81da",
-            "title": "PutRecord Latency",
-            "type": "lens",
-            "version": "7.13.2"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "hidePanelTitles": false
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "6ddd4401-6625-42b6-9270-9bc17c8408e6",
+                    "w": 16,
+                    "x": 0,
+                    "y": 35
+                },
+                "panelIndex": "6ddd4401-6625-42b6-9270-9bc17c8408e6",
+                "panelRefName": "panel_6ddd4401-6625-42b6-9270-9bc17c8408e6",
+                "title": "PutRecords Success",
+                "type": "lens",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 15,
-              "i": "01a12917-ef1c-47b6-964a-26ef424dd0d3",
-              "w": 16,
-              "x": 32,
-              "y": 20
-            },
-            "panelIndex": "01a12917-ef1c-47b6-964a-26ef424dd0d3",
-            "panelRefName": "panel_01a12917-ef1c-47b6-964a-26ef424dd0d3",
-            "title": "GetRecords Bytes",
-            "type": "lens",
-            "version": "7.13.2"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "hidePanelTitles": false
-            },
-            "gridData": {
-              "h": 15,
-              "i": "7e5774cb-e2e5-4f11-95bc-732ed6600757",
-              "w": 16,
-              "x": 0,
-              "y": 20
-            },
-            "panelIndex": "7e5774cb-e2e5-4f11-95bc-732ed6600757",
-            "panelRefName": "panel_7e5774cb-e2e5-4f11-95bc-732ed6600757",
-            "title": "PutRecord Bytes",
-            "type": "lens",
-            "version": "7.13.2"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "hidePanelTitles": false
-            },
-            "gridData": {
-              "h": 15,
-              "i": "e18e62e5-672a-4939-afe1-68354e76aefc",
-              "w": 16,
-              "x": 16,
-              "y": 20
-            },
-            "panelIndex": "e18e62e5-672a-4939-afe1-68354e76aefc",
-            "panelRefName": "panel_e18e62e5-672a-4939-afe1-68354e76aefc",
-            "title": "PutRecord Bytes",
-            "type": "lens",
-            "version": "7.13.2"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "hidePanelTitles": false
-            },
-            "gridData": {
-              "h": 15,
-              "i": "a1f01da7-4496-4f4e-acc8-9e6efd826f52",
-              "w": 16,
-              "x": 32,
-              "y": 35
-            },
-            "panelIndex": "a1f01da7-4496-4f4e-acc8-9e6efd826f52",
-            "panelRefName": "panel_a1f01da7-4496-4f4e-acc8-9e6efd826f52",
-            "title": "GetRecords Success",
-            "type": "lens",
-            "version": "7.13.2"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "hidePanelTitles": false
-            },
-            "gridData": {
-              "h": 15,
-              "i": "6ddd4401-6625-42b6-9270-9bc17c8408e6",
-              "w": 16,
-              "x": 0,
-              "y": 35
-            },
-            "panelIndex": "6ddd4401-6625-42b6-9270-9bc17c8408e6",
-            "panelRefName": "panel_6ddd4401-6625-42b6-9270-9bc17c8408e6",
-            "title": "PutRecords Success",
-            "type": "lens",
-            "version": "7.13.2"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "hidePanelTitles": false
-            },
-            "gridData": {
-              "h": 15,
-              "i": "fb4e4fb3-91de-46c8-b3f8-ef17ba3c4773",
-              "w": 16,
-              "x": 16,
-              "y": 35
-            },
-            "panelIndex": "fb4e4fb3-91de-46c8-b3f8-ef17ba3c4773",
-            "panelRefName": "panel_fb4e4fb3-91de-46c8-b3f8-ef17ba3c4773",
-            "title": "PutRecord Success",
-            "type": "lens",
-            "version": "7.13.2"
-          }
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "fb4e4fb3-91de-46c8-b3f8-ef17ba3c4773",
+                    "w": 16,
+                    "x": 16,
+                    "y": 35
+                },
+                "panelIndex": "fb4e4fb3-91de-46c8-b3f8-ef17ba3c4773",
+                "panelRefName": "panel_fb4e4fb3-91de-46c8-b3f8-ef17ba3c4773",
+                "title": "PutRecord Success",
+                "type": "lens",
+                "version": "7.11.0"
+            }
         ],
         "timeRestore": false,
         "title": "[Metricbeat AWS] Kinesis Overview",
         "version": 1
-      },
-      "coreMigrationVersion": "7.13.2",
-      "id": "07d67a60-d872-11eb-8220-c9141cc1b15c",
-      "migrationVersion": {
-        "dashboard": "7.13.1"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "3c5d7860-d903-11eb-8220-c9141cc1b15c",
-          "name": "0359194f-01a1-4a5b-8040-c897bdc86638:panel_0359194f-01a1-4a5b-8040-c897bdc86638",
-          "type": "visualization"
-        },
-        {
-          "id": "63aa5990-d86f-11eb-8220-c9141cc1b15c",
-          "name": "df2dc50f-c09b-4dcd-96a8-24037c576db3:panel_df2dc50f-c09b-4dcd-96a8-24037c576db3",
-          "type": "lens"
-        },
-        {
-          "id": "9deb6a80-d870-11eb-8220-c9141cc1b15c",
-          "name": "5f153d11-e84a-4ac5-aec9-4fca79863744:panel_5f153d11-e84a-4ac5-aec9-4fca79863744",
-          "type": "lens"
-        },
-        {
-          "id": "2a711450-d871-11eb-8220-c9141cc1b15c",
-          "name": "a7378b79-483c-4e99-97e2-9b49fd9e81da:panel_a7378b79-483c-4e99-97e2-9b49fd9e81da",
-          "type": "lens"
-        },
-        {
-          "id": "d1468000-d86f-11eb-8220-c9141cc1b15c",
-          "name": "01a12917-ef1c-47b6-964a-26ef424dd0d3:panel_01a12917-ef1c-47b6-964a-26ef424dd0d3",
-          "type": "lens"
-        },
-        {
-          "id": "6d631980-d870-11eb-8220-c9141cc1b15c",
-          "name": "7e5774cb-e2e5-4f11-95bc-732ed6600757:panel_7e5774cb-e2e5-4f11-95bc-732ed6600757",
-          "type": "lens"
-        },
-        {
-          "id": "6d631980-d870-11eb-8220-c9141cc1b15c",
-          "name": "e18e62e5-672a-4939-afe1-68354e76aefc:panel_e18e62e5-672a-4939-afe1-68354e76aefc",
-          "type": "lens"
-        },
-        {
-          "id": "79d713c0-d86f-11eb-8220-c9141cc1b15c",
-          "name": "a1f01da7-4496-4f4e-acc8-9e6efd826f52:panel_a1f01da7-4496-4f4e-acc8-9e6efd826f52",
-          "type": "lens"
-        },
-        {
-          "id": "c68d7c30-d870-11eb-8220-c9141cc1b15c",
-          "name": "6ddd4401-6625-42b6-9270-9bc17c8408e6:panel_6ddd4401-6625-42b6-9270-9bc17c8408e6",
-          "type": "lens"
-        },
-        {
-          "id": "56ac2b40-d871-11eb-8220-c9141cc1b15c",
-          "name": "fb4e4fb3-91de-46c8-b3f8-ef17ba3c4773:panel_fb4e4fb3-91de-46c8-b3f8-ef17ba3c4773",
-          "type": "lens"
-        }
-      ],
-      "type": "dashboard",
-      "updated_at": "2021-06-29T18:23:18.412Z",
-      "version": "WzEzOTgwLDFd"
     },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "AWS Kinesis Filter [Metricbeat AWS]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "controls": [
-              {
-                "fieldName": "cloud.region",
-                "id": "1549397251041",
-                "indexPatternRefName": "control_0_index_pattern",
-                "label": "region name",
-                "options": {
-                  "dynamicOptions": true,
-                  "multiselect": true,
-                  "order": "desc",
-                  "size": 5,
-                  "type": "terms"
-                },
-                "parent": "",
-                "type": "list"
-              },
-              {
-                "fieldName": "aws.dimensions.StreamName",
-                "id": "1624989316975",
-                "indexPatternRefName": "control_1_index_pattern",
-                "label": "stream name",
-                "options": {
-                  "dynamicOptions": true,
-                  "multiselect": true,
-                  "order": "desc",
-                  "size": 5,
-                  "type": "terms"
-                },
-                "parent": "",
-                "type": "list"
-              }
-            ],
-            "pinFilters": false,
-            "updateFiltersOnChange": true,
-            "useTimeFilter": false
-          },
-          "title": "AWS Kinesis Filter [Metricbeat AWS]",
-          "type": "input_control_vis"
-        }
-      },
-      "coreMigrationVersion": "7.13.2",
-      "id": "3c5d7860-d903-11eb-8220-c9141cc1b15c",
-      "migrationVersion": {
-        "visualization": "7.13.1"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "metricbeat-*",
-          "name": "control_0_index_pattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "metricbeat-*",
-          "name": "control_1_index_pattern",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-06-29T17:55:48.582Z",
-      "version": "WzEzNjQ1LDFd"
+    "coreMigrationVersion": "8.0.0",
+    "id": "07d67a60-d872-11eb-8220-c9141cc1b15c",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
     },
-    {
-      "attributes": {
-        "description": "",
-        "state": {
-          "datasourceStates": {
-            "indexpattern": {
-              "layers": {
-                "fa1d3f51-58b9-4971-a28d-40616cfceb01": {
-                  "columnOrder": [
-                    "19e03939-49d0-48f7-b76c-d70142001365",
-                    "8c750b7f-30c5-4d35-93f7-dbea0067dca4",
-                    "092aa8e6-3739-49c1-ac6c-ec67956dec97"
-                  ],
-                  "columns": {
-                    "092aa8e6-3739-49c1-ac6c-ec67956dec97": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "GetRecords Latency",
-                      "operationType": "median",
-                      "scale": "ratio",
-                      "sourceField": "aws.kinesis.metrics.GetRecords_Latency.avg"
-                    },
-                    "19e03939-49d0-48f7-b76c-d70142001365": {
-                      "dataType": "date",
-                      "isBucketed": true,
-                      "label": "@timestamp",
-                      "operationType": "date_histogram",
-                      "params": {
-                        "interval": "auto"
-                      },
-                      "scale": "interval",
-                      "sourceField": "@timestamp"
-                    },
-                    "8c750b7f-30c5-4d35-93f7-dbea0067dca4": {
-                      "dataType": "string",
-                      "isBucketed": true,
-                      "label": "Top values of aws.dimensions.StreamName",
-                      "operationType": "terms",
-                      "params": {
-                        "missingBucket": false,
-                        "orderBy": {
-                          "columnId": "092aa8e6-3739-49c1-ac6c-ec67956dec97",
-                          "type": "column"
-                        },
-                        "orderDirection": "desc",
-                        "otherBucket": true,
-                        "size": 10
-                      },
-                      "scale": "ordinal",
-                      "sourceField": "aws.dimensions.StreamName"
-                    }
-                  },
-                  "incompleteColumns": {}
-                }
-              }
-            }
-          },
-          "filters": [],
-          "query": {
-            "language": "kuery",
-            "query": ""
-          },
-          "visualization": {
-            "axisTitlesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "fittingFunction": "None",
-            "gridlinesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "layers": [
-              {
-                "accessors": [
-                  "092aa8e6-3739-49c1-ac6c-ec67956dec97"
-                ],
-                "layerId": "fa1d3f51-58b9-4971-a28d-40616cfceb01",
-                "position": "top",
-                "seriesType": "line",
-                "showGridlines": false,
-                "splitAccessor": "8c750b7f-30c5-4d35-93f7-dbea0067dca4",
-                "xAccessor": "19e03939-49d0-48f7-b76c-d70142001365"
-              }
-            ],
-            "legend": {
-              "isVisible": true,
-              "position": "right"
-            },
-            "preferredSeriesType": "line",
-            "tickLabelsVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "valueLabels": "hide"
-          }
-        },
-        "title": "AWS GetRecords Latency [Metricbeat AWS]",
-        "visualizationType": "lnsXY"
-      },
-      "coreMigrationVersion": "7.13.2",
-      "id": "63aa5990-d86f-11eb-8220-c9141cc1b15c",
-      "migrationVersion": {
-        "lens": "7.13.1"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
+    "references": [
         {
-          "id": "metricbeat-*",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
+            "id": "3c5d7860-d903-11eb-8220-c9141cc1b15c",
+            "name": "0359194f-01a1-4a5b-8040-c897bdc86638:panel_0359194f-01a1-4a5b-8040-c897bdc86638",
+            "type": "visualization"
         },
         {
-          "id": "metricbeat-*",
-          "name": "indexpattern-datasource-layer-fa1d3f51-58b9-4971-a28d-40616cfceb01",
-          "type": "index-pattern"
+            "id": "63aa5990-d86f-11eb-8220-c9141cc1b15c",
+            "name": "df2dc50f-c09b-4dcd-96a8-24037c576db3:panel_df2dc50f-c09b-4dcd-96a8-24037c576db3",
+            "type": "lens"
+        },
+        {
+            "id": "9deb6a80-d870-11eb-8220-c9141cc1b15c",
+            "name": "5f153d11-e84a-4ac5-aec9-4fca79863744:panel_5f153d11-e84a-4ac5-aec9-4fca79863744",
+            "type": "lens"
+        },
+        {
+            "id": "2a711450-d871-11eb-8220-c9141cc1b15c",
+            "name": "a7378b79-483c-4e99-97e2-9b49fd9e81da:panel_a7378b79-483c-4e99-97e2-9b49fd9e81da",
+            "type": "lens"
+        },
+        {
+            "id": "d1468000-d86f-11eb-8220-c9141cc1b15c",
+            "name": "01a12917-ef1c-47b6-964a-26ef424dd0d3:panel_01a12917-ef1c-47b6-964a-26ef424dd0d3",
+            "type": "lens"
+        },
+        {
+            "id": "6d631980-d870-11eb-8220-c9141cc1b15c",
+            "name": "7e5774cb-e2e5-4f11-95bc-732ed6600757:panel_7e5774cb-e2e5-4f11-95bc-732ed6600757",
+            "type": "lens"
+        },
+        {
+            "id": "6d631980-d870-11eb-8220-c9141cc1b15c",
+            "name": "e18e62e5-672a-4939-afe1-68354e76aefc:panel_e18e62e5-672a-4939-afe1-68354e76aefc",
+            "type": "lens"
+        },
+        {
+            "id": "79d713c0-d86f-11eb-8220-c9141cc1b15c",
+            "name": "a1f01da7-4496-4f4e-acc8-9e6efd826f52:panel_a1f01da7-4496-4f4e-acc8-9e6efd826f52",
+            "type": "lens"
+        },
+        {
+            "id": "c68d7c30-d870-11eb-8220-c9141cc1b15c",
+            "name": "6ddd4401-6625-42b6-9270-9bc17c8408e6:panel_6ddd4401-6625-42b6-9270-9bc17c8408e6",
+            "type": "lens"
+        },
+        {
+            "id": "56ac2b40-d871-11eb-8220-c9141cc1b15c",
+            "name": "fb4e4fb3-91de-46c8-b3f8-ef17ba3c4773:panel_fb4e4fb3-91de-46c8-b3f8-ef17ba3c4773",
+            "type": "lens"
         }
-      ],
-      "type": "lens",
-      "updated_at": "2021-06-29T17:59:42.533Z",
-      "version": "WzEzNjk2LDFd"
-    },
-    {
-      "attributes": {
-        "description": "",
-        "state": {
-          "datasourceStates": {
-            "indexpattern": {
-              "layers": {
-                "fa1d3f51-58b9-4971-a28d-40616cfceb01": {
-                  "columnOrder": [
-                    "19e03939-49d0-48f7-b76c-d70142001365",
-                    "8c750b7f-30c5-4d35-93f7-dbea0067dca4",
-                    "092aa8e6-3739-49c1-ac6c-ec67956dec97"
-                  ],
-                  "columns": {
-                    "092aa8e6-3739-49c1-ac6c-ec67956dec97": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "PutRecords Latency",
-                      "operationType": "average",
-                      "scale": "ratio",
-                      "sourceField": "aws.kinesis.metrics.PutRecords.Latency.avg"
-                    },
-                    "19e03939-49d0-48f7-b76c-d70142001365": {
-                      "dataType": "date",
-                      "isBucketed": true,
-                      "label": "@timestamp",
-                      "operationType": "date_histogram",
-                      "params": {
-                        "interval": "auto"
-                      },
-                      "scale": "interval",
-                      "sourceField": "@timestamp"
-                    },
-                    "8c750b7f-30c5-4d35-93f7-dbea0067dca4": {
-                      "dataType": "string",
-                      "isBucketed": true,
-                      "label": "Top values of aws.dimensions.StreamName",
-                      "operationType": "terms",
-                      "params": {
-                        "missingBucket": false,
-                        "orderBy": {
-                          "columnId": "092aa8e6-3739-49c1-ac6c-ec67956dec97",
-                          "type": "column"
-                        },
-                        "orderDirection": "desc",
-                        "otherBucket": true,
-                        "size": 10
-                      },
-                      "scale": "ordinal",
-                      "sourceField": "aws.dimensions.StreamName"
-                    }
-                  },
-                  "incompleteColumns": {}
-                }
-              }
-            }
-          },
-          "filters": [],
-          "query": {
-            "language": "kuery",
-            "query": ""
-          },
-          "visualization": {
-            "axisTitlesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "fittingFunction": "None",
-            "gridlinesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "layers": [
-              {
-                "accessors": [
-                  "092aa8e6-3739-49c1-ac6c-ec67956dec97"
-                ],
-                "layerId": "fa1d3f51-58b9-4971-a28d-40616cfceb01",
-                "position": "top",
-                "seriesType": "line",
-                "showGridlines": false,
-                "splitAccessor": "8c750b7f-30c5-4d35-93f7-dbea0067dca4",
-                "xAccessor": "19e03939-49d0-48f7-b76c-d70142001365"
-              }
-            ],
-            "legend": {
-              "isVisible": true,
-              "position": "right"
-            },
-            "preferredSeriesType": "line",
-            "tickLabelsVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "valueLabels": "hide"
-          }
-        },
-        "title": "AWS PutRecords Latency [Metricbeat AWS]",
-        "visualizationType": "lnsXY"
-      },
-      "coreMigrationVersion": "7.13.2",
-      "id": "9deb6a80-d870-11eb-8220-c9141cc1b15c",
-      "migrationVersion": {
-        "lens": "7.13.1"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "metricbeat-*",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "metricbeat-*",
-          "name": "indexpattern-datasource-layer-fa1d3f51-58b9-4971-a28d-40616cfceb01",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "lens",
-      "updated_at": "2021-06-29T18:01:15.961Z",
-      "version": "WzEzODA1LDFd"
-    },
-    {
-      "attributes": {
-        "description": "",
-        "state": {
-          "datasourceStates": {
-            "indexpattern": {
-              "layers": {
-                "fa1d3f51-58b9-4971-a28d-40616cfceb01": {
-                  "columnOrder": [
-                    "19e03939-49d0-48f7-b76c-d70142001365",
-                    "8c750b7f-30c5-4d35-93f7-dbea0067dca4",
-                    "092aa8e6-3739-49c1-ac6c-ec67956dec97"
-                  ],
-                  "columns": {
-                    "092aa8e6-3739-49c1-ac6c-ec67956dec97": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "PutRecord Latency",
-                      "operationType": "average",
-                      "scale": "ratio",
-                      "sourceField": "aws.kinesis.metrics.PutRecord.Latency.avg"
-                    },
-                    "19e03939-49d0-48f7-b76c-d70142001365": {
-                      "dataType": "date",
-                      "isBucketed": true,
-                      "label": "@timestamp",
-                      "operationType": "date_histogram",
-                      "params": {
-                        "interval": "auto"
-                      },
-                      "scale": "interval",
-                      "sourceField": "@timestamp"
-                    },
-                    "8c750b7f-30c5-4d35-93f7-dbea0067dca4": {
-                      "dataType": "string",
-                      "isBucketed": true,
-                      "label": "Top values of aws.dimensions.StreamName",
-                      "operationType": "terms",
-                      "params": {
-                        "missingBucket": false,
-                        "orderBy": {
-                          "columnId": "092aa8e6-3739-49c1-ac6c-ec67956dec97",
-                          "type": "column"
-                        },
-                        "orderDirection": "desc",
-                        "otherBucket": true,
-                        "size": 10
-                      },
-                      "scale": "ordinal",
-                      "sourceField": "aws.dimensions.StreamName"
-                    }
-                  },
-                  "incompleteColumns": {}
-                }
-              }
-            }
-          },
-          "filters": [],
-          "query": {
-            "language": "kuery",
-            "query": ""
-          },
-          "visualization": {
-            "axisTitlesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "fittingFunction": "None",
-            "gridlinesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "layers": [
-              {
-                "accessors": [
-                  "092aa8e6-3739-49c1-ac6c-ec67956dec97"
-                ],
-                "layerId": "fa1d3f51-58b9-4971-a28d-40616cfceb01",
-                "position": "top",
-                "seriesType": "line",
-                "showGridlines": false,
-                "splitAccessor": "8c750b7f-30c5-4d35-93f7-dbea0067dca4",
-                "xAccessor": "19e03939-49d0-48f7-b76c-d70142001365"
-              }
-            ],
-            "legend": {
-              "isVisible": true,
-              "position": "right"
-            },
-            "preferredSeriesType": "line",
-            "tickLabelsVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "valueLabels": "hide"
-          }
-        },
-        "title": "AWS PutRecord Latency [Metricbeat AWS]",
-        "visualizationType": "lnsXY"
-      },
-      "coreMigrationVersion": "7.13.2",
-      "id": "2a711450-d871-11eb-8220-c9141cc1b15c",
-      "migrationVersion": {
-        "lens": "7.13.1"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "metricbeat-*",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "metricbeat-*",
-          "name": "indexpattern-datasource-layer-fa1d3f51-58b9-4971-a28d-40616cfceb01",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "lens",
-      "updated_at": "2021-06-29T18:01:38.259Z",
-      "version": "WzEzODQyLDFd"
-    },
-    {
-      "attributes": {
-        "description": "",
-        "state": {
-          "datasourceStates": {
-            "indexpattern": {
-              "layers": {
-                "fa1d3f51-58b9-4971-a28d-40616cfceb01": {
-                  "columnOrder": [
-                    "19e03939-49d0-48f7-b76c-d70142001365",
-                    "7cd103e8-3dd3-4fa2-8c13-bc9f80617367",
-                    "36345734-4c23-4815-8a5e-b63c20cac94d"
-                  ],
-                  "columns": {
-                    "19e03939-49d0-48f7-b76c-d70142001365": {
-                      "dataType": "date",
-                      "isBucketed": true,
-                      "label": "@timestamp",
-                      "operationType": "date_histogram",
-                      "params": {
-                        "interval": "auto"
-                      },
-                      "scale": "interval",
-                      "sourceField": "@timestamp"
-                    },
-                    "36345734-4c23-4815-8a5e-b63c20cac94d": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "GetRecords Bytes",
-                      "operationType": "median",
-                      "scale": "ratio",
-                      "sourceField": "aws.kinesis.metrics.GetRecords_Bytes.avg"
-                    },
-                    "7cd103e8-3dd3-4fa2-8c13-bc9f80617367": {
-                      "dataType": "string",
-                      "isBucketed": true,
-                      "label": "Top values of aws.dimensions.StreamName",
-                      "operationType": "terms",
-                      "params": {
-                        "missingBucket": false,
-                        "orderBy": {
-                          "columnId": "36345734-4c23-4815-8a5e-b63c20cac94d",
-                          "type": "column"
-                        },
-                        "orderDirection": "desc",
-                        "otherBucket": true,
-                        "size": 10
-                      },
-                      "scale": "ordinal",
-                      "sourceField": "aws.dimensions.StreamName"
-                    }
-                  },
-                  "incompleteColumns": {}
-                }
-              }
-            }
-          },
-          "filters": [],
-          "query": {
-            "language": "kuery",
-            "query": ""
-          },
-          "visualization": {
-            "axisTitlesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "fittingFunction": "None",
-            "gridlinesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "layers": [
-              {
-                "accessors": [
-                  "36345734-4c23-4815-8a5e-b63c20cac94d"
-                ],
-                "layerId": "fa1d3f51-58b9-4971-a28d-40616cfceb01",
-                "position": "top",
-                "seriesType": "line",
-                "showGridlines": false,
-                "splitAccessor": "7cd103e8-3dd3-4fa2-8c13-bc9f80617367",
-                "xAccessor": "19e03939-49d0-48f7-b76c-d70142001365"
-              }
-            ],
-            "legend": {
-              "isVisible": true,
-              "position": "right"
-            },
-            "preferredSeriesType": "line",
-            "tickLabelsVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "valueLabels": "hide"
-          }
-        },
-        "title": "AWS GetRecords Bytes [Metricbeat AWS]",
-        "visualizationType": "lnsXY"
-      },
-      "coreMigrationVersion": "7.13.2",
-      "id": "d1468000-d86f-11eb-8220-c9141cc1b15c",
-      "migrationVersion": {
-        "lens": "7.13.1"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "metricbeat-*",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "metricbeat-*",
-          "name": "indexpattern-datasource-layer-fa1d3f51-58b9-4971-a28d-40616cfceb01",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "lens",
-      "updated_at": "2021-06-29T18:00:11.026Z",
-      "version": "WzEzNzIzLDFd"
-    },
-    {
-      "attributes": {
-        "description": "",
-        "state": {
-          "datasourceStates": {
-            "indexpattern": {
-              "layers": {
-                "fa1d3f51-58b9-4971-a28d-40616cfceb01": {
-                  "columnOrder": [
-                    "19e03939-49d0-48f7-b76c-d70142001365",
-                    "7cd103e8-3dd3-4fa2-8c13-bc9f80617367",
-                    "36345734-4c23-4815-8a5e-b63c20cac94d"
-                  ],
-                  "columns": {
-                    "19e03939-49d0-48f7-b76c-d70142001365": {
-                      "dataType": "date",
-                      "isBucketed": true,
-                      "label": "@timestamp",
-                      "operationType": "date_histogram",
-                      "params": {
-                        "interval": "auto"
-                      },
-                      "scale": "interval",
-                      "sourceField": "@timestamp"
-                    },
-                    "36345734-4c23-4815-8a5e-b63c20cac94d": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "PutRecord Bytes",
-                      "operationType": "average",
-                      "scale": "ratio",
-                      "sourceField": "aws.kinesis.metrics.PutRecord.Bytes.avg"
-                    },
-                    "7cd103e8-3dd3-4fa2-8c13-bc9f80617367": {
-                      "dataType": "string",
-                      "isBucketed": true,
-                      "label": "Top values of aws.dimensions.StreamName",
-                      "operationType": "terms",
-                      "params": {
-                        "missingBucket": false,
-                        "orderBy": {
-                          "columnId": "36345734-4c23-4815-8a5e-b63c20cac94d",
-                          "type": "column"
-                        },
-                        "orderDirection": "desc",
-                        "otherBucket": true,
-                        "size": 10
-                      },
-                      "scale": "ordinal",
-                      "sourceField": "aws.dimensions.StreamName"
-                    }
-                  },
-                  "incompleteColumns": {}
-                }
-              }
-            }
-          },
-          "filters": [],
-          "query": {
-            "language": "kuery",
-            "query": ""
-          },
-          "visualization": {
-            "axisTitlesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "fittingFunction": "None",
-            "gridlinesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "layers": [
-              {
-                "accessors": [
-                  "36345734-4c23-4815-8a5e-b63c20cac94d"
-                ],
-                "layerId": "fa1d3f51-58b9-4971-a28d-40616cfceb01",
-                "position": "top",
-                "seriesType": "line",
-                "showGridlines": false,
-                "splitAccessor": "7cd103e8-3dd3-4fa2-8c13-bc9f80617367",
-                "xAccessor": "19e03939-49d0-48f7-b76c-d70142001365"
-              }
-            ],
-            "legend": {
-              "isVisible": true,
-              "position": "right"
-            },
-            "preferredSeriesType": "line",
-            "tickLabelsVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "valueLabels": "hide"
-          }
-        },
-        "title": "AWS PutRecord Bytes [Metricbeat AWS]",
-        "visualizationType": "lnsXY"
-      },
-      "coreMigrationVersion": "7.13.2",
-      "id": "6d631980-d870-11eb-8220-c9141cc1b15c",
-      "migrationVersion": {
-        "lens": "7.13.1"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "metricbeat-*",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "metricbeat-*",
-          "name": "indexpattern-datasource-layer-fa1d3f51-58b9-4971-a28d-40616cfceb01",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "lens",
-      "updated_at": "2021-06-29T18:01:45.819Z",
-      "version": "WzEzODU1LDFd"
-    },
-    {
-      "attributes": {
-        "description": "",
-        "state": {
-          "datasourceStates": {
-            "indexpattern": {
-              "layers": {
-                "fa1d3f51-58b9-4971-a28d-40616cfceb01": {
-                  "columnOrder": [
-                    "19e03939-49d0-48f7-b76c-d70142001365",
-                    "a077ea8a-21dd-4bfe-b146-6d6425f7a14f",
-                    "6117c588-4178-4597-b6da-e0277ec0d410"
-                  ],
-                  "columns": {
-                    "19e03939-49d0-48f7-b76c-d70142001365": {
-                      "dataType": "date",
-                      "isBucketed": true,
-                      "label": "@timestamp",
-                      "operationType": "date_histogram",
-                      "params": {
-                        "interval": "auto"
-                      },
-                      "scale": "interval",
-                      "sourceField": "@timestamp"
-                    },
-                    "6117c588-4178-4597-b6da-e0277ec0d410": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "GetRecords Success",
-                      "operationType": "average",
-                      "scale": "ratio",
-                      "sourceField": "aws.kinesis.metrics.GetRecords_Success.sum"
-                    },
-                    "a077ea8a-21dd-4bfe-b146-6d6425f7a14f": {
-                      "dataType": "string",
-                      "isBucketed": true,
-                      "label": "Top values of aws.dimensions.StreamName",
-                      "operationType": "terms",
-                      "params": {
-                        "missingBucket": false,
-                        "orderBy": {
-                          "columnId": "6117c588-4178-4597-b6da-e0277ec0d410",
-                          "type": "column"
-                        },
-                        "orderDirection": "desc",
-                        "otherBucket": true,
-                        "size": 10
-                      },
-                      "scale": "ordinal",
-                      "sourceField": "aws.dimensions.StreamName"
-                    }
-                  },
-                  "incompleteColumns": {}
-                }
-              }
-            }
-          },
-          "filters": [],
-          "query": {
-            "language": "kuery",
-            "query": ""
-          },
-          "visualization": {
-            "axisTitlesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "fittingFunction": "None",
-            "gridlinesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "layers": [
-              {
-                "accessors": [
-                  "6117c588-4178-4597-b6da-e0277ec0d410"
-                ],
-                "layerId": "fa1d3f51-58b9-4971-a28d-40616cfceb01",
-                "position": "top",
-                "seriesType": "line",
-                "showGridlines": false,
-                "splitAccessor": "a077ea8a-21dd-4bfe-b146-6d6425f7a14f",
-                "xAccessor": "19e03939-49d0-48f7-b76c-d70142001365"
-              }
-            ],
-            "legend": {
-              "isVisible": true,
-              "position": "right"
-            },
-            "preferredSeriesType": "line",
-            "tickLabelsVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "valueLabels": "hide"
-          }
-        },
-        "title": "AWS GetRecords Success [Metricbeat AWS]",
-        "visualizationType": "lnsXY"
-      },
-      "coreMigrationVersion": "7.13.2",
-      "id": "79d713c0-d86f-11eb-8220-c9141cc1b15c",
-      "migrationVersion": {
-        "lens": "7.13.1"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "metricbeat-*",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "metricbeat-*",
-          "name": "indexpattern-datasource-layer-fa1d3f51-58b9-4971-a28d-40616cfceb01",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "lens",
-      "updated_at": "2021-06-29T18:00:17.123Z",
-      "version": "WzEzNzMzLDFd"
-    },
-    {
-      "attributes": {
-        "description": "",
-        "state": {
-          "datasourceStates": {
-            "indexpattern": {
-              "layers": {
-                "fa1d3f51-58b9-4971-a28d-40616cfceb01": {
-                  "columnOrder": [
-                    "19e03939-49d0-48f7-b76c-d70142001365",
-                    "a077ea8a-21dd-4bfe-b146-6d6425f7a14f",
-                    "6117c588-4178-4597-b6da-e0277ec0d410"
-                  ],
-                  "columns": {
-                    "19e03939-49d0-48f7-b76c-d70142001365": {
-                      "dataType": "date",
-                      "isBucketed": true,
-                      "label": "@timestamp",
-                      "operationType": "date_histogram",
-                      "params": {
-                        "interval": "auto"
-                      },
-                      "scale": "interval",
-                      "sourceField": "@timestamp"
-                    },
-                    "6117c588-4178-4597-b6da-e0277ec0d410": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "PutRecords Success",
-                      "operationType": "average",
-                      "scale": "ratio",
-                      "sourceField": "aws.kinesis.metrics.PutRecords.Success.avg"
-                    },
-                    "a077ea8a-21dd-4bfe-b146-6d6425f7a14f": {
-                      "dataType": "string",
-                      "isBucketed": true,
-                      "label": "Top values of aws.dimensions.StreamName",
-                      "operationType": "terms",
-                      "params": {
-                        "missingBucket": false,
-                        "orderBy": {
-                          "columnId": "6117c588-4178-4597-b6da-e0277ec0d410",
-                          "type": "column"
-                        },
-                        "orderDirection": "desc",
-                        "otherBucket": true,
-                        "size": 10
-                      },
-                      "scale": "ordinal",
-                      "sourceField": "aws.dimensions.StreamName"
-                    }
-                  },
-                  "incompleteColumns": {}
-                }
-              }
-            }
-          },
-          "filters": [],
-          "query": {
-            "language": "kuery",
-            "query": ""
-          },
-          "visualization": {
-            "axisTitlesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "fittingFunction": "None",
-            "gridlinesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "layers": [
-              {
-                "accessors": [
-                  "6117c588-4178-4597-b6da-e0277ec0d410"
-                ],
-                "layerId": "fa1d3f51-58b9-4971-a28d-40616cfceb01",
-                "position": "top",
-                "seriesType": "line",
-                "showGridlines": false,
-                "splitAccessor": "a077ea8a-21dd-4bfe-b146-6d6425f7a14f",
-                "xAccessor": "19e03939-49d0-48f7-b76c-d70142001365"
-              }
-            ],
-            "legend": {
-              "isVisible": true,
-              "position": "right"
-            },
-            "preferredSeriesType": "line",
-            "tickLabelsVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "valueLabels": "hide"
-          }
-        },
-        "title": "AWS PutRecords Success [Metricbeat AWS]",
-        "visualizationType": "lnsXY"
-      },
-      "coreMigrationVersion": "7.13.2",
-      "id": "c68d7c30-d870-11eb-8220-c9141cc1b15c",
-      "migrationVersion": {
-        "lens": "7.13.1"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "metricbeat-*",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "metricbeat-*",
-          "name": "indexpattern-datasource-layer-fa1d3f51-58b9-4971-a28d-40616cfceb01",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "lens",
-      "updated_at": "2021-06-29T18:01:31.839Z",
-      "version": "WzEzODMwLDFd"
-    },
-    {
-      "attributes": {
-        "description": "",
-        "state": {
-          "datasourceStates": {
-            "indexpattern": {
-              "layers": {
-                "fa1d3f51-58b9-4971-a28d-40616cfceb01": {
-                  "columnOrder": [
-                    "19e03939-49d0-48f7-b76c-d70142001365",
-                    "a077ea8a-21dd-4bfe-b146-6d6425f7a14f",
-                    "6117c588-4178-4597-b6da-e0277ec0d410"
-                  ],
-                  "columns": {
-                    "19e03939-49d0-48f7-b76c-d70142001365": {
-                      "dataType": "date",
-                      "isBucketed": true,
-                      "label": "@timestamp",
-                      "operationType": "date_histogram",
-                      "params": {
-                        "interval": "auto"
-                      },
-                      "scale": "interval",
-                      "sourceField": "@timestamp"
-                    },
-                    "6117c588-4178-4597-b6da-e0277ec0d410": {
-                      "customLabel": true,
-                      "dataType": "number",
-                      "isBucketed": false,
-                      "label": "PutRecord Success",
-                      "operationType": "average",
-                      "scale": "ratio",
-                      "sourceField": "aws.kinesis.metrics.PutRecord.Success.avg"
-                    },
-                    "a077ea8a-21dd-4bfe-b146-6d6425f7a14f": {
-                      "dataType": "string",
-                      "isBucketed": true,
-                      "label": "Top values of aws.dimensions.StreamName",
-                      "operationType": "terms",
-                      "params": {
-                        "missingBucket": false,
-                        "orderBy": {
-                          "columnId": "6117c588-4178-4597-b6da-e0277ec0d410",
-                          "type": "column"
-                        },
-                        "orderDirection": "desc",
-                        "otherBucket": true,
-                        "size": 10
-                      },
-                      "scale": "ordinal",
-                      "sourceField": "aws.dimensions.StreamName"
-                    }
-                  },
-                  "incompleteColumns": {}
-                }
-              }
-            }
-          },
-          "filters": [],
-          "query": {
-            "language": "kuery",
-            "query": ""
-          },
-          "visualization": {
-            "axisTitlesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "fittingFunction": "None",
-            "gridlinesVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "layers": [
-              {
-                "accessors": [
-                  "6117c588-4178-4597-b6da-e0277ec0d410"
-                ],
-                "layerId": "fa1d3f51-58b9-4971-a28d-40616cfceb01",
-                "position": "top",
-                "seriesType": "line",
-                "showGridlines": false,
-                "splitAccessor": "a077ea8a-21dd-4bfe-b146-6d6425f7a14f",
-                "xAccessor": "19e03939-49d0-48f7-b76c-d70142001365"
-              }
-            ],
-            "legend": {
-              "isVisible": true,
-              "position": "right"
-            },
-            "preferredSeriesType": "line",
-            "tickLabelsVisibilitySettings": {
-              "x": true,
-              "yLeft": true,
-              "yRight": true
-            },
-            "valueLabels": "hide"
-          }
-        },
-        "title": "AWS PutRecord Success [Metricbeat AWS]",
-        "visualizationType": "lnsXY"
-      },
-      "coreMigrationVersion": "7.13.2",
-      "id": "56ac2b40-d871-11eb-8220-c9141cc1b15c",
-      "migrationVersion": {
-        "lens": "7.13.1"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "metricbeat-*",
-          "name": "indexpattern-datasource-current-indexpattern",
-          "type": "index-pattern"
-        },
-        {
-          "id": "metricbeat-*",
-          "name": "indexpattern-datasource-layer-fa1d3f51-58b9-4971-a28d-40616cfceb01",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "lens",
-      "updated_at": "2021-06-29T18:01:53.731Z",
-      "version": "WzEzODY5LDFd"
-    }
-  ],
-  "version": "7.13.2"
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:30.617Z",
+    "version": "WzMzNjMsMV0="
 }

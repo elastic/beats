@@ -80,5 +80,5 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "failed to get info from Elasticsearch")
 	}
 
-	return eventMapping(r, *info, content)
+	return eventMapping(r, *info, content, m.XPackEnabled)
 }

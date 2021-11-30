@@ -202,7 +202,7 @@ func TestStore_UpdateTTL(t *testing.T) {
 
 		// create pending update operation
 		res := store.Get("test::key")
-		op, err := createUpdateOp(store, res, "test-state-update")
+		op, err := createUpdateOp(res, "test-state-update")
 		require.NoError(t, err)
 		defer op.done(1)
 
@@ -244,7 +244,8 @@ func TestStore_ResetCursor(t *testing.T) {
 		require.Equal(t, uint(0), res.version)
 		require.Equal(t, uint(0), res.lockedVersion)
 		require.Equal(t, nil, res.cursor)
-		require.Equal(t, nil, res.pendingCursor)
+		require.Equal(t, nil, res.pendingCursorValue)
+		require.Equal(t, nil, res.pendingUpdate)
 
 		store.resetCursor("test::key", cur{Offset: 10})
 
@@ -272,7 +273,8 @@ func TestStore_ResetCursor(t *testing.T) {
 		require.Equal(t, uint(0), res.version)
 		require.Equal(t, uint(0), res.lockedVersion)
 		require.Equal(t, map[string]interface{}{"offset": int64(6)}, res.cursor)
-		require.Equal(t, nil, res.pendingCursor)
+		require.Equal(t, nil, res.pendingCursorValue)
+		require.Equal(t, nil, res.pendingUpdate)
 
 		store.resetCursor("test::key", cur{Offset: 0})
 
@@ -301,13 +303,13 @@ func TestStore_ResetCursor(t *testing.T) {
 		// lock before creating a new update operation
 		res, err := lock(input.Context{}, store, "test::key")
 		require.NoError(t, err)
-		op, err := createUpdateOp(store, res, cur{Offset: 42})
+		op, err := createUpdateOp(res, cur{Offset: 42})
 		require.NoError(t, err)
 
 		store.resetCursor("test::key", cur{Offset: 0})
 
 		// try to update cursor after it has been reset
-		op.Execute(1)
+		op.Execute(store, 1)
 		releaseResource(res)
 
 		res = store.Get("test::key")
@@ -315,7 +317,8 @@ func TestStore_ResetCursor(t *testing.T) {
 		require.Equal(t, uint(0), res.lockedVersion)
 		require.Equal(t, uint(0), res.activeCursorOperations)
 		require.Equal(t, map[string]interface{}{"offset": int64(0)}, res.cursor)
-		require.Equal(t, nil, res.pendingCursor)
+		require.Equal(t, nil, res.pendingCursorValue)
+		require.Equal(t, nil, res.pendingUpdate)
 
 	})
 }

@@ -15,6 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !aix
+// +build !aix
+
 package kubernetes
 
 import (
@@ -57,14 +60,23 @@ func NewNodeEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pu
 	// Ensure that node is set correctly whenever the scope is set to "node". Make sure that node is empty
 	// when cluster scope is enforced.
 	if config.Scope == "node" {
-		config.Node = kubernetes.DiscoverKubernetesNode(logger, config.Node, kubernetes.IsInCluster(config.KubeConfig), client)
+		nd := &kubernetes.DiscoverKubernetesNodeParams{
+			ConfigHost:  config.Node,
+			Client:      client,
+			IsInCluster: kubernetes.IsInCluster(config.KubeConfig),
+			HostUtils:   &kubernetes.DefaultDiscoveryUtils{},
+		}
+		config.Node, err = kubernetes.DiscoverKubernetesNode(logger, nd)
+		if err != nil {
+			return nil, fmt.Errorf("could not discover kubernetes node: %w", err)
+		}
 	} else {
 		config.Node = ""
 	}
 
 	logger.Debugf("Initializing a new Kubernetes watcher using node: %v", config.Node)
 
-	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, kubernetes.WatchOptions{
+	watcher, err := kubernetes.NewNamedWatcher("node", client, &kubernetes.Node{}, kubernetes.WatchOptions{
 		SyncTimeout:  config.SyncPeriod,
 		Node:         config.Node,
 		IsUpdated:    isUpdated,

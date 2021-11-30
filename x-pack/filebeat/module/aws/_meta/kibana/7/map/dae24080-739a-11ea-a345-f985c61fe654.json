@@ -1,0 +1,167 @@
+{
+    "attributes": {
+        "description": "",
+        "layerListJSON": [
+            {
+                "alpha": 1,
+                "id": "2c7b49fb-3fb5-4e18-b27f-fabe930971f3",
+                "label": null,
+                "maxZoom": 24,
+                "minZoom": 0,
+                "sourceDescriptor": {
+                    "isAutoSelect": true,
+                    "type": "EMS_TMS"
+                },
+                "style": {},
+                "type": "VECTOR_TILE",
+                "visible": true
+            },
+            {
+                "alpha": 0.75,
+                "id": "a10fa758-30ad-4e2a-bf9d-472e133a7f17",
+                "joins": [],
+                "label": "CloudTrail Soure Location",
+                "maxZoom": 24,
+                "minZoom": 0,
+                "query": {
+                    "language": "kuery",
+                    "query": "event.dataset:aws.cloudtrail"
+                },
+                "sourceDescriptor": {
+                    "applyGlobalQuery": true,
+                    "filterByMapBounds": true,
+                    "geoField": "source.geo.location",
+                    "id": "7bfe2df9-9398-4f1a-8cf7-b57aa5f3f31e",
+                    "indexPatternRefName": "layer_1_source_index_pattern",
+                    "scalingType": "LIMIT",
+                    "sortField": "",
+                    "sortOrder": "desc",
+                    "tooltipProperties": [],
+                    "topHitsSize": 1,
+                    "type": "ES_SEARCH"
+                },
+                "style": {
+                    "isTimeAware": true,
+                    "properties": {
+                        "fillColor": {
+                            "options": {
+                                "color": "#54B399"
+                            },
+                            "type": "STATIC"
+                        },
+                        "icon": {
+                            "options": {
+                                "value": "marker"
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconOrientation": {
+                            "options": {
+                                "orientation": 0
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconSize": {
+                            "options": {
+                                "size": 6
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelBorderColor": {
+                            "options": {
+                                "color": "#FFFFFF"
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelBorderSize": {
+                            "options": {
+                                "size": "SMALL"
+                            }
+                        },
+                        "labelColor": {
+                            "options": {
+                                "color": "#000000"
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelSize": {
+                            "options": {
+                                "size": 14
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelText": {
+                            "options": {
+                                "value": ""
+                            },
+                            "type": "STATIC"
+                        },
+                        "lineColor": {
+                            "options": {
+                                "color": "#41937c"
+                            },
+                            "type": "STATIC"
+                        },
+                        "lineWidth": {
+                            "options": {
+                                "size": 1
+                            },
+                            "type": "STATIC"
+                        },
+                        "symbolizeAs": {
+                            "options": {
+                                "value": "circle"
+                            }
+                        }
+                    },
+                    "type": "VECTOR"
+                },
+                "type": "VECTOR",
+                "visible": true
+            }
+        ],
+        "mapStateJSON": {
+            "center": {
+                "lat": 19.94277,
+                "lon": 0
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "refreshConfig": {
+                "interval": 0,
+                "isPaused": false
+            },
+            "settings": {
+                "autoFitToDataBounds": false
+            },
+            "timeFilters": {
+                "from": "now-15m",
+                "to": "now"
+            },
+            "zoom": 1.97
+        },
+        "title": "CloudTrail Source Location [Filebeat AWS]",
+        "uiStateJSON": {
+            "isLayerTOCOpen": true,
+            "openTOCDetails": []
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "dae24080-739a-11ea-a345-f985c61fe654",
+    "migrationVersion": {
+        "map": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "layer_1_source_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "map",
+    "updated_at": "2021-08-04T16:34:35.213Z",
+    "version": "WzQ2ODksMV0="
+}

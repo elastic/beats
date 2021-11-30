@@ -62,4 +62,5 @@ include::./faq.asciidoc[]
 
 include::{libbeat-dir}/contributing-to-beats.asciidoc[]
 
+include::{libbeat-dir}/redirects.asciidoc[]
 

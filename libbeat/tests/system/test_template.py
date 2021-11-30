@@ -107,7 +107,7 @@ class Test(BaseTest):
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
         self.wait_until(lambda: self.log_contains("Loading json template from file"))
-        self.wait_until(lambda: self.log_contains('Template with name "bla" loaded.'))
+        self.wait_until(lambda: self.log_contains('Template with name \\\"bla\\\" loaded.'))
         proc.check_kill_and_wait()
 
         result = es.transport.perform_request('GET', '/_template/' + template_name)
@@ -149,7 +149,7 @@ class TestRunTemplate(BaseTest):
         self.render_config()
         proc = self.start_beat()
         self.wait_until(lambda: self.log_contains("mockbeat start running."))
-        self.wait_until(lambda: self.log_contains('Template with name "mockbeat-9.9.9" loaded.'))
+        self.wait_until(lambda: self.log_contains('Template with name \\\"mockbeat-9.9.9\\\" loaded.'))
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
@@ -181,7 +181,7 @@ class TestCommandSetupTemplate(BaseTest):
         super(TestCommandSetupTemplate, self).setUp()
 
         # auto-derived default settings, if nothing else is set
-        self.setupCmd = "--template"
+        self.setupCmd = "--index-management"
         self.index_name = self.beat_name + "-9.9.9"
         self.custom_alias = self.beat_name + "_foo"
         self.policy_name = self.beat_name
@@ -209,7 +209,7 @@ class TestCommandSetupTemplate(BaseTest):
         """
         self.render_config()
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-                                  extra_args=["setup", self.setupCmd, "--ilm-policy"])
+                                  extra_args=["setup", self.setupCmd])
 
         assert exit_code == 0
         self.idxmgmt.assert_ilm_template_loaded(self.index_name, self.policy_name, self.index_name)
@@ -230,8 +230,6 @@ class TestCommandSetupTemplate(BaseTest):
         self.idxmgmt.assert_ilm_template_loaded(self.index_name, self.policy_name, self.index_name)
         self.idxmgmt.assert_index_template_index_pattern(self.index_name, [self.index_name + "-*"])
 
-        # when running `setup --template`
-        # write_alias and rollover_policy related to ILM are also created
         self.idxmgmt.assert_alias_created(self.index_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
 
@@ -249,8 +247,6 @@ class TestCommandSetupTemplate(BaseTest):
         assert exit_code == 0
         self.idxmgmt.assert_index_template_not_loaded(self.index_name)
 
-        # when running `setup --template` and `setup.template.enabled=false`
-        # write_alias and rollover_policy related to ILM are still created
         self.idxmgmt.assert_alias_created(self.index_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
 

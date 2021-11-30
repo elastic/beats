@@ -129,47 +129,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			}
 
 			src := p.identifier.GetSource(fe)
-			log = loggerWithEvent(log, fe, src)
-
-			switch fe.Op {
-			case loginp.OpCreate, loginp.OpWrite:
-				if fe.Op == loginp.OpCreate {
-					log.Debugf("A new file %s has been found", fe.NewPath)
-
-					err := s.UpdateMetadata(src, fileMeta{Source: fe.NewPath, IdentifierName: p.identifier.Name()})
-					if err != nil {
-						log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
-					}
-
-				} else if fe.Op == loginp.OpWrite {
-					log.Debugf("File %s has been updated", fe.NewPath)
-				}
-
-				if p.isFileIgnored(log, fe, ignoreInactiveSince) {
-					break
-				}
-
-				hg.Start(ctx, src)
-
-			case loginp.OpTruncate:
-				log.Debugf("File %s has been truncated", fe.NewPath)
-
-				s.ResetCursor(src, state{Offset: 0})
-				hg.Restart(ctx, src)
-
-			case loginp.OpDelete:
-				log.Debugf("File %s has been removed", fe.OldPath)
-
-				p.onRemove(log, fe, src, s, hg)
-
-			case loginp.OpRename:
-				log.Debugf("File %s has been renamed to %s", fe.OldPath, fe.NewPath)
-
-				p.onRename(log, ctx, fe, src, s, hg)
-
-			default:
-				log.Error("Unkown return value %v", fe.Op)
-			}
+			p.onFSEvent(loggerWithEvent(log, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
 		}
 		return nil
 	})
@@ -177,6 +137,57 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 	errs := tg.Wait()
 	if len(errs) > 0 {
 		log.Error("%s", sderr.WrapAll(errs, "running prospector failed"))
+	}
+}
+
+func (p *fileProspector) onFSEvent(
+	log *logp.Logger,
+	ctx input.Context,
+	event loginp.FSEvent,
+	src loginp.Source,
+	updater loginp.StateMetadataUpdater,
+	group loginp.HarvesterGroup,
+	ignoreSince time.Time,
+) {
+
+	switch event.Op {
+	case loginp.OpCreate, loginp.OpWrite:
+		if event.Op == loginp.OpCreate {
+			log.Debugf("A new file %s has been found", event.NewPath)
+
+			err := updater.UpdateMetadata(src, fileMeta{Source: event.NewPath, IdentifierName: p.identifier.Name()})
+			if err != nil {
+				log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
+			}
+
+		} else if event.Op == loginp.OpWrite {
+			log.Debugf("File %s has been updated", event.NewPath)
+		}
+
+		if p.isFileIgnored(log, event, ignoreSince) {
+			return
+		}
+
+		group.Start(ctx, src)
+
+	case loginp.OpTruncate:
+		log.Debugf("File %s has been truncated", event.NewPath)
+
+		updater.ResetCursor(src, state{Offset: 0})
+		group.Restart(ctx, src)
+
+	case loginp.OpDelete:
+		log.Debugf("File %s has been removed", event.OldPath)
+
+		p.onRemove(log, event, src, updater, group)
+
+	case loginp.OpRename:
+		log.Debugf("File %s has been renamed to %s", event.OldPath, event.NewPath)
+
+		p.onRename(log, ctx, event, src, updater, group)
+
+	default:
+		log.Error("Unkown return value %v", event.Op)
 	}
 }
 

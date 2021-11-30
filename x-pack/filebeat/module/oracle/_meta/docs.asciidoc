@@ -5,7 +5,6 @@
 
 
 == Oracle module
-beta[]
 
 This is a module for ingesting Audit Trail logs from Oracle Databases.
 

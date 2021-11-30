@@ -6,6 +6,7 @@
   anchor: kubernetes-processor
   fields:
     - name: kubernetes
+      default_field: true
       type: group
       fields:
         - name: pod.name
@@ -78,9 +79,3 @@
           type: keyword
           description: >
             Kubernetes container name (different than the name from the runtime)
-
-        - name: container.image
-          type: alias
-          path: container.image.name
-          description: >
-            Kubernetes container image

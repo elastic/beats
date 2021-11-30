@@ -1,7 +1,6 @@
 - name: vpcflow
   type: group
-  release: beta
-  default_field: false
+  release: ga
   description: >
     Fields for AWS VPC flow logs.
   fields:

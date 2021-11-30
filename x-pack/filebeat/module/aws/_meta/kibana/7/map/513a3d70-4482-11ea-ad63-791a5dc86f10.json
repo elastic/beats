@@ -1,0 +1,213 @@
+{
+    "attributes": {
+        "description": "",
+        "layerListJSON": [
+            {
+                "alpha": 1,
+                "id": "842c201e-96d7-413d-8688-de5ee4f8a1e0",
+                "label": null,
+                "maxZoom": 24,
+                "minZoom": 0,
+                "sourceDescriptor": {
+                    "isAutoSelect": true,
+                    "type": "EMS_TMS"
+                },
+                "style": {},
+                "type": "VECTOR_TILE",
+                "visible": true
+            },
+            {
+                "alpha": 0.75,
+                "id": "401944dd-a371-4698-be17-bc4542e9a5d4",
+                "label": "vpc flow action accept",
+                "maxZoom": 24,
+                "minZoom": 0,
+                "query": {
+                    "language": "kuery",
+                    "query": "aws.vpcflow.action : \"ACCEPT\" "
+                },
+                "sourceDescriptor": {
+                    "applyGlobalQuery": true,
+                    "filterByMapBounds": true,
+                    "geoField": "destination.geo.location",
+                    "id": "97903038-e08d-4451-bbd2-eb92c894bdf5",
+                    "indexPatternRefName": "layer_1_source_index_pattern",
+                    "scalingType": "LIMIT",
+                    "sortField": "@timestamp",
+                    "sortOrder": "desc",
+                    "tooltipProperties": [],
+                    "topHitsSize": 1,
+                    "type": "ES_SEARCH"
+                },
+                "style": {
+                    "properties": {
+                        "fillColor": {
+                            "options": {
+                                "color": "#1EA593"
+                            },
+                            "type": "STATIC"
+                        },
+                        "icon": {
+                            "options": {
+                                "value": "airfield"
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconOrientation": {
+                            "options": {
+                                "orientation": 0
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconSize": {
+                            "options": {
+                                "size": 5
+                            },
+                            "type": "STATIC"
+                        },
+                        "lineColor": {
+                            "options": {
+                                "color": "#167a6d"
+                            },
+                            "type": "STATIC"
+                        },
+                        "lineWidth": {
+                            "options": {
+                                "size": 1
+                            },
+                            "type": "STATIC"
+                        },
+                        "symbolizeAs": {
+                            "options": {
+                                "value": "circle"
+                            }
+                        }
+                    },
+                    "type": "VECTOR"
+                },
+                "type": "VECTOR",
+                "visible": true
+            },
+            {
+                "alpha": 0.75,
+                "id": "b1d44a5c-3a04-4c80-8080-57585b02fd48",
+                "label": "vpc flow action reject",
+                "maxZoom": 24,
+                "minZoom": 0,
+                "query": {
+                    "language": "kuery",
+                    "query": "aws.vpcflow.action : \"REJECT\" "
+                },
+                "sourceDescriptor": {
+                    "applyGlobalQuery": true,
+                    "filterByMapBounds": true,
+                    "geoField": "source.geo.location",
+                    "id": "9c0e7cce-4f21-4bcd-bb50-ae36c0fffffb",
+                    "indexPatternRefName": "layer_2_source_index_pattern",
+                    "scalingType": "LIMIT",
+                    "sortField": "@timestamp",
+                    "sortOrder": "desc",
+                    "tooltipProperties": [],
+                    "topHitsSize": 1,
+                    "type": "ES_SEARCH"
+                },
+                "style": {
+                    "properties": {
+                        "fillColor": {
+                            "options": {
+                                "color": "#f00f0b"
+                            },
+                            "type": "STATIC"
+                        },
+                        "icon": {
+                            "options": {
+                                "value": "airfield"
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconOrientation": {
+                            "options": {
+                                "orientation": 0
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconSize": {
+                            "options": {
+                                "size": 5
+                            },
+                            "type": "STATIC"
+                        },
+                        "lineColor": {
+                            "options": {
+                                "color": "#7a1a18"
+                            },
+                            "type": "STATIC"
+                        },
+                        "lineWidth": {
+                            "options": {
+                                "size": 1
+                            },
+                            "type": "STATIC"
+                        },
+                        "symbolizeAs": {
+                            "options": {
+                                "value": "circle"
+                            }
+                        }
+                    },
+                    "type": "VECTOR"
+                },
+                "type": "VECTOR",
+                "visible": true
+            }
+        ],
+        "mapStateJSON": {
+            "center": {
+                "lat": 0,
+                "lon": -108.92402
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "refreshConfig": {
+                "interval": 0,
+                "isPaused": false
+            },
+            "settings": {
+                "autoFitToDataBounds": false
+            },
+            "timeFilters": {
+                "from": "now-15d",
+                "to": "now"
+            },
+            "zoom": 0.47
+        },
+        "title": "VPC Flow Action Geo Location[Filebeat AWS]",
+        "uiStateJSON": {
+            "isLayerTOCOpen": false,
+            "openTOCDetails": []
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "513a3d70-4482-11ea-ad63-791a5dc86f10",
+    "migrationVersion": {
+        "map": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "layer_1_source_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "layer_2_source_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "map",
+    "updated_at": "2021-08-04T16:34:00.470Z",
+    "version": "WzQzNzUsMV0="
+}

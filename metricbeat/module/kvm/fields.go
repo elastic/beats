@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetKvm returns asset data.
-// This is the base64 encoded gzipped contents of module/kvm.
+// This is the base64 encoded zlib format compressed contents of module/kvm.
 func AssetKvm() string {
 	return "eJykk71uwyAUhXc/xVH29AEYOnWrsnan5TZCBmMBTuW3r+zY0QUTnChMlhHf+Q4/R7Q0CrQX2wBRR0MCh8+v06EBPBmSgQS+KcoGUBR+vO6jdp3AewNgWgfr1GCoAX41GRXEPHFEJy3N4Det5l9AHHsSMK47Lz8KxGl8OCt1h2UdR01fCayl8c959RDvtpgRE9jZu6GvoXhDDlLOWrIhynibKjErivNUiZIfwjpylVQog9SEdrWu40TW+bEMLrtwH3ZuJaf0FJ80y+zuZa0qF2mGmgu7ni+KlJJWC70tW4nfjU5fzDauuCf1vX80M0Hz+zeEVx7DhvDMQ+Aaee9a653OS+Mr9T8AAP//fuVDEQ=="
 }

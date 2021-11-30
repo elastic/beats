@@ -16,9 +16,9 @@ import (
 
 const (
 	// args: data path, pipeline name, application name
-	logFileFormat = "%s/logs/%s/%s-json.log"
+	logFileFormat = "%s/logs/%s/%s"
 	// args: data path, install path, pipeline name, application name
-	logFileFormatWin = "%s\\logs\\%s\\%s-json.log"
+	logFileFormatWin = "%s\\logs\\%s\\%s"
 
 	// args: pipeline name, application name
 	mbEndpointFileFormatWin = `npipe:///%s-%s`

@@ -1,0 +1,166 @@
+{
+    "attributes": {
+        "description": "Overview of GCP Storage Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "8d4e63d8-5747-4ebc-aeae-02d20e304526",
+                    "w": 10,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "8d4e63d8-5747-4ebc-aeae-02d20e304526",
+                "panelRefName": "panel_8d4e63d8-5747-4ebc-aeae-02d20e304526",
+                "title": "Filters",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "70c46ee3-be59-4fb1-a437-c8e92a1d0b2a",
+                    "w": 38,
+                    "x": 10,
+                    "y": 0
+                },
+                "panelIndex": "70c46ee3-be59-4fb1-a437-c8e92a1d0b2a",
+                "panelRefName": "panel_70c46ee3-be59-4fb1-a437-c8e92a1d0b2a",
+                "title": "Total Size of Objects",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "ba356b1b-ec2b-4a05-8a70-19a43b3dc3a8",
+                    "w": 24,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "ba356b1b-ec2b-4a05-8a70-19a43b3dc3a8",
+                "panelRefName": "panel_ba356b1b-ec2b-4a05-8a70-19a43b3dc3a8",
+                "title": "Total Number of Objects",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "77f185ba-74ad-4102-bca7-08587cd1bf6c",
+                    "w": 24,
+                    "x": 24,
+                    "y": 15
+                },
+                "panelIndex": "77f185ba-74ad-4102-bca7-08587cd1bf6c",
+                "panelRefName": "panel_77f185ba-74ad-4102-bca7-08587cd1bf6c",
+                "title": "API Request Count",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "f2ab3410-44b0-4b01-bb93-1394d6a64257",
+                    "w": 24,
+                    "x": 0,
+                    "y": 30
+                },
+                "panelIndex": "f2ab3410-44b0-4b01-bb93-1394d6a64257",
+                "panelRefName": "panel_f2ab3410-44b0-4b01-bb93-1394d6a64257",
+                "title": "Number of Bytes Received Over Network",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "75d342a5-f67b-4c61-b31d-b0b2db2ab50a",
+                    "w": 24,
+                    "x": 24,
+                    "y": 30
+                },
+                "panelIndex": "75d342a5-f67b-4c61-b31d-b0b2db2ab50a",
+                "panelRefName": "panel_75d342a5-f67b-4c61-b31d-b0b2db2ab50a",
+                "title": "Number of Bytes Sent Over Network",
+                "type": "visualization",
+                "version": "7.6.2"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat GCP] Storage Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ca401040-8e52-11ea-9fa6-4d675d5290dc",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "4b44b2b0-8e51-11ea-9fa6-4d675d5290dc",
+            "name": "8d4e63d8-5747-4ebc-aeae-02d20e304526:panel_8d4e63d8-5747-4ebc-aeae-02d20e304526",
+            "type": "visualization"
+        },
+        {
+            "id": "239e2290-8e52-11ea-9fa6-4d675d5290dc",
+            "name": "70c46ee3-be59-4fb1-a437-c8e92a1d0b2a:panel_70c46ee3-be59-4fb1-a437-c8e92a1d0b2a",
+            "type": "visualization"
+        },
+        {
+            "id": "02b3c620-8e52-11ea-9fa6-4d675d5290dc",
+            "name": "ba356b1b-ec2b-4a05-8a70-19a43b3dc3a8:panel_ba356b1b-ec2b-4a05-8a70-19a43b3dc3a8",
+            "type": "visualization"
+        },
+        {
+            "id": "91eb8d10-8e51-11ea-9fa6-4d675d5290dc",
+            "name": "77f185ba-74ad-4102-bca7-08587cd1bf6c:panel_77f185ba-74ad-4102-bca7-08587cd1bf6c",
+            "type": "visualization"
+        },
+        {
+            "id": "d4cc5ec0-8e51-11ea-9fa6-4d675d5290dc",
+            "name": "f2ab3410-44b0-4b01-bb93-1394d6a64257:panel_f2ab3410-44b0-4b01-bb93-1394d6a64257",
+            "type": "visualization"
+        },
+        {
+            "id": "e9e44d90-8e51-11ea-9fa6-4d675d5290dc",
+            "name": "75d342a5-f67b-4c61-b31d-b0b2db2ab50a:panel_75d342a5-f67b-4c61-b31d-b0b2db2ab50a",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:14.792Z",
+    "version": "WzM4MTYsMV0="
+}

@@ -67,8 +67,14 @@ var defaultFields = common.MapStr{
 		"executable": nil,
 		"args":       nil,
 		"pid":        nil,
-		"ppid":       nil,
+		"parent": common.MapStr{
+			"pid": nil,
+		},
 		"start_time": nil,
+		"owner": common.MapStr{
+			"name": nil,
+			"id":   nil,
+		},
 	},
 	"container": common.MapStr{
 		"id": nil,
@@ -92,7 +98,7 @@ func defaultConfig() config {
 		IgnoreMissing:         true,
 		OverwriteKeys:         false,
 		RestrictedFields:      false,
-		MatchPIDs:             []string{"process.pid", "process.ppid", "process.parent.pid", "process.parent.ppid"},
+		MatchPIDs:             []string{"process.pid", "process.parent.pid"},
 		HostPath:              "/",
 		CgroupPrefixes:        []string{"/kubepods", "/docker"},
 		CgroupCacheExpireTime: cacheExpiration,

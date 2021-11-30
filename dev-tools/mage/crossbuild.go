@@ -129,19 +129,40 @@ type crossBuildParams struct {
 
 // CrossBuild executes a given build target once for each target platform.
 func CrossBuild(options ...CrossBuildOption) error {
-	params := crossBuildParams{Platforms: Platforms, Target: defaultCrossBuildTarget, ImageSelector: crossBuildImage}
+	params := crossBuildParams{Platforms: Platforms, Target: defaultCrossBuildTarget, ImageSelector: CrossBuildImage}
 	for _, opt := range options {
 		opt(&params)
-	}
-
-	// Docker is required for this target.
-	if err := HaveDocker(); err != nil {
-		return err
 	}
 
 	if len(params.Platforms) == 0 {
 		log.Printf("Skipping cross-build of target=%v because platforms list is empty.", params.Target)
 		return nil
+	}
+
+	// AIX can't really be crossbuilt, due to cgo and various compiler shortcomings.
+	// If we have a singular AIX platform set, revert to a native build toolchain
+	if runtime.GOOS == "aix" {
+		for _, platform := range params.Platforms {
+			if platform.GOOS() == "aix" {
+				if len(params.Platforms) != 1 {
+					return errors.New("AIX cannot be crossbuilt with other platforms. Set PLATFORMS='aix/ppc64'")
+				} else {
+					// This is basically a short-out so we can attempt to build on AIX in a relatively generic way
+					log.Printf("Target is building for AIX, skipping normal crossbuild process")
+					args := DefaultBuildArgs()
+					args.OutputDir = filepath.Join("build", "golang-crossbuild")
+					args.Name += "-" + Platform.GOOS + "-" + Platform.Arch
+					return Build(args)
+				}
+			}
+		}
+		// If we're here, something isn't set.
+		return errors.New("Cannot crossbuild on AIX. Either run `mage build` or set PLATFORMS='aix/ppc64'")
+	}
+
+	// Docker is required for this target.
+	if err := HaveDocker(); err != nil {
+		return err
 	}
 
 	if CrossBuildMountModcache {
@@ -193,7 +214,7 @@ func buildMage() error {
 		"-compile", CreateDir(filepath.Join("build", "mage-linux-"+arch)))
 }
 
-func crossBuildImage(platform string) (string, error) {
+func CrossBuildImage(platform string) (string, error) {
 	tagSuffix := "main"
 
 	switch {

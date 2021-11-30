@@ -1,0 +1,95 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Ratio of used space in Tablespaces [Metricbeat Oracle]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "bar_color_rules": [
+                    {
+                        "id": "70de46f0-9bfc-11e9-baad-815beb8da1b5"
+                    }
+                ],
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "percent",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "oracle.tablespace.space.used.bytes",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "oracle.tablespace.space.total.bytes",
+                                "id": "37c93d70-9bfc-11e9-baad-815beb8da1b5",
+                                "type": "avg"
+                            },
+                            {
+                                "denominator": "2",
+                                "field": "oracle.tablespace.space.total.bytes",
+                                "id": "0d474830-9bfc-11e9-baad-815beb8da1b5",
+                                "numerator": "1",
+                                "script": "params.used / params.total",
+                                "type": "math",
+                                "variables": [
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                        "id": "34e8d9d0-9bfc-11e9-baad-815beb8da1b5",
+                                        "name": "used"
+                                    },
+                                    {
+                                        "field": "37c93d70-9bfc-11e9-baad-815beb8da1b5",
+                                        "id": "467fdf40-9bfc-11e9-baad-815beb8da1b5",
+                                        "name": "total"
+                                    }
+                                ]
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "oracle.tablespace.name",
+                        "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "Ratio of used space in Tablespaces [Metricbeat Oracle]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "981779d0-9bfc-11e9-a61b-f742ed613c57",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:20.355Z",
+    "version": "WzMyODAsMV0="
+}

@@ -43,7 +43,7 @@ func newInspectCommandWithArgs(s []string, streams *cli.IOStreams) *cobra.Comman
 		Args:  cobra.ExactArgs(0),
 		Run: func(c *cobra.Command, args []string) {
 			if err := inspectConfig(paths.ConfigFile()); err != nil {
-				fmt.Fprintf(streams.Err, "%v\n", err)
+				fmt.Fprintf(streams.Err, "Error: %v\n%s\n", err, troubleshootMessage())
 				os.Exit(1)
 			}
 		},
@@ -259,6 +259,7 @@ func getProgramsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *c
 	if err != nil {
 		return nil, err
 	}
+
 	composableWaiter := newWaitForCompose(composableCtrl)
 	configModifiers := &pipeline.ConfigModifiers{
 		Decorators: []pipeline.DecoratorFunc{modifiers.InjectMonitoring},

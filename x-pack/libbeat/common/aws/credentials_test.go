@@ -5,6 +5,7 @@
 package aws
 
 import (
+	"context"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -20,7 +21,7 @@ func TestGetAWSCredentials(t *testing.T) {
 	awsConfig, err := GetAWSCredentials(inputConfig)
 	assert.NoError(t, err)
 
-	retrievedAWSConfig, err := awsConfig.Credentials.Retrieve()
+	retrievedAWSConfig, err := awsConfig.Credentials.Retrieve(context.Background())
 	assert.NoError(t, err)
 
 	assert.Equal(t, inputConfig.AccessKeyID, retrievedAWSConfig.AccessKeyID)
@@ -55,6 +56,26 @@ func TestEnrichAWSConfigWithEndpoint(t *testing.T) {
 			awssdk.Config{},
 			awssdk.Config{
 				EndpointResolver: awssdk.ResolveWithEndpointURL("https://cloudwatch.us-west-1.amazonaws.com"),
+			},
+		},
+		{
+			"full URI endpoint",
+			"https://s3.test.com:9000",
+			"s3",
+			"",
+			awssdk.Config{},
+			awssdk.Config{
+				EndpointResolver: awssdk.ResolveWithEndpointURL("https://s3.test.com:9000"),
+			},
+		},
+		{
+			"full non HTTPS URI endpoint",
+			"http://testobjects.com:9000",
+			"s3",
+			"",
+			awssdk.Config{},
+			awssdk.Config{
+				EndpointResolver: awssdk.ResolveWithEndpointURL("http://testobjects.com:9000"),
 			},
 		},
 	}

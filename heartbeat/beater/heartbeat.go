@@ -18,14 +18,16 @@
 package beater
 
 import (
+	"errors"
 	"fmt"
+	"sync"
+	"syscall"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
@@ -35,7 +37,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 
+	_ "github.com/elastic/beats/v7/heartbeat/security"
 	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 )
 
@@ -65,15 +69,16 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	if err != nil {
 		return nil, err
 	}
+	jobConfig := parsedConfig.Jobs
 
-	scheduler := scheduler.NewWithLocation(limit, hbregistry.SchedulerRegistry, location)
+	scheduler := scheduler.NewWithLocation(limit, hbregistry.SchedulerRegistry, location, jobConfig)
 
 	bt := &Heartbeat{
 		done:      make(chan struct{}),
 		config:    parsedConfig,
 		scheduler: scheduler,
 		// dynamicFactory is the factory used for dynamic configs, e.g. autodiscover / reload
-		dynamicFactory: monitors.NewFactory(b.Info, scheduler, false),
+		dynamicFactory: monitors.NewFactory(b.Info, scheduler, plugin.GlobalPluginsReg),
 	}
 	return bt, nil
 }
@@ -81,6 +86,16 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 // Run executes the beat.
 func (bt *Heartbeat) Run(b *beat.Beat) error {
 	logp.Info("heartbeat is running! Hit CTRL-C to stop it.")
+	groups, _ := syscall.Getgroups()
+	logp.Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
+
+	if bt.config.RunOnce {
+		err := bt.runRunOnce(b)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
 
 	stopStaticMonitors, err := bt.RunStaticMonitors(b)
 	if err != nil {
@@ -123,19 +138,76 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	return nil
 }
 
+// runRunOnce runs the given config then exits immediately after any queued events have been sent to ES
+func (bt *Heartbeat) runRunOnce(b *beat.Beat) error {
+	logp.Info("Starting run_once run. This is an experimental feature and may be changed or removed in the future!")
+
+	publishClient, err := core.NewSyncClient(logp.NewLogger("run_once mode"), b.Publisher, beat.ClientConfig{})
+	if err != nil {
+		return fmt.Errorf("could not create sync client: %w", err)
+	}
+	defer publishClient.Close()
+
+	wg := &sync.WaitGroup{}
+	for _, cfg := range bt.config.Monitors {
+		err := runRunOnceSingleConfig(cfg, publishClient, wg)
+		if err != nil {
+			logp.Warn("error running run_once config: %s", err)
+		}
+	}
+
+	wg.Wait()
+	publishClient.Wait()
+
+	logp.Info("Ending run_once run")
+
+	return nil
+}
+
+func runRunOnceSingleConfig(cfg *common.Config, publishClient *core.SyncClient, wg *sync.WaitGroup) (err error) {
+	sf, err := stdfields.ConfigToStdMonitorFields(cfg)
+	if err != nil {
+		return fmt.Errorf("could not get stdmon fields: %w", err)
+	}
+	pluginFactory, exists := plugin.GlobalPluginsReg.Get(sf.Type)
+	if !exists {
+		return fmt.Errorf("no plugin for type: %s", sf.Type)
+	}
+	plugin, err := pluginFactory.Make(sf.Type, cfg)
+	if err != nil {
+		return err
+	}
+
+	results := plugin.RunWrapped(sf)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		defer plugin.Close()
+		for {
+			event := <-results
+			if event == nil {
+				break
+			}
+			publishClient.Publish(*event)
+		}
+	}()
+
+	return nil
+}
+
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
-	factory := monitors.NewFactory(b.Info, bt.scheduler, true)
-
 	var runners []cfgfile.Runner
 	for _, cfg := range bt.config.Monitors {
-		created, err := factory.Create(b.Publisher, cfg)
+		created, err := bt.dynamicFactory.Create(b.Publisher, cfg)
 		if err != nil {
-			if err == stdfields.ErrPluginDisabled {
+			if errors.Is(err, monitors.ErrMonitorDisabled) {
+				logp.Info("skipping disabled monitor: %s", err)
 				continue // don't stop loading monitors just because they're disabled
 			}
 
-			return nil, errors.Wrap(err, "could not create monitor")
+			return nil, fmt.Errorf("could not create monitor: %w", err)
 		}
 
 		created.Start()
@@ -162,7 +234,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 	// Check monitor configs
 	if err := bt.monitorReloader.Check(bt.dynamicFactory); err != nil {
-		logp.Error(errors.Wrap(err, "error loading reloadable monitors"))
+		logp.Error(fmt.Errorf("error loading reloadable monitors: %w", err))
 	}
 
 	// Execute the monitor

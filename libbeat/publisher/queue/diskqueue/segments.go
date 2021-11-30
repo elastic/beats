@@ -76,6 +76,9 @@ type diskQueueSegments struct {
 	// nextReadPosition is the next absolute byte offset on disk that should be
 	// read from the current read segment. The current read segment is either
 	// reading[0], or writing[0] if the reading list is empty.
+	// A value of 0 means the first frame in the segment (the
+	// exact byte position depends on the file header, see
+	// diskQueue.maybeReadPending()).
 	nextReadPosition uint64
 }
 

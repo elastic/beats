@@ -5,6 +5,7 @@
 package program
 
 import (
+	"flag"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -19,6 +20,10 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/internal/yamltest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
+)
+
+var (
+	generateFlag = flag.Bool("generate", false, "Write golden files")
 )
 
 func TestGroupBy(t *testing.T) {
@@ -395,10 +400,6 @@ func TestConfiguration(t *testing.T) {
 		// 	programs: []string{"auditbeat"},
 		// 	expected: 1,
 		// },
-		// "journal_config": {
-		// 	programs: []string{"journalbeat"},
-		// 	expected: 1,
-		// },
 		"fleet_server": {
 			programs: []string{"fleet-server"},
 			expected: 1,
@@ -483,6 +484,81 @@ func TestConfiguration(t *testing.T) {
 					diff := cmp.Diff(m, compareMap.Content)
 					if diff != "" {
 						t.Errorf("%s-%s mismatch (-want +got):\n%s", name, program.Spec.Name, diff)
+					}
+				}
+			}
+		})
+	}
+}
+
+func TestUseCases(t *testing.T) {
+	defer os.Remove("fleet.yml")
+
+	useCasesPath := filepath.Join("testdata", "usecases")
+	useCases, err := filepath.Glob(filepath.Join(useCasesPath, "*.yml"))
+	require.NoError(t, err)
+
+	generatedFilesDir := filepath.Join(useCasesPath, "generated")
+
+	// Cleanup all generated files to make sure not having any left overs
+	if *generateFlag {
+		err := os.RemoveAll(generatedFilesDir)
+		require.NoError(t, err)
+	}
+
+	for _, usecase := range useCases {
+		t.Run(usecase, func(t *testing.T) {
+
+			useCaseName := strings.TrimSuffix(filepath.Base(usecase), ".yml")
+			singleConfig, err := ioutil.ReadFile(usecase)
+			require.NoError(t, err)
+
+			var m map[string]interface{}
+			err = yaml.Unmarshal(singleConfig, &m)
+			require.NoError(t, err)
+
+			ast, err := transpiler.NewAST(m)
+			require.NoError(t, err)
+
+			programs, err := Programs(&fakeAgentInfo{}, ast)
+			require.NoError(t, err)
+
+			require.Equal(t, 1, len(programs))
+
+			defPrograms, ok := programs["default"]
+			require.True(t, ok)
+
+			for _, program := range defPrograms {
+				generatedPath := filepath.Join(
+					useCasesPath, "generated",
+					useCaseName+"."+strings.ToLower(program.Spec.Cmd)+".golden.yml",
+				)
+
+				compareMap := &transpiler.MapVisitor{}
+				program.Config.Accept(compareMap)
+
+				// Generate new golden file for programm
+				if *generateFlag {
+					d, err := yaml.Marshal(&compareMap.Content)
+					require.NoError(t, err)
+
+					err = os.MkdirAll(generatedFilesDir, 0755)
+					require.NoError(t, err)
+					err = ioutil.WriteFile(generatedPath, d, 0644)
+					require.NoError(t, err)
+				}
+
+				programConfig, err := ioutil.ReadFile(generatedPath)
+				require.NoError(t, err)
+
+				var m map[string]interface{}
+				err = yamltest.FromYAML(programConfig, &m)
+				require.NoError(t, errors.Wrap(err, program.Cmd()))
+
+				if !assert.True(t, cmp.Equal(m, compareMap.Content)) {
+					diff := cmp.Diff(m, compareMap.Content)
+					if diff != "" {
+						t.Errorf("%s-%s mismatch (-want +got):\n%s", usecase, program.Spec.Name, diff)
 					}
 				}
 			}

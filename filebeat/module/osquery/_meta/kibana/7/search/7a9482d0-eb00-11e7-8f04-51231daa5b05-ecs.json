@@ -1,0 +1,78 @@
+{
+    "attributes": {
+        "columns": [
+            "osquery.result.columns.path",
+            "osquery.result.columns.type",
+            "osquery.result.columns.flags"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "osquery.result.name",
+                            "negate": false,
+                            "params": {
+                                "query": "pack_it-compliance_mounts",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "pack_it-compliance_mounts"
+                        },
+                        "query": {
+                            "match": {
+                                "osquery.result.name": {
+                                    "query": "pack_it-compliance_mounts",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Mounts [Filebeat Osquery] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "7a9482d0-eb00-11e7-8f04-51231daa5b05-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:34:54.660Z",
+    "version": "WzQ5MjQsMV0="
+}

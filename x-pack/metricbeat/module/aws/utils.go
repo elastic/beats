@@ -16,9 +16,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
 	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
 )
 
 // GetStartTimeEndTime function uses durationString to create startTime and endTime for queries.
@@ -29,9 +26,14 @@ func GetStartTimeEndTime(period time.Duration, latency time.Duration) (time.Time
 		endTime = endTime.Add(latency * -1)
 	}
 
-	// Set startTime double the period earlier than the endtime in order to
-	// make sure GetMetricDataRequest gets the latest data point for each metric.
-	return endTime.Add(period * -2), endTime
+	// Set startTime to be one period earlier than the endTime. If metrics are
+	// not being collected, use latency config parameter to offset the startTime
+	// and endTime.
+	startTime := endTime.Add(period * -1)
+	// Defining duration
+	d := 60 * time.Second
+	// Calling Round() method
+	return startTime.Round(d), endTime.Round(d)
 }
 
 // GetListMetricsOutput function gets listMetrics results from cloudwatch per namespace for each region.
@@ -39,77 +41,61 @@ func GetStartTimeEndTime(period time.Duration, latency time.Duration) (time.Time
 // to obtain statistical data.
 func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch cloudwatchiface.ClientAPI) ([]cloudwatch.Metric, error) {
 	var metricsTotal []cloudwatch.Metric
-	init := true
 	var nextToken *string
 
-	for init || nextToken != nil {
-		init = false
-		listMetricsInput := &cloudwatch.ListMetricsInput{
-			NextToken: nextToken,
-		}
-		if namespace != "*" {
-			listMetricsInput.Namespace = &namespace
-		}
-		reqListMetrics := svcCloudwatch.ListMetricsRequest(listMetricsInput)
-
-		// List metrics of a given namespace for each region
-		listMetricsOutput, err := reqListMetrics.Send(context.TODO())
-		if err != nil {
-			return nil, errors.Wrap(err, "ListMetricsRequest failed, skipping region "+regionName)
-		}
-		metricsTotal = append(metricsTotal, listMetricsOutput.Metrics...)
-		nextToken = listMetricsOutput.NextToken
+	listMetricsInput := &cloudwatch.ListMetricsInput{
+		NextToken: nextToken,
+	}
+	if namespace != "*" {
+		listMetricsInput.Namespace = &namespace
 	}
 
+	// List metrics of a given namespace for each region
+	req := svcCloudwatch.ListMetricsRequest(listMetricsInput)
+	paginator := cloudwatch.NewListMetricsPaginator(req)
+	for paginator.Next(context.TODO()) {
+		page := paginator.CurrentPage()
+		metricsTotal = append(metricsTotal, page.Metrics...)
+	}
+
+	if err := paginator.Err(); err != nil {
+		return metricsTotal, errors.Wrap(err, "error ListMetrics with Paginator, skipping region "+regionName)
+	}
 	return metricsTotal, nil
-}
-
-func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, nextToken *string, svc cloudwatchiface.ClientAPI, startTime time.Time, endTime time.Time) (*cloudwatch.GetMetricDataOutput, error) {
-	getMetricDataInput := &cloudwatch.GetMetricDataInput{
-		NextToken:         nextToken,
-		StartTime:         &startTime,
-		EndTime:           &endTime,
-		MetricDataQueries: metricDataQueries,
-	}
-
-	reqGetMetricData := svc.GetMetricDataRequest(getMetricDataInput)
-	getMetricDataResponse, err := reqGetMetricData.Send(context.TODO())
-	if err != nil {
-		return nil, errors.Wrap(err, "Error GetMetricDataInput")
-	}
-	return getMetricDataResponse.GetMetricDataOutput, nil
 }
 
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.
 func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cloudwatchiface.ClientAPI, startTime time.Time, endTime time.Time) ([]cloudwatch.MetricDataResult, error) {
-	init := true
 	maxQuerySize := 100
 	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
-	for init || getMetricDataOutput.NextToken != nil {
-		init = false
-		// Split metricDataQueries into smaller slices that length no longer than 100.
-		// 100 is defined in maxQuerySize.
-		// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 100.
-		for i := 0; i < len(metricDataQueries); i += maxQuerySize {
-			metricDataQueriesPartial := metricDataQueries[i:int(math.Min(float64(i+maxQuerySize), float64(len(metricDataQueries))))]
-			if len(metricDataQueriesPartial) == 0 {
-				return getMetricDataOutput.MetricDataResults, nil
-			}
 
-			output, err := getMetricDataPerRegion(metricDataQueriesPartial, getMetricDataOutput.NextToken, svc, startTime, endTime)
-			if err != nil {
-				return getMetricDataOutput.MetricDataResults, errors.Wrap(err, "getMetricDataPerRegion failed")
-			}
+	// Split metricDataQueries into smaller slices that length no longer than 100.
+	// 100 is defined in maxQuerySize.
+	// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 100.
+	for i := 0; i < len(metricDataQueries); i += maxQuerySize {
+		metricDataQueriesPartial := metricDataQueries[i:int(math.Min(float64(i+maxQuerySize), float64(len(metricDataQueries))))]
+		if len(metricDataQueriesPartial) == 0 {
+			return getMetricDataOutput.MetricDataResults, nil
+		}
 
-			getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
+		getMetricDataInput := &cloudwatch.GetMetricDataInput{
+			StartTime:         &startTime,
+			EndTime:           &endTime,
+			MetricDataQueries: metricDataQueriesPartial,
+		}
+
+		req := svc.GetMetricDataRequest(getMetricDataInput)
+		paginator := cloudwatch.NewGetMetricDataPaginator(req)
+		for paginator.Next(context.TODO()) {
+			page := paginator.CurrentPage()
+			getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, page.MetricDataResults...)
+		}
+
+		if err := paginator.Err(); err != nil {
+			return getMetricDataOutput.MetricDataResults, errors.Wrap(err, "error GetMetricData with Paginator")
 		}
 	}
 	return getMetricDataOutput.MetricDataResults, nil
-}
-
-// EventMapping maps data in input to a predefined schema.
-func EventMapping(input map[string]interface{}, schema s.Schema) (common.MapStr, error) {
-	return schema.Apply(input, s.FailOnRequired)
 }
 
 // CheckTimestampInArray checks if input timestamp exists in timestampArray and if it exists, return the position.

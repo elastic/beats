@@ -1,0 +1,142 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Top ephemeral disk usage [Metricbeat Cloud Foundry]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color": null,
+                "background_color_rules": [
+                    {
+                        "background_color": "rgba(244,78,59,1)",
+                        "color": null,
+                        "id": "9c7cf130-f84e-11ea-bdee-833d96fe1a00",
+                        "operator": "gt",
+                        "value": 60000
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "bar_color": "rgba(104,188,0,1)",
+                        "id": "9cb8a18a-f84e-11ea-bd11-836ecccfc401",
+                        "operator": "lt",
+                        "value": 65
+                    },
+                    {
+                        "bar_color": "rgba(252,220,0,1)",
+                        "id": "9c87c1f0-f84e-11ea-abf6-9bcf7a4dd500",
+                        "operator": "gte",
+                        "value": 65
+                    },
+                    {
+                        "bar_color": "rgba(244,78,59,1)",
+                        "id": "9c95f1b2-f84e-11ea-9ca9-53ceca17b640",
+                        "operator": "gt",
+                        "value": 75
+                    }
+                ],
+                "drilldown_url": "",
+                "drop_last_bucket": 1,
+                "filter": {
+                    "language": "kuery",
+                    "query": "event.module: cloudfoundry and cloudfoundry.envelope.origin :\"bosh-system-metrics-forwarder\""
+                },
+                "gauge_color_rules": [
+                    {
+                        "gauge": null,
+                        "id": "9ca68d56-f84e-11ea-a6bb-f3164c0bb859",
+                        "text": null,
+                        "value": 0
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_max": "300000",
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "9c8aab7c-f84e-11ea-b4a3-e31a518913fa",
+                "ignore_global_filter": 0,
+                "index_pattern": "metricbeat-*",
+                "interval": ">=1m",
+                "isModelInvalid": false,
+                "legend_position": "bottom",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,188,0,1)",
+                        "fill": "0",
+                        "filter": {
+                            "language": "kuery",
+                            "query": "cloudfoundry.value.name: \"system.disk.ephemeral.percent\" "
+                        },
+                        "formatter": "00.00",
+                        "hidden": false,
+                        "hide_in_legend": 0,
+                        "id": "9c8c18f4-f84e-11ea-97ff-b32117553dae",
+                        "label": "Top Max Ephemeral Disk Usage (%)",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "agg_with": "avg",
+                                "field": "cloudfoundry.value.value",
+                                "id": "9c8d7514-f84e-11ea-9457-93fdc9395544",
+                                "order": "desc",
+                                "size": 1,
+                                "type": "max"
+                            }
+                        ],
+                        "offset_time": "",
+                        "point_size": "4",
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_filters": [
+                            {
+                                "color": "#68BC00",
+                                "filter": {
+                                    "language": "kuery",
+                                    "query": ""
+                                },
+                                "id": "9c753c7e-f84e-11ea-96e9-33ff984da2c7",
+                                "label": ""
+                            }
+                        ],
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "steps": 0,
+                        "terms_field": "cloudfoundry.envelope.job",
+                        "terms_include": "",
+                        "terms_order_by": "9c8d7514-f84e-11ea-9457-93fdc9395544",
+                        "type": "timeseries",
+                        "value_template": "{{value}} %"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "time_range_mode": "entire_time_range",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "Top ephemeral disk usage [Metricbeat Cloud Foundry]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "9c5e5c7a-f84e-11ea-9c79-3f5f46484ce3",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:58.327Z",
+    "version": "WzM2NDEsMV0="
+}

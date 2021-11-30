@@ -22,12 +22,13 @@ import (
 )
 
 type eventTemplate struct {
-	Data []eventData `xml:"data"`
+	Data []EventData `xml:"data"`
 }
 
-type eventData struct {
-	Name string `xml:"name,attr"`
-	Type string `xml:"outType,attr"`
+type EventData struct {
+	Name    string `xml:"name,attr"`
+	InType  string `xml:"inType,attr"`
+	OutType string `xml:"outType,attr"`
 }
 
 func (t *eventTemplate) Unmarshal(xmlData []byte) error {

@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux && cgo && withjournald
 // +build linux,cgo,withjournald
 
 package journald
@@ -22,7 +23,7 @@ package journald
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/journalbeat/pkg/journalfield"
+	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )

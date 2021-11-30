@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package template
@@ -142,7 +143,7 @@ func createTestTemplate(t *testing.T, beatVersion, esVersion string, config Temp
 		t.Fatalf("Failed to create the template: %+v", err)
 	}
 
-	return &testTemplate{t: t, tmpl: template, data: template.Generate(nil, nil)}
+	return &testTemplate{t: t, tmpl: template, data: template.Generate(nil, nil, nil)}
 }
 
 func (t *testTemplate) Has(path string) bool {

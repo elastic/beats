@@ -40,8 +40,6 @@ pipeline {
   }
   parameters {
     booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
-    booleanParam(name: 'linux', defaultValue: true, description: 'Allow linux stages.')
-    booleanParam(name: 'arm', defaultValue: true, description: 'Allow ARM stages.')
   }
   stages {
     stage('Filter build') {
@@ -103,7 +101,6 @@ pipeline {
                   'auditbeat',
                   'filebeat',
                   'heartbeat',
-                  'journalbeat',
                   'metricbeat',
                   'packetbeat',
                   'winlogbeat',
@@ -113,7 +110,6 @@ pipeline {
                   'x-pack/filebeat',
                   'x-pack/functionbeat',
                    'x-pack/heartbeat',
-                  // 'x-pack/journalbeat',
                   'x-pack/metricbeat',
                   'x-pack/osquerybeat',
                   'x-pack/packetbeat',
@@ -125,12 +121,6 @@ pipeline {
               stage('Package Linux'){
                 agent { label 'ubuntu-18 && immutable' }
                 options { skipDefaultCheckout() }
-                when {
-                  beforeAgent true
-                  expression {
-                    return params.linux
-                  }
-                }
                 environment {
                   HOME = "${env.WORKSPACE}"
                   PLATFORMS = [
@@ -207,7 +197,6 @@ pipeline {
                   'auditbeat',
                   'filebeat',
                   'heartbeat',
-                  'journalbeat',
                   'metricbeat',
                   'packetbeat',
                   'x-pack/auditbeat',
@@ -224,12 +213,6 @@ pipeline {
               stage('Package Docker images for linux/arm64'){
                 agent { label 'arm' }
                 options { skipDefaultCheckout() }
-                when {
-                  beforeAgent true
-                  expression {
-                    return params.arm
-                  }
-                }
                 environment {
                   HOME = "${env.WORKSPACE}"
                   PACKAGES = "docker"
@@ -291,8 +274,6 @@ def pushCIDockerImages(Map args = [:]) {
       tagAndPush(beatName: 'filebeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('heartbeat')) {
       tagAndPush(beatName: 'heartbeat', arch: arch)
-    } else if ("${env.BEATS_FOLDER}" == "journalbeat"){
-      tagAndPush(beatName: 'journalbeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('metricbeat')) {
       tagAndPush(beatName: 'metricbeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('osquerybeat')) {
@@ -335,15 +316,23 @@ def tagAndPush(Map args = [:]) {
   }
   // supported image flavours
   def variants = ["", "-oss", "-ubi8"]
+
+  if(beatName == 'elastic-agent'){
+      variants.add("-complete")
+      variants.add("-cloud")
+  }
+
   variants.each { variant ->
+    // cloud docker images are stored in the private docker namespace.
+    def sourceNamespace = variant.equals('-cloud') ? 'beats-ci' : 'beats'
     tags.each { tag ->
       // TODO:
       // For backward compatibility let's ensure we tag only for amd64, then E2E can benefit from until
       // they support the versioning with the architecture
       if ("${arch}" == "amd64") {
-        doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}")
+        doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}", sourceNamespace: sourceNamespace)
       }
-      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}")
+      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}", sourceNamespace: sourceNamespace)
     }
   }
 }
@@ -351,6 +340,7 @@ def tagAndPush(Map args = [:]) {
 /**
 * @param beatName name of the Beat
 * @param variant name of the variant used to build the docker image name
+* @param sourceNamespace namespace to be used as source for the docker tag command
 * @param sourceTag tag to be used as source for the docker tag command, usually under the 'beats' namespace
 * @param targetTag tag to be used as target for the docker tag command, usually under the 'observability-ci' namespace
 */
@@ -359,7 +349,8 @@ def doTagAndPush(Map args = [:]) {
   def variant = args.variant
   def sourceTag = args.sourceTag
   def targetTag = args.targetTag
-  def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
+  def sourceNamespace = args.sourceNamespace
+  def sourceName = "${DOCKER_REGISTRY}/${sourceNamespace}/${beatName}${variant}:${sourceTag}"
   def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
   def iterations = 0
   retryWithSleep(retries: 3, seconds: 5, backoff: true) {
@@ -420,37 +411,12 @@ def runE2ETests(){
       };
     }
 
-    triggerE2ETests(suites)
+    runE2E(runTestsSuites: suites,
+           beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
+           gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
+           gitHubCheckRepo: env.REPO,
+           gitHubCheckSha1: env.GIT_BASE_COMMIT)
   }
-}
-
-def triggerE2ETests(String suite) {
-  echo("Triggering E2E tests for PR-${env.CHANGE_ID}. Test suites: ${suite}.")
-
-  def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"
-  def e2eTestsPipeline = "e2e-tests/e2e-testing-mbp/${branchName}"
-  def beatVersion = "${env.BEAT_VERSION}-SNAPSHOT"
-
-  def parameters = [
-    booleanParam(name: 'forceSkipGitChecks', value: true),
-    booleanParam(name: 'forceSkipPresubmit', value: true),
-    booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
-    string(name: 'BEAT_VERSION', value: beatVersion),
-    booleanParam(name: 'BEATS_USE_CI_SNAPSHOTS', value: true),
-    string(name: 'runTestsSuites', value: suite),
-    string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
-    string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
-    string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
-  ]
-
-  build(job: "${e2eTestsPipeline}",
-    parameters: parameters,
-    propagate: false,
-    wait: false
-  )
-
-  def notifyContext = "${env.GITHUB_CHECK_E2E_TESTS_NAME}"
-  githubNotify(context: "${notifyContext}", description: "${notifyContext} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${e2eTestsPipeline.replaceAll('/','+')}")
 }
 
 def withMacOSEnv(Closure body){

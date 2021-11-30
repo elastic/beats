@@ -3,7 +3,7 @@
 
 - module: cef
   log:
-    enabled: true
+    enabled: false
     var:
       syslog_host: localhost
       syslog_port: 9003

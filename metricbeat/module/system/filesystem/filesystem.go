@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build darwin || freebsd || linux || openbsd || windows
 // +build darwin freebsd linux openbsd windows
 
 package filesystem
@@ -77,15 +78,23 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	for _, fs := range fss {
-		fsStat, err := GetFileSystemStat(fs)
+		stat, err := GetFileSystemStat(fs)
+		addStats := true
 		if err != nil {
-			debugf("error getting filesystem stats for '%s': %v", fs.DirName, err)
-			continue
+			addStats = false
+			m.Logger().Debugf("error fetching filesystem stats for '%s': %v", fs.DirName, err)
 		}
-		AddFileSystemUsedPercentage(fsStat)
+		fsStat := FSStat{
+			FileSystemUsage: stat,
+			DevName:         fs.DevName,
+			Mount:           fs.DirName,
+			SysTypeName:     fs.SysTypeName,
+		}
+
+		AddFileSystemUsedPercentage(&fsStat)
 
 		event := mb.Event{
-			MetricSetFields: GetFilesystemEvent(fsStat),
+			MetricSetFields: GetFilesystemEvent(&fsStat, addStats),
 		}
 		if !r.Event(event) {
 			return nil

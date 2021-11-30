@@ -21,6 +21,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -84,7 +85,6 @@ func TestEnroll(t *testing.T) {
 			cmd, err := newEnrollCmdWithStore(
 				log,
 				&enrollCmdOption{
-					ID:                   "my-id",
 					URL:                  url,
 					CAs:                  []string{caFile},
 					EnrollAPIKey:         "my-enrollment-token",
@@ -95,7 +95,8 @@ func TestEnroll(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = cmd.Execute(context.Background())
+			streams, _, _, _ := cli.NewTestingIOStreams()
+			err = cmd.Execute(context.Background(), streams)
 			require.Error(t, err)
 		},
 	))
@@ -137,7 +138,6 @@ func TestEnroll(t *testing.T) {
 			cmd, err := newEnrollCmdWithStore(
 				log,
 				&enrollCmdOption{
-					ID:                   "my-id",
 					URL:                  url,
 					CAs:                  []string{caFile},
 					EnrollAPIKey:         "my-enrollment-api-key",
@@ -148,7 +148,8 @@ func TestEnroll(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = cmd.Execute(context.Background())
+			streams, _, _, _ := cli.NewTestingIOStreams()
+			err = cmd.Execute(context.Background(), streams)
 			require.NoError(t, err)
 
 			config, err := readConfig(store.Content)
@@ -194,7 +195,6 @@ func TestEnroll(t *testing.T) {
 			cmd, err := newEnrollCmdWithStore(
 				log,
 				&enrollCmdOption{
-					ID:                   "my-id",
 					URL:                  url,
 					CAs:                  []string{},
 					EnrollAPIKey:         "my-enrollment-api-key",
@@ -206,7 +206,8 @@ func TestEnroll(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = cmd.Execute(context.Background())
+			streams, _, _, _ := cli.NewTestingIOStreams()
+			err = cmd.Execute(context.Background(), streams)
 			require.NoError(t, err)
 
 			require.True(t, store.Called)
@@ -254,7 +255,6 @@ func TestEnroll(t *testing.T) {
 			cmd, err := newEnrollCmdWithStore(
 				log,
 				&enrollCmdOption{
-					ID:                   "my-id",
 					URL:                  url,
 					CAs:                  []string{},
 					EnrollAPIKey:         "my-enrollment-api-key",
@@ -266,7 +266,8 @@ func TestEnroll(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = cmd.Execute(context.Background())
+			streams, _, _, _ := cli.NewTestingIOStreams()
+			err = cmd.Execute(context.Background(), streams)
 			require.NoError(t, err)
 
 			require.True(t, store.Called)
@@ -299,7 +300,6 @@ func TestEnroll(t *testing.T) {
 			cmd, err := newEnrollCmdWithStore(
 				log,
 				&enrollCmdOption{
-					ID:                   "my-id",
 					URL:                  url,
 					CAs:                  []string{},
 					EnrollAPIKey:         "my-enrollment-token",
@@ -311,7 +311,8 @@ func TestEnroll(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = cmd.Execute(context.Background())
+			streams, _, _, _ := cli.NewTestingIOStreams()
+			err = cmd.Execute(context.Background(), streams)
 			require.Error(t, err)
 			require.False(t, store.Called)
 		},

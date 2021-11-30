@@ -1,0 +1,76 @@
+{
+  "name":"elastic-m1.local",
+  "version":{
+    "number":"8.0.0",
+    "build_hash":"unknown",
+    "build_date":null
+  },
+  "jvm":{
+    "gc":{
+      "collection_count":20,
+      "collection_time":2303,
+      "garbage_collectors":{
+        "PS Scavenge":{
+          "collection_count":16,
+          "collection_time":657
+        },
+        "PS MarkSweep":{
+          "collection_count":4,
+          "collection_time":1646
+        }
+      }
+    },
+    "pid":59623,
+    "uptime":170377,
+    "memory_usage":{
+      "heap_init":268435456,
+      "heap_used":736601248,
+      "heap_committed":1279262720,
+      "heap_max":1908932608,
+      "object_pending_finalization_count":0,
+      "non_heap_init":2555904,
+      "non_heap_committed":99745792
+    },
+    "memory_pools":[
+      "Code Cache",
+      "Metaspace",
+      "Compressed Class Space",
+      "PS Eden Space",
+      "PS Survivor Space",
+      "PS Old Gen"
+    ],
+    "threads":{
+      "thread_count":27,
+      "peak_thread_count":32,
+      "total_started_thread_count":35,
+      "daemon_thread_count":17
+    },
+    "vm_version":"25.292-b10",
+    "vm_vendor":"AdoptOpenJDK",
+    "vm_name":"OpenJDK 64-Bit Server VM"
+  },
+  "filebeat":{
+    "pid":60067,
+    "alive":true,
+    "restart_count":0,
+    "seconds_since_last_restart":-1
+  },
+  "esqueues_me":{
+
+  },
+  "crawler":{
+    "running":true,
+    "workers":{
+      "pool_size":16,
+      "active":0,
+      "available":16
+    }
+  },
+  "system":{
+    "java_version":"1.8.0_292",
+    "jruby_version":"9.2.13.0",
+    "os_name":"Mac OS X",
+    "os_version":"10.16"
+  },
+  "cluster_uuid":"MTD6fXYGTZylTMoW5AG5JA"
+}

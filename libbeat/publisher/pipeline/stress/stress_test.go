@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build stresstest
 // +build stresstest
 
 package stress_test
@@ -33,7 +34,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline/stress"
 	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/spool"
 )
 
 // additional flags

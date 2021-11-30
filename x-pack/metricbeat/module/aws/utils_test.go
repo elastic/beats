@@ -5,6 +5,7 @@
 package aws
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -58,7 +59,13 @@ func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsI
 	}
 	httpReq, _ := http.NewRequest("", "", nil)
 	return cloudwatch.ListMetricsRequest{
+		Input: input,
+		Copy:  m.ListMetricsRequest,
 		Request: &awssdk.Request{
+			Operation: &awssdk.Operation{
+				Name:      "ListMetrics",
+				Paginator: nil,
+			},
 			Data: &cloudwatch.ListMetricsOutput{
 				Metrics: []cloudwatch.Metric{
 					{
@@ -69,6 +76,7 @@ func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsI
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -81,7 +89,13 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 	httpReq, _ := http.NewRequest("", "", nil)
 
 	return cloudwatch.GetMetricDataRequest{
+		Input: input,
+		Copy:  m.GetMetricDataRequest,
 		Request: &awssdk.Request{
+			Operation: &awssdk.Operation{
+				Name:      "GetMetricData",
+				Paginator: nil,
+			},
 			Data: &cloudwatch.GetMetricDataOutput{
 				MetricDataResults: []cloudwatch.MetricDataResult{
 					{
@@ -107,6 +121,7 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -154,6 +169,7 @@ func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegro
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 		Input: input,
 		Copy:  m.GetResourcesRequest,
@@ -169,6 +185,7 @@ func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegro
 			},
 			HTTPRequest: httpReq,
 			Operation:   op,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 		Input: input,
 		Copy:  m.GetResourcesRequest,
@@ -210,7 +227,16 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 
 	mockSvc := &MockCloudWatchClient{}
 	var metricDataQueries []cloudwatch.MetricDataQuery
-	getMetricDataOutput, err := getMetricDataPerRegion(metricDataQueries, nil, mockSvc, startTime, endTime)
+
+	getMetricDataInput := &cloudwatch.GetMetricDataInput{
+		NextToken:         nil,
+		StartTime:         &startTime,
+		EndTime:           &endTime,
+		MetricDataQueries: metricDataQueries,
+	}
+
+	reqGetMetricData := mockSvc.GetMetricDataRequest(getMetricDataInput)
+	getMetricDataOutput, err := reqGetMetricData.Send(context.TODO())
 	if err != nil {
 		fmt.Println("failed getMetricDataPerRegion: ", err)
 		t.FailNow()

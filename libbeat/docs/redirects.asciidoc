@@ -1,0 +1,25 @@
+["appendix",role="exclude",id="redirects-global"]
+= Deleted pages
+
+The following pages have moved or been deleted.
+
+[role="exclude",id="configuration-central-management"]
+== {beats} central management
+
+Starting in version 7.14, {beats} central management has been removed.
+
+// tag::fleet-redirect[]
+Elastic now provides simpler and faster data onboarding with secure,
+centralized agent management through {agent} and {fleet}. For more information,
+refer to {fleet-guide}/fleet-overview.html[{fleet} and {agent} overview].
+// end::fleet-redirect[]
+
+[role="exclude",id="how-central-managment-works"]
+== How central management works
+
+include::redirects.asciidoc[tag=fleet-redirect]
+
+[role="exclude",id="enroll-beats"]
+== Enroll {beats} in central management
+
+include::redirects.asciidoc[tag=fleet-redirect]

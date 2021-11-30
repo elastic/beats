@@ -18,6 +18,7 @@
 package add_process_metadata
 
 import (
+	"os/user"
 	"strings"
 
 	"github.com/elastic/go-sysinfo"
@@ -39,6 +40,14 @@ func (p gosysinfoProvider) GetProcessMetadata(pid int) (result *processMetadata,
 		return nil, err
 	}
 
+	username, userid := "", ""
+	if userInfo, err := proc.User(); err == nil {
+		userid = userInfo.UID
+		if u, err := user.LookupId(userInfo.UID); err == nil {
+			username = u.Username
+		}
+	}
+
 	r := processMetadata{
 		name:      info.Name,
 		args:      info.Args,
@@ -47,6 +56,8 @@ func (p gosysinfoProvider) GetProcessMetadata(pid int) (result *processMetadata,
 		pid:       info.PID,
 		ppid:      info.PPID,
 		startTime: info.StartTime,
+		username:  username,
+		userid:    userid,
 	}
 	r.fields = r.toMap()
 	return &r, nil

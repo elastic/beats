@@ -50,6 +50,8 @@ func exposeMetricsEndpoint(log *logger.Logger, config *common.Config, ns func(st
 	if enableProcessStats {
 		r.HandleFunc("/processes", processesHandler(routesFetchFn))
 		r.Handle("/processes/{processID}", createHandler(processHandler(statsHandler)))
+		r.Handle("/processes/{processID}/", createHandler(processHandler(statsHandler)))
+		r.Handle("/processes/{processID}/{beatsPath}", createHandler(processHandler(statsHandler)))
 	}
 
 	mux := http.NewServeMux()

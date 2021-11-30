@@ -26,10 +26,22 @@ spec:
         - image: docker.elastic.co/elasticsearch/elasticsearch:8.0.0-SNAPSHOT
           imagePullPolicy: IfNotPresent
           name: elasticsearch
-          env:
-            - name: "discovery.type"
-              value: "single-node"
-
+          envFrom:
+            - configMapRef:
+                name: elasticsearch-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elasticsearch-config
+data:
+  discovery.type: "single-node"
+  ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+  xpack.license.self_generated.type: "trial"
+  xpack.security.enabled: 'true'
+  xpack.security.authc.api_key.enabled: 'true'
+  ELASTIC_USERNAME: "elastic"
+  ELASTIC_PASSWORD: "changeme"
 ---
 apiVersion: v1
 kind: Service
@@ -47,7 +59,6 @@ spec:
     app: elasticsearch
   sessionAffinity: None
   type: ClusterIP
-
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -77,3 +88,8 @@ spec:
         - image: docker.elastic.co/kibana/kibana:8.0.0-SNAPSHOT
           imagePullPolicy: IfNotPresent
           name: kibana
+          env:
+          - name: ELASTICSEARCH_USERNAME
+            value: elastic
+          - name: ELASTICSEARCH_PASSWORD
+            value: changeme

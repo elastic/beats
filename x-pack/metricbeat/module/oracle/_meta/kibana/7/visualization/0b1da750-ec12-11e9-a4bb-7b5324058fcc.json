@@ -1,0 +1,159 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Lock/Pin requests and IO reloads ratios [Metricbeat Oracle]",
+        "uiStateJSON": {
+            "vis": {
+                "defaultColors": {
+                    "0 - 50": "rgb(247,251,255)",
+                    "50 - 75": "rgb(107,174,214)",
+                    "75 - 100": "rgb(8,48,107)"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "IO Reloads",
+                        "field": "oracle.performance.io_reloads"
+                    },
+                    "schema": "metric",
+                    "type": "avg"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Lock requests",
+                        "field": "oracle.performance.lock_requests"
+                    },
+                    "schema": "metric",
+                    "type": "avg"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Pin requests",
+                        "field": "oracle.performance.pin_requests"
+                    },
+                    "schema": "metric",
+                    "type": "avg"
+                }
+            ],
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "dimensions": {
+                    "x": null,
+                    "y": [
+                        {
+                            "accessor": 0,
+                            "aggType": "avg",
+                            "format": {
+                                "id": "number"
+                            },
+                            "params": {}
+                        },
+                        {
+                            "accessor": 1,
+                            "aggType": "avg",
+                            "format": {
+                                "id": "number"
+                            },
+                            "params": {}
+                        },
+                        {
+                            "accessor": 2,
+                            "aggType": "avg",
+                            "format": {
+                                "id": "number"
+                            },
+                            "params": {}
+                        }
+                    ]
+                },
+                "gauge": {
+                    "alignment": "automatic",
+                    "backStyle": "Full",
+                    "colorSchema": "Blues",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 0.5
+                        },
+                        {
+                            "from": 0.5,
+                            "to": 0.75
+                        },
+                        {
+                            "from": 0.75,
+                            "to": 1
+                        }
+                    ],
+                    "extendRange": true,
+                    "gaugeColorMode": "Labels",
+                    "gaugeStyle": "Full",
+                    "gaugeType": "Arc",
+                    "invertColors": false,
+                    "labels": {
+                        "color": "black",
+                        "show": true
+                    },
+                    "orientation": "vertical",
+                    "percentageMode": true,
+                    "scale": {
+                        "color": "rgba(105,112,125,0.2)",
+                        "labels": false,
+                        "show": true
+                    },
+                    "style": {
+                        "bgColor": true,
+                        "bgFill": "rgba(105,112,125,0.2)",
+                        "bgMask": false,
+                        "bgWidth": 0.9,
+                        "fontSize": 60,
+                        "mask": false,
+                        "maskBars": 50,
+                        "subText": "",
+                        "width": 0.9
+                    },
+                    "type": "meter"
+                },
+                "isDisplayWarning": false,
+                "type": "gauge"
+            },
+            "title": "Lock/Pin requests and IO reloads ratios [Metricbeat Oracle]",
+            "type": "gauge"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0b1da750-ec12-11e9-a4bb-7b5324058fcc",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:19.365Z",
+    "version": "WzMyNzQsMV0="
+}

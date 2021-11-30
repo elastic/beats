@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux
 // +build linux
 
 package tracing
@@ -319,9 +320,8 @@ func (d *structDecoder) Decode(raw []byte, meta Metadata) (s interface{}, err er
 		}
 		switch dec.typ {
 		case FieldTypeInteger:
-			if err := copyInt(
-				unsafe.Pointer(uintptr(destPtr)+dec.dst),
-				unsafe.Pointer(&raw[dec.src]), uint8(dec.len)); err != nil {
+			err := copyInt(unsafe.Add(destPtr, dec.dst), unsafe.Pointer(&raw[dec.src]), uint8(dec.len))
+			if err != nil {
 				return nil, fmt.Errorf("bad size=%d for integer field=%s", dec.len, dec.name)
 			}
 
@@ -334,13 +334,13 @@ func (d *structDecoder) Decode(raw []byte, meta Metadata) (s interface{}, err er
 			if len > 0 && raw[offset+len-1] == 0 {
 				len--
 			}
-			*((*string)(unsafe.Pointer(uintptr(destPtr) + dec.dst))) = string(raw[offset : offset+len])
+			*(*string)(unsafe.Add(destPtr, dec.dst)) = string(raw[offset : offset+len])
 
 		case FieldTypeMeta:
-			*(*Metadata)(unsafe.Pointer(uintptr(destPtr) + dec.dst)) = meta
+			*(*Metadata)(unsafe.Add(destPtr, dec.dst)) = meta
 
 		case FieldTypeRaw:
-			copy((*(*[maxRawCopySize]byte)(unsafe.Pointer(uintptr(destPtr) + dec.dst)))[:dec.len], raw[dec.src:dec.src+dec.len])
+			copy(unsafe.Slice((*byte)(unsafe.Add(destPtr, dec.dst)), dec.len), raw[dec.src:])
 		}
 	}
 

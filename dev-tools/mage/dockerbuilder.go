@@ -70,12 +70,12 @@ func (b *dockerBuilder) Build() error {
 		return errors.Wrap(err, "failed to prepare build")
 	}
 
-	tries := 3
 	tag, err := b.dockerBuild()
+	tries := 3
 	for err != nil && tries != 0 {
-		fmt.Println(">> Building docker images again (after 10 seconds)")
+		fmt.Println(">> Building docker images again (after 10 s)")
 		// This sleep is to avoid hitting the docker build issues when resources are not available.
-		time.Sleep(10)
+		time.Sleep(time.Second * 10)
 		tag, err = b.dockerBuild()
 		tries -= 1
 	}

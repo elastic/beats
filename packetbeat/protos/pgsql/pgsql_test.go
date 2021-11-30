@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package pgsql
@@ -43,10 +44,6 @@ type eventStore struct {
 func (e *eventStore) publish(event beat.Event) {
 	publish.MarshalPacketbeatFields(&event, nil, nil)
 	e.events = append(e.events, event)
-}
-
-func (e *eventStore) empty() bool {
-	return len(e.events) == 0
 }
 
 func pgsqlModForTests(store *eventStore) *pgsqlPlugin {
@@ -233,11 +230,11 @@ func TestPgsqlParser_threeResponses(t *testing.T) {
 	}
 	var tuple common.TCPTuple
 	var private pgsqlPrivateData
-	var countHandlePgsql = 0
+	countHandlePgsql := 0
 
 	pgsql.handlePgsql = func(pgsql *pgsqlPlugin, m *pgsqlMessage, tcptuple *common.TCPTuple,
-		dir uint8, raw_msg []byte) {
-
+		dir uint8, raw_msg []byte,
+	) {
 		countHandlePgsql++
 	}
 
