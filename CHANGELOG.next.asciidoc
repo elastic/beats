@@ -28,6 +28,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Index template's default_fields setting is only populated with ECS fields. {pull}28596[28596] {issue}28215[28215]
 - Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
 - Remove options `logging.files.suffix` and default to datetime endings. {pull}28927[28927]
+- Remove Journalbeat. Use `journald` input of Filebeat instead. {pull}29131[29131]
 
 *Auditbeat*
 
@@ -68,11 +69,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 - Change behavior in case of duplicate monitor IDs in configs to be last monitor wins. {pull}29041[29041]
-
-*Journalbeat*
-
-- Rename field `journald.process.capabilites` to `journald.process.capabilities` to fix spelling. {pull}28065[28065]
-- Rename field `log.syslog.facility.name` to `log.syslog.facility.code` because the value is numeric rather than the facility name. {pull}28065[28065]
 
 *Metricbeat*
 
@@ -144,6 +140,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allows disable pod events enrichment with deployment name {pull}28521[28521]
 - Fix `fingerprint` processor to give it access to the `@timestamp` field. {issue}28683[28683]
 - Fix the wrong beat name on monitoring and state endpoint {issue}27755[27755]
+- Skip configuration checks in autodiscover for configurations that are already running {pull}29048[29048]
+- Fix `decode_json_processor` to always respect `add_error_key` {pull}29107[29107]
 
 *Auditbeat*
 
@@ -190,6 +188,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Revert usageDetails api version to 2019-01-01. {pull}28995[28995]
 - Fix in `aws-s3` input regarding provider discovery through endpoint {pull}28963[28963]
 - Fix `threatintel.misp` filters configuration. {issue}27970[27970]
+- Fix opening files on Windows in filestream so open files can be deleted. {issue}29113[29113] {pull}29180[29180] 
 
 *Heartbeat*
 
@@ -199,9 +198,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Stop logging params values. {pull}28774[28774]
 - Remove accidentally included cups library in docker images. {pull}28853[pull]
 - Fix broken monitors with newer versions of image relying on dup3. {pull}28938[pull]
-
-*Journalbeat*
-
 
 *Metricbeat*
 
@@ -236,9 +232,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix list_docker.go {pull}28374[28374]
 - Use xpack.enabled on SM modules to write into .monitoring indices when using Metricbeat standalone {pull}28365[28365]
 - Fix in rename processor to ingest metrics for `write.iops` to proper field instead of `write_iops` in rds metricset. {pull}28960[28960]
+- Fix rds metadata in cloudwatch metricset. {pull}29106[29106]
 
 *Packetbeat*
 
+- Prevent incorrect use of AMQP protocol parsing from causing silent failure. {pull}29017[29017]
+- Fix error handling in MongoDB protocol parsing. {pull}29017[29017]
 
 *Winlogbeat*
 
@@ -346,14 +345,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support in aws-s3 input for s3 notification from SNS to SQS. {pull}28800[28800]
 - Add support in aws-s3 input for custom script parsing of s3 notifications. {pull}28946[28946]
 - Improve error handling in aws-s3 input for malformed s3 notifications. {issue}28828[28828] {pull}28946[28946]
+- Add support for parsers on journald input {pull}29070[29070]
 
 *Heartbeat*
 
 - Support JSON expressions / validation of JSON arrays. {pull}28073[28073]
 - Experimental 'run once' mode. {pull}25972[25972]
 - Add `keyword` multi-field mapping for `synthetics.step.name`. {pull}28452[28452]
-
-*Journalbeat*
 
 *Metricbeat*
 
@@ -371,6 +369,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Preliminary AIX support {pull}27954[27954]
 - Register additional name for `storage` metricset in the azure module. {pull}28447[28447]
 - Update reference to gosigar pacakge for filesystem windows fix. {pull}28909[28909]
+- Override `Host()` on statsd MetricSet {pull}29103[29103]
 
 *Packetbeat*
 
@@ -397,8 +396,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Deprecate `log` input in favour of `filestream` input. {pull}28623[28623]
 
 *Heartbeat*
-
-*Journalbeat*
 
 *Metricbeat*
 

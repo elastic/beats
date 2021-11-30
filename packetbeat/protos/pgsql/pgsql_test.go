@@ -46,10 +46,6 @@ func (e *eventStore) publish(event beat.Event) {
 	e.events = append(e.events, event)
 }
 
-func (e *eventStore) empty() bool {
-	return len(e.events) == 0
-}
-
 func pgsqlModForTests(store *eventStore) *pgsqlPlugin {
 	callback := func(beat.Event) {}
 	if store != nil {
@@ -234,11 +230,11 @@ func TestPgsqlParser_threeResponses(t *testing.T) {
 	}
 	var tuple common.TCPTuple
 	var private pgsqlPrivateData
-	var countHandlePgsql = 0
+	countHandlePgsql := 0
 
 	pgsql.handlePgsql = func(pgsql *pgsqlPlugin, m *pgsqlMessage, tcptuple *common.TCPTuple,
-		dir uint8, raw_msg []byte) {
-
+		dir uint8, raw_msg []byte,
+	) {
 		countHandlePgsql++
 	}
 

@@ -71,6 +71,10 @@ func NewUdpServer(base mb.BaseMetricSet) (server.Server, error) {
 	}, nil
 }
 
+func (g *UdpServer) GetHost() string {
+	return g.udpaddr.String()
+}
+
 func (g *UdpServer) Start() error {
 	listener, err := net.ListenUDP("udp", g.udpaddr)
 	if err != nil {
