@@ -59,7 +59,7 @@ class TestCommandSetupIndexManagement(BaseTest):
 
         assert exit_code == 0
         self.idxmgmt.assert_index_template_loaded(self.data_stream)
-        self.idxmgmt.assert_index_template_index_pattern(self.data_stream, [self.data_stream + "*"])
+        self.idxmgmt.assert_index_template_index_pattern(self.data_stream, [self.data_stream])
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -154,22 +154,6 @@ class TestCommandSetupIndexManagement(BaseTest):
         resp = self.es.transport.perform_request('GET', '/_ilm/policy/' + policy_name)
         assert "delete" not in resp[policy_name]["policy"]["phases"]
         assert "hot" in resp[policy_name]["policy"]["phases"]
-
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.tag('integration')
-    def test_setup_template_name_and_pattern(self):
-        """
-        Test setup --index-management ignores template.name and template.pattern when ilm is enabled
-        """
-        self.render_config()
-        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-                                  extra_args=["setup", self.cmd,
-                                              "-E", "setup.template.name=" + self.custom_template,
-                                              "-E", "setup.template.pattern=" + self.custom_template + "*"])
-
-        assert exit_code == 0
-        self.idxmgmt.assert_index_template_loaded(self.custom_template)
-        self.idxmgmt.assert_index_template_index_pattern(self.custom_template, [self.custom_template + "*"])
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
