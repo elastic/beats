@@ -50,7 +50,7 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
                         "paths": dirs,
                     }
                 }],
-                elasticsearch = self.get_elasticsearch_template_config()
+                elasticsearch=self.get_elasticsearch_template_config()
             )
             self.run_beat(extra_args=["setup", "--index-management"], exit_code=0)
 
@@ -75,8 +75,8 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
                         "paths": dirs,
                     }
                 }],
-                elasticsearch = self.get_elasticsearch_template_config(),
-                kibana = self.get_kibana_template_config(),
+                elasticsearch=self.get_elasticsearch_template_config(),
+                kibana=self.get_kibana_template_config(),
             )
             self.run_beat(extra_args=["setup", "--dashboards"], exit_code=0)
 
