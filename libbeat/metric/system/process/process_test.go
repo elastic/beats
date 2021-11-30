@@ -25,6 +25,7 @@ import (
 	"os"
 	"runtime"
 	"sort"
+	"strings"
 	"testing"
 	"time"
 
@@ -41,16 +42,17 @@ var numCPU = runtime.NumCPU()
 func TestPidFetch(t *testing.T) {
 	logp.DevelopmentSetup()
 	matcherFunc := func(name string) bool {
-		// if strings.Contains(name, "vscode") {
-		// 	return true
-		// }
-		// return false
-		return true
+		if strings.Contains(name, "node") {
+			return true
+		}
+		return false
+
 	}
 
 	procList, err := FetchPids("/proc", matcherFunc)
 	assert.NoError(t, err, "error in FetchPids")
 	t.Logf("Process list is: %d", len(procList))
+	t.Logf("First Process: %#v", procList[0])
 
 }
 

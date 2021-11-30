@@ -40,7 +40,7 @@ type ProcState struct {
 	Env     common.MapStr `struct:"env,omitempty"`
 
 	// Resource Metrics
-	Memory ProcMeminfo `struct:"memory,omitempty"`
+	Memory ProcMemInfo `struct:"memory,omitempty"`
 	CPU    ProcCPUInfo `struct:"cpu,omitempty"`
 	FD     ProcLimits  `struct:"fd,omitempty"`
 
@@ -51,15 +51,23 @@ type ProcState struct {
 type ProcCPUInfo struct {
 	StartTime common.Time `struct:"start_time,omitempty"`
 	Total     CPUTotal    `struct:"total,omitempty"`
+	// Optional Tick values
+	User   CPUTicks `struct:"user,omitempty"`
+	System CPUTicks `struct:"system,omitempty"`
+}
+
+type CPUTicks struct {
+	Ticks opt.Uint `struct:"ticks,omitempty"`
 }
 
 type CPUTotal struct {
 	Value opt.Float  `struct:"value,omitempty"`
+	Ticks opt.Uint   `struct:"ticks,omitempty"`
 	Pct   opt.Float  `struct:"pct,omitempty"`
 	Norm  opt.PctOpt `struct:"norm,omitempty"`
 }
 
-type ProcMeminfo struct {
+type ProcMemInfo struct {
 	Size  opt.Uint   `struct:"size,omitempty"`
 	Share opt.Uint   `struct:"share,omitempty"`
 	Rss   MemBytePct `struct:"rss,omitempty"`
