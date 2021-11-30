@@ -563,6 +563,38 @@ func (s *state) CreateProcess(p *process) error {
 	return nil
 }
 
+func (s *state) ForkProcess(parentPID, childPID uint32, ts kernelTime) error {
+	if parentPID == childPID {
+		return nil
+	}
+	s.Lock()
+	defer s.Unlock()
+	if _, found := s.processes[childPID]; found {
+		return errors.New("fork: child pid already registered to another process")
+	}
+	if parent, found := s.processes[parentPID]; found {
+		child := &process{
+			pid:         childPID,
+			name:        parent.name,
+			path:        parent.path,
+			args:        parent.args, // TODO: shallow copy
+			created:     ts,
+			uid:         parent.uid,
+			gid:         parent.gid,
+			euid:        parent.euid,
+			egid:        parent.egid,
+			hasCreds:    parent.hasCreds,
+			createdTime: s.kernTimestampToTime(ts),
+		}
+		child.resolvedDomains = make(map[string]string, len(parent.resolvedDomains))
+		for k, v := range parent.resolvedDomains {
+			child.resolvedDomains[k] = v
+		}
+		s.processes[childPID] = child
+	}
+	return nil
+}
+
 func (s *state) TerminateProcess(pid uint32) error {
 	if pid == 0 {
 		return errors.New("can't terminate process with PID 0")

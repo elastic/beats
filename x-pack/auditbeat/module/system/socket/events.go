@@ -948,6 +948,24 @@ func (e *execveRet) Update(s *state) error {
 	return nil
 }
 
+type forkRet struct {
+	Meta   tracing.Metadata `kprobe:"metadata"`
+	Retval int              `kprobe:"retval"`
+}
+
+// String returns a representation of the event.
+func (e *forkRet) String() string {
+	return fmt.Sprintf("%s <- fork %d", header(e.Meta), e.Retval)
+}
+
+// Update the state with the contents of this event.
+func (e *forkRet) Update(s *state) error {
+	if e.Retval <= 0 {
+		return nil
+	}
+	return s.ForkProcess(e.Meta.PID, uint32(e.Retval), kernelTime(e.Meta.Timestamp))
+}
+
 type doExit struct {
 	Meta tracing.Metadata `kprobe:"metadata"`
 }
