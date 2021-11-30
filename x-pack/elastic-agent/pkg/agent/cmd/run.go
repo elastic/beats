@@ -142,6 +142,9 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 	if err != nil {
 		return err
 	}
+	// Close apm.DefaultTracer since we're creating our own.
+	apm.DefaultTracer.Close()
+
 	control := server.New(logger.Named("control"), rex, statusCtrl, nil, tracer)
 	// start the control listener
 	if err := control.Start(); err != nil {
