@@ -29,26 +29,17 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/paths"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 func setHostfs(pathString string) {
 	os.Setenv("HOST_PROC", filepath.Join(pathString, "proc"))
-	path := paths.Path{
-		Hostfs: pathString,
-	}
-	paths.InitPaths(&path)
+
 }
 
 func TestDataNameFilter(t *testing.T) {
-	oldFS := paths.Paths.Hostfs
 	setHostfs("_meta/testdata")
-
-	defer func() {
-		setHostfs(oldFS)
-	}()
 
 	conf := map[string]interface{}{
 		"module":                 "system",
@@ -63,12 +54,7 @@ func TestDataNameFilter(t *testing.T) {
 }
 
 func TestDataEmptyFilter(t *testing.T) {
-	oldFS := paths.Paths.Hostfs
 	setHostfs("_meta/testdata")
-
-	defer func() {
-		setHostfs(oldFS)
-	}()
 
 	conf := map[string]interface{}{
 		"module":     "system",
