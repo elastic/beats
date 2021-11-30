@@ -82,6 +82,8 @@ filebeat.inputs:
     client.id: 12345678901234567890abcdef
     client.secret: abcdef12345678901234567890
     token_url: http://localhost/oauth2/token
+    user: abc.xyz@mail.com
+    password: P@$$W0₹D
   request.url: http://localhost
 ----
 
@@ -264,6 +266,23 @@ except if using `google` as provider. Required for providers: `default`, `azure`
 
 The client secret used as part of the authentication flow. It is always required
 except if using `google` as provider. Required for providers: `default`, `azure`.
+
+[float]
+==== `auth.oauth2.user`
+
+The user used as part of the authentication flow. It is required for authentication 
+- grant type password. It is always required except if using `google` as provider. 
+Required for providers: `default`, `azure`.
+
+[float]
+==== `auth.oauth2.password`
+
+The password used as part of the authentication flow.It is required for authentication 
+- grant type password. It is always required except if using `google` as provider.
+Required for providers: `default`, `azure`.
+
+NOTE: If user and password is not used then it will automatically use `token_url` and 
+`client credential` method
 
 [float]
 ==== `auth.oauth2.scopes`
