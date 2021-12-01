@@ -56,9 +56,6 @@ import (
 // returns a 404 status code.
 var RegistryNotFound = errors.New("npcap: registry not found")
 
-// Registry is the location of current Npcap version information.
-const Registry = "https://artifacts.elastic.co/downloads/npcap/current_version"
-
 // Fetch downloads the Npcap installer, writes the content to the given filepath
 // and returns the sha256 hash of the downloaded object. If the registry is not
 // found RegistryNotFound is returned.
