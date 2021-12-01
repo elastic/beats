@@ -328,7 +328,11 @@
         "host.os.family": "Windows",
         "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
         "input.type": "log",
+<<<<<<< HEAD
         "log.offset": 1642,
+=======
+        "log.offset": 1644,
+>>>>>>> 303e4ed71 (PANW: Fix bugs in globalprotect pipeline (#29154))
         "network.type": "ipv4",
         "observer.hostname": "GP GW intern",
         "observer.product": "PAN-OS",
@@ -456,7 +460,7 @@
         "host.os.family": "Windows",
         "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
         "input.type": "log",
-        "log.offset": 2467,
+        "log.offset": 2466,
         "network.type": "ipv4",
         "observer.hostname": "GP Portal",
         "observer.product": "PAN-OS",
@@ -518,7 +522,7 @@
         "host.os.family": "Windows",
         "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
         "input.type": "log",
-        "log.offset": 2874,
+        "log.offset": 2873,
         "network.type": "ipv4",
         "observer.hostname": "GP Portal",
         "observer.product": "PAN-OS",
@@ -564,5 +568,173 @@
         ],
         "user.domain": "domain",
         "user.name": "maxmustermann"
+    },
+    {
+        "@timestamp": "2021-10-22T16:10:05.000Z",
+        "client.address": "10.2.2.2",
+        "client.ip": "10.2.2.2",
+        "client.nat.ip": "10.1.1.1",
+        "event.code": "gateway-hip-check",
+        "event.dataset": "panw.panos",
+        "event.duration": 0,
+        "event.module": "panw",
+        "event.original": "931201168,2021-10-22T16:10:10.000000Z,no-serial,GLOBALPROTECT,globalprotect,9.1,2021-10-22T16:10:05.000000Z,vsys1,gateway-hip-check,host-info,,,host\\\\user,,HOSTNAME,10.1.1.1,,10.2.2.2,fc00::1,8cbc136b-e262-4cf8-912c-95ea132d9fef,SERIALNR,5.2.6,,,1,,,HIP report is not needed,success,,0,,0,GlobalProtect_External_Gateway,1305925,true",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "fileset.name": "panos",
+        "host.id": "8cbc136b-e262-4cf8-912c-95ea132d9fef",
+        "host.ip": "10.2.2.2",
+        "host.name": "HOSTNAME",
+        "input.type": "log",
+        "log.offset": 3360,
+        "network.type": "ipv4",
+        "observer.hostname": "GlobalProtect_External_Gateway",
+        "observer.product": "PAN-OS",
+        "observer.serial_number": "no-serial",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
+        "panw.panos.actionflags": "true",
+        "panw.panos.client_ver": "5.2.6",
+        "panw.panos.description": "HIP report is not needed",
+        "panw.panos.error_code": "0",
+        "panw.panos.repeatcnt": 1,
+        "panw.panos.sequence_number": 1305925,
+        "panw.panos.serial_number": "SERIALNR",
+        "panw.panos.source.nat.ip": "10.1.1.1",
+        "panw.panos.stage": "host-info",
+        "panw.panos.sub_type": "globalprotect",
+        "panw.panos.type": "GLOBALPROTECT",
+        "panw.panos.virtual_sys": "vsys1",
+        "related.hosts": [
+            "GlobalProtect_External_Gateway",
+            "HOSTNAME"
+        ],
+        "related.ip": [
+            "10.1.1.1",
+            "10.2.2.2"
+        ],
+        "related.user": [
+            "host"
+        ],
+        "service.type": "panw",
+        "source.address": "10.2.2.2",
+        "source.ip": "10.2.2.2",
+        "source.nat.ip": "10.1.1.1",
+        "source.user.name": "host",
+        "tags": [
+            "forwarded",
+            "pan-os"
+        ],
+        "user.name": "host"
+    },
+    {
+        "@timestamp": "2021-11-09T21:45:14.000Z",
+        "client.address": "10.4.4.4",
+        "client.ip": "10.4.4.4",
+        "client.nat.ip": "10.3.3.3",
+        "event.code": "gateway-tunnel-latency",
+        "event.dataset": "panw.panos",
+        "event.duration": 0,
+        "event.module": "panw",
+        "event.original": "931201168,2021-11-09T21:45:36.000000Z,no-serial,GLOBALPROTECT,globalprotect,9.1,2021-11-09T21:45:14.000000Z,vsys1,gateway-tunnel-latency,tunnel,,,user,,HOSTNAME,10.3.3.3,,10.4.4.4,,8cbc136b-e262-4cf8-912c-95ea132d9fef,SERIALNR,5.2.8,,,1,,,\"Pre-tunnel latency: 35ms, Post-tunnel latency: 16ms\",success,,0,,0,GlobalProtect_External_Gateway,1041590,true",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "fileset.name": "panos",
+        "host.id": "8cbc136b-e262-4cf8-912c-95ea132d9fef",
+        "host.ip": "10.4.4.4",
+        "host.name": "HOSTNAME",
+        "input.type": "log",
+        "log.offset": 3693,
+        "network.type": "ipv4",
+        "observer.hostname": "GlobalProtect_External_Gateway",
+        "observer.product": "PAN-OS",
+        "observer.serial_number": "no-serial",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
+        "panw.panos.actionflags": "true",
+        "panw.panos.client_ver": "5.2.8",
+        "panw.panos.description": "Pre-tunnel latency: 35ms, Post-tunnel latency: 16ms",
+        "panw.panos.error_code": "0",
+        "panw.panos.repeatcnt": 1,
+        "panw.panos.sequence_number": 1041590,
+        "panw.panos.serial_number": "SERIALNR",
+        "panw.panos.source.nat.ip": "10.3.3.3",
+        "panw.panos.stage": "tunnel",
+        "panw.panos.sub_type": "globalprotect",
+        "panw.panos.type": "GLOBALPROTECT",
+        "panw.panos.virtual_sys": "vsys1",
+        "related.hosts": [
+            "GlobalProtect_External_Gateway",
+            "HOSTNAME"
+        ],
+        "related.ip": [
+            "10.3.3.3",
+            "10.4.4.4"
+        ],
+        "related.user": [
+            "user"
+        ],
+        "service.type": "panw",
+        "source.address": "10.4.4.4",
+        "source.ip": "10.4.4.4",
+        "source.nat.ip": "10.3.3.3",
+        "source.user.name": "user",
+        "tags": [
+            "forwarded",
+            "pan-os"
+        ],
+        "user.name": "user"
+    },
+    {
+        "@timestamp": "2021-11-09T21:45:14.000Z",
+        "event.code": "gateway-tunnel-latency",
+        "event.dataset": "panw.panos",
+        "event.duration": 0,
+        "event.module": "panw",
+        "event.original": "931201168,2021-11-09T21:45:36.000000Z,no-serial,GLOBALPROTECT,globalprotect,9.1,2021-11-09T21:45:14.000000Z,vsys1,gateway-tunnel-latency,tunnel,,,user,,HOSTNAME,,fc00::1234,,fc00::abcd,8cbc136b-e262-4cf8-912c-95ea132d9fef,SERIALNR,5.2.8,,,1,,,\"Pre-tunnel latency: 35ms, Post-tunnel latency: 16ms\",success,,0,,0,GlobalProtect_External_Gateway,1041590,true",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "fileset.name": "panos",
+        "host.id": "8cbc136b-e262-4cf8-912c-95ea132d9fef",
+        "host.name": "HOSTNAME",
+        "input.type": "log",
+        "log.offset": 4044,
+        "network.type": "ipv6",
+        "observer.hostname": "GlobalProtect_External_Gateway",
+        "observer.product": "PAN-OS",
+        "observer.serial_number": "no-serial",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
+        "panw.panos.actionflags": "true",
+        "panw.panos.client_ver": "5.2.8",
+        "panw.panos.description": "Pre-tunnel latency: 35ms, Post-tunnel latency: 16ms",
+        "panw.panos.error_code": "0",
+        "panw.panos.repeatcnt": 1,
+        "panw.panos.sequence_number": 1041590,
+        "panw.panos.serial_number": "SERIALNR",
+        "panw.panos.stage": "tunnel",
+        "panw.panos.sub_type": "globalprotect",
+        "panw.panos.type": "GLOBALPROTECT",
+        "panw.panos.virtual_sys": "vsys1",
+        "related.hosts": [
+            "GlobalProtect_External_Gateway",
+            "HOSTNAME"
+        ],
+        "related.ip": [
+            "fc00::1234",
+            "fc00::abcd"
+        ],
+        "related.user": [
+            "user"
+        ],
+        "service.type": "panw",
+        "source.ip": "fc00::abcd",
+        "source.nat.ip": "fc00::1234",
+        "source.user.name": "user",
+        "tags": [
+            "forwarded",
+            "pan-os"
+        ],
+        "user.name": "user"
     }
 ]
