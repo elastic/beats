@@ -29,6 +29,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/gosigar"
@@ -127,6 +128,15 @@ func FillPidMetrics(hostfs string, pid int, state ProcState) (ProcState, error) 
 		return state, errors.Wrapf(err, "error getting CLI args for pid %d", pid)
 	}
 
+	// FD metrics
+	state.FD, err = getFDStats(hostfs, pid)
+	if err != nil {
+		return state, errors.Wrapf(err, "error getting FD metrics for pid %d", pid)
+	}
+
+	// env vars
+	state.Env, err = getEnvData(hostfs, pid)
+
 	return state, nil
 }
 
@@ -188,6 +198,31 @@ func dirIsPid(name string) bool {
 		return false
 	}
 	return true
+}
+
+func getEnvData(hostfs string, pid int) (common.MapStr, error) {
+	path := filepath.Join(hostfs, strconv.Itoa(pid), "environ")
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error opening file %s", path)
+	}
+	env := common.MapStr{}
+
+	pairs := bytes.Split(data, []byte{0})
+	for _, kv := range pairs {
+		parts := bytes.SplitN(kv, []byte{'='}, 2)
+		if len(parts) != 2 {
+			continue
+		}
+
+		key := string(bytes.TrimSpace(parts[0]))
+		if key == "" {
+			continue
+		}
+
+		env[key] = string(bytes.TrimSpace(parts[1]))
+	}
+	return env, nil
 }
 
 func getMemData(hostfs string, pid int) (ProcMemInfo, error) {

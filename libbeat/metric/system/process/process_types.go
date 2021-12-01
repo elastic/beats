@@ -42,7 +42,7 @@ type ProcState struct {
 	// Resource Metrics
 	Memory ProcMemInfo `struct:"memory,omitempty"`
 	CPU    ProcCPUInfo `struct:"cpu,omitempty"`
-	FD     ProcLimits  `struct:"fd,omitempty"`
+	FD     ProcFDInfo  `struct:"fd,omitempty"`
 
 	// cgroups
 	Cgroup cgroup.CGStats `struct:"cgroups,omitempty"`
