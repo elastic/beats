@@ -347,23 +347,27 @@ def githubAction(Map args = [:]) {
   // We don't support branches/tags for the time being.
   if (!isPR()) { return }
   // Notify the status with a specific GitHub Check
-  withGithubNotify(context: args.context) {
-    // Provision a worker with the given labels. For the time being, let's provision a worker.
-    // We can revisit this to maybe use the async mode when triggering the github action.
-    withNode(labels: args.label, forceWorkspace: true) {
-      def result = githubWorkflowRun(
-        workflow: "macos-build",
-        ref: env.TARGET_BRANCH,
-          parameters: [
-            pr: env.CHANGE_ID,
-            path: args.directory,
-            command: args.command,
-            go_version: env.GO_VERSION,
-          ])
-      log(level: 'INFO', text: "Github data ${result}")
-      log(level: 'INFO', text: "Github build link: ${result.html_url}")
-      log(level: 'INFO', text: "Github build status: ${result.conclusion}")
-    }
+  withGithubStatus.notifyMap(context: args.context, description: "${args.context} ...", status: 'PENDING', ignoreGitHubFailures: true)
+  def redirect = env.RUN_DISPLAY_URL
+  // Provision a worker with the given labels. For the time being, let's provision a worker.
+  // We can revisit this to maybe use the async mode when triggering the github action.
+  withNode(labels: args.label, forceWorkspace: true) {
+    def result = githubWorkflowRun(
+      workflow: "macos-build",
+      ref: env.TARGET_BRANCH,
+        parameters: [
+          pr: env.CHANGE_ID,
+          path: args.directory,
+          command: args.command,
+          go_version: env.GO_VERSION,
+        ])
+    redirect = result.html_url
+  }
+  if (result?.conclusion?.trim() && result?.conclusion?.equals('success')) {
+    withGithubStatus.notifyMap(context: args.context, description: "${args.context} passed", status: 'SUCCESS', redirect: redirect, ignoreGitHubFailures: true)
+  } else {
+    withGithubStatus.notifyMap(context: args.context, description: "${args.context} failed", status: 'FAILURE', redirect: redirect, ignoreGitHubFailures: true)
+    error("${args.context} failed: see ${redirect}")
   }
 }
 
