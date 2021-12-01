@@ -39,7 +39,6 @@ import (
 // to a Worker.
 type Sniffer struct {
 	config config.InterfacesConfig
-	dumper *pcap.Dumper
 
 	state atomic.Int32 // store snifferState
 
@@ -60,7 +59,6 @@ type Worker interface {
 
 type snifferHandle interface {
 	gopacket.PacketDataSource
-
 	LinkType() layers.LinkType
 	Close()
 }

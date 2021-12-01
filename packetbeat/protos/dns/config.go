@@ -28,10 +28,8 @@ type dnsConfig struct {
 	IncludeAdditionals    bool `config:"include_additionals"`
 }
 
-var (
-	defaultConfig = dnsConfig{
-		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionExpiration,
-		},
-	}
-)
+var defaultConfig = dnsConfig{
+	ProtocolCommon: config.ProtocolCommon{
+		TransactionTimeout: protos.DefaultTransactionExpiration,
+	},
+}
