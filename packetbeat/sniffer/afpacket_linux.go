@@ -41,8 +41,8 @@ type afpacketHandle struct {
 }
 
 func newAfpacketHandle(device string, snaplen int, block_size int, num_blocks int,
-	timeout time.Duration, autoPromiscMode bool) (*afpacketHandle, error) {
-
+	timeout time.Duration, autoPromiscMode bool) (*afpacketHandle, error,
+) {
 	var err error
 	var promiscEnabled bool
 

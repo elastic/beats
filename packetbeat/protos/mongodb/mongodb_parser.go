@@ -116,10 +116,26 @@ func mongodbMessageParser(s *stream) (bool, bool) {
 // see http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/#op-reply
 func opReplyParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	_, err := d.readInt32() // ignore flags for now
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_REPLY message: %s", err)
+		return false, false
+	}
 	m.event["cursorId"], err = d.readInt64()
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_REPLY message: %s", err)
+		return false, false
+	}
 	m.event["startingFrom"], err = d.readInt32()
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_REPLY message: %s", err)
+		return false, false
+	}
 
 	numberReturned, err := d.readInt32()
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_REPLY message: %s", err)
+		return false, false
+	}
 	m.event["numberReturned"] = numberReturned
 
 	debugf("Prepare to read %d document from reply", m.event["numberReturned"])
@@ -128,15 +144,27 @@ func opReplyParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	for i := 0; i < numberReturned; i++ {
 		var document bson.M
 		document, err = d.readDocument()
+		if err != nil {
+			logp.Err("An error occurred while parsing OP_REPLY message: %s", err)
+			return false, false
+		}
 
 		// Check if the result is actually an error
 		if i == 0 {
 			if mongoError, present := document["$err"]; present {
 				m.error, err = doc2str(mongoError)
+				if err != nil {
+					logp.Err("An error occurred while parsing OP_REPLY message: %s", err)
+					return false, false
+				}
 			}
 
 			if writeErrors, present := document["writeErrors"]; present {
 				m.error, err = doc2str(writeErrors)
+				if err != nil {
+					logp.Err("An error occurred while parsing OP_REPLY message: %s", err)
+					return false, false
+				}
 			}
 		}
 
@@ -144,10 +172,6 @@ func opReplyParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	}
 	m.documents = documents
 
-	if err != nil {
-		logp.Err("An error occurred while parsing OP_REPLY message: %s", err)
-		return false, false
-	}
 	return true, true
 }
 
@@ -163,12 +187,26 @@ func opMsgLegacyParse(d *decoder, m *mongodbMessage) (bool, bool) {
 
 func opUpdateParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	_, err := d.readInt32() // always ZERO, a slot reserved in the protocol for future use
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_UPDATE message: %s", err)
+		return false, false
+	}
 	m.event["fullCollectionName"], err = d.readCStr()
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_UPDATE message: %s", err)
+		return false, false
+	}
 	_, err = d.readInt32() // ignore flags for now
-
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_UPDATE message: %s", err)
+		return false, false
+	}
 	m.event["selector"], err = d.readDocumentStr()
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_UPDATE message: %s", err)
+		return false, false
+	}
 	m.event["update"], err = d.readDocumentStr()
-
 	if err != nil {
 		logp.Err("An error occurred while parsing OP_UPDATE message: %s", err)
 		return false, false
@@ -179,6 +217,10 @@ func opUpdateParse(d *decoder, m *mongodbMessage) (bool, bool) {
 
 func opInsertParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	_, err := d.readInt32() // ignore flags for now
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_INSERT message: %s", err)
+		return false, false
+	}
 	m.event["fullCollectionName"], err = d.readCStr()
 
 	// TODO parse bson documents
@@ -230,11 +272,27 @@ func isDatabaseCommand(key string, val interface{}) bool {
 
 func opQueryParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	_, err := d.readInt32() // ignore flags for now
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_QUERY message: %s", err)
+		return false, false
+	}
 	fullCollectionName, err := d.readCStr()
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_QUERY message: %s", err)
+		return false, false
+	}
 	m.event["fullCollectionName"] = fullCollectionName
 
 	m.event["numberToSkip"], err = d.readInt32()
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_QUERY message: %s", err)
+		return false, false
+	}
 	m.event["numberToReturn"], err = d.readInt32()
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_QUERY message: %s", err)
+		return false, false
+	}
 
 	query, err := d.readDocument()
 	if d.i < len(d.in) {
@@ -275,10 +333,21 @@ func opQueryParse(d *decoder, m *mongodbMessage) (bool, bool) {
 
 func opGetMoreParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	_, err := d.readInt32() // always ZERO, a slot reserved in the protocol for future use
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_GET_MORE message: %s", err)
+		return false, false
+	}
 	m.event["fullCollectionName"], err = d.readCStr()
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_GET_MORE message: %s", err)
+		return false, false
+	}
 	m.event["numberToReturn"], err = d.readInt32()
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_GET_MORE message: %s", err)
+		return false, false
+	}
 	m.event["cursorId"], err = d.readInt64()
-
 	if err != nil {
 		logp.Err("An error occurred while parsing OP_GET_MORE message: %s", err)
 		return false, false
@@ -288,11 +357,21 @@ func opGetMoreParse(d *decoder, m *mongodbMessage) (bool, bool) {
 
 func opDeleteParse(d *decoder, m *mongodbMessage) (bool, bool) {
 	_, err := d.readInt32() // always ZERO, a slot reserved in the protocol for future use
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_DELETE message: %s", err)
+		return false, false
+	}
 	m.event["fullCollectionName"], err = d.readCStr()
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_DELETE message: %s", err)
+		return false, false
+	}
 	_, err = d.readInt32() // ignore flags for now
-
+	if err != nil {
+		logp.Err("An error occurred while parsing OP_DELETE message: %s", err)
+		return false, false
+	}
 	m.event["selector"], err = d.readDocumentStr()
-
 	if err != nil {
 		logp.Err("An error occurred while parsing OP_DELETE message: %s", err)
 		return false, false
@@ -405,7 +484,6 @@ func (d *decoder) readByte() (byte, error) {
 
 func (d *decoder) readInt32() (int, error) {
 	b, err := d.readBytes(4)
-
 	if err != nil {
 		return 0, err
 	}
@@ -418,7 +496,6 @@ func (d *decoder) readInt32() (int, error) {
 
 func (d *decoder) readInt64() (int, error) {
 	b, err := d.readBytes(8)
-
 	if err != nil {
 		return 0, err
 	}
@@ -436,6 +513,9 @@ func (d *decoder) readInt64() (int, error) {
 func (d *decoder) readDocument() (bson.M, error) {
 	start := d.i
 	documentLength, err := d.readInt32()
+	if err != nil {
+		return nil, err
+	}
 	d.i = start + documentLength
 	if len(d.in) < d.i {
 		return nil, errors.New("document out of bounds")
@@ -461,6 +541,9 @@ func doc2str(documentMap interface{}) (string, error) {
 
 func (d *decoder) readDocumentStr() (string, error) {
 	documentMap, err := d.readDocument()
+	if err != nil {
+		return "", err
+	}
 	document, err := doc2str(documentMap)
 	return document, err
 }
