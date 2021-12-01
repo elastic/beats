@@ -20,8 +20,6 @@ package actions
 import (
 	"fmt"
 
-	"github.com/elastic/go-ucfg"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
@@ -77,8 +75,7 @@ func flattenLabels(labels common.MapStr) (common.MapStr, error) {
 		return nil, err
 	}
 
-	flatKeys := (*ucfg.Config)(labelConfig).FlattenedKeys()
-
+	flatKeys := labelConfig.FlattenedKeys()
 	flatMap := make(common.MapStr, len(flatKeys))
 	for _, k := range flatKeys {
 		v, err := labelConfig.String(k, -1)
