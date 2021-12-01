@@ -211,7 +211,7 @@ func (p *Processor) String() string {
 // adaptPipelineForCompatibility iterates over all processors in the pipeline
 // and adapts them for version of Elasticsearch used. Adapt can mean modifying
 // processor options or removing the processor.
-func adaptPipelineForCompatibility(esVersion common.Version, pipelineID string, content map[string]interface{}, log *logp.Logger) (err error) {
+func AdaptPipelineForCompatibility(esVersion common.Version, pipelineID string, content map[string]interface{}, log *logp.Logger) (err error) {
 	log = log.With("pipeline_id", pipelineID)
 	// Adapt the main processors in the pipeline.
 	if err = adaptProcessorsForCompatibility(esVersion, content, "processors", false, log); err != nil {
