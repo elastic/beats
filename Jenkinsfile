@@ -360,6 +360,7 @@ def githubAction(Map args = [:]) {
             command: args.command,
             go_version: env.GO_VERSION,
           ])
+      log(level: 'INFO', text: "Github data ${result}")
       log(level: 'INFO', text: "Github build link: ${result.html_url}")
       log(level: 'INFO', text: "Github build status: ${result.conclusion}")
     }
