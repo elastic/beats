@@ -12,7 +12,7 @@ import (
 // The FileSystemFetcher meant to fetch file/directories from the file system and ship it
 // to the Kubebeat
 type FileSystemFetcher struct {
-	inputFiles []string // Files and directories paths for the fetcher to extract info from
+	inputFilePatterns []string // Files and directories paths for the fetcher to extract info from
 }
 
 const (
@@ -32,7 +32,7 @@ type FileSystemResourceData struct {
 
 func NewFileFetcher(filesPaths []string) Fetcher {
 	return &FileSystemFetcher{
-		inputFiles: filesPaths,
+		inputFilePatterns: filesPaths,
 	}
 }
 
@@ -40,7 +40,7 @@ func (f *FileSystemFetcher) Fetch() ([]interface{}, error) {
 	results := make([]interface{}, 0)
 
 	// Input files might contain glob pattern
-	for _, filePattern := range f.inputFiles {
+	for _, filePattern := range f.inputFilePatterns {
 		matchedFiles, err := Glob(filePattern)
 		if err != nil {
 			logp.Err("Failed to find matched glob for %s, error - %+v", filePattern, err)

@@ -29,6 +29,32 @@ func TestFileFetcherFetchASingleFile(t *testing.T) {
 	assert.Equal(t, "600", result.FileMode)
 }
 
+
+func TestFileFetcherFetchTwoPattern(t *testing.T) {
+	outerDirectoryName := "test-outer-dir"
+	outerFiles := []string{"output.txt", "output1.txt"}
+	outerDir := createDirectoriesWithFiles(t, "", outerDirectoryName, outerFiles)
+	defer os.RemoveAll(outerDir)
+
+	path := []string{filepath.Join(outerDir, outerFiles[0]), filepath.Join(outerDir, outerFiles[1])}
+	fileFetcher := NewFileFetcher(path)
+	results, err := fileFetcher.Fetch()
+
+	if err != nil {
+		assert.Fail(t, "Fetcher was not able to fetch files from FS", err)
+	}
+
+	assert.Equal(t, len(results), 2)
+
+	firstResult := results[0].(FileSystemResourceData)
+	assert.Equal(t, outerFiles[0], firstResult.FileName)
+	assert.Equal(t, "600", firstResult.FileMode)
+
+	secResult := results[1].(FileSystemResourceData)
+	assert.Equal(t, outerFiles[1], secResult.FileName)
+	assert.Equal(t, "600", secResult.FileMode)
+}
+
 func TestFileFetcherFetchDirectoryOnly(t *testing.T) {
 	directoryName := "test-outer-dir"
 	files := []string{"file.txt"}
