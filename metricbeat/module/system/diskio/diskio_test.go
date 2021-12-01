@@ -22,8 +22,6 @@
 package diskio
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -33,18 +31,12 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
-func setHostfs(pathString string) {
-	os.Setenv("HOST_PROC", filepath.Join(pathString, "proc"))
-
-}
-
 func TestDataNameFilter(t *testing.T) {
-	setHostfs("_meta/testdata")
-
 	conf := map[string]interface{}{
 		"module":                 "system",
 		"metricsets":             []string{"diskio"},
-		"diskio.include_devices": []string{"sda", "sda1", "sda2"},
+		"diskio.include_devices": []string{"sdb", "sdb1", "sdb2"},
+		"hostfs":                 "./_meta/testdata",
 	}
 
 	f := mbtest.NewReportingMetricSetV2Error(t, conf)
@@ -54,11 +46,10 @@ func TestDataNameFilter(t *testing.T) {
 }
 
 func TestDataEmptyFilter(t *testing.T) {
-	setHostfs("_meta/testdata")
-
 	conf := map[string]interface{}{
 		"module":     "system",
 		"metricsets": []string{"diskio"},
+		"hostfs":     "./_meta/testdata",
 	}
 
 	f := mbtest.NewReportingMetricSetV2Error(t, conf)
