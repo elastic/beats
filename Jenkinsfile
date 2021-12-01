@@ -346,10 +346,11 @@ def k8sTest(Map args = [:]) {
 def githubAction(Map args = [:]) {
   // We don't support branches/tags for the time being.
   if (!isPR()) { return }
+  def redirect = env.BUILD_URL
   // Notify the status with a specific GitHub Check
-  withGithubStatus.notifyMap(context: args.context, description: "${args.context} ...", status: 'PENDING', ignoreGitHubFailures: true)
-  def redirect = env.RUN_DISPLAY_URL
-  // Provision a worker with the given labels. For the time being, let's provision a worker.
+  withGithubStatus.notifyMap(context: args.context, description: "${args.context} ...", status: 'PENDING', redirect: redirect, ignoreGitHubFailures: true)
+
+  /// TODO: Provision a worker with the given labels. For the time being, let's provision a worker.
   // We can revisit this to maybe use the async mode when triggering the github action.
   withNode(labels: args.label, forceWorkspace: true) {
     def result = githubWorkflowRun(
