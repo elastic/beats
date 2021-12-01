@@ -30,7 +30,7 @@ func TestFileFetcherFetchASingleFile(t *testing.T) {
 }
 
 
-func TestFileFetcherFetchTwoPattern(t *testing.T) {
+func TestFileFetcherFetchTwoPatterns(t *testing.T) {
 	outerDirectoryName := "test-outer-dir"
 	outerFiles := []string{"output.txt", "output1.txt"}
 	outerDir := createDirectoriesWithFiles(t, "", outerDirectoryName, outerFiles)
