@@ -14,6 +14,12 @@
 # directory in which it was started.
 #winlogbeat.registry_file: .winlogbeat.yml
 
+# The timeout value that controls when registry entries are written to disk
+# (flushed). When an unwritten update exceeds this value, it triggers a write
+# to disk. When flush is set to 0s, the registry is written to disk after each
+# batch of events has been published successfully. The default value is 5s.
+#winlogbeat.registry_flush: 5s
+
 # event_logs specifies a list of event logs to monitor as well as any
 # accompanying options. The YAML data type of event_logs is a list of
 # dictionaries.
