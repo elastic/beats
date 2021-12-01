@@ -56,6 +56,14 @@ import (
 // returns a 404 status code.
 var RegistryNotFound = errors.New("npcap: registry not found")
 
+var (
+	// Installer holds the embedded installer when run with x-pack.
+	Installer []byte
+
+	// EmbeddedInstallerVersion holds the version of the embedded installer.
+	EmbeddedInstallerVersion string
+)
+
 // Fetch downloads the Npcap installer, writes the content to the given filepath
 // and returns the sha256 hash of the downloaded object. If the registry is not
 // found RegistryNotFound is returned.
