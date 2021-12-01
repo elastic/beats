@@ -31,15 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/packetbeat/internal/npcap"
-)
-
-var (
-	// installer holds the embedded installer when run with x-pack.
-	installer []byte
-
-	// embeddedInstallerVersion holds the version of the embedded installer.
-	embeddedInstallerVersion string
+	"github.com/elastic/beats/v7/packetbeat/npcap"
 )
 
 func installNpcap(b *beat.Beat) error {
@@ -75,7 +67,11 @@ func installNpcap(b *beat.Beat) error {
 
 	// If no location is provided, go ahead and install from the embedded installer.
 	if rawURI == "" {
-		if installer == nil || !npcap.Upgradeable(embeddedInstallerVersion) {
+		if npcap.Installer == nil {
+			return nil
+		}
+		if !npcap.Upgradeable(npcap.EmbeddedInstallerVersion) {
+			npcap.Installer = nil
 			return nil
 		}
 		tmp, err := os.MkdirTemp("", "")
@@ -86,12 +82,12 @@ func installNpcap(b *beat.Beat) error {
 			// The init sequence duplicates the embedded binary.
 			// Get rid of the part we can. The remainder is in
 			// the packetbeat text section as a string.
-			installer = nil
+			npcap.Installer = nil
 			// Remove the installer from the file system.
 			os.RemoveAll(tmp)
 		}()
 		installerPath := filepath.Join(tmp, "npcap.exe")
-		err = os.WriteFile(installerPath, installer, 0o700)
+		err = os.WriteFile(installerPath, npcap.Installer, 0o700)
 		if err != nil {
 			return fmt.Errorf("could not create installation temporary file: %w", err)
 		}
