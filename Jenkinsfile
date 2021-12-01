@@ -355,7 +355,7 @@ def githubAction(Map args = [:]) {
   withNode(labels: args.label, forceWorkspace: true) {
     def result = githubWorkflowRun(
       workflow: "macos-build",
-      ref: env.TARGET_BRANCH,
+      ref: env.CHANGE_TARGET,
         parameters: [
           pr: env.CHANGE_ID,
           path: args.directory,
