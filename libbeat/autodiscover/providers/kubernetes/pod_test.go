@@ -1907,7 +1907,11 @@ func TestPod_EmitEvent(t *testing.T) {
 				t.Fatal(err)
 			}
 
+<<<<<<< HEAD
 			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, client, nil, nil)
+=======
+			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, client, nil, nil, nil)
+>>>>>>> 95bdebf7cf (Align k8s metadata configurations in Kubernetes module: add addResourceMetadata config (#29133))
 			p := &Provider{
 				config:    defaultConfig(),
 				bus:       bus.New(logp.NewLogger("bus"), "test"),

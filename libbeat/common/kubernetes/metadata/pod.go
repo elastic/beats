@@ -29,11 +29,20 @@ import (
 )
 
 type pod struct {
+<<<<<<< HEAD
 	store     cache.Store
 	client    k8s.Interface
 	node      MetaGen
 	namespace MetaGen
 	resource  *Resource
+=======
+	store               cache.Store
+	client              k8s.Interface
+	node                MetaGen
+	namespace           MetaGen
+	resource            *Resource
+	addResourceMetadata *AddResourceMetadataConfig
+>>>>>>> 95bdebf7cf (Align k8s metadata configurations in Kubernetes module: add addResourceMetadata config (#29133))
 }
 
 // NewPodMetadataGenerator creates a metagen for pod resources
@@ -42,6 +51,7 @@ func NewPodMetadataGenerator(
 	pods cache.Store,
 	client k8s.Interface,
 	node MetaGen,
+<<<<<<< HEAD
 	namespace MetaGen) MetaGen {
 	return &pod{
 		resource:  NewResourceMetadataGenerator(cfg, client),
@@ -49,6 +59,22 @@ func NewPodMetadataGenerator(
 		node:      node,
 		namespace: namespace,
 		client:    client,
+=======
+	namespace MetaGen,
+	addResourceMetadata *AddResourceMetadataConfig) MetaGen {
+
+	if addResourceMetadata == nil {
+		addResourceMetadata = GetDefaultResourceMetadataConfig()
+	}
+
+	return &pod{
+		resource:            NewResourceMetadataGenerator(cfg, client),
+		store:               pods,
+		node:                node,
+		namespace:           namespace,
+		client:              client,
+		addResourceMetadata: addResourceMetadata,
+>>>>>>> 95bdebf7cf (Align k8s metadata configurations in Kubernetes module: add addResourceMetadata config (#29133))
 	}
 }
 
@@ -84,11 +110,21 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	out := p.resource.GenerateK8s("pod", obj, opts...)
 
 	// check if Pod is handled by a ReplicaSet which is controlled by a Deployment
+<<<<<<< HEAD
 	rsName, _ := out.GetValue("replicaset.name")
 	if rsName, ok := rsName.(string); ok {
 		dep := p.getRSDeployment(rsName, po.GetNamespace())
 		if dep != "" {
 			out.Put("deployment.name", dep)
+=======
+	if p.addResourceMetadata.Deployment {
+		rsName, _ := out.GetValue("replicaset.name")
+		if rsName, ok := rsName.(string); ok {
+			dep := p.getRSDeployment(rsName, po.GetNamespace())
+			if dep != "" {
+				out.Put("deployment.name", dep)
+			}
+>>>>>>> 95bdebf7cf (Align k8s metadata configurations in Kubernetes module: add addResourceMetadata config (#29133))
 		}
 	}
 

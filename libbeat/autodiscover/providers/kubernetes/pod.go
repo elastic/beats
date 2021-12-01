@@ -97,10 +97,14 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 		options.Namespace = config.Namespace
 	}
 	metaConf := config.AddResourceMetadata
+<<<<<<< HEAD
 	if metaConf == nil {
 		metaConf = metadata.GetDefaultResourceMetadataConfig()
 	}
 	nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
+=======
+	nodeWatcher, err := kubernetes.NewNamedWatcher("node", client, &kubernetes.Node{}, options, nil)
+>>>>>>> 95bdebf7cf (Align k8s metadata configurations in Kubernetes module: add addResourceMetadata config (#29133))
 	if err != nil {
 		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
 	}

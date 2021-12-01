@@ -88,6 +88,22 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
+- Move the windows pdh implementation from perfmon to a shared location in order for future modules/metricsets to make use of. {pull}15503[15503]
+- Add database_account azure metricset. {issue}15758[15758]
+- Add database_account azure metricset. {issue}15758[15758]
+- Release Zookeeper/connection module as GA. {issue}14281[14281] {pull}17043[17043]
+- Add dashboard for pubsub metricset in googlecloud module. {pull}17161[17161]
+- Added documentation for running Metricbeat in Cloud Foundry. {pull}17275[17275]
+- Added documentation for running Metricbeat in Cloud Foundry. {pull}17275[17275]
+- Remove required for region/zone and make stackdriver a metricset in googlecloud. {issue}16785[16785] {pull}18398[18398]
+- Add memory metrics into compute googlecloud. {pull}18802[18802]
+- Enable `journald` input type in Filebeat. {issue}7955[7955] {pull}27351[27351]
+- Added a new beta `enterprisesearch` module for Elastic Enterprise Search {pull}27549[27549]
+- Preliminary AIX support {pull}27954[27954]
+- Register additional name for `storage` metricset in the azure module. {pull}28447[28447]
+- Update reference to gosigar pacakge for filesystem windows fix. {pull}28909[28909]
+- Override `Host()` on statsd MetricSet {pull}29103[29103]
+- Add `add_resource_metadata` configuration to Kubernetes module. {pull}29133[29133]
 
 *Packetbeat*
 

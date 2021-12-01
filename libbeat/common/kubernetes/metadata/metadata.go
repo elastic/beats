@@ -101,8 +101,12 @@ func GetPodMetaGen(
 	if namespaceWatcher != nil && metaConf.Namespace.Enabled() {
 		namespaceMetaGen = NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), namespaceWatcher.Client())
 	}
+<<<<<<< HEAD
 	metaGen := NewPodMetadataGenerator(cfg, podWatcher.Store(), podWatcher.Client(), nodeMetaGen, namespaceMetaGen)
 
+=======
+	metaGen := NewPodMetadataGenerator(cfg, podWatcher.Store(), podWatcher.Client(), nodeMetaGen, namespaceMetaGen, metaConf)
+>>>>>>> 95bdebf7cf (Align k8s metadata configurations in Kubernetes module: add addResourceMetadata config (#29133))
 	return metaGen
 }
 

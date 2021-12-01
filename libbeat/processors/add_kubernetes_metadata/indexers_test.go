@@ -32,7 +32,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 )
 
+<<<<<<< HEAD
 var metagen = metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil)
+=======
+var metagen = metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil, nil)
+>>>>>>> 95bdebf7cf (Align k8s metadata configurations in Kubernetes module: add addResourceMetadata config (#29133))
 
 func TestPodIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
@@ -90,7 +94,11 @@ func TestPodIndexer(t *testing.T) {
 func TestPodUIDIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
 
+<<<<<<< HEAD
 	metaGenWithPodUID := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil)
+=======
+	metaGenWithPodUID := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil, nil)
+>>>>>>> 95bdebf7cf (Align k8s metadata configurations in Kubernetes module: add addResourceMetadata config (#29133))
 
 	podUIDIndexer, err := NewPodUIDIndexer(*testConfig, metaGenWithPodUID)
 	assert.Nil(t, err)
@@ -301,7 +309,11 @@ func TestFilteredGenMeta(t *testing.T) {
 	})
 	assert.Nil(t, err)
 
+<<<<<<< HEAD
 	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil, nil)
+=======
+	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil, nil, nil)
+>>>>>>> 95bdebf7cf (Align k8s metadata configurations in Kubernetes module: add addResourceMetadata config (#29133))
 
 	podIndexer, err = NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
@@ -338,7 +350,11 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 	})
 	assert.Nil(t, err)
 
+<<<<<<< HEAD
 	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil, nil)
+=======
+	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil, nil, nil)
+>>>>>>> 95bdebf7cf (Align k8s metadata configurations in Kubernetes module: add addResourceMetadata config (#29133))
 
 	podIndexer, err := NewPodNameIndexer(*testConfig, filteredGen)
 	assert.Nil(t, err)
