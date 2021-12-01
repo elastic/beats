@@ -577,7 +577,7 @@ func (s *state) ForkProcess(parentPID, childPID uint32, ts kernelTime) error {
 			pid:         childPID,
 			name:        parent.name,
 			path:        parent.path,
-			args:        parent.args, // TODO: shallow copy
+			args:        parent.args,
 			created:     ts,
 			uid:         parent.uid,
 			gid:         parent.gid,
