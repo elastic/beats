@@ -46,6 +46,9 @@ stages:
         mage: "mage pythonIntegTest"
         withModule: true
         stage: mandatory
+    macosAction:
+        githubAction: "mage build unitTest"
+        stage: mandatory
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
