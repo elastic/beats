@@ -11,6 +11,7 @@ package cometd
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"sync"
@@ -64,7 +65,7 @@ func NewInput(
 	// Extract and validate the input's configuration.
 	conf := defaultConfig()
 	if err = cfg.Unpack(&conf); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cometd config: unpacking of config failed: %v", err)
 	}
 
 	logger := logp.NewLogger("cometd").With(
@@ -133,7 +134,7 @@ func (in *cometdInput) run() error {
 
 	client, err := in.newPubsubClient(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("cometd client: error creating pub-sub client: %v", err)
 	}
 
 	in.log.Debug("client successfully created")
@@ -168,14 +169,13 @@ type retryConfig struct {
 }
 
 func (in *cometdInput) newPubsubClient(ctx context.Context) (*http.Client, error) {
-
 	// Make retryable HTTP client
 	netHTTPClient, err := in.Transport.Client(
 		httpcommon.WithAPMHTTPInstrumentation(),
 		httpcommon.WithKeepaliveSettings{Disable: true},
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cometd client: error on newHTTPClient: %v", err)
 	}
 
 	client := &retryablehttp.Client{
@@ -186,7 +186,7 @@ func (in *cometdInput) newPubsubClient(ctx context.Context) (*http.Client, error
 
 	authClient, err := in.config.Auth.OAuth2.client(ctx, client.StandardClient())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cometd client: error on authClient: client not created: %v", err)
 	}
 	return authClient, nil
 }
