@@ -363,12 +363,12 @@ def githubAction(Map args = [:]) {
           go_version: env.GO_VERSION,
         ])
     redirect = result.html_url
-  }
-  if (result?.conclusion?.trim() && result?.conclusion?.equals('success')) {
-    withGithubStatus.notifyMap(context: args.context, description: "${args.context} passed", status: 'SUCCESS', redirect: redirect, ignoreGitHubFailures: true)
-  } else {
-    withGithubStatus.notifyMap(context: args.context, description: "${args.context} failed", status: 'FAILURE', redirect: redirect, ignoreGitHubFailures: true)
-    error("${args.context} failed: see ${redirect}")
+    if (result?.conclusion?.trim() && result?.conclusion?.equals('success')) {
+      withGithubStatus.notifyMap(context: args.context, description: "${args.context} passed", status: 'SUCCESS', redirect: redirect, ignoreGitHubFailures: true)
+    } else {
+      withGithubStatus.notifyMap(context: args.context, description: "${args.context} failed", status: 'FAILURE', redirect: redirect, ignoreGitHubFailures: true)
+      error("${args.context} failed: see ${redirect}")
+    }
   }
 }
 
