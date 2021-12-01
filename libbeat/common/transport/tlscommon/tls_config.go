@@ -18,8 +18,11 @@
 package tlscommon
 
 import (
+	"bytes"
+	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/hex"
 	"fmt"
 	"net"
 	"time"
@@ -189,11 +192,43 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 				return verifyCAPin(cfg.CASha256, cs.VerifiedChains)
 			}
 		}
+	case VerifyFingerprintOnly:
+		if len(cfg.CASha256) > 0 {
+			return func(cs tls.ConnectionState) error {
+				return verifyFingerprintOnly(cfg.CASha256, cs.PeerCertificates)
+			}
+		}
 	default:
 	}
 
 	return nil
+}
 
+func verifyFingerprintOnly(fingerprints []string, certs []*x509.Certificate) error {
+	for _, hexFingerprint := range fingerprints {
+		fingerprint, _ := hex.DecodeString(hexFingerprint)
+
+		for _, cert := range certs {
+			// Compute digest for each certificate.
+			digest := sha256.Sum256(cert.Raw)
+
+			// Provided fingerprint should match at least one certificate before we continue.
+			if bytes.Compare(digest[0:], fingerprint) == 0 {
+				now := time.Now()
+				if now.Before(cert.NotBefore) {
+					return errors.New("certificate is not valid yet")
+				}
+
+				if now.After(cert.NotAfter) {
+					return errors.New("certificate has expired")
+				}
+
+				return nil
+			}
+		}
+	}
+
+	return fmt.Errorf("certificate did not match any fingerprint: %v", fingerprints)
 }
 
 func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
