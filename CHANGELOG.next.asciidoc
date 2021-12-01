@@ -151,6 +151,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix the wrong beat name on monitoring and state endpoint {issue}27755[27755]
 - Skip configuration checks in autodiscover for configurations that are already running {pull}29048[29048]
 - Fix `decode_json_processor` to always respect `add_error_key` {pull}29107[29107]
+- Fix `add_labels` flattening of array values. {pull}29211[29211]
 
 *Auditbeat*
 
@@ -197,7 +198,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Upgrade azure-eventhub sdk reference, contains potential checkpoint fixes. {pull}28919[28919]
 - Revert usageDetails api version to 2019-01-01. {pull}28995[28995]
 - Fix `threatintel.misp` filters configuration. {issue}27970[27970]
-- Fix opening files on Windows in filestream so open files can be deleted. {issue}29113[29113] {pull}29180[29180] 
+- Fix opening files on Windows in filestream so open files can be deleted. {issue}29113[29113] {pull}29180[29180]
 
 *Heartbeat*
 
