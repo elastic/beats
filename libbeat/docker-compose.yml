@@ -21,7 +21,9 @@ services:
       - KIBANA_PASS=testing
       - ES_HOST=elasticsearch
       - ES_PORT=9200
-      - ES_USER=beats
+      # ES_USER must be admin in order for the Go Integration tests to
+      # function because they require indices:data/read/search
+      - ES_USER=admin
       - ES_PASS=testing
       - ES_MONITORING_HOST=elasticsearch_monitoring
       - ES_MONITORING_PORT=9200
@@ -94,6 +96,9 @@ services:
       - "xpack.security.authc.realms.file.file1.order=0"
     volumes:
       - ${ES_BEATS}/testing/environments/docker/elasticsearch/pki:/usr/share/elasticsearch/config/pki:ro
+      - ${ES_BEATS}/testing/environments/docker/elasticsearch/roles.yml:/usr/share/elasticsearch/config/roles.yml
+      - ${ES_BEATS}/testing/environments/docker/elasticsearch/users:/usr/share/elasticsearch/config/users
+      - ${ES_BEATS}/testing/environments/docker/elasticsearch/users_roles:/usr/share/elasticsearch/config/users_roles
     expose:
       - 9200
 

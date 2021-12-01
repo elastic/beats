@@ -32,7 +32,7 @@ class Test(BaseTest):
         Test that beat starts running if elasticsearch output is set
         """
         self.render_config_template(
-            elasticsearch={"hosts": "localhost:9200"},
+            elasticsearch=self.get_elasticsearch_template_config(),
         )
 
         proc = self.start_beat()
@@ -74,7 +74,7 @@ class Test(BaseTest):
         Test that beat starts running if elasticsearch output with modified index and pattern and name are set
         """
         self.render_config_template(
-            elasticsearch={"hosts": "localhost:9200"},
+            elasticsearch=self.get_elasticsearch_template_config(),
             es_template_name="test",
             es_template_pattern="test-*",
         )
@@ -97,7 +97,7 @@ class Test(BaseTest):
         print(path)
 
         self.render_config_template(
-            elasticsearch={"hosts": self.get_host(), "username": "admin", "password": "testing"},
+            elasticsearch=self.get_elasticsearch_template_config(),
             template_overwrite="true",
             template_json_enabled="true",
             template_json_path=path,
@@ -136,7 +136,7 @@ class TestRunTemplate(BaseTest):
 
     def render_config(self, **kwargs):
         self.render_config_template(
-            elasticsearch={"hosts": self.get_elasticsearch_url(), "username": "admin", "password": "testing"},
+            elasticsearch=self.get_elasticsearch_template_config(),
             **kwargs
         )
 
@@ -197,7 +197,7 @@ class TestCommandSetupTemplate(BaseTest):
 
     def render_config(self, **kwargs):
         self.render_config_template(
-            elasticsearch={"hosts": self.get_elasticsearch_url(), "username": "admin", "password": "testing"},
+            elasticsearch=self.get_elasticsearch_template_config(),
             **kwargs
         )
 

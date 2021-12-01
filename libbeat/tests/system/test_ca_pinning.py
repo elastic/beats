@@ -34,7 +34,7 @@ class TestCAPinning(BaseTest):
         self.render_config_template(
             elasticsearch={
                 "host": self.get_elasticsearch_url_ssl(),
-                "user": "beats",
+                "user": "admin",
                 "pass": "testing",
                 "ssl_certificate_authorities": [ca],
                 "ssl_ca_sha256": "8hZS8gpciuzlu+7Xi0sdv8T7RKRRxG1TWKumUQsDam0=",

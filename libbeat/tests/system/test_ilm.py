@@ -36,7 +36,7 @@ class TestRunILM(BaseTest):
 
     def render_config(self, **kwargs):
         self.render_config_template(
-            elasticsearch={"hosts": self.get_elasticsearch_url(), "username": "admin", "password": "testing"},
+            elasticsearch=self.get_elasticsearch_template_config(),
             es_template_name=self.index_name,
             **kwargs
         )
@@ -186,7 +186,7 @@ class TestCommandSetupILMPolicy(BaseTest):
 
     def render_config(self, **kwargs):
         self.render_config_template(
-            elasticsearch={"hosts": self.get_elasticsearch_url(), "username": "admin", "password": "testing"},
+            elasticsearch=self.get_elasticsearch_template_config(),
             es_template_name=self.index_name,
             **kwargs
         )

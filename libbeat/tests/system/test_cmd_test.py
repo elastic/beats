@@ -52,7 +52,7 @@ class TestCommandTest(BaseTest):
 
         self.render_config_template("mockbeat",
                                     os.path.join(self.working_dir, "mockbeat.yml"),
-                                    elasticsearch={"hosts": self.get_elasticsearch_url(), "username": "admin", "password": "testing"})
+                                    elasticsearch=self.get_elasticsearch_template_config())
         exit_code = self.run_beat(
             extra_args=["test", "output"],
             config="mockbeat.yml")
@@ -70,7 +70,11 @@ class TestCommandTest(BaseTest):
         self.render_config_template("mockbeat",
                                     os.path.join(self.working_dir,
                                                  "mockbeat.yml"),
-                                    elasticsearch={"hosts": '["badhost:9200"]'})
+                                    elasticsearch={
+                                        "host": 'badhost:9200',
+                                        "user": 'admin',
+                                        "pass": 'testing'
+                                    })
         exit_code = self.run_beat(
             extra_args=["test", "output"],
             config="mockbeat.yml")
