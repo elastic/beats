@@ -29,12 +29,12 @@ import (
 )
 
 type pod struct {
-	store         cache.Store
-	client        k8s.Interface
-	node          MetaGen
-	namespace     MetaGen
-	resource      *Resource
-	addDeployment bool
+	store               cache.Store
+	client              k8s.Interface
+	node                MetaGen
+	namespace           MetaGen
+	resource            *Resource
+	addResourceMetadata *AddResourceMetadataConfig
 }
 
 // NewPodMetadataGenerator creates a metagen for pod resources
@@ -44,14 +44,19 @@ func NewPodMetadataGenerator(
 	client k8s.Interface,
 	node MetaGen,
 	namespace MetaGen,
-	addDeploymentMeta bool) MetaGen {
+	addResourceMetadata *AddResourceMetadataConfig) MetaGen {
+
+	if addResourceMetadata == nil {
+		addResourceMetadata = GetDefaultResourceMetadataConfig()
+	}
+
 	return &pod{
-		resource:      NewResourceMetadataGenerator(cfg, client),
-		store:         pods,
-		node:          node,
-		namespace:     namespace,
-		client:        client,
-		addDeployment: addDeploymentMeta,
+		resource:            NewResourceMetadataGenerator(cfg, client),
+		store:               pods,
+		node:                node,
+		namespace:           namespace,
+		client:              client,
+		addResourceMetadata: addResourceMetadata,
 	}
 }
 
@@ -87,7 +92,7 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	out := p.resource.GenerateK8s("pod", obj, opts...)
 
 	// check if Pod is handled by a ReplicaSet which is controlled by a Deployment
-	if p.addDeployment {
+	if p.addResourceMetadata.Deployment {
 		rsName, _ := out.GetValue("replicaset.name")
 		if rsName, ok := rsName.(string); ok {
 			dep := p.getRSDeployment(rsName, po.GetNamespace())
