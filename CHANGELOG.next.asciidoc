@@ -177,6 +177,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix in `aws-s3` input regarding provider discovery through endpoint {pull}28963[28963]
 - Fix `threatintel.misp` filters configuration. {issue}27970[27970]
 - Fix opening files on Windows in filestream so open files can be deleted. {issue}29113[29113] {pull}29180[29180]
+- Fix `panw` module ingest errors for GLOBALPROTECT logs {pull}29154[29154]
 
 *Heartbeat*
 
