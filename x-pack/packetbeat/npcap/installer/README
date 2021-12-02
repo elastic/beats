@@ -2,4 +2,6 @@ This directory is pinned to allow placement of the Npcap OEM installer
 during x-pack Packetbeat builds.
 
 Only one exe file may be placed here and this should be the most recent
-available Npcap installer.
+available Npcap installer. As part of the distribution a place-holder file
+is put here to allow compilation. This file must be removed when a real
+installer in included for the build.
