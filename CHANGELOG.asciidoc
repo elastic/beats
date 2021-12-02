@@ -16,11 +16,6 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 - Previously, RE2 and thus Golang had a bug where `(|a)*` matched more characters than `(|a)+`. To stay consistent with PCRE, the bug was fixed. Configurations that rely on the old, buggy behaviour has to be adjusted. See more about Golang bug: https://github.com/golang/go/issues/46123 {pull}27543[27543]
 - Remove Journalbeat. Use `journald` input of Filebeat instead. {pull}29131[29131]
 
-*Auditbeat*
-
-
-*Filebeat*
-
 *Heartbeat*
 
 - Change behavior in case of duplicate monitor IDs in configs to be last monitor wins. {pull}29041[29041]
@@ -29,16 +24,9 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 
 - Align fields to Beats naming conventions in GCP module. {issue}27231[27231] {pull}27974[27974]
 
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
 *Functionbeat*
 
 - Support for Google Cloud Functions have been removed, as it has been in Beta for a long time and been broken for a few releases. Please use other tools provided by Elastic to fetch data from GCP (e.g. Filebeat).
-
 
 ==== Bugfixes
 
@@ -87,21 +75,12 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 - Fix RDS metadata in Cloudwatch metricset. {pull}29106[29106]
 - Errors should be thrown as errors. Metricsets inside metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
 
-*Packetbeat*
-
-
 *Winlogbeat*
 
 - Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
 - Add ECS 1.9 new users fields {pull}26509[26509]
 - Don't split hyphenated tokens {pull}28483[28483]
 - Correctly handle AccessMask if it is an integer or list of masks. {pull}29016[29016]
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
@@ -123,9 +102,6 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 - Add default seccomp policy for Linux arm64. {pull}27955[27955]
 - Add `http.pprof.enabled` option to libbeat to allow http/pprof endpoints on the socket that libbeat creates for metrics. {issue}21965[21965]
 - Enable IMDSv2 support for `add_cloud_metadata` processor on AWS. {issue}22101[22101] {pull}28285[28285]
-
-*Auditbeat*
-
 
 *Filebeat*
 
@@ -173,9 +149,6 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 - Add Linux pressure metricset {pull}27355[27355]
 - Add User-Agent header to HTTP requests. {issue}18160[18160] {pull}27509[27509]
 
-*Packetbeat*
-
-
 *Functionbeat*
 
 - Add support for AWS Kinesis record deaggregation {pull}28241[28241]
@@ -183,9 +156,6 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 *Winlogbeat*
 
 - Add support for event language selection from config file {pull}19818[19818]
-
-*Elastic Log Driver*
-
 
 ==== Deprecated
 
@@ -196,22 +166,6 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 *Filebeat*
 
 - Deprecate `log` input in favour of `filestream` input. {pull}28623[28623]
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-*Journalbeat*
-
 
 
 [[release-notes-7.15.2]]
