@@ -46,10 +46,12 @@ func init() {
 			"container_cpu_total_nanoseconds":  prometheus.Metric("usage.total.ns"),
 			"container_cpu_user_nanoseconds":   prometheus.Metric("usage.user.ns"),
 			"container_cpu_kernel_nanoseconds": prometheus.Metric("usage.kernel.ns"),
+			"container_per_cpu_nanoseconds":    prometheus.Metric("usage.percpu.ns"),
 			"process_cpu_seconds_total":        prometheus.Metric("system.total"),
 		},
 		Labels: map[string]prometheus.LabelMap{
 			"container_id": p.KeyLabel("id"),
+			"cpu":          p.KeyLabel("cpu"),
 		},
 	}
 
