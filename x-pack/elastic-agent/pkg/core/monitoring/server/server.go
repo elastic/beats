@@ -54,7 +54,9 @@ func exposeMetricsEndpoint(
 	tracer *apm.Tracer,
 ) (*api.Server, error) {
 	r := mux.NewRouter()
-	r.Use(apmgorilla.Middleware(apmgorilla.WithTracer(tracer)))
+	if tracer != nil {
+		r.Use(apmgorilla.Middleware(apmgorilla.WithTracer(tracer)))
+	}
 	statsHandler := statsHandler(ns("stats"))
 	r.Handle("/stats", createHandler(statsHandler))
 

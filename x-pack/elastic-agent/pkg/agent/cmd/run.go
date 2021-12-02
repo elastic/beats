@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"go.elastic.co/apm"
+	apmtransport "go.elastic.co/apm/transport"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -44,6 +46,10 @@ import (
 const (
 	agentName = "elastic-agent"
 )
+
+func init() {
+	apm.DefaultTracer.Close()
+}
 
 type cfgOverrider func(cfg *configuration.Configuration)
 
@@ -137,13 +143,16 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 	statusCtrl := status.NewController(logger)
 
 	// TODO: How do we get the version?
-	version := release.Version()
-	tracer, err := apm.NewTracer(agentName, version)
+	tracer, err := initTracer(agentName, release.Version(), cfg.Settings.InstrumentationConfig)
 	if err != nil {
 		return err
 	}
-	// Close apm.DefaultTracer since we're creating our own.
-	apm.DefaultTracer.Close()
+	if tracer != nil {
+		defer func() {
+			tracer.Flush(nil)
+			tracer.Close()
+		}()
+	}
 
 	control := server.New(logger.Named("control"), rex, statusCtrl, nil, tracer)
 	// start the control listener
@@ -385,4 +394,39 @@ func tryDelayEnroll(ctx context.Context, logger *logger.Logger, cfg *configurati
 	}
 	logger.Info("Successfully performed delayed enrollment of this Elastic Agent.")
 	return loadConfig(override)
+}
+
+func initTracer(agentName, version string, cfg *configuration.InstrumentationConfig) (*apm.Tracer, error) {
+	if !cfg.Enabled {
+		return nil, nil
+	}
+
+	transport, err := apmtransport.NewHTTPTransport()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(cfg.Hosts) > 0 {
+		hosts := make([]*url.URL, 0, len(cfg.Hosts))
+		for _, host := range cfg.Hosts {
+			u, err := url.Parse(host)
+			if err != nil {
+				return nil, fmt.Errorf("failed parsing %s: %w", host, err)
+			}
+			hosts = append(hosts, u)
+		}
+		transport.SetServerURL(hosts...)
+	}
+	if cfg.APIKey != "" {
+		transport.SetAPIKey(cfg.APIKey)
+	} else {
+		transport.SetSecretToken(cfg.SecretToken)
+	}
+
+	return apm.NewTracerOptions(apm.TracerOptions{
+		ServiceName:        agentName,
+		ServiceVersion:     version,
+		ServiceEnvironment: cfg.Environment,
+		Transport:          transport,
+	})
 }

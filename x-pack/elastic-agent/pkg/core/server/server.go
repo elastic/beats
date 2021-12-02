@@ -155,11 +155,15 @@ func (s *Server) Start() error {
 		ClientCAs:      certPool,
 		GetCertificate: s.getCertificate,
 	})
-	apmInterceptor := apmgrpc.NewUnaryServerInterceptor(apmgrpc.WithRecovery(), apmgrpc.WithTracer(s.tracer))
-	s.server = grpc.NewServer(
-		grpc.UnaryInterceptor(apmInterceptor),
-		grpc.Creds(creds),
-	)
+	if s.tracer != nil {
+		apmInterceptor := apmgrpc.NewUnaryServerInterceptor(apmgrpc.WithRecovery(), apmgrpc.WithTracer(s.tracer))
+		s.server = grpc.NewServer(
+			grpc.UnaryInterceptor(apmInterceptor),
+			grpc.Creds(creds),
+		)
+	} else {
+		s.server = grpc.NewServer()
+	}
 	proto.RegisterElasticAgentServer(s.server, s)
 
 	// start serving GRPC connections

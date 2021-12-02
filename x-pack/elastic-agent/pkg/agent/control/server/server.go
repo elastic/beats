@@ -88,8 +88,12 @@ func (s *Server) Start() error {
 		return err
 	}
 	s.listener = lis
-	apmInterceptor := apmgrpc.NewUnaryServerInterceptor(apmgrpc.WithRecovery(), apmgrpc.WithTracer(s.tracer))
-	s.server = grpc.NewServer(grpc.UnaryInterceptor(apmInterceptor))
+	if s.tracer != nil {
+		apmInterceptor := apmgrpc.NewUnaryServerInterceptor(apmgrpc.WithRecovery(), apmgrpc.WithTracer(s.tracer))
+		s.server = grpc.NewServer(grpc.UnaryInterceptor(apmInterceptor))
+	} else {
+		s.server = grpc.NewServer()
+	}
 	proto.RegisterElasticAgentControlServer(s.server, s)
 
 	// start serving GRPC connections
