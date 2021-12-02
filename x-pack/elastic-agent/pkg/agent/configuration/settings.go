@@ -15,12 +15,13 @@ import (
 
 // SettingsConfig is an collection of agent settings configuration.
 type SettingsConfig struct {
-	DownloadConfig   *artifact.Config                `yaml:"download" config:"download" json:"download"`
-	ProcessConfig    *process.Config                 `yaml:"process" config:"process" json:"process"`
-	GRPC             *server.Config                  `yaml:"grpc" config:"grpc" json:"grpc"`
-	RetryConfig      *retry.Config                   `yaml:"retry" config:"retry" json:"retry"`
-	MonitoringConfig *monitoringCfg.MonitoringConfig `yaml:"monitoring" config:"monitoring" json:"monitoring"`
-	LoggingConfig    *logger.Config                  `yaml:"logging,omitempty" config:"logging,omitempty" json:"logging,omitempty"`
+	DownloadConfig        *artifact.Config                `yaml:"download" config:"download" json:"download"`
+	ProcessConfig         *process.Config                 `yaml:"process" config:"process" json:"process"`
+	GRPC                  *server.Config                  `yaml:"grpc" config:"grpc" json:"grpc"`
+	RetryConfig           *retry.Config                   `yaml:"retry" config:"retry" json:"retry"`
+	MonitoringConfig      *monitoringCfg.MonitoringConfig `yaml:"monitoring" config:"monitoring" json:"monitoring"`
+	LoggingConfig         *logger.Config                  `yaml:"logging,omitempty" config:"logging,omitempty" json:"logging,omitempty"`
+	InstrumentationConfig *InstrumentationConfig          `yaml:"instrumentation,omitempty" config:"instrumentation,omitempty" json:"instrumentation,omitempty"`
 
 	// standalone config
 	Reload *ReloadConfig `config:"reload" yaml:"reload" json:"reload"`
@@ -30,12 +31,13 @@ type SettingsConfig struct {
 // DefaultSettingsConfig creates a config with pre-set default values.
 func DefaultSettingsConfig() *SettingsConfig {
 	return &SettingsConfig{
-		ProcessConfig:    process.DefaultConfig(),
-		RetryConfig:      retry.DefaultConfig(),
-		DownloadConfig:   artifact.DefaultConfig(),
-		LoggingConfig:    logger.DefaultLoggingConfig(),
-		MonitoringConfig: monitoringCfg.DefaultConfig(),
-		GRPC:             server.DefaultGRPCConfig(),
-		Reload:           DefaultReloadConfig(),
+		ProcessConfig:         process.DefaultConfig(),
+		RetryConfig:           retry.DefaultConfig(),
+		DownloadConfig:        artifact.DefaultConfig(),
+		LoggingConfig:         logger.DefaultLoggingConfig(),
+		MonitoringConfig:      monitoringCfg.DefaultConfig(),
+		GRPC:                  server.DefaultGRPCConfig(),
+		Reload:                DefaultReloadConfig(),
+		InstrumentationConfig: DefaultInstrumentationConfig(),
 	}
 }
