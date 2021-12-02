@@ -328,11 +328,7 @@
         "host.os.family": "Windows",
         "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
         "input.type": "log",
-<<<<<<< HEAD
-        "log.offset": 1642,
-=======
-        "log.offset": 1644,
->>>>>>> 303e4ed71 (PANW: Fix bugs in globalprotect pipeline (#29154))
+        "log.offset": 1641,
         "network.type": "ipv4",
         "observer.hostname": "GP GW intern",
         "observer.product": "PAN-OS",
@@ -396,7 +392,7 @@
         "host.os.family": "Windows",
         "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
         "input.type": "log",
-        "log.offset": 2059,
+        "log.offset": 2058,
         "network.type": "ipv4",
         "observer.hostname": "GPGateway",
         "observer.product": "PAN-OS",
