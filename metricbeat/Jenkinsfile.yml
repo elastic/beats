@@ -35,9 +35,10 @@ stages:
     crosscompile:
         make: "make -C metricbeat crosscompile"
         stage: mandatory
-    macosAction:
-        githubAction: "mage build unitTest"
-        stage: mandatory
+    # See https://github.com/elastic/beats/issues/29038
+    #macosAction:
+        #githubAction: "mage build unitTest"
+        #stage: mandatory
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
