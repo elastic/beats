@@ -3,30 +3,14 @@ package beater
 import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ecr"
 	"github.com/aws/aws-sdk-go-v2/service/ecr/types"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"log"
 	"time"
 )
 
 type ECRDataFetcher struct {
 }
-
-func Repositories() error{
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	ctx, cancel := context.WithTimeout(context.TODO(), 30*time.Second)
-	defer cancel()
-
-	repo := []string{"test-repo"}
-	a, err = e.DescribeAllRepositories(cfg, ctx, repo)
-}
-
 
 func (e ECRDataFetcher) DescribeAllRepositories(cfg aws.Config, ctx context.Context, repoNames []string) ([]types.Repository, error) {
 
@@ -41,7 +25,7 @@ func (e ECRDataFetcher) DescribeAllRepositories(cfg aws.Config, ctx context.Cont
 
 	response, err := svc.DescribeRepositories(ctx, input)
 	if err != nil {
-		logp.Err("Failed to fetch %s from ecr, error - %+v", repoName, err)
+		logp.Err("Failed to fetch %s from ecr, error - %+v", repoNames, err)
 		return nil, err
 	}
 
