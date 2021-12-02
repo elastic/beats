@@ -219,6 +219,11 @@ func install(ctx context.Context, log *logp.Logger, path, dst string, compat boo
 }
 
 func Upgradeable(version string) bool {
+	// Chack for the place-holder file.
+	if version == "0.00" {
+		return false
+	}
+
 	// pcap.Version() returns a string in the form:
 	//
 	//  Npcap version 1.55, based on libpcap version 1.10.2-PRE-GIT
