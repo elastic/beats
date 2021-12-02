@@ -12,7 +12,6 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 *Affecting all Beats*
 
 - Skip add_kubernetes_metadata processor when kubernetes metadata are already present {pull}27689[27689]
-- Enable IMDSv2 support for `add_cloud_metadata` processor on AWS. {issue}22101[22101] {pull}28285[28285]
 - Load index templates v2 (composable index templates) by default when talking to ES 7.16 or ES 8.x. Please note that you cannot load templates into Elasticsearch 7.8 or older with this default. To load templates to these ES version, set `setup.template.type` back to `legacy`. {pull}28538[28538]
 - Previously, RE2 and thus Golang had a bug where `(|a)*` matched more characters than `(|a)+`. To stay consistent with PCRE, the bug was fixed. Configurations that rely on the old, buggy behaviour has to be adjusted. See more about Golang bug: https://github.com/golang/go/issues/46123 {pull}27543[27543]
 - Remove Journalbeat. Use `journald` input of Filebeat instead. {pull}29131[29131]
@@ -21,8 +20,6 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 
 
 *Filebeat*
-
-- `filestream` and `log` inputs accept null (`\u0000`) as line terminator. {pull}28998[28998]
 
 *Heartbeat*
 - Change behavior in case of duplicate monitor IDs in configs to be last monitor wins. {pull}29041[29041]
@@ -69,7 +66,6 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 *Filebeat*
 
 - Update indentation for azure filebeat configuration. {pull}26604[26604]
-- Add support for passing a prefix on S3 bucket list mode for AWS-S3 input {pull}28252[28252] {issue}27965[27965]
 - Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
 - Add support for username in cisco asa security negotiation logs {pull}26975[26975]
 - Relax time parsing and capture group and session type in Cisco ASA module {issue}24710[24710] {pull}28325[28325]
@@ -131,6 +127,7 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 - Update kubernetes scheduler and controllermanager endpoints in elastic-agent-standalone-kubernetes.yaml with secure ports {pull}28675[28675]
 - Add default seccomp policy for linux arm64. {pull}27955[27955]
 - Add http.pprof.enabled option to libbeat to allow http/pprof endpoints on the socket that libbeat creates for metrics. {issue}21965[21965]
+- Enable IMDSv2 support for `add_cloud_metadata` processor on AWS. {issue}22101[22101] {pull}28285[28285]
 
 *Auditbeat*
 
@@ -144,8 +141,7 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 - Add `join` and `sprintf` functions to `httpjson` input. {pull}27735[27735]
 - Improve memory usage of line reader of `log` and `filestream` input. {pull}27782[27782]
 - Add `ignore_empty_value` flag to `httpjson` `split` processor. {pull}27880[27880]
-
-- Add `ignore_empty_value` flag to `httpjson` `split` processor. {pull}27880[27880]
+- Add support for passing a prefix on S3 bucket list mode for AWS-S3 input {pull}28252[28252] {issue}27965[27965]
 - Update Cisco ASA/FTD ingest pipeline grok/dissect patterns for multiple message IDs. {issue}26869[26869] {pull}26879[26879]
 - Add write access to `url.value` from `request.transforms` in `httpjson` input. {pull}27937[27937]
 - Add Base64 encoded HMAC and UUID template functions to `httpjson` input {pull}27873[27873]
@@ -164,6 +160,7 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 - Add support in aws-s3 input for s3 notification from SNS to SQS. {pull}28800[28800]
 - Add support in aws-s3 input for custom script parsing of s3 notifications. {pull}28946[28946]
 - Improve error handling in aws-s3 input for malformed s3 notifications. {issue}28828[28828] {pull}28946[28946]
+- `filestream` and `log` inputs accept null (`\u0000`) as line terminator. {pull}28998[28998]
 
 *Heartbeat*
 
