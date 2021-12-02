@@ -228,6 +228,10 @@ func (s *Server) ProcMeta(ctx context.Context, _ *proto.Empty) (*proto.ProcMetaR
 
 // Pprof returns /debug/pprof data for the requested applicaiont-route_key or all running applications.
 func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.PprofResponse, error) {
+	if !s.monitoringCfg.Pprof {
+		return nil, fmt.Errorf("agent.monitoring.pprof disabled")
+	}
+
 	if s.routeFn == nil {
 		return nil, errors.New("route function is nil")
 	}
@@ -246,9 +250,6 @@ func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.Ppr
 
 	// retrieve elastic-agent pprof data if requested or application is unspecified.
 	if req.AppName == "" || req.AppName == "elastic-agent" {
-		if !s.monitoringCfg.Pprof {
-			return nil, fmt.Errorf("elastic-agent pprof disabled")
-		}
 		endpoint := beats.AgentMonitoringEndpoint(runtime.GOOS, s.monitoringCfg.HTTP)
 		c := newSocketRequester("elastic-agent", "", endpoint)
 		for _, opt := range req.PprofType {
