@@ -263,7 +263,10 @@ func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.Ppr
 	}
 
 	// get requested rk/appname spec or all specs
-	specs := s.getSpecInfo(req.RouteKey, req.AppName)
+	var specs []specInfo
+	if req.AppName != "elastic-agent" {
+		specs = s.getSpecInfo(req.RouteKey, req.AppName)
+	}
 	for _, si := range specs {
 		endpoint := monitoring.MonitoringEndpoint(si.spec, runtime.GOOS, si.rk)
 		c := newSocketRequester(si.app, si.rk, endpoint)
