@@ -19,9 +19,6 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 
 *Auditbeat*
 
-- Fix handling of long file names on Windows. {issue}25334[25334] {pull}28517[28517]
-- System/socket dataset: Fix uninstallation of return kprobes. {issue}28608[28608] {pull}28609[28609]
-- Fix auditbeat tracing struct decoding. {pull}28580[28580]
 
 *Filebeat*
 
@@ -65,6 +62,9 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 *Auditbeat*
 
 - Fix handling of root and relative paths {issue}24430[24430] {pull}28354[28354]
+- Fix handling of long file names on Windows. {issue}25334[25334] {pull}28517[28517]
+- System/socket dataset: Fix uninstallation of return kprobes. {issue}28608[28608] {pull}28609[28609]
+- Fix auditbeat tracing struct decoding. {pull}28580[28580]
 
 *Filebeat*
 
