@@ -112,7 +112,6 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 		return fmt.Errorf("fail to unmarshal the index content from file %s: %v", file, err)
 	}
 
-	loader.statusMsg("Finished tasks for %s", file)
 	return loader.ImportIndex(indexContent)
 }
 

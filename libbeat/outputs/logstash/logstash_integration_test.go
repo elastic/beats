@@ -102,12 +102,14 @@ func esConnect(t *testing.T, index string) *esConnection {
 		Timestamp: ts,
 	})
 
+	username := os.Getenv("ES_USER")
+	password := os.Getenv("ES_PASS")
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = 60 * time.Second
 	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:       host,
-		Username:  "admin",
-		Password:  "testing",
+		Username:  username,
+		Password:  password,
 		Transport: transport,
 	})
 	if err != nil {
@@ -172,13 +174,11 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 
 	bulkSize := 0
 	config, _ := common.NewConfigFrom(map[string]interface{}{
-		"hosts":         []string{getElasticsearchHost()},
-		"index":         connection.index,
-		"bulk_max_size": &bulkSize,
-		//"username":         os.Getenv("ES_USER"),
-		//"password":         os.Getenv("ES_PASS"),
-		"username":         "admin",
-		"password":         "testing",
+		"hosts":            []string{getElasticsearchHost()},
+		"index":            connection.index,
+		"bulk_max_size":    &bulkSize,
+		"username":         os.Getenv("ES_USER"),
+		"password":         os.Getenv("ES_PASS"),
 		"template.enabled": false,
 	})
 
