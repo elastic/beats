@@ -802,16 +802,6 @@ ifdef::apm-server[]
 Registers the <<configuring-ingest-node,pipeline>> definitions set in `ingest/pipeline/definition.json`.
 endif::apm-server[]
 
-*`--template`*::
-deprecated:[7.2]
-Sets up the index template only.
-It is recommended to use `--index-management` instead.
-
-*`--ilm-policy`*::
-deprecated:[7.2]
-Sets up the index lifecycle management policy.
-It is recommended to use `--index-management` instead.
-
 {global-flags}
 
 *EXAMPLES*

@@ -151,3 +151,4 @@
 - Add `KIBANA_FLEET_SERVICE_TOKEN` to Elastic Agent container. {pull}28096[28096]
 - Enable pprof endpoints for beats processes. Allow pprof endpoints for elastic-agent if enabled. {pull}28983[28983]
 - Add `--pprof` flag to `elastic-agent diagnostics` and an `elastic-agent pprof` command to allow operators to gather pprof data from the agent and beats running under it. {pull}28798[28798]
+- Allow pprof endpoints for elastic-agent or beats if enabled. {pull}28983[28983] {pull}29155[29155]

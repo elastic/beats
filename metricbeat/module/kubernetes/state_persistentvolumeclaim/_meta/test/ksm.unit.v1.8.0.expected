@@ -5,9 +5,7 @@
 			"labels": {
 				"app": "mysql-server"
 			},
-			"namespace": {
-				"name": "default"
-			}
+			"namespace": "default"
 		},
 		"MetricSetFields": {
 			"access_mode": "ReadWriteOnce",
@@ -32,12 +30,15 @@
 	},
 	{
 		"RootFields": {},
-		"ModuleFields": null,
+		"ModuleFields": {
+			"namespace": "default"
+		},
 		"MetricSetFields": {
 			"access_mode": "ReadWriteOnce",
-			"name": "mongo-data",
-			"phase": "Lost",
-			"storage_class": "\u003cnone\u003e"
+			"name": "prometheus-data",
+			"phase": "Pending",
+			"storage_class": "rbd",
+			"volume_name": "pvc-prometheus-data"
 		},
 		"Index": "",
 		"ID": "",
@@ -52,17 +53,12 @@
 	},
 	{
 		"RootFields": {},
-		"ModuleFields": {
-			"namespace": {
-				"name": "default"
-			}
-		},
+		"ModuleFields": null,
 		"MetricSetFields": {
 			"access_mode": "ReadWriteOnce",
-			"name": "prometheus-data",
-			"phase": "Pending",
-			"storage_class": "rbd",
-			"volume_name": "pvc-prometheus-data"
+			"name": "mongo-data",
+			"phase": "Lost",
+			"storage_class": "\u003cnone\u003e"
 		},
 		"Index": "",
 		"ID": "",
