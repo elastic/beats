@@ -22,6 +22,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+// OptionalGovCloudFIPS is a list of services on AWS GovCloud that is not FIPS by default.
+// These services follow the standard <service name>-fips.<region>.amazonaws.com format.
+var OptionalGovCloudFIPS = map[string]bool{
+	"s3": true,
+}
+
 // ConfigAWS is a structure defined for AWS credentials
 type ConfigAWS struct {
 	AccessKeyID          string `config:"access_key_id"`
@@ -175,9 +181,6 @@ func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName
 //Create AWS service name based on Region and FIPS
 func CreateServiceName(serviceName string, fipsEnabled bool, region string) string {
 	if fipsEnabled {
-		OptionalGovCloudFIPS := map[string]bool{
-			"s3": true,
-		}
 		_, found := OptionalGovCloudFIPS[serviceName]
 		if !strings.HasPrefix(region, "us-gov-") || found {
 			return serviceName + "-fips"
