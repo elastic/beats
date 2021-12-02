@@ -215,16 +215,7 @@ func install(ctx context.Context, log *logp.Logger, path, dst string, compat boo
 		return fmt.Errorf("npcap: failed to install Npcap: %w", err)
 	}
 
-	// gopacket/pcap does not provide a mechanism to reload the pcap DLL
-	// so if we are upgrading we wait for the next startup of packetbeat.
-	// Otherwise we can make sure that the DLL is loaded by calling
-	// pcap.LoadWinPCAP. pcap.LoadWinPCAP is called on pcap package
-	// initialization and if successful, subsequent calls are no-op, but
-	// if Npcap/WinPCAP was not installed, it will have failed and can be
-	// called now. So this is safe in all cases.
-	err = loadWinPCAP()
-
-	return err
+	return reloadWinPCAP()
 }
 
 func Upgradeable(version string) bool {
