@@ -7,16 +7,11 @@ paths:
 {{ end }}
 exclude_files: [".gz$"]
 
-{{ else if eq .input "syslog" }}
-
-type: udp
-udp:
-host: "{{.syslog_host}}:{{.syslog_port}}"
-
 {{ else }}
 
 type: {{.input}}
 host: "{{.syslog_host}}:{{.syslog_port}}"
+ssl: {{ .ssl | tojson }}
 
 {{ end }}
 

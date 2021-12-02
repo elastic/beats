@@ -10,13 +10,8 @@ exclude_files: [".gz$"]
 {{ else if eq .input "syslog" }}
 
 type: syslog
-protocol.udp:
+protocol.{{.syslog_protocol}}:
   host: "{{.syslog_host}}:{{.syslog_port}}"
-
-{{ else }}
-
-type: {{.input}}
-host: "{{.syslog_host}}:{{.syslog_port}}"
 
 {{ end }}
 
