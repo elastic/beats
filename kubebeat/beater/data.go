@@ -62,11 +62,17 @@ func (d *Data) Run() error {
 
 	for key, fetcher := range d.fetchers {
 		wg.Add(1)
-		go d.fetchWorker(&wg, updates, key, fetcher)
+		go func(k string, f Fetcher) {
+			defer wg.Done()
+			d.fetchWorker(updates, k, f)
+		}(key, fetcher)
 	}
 
 	wg.Add(1)
-	go d.fetchManager(&wg, updates)
+	go func() {
+		defer wg.Done()
+		d.fetchManager(updates)
+	}()
 
 	return nil
 }
@@ -77,9 +83,7 @@ type update struct {
 	val []interface{}
 }
 
-func (d *Data) fetchWorker(wg *sync.WaitGroup, updates chan update, k string, f Fetcher) {
-	defer wg.Done()
-
+func (d *Data) fetchWorker(updates chan update, k string, f Fetcher) {
 	for {
 		select {
 		case <-d.ctx.Done():
@@ -98,9 +102,7 @@ func (d *Data) fetchWorker(wg *sync.WaitGroup, updates chan update, k string, f 
 	}
 }
 
-func (d *Data) fetchManager(wg *sync.WaitGroup, updates chan update) {
-	defer wg.Done()
-
+func (d *Data) fetchManager(updates chan update) {
 	ticker := time.NewTicker(d.interval)
 
 	for {
