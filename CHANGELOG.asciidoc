@@ -21,7 +21,6 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 
 - Fix handling of long file names on Windows. {issue}25334[25334] {pull}28517[28517]
 - System/socket dataset: Fix uninstallation of return kprobes. {issue}28608[28608] {pull}28609[28609]
-- Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
 - Fix auditbeat tracing struct decoding. {pull}28580[28580]
 
 *Filebeat*
