@@ -16,13 +16,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Enable IMDSv2 support for `add_cloud_metadata` processor on AWS. {issue}22101[22101] {pull}28285[28285]
 - Load index templates v2 (composable index templates) by default when talking to ES 7.16 or ES 8.x. Please note that you cannot load templates into Elasticsearch 7.8 or older with this default. To load templates to these ES version, set `setup.template.type` back to `legacy`. {pull}28538[28538]
 - Previously, RE2 and thus Golang had a bug where `(|a)*` matched more characters than `(|a)+`. To stay consistent with PCRE, the bug was fixed. Configurations that rely on the old, buggy behaviour has to be adjusted. See more about Golang bug: https://github.com/golang/go/issues/46123 {pull}27543[27543]
-- Update docker client. {pull}28716[28716]
-- Remove `auto` from the available options of `setup.ilm.enabled` and set the default value to `true`. {pull}28671[28671]
-- add_process_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
-- add_docker_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
-- Index template's default_fields setting is only populated with ECS fields. {pull}28596[28596] {issue}28215[28215]
-- Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
-- Remove options `logging.files.suffix` and default to datetime endings. {pull}28927[28927]
 - Remove Journalbeat. Use `journald` input of Filebeat instead. {pull}29131[29131]
 
 *Auditbeat*
