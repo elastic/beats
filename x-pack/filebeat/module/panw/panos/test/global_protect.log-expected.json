@@ -327,12 +327,8 @@
         "host.os.family": "Windows",
         "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
         "input.type": "log",
-<<<<<<< HEAD
-        "log.offset": 1642,
+        "log.offset": 1641,
         "log.original": "1,2021/03/02 09:55:42,12345678999,GLOBALPROTECT,0,2305,2021/03/02 09:55:39,vsys1,gateway-auth,login,Other,,maxmustermann,10.0.0.0-10.255.255.255,PC1234,10.20.30.40,0.0.0.0,0.0.0.0,0.0.0.0,985e865f-7da3-43b4-89a9-299b1bb0c975,SERIALNR,5.1.1,Windows,\"Microsoft Windows 10 Enterprise, 64-bit\",1,,,,success,,0,pre-logon,0,GP GW intern,6894571632887748064,0x8000000000000000,1970-01-01T01:00:00.000+01:00,,0,manual only,,",
-=======
-        "log.offset": 1644,
->>>>>>> 303e4ed717 (PANW: Fix bugs in globalprotect pipeline (#29154))
         "network.type": "ipv4",
         "observer.hostname": "GP GW intern",
         "observer.product": "PAN-OS",
@@ -395,7 +391,7 @@
         "host.os.family": "Windows",
         "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
         "input.type": "log",
-        "log.offset": 2059,
+        "log.offset": 2058,
         "log.original": "1,2021/03/02 11:01:03,123456789999,GLOBALPROTECT,0,2305,2021/03/02 11:01:02,vsys1,gateway-setup-ipsec,tunnel,,IPSec,domain\\musterman,DE,Rechner123,123.123.123.123,0.0.0.0,10.20.30.40,0.0.0.0,96c43d47-8bb5-4f78-8dfc-413a189a29e0,SERIALNR,5.1.1,Windows,\"Microsoft Windows 10 Enterprise, 64-bit\",1,,,,success,,0,,0,GPGateway,6894571632887761989,0x8000000000000000,1970-01-01T01:00:00.000+01:00,,0,manual only,,",
         "network.type": "ipv4",
         "observer.hostname": "GPGateway",
@@ -459,12 +455,8 @@
         "host.os.family": "Windows",
         "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
         "input.type": "log",
-<<<<<<< HEAD
-        "log.offset": 2467,
-        "log.original": "1,2021/03/02 09:39:33,12345678999,GLOBALPROTECT,0,2305,2021/03/02 09:39:26,vsys1,portal-prelogin,before-login,,,Max.Mustermann@domain.de,10.0.0.0-10.255.255.255,,10.20.30.40,0.0.0.0,0.0.0.0,0.0.0.0,0183d851-7ea2-4a0d-80de-fde1e04ce12f,,5.1.1,Windows,\"Microsoft Windows 10 Enterprise, 64-bit\",1,,,,success,,0,,0,GP Portal,6894571632887745099,0x8000000000000000,1970-01-01T01:00:00.000+01:00,,0,manual only,,",
-=======
         "log.offset": 2466,
->>>>>>> 303e4ed717 (PANW: Fix bugs in globalprotect pipeline (#29154))
+        "log.original": "1,2021/03/02 09:39:33,12345678999,GLOBALPROTECT,0,2305,2021/03/02 09:39:26,vsys1,portal-prelogin,before-login,,,Max.Mustermann@domain.de,10.0.0.0-10.255.255.255,,10.20.30.40,0.0.0.0,0.0.0.0,0.0.0.0,0183d851-7ea2-4a0d-80de-fde1e04ce12f,,5.1.1,Windows,\"Microsoft Windows 10 Enterprise, 64-bit\",1,,,,success,,0,,0,GP Portal,6894571632887745099,0x8000000000000000,1970-01-01T01:00:00.000+01:00,,0,manual only,,",
         "network.type": "ipv4",
         "observer.hostname": "GP Portal",
         "observer.product": "PAN-OS",
@@ -525,12 +517,8 @@
         "host.os.family": "Windows",
         "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
         "input.type": "log",
-<<<<<<< HEAD
-        "log.offset": 2874,
-        "log.original": "1,2021/03/02 09:47:18,12345678999,GLOBALPROTECT,0,2305,2021/03/02 09:47:13,vsys1,portal-getconfig,configuration,,,domain\\maxmustermann,10.0.0.0-10.255.255.255,PC12345,10.20.30.40,0.0.0.0,0.0.0.0,0.0.0.0,8cbc136b-e262-4cf8-912c-95ea132d9fef,SERIENNR,5.1.1,Windows,\"Microsoft Windows 10 Enterprise, 64-bit\",1,,,\"Config name: GP Clients, Machine Certificate CN : (null)\",success,,0,pre-logon,0,GP Portal,6894571632887746544,0x8000000000000000,1970-01-01T01:00:00.000+01:00,,0,manual only,,",
-=======
         "log.offset": 2873,
->>>>>>> 303e4ed717 (PANW: Fix bugs in globalprotect pipeline (#29154))
+        "log.original": "1,2021/03/02 09:47:18,12345678999,GLOBALPROTECT,0,2305,2021/03/02 09:47:13,vsys1,portal-getconfig,configuration,,,domain\\maxmustermann,10.0.0.0-10.255.255.255,PC12345,10.20.30.40,0.0.0.0,0.0.0.0,0.0.0.0,8cbc136b-e262-4cf8-912c-95ea132d9fef,SERIENNR,5.1.1,Windows,\"Microsoft Windows 10 Enterprise, 64-bit\",1,,,\"Config name: GP Clients, Machine Certificate CN : (null)\",success,,0,pre-logon,0,GP Portal,6894571632887746544,0x8000000000000000,1970-01-01T01:00:00.000+01:00,,0,manual only,,",
         "network.type": "ipv4",
         "observer.hostname": "GP Portal",
         "observer.product": "PAN-OS",
@@ -586,7 +574,6 @@
         "event.dataset": "panw.panos",
         "event.duration": 0,
         "event.module": "panw",
-        "event.original": "931201168,2021-10-22T16:10:10.000000Z,no-serial,GLOBALPROTECT,globalprotect,9.1,2021-10-22T16:10:05.000000Z,vsys1,gateway-hip-check,host-info,,,host\\\\user,,HOSTNAME,10.1.1.1,,10.2.2.2,fc00::1,8cbc136b-e262-4cf8-912c-95ea132d9fef,SERIALNR,5.2.6,,,1,,,HIP report is not needed,success,,0,,0,GlobalProtect_External_Gateway,1305925,true",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "panos",
@@ -595,6 +582,7 @@
         "host.name": "HOSTNAME",
         "input.type": "log",
         "log.offset": 3360,
+        "log.original": "931201168,2021-10-22T16:10:10.000000Z,no-serial,GLOBALPROTECT,globalprotect,9.1,2021-10-22T16:10:05.000000Z,vsys1,gateway-hip-check,host-info,,,host\\\\user,,HOSTNAME,10.1.1.1,,10.2.2.2,fc00::1,8cbc136b-e262-4cf8-912c-95ea132d9fef,SERIALNR,5.2.6,,,1,,,HIP report is not needed,success,,0,,0,GlobalProtect_External_Gateway,1305925,true",
         "network.type": "ipv4",
         "observer.hostname": "GlobalProtect_External_Gateway",
         "observer.product": "PAN-OS",
@@ -644,7 +632,6 @@
         "event.dataset": "panw.panos",
         "event.duration": 0,
         "event.module": "panw",
-        "event.original": "931201168,2021-11-09T21:45:36.000000Z,no-serial,GLOBALPROTECT,globalprotect,9.1,2021-11-09T21:45:14.000000Z,vsys1,gateway-tunnel-latency,tunnel,,,user,,HOSTNAME,10.3.3.3,,10.4.4.4,,8cbc136b-e262-4cf8-912c-95ea132d9fef,SERIALNR,5.2.8,,,1,,,\"Pre-tunnel latency: 35ms, Post-tunnel latency: 16ms\",success,,0,,0,GlobalProtect_External_Gateway,1041590,true",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "panos",
@@ -653,6 +640,7 @@
         "host.name": "HOSTNAME",
         "input.type": "log",
         "log.offset": 3693,
+        "log.original": "931201168,2021-11-09T21:45:36.000000Z,no-serial,GLOBALPROTECT,globalprotect,9.1,2021-11-09T21:45:14.000000Z,vsys1,gateway-tunnel-latency,tunnel,,,user,,HOSTNAME,10.3.3.3,,10.4.4.4,,8cbc136b-e262-4cf8-912c-95ea132d9fef,SERIALNR,5.2.8,,,1,,,\"Pre-tunnel latency: 35ms, Post-tunnel latency: 16ms\",success,,0,,0,GlobalProtect_External_Gateway,1041590,true",
         "network.type": "ipv4",
         "observer.hostname": "GlobalProtect_External_Gateway",
         "observer.product": "PAN-OS",
@@ -699,7 +687,6 @@
         "event.dataset": "panw.panos",
         "event.duration": 0,
         "event.module": "panw",
-        "event.original": "931201168,2021-11-09T21:45:36.000000Z,no-serial,GLOBALPROTECT,globalprotect,9.1,2021-11-09T21:45:14.000000Z,vsys1,gateway-tunnel-latency,tunnel,,,user,,HOSTNAME,,fc00::1234,,fc00::abcd,8cbc136b-e262-4cf8-912c-95ea132d9fef,SERIALNR,5.2.8,,,1,,,\"Pre-tunnel latency: 35ms, Post-tunnel latency: 16ms\",success,,0,,0,GlobalProtect_External_Gateway,1041590,true",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "panos",
@@ -707,6 +694,7 @@
         "host.name": "HOSTNAME",
         "input.type": "log",
         "log.offset": 4044,
+        "log.original": "931201168,2021-11-09T21:45:36.000000Z,no-serial,GLOBALPROTECT,globalprotect,9.1,2021-11-09T21:45:14.000000Z,vsys1,gateway-tunnel-latency,tunnel,,,user,,HOSTNAME,,fc00::1234,,fc00::abcd,8cbc136b-e262-4cf8-912c-95ea132d9fef,SERIALNR,5.2.8,,,1,,,\"Pre-tunnel latency: 35ms, Post-tunnel latency: 16ms\",success,,0,,0,GlobalProtect_External_Gateway,1041590,true",
         "network.type": "ipv6",
         "observer.hostname": "GlobalProtect_External_Gateway",
         "observer.product": "PAN-OS",
