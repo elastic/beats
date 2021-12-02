@@ -26,14 +26,7 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 
 *Metricbeat*
 
-- Add Linux pressure metricset {pull}27355[27355]
-- Add User-Agent header to HTTP requests. {issue}18160[18160] {pull}27509[27509]
-- Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
 - Align fields to Beats naming conventions in GCP module. {issue}27231[27231] {pull}27974[27974]
-- Add Tomcat overview dashboard {pull}14026[14026]
-- Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
-- Remove "invalid zero" metrics on Windows and Darwin, don't report linux-only memory and diskio metrics when running under agent. {pull}21457[21457]
-- Add Linux pressure metricset {pull}27355[27355]
 
 *Packetbeat*
 
@@ -91,6 +84,7 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 - `beat` module respects `basepath` config option. {pull}28162[28162]
 - Fix list_docker.go {pull}28374[28374]
 - Fix rds metadata in cloudwatch metricset. {pull}29106[29106]
+- Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
 
 *Packetbeat*
 
@@ -175,6 +169,8 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 - Register additional name for `storage` metricset in the azure module. {pull}28447[28447]
 - Update reference to gosigar pacakge for filesystem windows fix. {pull}28909[28909]
 - Override `Host()` on statsd MetricSet {pull}29103[29103]
+- Add Linux pressure metricset {pull}27355[27355]
+- Add User-Agent header to HTTP requests. {issue}18160[18160] {pull}27509[27509]
 
 *Packetbeat*
 
