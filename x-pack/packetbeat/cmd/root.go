@@ -9,6 +9,9 @@ import (
 	packetbeatCmd "github.com/elastic/beats/v7/packetbeat/cmd"
 
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+
+	// This registers the Npcap installer on Windows.
+	_ "github.com/elastic/beats/v7/x-pack/packetbeat/npcap"
 )
 
 // Name of this beat.
