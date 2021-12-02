@@ -189,7 +189,10 @@ python-env:
 	${PYTHON_EXE} -m pip install -q --upgrade pip autopep8==1.5.4 pylint==2.4.4; \
 	find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 	@# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7.16
 
 ## test-apm : Tests if apm works with the current code
 .PHONY: test-apm
