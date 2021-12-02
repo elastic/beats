@@ -2,10 +2,11 @@
 
 # Windows Npcap installation options. These options specify how the Npcap packet
 # capture library for Windows should be obtained and installed.
+# Windows Npcap installation is only available with x-pack.
 #npcap:
 #  # installer_location is either a URL or a bare path. The URL may have an http,
-#  # https or file scheme. If it is empty or unset, a default URL pointing to the
-#  # current latest version is used.
+#  # https or file scheme. If it is empty or unset, a bundled installer is used
+#  # and the retain_download and ignore_missing_registry are ignored.
 #  installer_location: ""
 #  # install_destination allows configuration of the location that the Npcap will
 #  # place the Npcap library and associated files. See https://nmap.org/npcap/guide/npcap-users-guide.html#npcap-installation-uninstall-options.
