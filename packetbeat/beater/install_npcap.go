@@ -122,20 +122,11 @@ func installNpcap(b *beat.Beat) error {
 		return nil
 	}
 
-	retain, err := configBool(cfg, "npcap.retain_download")
-	if err != nil {
-		return err
-	}
-
 	dir, err := os.MkdirTemp("", "packetbeat-npcap-*")
 	if err != nil {
 		return err
 	}
-	if retain {
-		log.Infof("working in %s", dir)
-	} else {
-		defer os.RemoveAll(dir)
-	}
+	defer os.RemoveAll(dir)
 	pth := filepath.Join(dir, path.Base(download))
 
 	gotHash, err := npcap.Fetch(ctx, log, download, pth)
