@@ -184,14 +184,35 @@ func checkZip(t *testing.T, file string) {
 	checkLicensesPresent(t, "", p)
 }
 
-var npcapConfigPattern = regexp.MustCompile("Windows Npcap installation settings")
+const (
+	npcapSettings   = "Windows Npcap installation settings"
+	npcapGrant      = `Insecure.Com LLC \(“The Nmap Project”\) has granted Elasticsearch`
+	npcapLicense    = `Dependency : Npcap \(https://nmap.org/npcap/\)`
+	libpcapLicense  = `Dependency : Libpcap \(http://www.tcpdump.org/\)`
+	winpcapLicense  = `Dependency : Winpcap \(https://www.winpcap.org/\)`
+	radiotapLicense = `Dependency : ieee80211_radiotap.h Header File`
+)
+
+var (
+	// These reflect the order that the licenses and notices appear in the relevant files.
+	npcapConfigPattern = regexp.MustCompile(
+		"(?s)" + npcapSettings +
+			".*" + npcapGrant,
+	)
+	npcapLicensePattern = regexp.MustCompile(
+		"(?s)" + npcapLicense +
+			".*" + libpcapLicense +
+			".*" + winpcapLicense +
+			".*" + radiotapLicense,
+	)
+)
 
 func checkNpcapNotices(pkg, file string, contents io.Reader) error {
-	if !strings.Contains(pkg, "packetbeat") || !strings.Contains(pkg, "windows") {
+	if !strings.Contains(pkg, "packetbeat") {
 		return nil
 	}
 
-	wantNotices := strings.Contains(pkg, "windows")
+	wantNotices := strings.Contains(pkg, "windows") && !strings.Contains(pkg, "oss")
 
 	// If the packetbeat README.md is made to be generated
 	// conditionally then it should also be checked here.
@@ -207,6 +228,13 @@ func checkNpcapNotices(pkg, file string, contents io.Reader) error {
 				return fmt.Errorf("Npcap config section not found in config file %s in %s", file, pkg)
 			}
 			return fmt.Errorf("unexpected Npcap config section found in config file %s in %s", file, pkg)
+		}
+	case "NOTICE.txt":
+		if npcapLicensePattern.MatchReader(bufio.NewReader(contents)) != wantNotices {
+			if wantNotices {
+				return fmt.Errorf("Npcap license section not found in %s file in %s", file, pkg)
+			}
+			return fmt.Errorf("unexpected Npcap license section found in %s file in %s", file, pkg)
 		}
 	}
 	return nil
