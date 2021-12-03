@@ -28,7 +28,7 @@ type mockEmitter struct {
 	policy *config.Config
 }
 
-func (m *mockEmitter) Emitter(policy *config.Config) error {
+func (m *mockEmitter) Emitter(_ context.Context, policy *config.Config) error {
 	m.policy = policy
 	return m.err
 }

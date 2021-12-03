@@ -136,6 +136,7 @@ func (b *FleetServerBootstrap) Start() error {
 	if err := b.srv.Start(); err != nil {
 		return err
 	}
+	// TODO: Does it make sense to pass in a ctx here?
 	if err := b.source.Start(); err != nil {
 		return err
 	}
@@ -176,7 +177,9 @@ func bootstrapEmitter(ctx context.Context, log *logger.Logger, agentInfo transpi
 		}
 	}()
 
-	return func(c *config.Config) error {
+	return func(ctx context.Context, c *config.Config) error {
+		span, _ := apm.StartSpan(ctx, "emit", "app.internal")
+		defer span.End()
 		ch <- c
 		return nil
 	}, nil

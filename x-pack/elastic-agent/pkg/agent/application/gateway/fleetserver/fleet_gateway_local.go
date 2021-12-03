@@ -76,7 +76,8 @@ func New(
 
 // Start starts the gateway.
 func (w *fleetServerWrapper) Start() error {
-	err := w.emitter(w.injectedCfg)
+	// TODO: Do we want to pass a ctx to Start()?
+	err := w.emitter(context.Background(), w.injectedCfg)
 	if err != nil {
 		return err
 	}

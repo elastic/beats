@@ -5,6 +5,8 @@
 package pipeline
 
 import (
+	"context"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -47,7 +49,7 @@ type Stream interface {
 }
 
 // EmitterFunc emits configuration for processing.
-type EmitterFunc func(*config.Config) error
+type EmitterFunc func(context.Context, *config.Config) error
 
 // DecoratorFunc is a func for decorating a retrieved configuration before processing.
 type DecoratorFunc = func(*info.AgentInfo, string, *transpiler.AST, []program.Program) ([]program.Program, error)

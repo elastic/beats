@@ -295,7 +295,7 @@ func getProgramsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *c
 		return nil, err
 	}
 
-	if err := emit(cfg); err != nil {
+	if err := emit(ctx, cfg); err != nil {
 		return nil, err
 	}
 	composableWaiter.Wait()
