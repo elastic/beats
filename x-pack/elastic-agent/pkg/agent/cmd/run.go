@@ -8,11 +8,13 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"syscall"
+	"time"
 
 	"github.com/spf13/cobra"
 	"go.elastic.co/apm"
@@ -21,6 +23,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
+	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/service"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
@@ -142,7 +146,6 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 
 	statusCtrl := status.NewController(logger)
 
-	// TODO: How do we get the version?
 	tracer, err := initTracer(agentName, release.Version(), cfg.Settings.InstrumentationConfig)
 	if err != nil {
 		return err
@@ -401,9 +404,26 @@ func initTracer(agentName, version string, cfg *configuration.InstrumentationCon
 		return nil, nil
 	}
 
-	transport, err := apmtransport.NewHTTPTransport()
+	ts, err := apmtransport.NewHTTPTransport()
 	if err != nil {
 		return nil, err
+	}
+	var tlsConfig *tlscommon.TLSConfig
+	if cfg.TLS.IsEnabled() {
+		if tlsConfig, err = tlscommon.LoadTLSConfig(cfg.TLS); err != nil {
+			return nil, err
+		}
+	}
+
+	timeout := 30 * time.Second
+	dialer := transport.NetDialer(timeout)
+	tlsDialer := transport.TLSDialer(dialer, tlsConfig, timeout)
+
+	rt := &http.Transport{
+		Proxy:           http.ProxyFromEnvironment,
+		Dial:            dialer.Dial,
+		DialTLS:         tlsDialer.Dial,
+		TLSClientConfig: tlsConfig.ToConfig(),
 	}
 
 	if len(cfg.Hosts) > 0 {
@@ -415,18 +435,20 @@ func initTracer(agentName, version string, cfg *configuration.InstrumentationCon
 			}
 			hosts = append(hosts, u)
 		}
-		transport.SetServerURL(hosts...)
+		ts.SetServerURL(hosts...)
 	}
 	if cfg.APIKey != "" {
-		transport.SetAPIKey(cfg.APIKey)
+		ts.SetAPIKey(cfg.APIKey)
 	} else {
-		transport.SetSecretToken(cfg.SecretToken)
+		ts.SetSecretToken(cfg.SecretToken)
 	}
+
+	ts.Client.Transport = rt
 
 	return apm.NewTracerOptions(apm.TracerOptions{
 		ServiceName:        agentName,
 		ServiceVersion:     version,
 		ServiceEnvironment: cfg.Environment,
-		Transport:          transport,
+		Transport:          ts,
 	})
 }
