@@ -77,6 +77,11 @@ type TLSConfig struct {
 	// the server certificate.
 	CASha256 []string
 
+	// ESCAFingerprint is the CA certificate pin, in HEX form, from Elasticsearch self
+	// generated CA cartificate. We use that to trust self-signed certificates generated
+	// by Elasticsearch
+	ESCAFingerprint string `config:"es_ca_fingerprint" yaml:"es_ca_fingerprint,omitempty"`
+
 	// time returns the current time as the number of seconds since the epoch.
 	// If time is nil, TLS uses time.Now.
 	time func() time.Time
@@ -154,10 +159,41 @@ func (c *TLSConfig) BuildServerConfig(host string) *tls.Config {
 	return config
 }
 
+func trustESRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate) error {
+	fingerprint, err := hex.DecodeString(cfg.ESCAFingerprint)
+	if err != nil {
+		return fmt.Errorf("decode fingerprint: %w", err)
+	}
+
+	for _, cert := range peerCerts {
+		// Compute digest for each certificate.
+		digest := sha256.Sum256(cert.Raw)
+
+		if bytes.Compare(digest[0:], fingerprint) == 0 {
+			// Make sure the fingerprint matches a CA certificate
+			if cert.IsCA {
+				if cfg.RootCAs == nil {
+					cfg.RootCAs = x509.NewCertPool()
+				}
+				cfg.RootCAs.AddCert(cert)
+
+				cfg.CASha256 = append(cfg.CASha256, Fingerprint(cert))
+			}
+		}
+	}
+
+	return nil
+}
+
 func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 	switch cfg.Verification {
 	case VerifyFull:
 		return func(cs tls.ConnectionState) error {
+			if cfg.ESCAFingerprint != "" {
+				if err := trustESRootCA(cfg, cs.PeerCertificates); err != nil {
+					return err
+				}
+			}
 			// On the client side, PeerCertificates can't be empty.
 			if len(cs.PeerCertificates) == 0 {
 				return MissingPeerCertificate
@@ -175,6 +211,11 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 		}
 	case VerifyCertificate:
 		return func(cs tls.ConnectionState) error {
+			if cfg.ESCAFingerprint != "" {
+				if err := trustESRootCA(cfg, cs.PeerCertificates); err != nil {
+					return err
+				}
+			}
 			// On the client side, PeerCertificates can't be empty.
 			if len(cs.PeerCertificates) == 0 {
 				return MissingPeerCertificate
@@ -189,58 +230,18 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 	case VerifyStrict:
 		if len(cfg.CASha256) > 0 {
 			return func(cs tls.ConnectionState) error {
-				return verifyCAPin(cfg.CASha256, cs.VerifiedChains)
-			}
-		}
-	case VerifyFingerprintOnly:
-		if len(cfg.CASha256) > 0 {
-			return func(cs tls.ConnectionState) error {
-				if err := verifyAndTrustRootCA(cfg.CASha256, cs.PeerCertificates); err != nil {
-					return err
+				if cfg.ESCAFingerprint != "" {
+					if err := trustESRootCA(cfg, cs.PeerCertificates); err != nil {
+						return err
+					}
 				}
-				return verifyHostname(cs.PeerCertificates[0], cs.ServerName)
+				return verifyCAPin(cfg.CASha256, cs.VerifiedChains)
 			}
 		}
 	default:
 	}
 
 	return nil
-}
-
-func verifyAndTrustRootCA(fingerprints []string, certs []*x509.Certificate) error {
-	for _, hexFingerprint := range fingerprints {
-		fingerprint, _ := hex.DecodeString(hexFingerprint)
-
-		for _, cert := range certs {
-			// Compute digest for each certificate.
-			digest := sha256.Sum256(cert.Raw)
-
-			// Provided fingerprint should match at least one certificate before we continue.
-			if bytes.Compare(digest[0:], fingerprint) == 0 {
-
-				// That is just a proof of concept of getting the CA certificate from the "request" and using it
-				// to validate ES's leaf certificate.
-				//
-				// If the fingerprint matches and it's a root CA, then add it as trusted
-				// and move on with the certificate validation.
-				if cert.IsCA {
-					pool := x509.NewCertPool()
-					pool.AddCert(cert)
-
-					opts := x509.VerifyOptions{
-						Roots:         pool,
-						Intermediates: x509.NewCertPool(),
-					}
-
-					// Quick and dirty way to get the fingerprint in the expected format
-					finger := Fingerprint(cert)
-					return verifyCertsWithOpts(certs, append(fingerprints, finger), opts)
-				}
-			}
-		}
-	}
-
-	return fmt.Errorf("certificate did not match any fingerprint: %v", fingerprints)
 }
 
 func makeVerifyServerConnection(cfg *TLSConfig) func(tls.ConnectionState) error {

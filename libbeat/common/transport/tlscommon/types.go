@@ -128,16 +128,14 @@ const (
 	VerifyNone
 	VerifyCertificate
 	VerifyStrict
-	VerifyFingerprintOnly
 )
 
 var tlsVerificationModes = map[string]TLSVerificationMode{
-	"":                 VerifyFull,
-	"full":             VerifyFull,
-	"strict":           VerifyStrict,
-	"none":             VerifyNone,
-	"certificate":      VerifyCertificate,
-	"fingerprint_only": VerifyFingerprintOnly,
+	"":            VerifyFull,
+	"full":        VerifyFull,
+	"strict":      VerifyStrict,
+	"none":        VerifyNone,
+	"certificate": VerifyCertificate,
 }
 
 func (m TLSVerificationMode) String() string {
