@@ -37,9 +37,6 @@ packetbeat.interfaces.internal_networks:
 #  # place the Npcap library and associated files. See https://nmap.org/npcap/guide/npcap-users-guide.html#npcap-installation-uninstall-options.
 #  install_destination: ""
 #  install_timeout: 120s
-#  # retain_download specifies that a downloaded installer will be kept on the host
-#  # filesystem and its location will be recorded in the logs.
-#  retain_download: false
 #  # ignore_missing_registry specifies that failure to query the registry server
 #  # will be ignored with a logged warning.
 #  ignore_missing_registry: false
