@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/joeshaw/multierror"
 
@@ -49,6 +50,11 @@ func newGeneralizeProcessor(keepNull bool) *processorFn {
 		// Filter out empty events. Empty events are still reported by ACK callbacks.
 		if len(event.Fields) == 0 {
 			return nil, nil
+		}
+
+		// data streams require @timestamp field
+		if event.Timestamp.IsZero() {
+			event.Timestamp = time.Now()
 		}
 
 		fields := g.Convert(event.Fields)
