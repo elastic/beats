@@ -195,7 +195,10 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 	case VerifyFingerprintOnly:
 		if len(cfg.CASha256) > 0 {
 			return func(cs tls.ConnectionState) error {
-				return verifyFingerprintOnly(cfg.CASha256, cs.PeerCertificates)
+				if err := verifyAndTrustRootCA(cfg.CASha256, cs.PeerCertificates); err != nil {
+					return err
+				}
+				return verifyHostname(cs.PeerCertificates[0], cs.ServerName)
 			}
 		}
 	default:
@@ -204,7 +207,7 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 	return nil
 }
 
-func verifyFingerprintOnly(fingerprints []string, certs []*x509.Certificate) error {
+func verifyAndTrustRootCA(fingerprints []string, certs []*x509.Certificate) error {
 	for _, hexFingerprint := range fingerprints {
 		fingerprint, _ := hex.DecodeString(hexFingerprint)
 
@@ -214,16 +217,25 @@ func verifyFingerprintOnly(fingerprints []string, certs []*x509.Certificate) err
 
 			// Provided fingerprint should match at least one certificate before we continue.
 			if bytes.Compare(digest[0:], fingerprint) == 0 {
-				now := time.Now()
-				if now.Before(cert.NotBefore) {
-					return errors.New("certificate is not valid yet")
-				}
 
-				if now.After(cert.NotAfter) {
-					return errors.New("certificate has expired")
-				}
+				// That is just a proof of concept of getting the CA certificate from the "request" and using it
+				// to validate ES's leaf certificate.
+				//
+				// If the fingerprint matches and it's a root CA, then add it as trusted
+				// and move on with the certificate validation.
+				if cert.IsCA {
+					pool := x509.NewCertPool()
+					pool.AddCert(cert)
 
-				return nil
+					opts := x509.VerifyOptions{
+						Roots:         pool,
+						Intermediates: x509.NewCertPool(),
+					}
+
+					// Quick and dirty way to get the fingerprint in the expected format
+					finger := Fingerprint(cert)
+					return verifyCertsWithOpts(certs, append(fingerprints, finger), opts)
+				}
 			}
 		}
 	}
