@@ -65,5 +65,5 @@ type ConfigModifiers struct {
 
 // Dispatcher processes actions coming from fleet api.
 type Dispatcher interface {
-	Dispatch(acker store.FleetAcker, actions ...fleetapi.Action) error
+	Dispatch(context.Context, store.FleetAcker, ...fleetapi.Action) error
 }

@@ -249,7 +249,7 @@ func newManaged(
 		// TODO(ph) We will need an improvement on fleet, if there is an error while dispatching a
 		// persisted action on disk we should be able to ask Fleet to get the latest configuration.
 		// But at the moment this is not possible because the policy change was acked.
-		if err := store.ReplayActions(log, actionDispatcher, actionAcker, actions...); err != nil {
+		if err := store.ReplayActions(ctx, log, actionDispatcher, actionAcker, actions...); err != nil {
 			log.Errorf("could not recover state, error %+v, skipping...", err)
 		}
 		stateRestored = true
