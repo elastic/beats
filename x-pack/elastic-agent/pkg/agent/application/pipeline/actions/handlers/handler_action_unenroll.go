@@ -60,7 +60,7 @@ func (h *Unenroll) Handle(ctx context.Context, a fleetapi.Action, acker store.Fl
 
 	// Providing empty map will close all pipelines
 	noPrograms := make(map[pipeline.RoutingKey][]program.Program)
-	h.dispatcher.Route(a.ID(), noPrograms)
+	h.dispatcher.Route(ctx, a.ID(), noPrograms)
 
 	if !action.IsDetected {
 		// ACK only events comming from fleet

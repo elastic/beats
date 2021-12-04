@@ -27,20 +27,20 @@ func New(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, con
 
 	ctrl := NewController(log, agentInfo, controller, router, modifiers, caps, reloadables...)
 	err := controller.Run(ctx, func(vars []*transpiler.Vars) {
-		ctrl.Set(vars)
+		ctrl.Set(ctx, vars)
 	})
 	if err != nil {
 		return nil, errors.New(err, "failed to start composable controller")
 	}
 	return func(ctx context.Context, c *config.Config) (err error) {
-		span, ctx := apm.StartSpan(ctx, "emit", "app.internal")
+		span, ctx := apm.StartSpan(ctx, "update", "app.internal")
 		defer func() {
 			if err != nil {
 				apm.CaptureError(ctx, err).Send()
 			}
 			span.End()
 		}()
-		err = ctrl.Update(c)
+		err = ctrl.Update(ctx, c)
 		return err
 	}, nil
 }

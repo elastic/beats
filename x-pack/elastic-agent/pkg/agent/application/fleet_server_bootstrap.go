@@ -170,7 +170,7 @@ func bootstrapEmitter(ctx context.Context, log *logger.Logger, agentInfo transpi
 			case c = <-ch:
 			}
 
-			err := emit(log, agentInfo, router, modifiers, c)
+			err := emit(ctx, log, agentInfo, router, modifiers, c)
 			if err != nil {
 				log.Error(err)
 			}
@@ -185,7 +185,7 @@ func bootstrapEmitter(ctx context.Context, log *logger.Logger, agentInfo transpi
 	}, nil
 }
 
-func emit(log *logger.Logger, agentInfo transpiler.AgentInfo, router pipeline.Router, modifiers *pipeline.ConfigModifiers, c *config.Config) error {
+func emit(ctx context.Context, log *logger.Logger, agentInfo transpiler.AgentInfo, router pipeline.Router, modifiers *pipeline.ConfigModifiers, c *config.Config) error {
 	if err := info.InjectAgentConfig(c); err != nil {
 		return err
 	}
@@ -224,7 +224,7 @@ func emit(log *logger.Logger, agentInfo transpiler.AgentInfo, router pipeline.Ro
 		return errors.New("bootstrap configuration is incorrect causing fleet-server to not be started")
 	}
 
-	return router.Route(ast.HashStr(), map[pipeline.RoutingKey][]program.Program{
+	return router.Route(ctx, ast.HashStr(), map[pipeline.RoutingKey][]program.Program{
 		pipeline.DefaultRK: {
 			{
 				Spec:   spec,

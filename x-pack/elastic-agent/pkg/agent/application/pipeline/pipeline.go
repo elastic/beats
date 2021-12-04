@@ -20,7 +20,7 @@ import (
 
 // ConfigHandler is capable of handling configrequest.
 type ConfigHandler interface {
-	HandleConfig(configrequest.Request) error
+	HandleConfig(context.Context, configrequest.Request) error
 	Close() error
 	Shutdown()
 }
@@ -34,7 +34,7 @@ type RoutingKey = string
 // Router is an interace routes programs to correspongind stream
 type Router interface {
 	Routes() *sorted.Set
-	Route(id string, grpProg map[RoutingKey][]program.Program) error
+	Route(ctx context.Context, id string, grpProg map[RoutingKey][]program.Program) error
 	Shutdown()
 }
 
@@ -43,7 +43,7 @@ type StreamFunc func(*logger.Logger, RoutingKey) (Stream, error)
 
 // Stream is capable of executing configrequest change.
 type Stream interface {
-	Execute(configrequest.Request) error
+	Execute(context.Context, configrequest.Request) error
 	Close() error
 	Shutdown()
 }
