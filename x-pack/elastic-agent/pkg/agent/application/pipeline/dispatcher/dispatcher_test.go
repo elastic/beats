@@ -49,8 +49,9 @@ func TestActionDispatcher(t *testing.T) {
 	ack := noopacker.NewAcker()
 
 	t.Run("Success to dispatch multiples events", func(t *testing.T) {
+		ctx := context.Background()
 		def := &mockHandler{}
-		d, err := New(context.Background(), nil, def)
+		d, err := New(ctx, nil, def)
 		require.NoError(t, err)
 
 		success1 := &mockHandler{}
@@ -62,7 +63,7 @@ func TestActionDispatcher(t *testing.T) {
 		action1 := &mockAction{}
 		action2 := &mockActionOther{}
 
-		err = d.Dispatch(ack, action1, action2)
+		err = d.Dispatch(ctx, ack, action1, action2)
 
 		require.NoError(t, err)
 
@@ -78,11 +79,12 @@ func TestActionDispatcher(t *testing.T) {
 
 	t.Run("Unknown action are caught by the unknown handler", func(t *testing.T) {
 		def := &mockHandler{}
-		d, err := New(context.Background(), nil, def)
+		ctx := context.Background()
+		d, err := New(ctx, nil, def)
 		require.NoError(t, err)
 
 		action := &mockActionUnknown{}
-		err = d.Dispatch(ack, action)
+		err = d.Dispatch(ctx, ack, action)
 
 		require.NoError(t, err)
 		require.True(t, def.called)
