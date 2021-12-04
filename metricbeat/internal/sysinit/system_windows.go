@@ -15,16 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package linux
+package sysinit
 
 import (
-	"github.com/elastic/beats/v7/metricbeat/internal/sysinit"
-	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/helper"
 )
 
-func init() {
-	// Register the ModuleFactory function for the "system" module.
-	if err := mb.Registry.AddModule("linux", sysinit.InitSystemModule); err != nil {
-		panic(err)
+func InitModule(config string) {
+	if err := helper.CheckAndEnableSeDebugPrivilege(); err != nil {
+		logp.Warn("%v", err)
 	}
 }

@@ -18,6 +18,8 @@
 package cmd
 
 import (
+	"flag"
+
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/v7/libbeat/cmd"
@@ -54,6 +56,7 @@ var withECSVersion = processing.WithFields(common.MapStr{
 // MetricbeatSettings contains the default settings for metricbeat
 func MetricbeatSettings() instance.Settings {
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
+	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
 	return instance.Settings{
 		RunFlags:      runFlags,
 		Name:          Name,

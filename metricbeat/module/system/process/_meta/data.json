@@ -20,16 +20,18 @@
         ],
         "command_line": "/usr/lib/systemd/systemd rhgb --switched-root --system --deserialize 31",
         "cpu": {
-            "pct": 0,
-            "start_time": "2021-09-29T22:29:55.000Z"
+            "pct": 0.0007,
+            "start_time": "2021-11-08T21:47:04.000Z"
         },
         "memory": {
             "pct": 0.0003
         },
         "name": "systemd",
+        "parent": {
+            "pid": 0
+        },
         "pgid": 1,
         "pid": 1,
-        "ppid": 0,
         "state": "sleeping"
     },
     "service": {
@@ -37,265 +39,24 @@
     },
     "system": {
         "process": {
-            "cgroup": {
-                "cgroups_version": 2,
-                "cpu": {
-                    "id": "init.scope",
-                    "path": "/init.scope",
-                    "pressure": {
-                        "full": {
-                            "10": {
-                                "pct": 0
-                            },
-                            "300": {
-                                "pct": 0
-                            },
-                            "60": {
-                                "pct": 0
-                            },
-                            "total": 50432
-                        },
-                        "some": {
-                            "10": {
-                                "pct": 0
-                            },
-                            "300": {
-                                "pct": 0
-                            },
-                            "60": {
-                                "pct": 0
-                            },
-                            "total": 50879
-                        }
-                    },
-                    "stats": {
-                        "periods": 0,
-                        "system": {
-                            "norm": {
-                                "pct": 0
-                            },
-                            "ns": 2293648,
-                            "pct": 0
-                        },
-                        "throttled": {
-                            "periods": 0,
-                            "us": 0
-                        },
-                        "usage": {
-                            "norm": {
-                                "pct": 0
-                            },
-                            "ns": 4958009,
-                            "pct": 0
-                        },
-                        "user": {
-                            "norm": {
-                                "pct": 0
-                            },
-                            "ns": 2664361,
-                            "pct": 0
-                        }
-                    }
-                },
-                "id": "init.scope",
-                "io": {
-                    "id": "init.scope",
-                    "path": "/init.scope",
-                    "pressure": {
-                        "full": {
-                            "10": {
-                                "pct": 0
-                            },
-                            "300": {
-                                "pct": 0
-                            },
-                            "60": {
-                                "pct": 0
-                            },
-                            "total": 2393048
-                        },
-                        "some": {
-                            "10": {
-                                "pct": 0
-                            },
-                            "300": {
-                                "pct": 0
-                            },
-                            "60": {
-                                "pct": 0
-                            },
-                            "total": 2402448
-                        }
-                    },
-                    "stats": {
-                        "dm-0": {
-                            "discarded": {
-                                "bytes": 0,
-                                "ios": 0
-                            },
-                            "read": {
-                                "bytes": 8192,
-                                "ios": 2
-                            },
-                            "write": {
-                                "bytes": 0,
-                                "ios": 0
-                            }
-                        },
-                        "sda": {
-                            "discarded": {
-                                "bytes": 0,
-                                "ios": 0
-                            },
-                            "read": {
-                                "bytes": 8192,
-                                "ios": 2
-                            },
-                            "write": {
-                                "bytes": 0,
-                                "ios": 0
-                            }
-                        }
-                    }
-                },
-                "memory": {
-                    "id": "init.scope",
-                    "mem": {
-                        "events": {
-                            "high": 0,
-                            "low": 0,
-                            "max": 0,
-                            "oom": 0,
-                            "oom_kill": 0
-                        },
-                        "low": {
-                            "bytes": 0
-                        },
-                        "usage": {
-                            "bytes": 45223936
-                        }
-                    },
-                    "memsw": {
-                        "events": {
-                            "fail": 0,
-                            "high": 0,
-                            "max": 0
-                        },
-                        "low": {
-                            "bytes": 0
-                        },
-                        "usage": {
-                            "bytes": 0
-                        }
-                    },
-                    "path": "/init.scope",
-                    "stats": {
-                        "active_anon": {
-                            "bytes": 24576
-                        },
-                        "active_file": {
-                            "bytes": 21671936
-                        },
-                        "anon": {
-                            "bytes": 8499200
-                        },
-                        "anon_thp": {
-                            "bytes": 0
-                        },
-                        "file": {
-                            "bytes": 30720000
-                        },
-                        "file_dirty": {
-                            "bytes": 0
-                        },
-                        "file_mapped": {
-                            "bytes": 14823424
-                        },
-                        "file_thp": {
-                            "bytes": 0
-                        },
-                        "file_writeback": {
-                            "bytes": 0
-                        },
-                        "htp_collapse_alloc": 0,
-                        "inactive_anon": {
-                            "bytes": 8503296
-                        },
-                        "inactive_file": {
-                            "bytes": 9019392
-                        },
-                        "kernel_stack": {
-                            "bytes": 442368
-                        },
-                        "major_page_faults": 169,
-                        "page_activate": 5454,
-                        "page_deactivate": 0,
-                        "page_faults": 105959,
-                        "page_lazy_free": 0,
-                        "page_lazy_freed": 0,
-                        "page_refill": 0,
-                        "page_scan": 0,
-                        "page_steal": 0,
-                        "page_tables": {
-                            "bytes": 102400
-                        },
-                        "per_cpu": {
-                            "bytes": 36288
-                        },
-                        "shmem": {
-                            "bytes": 28672
-                        },
-                        "shmem_thp": {
-                            "bytes": 0
-                        },
-                        "slab": {
-                            "bytes": 5320160
-                        },
-                        "slab_reclaimable": {
-                            "bytes": 4626072
-                        },
-                        "slab_unreclaimable": {
-                            "bytes": 694088
-                        },
-                        "sock": {
-                            "bytes": 0
-                        },
-                        "swap_cached": {
-                            "bytes": 0
-                        },
-                        "thp_fault_alloc": 0,
-                        "unevictable": {
-                            "bytes": 0
-                        },
-                        "workingset_activate_anon": 0,
-                        "workingset_activate_file": 0,
-                        "workingset_node_reclaim": 0,
-                        "workingset_refault_anon": 0,
-                        "workingset_refault_file": 0,
-                        "workingset_restore_anon": 0,
-                        "workingset_restore_file": 0
-                    }
-                },
-                "path": "/init.scope"
-            },
             "cmdline": "/usr/lib/systemd/systemd rhgb --switched-root --system --deserialize 31",
             "cpu": {
-                "start_time": "2021-09-29T22:29:55.000Z",
+                "start_time": "2021-11-08T21:47:04.000Z",
                 "total": {
                     "norm": {
-                        "pct": 0
+                        "pct": 0.0007
                     },
-                    "pct": 0,
-                    "value": 4640
+                    "pct": 0.0088,
+                    "value": 10851390
                 }
             },
             "memory": {
                 "rss": {
-                    "bytes": 18153472,
+                    "bytes": 17469440,
                     "pct": 0.0003
                 },
-                "share": 11046912,
-                "size": 181272576
+                "share": 11063296,
+                "size": 180555776
             },
             "state": "sleeping"
         }

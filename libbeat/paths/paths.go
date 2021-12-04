@@ -49,7 +49,6 @@ type Path struct {
 	Config string
 	Data   string
 	Logs   string
-	Hostfs string
 }
 
 // FileType is an enumeration type representing the file types.
@@ -121,10 +120,6 @@ func (paths *Path) initPaths(cfg *Path) error {
 		paths.Logs = filepath.Join(paths.Home, "logs")
 	}
 
-	if paths.Hostfs == "" {
-		paths.Hostfs = "/"
-	}
-
 	return nil
 }
 
@@ -161,6 +156,6 @@ func Resolve(fileType FileType, path string) string {
 
 // String returns a textual representation
 func (paths *Path) String() string {
-	return fmt.Sprintf("Home path: [%s] Config path: [%s] Data path: [%s] Logs path: [%s] Hostfs Path: [%s]",
-		paths.Home, paths.Config, paths.Data, paths.Logs, paths.Hostfs)
+	return fmt.Sprintf("Home path: [%s] Config path: [%s] Data path: [%s] Logs path: [%s]",
+		paths.Home, paths.Config, paths.Data, paths.Logs)
 }

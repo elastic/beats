@@ -18,7 +18,7 @@
 //go:build !linux && !windows
 // +build !linux,!windows
 
-package system
+package sysinit
 
 func InitModule(config string) {
 	// Stub method for non-linux.

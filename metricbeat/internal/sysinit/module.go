@@ -15,15 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package system
+package sysinit
 
 import (
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/helper"
+	"path/filepath"
+
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-func InitModule(config string) {
-	if err := helper.CheckAndEnableSeDebugPrivilege(); err != nil {
-		logp.Warn("%v", err)
-	}
+// Module represents the system/linux module
+type Module struct {
+	mb.BaseModule
+	HostFS        string
+	UserSetHostFS bool
+}
+
+// ResolveHostFS returns a full path based on a user-suppled path, and impliments the Resolver interface
+// This is mostly to prevent any chance that other metricsets will develop their own way of
+// using a user-suppied hostfs flag. We try to do all the logic in one place.
+func (m Module) ResolveHostFS(path string) string {
+	return filepath.Join(m.HostFS, path)
+}
+
+func (m Module) IsSet() bool {
+	return m.UserSetHostFS
 }

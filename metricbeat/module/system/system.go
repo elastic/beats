@@ -18,10 +18,9 @@
 package system
 
 import (
-	"path/filepath"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/internal/sysinit"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -29,62 +28,7 @@ var once sync.Once
 
 func init() {
 	// Register the ModuleFactory function for the "system" module.
-	if err := mb.Registry.AddModule("system", NewModule); err != nil {
+	if err := mb.Registry.AddModule("system", sysinit.InitSystemModule); err != nil {
 		panic(err)
 	}
-}
-
-type HostFSConfig struct {
-	HostFS string `config:"hostfs"`
-}
-
-// Module represents the system module
-type Module struct {
-	mb.BaseModule
-	HostFS        string
-	UserSetHostFS bool
-}
-
-type SystemModule interface {
-	ResolveHostFS(string) string
-}
-
-func NewModule(base mb.BaseModule) (mb.Module, error) {
-	logger := logp.L()
-	var hostfs string
-
-	partialConfig := HostFSConfig{}
-	base.UnpackConfig(&partialConfig)
-	userSet := false
-	if partialConfig.HostFS != "" {
-		hostfs = partialConfig.HostFS
-		userSet = true
-	} else {
-		hostfs = "/"
-	}
-
-	once.Do(func() {
-		logger.Infof("hostfs initializing with %s", hostfs)
-		InitModule(hostfs)
-
-	})
-
-	// We want at least one initModule() call, but in cases where we're running under agent, we might need to set and update this multiple times, as the value isn't set globally and can be updated.
-	if userSet {
-		logger.Infof("hostfs re-initializing with %s", hostfs)
-		InitModule(hostfs)
-	}
-
-	return &Module{BaseModule: base, HostFS: hostfs, UserSetHostFS: userSet}, nil
-}
-
-// ResolveHostFS returns a full path based on a user-suppled path, and impliments the Resolver interface
-// This is mostly to prevent any chance that other metricsets will develop their own way of
-// using a user-suppied hostfs flag. We try to do all the logic in one place.
-func (m Module) ResolveHostFS(path string) string {
-	return filepath.Join(m.HostFS, path)
-}
-
-func (m Module) IsSet() bool {
-	return m.UserSetHostFS
 }

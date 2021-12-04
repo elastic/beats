@@ -311,21 +311,21 @@ data:
             metricsets:
               - process
             process.include_cpu_ticks: false
-            hostfs: /hostfs
+            system.hostfs: /hostfs
           - data_stream:
               dataset: system.process_summary
               type: metrics
             period: 10s
             metricsets:
               - process_summary
-            hostfs: /hostfs
+            system.hostfs: /hostfs
           - data_stream:
               dataset: system.socket_summary
               type: metrics
             period: 10s
             metricsets:
               - socket_summary
-            hostfs: /hostfs
+            system.hostfs: /hostfs
       - name: kubernetes-node-metrics
         type: kubernetes/metrics
         use_output: default

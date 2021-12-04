@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package system
+package sysinit
 
 import (
 	"os"
@@ -30,9 +30,6 @@ func InitModule(config string) {
 
 func configureHostFS(config string) {
 	dir := config
-	if dir == "" {
-		dir = "/"
-	}
 
 	// Set environment variables for gopsutil.
 	os.Setenv("HOST_PROC", filepath.Join(dir, "/proc"))
