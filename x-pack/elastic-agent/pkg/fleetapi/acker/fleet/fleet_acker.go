@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"go.elastic.co/apm"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
@@ -48,7 +50,14 @@ func (f *Acker) SetClient(c client.Sender) {
 }
 
 // Ack acknowledges action.
-func (f *Acker) Ack(ctx context.Context, action fleetapi.Action) error {
+func (f *Acker) Ack(ctx context.Context, action fleetapi.Action) (err error) {
+	span, ctx := apm.StartSpan(ctx, "ack", "app.internal")
+	defer func() {
+		if err != nil {
+			apm.CaptureError(ctx, err).Send()
+		}
+		span.End()
+	}()
 	// checkin
 	agentID := f.agentInfo.AgentID()
 	cmd := fleetapi.NewAckCmd(f.agentInfo, f.client)
@@ -58,7 +67,7 @@ func (f *Acker) Ack(ctx context.Context, action fleetapi.Action) error {
 		},
 	}
 
-	_, err := cmd.Execute(ctx, req)
+	_, err = cmd.Execute(ctx, req)
 	if err != nil {
 		return errors.New(err, fmt.Sprintf("acknowledge action '%s' for elastic-agent '%s' failed", action.ID(), agentID), errors.TypeNetwork)
 	}
@@ -69,7 +78,14 @@ func (f *Acker) Ack(ctx context.Context, action fleetapi.Action) error {
 }
 
 // AckBatch acknowledges multiple actions at once.
-func (f *Acker) AckBatch(ctx context.Context, actions []fleetapi.Action) error {
+func (f *Acker) AckBatch(ctx context.Context, actions []fleetapi.Action) (err error) {
+	span, ctx := apm.StartSpan(ctx, "ackBatch", "app.internal")
+	defer func() {
+		if err != nil {
+			apm.CaptureError(ctx, err).Send()
+		}
+		span.End()
+	}()
 	// checkin
 	agentID := f.agentInfo.AgentID()
 	events := make([]fleetapi.AckEvent, 0, len(actions))
@@ -91,7 +107,7 @@ func (f *Acker) AckBatch(ctx context.Context, actions []fleetapi.Action) error {
 
 	f.log.Debugf("%d actions with ids '%s' acknowledging", len(ids), strings.Join(ids, ","))
 
-	_, err := cmd.Execute(ctx, req)
+	_, err = cmd.Execute(ctx, req)
 	if err != nil {
 		return errors.New(err, fmt.Sprintf("acknowledge %d actions '%v' for elastic-agent '%s' failed", len(actions), actions, agentID), errors.TypeNetwork)
 	}

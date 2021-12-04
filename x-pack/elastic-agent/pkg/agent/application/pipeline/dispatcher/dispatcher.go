@@ -108,7 +108,6 @@ func (ad *ActionDispatcher) Dispatch(ctx context.Context, acker store.FleetAcker
 		ad.log.Debugf("Successfully dispatched action: '%+v'", action)
 	}
 
-	// TODO: Instrument acker
 	err = acker.Commit(ctx)
 	return err
 }
