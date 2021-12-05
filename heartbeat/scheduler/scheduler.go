@@ -215,7 +215,6 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc, jobType 
 			s.runOnce(sched.Next(lastRanAt), taskFn)
 			debugf("Job '%v' returned at %v", id, time.Now())
 		}
-
 	}
 
 	// We skip using the scheduler to execute the initial tasks for jobs that have RunOnInit returning true.
