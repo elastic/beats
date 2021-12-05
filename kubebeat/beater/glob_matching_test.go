@@ -19,7 +19,7 @@ func TestGlobMatchingNonExistingPattern(t *testing.T) {
 	filePath := filepath.Join(dir, fileName)
 	matchedFiles, err := Glob(filePath + "/***")
 
-	assert.NoError(t, err)
+	assert.Nil(t, err)
 	assert.Nil(t, matchedFiles)
 }
 
@@ -32,7 +32,7 @@ func TestGlobMatchingPathDoesNotExist(t *testing.T) {
 	filePath := filepath.Join(dir, fileName)
 	matchedFiles, err := Glob(filePath + "/abc")
 
-	assert.NoError(t, err)
+	assert.Nil(t, err)
 	assert.Nil(t, matchedFiles)
 }
 
