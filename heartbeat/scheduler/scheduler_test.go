@@ -51,7 +51,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestNewWithLocation(t *testing.T) {
-	scheduler := NewWithLocation(123, monitoring.NewRegistry(), tarawaTime(), nil)
+	scheduler := NewWithLocation(123, monitoring.NewRegistry(), tarawaTime(), nil, false)
 	assert.Equal(t, int64(123), scheduler.limit)
 	assert.Equal(t, tarawaTime(), scheduler.location)
 }
@@ -86,7 +86,7 @@ func testTaskTimes(limit uint32, fn TaskFunc) TaskFunc {
 func TestScheduler_Start(t *testing.T) {
 	// We use tarawa runAt because it could expose some weird runAt math if by accident some code
 	// relied on the local TZ.
-	s := NewWithLocation(10, monitoring.NewRegistry(), tarawaTime(), nil)
+	s := NewWithLocation(10, monitoring.NewRegistry(), tarawaTime(), nil, false)
 	defer s.Stop()
 
 	executed := make(chan string)
@@ -161,7 +161,7 @@ func TestScheduler_Start(t *testing.T) {
 }
 
 func TestScheduler_Stop(t *testing.T) {
-	s := NewWithLocation(10, monitoring.NewRegistry(), tarawaTime(), nil)
+	s := NewWithLocation(10, monitoring.NewRegistry(), tarawaTime(), nil, false)
 
 	executed := make(chan struct{})
 
@@ -235,7 +235,7 @@ func TestSchedTaskLimits(t *testing.T) {
 					jobType: {Limit: tt.limit},
 				}
 			}
-			s := NewWithLocation(math.MaxInt64, monitoring.NewRegistry(), tarawaTime(), jobConfigByType)
+			s := NewWithLocation(math.MaxInt64, monitoring.NewRegistry(), tarawaTime(), jobConfigByType, false)
 			var taskArr []int
 			wg := sync.WaitGroup{}
 			wg.Add(tt.numJobs)
@@ -257,7 +257,7 @@ func TestSchedTaskLimits(t *testing.T) {
 }
 
 func BenchmarkScheduler(b *testing.B) {
-	s := NewWithLocation(0, monitoring.NewRegistry(), tarawaTime(), nil)
+	s := NewWithLocation(0, monitoring.NewRegistry(), tarawaTime(), nil, false)
 
 	sched := testSchedule{0}
 

@@ -63,7 +63,7 @@ func TestSchedJobRun(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			limit := int64(100)
-			s := NewWithLocation(limit, monitoring.NewRegistry(), tarawaTime(), nil)
+			s := NewWithLocation(limit, monitoring.NewRegistry(), tarawaTime(), nil, false)
 
 			if testCase.overLimit {
 				s.limitSem.Acquire(context.Background(), limit)
@@ -100,7 +100,7 @@ func TestSchedJobRun(t *testing.T) {
 func TestRecursiveForkingJob(t *testing.T) {
 	s := NewWithLocation(1000, monitoring.NewRegistry(), tarawaTime(), map[string]config.JobLimit{
 		"atype": {Limit: 1},
-	})
+	}, false)
 	ran := batomic.NewInt(0)
 
 	var terminalTf TaskFunc = func(ctx context.Context) []TaskFunc {
