@@ -28,8 +28,8 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
+	_ "github.com/elastic/beats/v7/heartbeat/security"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -37,9 +37,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
-
-	_ "github.com/elastic/beats/v7/heartbeat/security"
 	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 )
 
@@ -71,7 +68,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	}
 	jobConfig := parsedConfig.Jobs
 
-	scheduler := scheduler.NewWithLocation(limit, hbregistry.SchedulerRegistry, location, jobConfig)
+	scheduler := scheduler.NewWithLocation(limit, hbregistry.SchedulerRegistry, location, jobConfig, parsedConfig.RunOnce)
 
 	bt := &Heartbeat{
 		done:      make(chan struct{}),
@@ -89,15 +86,8 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	groups, _ := syscall.Getgroups()
 	logp.Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
 
-	if bt.config.RunOnce {
-		err := bt.runRunOnce(b)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
 	stopStaticMonitors, err := bt.RunStaticMonitors(b)
+
 	if err != nil {
 		return err
 	}
@@ -132,6 +122,17 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	}
 	defer bt.scheduler.Stop()
 
+	if bt.config.RunOnce {
+		wg := &sync.WaitGroup{}
+
+		bt.runRunOnce(wg)
+		if err != nil {
+			return err
+		}
+		wg.Wait()
+		return nil
+	}
+
 	<-bt.done
 
 	logp.Info("Shutting down.")
@@ -139,61 +140,32 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 }
 
 // runRunOnce runs the given config then exits immediately after any queued events have been sent to ES
-func (bt *Heartbeat) runRunOnce(b *beat.Beat) error {
+func (bt *Heartbeat) runRunOnce(wg *sync.WaitGroup) {
 	logp.Info("Starting run_once run. This is an experimental feature and may be changed or removed in the future!")
 
-	publishClient, err := core.NewSyncClient(logp.NewLogger("run_once mode"), b.Publisher, beat.ClientConfig{})
-	if err != nil {
-		return fmt.Errorf("could not create sync client: %w", err)
-	}
-	defer publishClient.Close()
-
-	wg := &sync.WaitGroup{}
-	for _, cfg := range bt.config.Monitors {
-		err := runRunOnceSingleConfig(cfg, publishClient, wg)
-		if err != nil {
-			logp.Warn("error running run_once config: %s", err)
-		}
-	}
-
-	wg.Wait()
-	publishClient.Wait()
-
-	logp.Info("Ending run_once run")
-
-	return nil
-}
-
-func runRunOnceSingleConfig(cfg *common.Config, publishClient *core.SyncClient, wg *sync.WaitGroup) (err error) {
-	sf, err := stdfields.ConfigToStdMonitorFields(cfg)
-	if err != nil {
-		return fmt.Errorf("could not get stdmon fields: %w", err)
-	}
-	pluginFactory, exists := plugin.GlobalPluginsReg.Get(sf.Type)
-	if !exists {
-		return fmt.Errorf("no plugin for type: %s", sf.Type)
-	}
-	plugin, err := pluginFactory.Make(sf.Type, cfg)
-	if err != nil {
-		return err
-	}
-
-	results := plugin.RunWrapped(sf)
-
 	wg.Add(1)
+
+	ticker := time.NewTicker(10 * time.Second)
+	quit := make(chan struct{})
+	// we give it an extra tick to make sure, any left task is done
+	quitOnNextTick := false
 	go func() {
-		defer wg.Done()
-		defer plugin.Close()
 		for {
-			event := <-results
-			if event == nil {
-				break
+			select {
+			case <-ticker.C:
+				if quitOnNextTick {
+					logp.Info("Ending run_once run")
+					close(quit)
+				}
+				quitOnNextTick = bt.scheduler.RunOnceCompleted()
+			case <-quit:
+				ticker.Stop()
+				wg.Done()
+				return
 			}
-			publishClient.Publish(*event)
 		}
 	}()
 
-	return nil
 }
 
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.

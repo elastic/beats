@@ -55,6 +55,7 @@ type Scheduler struct {
 	cancelCtx   context.CancelFunc
 	stats       schedulerStats
 	jobLimitSem map[string]*semaphore.Weighted
+	runOnceMode bool
 }
 
 type schedulerStats struct {
@@ -90,11 +91,11 @@ func getJobLimitSem(jobLimitByType map[string]config.JobLimit) map[string]*semap
 
 // New creates a new Scheduler
 func New(limit int64, registry *monitoring.Registry) *Scheduler {
-	return NewWithLocation(limit, registry, time.Local, nil)
+	return NewWithLocation(limit, registry, time.Local, nil, false)
 }
 
 // NewWithLocation creates a new Scheduler using the given runAt zone.
-func NewWithLocation(limit int64, registry *monitoring.Registry, location *time.Location, jobLimitByType map[string]config.JobLimit) *Scheduler {
+func NewWithLocation(limit int64, registry *monitoring.Registry, location *time.Location, jobLimitByType map[string]config.JobLimit, runOnceMode bool) *Scheduler {
 	ctx, cancelCtx := context.WithCancel(context.Background())
 
 	if limit < 1 {
@@ -115,6 +116,7 @@ func NewWithLocation(limit int64, registry *monitoring.Registry, location *time.
 		limitSem:    semaphore.NewWeighted(limit),
 		jobLimitSem: getJobLimitSem(jobLimitByType),
 		timerQueue:  timerqueue.NewTimerQueue(ctx),
+		runOnceMode: runOnceMode,
 
 		stats: schedulerStats{
 			activeJobs:         activeJobsGauge,
@@ -209,8 +211,11 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc, jobType 
 		debugf("Job '%s' started", id)
 		lastRanAt := newSchedJob(jobCtx, s, id, jobType, entrypoint).run()
 		s.stats.activeJobs.Dec()
-		s.runOnce(sched.Next(lastRanAt), taskFn)
-		debugf("Job '%v' returned at %v", id, time.Now())
+		if !s.runOnceMode {
+			s.runOnce(sched.Next(lastRanAt), taskFn)
+			debugf("Job '%v' returned at %v", id, time.Now())
+		}
+
 	}
 
 	// We skip using the scheduler to execute the initial tasks for jobs that have RunOnInit returning true.
@@ -240,4 +245,11 @@ func (s *Scheduler) runOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn) {
 	// block the timer thread.
 	asyncTask := func(now time.Time) { go taskFn(now) }
 	s.timerQueue.Push(runAt, asyncTask)
+}
+
+func (s *Scheduler) RunOnceCompleted() bool {
+	println("Active jobs", s.stats.activeJobs.Get())
+	println("Active tasks", s.stats.activeTasks.Get())
+	println("waiting jobs", s.stats.waitingTasks.Get())
+	return s.stats.activeJobs.Get() == 0 && s.stats.activeTasks.Get() == 0 && s.stats.waitingTasks.Get() == 0
 }
