@@ -248,8 +248,5 @@ func (s *Scheduler) runOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn) {
 }
 
 func (s *Scheduler) RunOnceCompleted() bool {
-	println("Active jobs", s.stats.activeJobs.Get())
-	println("Active tasks", s.stats.activeTasks.Get())
-	println("waiting jobs", s.stats.waitingTasks.Get())
 	return s.stats.activeJobs.Get() == 0 && s.stats.activeTasks.Get() == 0 && s.stats.waitingTasks.Get() == 0
 }
