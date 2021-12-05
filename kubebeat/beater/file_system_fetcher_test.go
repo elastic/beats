@@ -19,16 +19,13 @@ func TestFileFetcherFetchASingleFile(t *testing.T) {
 	fileFetcher := NewFileFetcher(filePaths)
 	results, err := fileFetcher.Fetch()
 
-	if err != nil {
-		assert.Fail(t, "Fetcher was not able to fetch files from FS", err)
-	}
-	assert.Equal(t, len(results), 1)
-	result := results[0].(FileSystemResourceData)
+	assert.Nil(t, err, "Fetcher was not able to fetch files from FS")
+	assert.Equal(t, 1, len(results))
 
+	result := results[0].(FileSystemResourceData)
 	assert.Equal(t, files[0], result.FileName)
 	assert.Equal(t, "600", result.FileMode)
 }
-
 
 func TestFileFetcherFetchTwoPatterns(t *testing.T) {
 	outerDirectoryName := "test-outer-dir"
@@ -40,11 +37,8 @@ func TestFileFetcherFetchTwoPatterns(t *testing.T) {
 	fileFetcher := NewFileFetcher(path)
 	results, err := fileFetcher.Fetch()
 
-	if err != nil {
-		assert.Fail(t, "Fetcher was not able to fetch files from FS", err)
-	}
-
-	assert.Equal(t, len(results), 2)
+	assert.Nil(t, err, "Fetcher was not able to fetch files from FS")
+	assert.Equal(t, 2, len(results))
 
 	firstResult := results[0].(FileSystemResourceData)
 	assert.Equal(t, outerFiles[0], firstResult.FileName)
@@ -65,16 +59,13 @@ func TestFileFetcherFetchDirectoryOnly(t *testing.T) {
 	fileFetcher := NewFileFetcher(filePaths)
 	results, err := fileFetcher.Fetch()
 
-	if err != nil {
-		assert.Fail(t, "Fetcher was not able to fetch files from FS", err)
-	}
-	assert.Equal(t, len(results), 1)
+	assert.Nil(t, err, "Fetcher was not able to fetch files from FS")
+	assert.Equal(t, 1, len(results))
 	result := results[0].(FileSystemResourceData)
 
 	expectedResult := filepath.Base(dir)
 	assert.Equal(t, expectedResult, result.FileName)
 }
-
 
 func TestFileFetcherFetchOuterDirectoryOnly(t *testing.T) {
 	outerDirectoryName := "test-outer-dir"
@@ -90,11 +81,8 @@ func TestFileFetcherFetchOuterDirectoryOnly(t *testing.T) {
 	fileFetcher := NewFileFetcher(path)
 	results, err := fileFetcher.Fetch()
 
-	if err != nil {
-		assert.Fail(t, "Fetcher was not able to fetch files from FS", err)
-	}
-
-	assert.Equal(t, len(results), 2)
+	assert.Nil(t, err, "Fetcher was not able to fetch files from FS")
+	assert.Equal(t, 2, len(results))
 
 	//All inner files should exist in the final result
 	expectedResult := []string{"output.txt", filepath.Base(innerDir)}
@@ -122,14 +110,11 @@ func TestFileFetcherFetchDirectoryRecursively(t *testing.T) {
 	fileFetcher := NewFileFetcher(path)
 	results, err := fileFetcher.Fetch()
 
-	if err != nil {
-		assert.Fail(t, "Fetcher was not able to fetch files from FS", err)
-	}
-
-	assert.Equal(t, len(results), 6)
+	assert.Nil(t, err, "Fetcher was not able to fetch files from FS")
+	assert.Equal(t, 6, len(results))
 
 	directories := []string{filepath.Base(outerDir), filepath.Base(innerDir), filepath.Base(innerInnerDir)}
-	allFilesName := append(append(append(innerFiles, directories...), outerFiles...),innerInnerFiles...)
+	allFilesName := append(append(append(innerFiles, directories...), outerFiles...), innerInnerFiles...)
 
 	//All inner files should exist in the final result
 	for i := 0; i < len(results); i++ {
@@ -147,9 +132,7 @@ func createDirectoriesWithFiles(t *testing.T, dirPath string, dirName string, fi
 	}
 	for _, fileName := range filesToWriteInDirectory {
 		file := filepath.Join(dirPath, fileName)
-		if err := ioutil.WriteFile(file, []byte("test txt\n"), 0600); err != nil {
-			assert.Fail(t, "Could not able to write a new file", err)
-		}
+		assert.Nil(t, ioutil.WriteFile(file, []byte("test txt\n"), 0600), "Could not able to write a new file")
 	}
 	return dirPath
 }
