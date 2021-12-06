@@ -30,7 +30,6 @@ func InitModule(config string) {
 
 func configureHostFS(config string) {
 	dir := config
-
 	// Set environment variables for gopsutil.
 	os.Setenv("HOST_PROC", filepath.Join(dir, "/proc"))
 	os.Setenv("HOST_SYS", filepath.Join(dir, "/sys"))

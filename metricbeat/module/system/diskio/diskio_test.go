@@ -25,13 +25,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
+	"github.com/elastic/beats/v7/metricbeat/internal/sysinit"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	_ "github.com/elastic/beats/v7/metricbeat/module/system"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestDataNameFilter(t *testing.T) {
+	sysinit.InitModule("./_meta/testdata")
 	conf := map[string]interface{}{
 		"module":                 "system",
 		"metricsets":             []string{"diskio"},

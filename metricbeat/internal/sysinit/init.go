@@ -46,14 +46,11 @@ type MetricbeatHostFSConfig struct {
 
 // Init either the system or linux module. This will produce different modules depending on if we're running under agent or not.
 func InitSystemModule(base mb.BaseModule) (mb.Module, error) {
-
 	// common code for the base use case of `hostfs` being set at the module-level
 	logger := logp.L()
 	hostfs, userSet := findConfigValue(base)
-
 	if fleetmode.Enabled() {
 		logger.Infof("initializing HostFS values under agent: %s", hostfs)
-		logger.Infof("Raw module config: %s", base.GoString())
 		return fleetInit(base, hostfs, userSet)
 	}
 	return metricbeatInit(base, hostfs, userSet)
@@ -74,11 +71,11 @@ func fleetInit(base mb.BaseModule, modulepath string, moduleSet bool) (mb.Module
 }
 
 // Deal with the legacy configs available to metricbeat
-func metricbeatInit(base mb.BaseModule, modulepath string, moduleSet bool) (mb.Module, error) {
-	var hostfs string
+func metricbeatInit(base mb.BaseModule, modulePath string, moduleSet bool) (mb.Module, error) {
+	var hostfs = modulePath
 	var userSet bool
 	// allow the CLI to override other settings
-	if hostFS != nil {
+	if hostFS != nil && *hostFS != "" {
 		cfgwarn.Deprecate("x", "The --system.hostfs flag will be removed in the future and replaced by a config value.")
 		hostfs = *hostFS
 		userSet = true
@@ -87,7 +84,6 @@ func metricbeatInit(base mb.BaseModule, modulepath string, moduleSet bool) (mb.M
 	once.Do(func() {
 		InitModule(hostfs)
 	})
-
 	return &Module{BaseModule: base, HostFS: hostfs, UserSetHostFS: userSet}, nil
 
 }
