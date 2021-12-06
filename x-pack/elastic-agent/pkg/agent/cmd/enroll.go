@@ -53,7 +53,7 @@ func addEnrollFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP("enrollment-token", "t", "", "Enrollment token to use to enroll Agent into Fleet")
 	cmd.Flags().StringP("fleet-server-es", "", "", "Start and run a Fleet Server along side this Elastic Agent connecting to the provided elasticsearch")
 	cmd.Flags().StringP("fleet-server-es-ca", "", "", "Path to certificate authority to use with communicate with elasticsearch")
-	cmd.Flags().StringP("fleet-server-es-ca-sha256", "x", "", "Elasticsearch certificate authority's SHA256 fingerprint")
+	cmd.Flags().StringP("fleet-server-es-ca-trusted-fingerprint", "x", "", "Elasticsearch certificate authority's SHA256 fingerprint")
 	cmd.Flags().BoolP("fleet-server-es-insecure", "", false, "Disables validation of certificates")
 	cmd.Flags().StringP("fleet-server-service-token", "", "", "Service token to use for communication with elasticsearch")
 	cmd.Flags().StringP("fleet-server-policy", "", "", "Start and run a Fleet Server on this specific policy")
@@ -104,7 +104,7 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 	}
 	fServer, _ := cmd.Flags().GetString("fleet-server-es")
 	fElasticSearchCA, _ := cmd.Flags().GetString("fleet-server-es-ca")
-	fElasticSearchCASHA256, _ := cmd.Flags().GetString("fleet-server-es-ca-sha256")
+	fElasticSearchCASHA256, _ := cmd.Flags().GetString("fleet-server-es-ca-trusted-fingerprint")
 	fElasticSearchInsecure, _ := cmd.Flags().GetBool("fleet-server-es-insecure")
 	fServiceToken, _ := cmd.Flags().GetString("fleet-server-service-token")
 	fPolicy, _ := cmd.Flags().GetString("fleet-server-policy")
@@ -143,7 +143,7 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 		args = append(args, fElasticSearchCA)
 	}
 	if fElasticSearchCASHA256 != "" {
-		args = append(args, "--fleet-server-es-ca-sha256")
+		args = append(args, "--fleet-server-es-ca-trusted-fingerprint")
 		args = append(args, fElasticSearchCASHA256)
 	}
 	if fServiceToken != "" {
