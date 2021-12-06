@@ -29,8 +29,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
@@ -135,9 +135,9 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 
 			p.cgroupsCache = common.NewCacheWithRemovalListener(config.CgroupCacheExpireTime, 100, evictionListener)
 			p.cgroupsCache.StartJanitor(config.CgroupCacheExpireTime)
-			p.cidProvider = newCidProvider(system.NewTestResolver(config.HostPath), config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, p.cgroupsCache)
+			p.cidProvider = newCidProvider(resolve.NewTestResolver(config.HostPath), config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, p.cgroupsCache)
 		} else {
-			p.cidProvider = newCidProvider(system.NewTestResolver(config.HostPath), config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, nil)
+			p.cidProvider = newCidProvider(resolve.NewTestResolver(config.HostPath), config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, nil)
 		}
 
 	}

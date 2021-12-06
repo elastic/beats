@@ -27,8 +27,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 )
 
 const (
@@ -37,11 +37,11 @@ const (
 
 type gosigarCidProvider struct {
 	log                *logp.Logger
-	hostPath           system.Resolver
+	hostPath           resolve.Resolver
 	cgroupPrefixes     []string
 	cgroupRegex        string
 	cidRegex           *regexp.Regexp
-	processCgroupPaths func(system.Resolver, int) (cgroup.PathList, error)
+	processCgroupPaths func(resolve.Resolver, int) (cgroup.PathList, error)
 	pidCidCache        *common.Cache
 }
 
@@ -73,7 +73,7 @@ func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 	return cid, nil
 }
 
-func newCidProvider(hostPath system.Resolver, cgroupPrefixes []string, cgroupRegex string, processCgroupPaths func(system.Resolver, int) (cgroup.PathList, error), pidCidCache *common.Cache) gosigarCidProvider {
+func newCidProvider(hostPath resolve.Resolver, cgroupPrefixes []string, cgroupRegex string, processCgroupPaths func(resolve.Resolver, int) (cgroup.PathList, error), pidCidCache *common.Cache) gosigarCidProvider {
 	return gosigarCidProvider{
 		log:                logp.NewLogger(providerName),
 		hostPath:           hostPath,

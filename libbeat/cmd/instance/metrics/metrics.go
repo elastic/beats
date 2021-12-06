@@ -27,11 +27,11 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cpu"
 	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
 	"github.com/elastic/beats/v7/libbeat/metric/system/process"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
@@ -288,7 +288,7 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 	}
 
 	cgroups, err := cgroup.NewReaderOptions(cgroup.ReaderOptions{
-		RootfsMountpoint:         system.NewTestResolver("/"),
+		RootfsMountpoint:         resolve.NewTestResolver("/"),
 		IgnoreRootCgroups:        true,
 		CgroupsHierarchyOverride: os.Getenv(libbeatMonitoringCgroupsHierarchyOverride),
 	})
