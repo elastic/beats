@@ -145,7 +145,7 @@ func (l *ESLoader) loadTemplate(templateName string, templateType IndexTemplateT
 // templateExists checks if a template exists
 func (l *ESLoader) templateExists(templateName string, templateType IndexTemplateType) (bool, error) {
 	path := templateLoaderPath[templateType] + templateName
-	status, body, err := l.client.Request("HEAD", path, "", nil, nil)
+	status, _, err := l.client.Request("HEAD", path, "", nil, nil)
 	if err != nil {
 		return false, err
 	}
