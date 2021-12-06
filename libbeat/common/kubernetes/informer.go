@@ -30,7 +30,7 @@ import (
 
 func nodeSelector(options *metav1.ListOptions, opt WatchOptions) {
 	if opt.Node != "" {
-		options.FieldSelector = "spec.nodeName=" + opt.Node
+		options.FieldSelector = "Spec.nodeName=" + opt.Node
 	}
 }
 

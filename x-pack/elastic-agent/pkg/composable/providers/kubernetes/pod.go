@@ -44,29 +44,6 @@ type providerData struct {
 	processors []map[string]interface{}
 }
 
-type containerInPod struct {
-	id      string
-	runtime string
-	spec    kubernetes.Container
-	status  kubernetes.PodContainerStatus
-}
-
-// podUpdaterHandlerFunc is a function that handles pod updater notifications.
-type podUpdaterHandlerFunc func(interface{})
-
-// podUpdaterStore is the interface that an object needs to implement to be
-// used as a pod updater store.
-type podUpdaterStore interface {
-	List() []interface{}
-}
-
-// namespacePodUpdater notifies updates on pods when their namespaces are updated.
-type namespacePodUpdater struct {
-	handler podUpdaterHandlerFunc
-	store   podUpdaterStore
-	locker  sync.Locker
-}
-
 // NewPodEventer creates an eventer that can discover and process pod objects
 func NewPodEventer(
 	comm composable.DynamicProviderComm,
@@ -121,8 +98,13 @@ func NewPodEventer(
 
 	watcher.AddEventHandler(p)
 
+	if nodeWatcher != nil && metaConf.Node.Enabled() {
+		updater := kubernetes.NewNodePodUpdater(p.unlockedUpdate, watcher.Store(), &p.crossUpdate)
+		nodeWatcher.AddEventHandler(updater)
+	}
+
 	if namespaceWatcher != nil && metaConf.Namespace.Enabled() {
-		updater := newNamespacePodUpdater(p.unlockedUpdate, watcher.Store(), &p.crossUpdate)
+		updater := kubernetes.NewNamespacePodUpdater(p.unlockedUpdate, watcher.Store(), &p.crossUpdate)
 		namespaceWatcher.AddEventHandler(updater)
 	}
 
@@ -162,7 +144,7 @@ func (p *pod) Stop() {
 
 func (p *pod) emitRunning(pod *kubernetes.Pod) {
 
-	namespaceAnnotations := podNamespaceAnnotations(pod, p.namespaceWatcher)
+	namespaceAnnotations := kubernetes.PodNamespaceAnnotations(pod, p.namespaceWatcher)
 
 	data := generatePodData(pod, p.config, p.metagen, namespaceAnnotations)
 	data.mapping["scope"] = p.scope
@@ -286,7 +268,7 @@ func generateContainerData(
 	kubeMetaGen metadata.MetaGen,
 	namespaceAnnotations common.MapStr) {
 
-	containers := getContainersInPod(pod)
+	containers := kubernetes.GetContainersInPod(pod)
 
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
@@ -298,14 +280,14 @@ func generateContainerData(
 		// If it doesn't have an ID, container doesn't exist in
 		// the runtime, emit only an event if we are stopping, so
 		// we are sure of cleaning up configurations.
-		if c.id == "" {
+		if c.ID == "" {
 			continue
 		}
 
 		// ID is the combination of pod UID + container name
-		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.spec.Name)
+		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Spec.Name)
 
-		meta := kubeMetaGen.Generate(pod, metadata.WithFields("container.name", c.spec.Name))
+		meta := kubeMetaGen.Generate(pod, metadata.WithFields("container.name", c.Spec.Name))
 		kubemetaMap, err := meta.GetValue("kubernetes")
 		if err != nil {
 			continue
@@ -323,10 +305,10 @@ func generateContainerData(
 
 		//container ECS fields
 		cmeta := common.MapStr{
-			"id":      c.id,
-			"runtime": c.runtime,
+			"id":      c.ID,
+			"runtime": c.Runtime,
 			"image": common.MapStr{
-				"name": c.spec.Image,
+				"name": c.Spec.Image,
 			},
 		}
 
@@ -353,13 +335,13 @@ func generateContainerData(
 		// add container metadata under kubernetes.container.* to
 		// make them available to dynamic var resolution
 		containerMeta := common.MapStr{
-			"id":      c.id,
-			"name":    c.spec.Name,
-			"image":   c.spec.Image,
-			"runtime": c.runtime,
+			"id":      c.ID,
+			"name":    c.Spec.Name,
+			"image":   c.Spec.Image,
+			"runtime": c.Runtime,
 		}
-		if len(c.spec.Ports) > 0 {
-			for _, port := range c.spec.Ports {
+		if len(c.Spec.Ports) > 0 {
+			for _, port := range c.Spec.Ports {
 				containerMeta.Put("port", fmt.Sprintf("%v", port.ContainerPort))
 				containerMeta.Put("port_name", port.Name)
 				k8sMapping["container"] = containerMeta
@@ -370,102 +352,4 @@ func generateContainerData(
 			comm.AddOrUpdate(eventID, ContainerPriority, k8sMapping, processors)
 		}
 	}
-}
-
-// podNamespaceAnnotations returns the annotations of the namespace of the pod
-func podNamespaceAnnotations(pod *kubernetes.Pod, watcher kubernetes.Watcher) common.MapStr {
-	if watcher == nil {
-		return nil
-	}
-
-	rawNs, ok, err := watcher.Store().GetByKey(pod.Namespace)
-	if !ok || err != nil {
-		return nil
-	}
-
-	namespace, ok := rawNs.(*kubernetes.Namespace)
-	if !ok {
-		return nil
-	}
-
-	annotations := common.MapStr{}
-	for k, v := range namespace.GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
-	}
-	return annotations
-}
-
-// newNamespacePodUpdater creates a namespacePodUpdater
-func newNamespacePodUpdater(handler podUpdaterHandlerFunc, store podUpdaterStore, locker sync.Locker) *namespacePodUpdater {
-	return &namespacePodUpdater{
-		handler: handler,
-		store:   store,
-		locker:  locker,
-	}
-}
-
-// OnUpdate handles update events on namespaces.
-func (n *namespacePodUpdater) OnUpdate(obj interface{}) {
-	ns, ok := obj.(*kubernetes.Namespace)
-	if !ok {
-		return
-	}
-
-	// n.store.List() returns a snapshot at this point. If a delete is received
-	// from the main watcher, this loop may generate an update event after the
-	// delete is processed, leaving configurations that would never be deleted.
-	// Also this loop can miss updates, what could leave outdated configurations.
-	// Avoid these issues by locking the processing of events from the main watcher.
-	if n.locker != nil {
-		n.locker.Lock()
-		defer n.locker.Unlock()
-	}
-	for _, pod := range n.store.List() {
-		pod, ok := pod.(*kubernetes.Pod)
-		if ok && pod.Namespace == ns.Name {
-			n.handler(pod)
-		}
-	}
-}
-
-// OnAdd handles add events on namespaces. Nothing to do, if pods are added to this
-// namespace they will generate their own add events.
-func (*namespacePodUpdater) OnAdd(interface{}) {}
-
-// OnDelete handles delete events on namespaces. Nothing to do, if pods are deleted from this
-// namespace they will generate their own delete events.
-func (*namespacePodUpdater) OnDelete(interface{}) {}
-
-// getContainersInPod returns all the containers defined in a pod and their statuses.
-// It includes init and ephemeral containers.
-func getContainersInPod(pod *kubernetes.Pod) []*containerInPod {
-	var containers []*containerInPod
-	for _, c := range pod.Spec.Containers {
-		containers = append(containers, &containerInPod{spec: c})
-	}
-	for _, c := range pod.Spec.InitContainers {
-		containers = append(containers, &containerInPod{spec: c})
-	}
-	for _, c := range pod.Spec.EphemeralContainers {
-		c := kubernetes.Container(c.EphemeralContainerCommon)
-		containers = append(containers, &containerInPod{spec: c})
-	}
-
-	statuses := make(map[string]*kubernetes.PodContainerStatus)
-	mapStatuses := func(s []kubernetes.PodContainerStatus) {
-		for i := range s {
-			statuses[s[i].Name] = &s[i]
-		}
-	}
-	mapStatuses(pod.Status.ContainerStatuses)
-	mapStatuses(pod.Status.InitContainerStatuses)
-	mapStatuses(pod.Status.EphemeralContainerStatuses)
-	for _, c := range containers {
-		if s, ok := statuses[c.spec.Name]; ok {
-			c.id, c.runtime = kubernetes.ContainerIDWithRuntime(*s)
-			c.status = *s
-		}
-	}
-
-	return containers
 }

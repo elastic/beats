@@ -24,6 +24,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
@@ -114,7 +117,7 @@ func IsInCluster(kubeconfig string) bool {
 // If host is provided in the config use it directly.
 // If it is empty then try
 // 1. If beat is deployed in k8s cluster, use hostname of pod as the pod name to query pod metadata for node name.
-// 2. If step 1 fails or beat is deployed outside k8s cluster, use machine-id to match against k8s nodes for node name.
+// 2. If step 1 fails or beat is deployed outside k8s cluster, use machine-ID to match against k8s nodes for node name.
 // 3. If node cannot be discovered with step 1,2, fallback to NODE_NAME env var as default value. In case it is not set return error.
 func DiscoverKubernetesNode(log *logp.Logger, nd *DiscoverKubernetesNodeParams) (string, error) {
 	ctx := context.TODO()
@@ -133,10 +136,10 @@ func DiscoverKubernetesNode(log *logp.Logger, nd *DiscoverKubernetesNodeParams) 
 		log.Debug(err)
 	}
 
-	// try discover node by machine id
+	// try discover node by machine ID
 	node, err := discoverByMachineId(nd, ctx)
 	if err == nil {
-		log.Infof("kubernetes: Node %s discovered by machine-id matching", node)
+		log.Infof("kubernetes: Node %s discovered by machine-ID matching", node)
 		return node, nil
 	}
 	log.Debug(err)
@@ -173,7 +176,7 @@ func discoverInCluster(nd *DiscoverKubernetesNodeParams, ctx context.Context) (n
 func discoverByMachineId(nd *DiscoverKubernetesNodeParams, ctx context.Context) (nodeName string, errorMsg error) {
 	mid := nd.HostUtils.GetMachineID()
 	if mid == "" {
-		errorMsg = errors.New("kubernetes: Couldn't collect info from any of the files in /etc/machine-id /var/lib/dbus/machine-id")
+		errorMsg = errors.New("kubernetes: Couldn't collect info from any of the files in /etc/machine-ID /var/lib/dbus/machine-ID")
 		return
 	}
 
@@ -192,12 +195,12 @@ func discoverByMachineId(nd *DiscoverKubernetesNodeParams, ctx context.Context) 
 	return
 }
 
-// GetMachineID returns the machine-id
+// GetMachineID returns the machine-ID
 // borrowed from machineID of cadvisor.
 func (hd *DefaultDiscoveryUtils) GetMachineID() string {
 	for _, file := range []string{
-		"/etc/machine-id",
-		"/var/lib/dbus/machine-id",
+		"/etc/machine-ID",
+		"/var/lib/dbus/machine-ID",
 	} {
 		id, err := ioutil.ReadFile(file)
 		if err == nil {
@@ -225,4 +228,110 @@ func InClusterNamespace() (string, error) {
 		return "", err
 	}
 	return strings.TrimSpace(string(data)), nil
+}
+
+type ContainerInPod struct {
+	ID      string
+	Runtime string
+	Spec    Container
+	Status  PodContainerStatus
+}
+
+// GetContainersInPod returns all the containers defined in a pod and their statuses.
+// It includes init and ephemeral containers.
+func GetContainersInPod(pod *Pod) []*ContainerInPod {
+	var containers []*ContainerInPod
+	for _, c := range pod.Spec.Containers {
+		containers = append(containers, &ContainerInPod{Spec: c})
+	}
+	for _, c := range pod.Spec.InitContainers {
+		containers = append(containers, &ContainerInPod{Spec: c})
+	}
+	for _, c := range pod.Spec.EphemeralContainers {
+		c := Container(c.EphemeralContainerCommon)
+		containers = append(containers, &ContainerInPod{Spec: c})
+	}
+
+	statuses := make(map[string]*PodContainerStatus)
+	mapStatuses := func(s []PodContainerStatus) {
+		for i := range s {
+			statuses[s[i].Name] = &s[i]
+		}
+	}
+	mapStatuses(pod.Status.ContainerStatuses)
+	mapStatuses(pod.Status.InitContainerStatuses)
+	mapStatuses(pod.Status.EphemeralContainerStatuses)
+	for _, c := range containers {
+		if s, ok := statuses[c.Spec.Name]; ok {
+			c.ID, c.Runtime = ContainerIDWithRuntime(*s)
+			c.Status = *s
+		}
+	}
+
+	return containers
+}
+
+// PodAnnotations returns the annotations in a pod
+func PodAnnotations(pod *Pod) common.MapStr {
+	annotations := common.MapStr{}
+	for k, v := range pod.GetObjectMeta().GetAnnotations() {
+		safemapstr.Put(annotations, k, v)
+	}
+	return annotations
+}
+
+// PodNamespaceAnnotations returns the annotations of the namespace of the pod
+func PodNamespaceAnnotations(pod *Pod, watcher Watcher) common.MapStr {
+	if watcher == nil {
+		return nil
+	}
+
+	rawNs, ok, err := watcher.Store().GetByKey(pod.Namespace)
+	if !ok || err != nil {
+		return nil
+	}
+
+	namespace, ok := rawNs.(*Namespace)
+	if !ok {
+		return nil
+	}
+
+	annotations := common.MapStr{}
+	for k, v := range namespace.GetAnnotations() {
+		safemapstr.Put(annotations, k, v)
+	}
+	return annotations
+}
+
+// PodTerminating returns true if a pod is marked for deletion or is in a phase beyond running.
+func PodTerminating(pod *Pod) bool {
+	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
+		return true
+	}
+
+	switch pod.Status.Phase {
+	case PodRunning, PodPending:
+	default:
+		return true
+	}
+
+	return false
+}
+
+// PodTerminated returns true if a pod is terminated, this method considers a
+// pod as terminated if none of its containers are running (or going to be running).
+func PodTerminated(pod *Pod, containers []*ContainerInPod) bool {
+	// Pod is not marked for termination, so it is not terminated.
+	if !PodTerminating(pod) {
+		return false
+	}
+
+	// If any container is running, the pod is not terminated yet.
+	for _, container := range containers {
+		if container.Status.State.Running != nil {
+			return false
+		}
+	}
+
+	return true
 }
