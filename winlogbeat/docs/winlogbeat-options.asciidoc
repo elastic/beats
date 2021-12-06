@@ -137,6 +137,9 @@ channel is a named stream of events that transports events from an event source
 to an event log. Most channels are tied to specific event publishers. Here is an
 example showing how to list all channels using PowerShell.
 
+If a custom XML query is provided, the name will act as an identifier for this
+event log.
+
 [source,sh]
 --------------------------------------------------------------------------------
 PS C:\> Get-WinEvent -ListLog * | Format-List -Property LogName
@@ -334,6 +337,35 @@ VSSAudit
 Microsoft-Windows-Security-Auditing
 Microsoft-Windows-Eventlog
 --------------------------------------------------------------------------------
+
+[float]
+==== `event_logs.xml_query`
+
+Provide a custom XML query. This option is mutually exclusive with the `event_id`,
+`ignore_older`, `level`, and `provider` options. These options should be included in
+the XML query directly. Custom XML queries provide more flexibility and advanced
+options than the simpler query options in {beatname_uc}.
+*{vista_and_newer}*
+
+Here is a configuration which will collect DHCP server events from multiple channels:
+
+[source,yaml]
+--------------------------------------------------------------------------------
+winlogbeat.event_logs:
+  - name: dhcp-server
+    xml_query: >
+      <QueryList>
+        <Query Id="0" Path="DhcpAdminEvents">
+          <Select Path="DhcpAdminEvents">*</Select>
+          <Select Path="Microsoft-Windows-Dhcp-Server/FilterNotifications">*</Select>
+          <Select Path="Microsoft-Windows-Dhcp-Server/Operational">*</Select>
+        </Query>
+      </QueryList>
+--------------------------------------------------------------------------------
+
+XML queries may also be created in Event Viewer using custom views. The query
+can be created using a graphical interface and the corresponding XML can be
+retrieved from the XML tab.
 
 [float]
 ==== `event_logs.include_xml`
