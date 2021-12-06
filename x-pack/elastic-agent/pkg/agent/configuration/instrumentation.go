@@ -4,16 +4,22 @@
 
 package configuration
 
-import "github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-
 // InstrumentationConfig configures APM Tracing.
 type InstrumentationConfig struct {
-	Environment string            `config:"environment"`
-	APIKey      string            `config:"api_key"`
-	SecretToken string            `config:"secret_token"`
-	Hosts       []string          `config:"hosts"`
-	Enabled     bool              `config:"enabled"`
-	TLS         *tlscommon.Config `config:"ssl"`
+	Environment string             `config:"environment"`
+	APIKey      string             `config:"api_key"`
+	SecretToken string             `config:"secret_token"`
+	Hosts       []string           `config:"hosts"`
+	Enabled     bool               `config:"enabled"`
+	TLS         InstrumentationTLS `config:"tls"`
+}
+
+// InstrumentationTLS contains the configuration options necessary for
+// configuring TLS in apm-agent-go.
+type InstrumentationTLS struct {
+	SkipVerify        bool   `config:"skip_verify"`
+	ServerCertificate string `config:"server_certificate"`
+	ServerCA          string `config:"server_ca"`
 }
 
 // DefaultInstrumentationConfig creates a default InstrumentationConfig.

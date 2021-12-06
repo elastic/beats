@@ -29,6 +29,11 @@ func TestInstrumentationConfig(t *testing.T) {
 					"api_key":     "abc123",
 					"environment": "production",
 					"hosts":       []string{"https://abc.123.com"},
+					"tls": map[string]interface{}{
+						"skip_verify":        true,
+						"server_certificate": "server_cert",
+						"server_ca":          "server_ca",
+					},
 				},
 			},
 			out: &InstrumentationConfig{
@@ -36,6 +41,11 @@ func TestInstrumentationConfig(t *testing.T) {
 				APIKey:      "abc123",
 				Environment: "production",
 				Hosts:       []string{"https://abc.123.com"},
+				TLS: InstrumentationTLS{
+					SkipVerify:        true,
+					ServerCertificate: "server_cert",
+					ServerCA:          "server_ca",
+				},
 			},
 		},
 	}

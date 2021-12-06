@@ -8,13 +8,11 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"syscall"
-	"time"
 
 	"github.com/spf13/cobra"
 	"go.elastic.co/apm"
@@ -23,8 +21,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/service"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
@@ -404,26 +400,30 @@ func initTracer(agentName, version string, cfg *configuration.InstrumentationCon
 		return nil, nil
 	}
 
+	// TODO(stn): Ideally, we'd use apmtransport.NewHTTPTransportOptions()
+	// but it doesn't exist today. Update this code once we have something
+	// available via the APM Go agent.
+	const (
+		envVerifyServerCert = "ELASTIC_APM_VERIFY_SERVER_CERT"
+		envServerCert       = "ELASTIC_APM_SERVER_CERT"
+		envCACert           = "ELASTIC_APM_SERVER_CA_CERT_FILE"
+	)
+	if cfg.TLS.SkipVerify {
+		os.Setenv(envVerifyServerCert, "false")
+		defer os.Unsetenv(envVerifyServerCert)
+	}
+	if cfg.TLS.ServerCertificate != "" {
+		os.Setenv(envServerCert, cfg.TLS.ServerCertificate)
+		defer os.Unsetenv(envServerCert)
+	}
+	if cfg.TLS.ServerCA != "" {
+		os.Setenv(envCACert, cfg.TLS.ServerCA)
+		defer os.Unsetenv(envCACert)
+	}
+
 	ts, err := apmtransport.NewHTTPTransport()
 	if err != nil {
 		return nil, err
-	}
-	var tlsConfig *tlscommon.TLSConfig
-	if cfg.TLS.IsEnabled() {
-		if tlsConfig, err = tlscommon.LoadTLSConfig(cfg.TLS); err != nil {
-			return nil, err
-		}
-	}
-
-	timeout := 30 * time.Second
-	dialer := transport.NetDialer(timeout)
-	tlsDialer := transport.TLSDialer(dialer, tlsConfig, timeout)
-
-	rt := &http.Transport{
-		Proxy:           http.ProxyFromEnvironment,
-		Dial:            dialer.Dial,
-		DialTLS:         tlsDialer.Dial,
-		TLSClientConfig: tlsConfig.ToConfig(),
 	}
 
 	if len(cfg.Hosts) > 0 {
@@ -442,8 +442,6 @@ func initTracer(agentName, version string, cfg *configuration.InstrumentationCon
 	} else {
 		ts.SetSecretToken(cfg.SecretToken)
 	}
-
-	ts.Client.Transport = rt
 
 	return apm.NewTracerOptions(apm.TracerOptions{
 		ServiceName:        agentName,
