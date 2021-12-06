@@ -44,8 +44,6 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/ceph/pool_disk"
 	_ "github.com/elastic/beats/v7/metricbeat/module/consul"
 	_ "github.com/elastic/beats/v7/metricbeat/module/consul/agent"
-	_ "github.com/elastic/beats/v7/metricbeat/module/containerd"
-	_ "github.com/elastic/beats/v7/metricbeat/module/containerd/cpu"
 	_ "github.com/elastic/beats/v7/metricbeat/module/couchbase"
 	_ "github.com/elastic/beats/v7/metricbeat/module/couchbase/bucket"
 	_ "github.com/elastic/beats/v7/metricbeat/module/couchbase/cluster"
