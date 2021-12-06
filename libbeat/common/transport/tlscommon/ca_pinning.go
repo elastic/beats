@@ -51,7 +51,7 @@ func verifyCAPin(hashes []string, verifiedChains [][]*x509.Certificate) error {
 
 // Fingerprint takes a certificate and create a hash of the DER encoded public key.
 func Fingerprint(certificate *x509.Certificate) string {
-	hash := sha256.Sum256(certificate.Raw)
+	hash := sha256.Sum256(certificate.RawSubjectPublicKeyInfo)
 	return base64.StdEncoding.EncodeToString(hash[:])
 }
 

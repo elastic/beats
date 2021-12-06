@@ -880,10 +880,10 @@ func createFleetServerBootstrapConfig(
 	if esCASHA256 != "" {
 		if es.TLS == nil {
 			es.TLS = &tlscommon.Config{
-				CASha256: []string{esCASHA256},
+				CATrustedFingerprint: esCASHA256,
 			}
 		} else {
-			es.TLS.CASha256 = []string{esCASHA256}
+			es.TLS.CATrustedFingerprint = esCASHA256
 		}
 	}
 	if host == "" {
