@@ -18,7 +18,6 @@
 package cpu
 
 import (
-	p "github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -50,8 +49,8 @@ func init() {
 			"process_cpu_seconds_total":        prometheus.Metric("system.total"),
 		},
 		Labels: map[string]prometheus.LabelMap{
-			"container_id": p.KeyLabel("id"),
-			"cpu":          p.KeyLabel("cpu"),
+			"container_id": prometheus.KeyLabel("id"),
+			"cpu":          prometheus.KeyLabel("cpu"),
 		},
 	}
 

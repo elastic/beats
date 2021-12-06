@@ -20,6 +20,8 @@ package cpu
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/metricbeat/module/containerd"
+
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 
 	"github.com/pkg/errors"
@@ -34,6 +36,7 @@ type metricset struct {
 	mb.BaseMetricSet
 	prometheusClient           prometheus.Prometheus
 	prometheusMappings         *prometheus.MetricsMapping
+	calcPct                    bool
 	preSystemCpuUsage          float64
 	preContainerCpuTotalUsage  map[string]float64
 	preContainerCpuKernelUsage map[string]float64
@@ -49,10 +52,15 @@ func getMetricsetFactory(prometheusMappings *prometheus.MetricsMapping) mb.Metri
 		if err != nil {
 			return nil, err
 		}
+		config := containerd.DefaultConfig()
+		if err := base.Module().UnpackConfig(&config); err != nil {
+			return nil, err
+		}
 		return &metricset{
 			BaseMetricSet:              base,
 			prometheusClient:           pc,
 			prometheusMappings:         prometheusMappings,
+			calcPct:                    config.CalculatePct,
 			preSystemCpuUsage:          0.0,
 			preContainerCpuTotalUsage:  map[string]float64{},
 			preContainerCpuKernelUsage: map[string]float64{},
@@ -67,30 +75,28 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 	if err != nil {
 		return errors.Wrap(err, "error getting metrics")
 	}
+
 	var systemTotalNs int64
 	perContainerCpus := make(map[string]int)
-	elToDel := -1
-	for i, event := range events {
-		systemTotalSeconds, err := event.GetValue("system.total")
-		if err == nil {
-			systemTotalNs = systemTotalSeconds.(int64) * 1e9
-			elToDel = i
-		}
-		if _, err = event.GetValue("cpu"); err == nil {
-			// calculate cpus used by each container
-			setContCpus(event, perContainerCpus)
-		}
 
+	if m.calcPct {
+		for _, event := range events {
+			systemTotalSeconds, err := event.GetValue("system.total")
+			if err == nil {
+				systemTotalNs = systemTotalSeconds.(int64) * 1e9
+			}
+			if _, err = event.GetValue("cpu"); err == nil {
+				// calculate cpus used by each container
+				setContCpus(event, perContainerCpus)
+			}
+		}
 	}
-	// Remove event containing system.total
-	if elToDel != -1 {
-		events[elToDel] = events[len(events)-1] // Copy last element to index i.
-		events[len(events)-1] = common.MapStr{} // Erase last element (write empty value).
-		events = events[:len(events)-1]
-	}
-	//m.Logger().Infof("ContainerCpus are %+v", perContainerCpus)
 
 	for _, event := range events {
+		// Discard event containing system.total
+		if _, err := event.GetValue("system.total"); err == nil {
+			continue
+		}
 		// setting ECS container.id
 		containerFields := common.MapStr{}
 		var cID string
@@ -115,46 +121,47 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 				}
 			}
 		}
-		contCpus, ok := perContainerCpus[cID]
-		if !ok {
-			contCpus = 1
-		}
-		// calculate system usage delta
-		systemUsageDelta := float64(systemTotalNs) - m.preSystemCpuUsage
+		if m.calcPct {
+			contCpus, ok := perContainerCpus[cID]
+			if !ok {
+				contCpus = 1
+			}
+			// calculate system usage delta
+			systemUsageDelta := float64(systemTotalNs) - m.preSystemCpuUsage
 
-		// Calculate cpu total usage percentage
-		cpuUsageTotal, err := event.GetValue("usage.total.ns")
-		if err == nil {
-			cpuUsageTotalPct := calcCpuTotalUsagePct(cpuUsageTotal.(float64), systemUsageDelta,
-				float64(contCpus), cID, m.preContainerCpuTotalUsage)
-			m.Logger().Infof("cpuUsageTotalPct for %+v is %+v", cID, cpuUsageTotalPct)
-			e.MetricSetFields.Put("usage.total.pct", cpuUsageTotalPct)
-			// Update values
-			m.preContainerCpuTotalUsage[cID] = cpuUsageTotal.(float64)
-		}
+			// Calculate cpu total usage percentage
+			cpuUsageTotal, err := event.GetValue("usage.total.ns")
+			if err == nil {
+				cpuUsageTotalPct := calcCpuTotalUsagePct(cpuUsageTotal.(float64), systemUsageDelta,
+					float64(contCpus), cID, m.preContainerCpuTotalUsage)
+				m.Logger().Debugf("cpuUsageTotalPct for %+v is %+v", cID, cpuUsageTotalPct)
+				e.MetricSetFields.Put("usage.total.pct", cpuUsageTotalPct)
+				// Update values
+				m.preContainerCpuTotalUsage[cID] = cpuUsageTotal.(float64)
+			}
 
-		// Calculate cpu kernel usage percentage
-		cpuUsageKernel, err := event.GetValue("usage.kernel.ns")
-		if err == nil {
-			cpuUsageKernelPct := calcCpuKernelUsagePct(cpuUsageKernel.(float64), systemUsageDelta,
-				float64(contCpus), cID, m.preContainerCpuKernelUsage)
-			m.Logger().Infof("cpuUsageKernelPct for %+v is %+v", cID, cpuUsageKernelPct)
-			e.MetricSetFields.Put("usage.kernel.pct", cpuUsageKernelPct)
-			// Update values
-			m.preContainerCpuKernelUsage[cID] = cpuUsageKernel.(float64)
-		}
+			// Calculate cpu kernel usage percentage
+			cpuUsageKernel, err := event.GetValue("usage.kernel.ns")
+			if err == nil {
+				cpuUsageKernelPct := calcCpuKernelUsagePct(cpuUsageKernel.(float64), systemUsageDelta,
+					float64(contCpus), cID, m.preContainerCpuKernelUsage)
+				m.Logger().Debugf("cpuUsageKernelPct for %+v is %+v", cID, cpuUsageKernelPct)
+				e.MetricSetFields.Put("usage.kernel.pct", cpuUsageKernelPct)
+				// Update values
+				m.preContainerCpuKernelUsage[cID] = cpuUsageKernel.(float64)
+			}
 
-		// Calculate cpu user usage percentage
-		cpuUsageUser, err := event.GetValue("usage.user.ns")
-		if err == nil {
-			cpuUsageUserPct := calcCpuUserUsagePct(cpuUsageUser.(float64), systemUsageDelta,
-				float64(contCpus), cID, m.preContainerCpuUserUsage)
-			m.Logger().Infof("cpuUsageUserPct for %+v is %+v", cID, cpuUsageUserPct)
-			e.MetricSetFields.Put("usage.user.pct", cpuUsageUserPct)
-			// Update values
-			m.preContainerCpuUserUsage[cID] = cpuUsageUser.(float64)
+			// Calculate cpu user usage percentage
+			cpuUsageUser, err := event.GetValue("usage.user.ns")
+			if err == nil {
+				cpuUsageUserPct := calcCpuUserUsagePct(cpuUsageUser.(float64), systemUsageDelta,
+					float64(contCpus), cID, m.preContainerCpuUserUsage)
+				m.Logger().Debugf("cpuUsageUserPct for %+v is %+v", cID, cpuUsageUserPct)
+				e.MetricSetFields.Put("usage.user.pct", cpuUsageUserPct)
+				// Update values
+				m.preContainerCpuUserUsage[cID] = cpuUsageUser.(float64)
+			}
 		}
-
 		if cpuId, err := event.GetValue("cpu"); err == nil {
 			perCpuNs, err := event.GetValue("usage.percpu.ns")
 			if err == nil {
