@@ -528,7 +528,7 @@ func numParallel() int {
 	maxParallel := runtime.NumCPU()
 
 	info, err := GetDockerInfo()
-	if err == nil && info.NCPU < maxParallel {
+	if err == nil && info.NCPU != 0 && info.NCPU < maxParallel {
 		maxParallel = info.NCPU
 	}
 
