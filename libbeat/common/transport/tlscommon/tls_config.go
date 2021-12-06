@@ -169,20 +169,21 @@ func trustESRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate) error {
 		// Compute digest for each certificate.
 		digest := sha256.Sum256(cert.Raw)
 
-		if bytes.Compare(digest[0:], fingerprint) == 0 {
+		if bytes.Equal(digest[0:], fingerprint) {
 			// Make sure the fingerprint matches a CA certificate
 			if cert.IsCA {
 				if cfg.RootCAs == nil {
 					cfg.RootCAs = x509.NewCertPool()
 				}
-				cfg.RootCAs.AddCert(cert)
 
+				cfg.RootCAs.AddCert(cert)
 				cfg.CASha256 = append(cfg.CASha256, Fingerprint(cert))
+				return nil
 			}
 		}
 	}
 
-	return nil
+	return errors.New("provided CA certificate fingerprint doesn't match any of the certificate authorities")
 }
 
 func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
