@@ -33,17 +33,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
 - Remove options `logging.files.suffix` and default to datetime endings. {pull}28927[28927]
 - Remove Journalbeat. Use `journald` input of Filebeat instead. {pull}29131[29131]
+- Fix panic with inline SSL when the certificate or key were small than 256 bytes. {pull}23820[23820]
 
 *Auditbeat*
 
 - File integrity dataset (macOS): Replace unnecessary `file.origin.raw` (type keyword) with `file.origin.text` (type `text`). {issue}12423[12423] {pull}15630[15630]
 - Change event.kind=error to event.kind=event to comply with ECS. {issue}18870[18870] {pull}20685[20685]
-- File integrity dataset: Remove non-ECS `hash.*` fields. Hashes are under `file.hash.*`. {issue}19039[19039] {pull}28378[28378]
-- Auditd dataset: Removes the authentication_success and authentication_failure event.type values for user logins. {issue}19039[19039] {pull}28378[28378]
-- Fix handling of long file names on Windows. {issue}25334[25334] {pull}28517[28517]
-- System/socket dataset: Fix uninstallation of return kprobes. {issue}28608[28608] {pull}28609[28609]
-- Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
-- Fix auditbeat tracing struct decoding. {pull}28580[28580]
 
 *Filebeat*
 
@@ -55,21 +50,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
 - Add `while_pattern` type to multiline reader. {pull}19662[19662]
 - Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
-- Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
-- Removes old module aliases for `googlecloud` (moved to gcp) and `apache2` (moved to apache). {pull}27919[27919]
-- Removes old module name aliases (gsuite) and removing old cyberark module in favor of the new cyberarkpas{pull}27915[27915]
-- Only filesets that are explicitly configured will be enabled. {issue}17256[17256] {pull}27526[27526]
-- All filesets are disabled in the default configuration. {issue}17256[17256] {pull}27762[27762]
-- Remove deprecated fields in Kafka module. {pull}27938[27938]
-- Remove deprecated fields in coredns module. {pull}28196[28196]
-- Remove old `httpjson` config implementation. {pull}28054[28054]
-- Added dataset `threatq` to the `threatintel` module to ingest indicators from ThreatQ {issue}27423[27423]
-- Fail to start Filebat if none between `queue_url`, `bucket_arn` or `non_aws_bucket_name` is set for a configured aws-s3 input {issue}13911[13911] {pull}28666[28666]
-- All modules: Replace usages of deprecated ECS fields `process.ppid` and `log.original` with `process.parent.pid` and `event.original`. {pull}28620[28620]
-- Replace usages of `host.user.*` fields with `user.*` in `cisco`, `microsoft` and `oracle` modules. {pull}28620[28620]
-- Remove `docker` input. Please use `filestream` input with `container` parser or `container` input. {pull}28817[28817]
-- Change `threatintel` module to use new `threat.*` ECS fields. {pull}29014[29014]
-- `filestream` and `log` inputs accept null (`\u0000`) as line terminator. {pull}28998[28998]
 
 *Heartbeat*
 - Change behavior in case of duplicate monitor IDs in configs to be last monitor wins. {pull}29041[29041]
@@ -100,6 +80,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Bump AWS SDK version to v0.24.0 for WebIdentity authentication flow {issue}19393[19393] {pull}27126[27126]
 - Add Linux pressure metricset {pull}27355[27355]
 
+*Metricbeat*
+
+- kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
+
 *Packetbeat*
 
 - Redis: fix incorrectly handle with two-words redis command. {issue}14872[14872] {pull}14873[14873]
@@ -120,7 +104,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 
-- Support for Google Cloud Functions have been removed, as it has been in Beta for a long time and been broken for a few releases. Please use other tools provided by Elastic to fetch data from GCP (e.g. Filebeat).
 
 ==== Bugfixes
 
@@ -367,12 +350,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for parsers on journald input {pull}29070[29070]
 - Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
 - Add elapsed time information to `aws-s3` input errors and log messages. {pull}29328[29328]
+- Added feature to modules to adapt Ingest Node pipelines for compatibility with older Elasticsearch versions by
+
 
 *Heartbeat*
 
-- Support JSON expressions / validation of JSON arrays. {pull}28073[28073]
-- Experimental 'run once' mode. {pull}25972[25972]
-- Add `keyword` multi-field mapping for `synthetics.step.name`. {pull}28452[28452]
 
 *Metricbeat*
 
@@ -396,7 +378,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 
-- Add support for AWS Kinesis record deaggregation {pull}28241[28241]
 
 *Winlogbeat*
 
@@ -415,7 +396,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-- Deprecate `log` input in favour of `filestream` input. {pull}28623[28623]
 
 *Heartbeat*
 
@@ -431,3 +411,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
+
+
+
