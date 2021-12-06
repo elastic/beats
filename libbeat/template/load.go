@@ -24,7 +24,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -143,40 +142,13 @@ func (l *ESLoader) loadTemplate(templateName string, templateType IndexTemplateT
 	return nil
 }
 
+// templateExists checks if a template exists
 func (l *ESLoader) templateExists(templateName string, templateType IndexTemplateType) (bool, error) {
-	if templateType == IndexTemplateComponent {
-		return l.checkExistsComponentTemplate(templateName)
-	}
-	return l.checkExistsTemplate(templateName)
-}
-
-// existsTemplate checks if a given template already exist, using the
-// `_cat/templates/<name>` API.
-//
-// An error is returned if the loader failed to execute the request, or a
-// status code indicating some problems is encountered.
-func (l *ESLoader) checkExistsTemplate(name string) (bool, error) {
-	status, body, err := l.client.Request("GET", "/_cat/templates/"+name, "", nil, nil)
+	path := templateLoaderPath[templateType] + templateName
+	status, body, err := l.client.Request("HEAD", path, "", nil, nil)
 	if err != nil {
 		return false, err
 	}
-
-	// Elasticsearch API returns 200, even if the template does not exists. We
-	// need to validate the body to be sure the template is actually known. Any
-	// status code other than 200 will be treated as error.
-	if status != http.StatusOK {
-		return false, &StatusError{status: status}
-	}
-	return strings.Contains(string(body), name), nil
-}
-
-// existsComponentTemplate checks if a component template exists by querying
-// the `_component_template/<name>` API.
-//
-// The resource is assumed as present if a 200 OK status is returned and missing if a 404 is returned.
-// Other status codes or IO errors during the request are reported as error.
-func (l *ESLoader) checkExistsComponentTemplate(name string) (bool, error) {
-	status, _, err := l.client.Request("GET", "/_component_template/"+name, "", nil, nil)
 
 	switch status {
 	case http.StatusNotFound:
