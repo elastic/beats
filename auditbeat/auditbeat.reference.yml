@@ -513,9 +513,11 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
-  # A root CA HEX encoded fingerprint used to trust and pin this certificate.
-  # This enables compatibility with Elasticserach self signed certificates as well as trusting
-  # and pinning any other self-signed certificate.
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
@@ -650,9 +652,11 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
-  # A root CA HEX encoded fingerprint used to trust and pin this certificate.
-  # This enables compatibility with Elasticserach self signed certificates as well as trusting
-  # and pinning any other self-signed certificate.
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
 
   # The number of times to retry publishing an event after a publishing failure.
@@ -856,9 +860,11 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
-  # A root CA HEX encoded fingerprint used to trust and pin this certificate.
-  # This enables compatibility with Elasticserach self signed certificates as well as trusting
-  # and pinning any other self-signed certificate.
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
@@ -1025,9 +1031,11 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
-  # A root CA HEX encoded fingerprint used to trust and pin this certificate.
-  # This enables compatibility with Elasticserach self signed certificates as well as trusting
-  # and pinning any other self-signed certificate.
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
 
 
@@ -1317,9 +1325,11 @@ setup.kibana:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
-  # A root CA HEX encoded fingerprint used to trust and pin this certificate.
-  # This enables compatibility with Elasticserach self signed certificates as well as trusting
-  # and pinning any other self-signed certificate.
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
 
 
@@ -1520,9 +1530,11 @@ logging.files:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
-  # A root CA HEX encoded fingerprint used to trust and pin this certificate.
-  # This enables compatibility with Elasticserach self signed certificates as well as trusting
-  # and pinning any other self-signed certificate.
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
   #ssl.ca_trusted_fingerprint: ""
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.

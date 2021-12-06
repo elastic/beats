@@ -77,8 +77,8 @@ type TLSConfig struct {
 	// the server certificate.
 	CASha256 []string
 
-	// CATrustedFingerprint is the CA certificate pin, in HEX form, from a self
-	// generated CA cartificate.
+	// CATrustedFingerprint is the HEX encoded fingerprint of a CA certificate. If present in the chain
+	// this certificate will be added to the list of trusted CAs (RootCAs) during the handshake.
 	CATrustedFingerprint string `config:"ca_trusted_fingerprint" yaml:"ca_trusted_fingerprint,omitempty"`
 
 	// time returns the current time as the number of seconds since the epoch.
@@ -176,13 +176,13 @@ func trustRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate) error {
 				}
 
 				cfg.RootCAs.AddCert(cert)
-				cfg.CASha256 = append(cfg.CASha256, Fingerprint(cert))
 				return nil
 			}
 		}
 	}
 
-	return errors.New("provided CA certificate fingerprint doesn't match any of the certificate authorities")
+	logp.NewLogger("tls").Warn("no CA certificate matching the fingerprint")
+	return nil
 }
 
 func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {

@@ -219,16 +219,6 @@ NOTE: This check is not a replacement for the normal SSL validation, but it adds
 If this option is used with  `verification_mode` set to `none`, the check will always fail because
 it will not receive any verified chains.
 
-[float]
-[[_ca_trusted_fingerprint]]
-==== `ca_trusted_fingerprint`
-This configures a certificate pin that you can use to trust and pin a
-root CA without providing the certificate under
-`certificate_authorities`
-
-The pin is the HEX encoded SHA-256 of the certificate.
-
-
 [discrete]
 [[ssl-client-config]]
 === Client configuration options
@@ -386,6 +376,15 @@ diagnostic mechanism when attempting to resolve TLS errors; its use in
 production environments is strongly discouraged.
 +
 The default value is `full`.
+
+[float]
+[[ca_trusted_fingerprint]]
+==== `ca_trusted_fingerprint`
+A HEX encoded SHA-256 of a CA certificate. If this certificate is
+present in the chain during the handshake, it will be added to the
+`certificate_authorities` list and the handshake will continue
+normaly.
+
 
 [discrete]
 [[ssl-server-config]]
