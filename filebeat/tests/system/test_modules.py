@@ -242,7 +242,7 @@ def clean_keys(obj):
         host_keys.append("host.name")
 
     # The create timestamps area always new
-    time_keys = ["event.created", "event.ingested"]
+    time_keys = ["event.created", "event.ingested", "@timestamp"]
     # source path and agent.version can be different for each run
     other_keys = ["log.file.path", "agent.version"]
     # ECS versions change for any ECS release, large or small
