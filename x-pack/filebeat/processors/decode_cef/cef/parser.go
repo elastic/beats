@@ -1055,7 +1055,6 @@ func (e *Event) unpack(data string) error {
 		recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", extKey, p+1))
 		(p)--
 		cs = 33
-		goto _again
 
 		goto _again
 	f26:
@@ -1065,7 +1064,6 @@ func (e *Event) unpack(data string) error {
 		// Resume processing at p, the start of the next extension key.
 		p = mark
 		cs = 29
-		goto _again
 
 		goto _again
 	f2:
@@ -1288,7 +1286,6 @@ func (e *Event) unpack(data string) error {
 				recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", extKey, p+1))
 				(p)--
 				cs = 33
-				goto _again
 
 			case 35:
 //line cef.rl:44
@@ -1317,7 +1314,7 @@ func (e *Event) unpack(data string) error {
 					extKey, extValueStart, extValueEnd, escapes = "", 0, 0, escapes[:0]
 				}
 
-//line parser.go:1119
+//line parser.go:1116
 			}
 		}
 

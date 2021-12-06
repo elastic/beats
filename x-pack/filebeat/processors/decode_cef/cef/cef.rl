@@ -94,13 +94,13 @@ func (e *Event) unpack(data string) error {
         }
         action extension_err {
             recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", extKey, p+1))
-            fhold; fgoto gobble_extension;
+            fhold; fnext gobble_extension;
         }
         action recover_next_extension {
             extKey, extValueStart, extValueEnd = "", 0, 0
             // Resume processing at p, the start of the next extension key.
             p = mark;
-            fgoto extensions;
+            fnext extensions;
         }
 
         # Define what header characters are allowed.
