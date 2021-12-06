@@ -2022,7 +2022,7 @@
 - from: method
   to: http.request.method
   alias: false
-  comment: Field is used by serveral protocols.
+  comment: Field is used by several protocols.
   beat: packetbeat
 
 - from: path
@@ -2033,7 +2033,7 @@
 - from: real_ip
   to: network.forwarded_ip
   alias: false
-  comment: Field is used by serveral protocols.
+  comment: Field is used by several protocols.
   beat: packetbeat
 
 ## MySQL
@@ -2041,7 +2041,7 @@
   to: status
   alias: false
   comment: >
-    Status reflects whether or not an error occured. Its values are either
+    Status reflects whether or not an error occurred. Its values are either
     OK or Error.
   beat: packetbeat
 
@@ -2102,20 +2102,6 @@
   to: url.port
   alias: true
   beat: heartbeat
-
-# Journalbeat
-- from: host.name
-  to: host.hostname
-  alias: false
-  beat: journalbeat
-  comment: This field should not be renamed as it would cause issue some Beats and Journalbeat does not have dashboards
-  # This field should not be renamed as it would cause issue some Beats and Journalbeat does not have dashboards
-  rename: false
-
-- from: read_timestamp
-  to: event.created
-  alias: true
-  beat: journalbeat
 
 ## Winlogbeat
 

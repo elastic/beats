@@ -94,7 +94,6 @@ class Test(BaseTest):
         es = self.es_client()
         self.copy_files(["template.json"])
         path = os.path.join(self.working_dir, "template.json")
-        print(path)
 
         self.render_config_template(
             elasticsearch={"hosts": self.get_host()},
@@ -102,6 +101,7 @@ class Test(BaseTest):
             template_json_enabled="true",
             template_json_path=path,
             template_json_name=template_name,
+            template_type="index",
         )
 
         proc = self.start_beat()
@@ -110,7 +110,7 @@ class Test(BaseTest):
         self.wait_until(lambda: self.log_contains('Template with name "bla" loaded.'))
         proc.check_kill_and_wait()
 
-        result = es.transport.perform_request('GET', '/_template/' + template_name)
+        result = es.transport.perform_request('GET', '/_index_template/' + template_name)
         assert len(result) == 1
 
     def get_host(self):
@@ -153,7 +153,7 @@ class TestRunTemplate(BaseTest):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.idxmgmt.assert_ilm_template_loaded(self.index_name, self.beat_name, self.index_name)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.index_name, self.beat_name, self.index_name)
         self.idxmgmt.assert_alias_created(self.index_name)
         self.idxmgmt.assert_docs_written_to_alias(self.index_name)
 
@@ -212,7 +212,7 @@ class TestCommandSetupTemplate(BaseTest):
                                   extra_args=["setup", self.setupCmd, "--ilm-policy"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.index_name, self.policy_name, self.index_name)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.index_name, self.policy_name, self.index_name)
         self.idxmgmt.assert_alias_created(self.index_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
 
@@ -227,7 +227,7 @@ class TestCommandSetupTemplate(BaseTest):
                                   extra_args=["setup", self.setupCmd])
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.index_name, self.policy_name, self.index_name)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.index_name, self.policy_name, self.index_name)
         self.idxmgmt.assert_index_template_index_pattern(self.index_name, [self.index_name + "-*"])
 
         # when running `setup --template`
@@ -267,13 +267,17 @@ class TestCommandSetupTemplate(BaseTest):
                                               "-E", "setup.template.settings.index.number_of_shards=2"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_legacy_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_index_template_loaded(self.index_name)
 
         # check that settings are overwritten
-        resp = self.es.transport.perform_request('GET', '/_template/' + self.index_name)
-        assert self.index_name in resp
-        index = resp[self.index_name]["settings"]["index"]
-        assert index["number_of_shards"] == "2", index["number_of_shards"]
+        resp = self.es.transport.perform_request('GET', '/_index_template/' + self.index_name)
+        found = False
+        for index_template in resp["index_templates"]:
+            if self.index_name == index_template["name"]:
+                found = True
+                index = index_template["index_template"]["template"]["settings"]["index"]
+                assert index["number_of_shards"] == "2", index["number_of_shards"]
+            assert found
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
@@ -287,7 +291,7 @@ class TestCommandSetupTemplate(BaseTest):
                                               "-E", "setup.ilm.rollover_alias=" + self.custom_alias])
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
         self.idxmgmt.assert_index_template_index_pattern(self.custom_alias, [self.custom_alias + "-*"])
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -305,7 +309,7 @@ class TestCommandSetupTemplate(BaseTest):
                                               "-E", "setup.template.name=" + self.custom_alias,
                                               "-E", "setup.template.pattern=" + self.custom_alias + "*"])
         assert exit_code == 0
-        self.idxmgmt.assert_legacy_index_template_loaded(self.custom_alias)
+        self.idxmgmt.assert_index_template_loaded(self.custom_alias)
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
         # ensure ilm policy is created, triggering overwriting existing template
@@ -314,13 +318,17 @@ class TestCommandSetupTemplate(BaseTest):
                                               "-E", "setup.template.settings.index.number_of_shards=2",
                                               "-E", "setup.ilm.rollover_alias=" + self.custom_alias])
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
         self.idxmgmt.assert_policy_created(self.policy_name)
         # check that template was overwritten
-        resp = self.es.transport.perform_request('GET', '/_template/' + self.custom_alias)
-        assert self.custom_alias in resp
-        index = resp[self.custom_alias]["settings"]["index"]
-        assert index["number_of_shards"] == "2", index["number_of_shards"]
+        resp = self.es.transport.perform_request('GET', '/_index_template/' + self.custom_alias)
+        found = False
+        for index_template in resp["index_templates"]:
+            if index_template["name"] == self.custom_alias:
+                found = True
+                index = index_template["index_template"]["template"]["settings"]["index"]
+                assert index["number_of_shards"] == "2", index["number_of_shards"]
+        assert found
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')

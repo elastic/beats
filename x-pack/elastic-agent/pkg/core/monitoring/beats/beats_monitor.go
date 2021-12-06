@@ -123,6 +123,11 @@ func (b *Monitor) EnrichArgs(spec program.Spec, pipelineID string, args []string
 			"-E", "http.enabled=true",
 			"-E", "http.host="+endpoint,
 		)
+		if b.config.Pprof {
+			appendix = append(appendix,
+				"-E", "http.pprof.enabled=true",
+			)
+		}
 	}
 
 	loggingPath := b.generateLoggingPath(spec, pipelineID)

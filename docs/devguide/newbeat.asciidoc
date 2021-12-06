@@ -1,6 +1,8 @@
 [[new-beat]]
 == Creating a New Beat
 
+deprecated:[7.16.0]
+
 This guide walks you through the steps for creating a new Elastic Beat.  The
 Beats are a collection of lightweight daemons that collect operational data from
 your servers and ship it to Elasticsearch or Logstash.  The common parts for

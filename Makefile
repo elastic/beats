@@ -1,6 +1,6 @@
 BUILD_DIR=$(CURDIR)/build
 COVERAGE_DIR=$(BUILD_DIR)/coverage
-BEATS?=auditbeat filebeat heartbeat journalbeat metricbeat packetbeat winlogbeat x-pack/functionbeat x-pack/elastic-agent x-pack/osquerybeat
+BEATS?=auditbeat filebeat heartbeat metricbeat packetbeat winlogbeat x-pack/functionbeat x-pack/elastic-agent x-pack/osquerybeat
 PROJECTS=libbeat $(BEATS)
 PROJECTS_ENV=libbeat filebeat metricbeat
 PYTHON_ENV?=$(BUILD_DIR)/python-env
@@ -128,8 +128,9 @@ check-no-changes:
 ## check-python : Python Linting.
 .PHONY: check-python
 check-python: python-env
-	@$(FIND) -name *.py -name *.py -not -path "*/build/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false)
-	@$(FIND) -name *.py -not -path "*/build/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
+	@. $(PYTHON_ENV)/bin/activate; \
+	$(FIND) -name *.py -name *.py -not -path "*/build/*" -exec $(PYTHON_ENV)/bin/autopep8 -d --max-line-length 120  {} \; | (! grep . -q) || (echo "Code differs from autopep8's style" && false); \
+	$(FIND) -name *.py -not -path "*/build/*" | xargs $(PYTHON_ENV)/bin/pylint --py3k -E || (echo "Code is not compatible with Python 3" && false)
 
 ## check-headers : Check the license headers.
 .PHONY: check-headers
@@ -183,10 +184,11 @@ notice:
 ## python-env : Sets up the virtual python environment.
 .PHONY: python-env
 python-env:
-	@test -d $(PYTHON_ENV) || ${PYTHON_EXE} -m venv $(VENV_PARAMS) $(PYTHON_ENV)
-	@$(PYTHON_ENV)/bin/pip install -q --upgrade pip autopep8==1.5.4 pylint==2.4.4
+	@test -f $(PYTHON_ENV)/bin/activate || ${PYTHON_EXE} -m venv $(VENV_PARAMS) $(PYTHON_ENV)
+	@. $(PYTHON_ENV)/bin/activate; \
+	${PYTHON_EXE} -m pip install -q --upgrade pip autopep8==1.5.4 pylint==2.4.4; \
+	find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 	@# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
-	@find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 
 ## test-apm : Tests if apm works with the current code
 .PHONY: test-apm

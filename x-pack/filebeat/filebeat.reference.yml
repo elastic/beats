@@ -2506,8 +2506,8 @@ filebeat.inputs:
 # The different types cannot be mixed in one input
 #
 # Possible options are:
-# * log: Reads every line of the log file (default)
-# * filestream: Improved version of log input
+# * filestream: Reads every line of the log file
+# * log: Reads every line of the log file (deprecated)
 # * stdin: Reads the standard in
 
 #------------------------------ Log input --------------------------------
@@ -2590,7 +2590,8 @@ filebeat.inputs:
   #max_bytes: 10485760
 
   # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
-  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
+  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator,
+  # null_terminator
   #line_terminator: auto
 
   ### Recursive glob configuration
@@ -2844,7 +2845,8 @@ filebeat.inputs:
   #message_max_bytes: 10485760
 
   # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
-  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
+  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator,
+  # null_terminator
   #line_terminator: auto
 
   # The ingest pipeline ID associated with this input. If this is set, it
@@ -3266,7 +3268,7 @@ filebeat.inputs:
     #reload.enabled: true
     #reload.period: 10s
   #modules:
-    #enabled: false
+    #enabled: true
     #path: modules.d/*.yml
     #reload.enabled: true
     #reload.period: 10s
@@ -4359,8 +4361,8 @@ output.elasticsearch:
 
 # Select the kind of index template. From Elasticsearch 7.8, it is possible to
 # use component templates. Available options: legacy, component, index.
-# By default filebeat uses the legacy index templates.
-#setup.template.type: legacy
+# By default filebeat uses index templates.
+#setup.template.type: index
 
 # Template name. By default the template name is "filebeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
@@ -4597,11 +4599,13 @@ logging.files:
   #suffix: count
 
 # Set to true to log messages in JSON format.
+# Deprecated: As of 7.16.0 this setting is deprecated and will be removed in an upcoming release.
 #logging.json: false
 
 # Set to true, to log messages with minimal required Elastic Common Schema (ECS)
 # information. Recommended to use in combination with `logging.json=true`
 # Defaults to false.
+# Deprecated: As of 7.16.0 this setting is deprecated and will be removed in an upcoming release.
 #logging.ecs: false
 
 # ============================= X-Pack Monitoring ==============================
@@ -4787,6 +4791,10 @@ logging.files:
 # Descriptor Definition Language (SDDL) to define the permission. This option cannot be used with
 # `http.user`.
 #http.named_pipe.security_descriptor:
+
+# Defines if the HTTP pprof endpoints are enabled.
+# It is recommended that this is only enabled on localhost as these endpoints may leak data.
+#http.pprof.enabled: false
 
 # ============================== Process Security ==============================
 

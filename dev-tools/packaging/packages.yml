@@ -94,6 +94,18 @@ shared:
         source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
         mode: 0644
         skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{.AgentDropPath}}/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+        skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
+        source: '{{.AgentDropPath}}/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+        skip_on_missing: true
+      /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
+        source: '{{.AgentDropPath}}/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
       /var/lib/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
         source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
@@ -210,6 +222,18 @@ shared:
         source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
         mode: 0644
         skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
+        source: '{{.AgentDropPath}}/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+        skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512:
+        source: '{{.AgentDropPath}}/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+        skip_on_missing: true
+      /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc:
+        source: '{{.AgentDropPath}}/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
       /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/downloads/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz:
         source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
@@ -315,6 +339,18 @@ shared:
         source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
         mode: 0644
         skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
+        source: '{{.AgentDropPath}}/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512':
+        source: '{{.AgentDropPath}}/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.sha512'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc':
+        source: '{{.AgentDropPath}}/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
+        mode: 0644
+        skip_on_missing: true
       'data/{{.BeatName}}-{{ commit_short }}/downloads/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz':
         source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz'
         mode: 0644
@@ -388,6 +424,18 @@ shared:
         source: '{{.AgentDropPath}}/metricbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc'
         mode: 0644
         skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
+        source: '{{.AgentDropPath}}/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512':
+        source: '{{.AgentDropPath}}/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512'
+        mode: 0644
+        skip_on_missing: true
+      'data/{{.BeatName}}-{{ commit_short }}/downloads/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc':
+        source: '{{.AgentDropPath}}/osquerybeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc'
+        mode: 0644
+        skip_on_missing: true
       'data/{{.BeatName}}-{{ commit_short }}/downloads/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
         source: '{{.AgentDropPath}}/endpoint-security-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
         mode: 0644
@@ -450,6 +498,11 @@ shared:
     extra_vars:
       from: 'arm64v8/centos:7'
       buildFrom: 'arm64v8/centos:7'
+
+  - &agent_docker_complete_spec
+    <<: *agent_docker_spec
+    extra_vars:
+      image_name: '{{.BeatName}}-complete'
 
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
@@ -1002,9 +1055,20 @@ specs:
         <<: *agent_docker_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
-        # This image gets a 'complete' variant for synthetics and other large
-        # packages too big to fit in the main image
-        variants: ["complete"]
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    # Complete image gets a 'complete' variant for synthetics and other large
+    # packages too big to fit in the main image
+    - os: linux
+      arch: amd64
+      types: [docker]
+      spec:
+        <<: *agent_docker_spec
+        <<: *agent_docker_complete_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
@@ -1028,9 +1092,20 @@ specs:
         <<: *agent_docker_arm_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
-        # This image gets a 'complete' variant for synthetics and other large
-        # packages too big to fit in the main image
-        variants: ["complete"]
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    # Complete image gets a 'complete' variant for synthetics and other large
+    # packages too big to fit in the main image
+    - os: linux
+      arch: arm64
+      types: [docker]
+      spec:
+        <<: *agent_docker_arm_spec
+        <<: *agent_docker_complete_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}

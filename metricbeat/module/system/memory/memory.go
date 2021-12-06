@@ -27,6 +27,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -45,6 +46,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	IsAgent bool
+	mod     system.SystemModule
 }
 
 // New is a mb.MetricSetFactory that returns a memory.MetricSet.
@@ -54,14 +56,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if !ok {
 		return nil, fmt.Errorf("unexpected module type")
 	}
+	if runtime.GOOS == "linux" {
+		cfgwarn.Deprecate("8.0", "linux-only memory stats, such as hugepages, and page_stats, will be moved to the linux module")
+	}
 
-	return &MetricSet{BaseMetricSet: base, IsAgent: systemModule.IsAgent}, nil
+	sys := base.Module().(system.SystemModule)
+	return &MetricSet{BaseMetricSet: base, mod: sys, IsAgent: systemModule.IsAgent}, nil
 }
 
 // Fetch fetches memory metrics from the OS.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
-	eventRaw, err := metrics.Get("")
+	eventRaw, err := metrics.Get(m.mod.GetHostFS())
 	if err != nil {
 		return errors.Wrap(err, "error fetching memory metrics")
 	}

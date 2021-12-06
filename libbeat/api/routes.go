@@ -20,6 +20,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	_ "net/http/pprof"
 	"net/url"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -45,6 +46,14 @@ func NewWithDefaultRoutes(log *logp.Logger, config *common.Config, ns lookupFunc
 		mux.HandleFunc(api, h)
 	}
 	return New(log, mux, config)
+}
+
+func (s *Server) AttachPprof() {
+	s.log.Info("Attaching pprof endpoints")
+	s.mux.HandleFunc("/debug/pprof/", func(w http.ResponseWriter, r *http.Request) {
+		http.DefaultServeMux.ServeHTTP(w, r)
+	})
+
 }
 
 func makeRootAPIHandler(handler handlerFunc) handlerFunc {

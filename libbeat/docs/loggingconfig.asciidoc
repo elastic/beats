@@ -269,11 +269,15 @@ true.
 
 When true, logs messages in JSON format. The default is false.
 
+deprecated::[7.16.0]
+
 [float]
 ==== `logging.ecs`
 
 When true, logs messages with minimal required Elastic Common Schema (ECS)
 information.
+
+deprecated::[7.16.0]
 
 ifndef::serverless[]
 [float]

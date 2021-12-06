@@ -25,6 +25,7 @@ import (
 	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/metric/system/diskio"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -69,7 +70,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if !ok {
 		return nil, fmt.Errorf("unexpected module type")
 	}
-
+	if runtime.GOOS == "linux" {
+		cfgwarn.Deprecate("8.0", "io.ops and iostat metrics will be moved to the linux module")
+	}
 	return &MetricSet{
 		BaseMetricSet:  base,
 		statistics:     diskio.NewDiskIOStat(),

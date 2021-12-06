@@ -92,6 +92,8 @@ var configList = []ConfigItem{
 
 // Generate generates a new custom beat
 func Generate() error {
+	fmt.Println("Generating custom Beats are going to be removed in 8.0.0.")
+
 	cfg, err := getConfig()
 	if err != nil {
 		return errors.Wrap(err, "error getting config")

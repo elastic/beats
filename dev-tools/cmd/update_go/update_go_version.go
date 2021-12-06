@@ -30,7 +30,6 @@ var files = []string{
 	"auditbeat/Dockerfile",
 	"filebeat/Dockerfile",
 	"heartbeat/Dockerfile",
-	"journalbeat/Dockerfile",
 	"libbeat/Dockerfile",
 	"libbeat/docs/version.asciidoc",
 	"metricbeat/Dockerfile",

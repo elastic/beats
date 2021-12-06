@@ -1262,8 +1262,8 @@ output.elasticsearch:
 
 # Select the kind of index template. From Elasticsearch 7.8, it is possible to
 # use component templates. Available options: legacy, component, index.
-# By default auditbeat uses the legacy index templates.
-#setup.template.type: legacy
+# By default auditbeat uses index templates.
+#setup.template.type: index
 
 # Template name. By default the template name is "auditbeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
@@ -1500,11 +1500,13 @@ logging.files:
   #suffix: count
 
 # Set to true to log messages in JSON format.
+# Deprecated: As of 7.16.0 this setting is deprecated and will be removed in an upcoming release.
 #logging.json: false
 
 # Set to true, to log messages with minimal required Elastic Common Schema (ECS)
 # information. Recommended to use in combination with `logging.json=true`
 # Defaults to false.
+# Deprecated: As of 7.16.0 this setting is deprecated and will be removed in an upcoming release.
 #logging.ecs: false
 
 # ============================= X-Pack Monitoring ==============================
@@ -1690,6 +1692,10 @@ logging.files:
 # Descriptor Definition Language (SDDL) to define the permission. This option cannot be used with
 # `http.user`.
 #http.named_pipe.security_descriptor:
+
+# Defines if the HTTP pprof endpoints are enabled.
+# It is recommended that this is only enabled on localhost as these endpoints may leak data.
+#http.pprof.enabled: false
 
 # ============================== Process Security ==============================
 

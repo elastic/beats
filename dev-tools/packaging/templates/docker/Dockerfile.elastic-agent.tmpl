@@ -32,9 +32,6 @@ RUN readlink -f {{ $beatBinary }} | xargs setcap {{ .linux_capabilities }}
 
 FROM {{ .from }}
 
-# Contains the elastic agent image variant, an empty string for the standard variant
-# or "complete" for the bigger one.
-ENV ELASTIC_AGENT_IMAGE_VARIANT={{.Variant}}
 ENV BEAT_SETUID_AS={{ .user }}
 
 {{- if contains .from "ubi-minimal" }}
@@ -54,10 +51,10 @@ RUN case $(arch) in aarch64) YUM_FLAGS="-x bind-license";; esac; \
     (exit $exit_code)
 {{- end }}
 
-{{- if (and (eq .Variant "complete") (not (contains .from "ubi-minimal"))) }}
+{{- if (and (contains .image_name "-complete") (not (contains .from "ubi-minimal"))) }}
 RUN for iter in {1..10}; do \
-        yum -y install atk cups gtk gdk xrandr pango libXcomposite libXcursor libXdamage \
-        libXext libXi libXtst cups-libs libXScrnSaver libXrandr GConf2 \
+        yum -y install atk gtk gdk xrandr pango libXcomposite libXcursor libXdamage \
+        libXext libXi libXtst libXScrnSaver libXrandr GConf2 \
         alsa-lib atk gtk3 ipa-gothic-fonts xorg-x11-fonts-100dpi xorg-x11-fonts-75dpi xorg-x11-utils \
         xorg-x11-fonts-cyrillic xorg-x11-fonts-Type1 xorg-x11-fonts-misc \
         yum clean all && \
@@ -143,13 +140,13 @@ COPY --from=home {{ $beatHome }}/NOTICE.txt /licenses
 {{- if ne .user "root" }}
 RUN groupadd --gid 1000 {{ .BeatName }}
 RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
-{{- if (and (eq .Variant "complete") (not (contains .from "ubi-minimal")))  }}
+{{- if (and (contains .image_name "-complete") (not (contains .from "ubi-minimal")))  }}
 RUN chown {{ .user }} $NODE_PATH
 {{- end }}
 {{- end }}
 USER {{ .user }}
 
-{{- if (and (eq .Variant "complete") (not (contains .from "ubi-minimal")))  }}
+{{- if (and (contains .image_name "-complete") (not (contains .from "ubi-minimal")))  }}
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV SUITES_DIR={{ $beatHome }}/suites

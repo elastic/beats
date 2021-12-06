@@ -40,6 +40,10 @@ stages:
     pythonIntegTest:
         mage: "mage pythonIntegTest"
         stage: mandatory
+    shipping-to-next-major:
+        mage: >-                 ## Run integration tests under next major of Elastic stack.
+          STACK_ENVIRONMENT=next-major
+          mage pythonIntegTest
     crosscompile:
         make: "make -C libbeat crosscompile"
         stage: mandatory

@@ -189,6 +189,6 @@ func Resolve(fileType FileType, path string) string {
 
 // String returns a textual representation
 func (paths *Path) String() string {
-	return fmt.Sprintf("Home path: [%s] Config path: [%s] Data path: [%s] Logs path: [%s]",
-		paths.Home, paths.Config, paths.Data, paths.Logs)
+	return fmt.Sprintf("Home path: [%s] Config path: [%s] Data path: [%s] Logs path: [%s] Hostfs Path: [%s]",
+		paths.Home, paths.Config, paths.Data, paths.Logs, paths.Hostfs)
 }

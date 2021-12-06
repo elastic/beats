@@ -54,7 +54,7 @@ For example:
 ----------------------------------------------------------------------
 output.elasticsearch:
   hosts: ["https://myEShost:9200"]
-  api_key: "KnR6yE41RrSowb0kQ0HWoA" <1>
+  api_key: "ZCV7VnwBgnX0T19fN8Qe:KnR6yE41RrSowb0kQ0HWoA" <1>
 ----------------------------------------------------------------------
 <1> This API key must have the privileges required to publish events to {es}.
 To create an API key like this, see <<beats-api-keys>>.

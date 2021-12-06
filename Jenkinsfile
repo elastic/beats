@@ -141,11 +141,9 @@ pipeline {
     stage('Packaging') {
       options { skipDefaultCheckout() }
       when {
-        // Always when running builds on branches/tags
         // On a PR basis, skip if changes are only related to docs.
         // Always when forcing the input parameter
         anyOf {
-          not { changeRequest() }                           // If no PR
           allOf {                                           // If PR and no docs changes
             expression { return env.ONLY_DOCS == "false" }
             changeRequest()
@@ -419,8 +417,6 @@ def pushCIDockerImages(Map args = [:]) {
       tagAndPush(beatName: 'filebeat', arch: arch)
     } else if (beatsFolder.endsWith('heartbeat')) {
       tagAndPush(beatName: 'heartbeat', arch: arch)
-    } else if ("${beatsFolder}" == "journalbeat"){
-      tagAndPush(beatName: 'journalbeat', arch: arch)
     } else if (beatsFolder.endsWith('metricbeat')) {
       tagAndPush(beatName: 'metricbeat', arch: arch)
     } else if ("${beatsFolder}" == "packetbeat"){
@@ -524,7 +520,11 @@ def e2e(Map args = [:]) {
   if (args.e2e.get('entrypoint', '')?.trim()) {
     e2e_with_entrypoint(args)
   } else {
-    e2e_with_job(args)
+    runE2E(testMatrixFile: args.e2e?.get('testMatrixFile', ''),
+           beatVersion: "${env.VERSION}-SNAPSHOT",
+           gitHubCheckName: "e2e-${args.context}",
+           gitHubCheckRepo: env.REPO,
+           gitHubCheckSha1: env.GIT_BASE_COMMIT)
   }
 }
 
@@ -557,35 +557,6 @@ def e2e_with_entrypoint(Map args = [:]) {
       }
     }
   }
-}
-
-/**
-* This method triggers the end 2 end testing job.
-*/
-def e2e_with_job(Map args = [:]) {
-  def jobName = args.e2e?.get('job')
-  def testMatrixFile = args.e2e?.get('testMatrixFile', '')
-  def notifyContext = "e2e-${args.context}"
-  def e2eTestsPipeline = "${jobName}/${isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"}"
-
-  def parameters = [
-    booleanParam(name: 'forceSkipGitChecks', value: true),
-    booleanParam(name: 'forceSkipPresubmit', value: true),
-    booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
-    string(name: 'BEAT_VERSION', value: "${env.VERSION}-SNAPSHOT"),
-    string(name: 'testMatrixFile', value: testMatrixFile),
-    string(name: 'GITHUB_CHECK_NAME', value: notifyContext),
-    string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
-    string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
-  ]
-
-  build(job: "${e2eTestsPipeline}",
-    parameters: parameters,
-    propagate: false,
-    wait: false
-  )
-
-  githubNotify(context: "${notifyContext}", description: "${notifyContext} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${e2eTestsPipeline.replaceAll('/','+')}")
 }
 
 /**
@@ -839,20 +810,23 @@ def archiveTestOutput(Map args = [:]) {
       catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
         withMageEnv(version: "${env.GO_VERSION}"){
           dir(directory){
-            cmd(label: "Archive system tests files", script: 'mage packageSystemTests')
+            cmd(label: "Archive system tests files", script: 'mage packageSystemTests', returnStatus: true)
           }
         }
+
         def fileName = 'build/system-tests-*.tar.gz' // see dev-tools/mage/target/common/package.go#PackageSystemTests method
         def files = findFiles(glob: "${fileName}")
-        files.each { file ->
-          echo "${file.name}"
+
+        if (files?.length > 0) {
+          googleStorageUploadExt(
+            bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
+            credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+            pattern: "${fileName}",
+            sharedPublicly: true
+          )
+        } else {
+          log(level: 'WARN', text: "There are no system-tests files to upload Google Storage}")
         }
-        googleStorageUploadExt(
-          bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
-          credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-          pattern: "${fileName}",
-          sharedPublicly: true
-        )
       }
     }
   }

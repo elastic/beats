@@ -20,6 +20,8 @@ package template
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 )
 
@@ -69,17 +71,38 @@ func DefaultConfig() TemplateConfig {
 	return TemplateConfig{
 		Enabled:  true,
 		Fields:   "",
-		Type:     IndexTemplateLegacy,
+		Type:     IndexTemplateIndex,
 		Order:    1,
 		Priority: 150,
 	}
 }
 
+func Unpack(c *common.Config) (TemplateConfig, error) {
+	if c == nil {
+		return DefaultConfig(), nil
+	}
+
+	jsonEnabled, _ := c.Bool("json.enabled", -1)
+	config := DefaultConfig()
+	if jsonEnabled {
+		cfgwarn.Deprecate("8.0.0", "Please migrate your JSON templates from legacy template format to composable index template.")
+		config.Type = IndexTemplateLegacy
+	}
+	var err error
+	if c != nil {
+		err = c.Unpack(&config)
+	}
+	return config, err
+
+}
+
 func (t *IndexTemplateType) Unpack(v string) error {
 	if v == "" {
-		*t = IndexTemplateLegacy
+		*t = IndexTemplateIndex
 		return nil
 	}
+
+	cfgwarn.Deprecate("8.0.0", "do not use setup.template.type, it is deprecated, data streams will be loaded automatically")
 
 	var tt IndexTemplateType
 	var ok bool

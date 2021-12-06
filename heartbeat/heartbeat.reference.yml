@@ -71,26 +71,6 @@ heartbeat.monitors:
   # sub-dictionary. Default is false.
   #fields_under_root: false
 
-  # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
-  # Configure file json file to be watched for changes to the monitor:
-  #watch.poll_file:
-    # Path to check for updates.
-    #path:
-
-    # Interval between file file changed checks.
-    #interval: 5s
-
-  # The ingest pipeline ID associated with this input. If this is set, it
-  # overwrites the pipeline option from the Elasticsearch output.
-  #pipeline:
-
-  # The index name associated with this input. If this is set, it
-  # overwrites the index option from the Elasticsearch output.
-  #index:
-
-  # Set to true to publish fields with null values in events.
-  #keep_null: false
-
 # Define a directory to load monitor definitions from. Definitions take the form
 # of individual yaml files.
 # heartbeat.config.monitors:
@@ -168,16 +148,7 @@ heartbeat.monitors:
     # Required TLS protocols
     #supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
 
-  # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
-  # Configure file json file to be watched for changes to the monitor:
-  #watch.poll_file:
-    # Path to check for updates.
-    #path:
-
-    # Interval between file file changed checks.
-    #interval: 5s
-
-  # The ingest pipeline ID associated with this input. If this is set, it
+  # The Ingest Node pipeline ID associated with this input. If this is set, it
   # overwrites the pipeline option from the Elasticsearch output.
   #pipeline:
 
@@ -209,14 +180,6 @@ heartbeat.monitors:
   ipv4: true
   ipv6: true
   mode: any
-
-  # Configure file json file to be watched for changes to the monitor:
-  #watch.poll_file:
-    # Path to check for updates.
-    #path:
-
-    # Interval between file file changed checks.
-    #interval: 5s
 
   # Optional HTTP proxy url.
   #proxy_url: ''
@@ -272,17 +235,7 @@ heartbeat.monitors:
     #    equals:
     #      myField: expectedValue
 
-
-  # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
-  # Configure file json file to be watched for changes to the monitor:
-  #watch.poll_file:
-    # Path to check for updates.
-    #path:
-
-    # Interval between file file changed checks.
-    #interval: 5s
-
-  # The ingest pipeline ID associated with this input. If this is set, it
+  # The Ingest Node pipeline ID associated with this input. If this is set, it
   # overwrites the pipeline option from the Elasticsearch output.
   #pipeline:
 
@@ -1398,8 +1351,8 @@ output.elasticsearch:
 
 # Select the kind of index template. From Elasticsearch 7.8, it is possible to
 # use component templates. Available options: legacy, component, index.
-# By default heartbeat uses the legacy index templates.
-#setup.template.type: legacy
+# By default heartbeat uses index templates.
+#setup.template.type: index
 
 # Template name. By default the template name is "heartbeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
@@ -1636,11 +1589,13 @@ logging.files:
   #suffix: count
 
 # Set to true to log messages in JSON format.
+# Deprecated: As of 7.16.0 this setting is deprecated and will be removed in an upcoming release.
 #logging.json: false
 
 # Set to true, to log messages with minimal required Elastic Common Schema (ECS)
 # information. Recommended to use in combination with `logging.json=true`
 # Defaults to false.
+# Deprecated: As of 7.16.0 this setting is deprecated and will be removed in an upcoming release.
 #logging.ecs: false
 
 # ============================= X-Pack Monitoring ==============================
@@ -1826,6 +1781,10 @@ logging.files:
 # Descriptor Definition Language (SDDL) to define the permission. This option cannot be used with
 # `http.user`.
 #http.named_pipe.security_descriptor:
+
+# Defines if the HTTP pprof endpoints are enabled.
+# It is recommended that this is only enabled on localhost as these endpoints may leak data.
+#http.pprof.enabled: false
 
 # ============================== Process Security ==============================
 

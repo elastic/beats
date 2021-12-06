@@ -31,7 +31,6 @@ import (
 func TestFileLoader_Load(t *testing.T) {
 	ver := "7.0.0"
 	prefix := "mock"
-	order := 1
 	info := beat.Info{Version: ver, IndexPrefix: prefix}
 	tmplName := fmt.Sprintf("%s-%s", prefix, ver)
 
@@ -42,29 +41,35 @@ func TestFileLoader_Load(t *testing.T) {
 		"load minimal config info": {
 			body: common.MapStr{
 				"index_patterns": []string{"mock-7.0.0-*"},
-				"order":          order,
-				"settings":       common.MapStr{"index": nil}},
+				"priority":       150,
+				"template": common.MapStr{
+					"settings": common.MapStr{"index": nil}},
+			},
 		},
 		"load minimal config with index settings": {
 			settings: TemplateSettings{Index: common.MapStr{"code": "best_compression"}},
 			body: common.MapStr{
 				"index_patterns": []string{"mock-7.0.0-*"},
-				"order":          order,
-				"settings":       common.MapStr{"index": common.MapStr{"code": "best_compression"}}},
+				"priority":       150,
+				"template": common.MapStr{
+					"settings": common.MapStr{"index": common.MapStr{"code": "best_compression"}}},
+			},
 		},
 		"load minimal config with source settings": {
 			settings: TemplateSettings{Source: common.MapStr{"enabled": false}},
 			body: common.MapStr{
 				"index_patterns": []string{"mock-7.0.0-*"},
-				"order":          order,
-				"settings":       common.MapStr{"index": nil},
-				"mappings": common.MapStr{
-					"_source":           common.MapStr{"enabled": false},
-					"_meta":             common.MapStr{"beat": prefix, "version": ver},
-					"date_detection":    false,
-					"dynamic_templates": nil,
-					"properties":        nil,
-				}},
+				"priority":       150,
+				"template": common.MapStr{
+					"settings": common.MapStr{"index": nil},
+					"mappings": common.MapStr{
+						"_source":           common.MapStr{"enabled": false},
+						"_meta":             common.MapStr{"beat": prefix, "version": ver},
+						"date_detection":    false,
+						"dynamic_templates": nil,
+						"properties":        nil,
+					}},
+			},
 		},
 	} {
 		t.Run(name, func(t *testing.T) {

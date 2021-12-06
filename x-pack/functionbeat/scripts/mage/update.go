@@ -5,13 +5,9 @@
 package mage
 
 import (
-	"os"
-	"path/filepath"
-
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
 // Update target namespace.
@@ -24,7 +20,7 @@ var Aliases = map[string]interface{}{
 
 // All updates all generated content.
 func (Update) All() {
-	mg.Deps(Update.Fields, Update.IncludeFields, Update.Config, Update.FieldDocs, Update.VendorBeats)
+	mg.Deps(Update.Fields, Update.IncludeFields, Update.Config, Update.FieldDocs)
 }
 
 // Config generates both the short and reference configs.
@@ -49,43 +45,4 @@ func (Update) IncludeFields() error {
 	mg.Deps(Update.Fields)
 
 	return devtools.GenerateAllInOneFieldsGo()
-}
-
-// VendorBeats collects the vendor folder required to deploy the function for GCP.
-func (Update) VendorBeats() error {
-	for _, f := range []string{"pubsub", "storage"} {
-		gcpVendorPath := filepath.Join("provider", "gcp", "build", f, "vendor")
-		err := os.RemoveAll(gcpVendorPath)
-		if err != nil {
-			return err
-		}
-
-		deps, err := gotool.ListDepsLocation("github.com/elastic/beats/v7/x-pack/functionbeat/provider/gcp/" + f)
-		if err != nil {
-			return err
-		}
-
-		for importPath, location := range deps {
-			cp := &devtools.CopyTask{
-				Source:  location,
-				Dest:    filepath.Join(gcpVendorPath, importPath),
-				Mode:    0600,
-				DirMode: os.ModeDir | 0750,
-				Exclude: []string{
-					".*_test.go$",
-					".*.yml",
-					// XXX GCP function metadata lib must be removed to avoid build failures
-					// GH issue: https://github.com/googleapis/google-cloud-go/issues/1947
-					".*cloud.google.com/go.*/functions/metadata.*",
-				},
-			}
-			err = cp.Execute()
-			if err != nil {
-				return err
-			}
-		}
-
-	}
-
-	return nil
 }
