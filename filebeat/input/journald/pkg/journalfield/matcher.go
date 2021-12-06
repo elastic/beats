@@ -41,6 +41,30 @@ type MatcherBuilder struct {
 type journal interface {
 	AddMatch(string) error
 	AddDisjunction() error
+	AddConjunction() error
+}
+
+// IncludeMatches stores the advanced matching configuratio
+// provided by the user.
+type IncludeMatches struct {
+	Matches []Matcher        `config:"equals"`
+	AND     []IncludeMatches `config:"and"`
+	OR      []IncludeMatches `config:"or"`
+}
+
+func ApplyIncludeMatches(j journal, m IncludeMatches) error {
+	for _, match := range m.Matches {
+		j.AddMatch(match.str)
+	}
+
+	if len(m.OR) > 0 {
+		BuildIncludeMatches(j, m.OR)
+		j.AddDisjunction()
+	}
+	if len(m.AND) > 0 {
+		BuildIncludeMatches(j, m.AND)
+		j.AddConjunction()
+	}
 }
 
 var defaultBuilder = MatcherBuilder{Conversions: journaldEventFields}

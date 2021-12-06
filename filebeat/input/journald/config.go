@@ -48,7 +48,7 @@ type config struct {
 	CursorSeekFallback journalread.SeekMode `config:"cursor_seek_fallback"`
 
 	// Matches store the key value pairs to match entries.
-	Matches []journalfield.Matcher `config:"include_matches"`
+	Matches journalfield.IncludeMatches `config:"include_matches"`
 	// Units stores the units to monitor
 	Units []string `config:"units"`
 	// Kernel stores whether kernel messages should be monitored
