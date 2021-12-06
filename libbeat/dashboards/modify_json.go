@@ -53,9 +53,9 @@ func ReplaceIndexInIndexPattern(index string, content common.MapStr) (err error)
 		return nil
 	}
 
-	list, ok := content["objects"]
+	list, ok := content["references"]
 	if !ok {
-		return errors.New("empty index pattern")
+		return errors.New("no references")
 	}
 
 	updateObject := func(obj common.MapStr) {

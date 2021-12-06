@@ -126,7 +126,7 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 	}{
 		{
 			title: "Replace in []interface(map).map",
-			input: common.MapStr{"objects": []interface{}{map[string]interface{}{
+			input: common.MapStr{"references": []interface{}{map[string]interface{}{
 				"id":   "phonybeat-*",
 				"type": "index-pattern",
 				"attributes": map[string]interface{}{
@@ -134,7 +134,7 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 					"timeFieldName": "@timestamp",
 				}}}},
 			index: "otherindex-*",
-			expected: common.MapStr{"objects": []interface{}{map[string]interface{}{
+			expected: common.MapStr{"references": []interface{}{map[string]interface{}{
 				"id":   "otherindex-*",
 				"type": "index-pattern",
 				"attributes": map[string]interface{}{
@@ -144,7 +144,7 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 		},
 		{
 			title: "Replace in []interface(map).mapstr",
-			input: common.MapStr{"objects": []interface{}{map[string]interface{}{
+			input: common.MapStr{"references": []interface{}{map[string]interface{}{
 				"id":   "phonybeat-*",
 				"type": "index-pattern",
 				"attributes": common.MapStr{
@@ -152,7 +152,7 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 					"timeFieldName": "@timestamp",
 				}}}},
 			index: "otherindex-*",
-			expected: common.MapStr{"objects": []interface{}{map[string]interface{}{
+			expected: common.MapStr{"references": []interface{}{map[string]interface{}{
 				"id":   "otherindex-*",
 				"type": "index-pattern",
 				"attributes": common.MapStr{
@@ -162,7 +162,7 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 		},
 		{
 			title: "Replace in []map.mapstr",
-			input: common.MapStr{"objects": []map[string]interface{}{{
+			input: common.MapStr{"references": []map[string]interface{}{{
 				"id":   "phonybeat-*",
 				"type": "index-pattern",
 				"attributes": common.MapStr{
@@ -170,7 +170,7 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 					"timeFieldName": "@timestamp",
 				}}}},
 			index: "otherindex-*",
-			expected: common.MapStr{"objects": []map[string]interface{}{{
+			expected: common.MapStr{"references": []map[string]interface{}{{
 				"id":   "otherindex-*",
 				"type": "index-pattern",
 				"attributes": common.MapStr{
@@ -180,7 +180,7 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 		},
 		{
 			title: "Replace in []mapstr.mapstr",
-			input: common.MapStr{"objects": []common.MapStr{{
+			input: common.MapStr{"references": []common.MapStr{{
 				"id":   "phonybeat-*",
 				"type": "index-pattern",
 				"attributes": common.MapStr{
@@ -188,7 +188,7 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 					"timeFieldName": "@timestamp",
 				}}}},
 			index: "otherindex-*",
-			expected: common.MapStr{"objects": []common.MapStr{{
+			expected: common.MapStr{"references": []common.MapStr{{
 				"id":   "otherindex-*",
 				"type": "index-pattern",
 				"attributes": common.MapStr{
@@ -198,7 +198,7 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 		},
 		{
 			title: "Replace in []mapstr.interface(mapstr)",
-			input: common.MapStr{"objects": []common.MapStr{{
+			input: common.MapStr{"references": []common.MapStr{{
 				"id":   "phonybeat-*",
 				"type": "index-pattern",
 				"attributes": interface{}(common.MapStr{
@@ -206,7 +206,7 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 					"timeFieldName": "@timestamp",
 				})}}},
 			index: "otherindex-*",
-			expected: common.MapStr{"objects": []common.MapStr{{
+			expected: common.MapStr{"references": []common.MapStr{{
 				"id":   "otherindex-*",
 				"type": "index-pattern",
 				"attributes": interface{}(common.MapStr{
@@ -216,23 +216,23 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 		},
 		{
 			title: "Do not create missing attributes",
-			input: common.MapStr{"objects": []common.MapStr{{
+			input: common.MapStr{"references": []common.MapStr{{
 				"id":   "phonybeat-*",
 				"type": "index-pattern",
 			}}},
 			index: "otherindex-*",
-			expected: common.MapStr{"objects": []common.MapStr{{
+			expected: common.MapStr{"references": []common.MapStr{{
 				"id":   "otherindex-*",
 				"type": "index-pattern",
 			}}},
 		},
 		{
 			title: "Create missing id",
-			input: common.MapStr{"objects": []common.MapStr{{
+			input: common.MapStr{"references": []common.MapStr{{
 				"type": "index-pattern",
 			}}},
 			index: "otherindex-*",
-			expected: common.MapStr{"objects": []common.MapStr{{
+			expected: common.MapStr{"references": []common.MapStr{{
 				"id":   "otherindex-*",
 				"type": "index-pattern",
 			}}},
