@@ -61,7 +61,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
 
         heartbeat_proc = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=2))
-        self.wait_until(lambda: self.log_contains("Ending run_once run"))
+        self.wait_until(lambda: self.log_contains("Ending run_once run"), 30)
         heartbeat_proc.check_wait()
 
     def test_disabled(self):
