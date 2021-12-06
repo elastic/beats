@@ -154,7 +154,7 @@ func (s *Sniffer) Run() error {
 		}
 		defer f.Close()
 
-		w = pcapgo.NewWriter(f)
+		w = pcapgo.NewWriterNanos(f)
 		w.WriteFileHeader(65535, handle.LinkType())
 	}
 
