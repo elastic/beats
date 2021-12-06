@@ -95,7 +95,7 @@ func watchCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 
 	ctx := context.Background()
 	if err := watch(ctx, tilGrace, log); err != nil {
-		log.Debugf("Error detected proceeding to rollback", err)
+		log.Debugf("Error detected proceeding to rollback: %v", err)
 		err = upgrade.Rollback(ctx, marker.PrevHash, marker.Hash)
 		if err != nil {
 			log.Error("rollback failed", err)
