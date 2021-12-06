@@ -104,7 +104,7 @@ class Test(BaseTest):
         self.assert_explicit_ecs_version_set(module, fileset)
 
         try:
-            self.es.indices.delete(index=self.index_name)
+            self.es.indices.delete_data_stream(self.index_name)
         except BaseException:
             pass
         self.wait_until(lambda: not self.es.indices.exists(self.index_name))
@@ -242,7 +242,7 @@ def clean_keys(obj):
         host_keys.append("host.name")
 
     # The create timestamps area always new
-    time_keys = ["event.created", "event.ingested"]
+    time_keys = ["event.created", "event.ingested", "@timestamp"]
     # source path and agent.version can be different for each run
     other_keys = ["log.file.path", "agent.version"]
     # ECS versions change for any ECS release, large or small
