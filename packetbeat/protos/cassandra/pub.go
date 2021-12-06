@@ -33,7 +33,6 @@ type transPub struct {
 	sendResponse       bool
 	sendRequestHeader  bool
 	sendResponseHeader bool
-	ignoredOps         string
 
 	results protos.Reporter
 }
@@ -82,7 +81,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 	cassandra := common.MapStr{}
 	status := common.OK_STATUS
 
-	//requ can be null, if the message is a PUSHed message
+	// requ can be null, if the message is a PUSHed message
 	if requ != nil {
 		pbf.Source.Bytes = int64(requ.Size)
 		pbf.Event.Start = requ.Ts
@@ -101,7 +100,7 @@ func (pub *transPub) createEvent(requ, resp *message) beat.Event {
 			}
 		}
 	} else {
-		//dealing with PUSH message
+		// dealing with PUSH message
 		cassandra["no_request"] = true
 	}
 

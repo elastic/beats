@@ -66,7 +66,7 @@ func (i agentInput) addProcessorsAndIndex(cfg *common.Config) (*common.Config, e
 	mergeConfig, err := common.NewConfigFrom(common.MapStr{
 		"index": datastreamConfig.Datastream.Type + "-" + datastreamConfig.Datastream.Dataset + "-" + namespace,
 		"processors": append([]common.MapStr{
-			common.MapStr{
+			{
 				"add_fields": common.MapStr{
 					"target": "data_stream",
 					"fields": common.MapStr{
@@ -76,7 +76,7 @@ func (i agentInput) addProcessorsAndIndex(cfg *common.Config) (*common.Config, e
 					},
 				},
 			},
-			common.MapStr{
+			{
 				"add_fields": common.MapStr{
 					"target": "event",
 					"fields": common.MapStr{

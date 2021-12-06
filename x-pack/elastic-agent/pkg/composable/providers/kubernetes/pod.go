@@ -74,7 +74,7 @@ func NewPodEventer(
 	logger *logp.Logger,
 	client k8s.Interface,
 	scope string) (Eventer, error) {
-	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
+	watcher, err := kubernetes.NewNamedWatcher("agent-pod", client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
 		Namespace:    cfg.Namespace,
@@ -89,14 +89,12 @@ func NewPodEventer(
 		Node:        cfg.Node,
 	}
 	metaConf := cfg.AddResourceMetadata
-	if metaConf == nil {
-		metaConf = metadata.GetDefaultResourceMetadataConfig()
-	}
-	nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
+
+	nodeWatcher, err := kubernetes.NewNamedWatcher("agent-node", client, &kubernetes.Node{}, options, nil)
 	if err != nil {
 		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
 	}
-	namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+	namespaceWatcher, err := kubernetes.NewNamedWatcher("agent-namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
 		SyncTimeout: cfg.SyncPeriod,
 	}, nil)
 	if err != nil {
