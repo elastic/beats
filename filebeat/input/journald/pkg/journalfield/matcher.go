@@ -20,6 +20,8 @@ package journalfield
 import (
 	"fmt"
 	"strings"
+
+	"github.com/coreos/go-systemd/sdjournal"
 )
 
 // Matcher is a single field condition for filtering journal entries.
@@ -42,6 +44,7 @@ type journal interface {
 }
 
 var defaultBuilder = MatcherBuilder{Conversions: journaldEventFields}
+var kernelMatcher = Matcher{"_TRANSPORT=kernel"}
 
 // Build creates a new Matcher using the configured conversion table.
 // If no table has been configured the internal default table will be used.
@@ -117,4 +120,53 @@ func ApplyMatchersOr(j journal, matchers []Matcher) error {
 	}
 
 	return nil
+}
+
+func ApplyUnitMatchers(j journal, units []string, kernel bool) error {
+	for _, unit := range units {
+		matchers := [][]Matcher{
+			[]Matcher{
+				sdjournal.SD_JOURNAL_FIELD_SYSTEMD_UNIT + "=" + unit,
+			},
+			[]Matcher{
+				sdjournal.SD_JOURNAL_FIELD_MESSAGE_ID + "=fc2e22bc6ee647b6b90729ab34a250b1",
+				sdjournal.SD_JOURNAL_FIELD_UID + "=1",
+				"COREDUMP_UNIT=" + unit,
+			},
+			[]Matcher{
+				sdjournal.SD_JOURNAL_FIELD_PID + "=1",
+				"UNIT=" + unit,
+			},
+			[]Matcher{
+				sdjournal.SD_JOURNAL_FIELD_UID + "=1",
+				"OBJECT_SYSTEMD_UNIT=" + unit,
+			},
+		}
+
+		for _, m := range matchers {
+			err := ApplyMatchersOr(j, m)
+			if err != nil {
+				return fmt.Errorf("error while setting up unit matcher for %s: %+v", unit, err)
+			}
+		}
+
+	}
+
+	if kernel {
+		err := ApplyMatchersOr(j, []Matcher{kernelMatcher})
+		if err != nil {
+			return fmt.Errorf("error while adding kernel transport to matchers: %+v", err)
+		}
+	}
+
+	return nil
+
+}
+
+func ApplySyslogIdentifierMatcher(j journal, identifiers []string) error {
+	for i, identifier := range identifiers {
+		identifiers[i] = sdjournal.SD_JOURNAL_FIELD_SYSLOG_IDENTIFIER + "=" + identifier
+	}
+
+	return ApplyMatchersOr(j, identifiers)
 }

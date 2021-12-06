@@ -105,6 +105,9 @@ func configure(cfg *common.Config) ([]cursor.Source, cursor.Input, error) {
 		Seek:               config.Seek,
 		CursorSeekFallback: config.CursorSeekFallback,
 		Matches:            config.Matches,
+		Units:              config.Units,
+		Kernel:             config.Kernel,
+		Identifiers:        config.Identifiers,
 		SaveRemoteHostname: config.SaveRemoteHostname,
 		Parsers:            config.Parsers,
 	}, nil
@@ -187,6 +190,16 @@ func initCheckpoint(log *logp.Logger, c cursor.Cursor) checkpoint {
 func withFilters(filters []journalfield.Matcher) func(*sdjournal.Journal) error {
 	return func(j *sdjournal.Journal) error {
 		return journalfield.ApplyMatchersOr(j, filters)
+
+func withUnits(units []string, kernel bool) func(*sdjournal.Journal) error {
+	return func(j *sdjournal.Journal) error {
+		err := journalfield.ApplyUnitMatchers(j, units, kernel)
+	}
+}
+
+func withSyslogIdentifiers(identifiers []string) func(*sdjournal.Journal) error {
+	return func(j *sdjournal.Journal) error {
+		err := journalfield.ApplySyslogIdentifierMatcher(j, identifiers)
 	}
 }
 

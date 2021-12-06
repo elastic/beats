@@ -49,6 +49,12 @@ type config struct {
 
 	// Matches store the key value pairs to match entries.
 	Matches []journalfield.Matcher `config:"include_matches"`
+	// Units stores the units to monitor
+	Units []string `config:"units"`
+	// Kernel stores whether kernel messages should be monitored
+	Kernel bool `config:"kernel"`
+	// Identifiers stores the syslog identifiers to watch
+	Identifiers []string `config:"identifiers"`
 
 	// SaveRemoteHostname defines if the original source of the entry needs to be saved.
 	SaveRemoteHostname bool `config:"save_remote_hostname"`
