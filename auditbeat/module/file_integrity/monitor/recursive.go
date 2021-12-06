@@ -242,10 +242,10 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 func (watcher *recursiveWatcher) remove(path string) {
 	err := watcher.tree.Remove(path)
 	if err != nil {
-		watcher.inner.Errors <- errors.Wrapf(err, "failed to visit removed path '%s'", path)
+		watcher.inner.Errors <- errors.Wrapf(err, "failed to remove path '%s'", path)
 	}
 	err = watcher.inner.Remove(path)
 	if err != nil {
-		watcher.inner.Errors <- errors.Wrapf(err, "failed to visit removed path '%s'", path)
+		watcher.inner.Errors <- errors.Wrapf(err, "failed to remove path from fsnotify '%s'", path)
 	}
 }
