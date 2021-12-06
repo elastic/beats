@@ -30,14 +30,14 @@ import (
 
 type watcherWrapper struct {
 	*fsnotify.Watcher
-	paths map[string]interface{}
+	paths map[string]struct{}
 }
 
 func (i watcherWrapper) Add(path string) error {
 	if err := i.Watcher.Add(path); err != nil {
 		return err
 	}
-	i.paths[path] = nil
+	i.paths[path] = struct{}{}
 	return nil
 }
 
@@ -51,7 +51,7 @@ func (i watcherWrapper) Remove(path string) error {
 func (i watcherWrapper) Close() error {
 	err := i.Watcher.Close()
 	if err == nil {
-		i.paths = make(map[string]interface{})
+		i.paths = make(map[string]struct{})
 	}
 	return err
 }
@@ -72,7 +72,7 @@ func newRecursiveWatcher(inner *fsnotify.Watcher, IsExcludedPath func(path strin
 	return &recursiveWatcher{
 		inner: &watcherWrapper{
 			Watcher: inner,
-			paths:   make(map[string]interface{}),
+			paths:   make(map[string]struct{}),
 		},
 		tree:           FileTree{},
 		eventC:         make(chan fsnotify.Event, 1),
