@@ -50,3 +50,8 @@
 #
 # The pin is a base64 encoded string of the SHA-256 fingerprint.
 #ssl.ca_sha256: ""
+
+# A root CA HEX encoded fingerprint used to trust and pin this certificate.
+# This enables compatibility with Elasticserach self signed certificates as well as trusting
+# and pinning any other self-signed certificate.
+#ssl.es_ca_fingerprint: ""

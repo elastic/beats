@@ -569,6 +569,11 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # A root CA HEX encoded fingerprint used to trust and pin this certificate.
+  # This enables compatibility with Elasticserach self signed certificates as well as trusting
+  # and pinning any other self-signed certificate.
+  #ssl.es_ca_fingerprint: ""
+
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
 
@@ -700,6 +705,11 @@ output.elasticsearch:
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
+
+  # A root CA HEX encoded fingerprint used to trust and pin this certificate.
+  # This enables compatibility with Elasticserach self signed certificates as well as trusting
+  # and pinning any other self-signed certificate.
+  #ssl.es_ca_fingerprint: ""
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -902,6 +912,11 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # A root CA HEX encoded fingerprint used to trust and pin this certificate.
+  # This enables compatibility with Elasticserach self signed certificates as well as trusting
+  # and pinning any other self-signed certificate.
+  #ssl.es_ca_fingerprint: ""
+
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
 
@@ -1065,6 +1080,11 @@ output.elasticsearch:
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
+
+  # A root CA HEX encoded fingerprint used to trust and pin this certificate.
+  # This enables compatibility with Elasticserach self signed certificates as well as trusting
+  # and pinning any other self-signed certificate.
+  #ssl.es_ca_fingerprint: ""
 
 
 # -------------------------------- File Output ---------------------------------
@@ -1353,6 +1373,11 @@ setup.kibana:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # A root CA HEX encoded fingerprint used to trust and pin this certificate.
+  # This enables compatibility with Elasticserach self signed certificates as well as trusting
+  # and pinning any other self-signed certificate.
+  #ssl.es_ca_fingerprint: ""
+
 
 # ================================== Logging ===================================
 
@@ -1550,6 +1575,11 @@ logging.files:
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
+
+  # A root CA HEX encoded fingerprint used to trust and pin this certificate.
+  # This enables compatibility with Elasticserach self signed certificates as well as trusting
+  # and pinning any other self-signed certificate.
+  #ssl.es_ca_fingerprint: ""
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
