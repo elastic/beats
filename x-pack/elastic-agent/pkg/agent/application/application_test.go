@@ -5,10 +5,12 @@
 package application
 
 import (
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 )
 
 func TestMergeFleetConfig(t *testing.T) {
