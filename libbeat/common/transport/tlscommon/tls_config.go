@@ -77,10 +77,9 @@ type TLSConfig struct {
 	// the server certificate.
 	CASha256 []string
 
-	// ESCAFingerprint is the CA certificate pin, in HEX form, from Elasticsearch self
-	// generated CA cartificate. We use that to trust self-signed certificates generated
-	// by Elasticsearch
-	ESCAFingerprint string `config:"es_ca_fingerprint" yaml:"es_ca_fingerprint,omitempty"`
+	// CATrustedFingerprint is the CA certificate pin, in HEX form, from a self
+	// generated CA cartificate.
+	CATrustedFingerprint string `config:"ca_trusted_fingerprint" yaml:"ca_trusted_fingerprint,omitempty"`
 
 	// time returns the current time as the number of seconds since the epoch.
 	// If time is nil, TLS uses time.Now.
@@ -159,8 +158,8 @@ func (c *TLSConfig) BuildServerConfig(host string) *tls.Config {
 	return config
 }
 
-func trustESRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate) error {
-	fingerprint, err := hex.DecodeString(cfg.ESCAFingerprint)
+func trustRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate) error {
+	fingerprint, err := hex.DecodeString(cfg.CATrustedFingerprint)
 	if err != nil {
 		return fmt.Errorf("decode fingerprint: %w", err)
 	}
@@ -190,8 +189,8 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 	switch cfg.Verification {
 	case VerifyFull:
 		return func(cs tls.ConnectionState) error {
-			if cfg.ESCAFingerprint != "" {
-				if err := trustESRootCA(cfg, cs.PeerCertificates); err != nil {
+			if cfg.CATrustedFingerprint != "" {
+				if err := trustRootCA(cfg, cs.PeerCertificates); err != nil {
 					return err
 				}
 			}
@@ -212,8 +211,8 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 		}
 	case VerifyCertificate:
 		return func(cs tls.ConnectionState) error {
-			if cfg.ESCAFingerprint != "" {
-				if err := trustESRootCA(cfg, cs.PeerCertificates); err != nil {
+			if cfg.CATrustedFingerprint != "" {
+				if err := trustRootCA(cfg, cs.PeerCertificates); err != nil {
 					return err
 				}
 			}
@@ -231,8 +230,8 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 	case VerifyStrict:
 		if len(cfg.CASha256) > 0 {
 			return func(cs tls.ConnectionState) error {
-				if cfg.ESCAFingerprint != "" {
-					if err := trustESRootCA(cfg, cs.PeerCertificates); err != nil {
+				if cfg.CATrustedFingerprint != "" {
+					if err := trustRootCA(cfg, cs.PeerCertificates); err != nil {
 						return err
 					}
 				}
