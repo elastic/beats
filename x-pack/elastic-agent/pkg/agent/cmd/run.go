@@ -142,7 +142,7 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 
 	statusCtrl := status.NewController(logger)
 
-	tracer, err := initTracer(agentName, release.Version(), cfg.Settings.InstrumentationConfig)
+	tracer, err := initTracer(agentName, release.Version(), cfg.Settings.MonitoringConfig)
 	if err != nil {
 		return err
 	}
@@ -395,10 +395,12 @@ func tryDelayEnroll(ctx context.Context, logger *logger.Logger, cfg *configurati
 	return loadConfig(override)
 }
 
-func initTracer(agentName, version string, cfg *configuration.InstrumentationConfig) (*apm.Tracer, error) {
-	if !cfg.Enabled {
+func initTracer(agentName, version string, mcfg *monitoringCfg.MonitoringConfig) (*apm.Tracer, error) {
+	if !mcfg.Enabled || !mcfg.MonitorTraces {
 		return nil, nil
 	}
+
+	cfg := mcfg.APM
 
 	// TODO(stn): Ideally, we'd use apmtransport.NewHTTPTransportOptions()
 	// but it doesn't exist today. Update this code once we have something

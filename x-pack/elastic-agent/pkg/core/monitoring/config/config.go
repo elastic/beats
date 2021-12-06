@@ -15,6 +15,8 @@ type MonitoringConfig struct {
 	LogMetrics     bool                  `yaml:"-" config:"-"`
 	HTTP           *MonitoringHTTPConfig `yaml:"http" config:"http"`
 	Namespace      string                `yaml:"namespace" config:"namespace"`
+	MonitorTraces  bool                  `yaml:"traces" config:"traces"`
+	APM            APMConfig             `yaml:"apm,omitempty" config:"apm,omitempty" json:"apm,omitempty"`
 }
 
 // MonitoringHTTPConfig is a config defining HTTP endpoint published by agent
@@ -33,10 +35,33 @@ func DefaultConfig() *MonitoringConfig {
 		MonitorLogs:    true,
 		MonitorMetrics: true,
 		LogMetrics:     true,
+		MonitorTraces:  false,
 		HTTP: &MonitoringHTTPConfig{
 			Enabled: false,
 			Port:    defaultPort,
 		},
 		Namespace: defaultNamespace,
+		APM:       defaultAPMConfig(),
 	}
+}
+
+// APMConfig configures APM Tracing.
+type APMConfig struct {
+	Environment string   `config:"environment"`
+	APIKey      string   `config:"api_key"`
+	SecretToken string   `config:"secret_token"`
+	Hosts       []string `config:"hosts"`
+	TLS         APMTLS   `config:"tls"`
+}
+
+// APMTLS contains the configuration options necessary for configuring TLS in
+// apm-agent-go.
+type APMTLS struct {
+	SkipVerify        bool   `config:"skip_verify"`
+	ServerCertificate string `config:"server_certificate"`
+	ServerCA          string `config:"server_ca"`
+}
+
+func defaultAPMConfig() APMConfig {
+	return APMConfig{}
 }

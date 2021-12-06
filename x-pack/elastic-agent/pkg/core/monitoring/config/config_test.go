@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package configuration
+package config
 
 import (
 	"testing"
@@ -13,19 +13,19 @@ import (
 	"gotest.tools/assert"
 )
 
-func TestInstrumentationConfig(t *testing.T) {
+func TestAPMConfig(t *testing.T) {
 	tcs := map[string]struct {
 		in  map[string]interface{}
-		out *InstrumentationConfig
+		out APMConfig
 	}{
 		"default": {
 			in:  map[string]interface{}{},
-			out: DefaultInstrumentationConfig(),
+			out: defaultAPMConfig(),
 		},
 		"custom": {
 			in: map[string]interface{}{
-				"agent.instrumentation": map[string]interface{}{
-					"enabled":     true,
+				"traces": true,
+				"apm": map[string]interface{}{
 					"api_key":     "abc123",
 					"environment": "production",
 					"hosts":       []string{"https://abc.123.com"},
@@ -36,12 +36,11 @@ func TestInstrumentationConfig(t *testing.T) {
 					},
 				},
 			},
-			out: &InstrumentationConfig{
-				Enabled:     true,
+			out: APMConfig{
 				APIKey:      "abc123",
 				Environment: "production",
 				Hosts:       []string{"https://abc.123.com"},
-				TLS: InstrumentationTLS{
+				TLS: APMTLS{
 					SkipVerify:        true,
 					ServerCertificate: "server_cert",
 					ServerCA:          "server_ca",
@@ -55,11 +54,13 @@ func TestInstrumentationConfig(t *testing.T) {
 			in, err := config.NewConfigFrom(tc.in)
 			require.NoError(t, err)
 
-			cfg, err := NewFromConfig(in)
+			cfg := DefaultConfig()
+			require.NoError(t, in.Unpack(cfg))
+
 			require.NoError(t, err)
 			require.NotNil(t, cfg)
-			instCfg := cfg.Settings.InstrumentationConfig
-			assert.DeepEqual(t, *tc.out, *instCfg)
+			instCfg := cfg.APM
+			assert.DeepEqual(t, tc.out, instCfg)
 		})
 	}
 }
