@@ -228,7 +228,7 @@ func (s *Server) ProcMeta(ctx context.Context, _ *proto.Empty) (*proto.ProcMetaR
 
 // Pprof returns /debug/pprof data for the requested applicaiont-route_key or all running applications.
 func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.PprofResponse, error) {
-	if !s.monitoringCfg.Pprof {
+	if s.monitoringCfg == nil || !s.monitoringCfg.Pprof {
 		return nil, fmt.Errorf("agent.monitoring.pprof disabled")
 	}
 
