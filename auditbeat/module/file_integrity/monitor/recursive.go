@@ -42,9 +42,13 @@ func (i watcherWrapper) Add(path string) error {
 }
 
 func (i watcherWrapper) Remove(path string) error {
-	if _, ok := i.paths[path]; ok {
-		return i.Watcher.Remove(path)
+	if _, ok := i.paths[path]; !ok {
+		return nil
 	}
+	if err := i.Watcher.Remove(path); err != nil {
+		return err
+	}
+	delete(i.paths, path)
 	return nil
 }
 
