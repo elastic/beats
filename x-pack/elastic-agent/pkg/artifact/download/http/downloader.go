@@ -14,8 +14,6 @@ import (
 	"path"
 	"strings"
 
-	"go.elastic.co/apm/module/apmhttp"
-
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 
@@ -48,7 +46,6 @@ func NewDownloader(config *artifact.Config) (*Downloader, error) {
 	}
 
 	client.Transport = withHeaders(client.Transport, headers)
-	client = apmhttp.WrapClient(client)
 	return NewDownloaderWithClient(config, *client), nil
 }
 
