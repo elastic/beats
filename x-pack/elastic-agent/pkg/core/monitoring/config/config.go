@@ -15,6 +15,7 @@ type MonitoringConfig struct {
 	LogMetrics     bool                  `yaml:"-" config:"-"`
 	HTTP           *MonitoringHTTPConfig `yaml:"http" config:"http"`
 	Namespace      string                `yaml:"namespace" config:"namespace"`
+	Pprof          bool                  `yaml:"pprof" config:"pprof"`
 	MonitorTraces  bool                  `yaml:"traces" config:"traces"`
 	APM            APMConfig             `yaml:"apm,omitempty" config:"apm,omitempty" json:"apm,omitempty"`
 }
@@ -41,6 +42,7 @@ func DefaultConfig() *MonitoringConfig {
 			Port:    defaultPort,
 		},
 		Namespace: defaultNamespace,
+		Pprof:     false,
 		APM:       defaultAPMConfig(),
 	}
 }

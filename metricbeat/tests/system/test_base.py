@@ -39,9 +39,9 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         assert self.log_contains("metricbeat stopped")
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    def test_template(self):
+    def test_index_management(self):
         """
-        Test that the template can be loaded with `setup --template`
+        Test that the template can be loaded with `setup --index-management`
         """
         es = Elasticsearch([self.get_elasticsearch_url()])
         self.render_config_template(
@@ -52,7 +52,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
             }],
             elasticsearch={"host": self.get_elasticsearch_url()},
         )
-        exit_code = self.run_beat(extra_args=["setup", "--template", "-E", "setup.template.overwrite=true"])
+        exit_code = self.run_beat(extra_args=["setup", "--index-management", "-E", "setup.template.overwrite=true"])
 
         assert exit_code == 0
         assert self.log_contains('Loaded index template')
@@ -100,7 +100,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
             }],
             elasticsearch={"host": self.get_elasticsearch_url()},
         )
-        exit_code = self.run_beat(extra_args=["setup", "--template",
+        exit_code = self.run_beat(extra_args=["setup", "--index-management",
                                               "-E", "setup.template.overwrite=true", "-E", "migration.6_to_7.enabled=true"])
 
         assert exit_code == 0

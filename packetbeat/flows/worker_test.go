@@ -33,10 +33,8 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/procs"
 )
 
-var (
-	// Use `go test -data` to update sample event files.
-	dataFlag = flag.Bool("data", false, "Write updated data.json files")
-)
+// Use `go test -data` to update sample event files.
+var dataFlag = flag.Bool("data", false, "Write updated data.json files")
 
 func TestCreateEvent(t *testing.T) {
 	logp.TestingSetup()
@@ -124,7 +122,7 @@ func TestCreateEvent(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if err := ioutil.WriteFile("../_meta/sample_outputs/flow.json", output, 0644); err != nil {
+		if err := ioutil.WriteFile("../_meta/sample_outputs/flow.json", output, 0o644); err != nil {
 			t.Fatal(err)
 		}
 	}

@@ -7,7 +7,6 @@ Each Beat is a separately installable product. To learn how to get started, see:
 * {filebeat-ref}/filebeat-installation-configuration.html[Filebeat]
 * {functionbeat-ref}/functionbeat-installation-configuration.html[Functionbeat]
 * {heartbeat-ref}/heartbeat-installation-configuration.html[Heartbeat]
-* {journalbeat-ref}/journalbeat-installation-configuration.html[Journalbeat]
 * {metricbeat-ref}/metricbeat-installation-configuration.html[Metricbeat]
 * {packetbeat-ref}/packetbeat-installation-configuration.html[Packetbeat]
 * {winlogbeat-ref}/winlogbeat-installation-configuration.html[Winlogbeat]

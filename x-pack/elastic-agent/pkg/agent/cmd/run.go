@@ -338,6 +338,10 @@ func setupMetrics(
 	}
 	s.Start()
 
+	if cfg.Pprof {
+		s.AttachPprof()
+	}
+
 	// return server stopper
 	return s.Stop, nil
 }

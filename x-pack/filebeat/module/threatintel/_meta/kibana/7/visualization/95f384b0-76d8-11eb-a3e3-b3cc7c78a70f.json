@@ -35,7 +35,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "",
-                        "field": "threatintel.indicator.url.scheme",
+                        "field": "threat.indicator.url.scheme",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

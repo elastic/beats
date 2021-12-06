@@ -34,16 +34,14 @@ type thriftConfig struct {
 	IdlFiles               []string `config:"idl_files"`
 }
 
-var (
-	defaultConfig = thriftConfig{
-		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionExpiration,
-		},
-		StringMaxSize:          200,
-		CollectionMaxSize:      15,
-		DropAfterNStructFields: 500,
-		TransportType:          "socket",
-		ProtocolType:           "binary",
-		CaptureReply:           true,
-	}
-)
+var defaultConfig = thriftConfig{
+	ProtocolCommon: config.ProtocolCommon{
+		TransactionTimeout: protos.DefaultTransactionExpiration,
+	},
+	StringMaxSize:          200,
+	CollectionMaxSize:      15,
+	DropAfterNStructFields: 500,
+	TransportType:          "socket",
+	ProtocolType:           "binary",
+	CaptureReply:           true,
+}
