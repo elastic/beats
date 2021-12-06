@@ -23,11 +23,8 @@ import (
 )
 
 func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI string) (_ string, err error) {
-	// TODO: span type?
 	span, ctx := apm.StartSpan(ctx, "upgrade", "app.internal")
 	defer func() {
-		// TODO: do we want to capture the errors at this top-level, in
-		// the lower levels, or at each level?
 		if err != nil {
 			apm.CaptureError(ctx, err).Send()
 		}

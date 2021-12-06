@@ -157,7 +157,6 @@ func (o *Operator) Close() error {
 	o.monitor.Close()
 	o.statusReporter.Unregister()
 
-	// TODO: Pass in ctx?
 	return o.HandleConfig(context.Background(), configrequest.New("", time.Now(), nil))
 }
 

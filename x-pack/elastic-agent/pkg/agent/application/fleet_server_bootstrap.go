@@ -136,7 +136,6 @@ func (b *FleetServerBootstrap) Start() error {
 	if err := b.srv.Start(); err != nil {
 		return err
 	}
-	// TODO: Does it make sense to pass in a ctx here?
 	if err := b.source.Start(); err != nil {
 		return err
 	}

@@ -108,7 +108,6 @@ func (u *Upgrader) Upgradeable() bool {
 // Upgrade upgrades running agent, function returns shutdown callback if some needs to be executed for cases when
 // reexec is called by caller.
 func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (_ reexec.ShutdownCallbackFn, err error) {
-	// TODO: span type?
 	span, ctx := apm.StartSpan(ctx, "upgrade", "app.internal")
 	defer span.End()
 	// report failed

@@ -23,7 +23,6 @@ func newOnce(log *logger.Logger, discover discoverFunc, emitter pipeline.Emitter
 	return &once{log: log, discover: discover, emitter: emitter}
 }
 
-// TODO: Pass ctx here?
 func (o *once) Start() error {
 	files, err := o.discover()
 	if err != nil {

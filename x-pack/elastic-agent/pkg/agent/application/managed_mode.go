@@ -174,7 +174,6 @@ func newManaged(
 	managedApplication.stateStore = stateStore
 	actionAcker := store.NewStateStoreActionAcker(batchedAcker, stateStore)
 
-	// TODO: Is there something to instrument here
 	actionDispatcher, err := dispatcher.New(managedApplication.bgContext, log, handlers.NewDefault(log))
 	if err != nil {
 		return nil, err
