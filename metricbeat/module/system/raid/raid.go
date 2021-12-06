@@ -21,7 +21,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/system/raid/blockinfo"
@@ -36,13 +36,13 @@ func init() {
 // MetricSet contains proc fs data.
 type MetricSet struct {
 	mb.BaseMetricSet
-	mod system.Resolver
+	mod resolve.Resolver
 }
 
 // New creates a new instance of the raid metricset.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
-	sys := base.Module().(system.Resolver)
+	sys := base.Module().(resolve.Resolver)
 	return &MetricSet{
 		BaseMetricSet: base,
 

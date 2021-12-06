@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-var hostFS = flag.String("system.hostfs", "", "Mount point of the host's filesystem for use in monitoring a host from within a container")
+var hostfsCLI = flag.String("system.hostfs", "", "Mount point of the host's filesystem for use in monitoring a host from within a container")
 
 var once sync.Once
 
@@ -75,9 +75,9 @@ func metricbeatInit(base mb.BaseModule, modulePath string, moduleSet bool) (mb.M
 	var hostfs = modulePath
 	var userSet bool
 	// allow the CLI to override other settings
-	if hostFS != nil && *hostFS != "" {
-		cfgwarn.Deprecate("x", "The --system.hostfs flag will be removed in the future and replaced by a config value.")
-		hostfs = *hostFS
+	if hostfsCLI != nil && *hostfsCLI != "" {
+		cfgwarn.Deprecate("8.0.0", "The --system.hostfs flag will be removed in the future and replaced by a config value.")
+		hostfs = *hostfsCLI
 		userSet = true
 	}
 
@@ -102,7 +102,7 @@ func findConfigValue(base mb.BaseModule) (string, bool) {
 	legacyConfig := MetricbeatHostFSConfig{}
 	base.UnpackConfig(&legacyConfig)
 	if legacyConfig.HostFS != "" {
-		cfgwarn.Deprecate("x", "The system.hostfs config value will be removed, use `hostfs` from within the module config.")
+		cfgwarn.Deprecate("8.0.0", "The system.hostfs config value will be removed, use `hostfs` from within the module config.")
 		// Only fallback to this if the user didn't set anything else
 		return legacyConfig.HostFS, true
 	}

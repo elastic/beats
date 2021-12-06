@@ -29,7 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/metric/system"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -47,7 +47,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	mod system.Resolver
+	mod resolve.Resolver
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -55,7 +55,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The system entropy metricset is beta.")
 
-	sys := base.Module().(system.Resolver)
+	sys := base.Module().(resolve.Resolver)
 
 	return &MetricSet{
 		BaseMetricSet: base,

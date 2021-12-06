@@ -27,11 +27,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 )
 
 // Get returns a metrics object for CPU data
-func Get(procfs system.Resolver) (CPUMetrics, error) {
+func Get(procfs resolve.Resolver) (CPUMetrics, error) {
 	path := procfs.ResolveHostFS("/proc/stat")
 	fd, err := os.Open(path)
 	if err != nil {

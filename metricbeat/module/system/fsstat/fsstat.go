@@ -25,7 +25,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/system/filesystem"
@@ -51,7 +51,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-	sys := base.Module().(system.Resolver)
+	sys := base.Module().(resolve.Resolver)
 	if config.IgnoreTypes == nil {
 		config.IgnoreTypes = filesystem.DefaultIgnoredTypes(sys)
 	}

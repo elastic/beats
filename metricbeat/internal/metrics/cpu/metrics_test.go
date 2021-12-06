@@ -23,12 +23,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 func TestMonitorSample(t *testing.T) {
-	cpu := &Monitor{lastSample: CPUMetrics{}, Hostfs: system.NewTestResolver("")}
+	cpu := &Monitor{lastSample: CPUMetrics{}, Hostfs: resolve.NewTestResolver("")}
 	s, err := cpu.Fetch()
 	if err != nil {
 		t.Fatal(err)
@@ -41,10 +41,10 @@ func TestMonitorSample(t *testing.T) {
 
 func TestCoresMonitorSample(t *testing.T) {
 
-	cpuMetrics, err := Get(system.NewTestResolver(""))
+	cpuMetrics, err := Get(resolve.NewTestResolver(""))
 	assert.NoError(t, err, "error in Get()")
 
-	cores := &Monitor{lastSample: CPUMetrics{list: make([]CPU, len(cpuMetrics.list))}, Hostfs: system.NewTestResolver("")}
+	cores := &Monitor{lastSample: CPUMetrics{list: make([]CPU, len(cpuMetrics.list))}, Hostfs: resolve.NewTestResolver("")}
 	sample, err := cores.FetchCores()
 	if err != nil {
 		t.Fatal(err)

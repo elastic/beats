@@ -24,7 +24,7 @@ import (
 	"github.com/shirou/gopsutil/net"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -46,13 +46,13 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	sockstat string
-	mod      system.Resolver
+	mod      resolve.Resolver
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	sys := base.Module().(system.Resolver)
+	sys := base.Module().(resolve.Resolver)
 	return &MetricSet{
 		mod:           sys,
 		BaseMetricSet: base,

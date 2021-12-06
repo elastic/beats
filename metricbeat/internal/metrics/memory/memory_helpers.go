@@ -27,11 +27,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 )
 
 // ParseMeminfo parses the contents of /proc/meminfo into a hashmap
-func ParseMeminfo(rootfs system.Resolver) (map[string]uint64, error) {
+func ParseMeminfo(rootfs resolve.Resolver) (map[string]uint64, error) {
 	table := map[string]uint64{}
 
 	meminfoPath := rootfs.ResolveHostFS("/proc/meminfo")

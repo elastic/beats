@@ -11,57 +11,244 @@
     },
     "process": {
         "args": [
-            "/usr/lib/systemd/systemd",
-            "rhgb",
-            "--switched-root",
-            "--system",
-            "--deserialize",
-            "31"
+            "/home/alexk/.vscode-server/bin/7f6ab5485bbc008386c4386d08766667e155244e/node",
+            "/home/alexk/.vscode-server/bin/7f6ab5485bbc008386c4386d08766667e155244e/out/vs/server/main.js",
+            "--start-server",
+            "--host=127.0.0.1",
+            "--enable-remote-auto-shutdown",
+            "--port=0",
+            "--connection-secret",
+            "/home/alexk/.vscode-server/.7f6ab5485bbc008386c4386d08766667e155244e.token"
         ],
-        "command_line": "/usr/lib/systemd/systemd rhgb --switched-root --system --deserialize 31",
+        "command_line": "/home/alexk/.vscode-server/bin/7f6ab5485bbc008386c4386d08766667e155244e/node /home/alexk/.vscode-server/bin/7f6ab5485bbc008386c4386d08766667e155244e/out/vs/server/main.js --start-server --host=127.0.0.1 --enable-remote-auto-shutdown --port=0 --connection-secret /home/alexk/.vscode-server/.7f6ab5485bbc008386c4386d08766667e155244e.token",
         "cpu": {
-            "pct": 0.0007,
-            "start_time": "2021-11-08T21:47:04.000Z"
+            "pct": 0,
+            "start_time": "2021-11-15T05:02:43.000Z"
         },
+        "executable": "/home/alexk/.vscode-server/bin/7f6ab5485bbc008386c4386d08766667e155244e/node",
         "memory": {
-            "pct": 0.0003
+            "pct": 0.001
         },
-        "name": "systemd",
+        "name": "node",
         "parent": {
-            "pid": 0
+            "pid": 932570
         },
-        "pgid": 1,
-        "pid": 1,
-        "state": "sleeping"
+        "pgid": 932516,
+        "pid": 932578,
+        "state": "sleeping",
+        "working_directory": "/home/alexk"
     },
     "service": {
         "type": "system"
     },
     "system": {
         "process": {
-            "cmdline": "/usr/lib/systemd/systemd rhgb --switched-root --system --deserialize 31",
+            "cgroup": {
+                "cgroups_version": 2,
+                "cpu": {
+                    "id": "session-6.scope",
+                    "path": "/user.slice/user-1000.slice/session-6.scope",
+                    "pressure": {
+                        "full": {
+                            "10": {
+                                "pct": 0
+                            },
+                            "300": {
+                                "pct": 0
+                            },
+                            "60": {
+                                "pct": 0
+                            },
+                            "total": 3879840
+                        },
+                        "some": {
+                            "10": {
+                                "pct": 0
+                            },
+                            "300": {
+                                "pct": 0
+                            },
+                            "60": {
+                                "pct": 0
+                            },
+                            "total": 3899569
+                        }
+                    },
+                    "stats": {
+                        "system": {
+                            "norm": {
+                                "pct": 0
+                            },
+                            "ns": 69699800,
+                            "pct": 0
+                        },
+                        "usage": {
+                            "norm": {
+                                "pct": 0
+                            },
+                            "ns": 311034237,
+                            "pct": 0
+                        },
+                        "user": {
+                            "norm": {
+                                "pct": 0
+                            },
+                            "ns": 241334437,
+                            "pct": 0
+                        }
+                    }
+                },
+                "id": "session-6.scope",
+                "memory": {
+                    "id": "session-6.scope",
+                    "mem": {
+                        "events": {
+                            "high": 0,
+                            "low": 0,
+                            "max": 0,
+                            "oom": 0,
+                            "oom_kill": 0
+                        },
+                        "low": {
+                            "bytes": 0
+                        },
+                        "usage": {
+                            "bytes": 81653760
+                        }
+                    },
+                    "memsw": {
+                        "events": {
+                            "fail": 0,
+                            "high": 0,
+                            "max": 0
+                        },
+                        "low": {
+                            "bytes": 0
+                        },
+                        "usage": {
+                            "bytes": 0
+                        }
+                    },
+                    "path": "/user.slice/user-1000.slice/session-6.scope",
+                    "stats": {
+                        "active_anon": {
+                            "bytes": 12288
+                        },
+                        "active_file": {
+                            "bytes": 507904
+                        },
+                        "anon": {
+                            "bytes": 42983424
+                        },
+                        "anon_thp": {
+                            "bytes": 0
+                        },
+                        "file": {
+                            "bytes": 34598912
+                        },
+                        "file_dirty": {
+                            "bytes": 0
+                        },
+                        "file_mapped": {
+                            "bytes": 28467200
+                        },
+                        "file_thp": {
+                            "bytes": 0
+                        },
+                        "file_writeback": {
+                            "bytes": 0
+                        },
+                        "htp_collapse_alloc": 0,
+                        "inactive_anon": {
+                            "bytes": 42967040
+                        },
+                        "inactive_file": {
+                            "bytes": 34091008
+                        },
+                        "kernel_stack": {
+                            "bytes": 376832
+                        },
+                        "major_page_faults": 289,
+                        "page_activate": 135,
+                        "page_deactivate": 0,
+                        "page_faults": 766278,
+                        "page_lazy_free": 0,
+                        "page_lazy_freed": 0,
+                        "page_refill": 0,
+                        "page_scan": 0,
+                        "page_steal": 0,
+                        "page_tables": {
+                            "bytes": 2310144
+                        },
+                        "per_cpu": {
+                            "bytes": 0
+                        },
+                        "shmem": {
+                            "bytes": 0
+                        },
+                        "shmem_thp": {
+                            "bytes": 0
+                        },
+                        "slab": {
+                            "bytes": 766496
+                        },
+                        "slab_reclaimable": {
+                            "bytes": 298512
+                        },
+                        "slab_unreclaimable": {
+                            "bytes": 467984
+                        },
+                        "sock": {
+                            "bytes": 0
+                        },
+                        "swap_cached": {
+                            "bytes": 0
+                        },
+                        "thp_fault_alloc": 0,
+                        "unevictable": {
+                            "bytes": 0
+                        },
+                        "workingset_activate_anon": 0,
+                        "workingset_activate_file": 0,
+                        "workingset_node_reclaim": 0,
+                        "workingset_refault_anon": 0,
+                        "workingset_refault_file": 0,
+                        "workingset_restore_anon": 0,
+                        "workingset_restore_file": 0
+                    }
+                },
+                "path": "/user.slice/user-1000.slice/session-6.scope"
+            },
+            "cmdline": "/home/alexk/.vscode-server/bin/7f6ab5485bbc008386c4386d08766667e155244e/node /home/alexk/.vscode-server/bin/7f6ab5485bbc008386c4386d08766667e155244e/out/vs/server/main.js --start-server --host=127.0.0.1 --enable-remote-auto-shutdown --port=0 --connection-secret /home/alexk/.vscode-server/.7f6ab5485bbc008386c4386d08766667e155244e.token",
             "cpu": {
-                "start_time": "2021-11-08T21:47:04.000Z",
+                "start_time": "2021-11-15T05:02:43.000Z",
                 "total": {
                     "norm": {
-                        "pct": 0.0007
+                        "pct": 0
                     },
-                    "pct": 0.0088,
-                    "value": 10851390
+                    "pct": 0,
+                    "value": 226260
                 }
+            },
+            "fd": {
+                "limit": {
+                    "hard": 524288,
+                    "soft": 524288
+                },
+                "open": 23
             },
             "memory": {
                 "rss": {
-                    "bytes": 17469440,
-                    "pct": 0.0003
+                    "bytes": 64372736,
+                    "pct": 0.001
                 },
-                "share": 11063296,
-                "size": 180555776
+                "share": 32768000,
+                "size": 948490240
             },
             "state": "sleeping"
         }
     },
     "user": {
-        "name": "root"
+        "name": "alexk"
     }
 }

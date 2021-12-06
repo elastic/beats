@@ -25,7 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/metric/system"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -41,12 +41,12 @@ func init() {
 // MetricSet for fetching system memory metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	mod system.Resolver
+	mod resolve.Resolver
 }
 
 // New is a mb.MetricSetFactory that returns a memory.MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	sys := base.Module().(system.Resolver)
+	sys := base.Module().(resolve.Resolver)
 	return &MetricSet{BaseMetricSet: base, mod: sys}, nil
 }
 

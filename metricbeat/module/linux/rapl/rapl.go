@@ -37,7 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -83,7 +83,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	sys := base.Module().(system.Resolver)
+	sys := base.Module().(resolve.Resolver)
 	CPUList, err := getMSRCPUs(sys)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting list of CPUs to query")
@@ -204,7 +204,7 @@ func (m *MetricSet) updatePower() map[int]map[rapl.RAPLDomain]energyUsage {
 
 // getMSRCPUs forms a list of CPU cores to query
 // For multi-processor systems, this will be more than 1.
-func getMSRCPUs(hostfs system.Resolver) ([]int, error) {
+func getMSRCPUs(hostfs resolve.Resolver) ([]int, error) {
 	CPUs, err := topoPkgCPUMap(hostfs)
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching CPU topology")
@@ -226,7 +226,7 @@ func getMSRCPUs(hostfs system.Resolver) ([]int, error) {
 //it is, however, the simplest way to do this. The intel power gadget iterates through each CPU using affinity masks, and runs `cpuid` in a loop to
 //figure things out
 //This uses /sys/devices/system/cpu/cpu*/topology/physical_package_id, which is what lscpu does. I *think* geopm does something similar to this.
-func topoPkgCPUMap(hostfs system.Resolver) (map[int][]int, error) {
+func topoPkgCPUMap(hostfs resolve.Resolver) (map[int][]int, error) {
 
 	sysdir := "/sys/devices/system/cpu/"
 	cpuMap := make(map[int][]int)

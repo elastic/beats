@@ -21,14 +21,14 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
 	sysinfo "github.com/elastic/go-sysinfo"
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )
 
 // FetchLinuxMemStats gets page_stat and huge pages data for linux
-func FetchLinuxMemStats(baseMap common.MapStr, hostfs system.Resolver) error {
+func FetchLinuxMemStats(baseMap common.MapStr, hostfs resolve.Resolver) error {
 
 	vmstat, err := GetVMStat()
 	if err != nil {
@@ -83,7 +83,7 @@ func FetchLinuxMemStats(baseMap common.MapStr, hostfs system.Resolver) error {
 	return nil
 }
 
-func getHugePages(hostfs system.Resolver) (common.MapStr, error) {
+func getHugePages(hostfs resolve.Resolver) (common.MapStr, error) {
 	// see https://www.kernel.org/doc/Documentation/vm/hugetlbpage.txt
 	table, err := memory.ParseMeminfo(hostfs)
 	if err != nil {

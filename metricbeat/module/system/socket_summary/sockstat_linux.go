@@ -29,7 +29,7 @@ import (
 	"github.com/shirou/gopsutil/net"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 )
 
 // SockStat contains data from /proc/net/sockstat
@@ -61,7 +61,7 @@ type SockStat struct {
 }
 
 // applyEnhancements gets a list of platform-specific enhancements and apply them to our mapStr object.
-func applyEnhancements(data common.MapStr, sys system.Resolver) (common.MapStr, error) {
+func applyEnhancements(data common.MapStr, sys resolve.Resolver) (common.MapStr, error) {
 	dir := sys.ResolveHostFS("/proc/net/sockstat")
 	pageSize := os.Getpagesize()
 

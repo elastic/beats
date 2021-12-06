@@ -29,7 +29,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 )
 
 var (
@@ -120,7 +120,7 @@ func parseMountinfoLine(line string) (mountinfo, error) {
 
 // SupportedSubsystems returns the subsystems that are supported by the
 // kernel. The returned map contains a entry for each subsystem.
-func SupportedSubsystems(rootfs system.Resolver) (map[string]struct{}, error) {
+func SupportedSubsystems(rootfs resolve.Resolver) (map[string]struct{}, error) {
 	cgroups, err := os.Open(rootfs.ResolveHostFS("/proc/cgroups"))
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -168,7 +168,7 @@ func SupportedSubsystems(rootfs system.Resolver) (map[string]struct{}, error) {
 // SubsystemMountpoints returns the mountpoints for each of the given subsystems.
 // The returned map contains the subsystem name as a key and the value is the
 // mountpoint.
-func SubsystemMountpoints(rootfs system.Resolver, subsystems map[string]struct{}) (Mountpoints, error) {
+func SubsystemMountpoints(rootfs resolve.Resolver, subsystems map[string]struct{}) (Mountpoints, error) {
 
 	mountinfo, err := os.Open(rootfs.ResolveHostFS("/proc/self/mountinfo"))
 	if err != nil {
