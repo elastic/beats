@@ -16,6 +16,7 @@ type InstrumentationConfig struct {
 	TLS         *tlscommon.Config `config:"ssl"`
 }
 
+// DefaultInstrumentationConfig creates a default InstrumentationConfig.
 func DefaultInstrumentationConfig() *InstrumentationConfig {
 	return &InstrumentationConfig{
 		Enabled: false,

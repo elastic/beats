@@ -11,9 +11,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"go.elastic.co/apm"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
-	"go.elastic.co/apm"
 )
 
 const ackPath = "/api/fleet/agents/%s/acks"
