@@ -85,7 +85,7 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 		return nil
 	}
 
-	labelMap := common.MapStr{}
+	var labelMap common.MapStr
 	if len(r.config.IncludeLabels) == 0 {
 		labelMap = GenerateMap(accessor.GetLabels(), r.config.LabelsDedot)
 	} else {

@@ -18,8 +18,6 @@
 package ilm
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -27,11 +25,9 @@ import (
 
 // Config is used for unpacking a common.Config.
 type Config struct {
-	Enabled       bool                     `config:"enabled"`
-	PolicyName    fmtstr.EventFormatString `config:"policy_name"`
-	PolicyFile    string                   `config:"policy_file"`
-	RolloverAlias fmtstr.EventFormatString `config:"rollover_alias"`
-	Pattern       string                   `config:"pattern"`
+	Enabled    bool                     `config:"enabled"`
+	PolicyName fmtstr.EventFormatString `config:"policy_name"`
+	PolicyFile string                   `config:"policy_file"`
 
 	// CheckExists can disable the check for an existing policy. Check required
 	// read_ilm privileges.  If check is disabled the policy will only be
@@ -41,8 +37,6 @@ type Config struct {
 	// Enable always overwrite policy mode. This required manage_ilm privileges.
 	Overwrite bool `config:"overwrite"`
 }
-
-const ilmDefaultPattern = "{now/d}-000001"
 
 // DefaultPolicy defines the default policy to be used if no custom policy is
 // configured.
@@ -65,23 +59,16 @@ var DefaultPolicy = common.MapStr{
 
 //Validate verifies that expected config options are given and valid
 func (cfg *Config) Validate() error {
-	if cfg.RolloverAlias.IsEmpty() && cfg.Enabled {
-		return fmt.Errorf("rollover_alias must be set when ILM is not disabled")
-	}
 	return nil
 }
 
 func defaultConfig(info beat.Info) Config {
-	name := info.Beat + "-%{[agent.version]}"
-	aliasFmt := fmtstr.MustCompileEvent(name)
 	policyFmt := fmtstr.MustCompileEvent(info.Beat)
 
 	return Config{
-		Enabled:       true,
-		PolicyName:    *policyFmt,
-		RolloverAlias: *aliasFmt,
-		Pattern:       ilmDefaultPattern,
-		PolicyFile:    "",
-		CheckExists:   true,
+		Enabled:     true,
+		PolicyName:  *policyFmt,
+		PolicyFile:  "",
+		CheckExists: true,
 	}
 }
