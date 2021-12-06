@@ -28,8 +28,36 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+type watcherWrapper struct {
+	*fsnotify.Watcher
+	paths map[string]interface{}
+}
+
+func (i watcherWrapper) Add(path string) error {
+	if err := i.Watcher.Add(path); err != nil {
+		return err
+	}
+	i.paths[path] = nil
+	return nil
+}
+
+func (i watcherWrapper) Remove(path string) error {
+	if _, ok := i.paths[path]; ok {
+		return i.Watcher.Remove(path)
+	}
+	return nil
+}
+
+func (i watcherWrapper) Close() error {
+	err := i.Watcher.Close()
+	if err == nil {
+		i.paths = make(map[string]interface{})
+	}
+	return err
+}
+
 type recursiveWatcher struct {
-	inner   *fsnotify.Watcher
+	inner   *watcherWrapper
 	tree    FileTree
 	eventC  chan fsnotify.Event
 	done    chan bool
@@ -42,7 +70,10 @@ type recursiveWatcher struct {
 
 func newRecursiveWatcher(inner *fsnotify.Watcher, IsExcludedPath func(path string) bool) *recursiveWatcher {
 	return &recursiveWatcher{
-		inner:          inner,
+		inner: &watcherWrapper{
+			Watcher: inner,
+			paths:   make(map[string]interface{}),
+		},
 		tree:           FileTree{},
 		eventC:         make(chan fsnotify.Event, 1),
 		addC:           make(chan string),
@@ -191,25 +222,30 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 					watcher.inner.Errors <- errors.Wrapf(err, "failed to visit removed path '%s'", event.Name)
 				}
 
-				err = watcher.tree.Remove(event.Name)
-				if err != nil {
-					watcher.inner.Errors <- errors.Wrapf(err, "failed to visit removed path '%s'", event.Name)
-				}
+				watcher.remove(event.Name)
 
 			// Handling rename (move) as a special case to give this recursion
 			// the same semantics as macOS FSEvents:
 			// - Removal of a dir notifies removal for all files inside it
 			// - Moving a dir away sends only one notification for this dir
 			case fsnotify.Rename:
-				err := watcher.tree.Remove(event.Name)
-				if err != nil {
-					watcher.inner.Errors <- errors.Wrapf(err, "failed to remove path '%s'", event.Name)
-				}
+				watcher.remove(event.Name)
 				fallthrough
 
 			default:
 				watcher.deliver(event)
 			}
 		}
+	}
+}
+
+func (watcher *recursiveWatcher) remove(path string) {
+	err := watcher.tree.Remove(path)
+	if err != nil {
+		watcher.inner.Errors <- errors.Wrapf(err, "failed to visit removed path '%s'", path)
+	}
+	err = watcher.inner.Remove(path)
+	if err != nil {
+		watcher.inner.Errors <- errors.Wrapf(err, "failed to visit removed path '%s'", path)
 	}
 }
