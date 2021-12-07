@@ -1,0 +1,9 @@
+# Module: containerd
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-containerd.html
+
+- module: containerd
+  metricsets: ["cpu"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost:1338"]
+

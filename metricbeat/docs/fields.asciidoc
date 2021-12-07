@@ -10255,32 +10255,103 @@ type: long
 --
 
 [[exported-fields-containerd]]
-== containerd fields
+== Containerd fields
 
-containerd module
+Containerd stats collected from containerd
 
 
 
 [float]
 === containerd
 
+Information and statistics about containerd's running containers.
 
 
 
 [float]
 === cpu
 
-cpu
+Containerd Runtime CPU metrics.
 
 
 
-*`containerd.cpu.example`*::
+
+
+*`containerd.cpu.usage.kernel.ns`*::
 +
 --
-Example field
+CPU Kernel usage nanoseconds
 
 
-type: keyword
+type: double
+
+--
+
+
+*`containerd.cpu.usage.user.ns`*::
++
+--
+CPU User usage nanoseconds
+
+
+type: double
+
+--
+
+
+*`containerd.cpu.usage.total.ns`*::
++
+--
+CPU total usage nanoseconds
+
+
+type: double
+
+--
+
+*`containerd.cpu.usage.total.pct`*::
++
+--
+Percentage of total CPU time normalized by the number of CPU cores
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`containerd.cpu.usage.kernel.pct`*::
++
+--
+Percentage of time in kernel space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`containerd.cpu.usage.user.pct`*::
++
+--
+Percentage of time in user space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`containerd.cpu.usage.cpu.*.ns`*::
++
+--
+CPU usage nanoseconds in this cpu.
+
+
+type: object
 
 --
 

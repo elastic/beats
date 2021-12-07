@@ -20,7 +20,7 @@ package cpu
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/metricbeat/module/containerd"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/containerd"
 
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 
