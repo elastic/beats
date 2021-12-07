@@ -128,8 +128,6 @@ func (e *Controller) Update(ctx context.Context, c *config.Config) (rErr error) 
 // Set sets the transpiler vars for dynamic inputs resolution.
 func (e *Controller) Set(ctx context.Context, vars []*transpiler.Vars) {
 	var err error
-	// TODO: Both Set and Update are calling update(), do we differentiate
-	// the top-level calling fn in the span name?
 	span, ctx := apm.StartSpan(ctx, "Set", "app.internal")
 	defer func() {
 		if err != nil {
