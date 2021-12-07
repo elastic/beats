@@ -291,6 +291,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	fPolicy, _ := cmd.Flags().GetString("fleet-server-policy")
 	fHost, _ := cmd.Flags().GetString("fleet-server-host")
 	fPort, _ := cmd.Flags().GetUint16("fleet-server-port")
+	fInternalPort, _ := cmd.Flags().GetUint16("fleet-server-internal-port")
 	fCert, _ := cmd.Flags().GetString("fleet-server-cert")
 	fCertKey, _ := cmd.Flags().GetString("fleet-server-cert-key")
 	fInsecure, _ := cmd.Flags().GetBool("fleet-server-insecure-http")
@@ -336,6 +337,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 			SpawnAgent:            !fromInstall,
 			Headers:               mapFromEnvList(fHeaders),
 			Timeout:               fTimeout,
+			InternalPort:          fInternalPort,
 		},
 	}
 
