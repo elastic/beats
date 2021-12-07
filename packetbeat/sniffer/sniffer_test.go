@@ -52,13 +52,16 @@ func TestSniffer_afpacketComputeSize(t *testing.T) {
 		t.Error("Value too big", blockSize, numBlocks)
 	}
 
-	frameSize, blockSize, numBlocks, err = afpacketComputeSize(0, 1514, 4096)
+	_, _, _, err = afpacketComputeSize(0, 1514, 4096)
 	if err == nil {
 		t.Error("Expected an error")
 	}
 
 	// 16436 is the default MTU size of the loopback interface
 	frameSize, blockSize, numBlocks, err = afpacketComputeSize(30, 16436, 4096)
+	if err != nil {
+		t.Error(err)
+	}
 	if frameSize != 4096*5 || blockSize != 4096*5*128 || numBlocks != 12 {
 		t.Error("Bad result", frameSize, blockSize, numBlocks)
 	}

@@ -21,8 +21,9 @@ import (
 	"fmt"
 	"runtime"
 	"strconv"
+	"strings"
 
-	"github.com/tsg/gopacket/pcap"
+	"github.com/google/gopacket/pcap"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -33,44 +34,49 @@ var deviceAnySupported = runtime.GOOS == "linux"
 // this computer. If the withDescription parameter is set to true, a human
 // readable version of the adapter name is added. If the withIP parameter
 // is set to true, IP address of the adapter is added.
-func ListDeviceNames(withDescription bool, withIP bool) ([]string, error) {
+func ListDeviceNames(withDescription, withIP bool) ([]string, error) {
 	devices, err := pcap.FindAllDevs()
 	if err != nil {
-		return []string{}, err
+		return nil, err
 	}
+	return formatDeviceNames(devices, withDescription, withIP), nil
+}
 
-	ret := []string{}
+func formatDeviceNames(devices []pcap.Interface, withDescription, withIP bool) []string {
+	if len(devices) == 0 {
+		return nil
+	}
+	names := make([]string, 0, len(devices))
+	var buf strings.Builder
 	for _, dev := range devices {
-		r := dev.Name
+		buf.Reset()
+		buf.WriteString(dev.Name)
 
 		if withDescription {
 			desc := "No description available"
 			if len(dev.Description) > 0 {
 				desc = dev.Description
 			}
-			r += fmt.Sprintf(" (%s)", desc)
+			fmt.Fprintf(&buf, " (%s)", desc)
 		}
 
 		if withIP {
-			ips := "Not assigned ip address"
-			if len(dev.Addresses) > 0 {
-				ips = ""
-
+			buf.WriteString(" (")
+			if len(dev.Addresses) == 0 {
+				buf.WriteString("Not assigned ip address")
+			} else {
 				for i, address := range []pcap.InterfaceAddress(dev.Addresses) {
-					// Add a space between the IP address.
-					if i > 0 {
-						ips += " "
+					if i != 0 {
+						buf.WriteByte(' ')
 					}
-
-					ips += fmt.Sprintf("%s", address.IP.String())
+					fmt.Fprint(&buf, address.IP)
 				}
 			}
-			r += fmt.Sprintf(" (%s)", ips)
-
+			buf.WriteByte(')')
 		}
-		ret = append(ret, r)
+		names = append(names, buf.String())
 	}
-	return ret, nil
+	return names
 }
 
 func resolveDeviceName(name string) (string, error) {

@@ -18,9 +18,9 @@ processors:
     replacement: ' '
 - trim:
     field: message
-- rename:
-    field: '@timestamp'
-    target_field: event.created
+- set:
+    copy_from: '@timestamp'
+    field: event.created
 - grok:
     field: message
     patterns:
