@@ -30,17 +30,16 @@ var OptionalGovCloudFIPS = map[string]bool{
 
 // ConfigAWS is a structure defined for AWS credentials
 type ConfigAWS struct {
-	AccessKeyID          string `config:"access_key_id"`
-	SecretAccessKey      string `config:"secret_access_key"`
-	SessionToken         string `config:"session_token"`
-	ProfileName          string `config:"credential_profile_name"`
-	SharedCredentialFile string `config:"shared_credential_file"`
-	Endpoint             string `config:"endpoint"`
-	RoleArn              string `config:"role_arn"`
-	ProxyUrl             string `config:"proxy_url"`
-	FIPSEnabled          bool   `config:"fips_enabled"`
-	// TLS provides ssl/tls setup settings
-	TLS *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty" json:"ssl,omitempty"`
+	AccessKeyID          string            `config:"access_key_id"`
+	SecretAccessKey      string            `config:"secret_access_key"`
+	SessionToken         string            `config:"session_token"`
+	ProfileName          string            `config:"credential_profile_name"`
+	SharedCredentialFile string            `config:"shared_credential_file"`
+	Endpoint             string            `config:"endpoint"`
+	RoleArn              string            `config:"role_arn"`
+	ProxyUrl             string            `config:"proxy_url"`
+	FIPSEnabled          bool              `config:"fips_enabled"`
+	TLS                  *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty" json:"ssl,omitempty"`
 }
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
