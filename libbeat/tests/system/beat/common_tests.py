@@ -58,7 +58,12 @@ class TestExportsMixin:
         """
         output = self.run_export_cmd("template")
         js = json.loads(output)
-        assert "index_patterns" in js and "mappings" in js
+        assert "index_patterns" in js
+        assert "template" in js
+        assert "priority" in js
+        assert "order" not in js
+        assert "mappings" in js["template"]
+        assert "settings" in js["template"]
 
     def test_export_index_pattern(self):
         """
