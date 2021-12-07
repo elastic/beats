@@ -20,11 +20,8 @@ package beater
 import (
 	"errors"
 	"fmt"
-	"sync"
 	"syscall"
 	"time"
-
-	"golang.org/x/net/context"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
@@ -38,7 +35,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 
 	_ "github.com/elastic/beats/v7/heartbeat/security"
 	_ "github.com/elastic/beats/v7/libbeat/processors/script"
@@ -72,7 +68,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	}
 	jobConfig := parsedConfig.Jobs
 
-	scheduler := scheduler.NewWithLocation(limit, hbregistry.SchedulerRegistry, location, jobConfig)
+	scheduler := scheduler.Create(limit, hbregistry.SchedulerRegistry, location, jobConfig, parsedConfig.RunOnce)
 
 	bt := &Heartbeat{
 		done:      make(chan struct{}),
@@ -90,19 +86,19 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	groups, _ := syscall.Getgroups()
 	logp.Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
 
-	if bt.config.RunOnce {
-		err := bt.runRunOnce(b)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
+	// It is important this appear before we check for run once mode
+	// In run once mode we depend on these monitors being loaded, but not other more
+	// dynamic types.
 	stopStaticMonitors, err := bt.RunStaticMonitors(b)
 	if err != nil {
 		return err
 	}
 	defer stopStaticMonitors()
+
+	if bt.config.RunOnce {
+		bt.scheduler.WaitForRunOnce()
+		return nil
+	}
 
 	if b.Manager.Enabled() {
 		bt.RunCentralMgmtMonitors(b)
@@ -128,74 +124,11 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		defer bt.autodiscover.Stop()
 	}
 
-	if err := bt.scheduler.Start(); err != nil {
-		return err
-	}
 	defer bt.scheduler.Stop()
 
 	<-bt.done
 
 	logp.Info("Shutting down.")
-	return nil
-}
-
-// runRunOnce runs the given config then exits immediately after any queued events have been sent to ES
-func (bt *Heartbeat) runRunOnce(b *beat.Beat) error {
-	logp.Info("Starting run_once run. This is an experimental feature and may be changed or removed in the future!")
-
-	publishClient, err := core.NewSyncClient(logp.NewLogger("run_once mode"), b.Publisher, beat.ClientConfig{})
-	if err != nil {
-		return fmt.Errorf("could not create sync client: %w", err)
-	}
-	defer publishClient.Close()
-
-	wg := &sync.WaitGroup{}
-	for _, cfg := range bt.config.Monitors {
-		err := bt.runRunOnceSingleConfig(cfg, publishClient, wg, b)
-		if err != nil {
-			logp.Warn("error running run_once config: %s", err)
-		}
-	}
-
-	wg.Wait()
-	publishClient.Wait()
-
-	logp.Info("Ending run_once run")
-
-	return nil
-}
-
-func (bt *Heartbeat) runRunOnceSingleConfig(cfg *common.Config, publishClient *core.SyncClient, wg *sync.WaitGroup, b *beat.Beat) (err error) {
-	var runJob func(t scheduler.TaskFunc)
-	runJob = func(t scheduler.TaskFunc) {
-		defer wg.Done()
-
-		e := &beat.Event{
-			Fields: common.MapStr{},
-		}
-		conts := t(context.Background())
-
-		publishClient.Publish(*e)
-
-		wg.Add(len(conts))
-		for _, c := range conts {
-			go runJob(c)
-		}
-	}
-
-	addTask := func(sched scheduler.Schedule, id string, entrypoint scheduler.TaskFunc, jobType string) (removeFn context.CancelFunc, err error) {
-		wg.Add(1)
-		go runJob(entrypoint)
-		return nil, nil
-	}
-
-	f := monitors.NewFactory(b.Info, addTask, plugin.GlobalPluginsReg)
-	created, err := f.Create(b.Publisher, cfg)
-	if err != nil {
-		return fmt.Errorf("could not create monitor: %w", err)
-	}
-
-	created.Start()
 	return nil
 }
 

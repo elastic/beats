@@ -44,14 +44,8 @@ func tarawaTime() *time.Location {
 	return loc
 }
 
-func TestNew(t *testing.T) {
-	scheduler := New(123, monitoring.NewRegistry())
-	assert.Equal(t, int64(123), scheduler.limit)
-	assert.Equal(t, time.Local, scheduler.location)
-}
-
 func TestNewWithLocation(t *testing.T) {
-	scheduler := NewWithLocation(123, monitoring.NewRegistry(), tarawaTime(), nil)
+	scheduler := Create(123, monitoring.NewRegistry(), tarawaTime(), nil, false)
 	assert.Equal(t, int64(123), scheduler.limit)
 	assert.Equal(t, tarawaTime(), scheduler.location)
 }
@@ -86,7 +80,7 @@ func testTaskTimes(limit uint32, fn TaskFunc) TaskFunc {
 func TestScheduler_Start(t *testing.T) {
 	// We use tarawa runAt because it could expose some weird runAt math if by accident some code
 	// relied on the local TZ.
-	s := NewWithLocation(10, monitoring.NewRegistry(), tarawaTime(), nil)
+	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, false)
 	defer s.Stop()
 
 	executed := make(chan string)
@@ -119,7 +113,7 @@ func TestScheduler_Start(t *testing.T) {
 	require.NotNil(t, remove)
 	removeMtx.Unlock()
 
-	s.Start()
+	//s.Start()
 
 	postAddEvents := uint32(10)
 	s.Add(testSchedule{}, "postAdd", testTaskTimes(postAddEvents, func(_ context.Context) []TaskFunc {
@@ -160,13 +154,35 @@ func TestScheduler_Start(t *testing.T) {
 	assert.Equal(t, int(removedEvents), int(counts["removed"]))
 }
 
+func TestSchedulerWaitForRunOnce(t *testing.T) {
+	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, true)
+
+	defer s.Stop()
+
+	executed := new(uint32)
+
+	s.Add(testSchedule{0}, "runOnce", func(_ context.Context) []TaskFunc {
+		cont := func(_ context.Context) []TaskFunc {
+			// Make sure we actually wait for the task!
+			time.Sleep(time.Millisecond * 250)
+			atomic.AddUint32(executed, 1)
+			return nil
+		}
+		return []TaskFunc{cont}
+	}, "http")
+
+	s.WaitForRunOnce()
+	require.Equal(t, atomic.LoadUint32(executed), uint32(1))
+
+}
+
 func TestScheduler_Stop(t *testing.T) {
-	s := NewWithLocation(10, monitoring.NewRegistry(), tarawaTime(), nil)
+	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, false)
 
 	executed := make(chan struct{})
 
-	require.NoError(t, s.Start())
-	require.NoError(t, s.Stop())
+	//require.NoError(t, s.Start())
+	s.Stop()
 
 	_, err := s.Add(testSchedule{}, "testPostStop", testTaskTimes(1, func(_ context.Context) []TaskFunc {
 		executed <- struct{}{}
@@ -235,7 +251,7 @@ func TestSchedTaskLimits(t *testing.T) {
 					jobType: {Limit: tt.limit},
 				}
 			}
-			s := NewWithLocation(math.MaxInt64, monitoring.NewRegistry(), tarawaTime(), jobConfigByType)
+			s := Create(math.MaxInt64, monitoring.NewRegistry(), tarawaTime(), jobConfigByType, false)
 			var taskArr []int
 			wg := sync.WaitGroup{}
 			wg.Add(tt.numJobs)
@@ -257,7 +273,7 @@ func TestSchedTaskLimits(t *testing.T) {
 }
 
 func BenchmarkScheduler(b *testing.B) {
-	s := NewWithLocation(0, monitoring.NewRegistry(), tarawaTime(), nil)
+	s := Create(0, monitoring.NewRegistry(), tarawaTime(), nil, false)
 
 	sched := testSchedule{0}
 
@@ -270,9 +286,7 @@ func BenchmarkScheduler(b *testing.B) {
 		assert.NoError(b, err)
 	}
 
-	err := s.Start()
 	defer s.Stop()
-	assert.NoError(b, err)
 
 	count := 0
 	for count < b.N {
