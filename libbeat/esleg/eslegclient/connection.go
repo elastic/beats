@@ -421,7 +421,11 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	}
 
 	for name, value := range conn.Headers {
-		req.Header.Add(name, value)
+		if name == "Content-Type" || name == "Accept" {
+			req.Header.Set(name, value)
+		} else {
+			req.Header.Add(name, value)
+		}
 	}
 
 	// The stlib will override the value in the header based on the configured `Host`
