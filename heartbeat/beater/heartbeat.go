@@ -20,10 +20,11 @@ package beater
 import (
 	"errors"
 	"fmt"
-	"golang.org/x/net/context"
 	"sync"
 	"syscall"
 	"time"
+
+	"golang.org/x/net/context"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
