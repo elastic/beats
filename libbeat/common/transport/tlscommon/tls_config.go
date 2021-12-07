@@ -74,6 +74,13 @@ type TLSConfig struct {
 	// the server certificate.
 	CASha256 []string
 
+<<<<<<< HEAD
+=======
+	// CATrustedFingerprint is the HEX encoded fingerprint of a CA certificate. If present in the chain
+	// this certificate will be added to the list of trusted CAs (RootCAs) during the handshake.
+	CATrustedFingerprint string
+
+>>>>>>> db9b4104d (Add logs for ca_trusted_fingerprint workflow (#29312))
 	// time returns the current time as the number of seconds since the epoch.
 	// If time is nil, TLS uses time.Now.
 	time func() time.Time
@@ -151,6 +158,39 @@ func (c *TLSConfig) BuildServerConfig(host string) *tls.Config {
 	return config
 }
 
+<<<<<<< HEAD
+=======
+func trustRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate) error {
+	logger := logp.NewLogger("tls")
+	logger.Info("'ca_trusted_fingerprint' set, looking for matching fingerprints")
+	fingerprint, err := hex.DecodeString(cfg.CATrustedFingerprint)
+	if err != nil {
+		return fmt.Errorf("decode 'ca_trusted_fingerprint': %w", err)
+	}
+
+	for _, cert := range peerCerts {
+		// Compute digest for each certificate.
+		digest := sha256.Sum256(cert.Raw)
+
+		if bytes.Equal(digest[0:], fingerprint) {
+			logger.Info("CA certificate matching 'ca_trusted_fingerprint' found, adding it to 'certificate_authorities'")
+			// Make sure the fingerprint matches a CA certificate
+			if cert.IsCA {
+				if cfg.RootCAs == nil {
+					cfg.RootCAs = x509.NewCertPool()
+				}
+
+				cfg.RootCAs.AddCert(cert)
+				return nil
+			}
+		}
+	}
+
+	logger.Warn("no CA certificate matching the fingerprint")
+	return nil
+}
+
+>>>>>>> db9b4104d (Add logs for ca_trusted_fingerprint workflow (#29312))
 func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 	switch cfg.Verification {
 	case VerifyFull:
