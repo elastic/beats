@@ -13,12 +13,13 @@ import (
 
 // FleetServerConfig is the configuration written so Elastic Agent can run Fleet Server.
 type FleetServerConfig struct {
-	Bootstrap bool                     `config:"bootstrap" yaml:"bootstrap,omitempty"`
-	Policy    *FleetServerPolicyConfig `config:"policy" yaml:"policy,omitempty"`
-	Output    FleetServerOutputConfig  `config:"output" yaml:"output,omitempty"`
-	Host      string                   `config:"host" yaml:"host,omitempty"`
-	Port      uint16                   `config:"port" yaml:"port,omitempty"`
-	TLS       *tlscommon.Config        `config:"ssl" yaml:"ssl,omitempty"`
+	Bootstrap    bool                     `config:"bootstrap" yaml:"bootstrap,omitempty"`
+	Policy       *FleetServerPolicyConfig `config:"policy" yaml:"policy,omitempty"`
+	Output       FleetServerOutputConfig  `config:"output" yaml:"output,omitempty"`
+	Host         string                   `config:"host" yaml:"host,omitempty"`
+	Port         uint16                   `config:"port" yaml:"port,omitempty"`
+	InternalPort uint16                   `config:"internal_port" yaml:"internal_port,omitempty"`
+	TLS          *tlscommon.Config        `config:"ssl" yaml:"ssl,omitempty"`
 }
 
 // FleetServerPolicyConfig is the configuration for the policy Fleet Server should run on.
