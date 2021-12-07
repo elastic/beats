@@ -71,6 +71,7 @@ func defaultConfig() *Config {
 		CleanupTimeout: DefaultCleanupTimeout,
 		Prefix:         "co.elastic",
 		Unique:         false,
+		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
 	}
 }
 
