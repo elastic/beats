@@ -20,6 +20,8 @@ package stats
 import (
 	"encoding/json"
 
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -108,7 +110,7 @@ var (
 	}
 )
 
-func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
+func eventMapping(r mb.ReporterV2, info beat.Info, content []byte, isXpack bool) error {
 	event := mb.Event{
 		RootFields:      common.MapStr{},
 		ModuleFields:    common.MapStr{},
@@ -134,6 +136,13 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
 		"uuid":    info.UUID,
 		"version": info.Version,
 	})
+
+	// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+	// When using Agent, the index name is overwritten anyways.
+	if isXpack {
+		index := elastic.MakeXPackMonitoringIndexName(elastic.Beats)
+		event.Index = index
+	}
 
 	r.Event(event)
 	return nil
