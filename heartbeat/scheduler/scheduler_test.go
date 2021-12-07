@@ -86,10 +86,10 @@ func TestScheduler_Start(t *testing.T) {
 	executed := make(chan string)
 
 	preAddEvents := uint32(10)
-	s.Add(testSchedule{0}, "preAdd", testTaskTimes(preAddEvents, func(_ context.Context) []TaskFunc {
-		executed <- "preAdd"
+	s.Add(testSchedule{0}, "add", testTaskTimes(preAddEvents, func(_ context.Context) []TaskFunc {
+		executed <- "add"
 		cont := func(_ context.Context) []TaskFunc {
-			executed <- "preAddCont"
+			executed <- "add"
 			return nil
 		}
 		return []TaskFunc{cont}
@@ -112,8 +112,6 @@ func TestScheduler_Start(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, remove)
 	removeMtx.Unlock()
-
-	//s.Start()
 
 	postAddEvents := uint32(10)
 	s.Add(testSchedule{}, "postAdd", testTaskTimes(postAddEvents, func(_ context.Context) []TaskFunc {
@@ -154,7 +152,7 @@ func TestScheduler_Start(t *testing.T) {
 	assert.Equal(t, int(removedEvents), int(counts["removed"]))
 }
 
-func TestSchedulerWaitForRunOnce(t *testing.T) {
+func TestScheduler_WaitForRunOnce(t *testing.T) {
 	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, true)
 
 	defer s.Stop()
@@ -181,7 +179,6 @@ func TestScheduler_Stop(t *testing.T) {
 
 	executed := make(chan struct{})
 
-	//require.NoError(t, s.Start())
 	s.Stop()
 
 	_, err := s.Add(testSchedule{}, "testPostStop", testTaskTimes(1, func(_ context.Context) []TaskFunc {

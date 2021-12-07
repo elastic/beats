@@ -40,25 +40,22 @@ var ErrInvalidTransition = fmt.Errorf("invalid state transition")
 
 // Scheduler represents our async timer based scheduler.
 type Scheduler struct {
-	limit              int64
-	limitSem           *semaphore.Weighted
-	location           *time.Location
-	timerQueue         *timerqueue.TimerQueue
-	ctx                context.Context
-	cancelCtx          context.CancelFunc
-	stats              schedulerStats
-	jobLimitSem        map[string]*semaphore.Weighted
-	runOnce            bool
-	runOnceWg          *sync.WaitGroup
-	runOnceJobState    map[string]bool
-	runOnceJobStateMtx *sync.Mutex
+	limit       int64
+	limitSem    *semaphore.Weighted
+	location    *time.Location
+	timerQueue  *timerqueue.TimerQueue
+	ctx         context.Context
+	cancelCtx   context.CancelFunc
+	stats       schedulerStats
+	jobLimitSem map[string]*semaphore.Weighted
+	runOnce     bool
+	runOnceWg   *sync.WaitGroup
 }
 
 type schedulerStats struct {
 	activeJobs         *monitoring.Uint // gauge showing number of active jobs
 	activeTasks        *monitoring.Uint // gauge showing number of active tasks
 	waitingTasks       *monitoring.Uint // number of tasks waiting to run, but constrained by scheduler limit
-	jobsPerSecond      *monitoring.Uint // rate of job processing computed over the past hour
 	jobsMissedDeadline *monitoring.Uint // counter for number of jobs that missed start deadline
 }
 
@@ -163,8 +160,6 @@ func (s *Scheduler) WaitForRunOnce() {
 // has already stopped.
 var ErrAlreadyStopped = errors.New("attempted to add job to already stopped scheduler")
 
-type AddTask func(sched Schedule, id string, entrypoint TaskFunc, jobType string) (removeFn context.CancelFunc, err error)
-
 // Add adds the given TaskFunc to the current scheduler. Will return an error if the scheduler
 // is done.
 func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc, jobType string) (removeFn context.CancelFunc, err error) {
@@ -221,7 +216,9 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc, jobType 
 	}, nil
 }
 
-// runTaskOnce runs the given task exactly once at the given time. If
+// runTaskOnce runs the given task exactly once at the given time. Set deadlineCheck
+// to false if this is the first invocation of this, otherwise the deadline checker
+// will complain about a missed task
 func (s *Scheduler) runTaskOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn, deadlineCheck bool) {
 	now := time.Now().In(s.location)
 	// Check if the task is more than 1 second late
