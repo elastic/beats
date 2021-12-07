@@ -17,14 +17,8 @@ filebeat.registry:
 
 {% if ilm %}
 setup.ilm:
-  enabled: {{ ilm.enabled | default("auto") }}
+  enabled: {{ ilm.enabled | default("true") }}
   policy_name: libbeat-test-default-policy
-  {% if ilm.pattern %}
-  pattern: {{ ilm.pattern }}
-  {% endif %}
-  {% if ilm.rollover_alias %}
-  rollover_alias: {{ ilm.rollover_alias }}
-  {% endif %}
 {% endif %}
 
 

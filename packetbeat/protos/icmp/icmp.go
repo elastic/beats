@@ -21,6 +21,8 @@ import (
 	"net"
 	"time"
 
+	"github.com/google/gopacket/layers"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -30,8 +32,6 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
-
-	"github.com/tsg/gopacket/layers"
 )
 
 type icmpPlugin struct {

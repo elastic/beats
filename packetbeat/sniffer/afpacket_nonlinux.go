@@ -24,8 +24,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/layers"
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
 )
 
 type afpacketHandle struct{}
