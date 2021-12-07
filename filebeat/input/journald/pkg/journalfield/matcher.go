@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/coreos/go-systemd/sdjournal"
+	"github.com/coreos/go-systemd/v22/sdjournal"
 )
 
 // Matcher is a single field condition for filtering journal entries.
