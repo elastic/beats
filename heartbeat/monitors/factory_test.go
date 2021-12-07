@@ -158,7 +158,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	require.NoError(t, err)
 	defer sched.Stop()
 
-	f := NewFactory(binfo, sched, reg)
+	f := NewFactory(binfo, sched.Add, reg)
 	makeTestMon := func() (*Monitor, error) {
 		mIface, err := f.Create(pipelineConnector, serverMonConf)
 		if mIface == nil {
@@ -169,7 +169,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	}
 
 	// Ensure that an error is returned on a bad config
-	_, m0Err := newMonitor(badConf, reg, pipelineConnector, sched, nil)
+	_, m0Err := newMonitor(badConf, reg, pipelineConnector, sched.Add, nil)
 	require.Error(t, m0Err)
 
 	// Would fail if the previous newMonitor didn't free the monitor.id
