@@ -31,5 +31,12 @@ information, refer to
 //TODO: Add pointer to the integrations docs for custom journald logs when
 //available.
 
+[discrete]
+==== Custom {beats} generator is deprecated in 7.16
+
+The generator code for creating custom {beats} is deprecated in 7.16.0 and will
+be removed in 8.0.0. You can continue to build custom {beats} using the
+generators available in 7.16, or refer to existing {beats} as working examples.
+
 // end::notable-breaking-changes[]
 
