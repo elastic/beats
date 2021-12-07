@@ -219,7 +219,7 @@
                   type: long
                 - name: unauthorized
                   type: long
-    - name: beat
+    - name: info
       type: group
       fields:
         - name: name

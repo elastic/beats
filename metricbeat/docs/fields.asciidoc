@@ -8273,35 +8273,35 @@ type: long
 --
 
 
-*`beat.stats.beat.name`*::
+*`beat.stats.info.name`*::
 +
 --
 type: keyword
 
 --
 
-*`beat.stats.beat.host`*::
+*`beat.stats.info.host`*::
 +
 --
 type: keyword
 
 --
 
-*`beat.stats.beat.type`*::
+*`beat.stats.info.type`*::
 +
 --
 type: keyword
 
 --
 
-*`beat.stats.beat.uuid`*::
+*`beat.stats.info.uuid`*::
 +
 --
 type: keyword
 
 --
 
-*`beat.stats.beat.version`*::
+*`beat.stats.info.version`*::
 +
 --
 type: keyword
