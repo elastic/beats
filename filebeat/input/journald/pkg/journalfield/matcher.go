@@ -38,12 +38,6 @@ type MatcherBuilder struct {
 	Conversions map[string]Conversion
 }
 
-type journal interface {
-	AddMatch(string) error
-	AddDisjunction() error
-	AddConjunction() error
-}
-
 // IncludeMatches stores the advanced matching configuratio
 // provided by the user.
 type IncludeMatches struct {
@@ -52,19 +46,10 @@ type IncludeMatches struct {
 	OR      []IncludeMatches `config:"or"`
 }
 
-func ApplyIncludeMatches(j journal, m IncludeMatches) error {
-	for _, match := range m.Matches {
-		j.AddMatch(match.str)
-	}
-
-	if len(m.OR) > 0 {
-		BuildIncludeMatches(j, m.OR)
-		j.AddDisjunction()
-	}
-	if len(m.AND) > 0 {
-		BuildIncludeMatches(j, m.AND)
-		j.AddConjunction()
-	}
+type journal interface {
+	AddMatch(string) error
+	AddDisjunction() error
+	AddConjunction() error
 }
 
 var defaultBuilder = MatcherBuilder{Conversions: journaldEventFields}
@@ -146,24 +131,25 @@ func ApplyMatchersOr(j journal, matchers []Matcher) error {
 	return nil
 }
 
+// ApplySyslogIdentifierMatcher adds unit based filtering to the journal reader.
 func ApplyUnitMatchers(j journal, units []string, kernel bool) error {
 	for _, unit := range units {
 		matchers := [][]Matcher{
 			[]Matcher{
-				sdjournal.SD_JOURNAL_FIELD_SYSTEMD_UNIT + "=" + unit,
+				Matcher{sdjournal.SD_JOURNAL_FIELD_SYSTEMD_UNIT + "=" + unit},
 			},
 			[]Matcher{
-				sdjournal.SD_JOURNAL_FIELD_MESSAGE_ID + "=fc2e22bc6ee647b6b90729ab34a250b1",
-				sdjournal.SD_JOURNAL_FIELD_UID + "=1",
-				"COREDUMP_UNIT=" + unit,
+				Matcher{sdjournal.SD_JOURNAL_FIELD_MESSAGE_ID + "=fc2e22bc6ee647b6b90729ab34a250b1"},
+				Matcher{sdjournal.SD_JOURNAL_FIELD_UID + "=1"},
+				Matcher{"COREDUMP_UNIT=" + unit},
 			},
 			[]Matcher{
-				sdjournal.SD_JOURNAL_FIELD_PID + "=1",
-				"UNIT=" + unit,
+				Matcher{sdjournal.SD_JOURNAL_FIELD_PID + "=1"},
+				Matcher{"UNIT=" + unit},
 			},
 			[]Matcher{
-				sdjournal.SD_JOURNAL_FIELD_UID + "=1",
-				"OBJECT_SYSTEMD_UNIT=" + unit,
+				Matcher{sdjournal.SD_JOURNAL_FIELD_UID + "=1"},
+				Matcher{"OBJECT_SYSTEMD_UNIT=" + unit},
 			},
 		}
 
@@ -187,10 +173,49 @@ func ApplyUnitMatchers(j journal, units []string, kernel bool) error {
 
 }
 
+// ApplySyslogIdentifierMatcher adds syslog identifier filtering to the journal reader.
 func ApplySyslogIdentifierMatcher(j journal, identifiers []string) error {
+	identifierMatchers := make([]Matcher, len(identifiers))
 	for i, identifier := range identifiers {
-		identifiers[i] = sdjournal.SD_JOURNAL_FIELD_SYSLOG_IDENTIFIER + "=" + identifier
+		identifierMatchers[i] = Matcher{sdjournal.SD_JOURNAL_FIELD_SYSLOG_IDENTIFIER + "=" + identifier}
 	}
 
-	return ApplyMatchersOr(j, identifiers)
+	return ApplyMatchersOr(j, identifierMatchers)
+}
+
+// ApplyIncludeMatches adds advanced filtering to journals.
+func ApplyIncludeMatches(j journal, m IncludeMatches) error {
+	if len(m.OR) > 0 {
+		for _, or := range m.OR {
+			err := ApplyIncludeMatches(j, or)
+			if err != nil {
+				return err
+			}
+		}
+		err := j.AddDisjunction()
+		if err != nil {
+			return err
+		}
+	}
+	if len(m.AND) > 0 {
+		for _, and := range m.AND {
+			err := ApplyIncludeMatches(j, and)
+			if err != nil {
+				return err
+			}
+		}
+		err := j.AddConjunction()
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, match := range m.Matches {
+		err := match.Apply(j)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
