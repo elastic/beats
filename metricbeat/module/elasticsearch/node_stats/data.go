@@ -280,7 +280,7 @@ type nodesStruct struct {
 	Nodes map[string]map[string]interface{} `json:"nodes"`
 }
 
-func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticsearch.Info, content []byte) error {
+func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticsearch.Info, content []byte, isXpack bool) error {
 	nodeData := &nodesStruct{}
 	err := json.Unmarshal(content, nodeData)
 	if err != nil {
@@ -338,6 +338,13 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 		}
 		event.ModuleFields.Put("node.name", nameStr)
 		event.MetricSetFields.Delete("name")
+
+		// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+		// When using Agent, the index name is overwritten anyways.
+		if isXpack {
+			index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+			event.Index = index
+		}
 
 		r.Event(event)
 	}
