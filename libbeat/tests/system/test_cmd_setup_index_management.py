@@ -33,7 +33,6 @@ class TestCommandSetupIndexManagement(BaseTest):
                             policies=[self.policy_name, self.custom_policy],
                             data_streams=[self.data_stream])
 
-
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
