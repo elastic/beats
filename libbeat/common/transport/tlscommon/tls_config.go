@@ -188,7 +188,6 @@ func trustRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate) error {
 	return nil
 }
 
-
 func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 	switch cfg.Verification {
 	case VerifyFull:
