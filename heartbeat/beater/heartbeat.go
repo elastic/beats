@@ -166,26 +166,26 @@ func (bt *Heartbeat) runRunOnce(b *beat.Beat) error {
 }
 
 func (bt *Heartbeat) runRunOnceSingleConfig(cfg *common.Config, publishClient *core.SyncClient, wg *sync.WaitGroup, b *beat.Beat) (err error) {
-	wg.Add(1)
-
 	var runJob func(t scheduler.TaskFunc)
 	runJob = func(t scheduler.TaskFunc) {
+		defer wg.Done()
+
 		e := &beat.Event{
 			Fields: common.MapStr{},
 		}
 		conts := t(context.Background())
-		if len(conts) == 0 {
-			wg.Done()
-			return
-		}
+
 		publishClient.Publish(*e)
+
+		wg.Add(len(conts))
 		for _, c := range conts {
-			runJob(c)
+			go runJob(c)
 		}
 	}
 
 	addTask := func(sched scheduler.Schedule, id string, entrypoint scheduler.TaskFunc, jobType string) (removeFn context.CancelFunc, err error) {
-		runJob(entrypoint)
+		wg.Add(1)
+		go runJob(entrypoint)
 		return nil, nil
 	}
 
