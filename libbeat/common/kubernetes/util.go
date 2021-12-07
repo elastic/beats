@@ -117,7 +117,7 @@ func IsInCluster(kubeconfig string) bool {
 // If host is provided in the config use it directly.
 // If it is empty then try
 // 1. If beat is deployed in k8s cluster, use hostname of pod as the pod name to query pod metadata for node name.
-// 2. If step 1 fails or beat is deployed outside k8s cluster, use machine-ID to match against k8s nodes for node name.
+// 2. If step 1 fails or beat is deployed outside k8s cluster, use machine-id to match against k8s nodes for node name.
 // 3. If node cannot be discovered with step 1,2, fallback to NODE_NAME env var as default value. In case it is not set return error.
 func DiscoverKubernetesNode(log *logp.Logger, nd *DiscoverKubernetesNodeParams) (string, error) {
 	ctx := context.TODO()
@@ -136,10 +136,10 @@ func DiscoverKubernetesNode(log *logp.Logger, nd *DiscoverKubernetesNodeParams) 
 		log.Debug(err)
 	}
 
-	// try discover node by machine ID
+	// try discover node by machine id
 	node, err := discoverByMachineId(nd, ctx)
 	if err == nil {
-		log.Infof("kubernetes: Node %s discovered by machine-ID matching", node)
+		log.Infof("kubernetes: Node %s discovered by machine-id matching", node)
 		return node, nil
 	}
 	log.Debug(err)
@@ -176,7 +176,7 @@ func discoverInCluster(nd *DiscoverKubernetesNodeParams, ctx context.Context) (n
 func discoverByMachineId(nd *DiscoverKubernetesNodeParams, ctx context.Context) (nodeName string, errorMsg error) {
 	mid := nd.HostUtils.GetMachineID()
 	if mid == "" {
-		errorMsg = errors.New("kubernetes: Couldn't collect info from any of the files in /etc/machine-ID /var/lib/dbus/machine-ID")
+		errorMsg = errors.New("kubernetes: Couldn't collect info from any of the files in /etc/machine-id /var/lib/dbus/machine-id")
 		return
 	}
 
@@ -199,8 +199,8 @@ func discoverByMachineId(nd *DiscoverKubernetesNodeParams, ctx context.Context) 
 // borrowed from machineID of cadvisor.
 func (hd *DefaultDiscoveryUtils) GetMachineID() string {
 	for _, file := range []string{
-		"/etc/machine-ID",
-		"/var/lib/dbus/machine-ID",
+		"/etc/machine-id",
+		"/var/lib/dbus/machine-id",
 	} {
 		id, err := ioutil.ReadFile(file)
 		if err == nil {
