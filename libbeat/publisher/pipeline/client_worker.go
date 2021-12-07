@@ -29,9 +29,8 @@ import (
 )
 
 type worker struct {
-	id       uint
 	observer outputObserver
-	qu       workQueue
+	qu       chan publisher.Batch
 	done     chan struct{}
 }
 
@@ -46,14 +45,12 @@ type netClientWorker struct {
 	worker
 	client outputs.NetworkClient
 
-	batchSize  int
-	batchSizer func() int
-	logger     logger
+	logger logger
 
 	tracer *apm.Tracer
 }
 
-func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client, logger logger, tracer *apm.Tracer) outputWorker {
+func makeClientWorker(observer outputObserver, qu chan publisher.Batch, client outputs.Client, logger logger, tracer *apm.Tracer) outputWorker {
 	w := worker{
 		observer: observer,
 		qu:       qu,
@@ -102,7 +99,6 @@ func (w *clientWorker) run() {
 			if batch == nil {
 				continue
 			}
-			w.observer.outBatchSend(len(batch.Events()))
 			if err := w.client.Publish(context.TODO(), batch); err != nil {
 				return
 			}
