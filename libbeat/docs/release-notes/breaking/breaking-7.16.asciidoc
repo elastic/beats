@@ -14,12 +14,12 @@ including changes to beta or experimental functionality.
 // tag::notable-breaking-changes[]
 
 [discrete]
-==== {journalbeat} is deprecated in 7.16
+==== {journalbeat} is removed in 7.16
 
 {journalbeat}, a lightweight shipper for collecting logs written by the Journald
-system service, is deprecated in 7.16. This functionality is instead provided as
-a {filebeat} input. If you're currently using {journalbeat}, you should begin
-using the `journald` input in {filebeat} instead. For more information, refer to
+system service, is removed in 7.16. This functionality is instead provided as
+a {filebeat} input. If you're currently using {journalbeat}, you should
+use the `journald` input in {filebeat} instead. For more information, refer to
 the
 {filebeat-ref}/filebeat-input-journald.html[Journald input] documentation.
 
