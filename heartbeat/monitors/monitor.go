@@ -49,7 +49,7 @@ type Monitor struct {
 	stdFields      stdfields.StdMonitorFields
 	pluginName     string
 	config         *common.Config
-	taskAdder      scheduler.AddTask
+	addTask        scheduler.AddTask
 	configuredJobs []*configuredJob
 	enabled        bool
 	state          int
@@ -101,7 +101,7 @@ func newMonitorUnsafe(
 	config *common.Config,
 	registrar *plugin.PluginsReg,
 	pipelineConnector beat.PipelineConnector,
-	taskAdder scheduler.AddTask,
+	addTask scheduler.AddTask,
 	onStop func(*Monitor),
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
@@ -124,7 +124,7 @@ func newMonitorUnsafe(
 	m := &Monitor{
 		stdFields:         standardFields,
 		pluginName:        pluginFactory.Name,
-		taskAdder:         taskAdder,
+		addTask:           addTask,
 		configuredJobs:    []*configuredJob{},
 		pipelineConnector: pipelineConnector,
 		internalsMtx:      sync.Mutex{},
