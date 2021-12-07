@@ -92,7 +92,7 @@ func (ad *ActionDispatcher) Dispatch(ctx context.Context, acker store.FleetAcker
 
 	ad.log.Debugf(
 		"Dispatch %d actions of types: %s",
-
+		len(actions),
 		strings.Join(detectTypes(actions), ", "),
 	)
 
