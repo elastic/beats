@@ -1900,6 +1900,7 @@ func TestPod_EmitEvent(t *testing.T) {
 	}
 
 	client := k8sfake.NewSimpleClientset()
+	addResourceMetadata := metadata.GetDefaultResourceMetadataConfig()
 	for _, test := range tests {
 		t.Run(test.Message, func(t *testing.T) {
 			mapper, err := template.NewConfigMapper(nil, nil, nil)
@@ -1907,7 +1908,7 @@ func TestPod_EmitEvent(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, client, nil, nil, nil)
+			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, client, nil, nil, addResourceMetadata)
 			p := &Provider{
 				config:    defaultConfig(),
 				bus:       bus.New(logp.NewLogger("bus"), "test"),

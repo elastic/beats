@@ -195,7 +195,7 @@ func discoverByMachineId(nd *DiscoverKubernetesNodeParams, ctx context.Context) 
 	return
 }
 
-// GetMachineID returns the machine-id
+// GetMachineID returns the machine-idadd_kubernetes_metadata/indexers_test.go
 // borrowed from machineID of cadvisor.
 func (hd *DefaultDiscoveryUtils) GetMachineID() string {
 	for _, file := range []string{
