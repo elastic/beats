@@ -20,6 +20,7 @@ package beater
 import (
 	"errors"
 	"fmt"
+	"golang.org/x/net/context"
 	"sync"
 	"syscall"
 	"time"
@@ -28,7 +29,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -78,7 +78,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		config:    parsedConfig,
 		scheduler: scheduler,
 		// dynamicFactory is the factory used for dynamic configs, e.g. autodiscover / reload
-		dynamicFactory: monitors.NewFactory(b.Info, scheduler, plugin.GlobalPluginsReg),
+		dynamicFactory: monitors.NewFactory(b.Info, scheduler.Add, plugin.GlobalPluginsReg),
 	}
 	return bt, nil
 }
@@ -150,7 +150,7 @@ func (bt *Heartbeat) runRunOnce(b *beat.Beat) error {
 
 	wg := &sync.WaitGroup{}
 	for _, cfg := range bt.config.Monitors {
-		err := runRunOnceSingleConfig(cfg, publishClient, wg)
+		err := bt.runRunOnceSingleConfig(cfg, publishClient, wg, b)
 		if err != nil {
 			logp.Warn("error running run_once config: %s", err)
 		}
@@ -164,35 +164,37 @@ func (bt *Heartbeat) runRunOnce(b *beat.Beat) error {
 	return nil
 }
 
-func runRunOnceSingleConfig(cfg *common.Config, publishClient *core.SyncClient, wg *sync.WaitGroup) (err error) {
-	sf, err := stdfields.ConfigToStdMonitorFields(cfg)
-	if err != nil {
-		return fmt.Errorf("could not get stdmon fields: %w", err)
-	}
-	pluginFactory, exists := plugin.GlobalPluginsReg.Get(sf.Type)
-	if !exists {
-		return fmt.Errorf("no plugin for type: %s", sf.Type)
-	}
-	plugin, err := pluginFactory.Make(sf.Type, cfg)
-	if err != nil {
-		return err
-	}
-
-	results := plugin.RunWrapped(sf)
-
+func (bt *Heartbeat) runRunOnceSingleConfig(cfg *common.Config, publishClient *core.SyncClient, wg *sync.WaitGroup, b *beat.Beat) (err error) {
 	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		defer plugin.Close()
-		for {
-			event := <-results
-			if event == nil {
-				break
-			}
-			publishClient.Publish(*event)
-		}
-	}()
 
+	var runJob func(t scheduler.TaskFunc)
+	runJob = func(t scheduler.TaskFunc) {
+		e := &beat.Event{
+			Fields: common.MapStr{},
+		}
+		conts := t(context.Background())
+		if len(conts) == 0 {
+			wg.Done()
+			return
+		}
+		publishClient.Publish(*e)
+		for _, c := range conts {
+			runJob(c)
+		}
+	}
+
+	addTask := func(sched scheduler.Schedule, id string, entrypoint scheduler.TaskFunc, jobType string) (removeFn context.CancelFunc, err error) {
+		runJob(entrypoint)
+		return nil, nil
+	}
+
+	f := monitors.NewFactory(b.Info, addTask, plugin.GlobalPluginsReg)
+	created, err := f.Create(b.Publisher, cfg)
+	if err != nil {
+		return fmt.Errorf("could not create monitor: %w", err)
+	}
+
+	created.Start()
 	return nil
 }
 

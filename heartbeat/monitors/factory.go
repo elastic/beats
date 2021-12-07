@@ -40,7 +40,7 @@ import (
 // suitable for config reloading.
 type RunnerFactory struct {
 	info       beat.Info
-	sched      *scheduler.Scheduler
+	addTask    scheduler.AddTask
 	byId       map[string]*Monitor
 	mtx        *sync.Mutex
 	pluginsReg *plugin.PluginsReg
@@ -67,10 +67,10 @@ type publishSettings struct {
 }
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
-func NewFactory(info beat.Info, sched *scheduler.Scheduler, pluginsReg *plugin.PluginsReg) *RunnerFactory {
+func NewFactory(info beat.Info, addTask scheduler.AddTask, pluginsReg *plugin.PluginsReg) *RunnerFactory {
 	return &RunnerFactory{
 		info:       info,
-		sched:      sched,
+		addTask:    addTask,
 		byId:       map[string]*Monitor{},
 		mtx:        &sync.Mutex{},
 		pluginsReg: pluginsReg,
@@ -116,7 +116,7 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *common.Config) (cfgfile.Runne
 			}
 		}()
 	}
-	monitor, err := newMonitor(c, f.pluginsReg, p, f.sched, safeStop)
+	monitor, err := newMonitor(c, f.pluginsReg, p, f.addTask, safeStop)
 	if err != nil {
 		return nil, err
 	}
