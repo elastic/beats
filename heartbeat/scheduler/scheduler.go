@@ -224,7 +224,7 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc, jobType 
 func (s *Scheduler) runTaskOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn, deadlineCheck bool) {
 	now := time.Now().In(s.location)
 	// Check if the task is more than 1 second late
-	if deadlineCheck && runAt.Sub(now) > time.Second {
+	if deadlineCheck && runAt.Sub(now) < time.Second {
 		s.stats.jobsMissedDeadline.Inc()
 	}
 
