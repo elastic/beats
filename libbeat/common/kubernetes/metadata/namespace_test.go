@@ -51,11 +51,9 @@ func TestNamespace_Generate(t *testing.T) {
 					UID:  types.UID(uid),
 					Labels: map[string]string{
 						"foo": "bar",
-						"key": "value",
 					},
 					Annotations: map[string]string{
 						"spam": "baz",
-						"key":  "value",
 					},
 				},
 				TypeMeta: metav1.TypeMeta{
@@ -77,7 +75,6 @@ func TestNamespace_Generate(t *testing.T) {
 	}
 
 	cfg, err := common.NewConfigFrom(Config{
-		IncludeLabels:      []string{"foo"},
 		IncludeAnnotations: []string{"spam"},
 	})
 	if err != nil {

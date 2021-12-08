@@ -36,8 +36,6 @@ import (
 
 func TestBuildMetadataEnricher(t *testing.T) {
 	watcher := mockWatcher{}
-	nodeWatcher := mockWatcher{}
-	namespaceWatcher := mockWatcher{}
 	funcs := mockFuncs{}
 	resource := &v1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -50,7 +48,7 @@ func TestBuildMetadataEnricher(t *testing.T) {
 		},
 	}
 
-	enricher := buildMetadataEnricher(&watcher, &nodeWatcher, &namespaceWatcher, funcs.update, funcs.delete, funcs.index)
+	enricher := buildMetadataEnricher(&watcher, funcs.update, funcs.delete, funcs.index)
 	assert.NotNil(t, watcher.handler)
 
 	enricher.Start()

@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 )
 
-var metagen = metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil, nil)
+var metagen = metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil, true)
 
 func TestPodIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
@@ -90,7 +90,7 @@ func TestPodIndexer(t *testing.T) {
 func TestPodUIDIndexer(t *testing.T) {
 	var testConfig = common.NewConfig()
 
-	metaGenWithPodUID := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil, nil)
+	metaGenWithPodUID := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil, true)
 
 	podUIDIndexer, err := NewPodUIDIndexer(*testConfig, metaGenWithPodUID)
 	assert.NoError(t, err)
@@ -301,7 +301,7 @@ func TestFilteredGenMeta(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil, nil, nil)
+	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil, nil, true)
 
 	podIndexer, err = NewPodNameIndexer(*testConfig, filteredGen)
 	assert.NoError(t, err)
@@ -338,7 +338,7 @@ func TestFilteredGenMetaExclusion(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil, nil, nil)
+	filteredGen := metadata.NewPodMetadataGenerator(config, nil, nil, nil, nil, true)
 
 	podIndexer, err := NewPodNameIndexer(*testConfig, filteredGen)
 	assert.NoError(t, err)

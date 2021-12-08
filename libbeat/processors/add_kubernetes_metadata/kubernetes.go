@@ -191,6 +191,9 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 		}
 
 		metaConf := config.AddResourceMetadata
+		if metaConf == nil {
+			metaConf = metadata.GetDefaultResourceMetadataConfig()
+		}
 
 		options := kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
