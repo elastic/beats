@@ -52,11 +52,11 @@ type PluginConfig []map[string]common.Config
 
 func defaultKubernetesAnnotatorConfig() kubeAnnotatorConfig {
 	return kubeAnnotatorConfig{
-		SyncPeriod:      10 * time.Minute,
-		CleanupTimeout:  60 * time.Second,
-		DefaultMatchers: Enabled{true},
-		DefaultIndexers: Enabled{true},
-		Scope:           "node",
+		SyncPeriod:          10 * time.Minute,
+		CleanupTimeout:      60 * time.Second,
+		DefaultMatchers:     Enabled{true},
+		DefaultIndexers:     Enabled{true},
+		Scope:               "node",
 		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
 	}
 }
