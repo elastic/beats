@@ -70,7 +70,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	return eventsMapping(r, m.MetricSet, *info, content)
+	return eventsMapping(r, m.MetricSet, *info, content, m.XPackEnabled)
 }
 
 func (m *MetricSet) updateServiceURI() error {
