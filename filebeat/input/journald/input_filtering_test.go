@@ -129,16 +129,6 @@ func TestInputUnits(t *testing.T) {
 	}
 }
 
-//expectedMessages: []string{
-//	"pam_unix(sudo:session): session closed for user root",
-//	"Started Outputs some log lines.",
-//	"1st line",
-//	"2nd line",
-//	"3rd line",
-//	"4th line",
-//	"5th line",
-//	"6th line",
-//},
 func TestInputIncludeMatches(t *testing.T) {
 	tests := map[string]struct {
 		includeMatches   map[string]interface{}
