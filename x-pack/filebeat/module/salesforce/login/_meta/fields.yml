@@ -1,0 +1,119 @@
+- name: salesforce.login
+  type: group
+  # TODO: What should be the appropriate release value?
+  release: ga
+  description: >
+    Module for ingesting Salesforce login logs.
+  fields:
+    - name: api_type
+      type: keyword
+      description: >
+        The type of API that’s used to log in. Values include SOAP Enterprise, SOAP Partner, REST API
+    - name: api_version
+      type: keyword
+      description: >
+        The version number of the API. If no version number is available, “Unknown” is returned.
+    - name: application
+      type: keyword
+      description: >
+        The application used to access the org. Possible values include: AppExchange, Browser, Salesforce for iOS, Salesforce Developers API Explorer, N/A
+    - name: auth_method_reference
+      type: keyword
+      description: >
+        The authentication method used by a third-party identification provider for an OpenID Connect single sign-on protocol.
+    - name: auth_service_id
+      type: keyword
+      description: >
+        The 18-character ID for an authentication service for a login event.
+    - name: client_ip
+      type: keyword
+      description: >
+        The IP address of the client that’s using Salesforce services. A Salesforce internal IP (such as a login from Salesforce Workbench or AppExchange) is shown as “Salesforce.com IP”.
+    - name: client_version
+      type: keyword
+      description: >
+        The version number of the login client. If no version number is available, “Unknown” is returned.
+    - name: cpu_time
+      type: keyword
+      description: >
+        The CPU time in milliseconds used to complete the request. This field indicates the amount of activity taking place in the app server layer.
+    - name: created_by_id
+      type: keyword
+      description: >
+        Unavailable
+    - name: db_total_time
+      type: keyword
+      description: >
+        The time in nanoseconds for a database round trip. Includes time spent in the JDBC driver, network to the database, and DB_CPU_TIME. Compare this field to CPU_TIME to determine whether performance issues are occurring in the database layer or in your own code.
+    - name: evaluation_time
+      type: long
+      description: >
+        The amount of time it took to evaluate the transaction security policy, in milliseconds.
+    - name: event_type
+      type: keyword
+      description: >
+        The type of event. The value is always Login.
+    - name: login_geo_id
+      type: keyword
+      description: >
+        The Salesforce ID of the LoginGeo object associated with the login user’s IP address.
+    - name: login_history_id
+      type: keyword
+      description: >
+        Tracks a user session so you can correlate user activity with a particular login instance. This field is also available on the LoginHistory, AuthSession, and LoginHistory objects, making it easier to trace events back to a user’s original authentication.
+    - name: login_key
+      type: keyword
+      description: >
+        The string that ties together all events in a given user’s login session. It starts with a login event and ends with either a logout event or the user session expiring.
+    - name: login_type
+      type: keyword
+      description: >
+        The type of login used to access the session.
+    - name: organization_id
+      type: keyword
+      description: >
+        The 15-character ID of the organization.
+    - name: policy_id
+      type: keyword
+      description: >
+        The ID of the transaction security policy associated with this event.
+    - name: policy_outcome
+      type: keyword
+      description: >
+        The result of the transaction policy.
+    - name: related_event_identifier
+      type: keyword
+      description: >
+        This field is populated only when the activity that this event monitors requires extra authentication, such as multi-factor authentication. In this case, Salesforce generates more events and sets the RelatedEventIdentifier field of the new events to the value of the EventIdentifier field of the original event. Use this field with the EventIdentifier field to correlate all the related events. If no extra authentication is required, this field is blank.
+    - name: replay_id
+      type: long
+      description: >
+        Represents an ID value that is populated by the system and refers to the position of the event in the event stream. Replay ID values aren’t guaranteed to be contiguous for consecutive events. A subscriber can store a replay ID value and use it on resubscription to retrieve missed events that are within the retention window.
+    - name: request_id
+      type: keyword
+      description: >
+        The unique ID of a single transaction. A transaction can contain one or more events. Each event in a given transaction has the same REQUEST_ID.
+    - name: request_status
+      type: keyword
+      description: >
+        The status of the request for a page view or user interface action.
+    - name: run_time
+      type: keyword
+      description: >
+        The amount of time that the request took in milliseconds.
+    - name: schema
+      type: keyword
+      description: >
+        Unavailable
+    - name: session_level
+      type: keyword
+      description: >
+        Session-level security controls user access to features that support it, such as connected apps and reporting. Possible values are: HIGH_ASSURANCE, LOW, STANDARD
+    - name: uri_id_derived
+      type: keyword
+      description: >
+        The 18-character case insensitive ID of the URI of the page that’s receiving the request.
+    - name: user_id_derived
+      type: keyword
+      description: >
+        The 18-character case insensitive ID of the user who’s using Salesforce services through the UI or the API.
