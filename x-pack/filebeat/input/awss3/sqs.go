@@ -88,7 +88,10 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 				}()
 
 				if err := r.msgHandler.ProcessSQS(ctx, &msg); err != nil {
-					r.log.Warnw("Failed processing SQS message.", "error", err, "message_id", *msg.MessageId)
+					r.log.Warnw("Failed processing SQS message.",
+						"error", err,
+						"message_id", *msg.MessageId,
+						"elapsed_time_ns", time.Since(start))
 				}
 			}(msg, time.Now())
 		}
