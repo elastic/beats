@@ -3,7 +3,7 @@
 @Library('apm@current') _
 
 pipeline {
-  agent { label 'macos' }
+  agent { label 'macosx' }
   environment {
     REPO = 'beats'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
