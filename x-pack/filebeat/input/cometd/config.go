@@ -9,8 +9,6 @@ import "fmt"
 type config struct {
 	ChannelName string      `config:"channel_name" validate:"required"`
 	Auth        *authConfig `config:"auth"`
-	// Overrides the default Pub/Sub service address and disables TLS. For testing.
-	AlternativeHost string `config:"alternative_host"`
 }
 
 func (c *config) Validate() error {
