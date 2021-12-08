@@ -57,6 +57,7 @@ func defaultKubernetesAnnotatorConfig() kubeAnnotatorConfig {
 		DefaultMatchers: Enabled{true},
 		DefaultIndexers: Enabled{true},
 		Scope:           "node",
+		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
 	}
 }
 
