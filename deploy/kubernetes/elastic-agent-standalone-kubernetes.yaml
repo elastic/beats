@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: agent-node-datastreams
-  namespace: kube-system
+  namespace: elastic
   labels:
     k8s-app: elastic-agent
 data:
@@ -61,7 +61,7 @@ data:
               - state_container
             add_metadata: true
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'kube-state-metrics.kube-system:8080'
             period: 10s
           - data_stream:
               dataset: kubernetes.state_cronjob
@@ -70,7 +70,7 @@ data:
               - state_cronjob
             add_metadata: true
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'kube-state-metrics.kube-system:8080'
             period: 10s
           - data_stream:
               dataset: kubernetes.state_deployment
@@ -79,7 +79,7 @@ data:
               - state_deployment
             add_metadata: true
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'kube-state-metrics.kube-system:8080'
             period: 10s
           - data_stream:
               dataset: kubernetes.state_job
@@ -88,7 +88,7 @@ data:
               - state_job
             add_metadata: true
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'kube-state-metrics.kube-system:8080'
             period: 10s
           - data_stream:
               dataset: kubernetes.state_node
@@ -97,7 +97,7 @@ data:
               - state_node
             add_metadata: true
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'kube-state-metrics.kube-system:8080'
             period: 10s
           - data_stream:
               dataset: kubernetes.state_persistentvolume
@@ -106,7 +106,7 @@ data:
               - state_persistentvolume
             add_metadata: true
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'kube-state-metrics.kube-system:8080'
             period: 10s
           - data_stream:
               dataset: kubernetes.state_persistentvolumeclaim
@@ -115,7 +115,7 @@ data:
               - state_persistentvolumeclaim
             add_metadata: true
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'kube-state-metrics.kube-system:8080'
             period: 10s
           - data_stream:
               dataset: kubernetes.state_pod
@@ -124,7 +124,7 @@ data:
               - state_pod
             add_metadata: true
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'kube-state-metrics.kube-system:8080'
             period: 10s
           - data_stream:
               dataset: kubernetes.state_replicaset
@@ -133,7 +133,7 @@ data:
               - state_replicaset
             add_metadata: true
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'kube-state-metrics.kube-system:8080'
             period: 10s
           - data_stream:
               dataset: kubernetes.state_resourcequota
@@ -142,7 +142,7 @@ data:
               - state_resourcequota
             add_metadata: true
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'kube-state-metrics.kube-system:8080'
             period: 10s
           - data_stream:
               dataset: kubernetes.state_service
@@ -151,7 +151,7 @@ data:
               - state_service
             add_metadata: true
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'kube-state-metrics.kube-system:8080'
             period: 10s
           - data_stream:
               dataset: kubernetes.state_statefulset
@@ -160,7 +160,7 @@ data:
               - state_statefulset
             add_metadata: true
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'kube-state-metrics.kube-system:8080'
             period: 10s
           - data_stream:
               dataset: kubernetes.state_storageclass
@@ -169,7 +169,7 @@ data:
               - state_storageclass
             add_metadata: true
             hosts:
-              - 'kube-state-metrics:8080'
+              - 'kube-state-metrics.kube-system:8080'
             period: 10s
       - name: system-logs
         type: logfile
@@ -424,34 +424,34 @@ data:
       # Add extra input blocks here, based on conditions
       # so as to automatically identify targeted Pods and start monitoring them
       # using a predefined integration. For instance:
-      #- name: redis
-      #  type: redis/metrics
-      #  use_output: default
-      #  meta:
-      #    package:
-      #      name: redis
-      #      version: 0.3.6
-      #  data_stream:
-      #    namespace: default
-      #  streams:
-      #    - data_stream:
-      #        dataset: redis.info
-      #        type: metrics
-      #      metricsets:
-      #        - info
-      #      hosts:
-      #        - '${kubernetes.pod.ip}:6379'
-      #      idle_timeout: 20s
-      #      maxconn: 10
-      #      network: tcp
-      #      period: 10s
-      #      condition: ${kubernetes.labels.app} == 'redis'
+      - name: redis
+        type: redis/metrics
+        use_output: default
+        meta:
+          package:
+            name: redis
+            version: 0.3.6
+        data_stream:
+          namespace: default
+        streams:
+          - data_stream:
+              dataset: redis.info
+              type: metrics
+            metricsets:
+              - info
+            hosts:
+              - '${kubernetes.pod.ip}:6379'
+            idle_timeout: 20s
+            maxconn: 10
+            network: tcp
+            period: 10s
+            condition: ${kubernetes.labels.app} == 'redis'
 ---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: elastic-agent
-  namespace: kube-system
+  namespace: elastic
   labels:
     app: elastic-agent
 spec:
@@ -471,18 +471,18 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: elastic-agent
-          image: docker.elastic.co/beats/elastic-agent:8.0.0
+          image: docker.elastic.co/beats/elastic-agent:7.16.0-SNAPSHOT
           args: [
             "-c", "/etc/agent.yml",
-            "-e",
+            "-e", "-d", "*"
           ]
           env:
             - name: ES_USERNAME
               value: "elastic"
             - name: ES_PASSWORD
-              value: ""
+              value: "xxxxx"
             - name: ES_HOST
-              value: ""
+              value: "https://xxxxxx.es.us-central1.gcp.cloud.es.io:9243"
             - name: NODE_NAME
               valueFrom:
                 fieldRef:
@@ -541,7 +541,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: elastic-agent
-    namespace: kube-system
+    namespace: elastic
 roleRef:
   kind: ClusterRole
   name: elastic-agent
@@ -550,12 +550,12 @@ roleRef:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  namespace: kube-system
+  namespace: elastic
   name: elastic-agent
 subjects:
   - kind: ServiceAccount
     name: elastic-agent
-    namespace: kube-system
+    namespace: elastic
 roleRef:
   kind: Role
   name: elastic-agent
@@ -565,11 +565,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: elastic-agent-kubeadm-config
-  namespace: kube-system
+  namespace: elastic
 subjects:
   - kind: ServiceAccount
     name: elastic-agent
-    namespace: kube-system
+    namespace: elastic
 roleRef:
   kind: Role
   name: elastic-agent-kubeadm-config
@@ -627,7 +627,7 @@ kind: Role
 metadata:
   name: elastic-agent
   # should be the namespace where elastic-agent is running
-  namespace: kube-system
+  namespace: elastic
   labels:
     k8s-app: elastic-agent
 rules:
@@ -656,7 +656,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: elastic-agent
-  namespace: kube-system
+  namespace: elastic
   labels:
     k8s-app: elastic-agent
 ---
