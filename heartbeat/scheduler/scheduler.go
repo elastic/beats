@@ -21,7 +21,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 	"math"
 	"sync"
 	"time"
@@ -161,11 +160,11 @@ func (s *Scheduler) WaitForRunOnce() {
 // has already stopped.
 var ErrAlreadyStopped = errors.New("attempted to add job to already stopped scheduler")
 
-type AddTask func(sched Schedule, id string, entrypoint TaskFunc, jobType string, client *core.SyncClient) (removeFn context.CancelFunc, err error)
+type AddTask func(sched Schedule, id string, entrypoint TaskFunc, jobType string, waitForPublish func()) (removeFn context.CancelFunc, err error)
 
 // Add adds the given TaskFunc to the current scheduler. Will return an error if the scheduler
 // is done.
-func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc, jobType string, client *core.SyncClient) (removeFn context.CancelFunc, err error) {
+func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc, jobType string, waitForPublish func()) (removeFn context.CancelFunc, err error) {
 	if errors.Is(s.ctx.Err(), context.Canceled) {
 		return nil, ErrAlreadyStopped
 	}
@@ -193,7 +192,7 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc, jobType 
 		s.stats.activeJobs.Dec()
 
 		if s.runOnce {
-			client.Wait()
+			waitForPublish()
 			s.runOnceWg.Done()
 		} else {
 			// Schedule the next run

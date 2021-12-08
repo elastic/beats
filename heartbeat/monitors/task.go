@@ -20,6 +20,7 @@ package monitors
 import (
 	"context"
 	"fmt"
+
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 
 	"github.com/elastic/beats/v7/heartbeat/eventext"
@@ -78,8 +79,6 @@ func (t *configuredJob) makeSchedulerTaskFunc() scheduler.TaskFunc {
 func (t *configuredJob) Start() {
 	var err error
 
-	//t.client, err = t.monitor.pipelineConnector.Connect()
-
 	t.client, err = core.NewSyncClient(logp.NewLogger("monitor_task"), t.monitor.pipelineConnector, beat.ClientConfig{})
 
 	if err != nil {
@@ -88,7 +87,7 @@ func (t *configuredJob) Start() {
 	}
 
 	tf := t.makeSchedulerTaskFunc()
-	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ID, tf, t.config.Type, t.client)
+	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ID, tf, t.config.Type, t.client.Wait)
 	if err != nil {
 		logp.Err("could not start monitor: %v", err)
 	}
