@@ -30,10 +30,7 @@ import (
 )
 
 func TestMakeVerifyServerConnection(t *testing.T) {
-	testCerts, err := openTestCerts()
-	if err != nil {
-		t.Fatalf("failed to open test certs: %+v", err)
-	}
+	testCerts := openTestCerts(t)
 
 	testCA, errs := LoadCertificateAuthorities([]string{
 		filepath.Join("testdata", "ca.crt"),
@@ -50,7 +47,7 @@ func TestMakeVerifyServerConnection(t *testing.T) {
 		peerCerts        []*x509.Certificate
 		serverName       string
 		expectedCallback bool
-		expectedError    error
+		expectedError    bool
 	}{
 		"default verification without certificates when required": {
 			verificationMode: VerifyFull,
@@ -58,7 +55,7 @@ func TestMakeVerifyServerConnection(t *testing.T) {
 			peerCerts:        nil,
 			serverName:       "",
 			expectedCallback: true,
-			expectedError:    MissingPeerCertificate,
+			expectedError:    true,
 		},
 		"default verification with certificates when required with expired cert": {
 			verificationMode: VerifyFull,
@@ -67,7 +64,7 @@ func TestMakeVerifyServerConnection(t *testing.T) {
 			peerCerts:        []*x509.Certificate{testCerts["expired"]},
 			serverName:       "",
 			expectedCallback: true,
-			expectedError:    x509.CertificateInvalidError{Cert: testCerts["expired"], Reason: x509.Expired},
+			expectedError:    true,
 		},
 		"default verification with certificates when required with incorrect server name in cert": {
 			verificationMode: VerifyFull,
@@ -76,7 +73,7 @@ func TestMakeVerifyServerConnection(t *testing.T) {
 			peerCerts:        []*x509.Certificate{testCerts["correct"]},
 			serverName:       "bad.example.com",
 			expectedCallback: true,
-			expectedError:    x509.HostnameError{Certificate: testCerts["correct"], Host: "bad.example.com"},
+			expectedError:    true,
 		},
 		"default verification with certificates when required with correct cert": {
 			verificationMode: VerifyFull,
@@ -85,7 +82,7 @@ func TestMakeVerifyServerConnection(t *testing.T) {
 			peerCerts:        []*x509.Certificate{testCerts["correct"]},
 			serverName:       "localhost",
 			expectedCallback: true,
-			expectedError:    nil,
+			expectedError:    false,
 		},
 		"default verification with certificates when required with correct wildcard cert": {
 			verificationMode: VerifyFull,
@@ -94,7 +91,7 @@ func TestMakeVerifyServerConnection(t *testing.T) {
 			peerCerts:        []*x509.Certificate{testCerts["wildcard"]},
 			serverName:       "hello.example.com",
 			expectedCallback: true,
-			expectedError:    nil,
+			expectedError:    false,
 		},
 		"certificate verification with certificates when required with correct cert": {
 			verificationMode: VerifyCertificate,
@@ -103,7 +100,7 @@ func TestMakeVerifyServerConnection(t *testing.T) {
 			peerCerts:        []*x509.Certificate{testCerts["correct"]},
 			serverName:       "localhost",
 			expectedCallback: true,
-			expectedError:    nil,
+			expectedError:    false,
 		},
 		"certificate verification with certificates when required with expired cert": {
 			verificationMode: VerifyCertificate,
@@ -112,7 +109,7 @@ func TestMakeVerifyServerConnection(t *testing.T) {
 			peerCerts:        []*x509.Certificate{testCerts["expired"]},
 			serverName:       "localhost",
 			expectedCallback: true,
-			expectedError:    x509.CertificateInvalidError{Cert: testCerts["expired"], Reason: x509.Expired},
+			expectedError:    true,
 		},
 		"certificate verification with certificates when required with incorrect server name in cert": {
 			verificationMode: VerifyCertificate,
@@ -121,7 +118,7 @@ func TestMakeVerifyServerConnection(t *testing.T) {
 			peerCerts:        []*x509.Certificate{testCerts["correct"]},
 			serverName:       "bad.example.com",
 			expectedCallback: true,
-			expectedError:    nil,
+			expectedError:    false,
 		},
 		"strict verification with certificates when required with correct cert": {
 			verificationMode: VerifyStrict,
@@ -130,7 +127,7 @@ func TestMakeVerifyServerConnection(t *testing.T) {
 			peerCerts:        []*x509.Certificate{testCerts["correct"]},
 			serverName:       "localhost",
 			expectedCallback: false,
-			expectedError:    nil,
+			expectedError:    false,
 		},
 		"default verification with certificates when required with cert signed by unkown authority": {
 			verificationMode: VerifyFull,
@@ -139,7 +136,7 @@ func TestMakeVerifyServerConnection(t *testing.T) {
 			peerCerts:        []*x509.Certificate{testCerts["unknown authority"]},
 			serverName:       "",
 			expectedCallback: true,
-			expectedError:    x509.UnknownAuthorityError{Cert: testCerts["unknown authority"]},
+			expectedError:    true,
 		},
 		"default verification without certificates not required": {
 			verificationMode: VerifyFull,
@@ -147,20 +144,19 @@ func TestMakeVerifyServerConnection(t *testing.T) {
 			peerCerts:        nil,
 			serverName:       "",
 			expectedCallback: true,
-			expectedError:    nil,
+			expectedError:    false,
 		},
 		"no verification without certificates not required": {
 			verificationMode: VerifyNone,
 			clientAuth:       tls.NoClientCert,
 			peerCerts:        nil,
 			serverName:       "",
-			expectedError:    nil,
+			expectedError:    false,
 		},
 	}
 
 	for name, test := range testcases {
 		t.Run(name, func(t *testing.T) {
-			test := test
 			cfg := &TLSConfig{
 				Verification: test.verificationMode,
 				ClientAuth:   test.clientAuth,
@@ -177,17 +173,17 @@ func TestMakeVerifyServerConnection(t *testing.T) {
 				PeerCertificates: test.peerCerts,
 				ServerName:       test.serverName,
 			})
-			if test.expectedError == nil {
-				assert.Nil(t, err)
+			if test.expectedError {
+				assert.Error(t, err)
 			} else {
-				assert.Error(t, test.expectedError, err)
+				assert.NoError(t, err)
 			}
 		})
 	}
-
 }
 
-func openTestCerts() (map[string]*x509.Certificate, error) {
+func openTestCerts(t testing.TB) map[string]*x509.Certificate {
+	t.Helper()
 	certs := make(map[string]*x509.Certificate, 0)
 
 	for testcase, certname := range map[string]string{
@@ -201,24 +197,21 @@ func openTestCerts() (map[string]*x509.Certificate, error) {
 
 		certBytes, err := ioutil.ReadFile(filepath.Join("testdata", certname))
 		if err != nil {
-			return nil, err
+			t.Fatalf("reading file %q: %+v", certname, err)
 		}
 		block, _ := pem.Decode(certBytes)
 		testCert, err := x509.ParseCertificate(block.Bytes)
 		if err != nil {
-			return nil, err
+			t.Fatalf("parsing certificate %q: %+v", certname, err)
 		}
 		certs[testcase] = testCert
 	}
 
-	return certs, nil
+	return certs
 }
 
 func TestTrustRootCA(t *testing.T) {
-	certs, err := openTestCerts()
-	if err != nil {
-		t.Fatalf("reading test certificates: %v", err)
-	}
+	certs := openTestCerts(t)
 
 	nonEmptyCertPool := x509.NewCertPool()
 	nonEmptyCertPool.AddCert(certs["wildcard"])
@@ -290,10 +283,7 @@ func TestTrustRootCA(t *testing.T) {
 }
 
 func TestMakeVerifyConnectionUsesCATrustedFingerprint(t *testing.T) {
-	testCerts, err := openTestCerts()
-	if err != nil {
-		t.Fatalf("failed to open test certs: %+v", err)
-	}
+	testCerts := openTestCerts(t)
 
 	testcases := map[string]struct {
 		verificationMode     TLSVerificationMode
