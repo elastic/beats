@@ -78,11 +78,11 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 
 		// Calculate memory total usage percentage
 		if m.calcPct {
-			inactiveFiles, err := event.GetValue("usage.inactiveFiles")
+			inactiveFiles, err := event.GetValue("inactiveFiles")
 			if err == nil {
 				usageTotal, err := event.GetValue("usage.total")
 				if err == nil {
-					memoryLimit, err := event.GetValue("limit")
+					memoryLimit, err := event.GetValue("usage.limit")
 					if err == nil {
 						usage := usageTotal.(float64) - inactiveFiles.(float64)
 						memoryUsagePct := usage / memoryLimit.(float64)

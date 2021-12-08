@@ -4,11 +4,26 @@
   description: >
     memory
   fields:
-    - name: limit
+    - name: rss
       type: long
       format: bytes
       description: >
-        Memory limit.
+        Total memory resident set size.
+    - name: activeFiles
+      type: long
+      format: bytes
+      description: >
+        Total active file bytes.
+    - name: cache
+      type: long
+      format: bytes
+      description: >
+        Total cache bytes.
+    - name: inactiveFiles
+      type: long
+      format: bytes
+      description: >
+        Total inactive file bytes.
     - name: usage
       type: group
       description: >
@@ -29,8 +44,61 @@
           format: bytes
           description: >
             Total memory usage.
-        - name: inactiveFiles
+        - name: fail.count
+          type: scaled_float
+          description: >
+            Fail counter.
+        - name: limit
           type: long
           format: bytes
           description: >
-            Total inactive files.
+            Memory usage limit.
+    - name: kernel
+      type: group
+      description: >
+        Kernel memory stats.
+      fields:
+        - name: max
+          type: long
+          format: bytes
+          description: >
+            Kernel max memory usage.
+        - name: total
+          type: long
+          format: bytes
+          description: >
+            Kernel total memory usage.
+        - name: fail.count
+          type: scaled_float
+          description: >
+            Kernel fail counter.
+        - name: limit
+          type: long
+          format: bytes
+          description: >
+            Kernel memory limit.
+    - name: swap
+      type: group
+      description: >
+        Swap memory stats.
+      fields:
+        - name: max
+          type: long
+          format: bytes
+          description: >
+            Swap max memory usage.
+        - name: total
+          type: long
+          format: bytes
+          description: >
+            Swap total memory usage.
+        - name: fail.count
+          type: scaled_float
+          description: >
+            Swap fail counter.
+        - name: limit
+          type: long
+          format: bytes
+          description: >
+            Swap memory limit.
+
