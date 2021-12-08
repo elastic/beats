@@ -74,63 +74,68 @@ func newResponseProcessor(config *responseConfig, pagination *pagination, log *l
 	return rp
 }
 
-func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resp *http.Response) (<-chan maybeMsg, error) {
+func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resp []*http.Response) (<-chan maybeMsg, error) {
 	ch := make(chan maybeMsg)
 
 	go func() {
 		defer close(ch)
 
-		iter := rp.pagination.newPageIterator(stdCtx, trCtx, resp)
-		for {
-			page, hasNext, err := iter.next()
-			if err != nil {
-				ch <- maybeMsg{err: err}
-				return
-			}
+		for i, httpResp := range resp {
+			iter := rp.pagination.newPageIterator(stdCtx, trCtx, httpResp)
+			for {
+				page, hasNext, err := iter.next()
+				if err != nil {
+					ch <- maybeMsg{err: err}
+					return
+				}
 
-			if !hasNext {
-				return
-			}
-
-			respTrs := page.asTransformables(rp.log)
-
-			if len(respTrs) == 0 {
-				return
-			}
-
-			trCtx.updateLastResponse(*page)
-
-			rp.log.Debugf("last received page: %#v", trCtx.lastResponse)
-
-			for _, tr := range respTrs {
-				for _, t := range rp.transforms {
-					tr, err = t.run(trCtx, tr)
-					if err != nil {
-						ch <- maybeMsg{err: err}
-						return
+				if !hasNext {
+					if i+1 != len(resp) {
+						break
 					}
+					return
 				}
 
-				if rp.split == nil {
-					ch <- maybeMsg{msg: tr.body()}
-					rp.log.Debug("no split found: continuing")
-					continue
+				respTrs := page.asTransformables(rp.log)
+
+				if len(respTrs) == 0 {
+					return
 				}
 
-				if err := rp.split.run(trCtx, tr, ch); err != nil {
-					switch err {
-					case errEmptyField:
-						// nothing else to send for this page
-						rp.log.Debug("split operation finished")
+				trCtx.updateLastResponse(*page)
+
+				rp.log.Debugf("last received page: %#v", trCtx.lastResponse)
+
+				for _, tr := range respTrs {
+					for _, t := range rp.transforms {
+						tr, err = t.run(trCtx, tr)
+						if err != nil {
+							ch <- maybeMsg{err: err}
+							return
+						}
+					}
+
+					if rp.split == nil {
+						ch <- maybeMsg{msg: tr.body()}
+						rp.log.Debug("no split found: continuing")
 						continue
-					case errEmptyRootField:
-						// root field not found, most likely the response is empty
-						rp.log.Debug(err)
-						return
-					default:
-						rp.log.Debug("split operation failed")
-						ch <- maybeMsg{err: err}
-						return
+					}
+
+					if err := rp.split.run(trCtx, tr, ch); err != nil {
+						switch err {
+						case errEmptyField:
+							// nothing else to send for this page
+							rp.log.Debug("split operation finished")
+							continue
+						case errEmptyRootField:
+							// root field not found, most likely the response is empty
+							rp.log.Debug(err)
+							return
+						default:
+							rp.log.Debug("split operation failed")
+							ch <- maybeMsg{err: err}
+							return
+						}
 					}
 				}
 			}
