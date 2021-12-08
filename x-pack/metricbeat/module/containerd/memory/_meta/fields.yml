@@ -1,0 +1,36 @@
+- name: memory
+  type: group
+  release: beta
+  description: >
+    memory
+  fields:
+    - name: limit
+      type: long
+      format: bytes
+      description: >
+        Memory limit.
+    - name: usage
+      type: group
+      description: >
+        Usage memory stats.
+      fields:
+        - name: max
+          type: long
+          format: bytes
+          description: >
+            Max memory usage.
+        - name: pct
+          type: scaled_float
+          format: percent
+          description: >
+            Memory usage percentage.
+        - name: total
+          type: long
+          format: bytes
+          description: >
+            Total memory usage.
+        - name: inactiveFiles
+          type: long
+          format: bytes
+          description: >
+            Total inactive files.

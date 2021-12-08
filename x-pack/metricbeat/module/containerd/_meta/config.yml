@@ -1,6 +1,7 @@
 - module: containerd
-  metricsets: ["cpu"]
+  metricsets: ["cpu", "memory"]
   enabled: false
   period: 10s
   hosts: ["localhost:1338"]
+  calcpct: true
 
