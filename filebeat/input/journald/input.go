@@ -44,6 +44,9 @@ type journald struct {
 	Seek               journalread.SeekMode
 	CursorSeekFallback journalread.SeekMode
 	Matches            journalfield.IncludeMatches
+	Units              []string
+	Kernel             bool
+	Identifiers        []string
 	SaveRemoteHostname bool
 	Parsers            parser.Config
 }
@@ -188,7 +191,7 @@ func initCheckpoint(log *logp.Logger, c cursor.Cursor) checkpoint {
 	return cp
 }
 
-func withFilters(filters journalfield.Matcher) func(*sdjournal.Journal) error {
+func withFilters(filters journalfield.IncludeMatches) func(*sdjournal.Journal) error {
 	return func(j *sdjournal.Journal) error {
 		return journalfield.ApplyIncludeMatches(j, filters)
 	}

@@ -15,15 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux && cgo
-
 package journalfield
 
 import (
 	"fmt"
 	"strings"
-
-	"github.com/coreos/go-systemd/v22/sdjournal"
 )
 
 // Matcher is a single field condition for filtering journal entries.
@@ -87,6 +83,14 @@ func BuildMatcher(in string) (Matcher, error) {
 	return defaultBuilder.Build(in)
 }
 
+func MustBuildMatcher(in string) Matcher {
+	m, err := BuildMatcher(in)
+	if err != nil {
+		panic(err)
+	}
+	return m
+}
+
 // IsValid returns true if the matcher was initialized correctly.
 func (m Matcher) IsValid() bool { return m.str != "" }
 
@@ -138,20 +142,20 @@ func ApplyUnitMatchers(j journal, units []string, kernel bool) error {
 	for _, unit := range units {
 		matchers := [][]Matcher{
 			[]Matcher{
-				Matcher{sdjournal.SD_JOURNAL_FIELD_SYSTEMD_UNIT + "=" + unit},
+				MustBuildMatcher("systemd.unit=" + unit),
 			},
 			[]Matcher{
-				Matcher{sdjournal.SD_JOURNAL_FIELD_MESSAGE_ID + "=fc2e22bc6ee647b6b90729ab34a250b1"},
-				Matcher{sdjournal.SD_JOURNAL_FIELD_UID + "=1"},
-				Matcher{"COREDUMP_UNIT=" + unit},
+				MustBuildMatcher("message_id=fc2e22bc6ee647b6b90729ab34a250b1"),
+				MustBuildMatcher("journald.uid=1"),
+				MustBuildMatcher("journald.coredump.unit=" + unit),
 			},
 			[]Matcher{
-				Matcher{sdjournal.SD_JOURNAL_FIELD_PID + "=1"},
-				Matcher{"UNIT=" + unit},
+				MustBuildMatcher("journald.pid=1"),
+				MustBuildMatcher("journald.unit=" + unit),
 			},
 			[]Matcher{
-				Matcher{sdjournal.SD_JOURNAL_FIELD_UID + "=1"},
-				Matcher{"OBJECT_SYSTEMD_UNIT=" + unit},
+				MustBuildMatcher("journald.uid=1"),
+				MustBuildMatcher("journald.object.systemd.unit=" + unit),
 			},
 		}
 
@@ -165,8 +169,7 @@ func ApplyUnitMatchers(j journal, units []string, kernel bool) error {
 	}
 
 	if kernel {
-		err := ApplyMatchersOr(j, []Matcher{kernelMatcher})
-		if err != nil {
+		if err := ApplyMatchersOr(j, []Matcher{kernelMatcher}); err != nil {
 			return fmt.Errorf("error while adding kernel transport to matchers: %+v", err)
 		}
 	}
@@ -179,7 +182,7 @@ func ApplyUnitMatchers(j journal, units []string, kernel bool) error {
 func ApplySyslogIdentifierMatcher(j journal, identifiers []string) error {
 	identifierMatchers := make([]Matcher, len(identifiers))
 	for i, identifier := range identifiers {
-		identifierMatchers[i] = Matcher{sdjournal.SD_JOURNAL_FIELD_SYSLOG_IDENTIFIER + "=" + identifier}
+		identifierMatchers[i] = MustBuildMatcher("syslog.identifier=" + identifier)
 	}
 
 	return ApplyMatchersOr(j, identifierMatchers)
@@ -189,32 +192,28 @@ func ApplySyslogIdentifierMatcher(j journal, identifiers []string) error {
 func ApplyIncludeMatches(j journal, m IncludeMatches) error {
 	if len(m.OR) > 0 {
 		for _, or := range m.OR {
-			err := ApplyIncludeMatches(j, or)
-			if err != nil {
+			if err := ApplyIncludeMatches(j, or); err != nil {
 				return err
 			}
-		}
-		err := j.AddDisjunction()
-		if err != nil {
-			return err
+			if err := j.AddDisjunction(); err != nil {
+				return fmt.Errorf("error adding disjunction to journal: %v", err)
+			}
 		}
 	}
+
 	if len(m.AND) > 0 {
 		for _, and := range m.AND {
-			err := ApplyIncludeMatches(j, and)
-			if err != nil {
+			if err := ApplyIncludeMatches(j, and); err != nil {
 				return err
 			}
-		}
-		err := j.AddConjunction()
-		if err != nil {
-			return err
+			if err := j.AddConjunction(); err != nil {
+				return fmt.Errorf("error adding conjunction to journal: %v", err)
+			}
 		}
 	}
 
 	for _, match := range m.Matches {
-		err := match.Apply(j)
-		if err != nil {
+		if err := match.Apply(j); err != nil {
 			return err
 		}
 	}
