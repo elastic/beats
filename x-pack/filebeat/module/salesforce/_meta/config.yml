@@ -1,0 +1,48 @@
+- module: salesforce
+  # All logs
+  login:
+    enabled: false
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+
+    # Variable which specifies if data collection should be done using httpjson input or not.
+    # var.httpjson.enabled: true
+
+    # Variable which specifies if data collection should be done using cometd input or not.
+    # var.cometd.enabled: true
+
+    # Oauth Client ID
+    # var.clientid: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    # var.clientsecret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth User, should include the User mail
+    # var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    # var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    # var.url: "https://instance_id.my.salesforce.com"
+  
+  logout:
+    enabled: false
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    # Oauth Client ID
+    # var.clientid: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    # var.clientsecret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth User, should include the User mail
+    # var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    # var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    # var.url: "https://instance_id.my.salesforce.com"

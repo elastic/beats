@@ -1,0 +1,9 @@
+- key: salesforce
+  title: "salesforce"
+  description: >
+    salesforce Module
+  fields:
+    - name: access_mode
+      type: keyword
+      description: >
+        The mode of collecting logs from salesforce - "rest" or "stream".
