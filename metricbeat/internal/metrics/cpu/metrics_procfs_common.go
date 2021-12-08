@@ -34,6 +34,7 @@ import (
 func Get(procfs resolve.Resolver) (CPUMetrics, error) {
 	path := procfs.ResolveHostFS("/proc/stat")
 	fd, err := os.Open(path)
+	defer fd.Close()
 	if err != nil {
 		return CPUMetrics{}, errors.Wrapf(err, "error opening file %s", path)
 	}

@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -131,7 +132,7 @@ func NewReaderOptions(opts ReaderOptions) (*Reader, error) {
 
 // CgroupsVersion reports if the given PID is attached to a V1 or V2 controller
 func (r *Reader) CgroupsVersion(pid int) (CgroupsVersion, error) {
-	cgPath := filepath.Join("/proc/", fmt.Sprintf("%d", pid), "cgroup")
+	cgPath := filepath.Join("/proc/", strconv.Itoa(pid), "cgroup")
 	cgPath = r.rootfsMountpoint.ResolveHostFS(cgPath)
 	cgraw, err := ioutil.ReadFile(cgPath)
 	if err != nil {
