@@ -20,6 +20,7 @@ package monitors
 import (
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -153,9 +154,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	reg, built, closed := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
 
-	sched := scheduler.New(1, monitoring.NewRegistry())
-	err := sched.Start()
-	require.NoError(t, err)
+	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
 	defer sched.Stop()
 
 	f := NewFactory(binfo, sched.Add, reg)
