@@ -355,6 +355,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve error handling in aws-s3 input for malformed s3 notifications. {issue}28828[28828] {pull}28946[28946]
 - Add support for parsers on journald input {pull}29070[29070]
 - Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
+- Add support for filtering in journald input with `unit`, `kernel`, `identifiers` and `include_matches`. {pull}29294[29294]
 
 *Heartbeat*
 
