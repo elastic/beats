@@ -47,6 +47,23 @@ backslashes. Forward slashes are easier to work with in YAML because there is no
 need to escape them.
 
 [float]
+==== `registry_flush`
+
+The timeout value that controls when registry entries are written to disk
+(flushed). When an unwritten update exceeds this value, it triggers a write
+to disk. When flush is set to 0s, the registry is written to disk after each
+batch of events has been published successfully.
+
+The default value is 5s.
+
+Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`.
+
+[source,yaml]
+--------------------------------------------------------------------------------
+winlogbeat.registry_flush: 5s
+--------------------------------------------------------------------------------
+
+[float]
 ==== `shutdown_timeout`
 
 The amount of time to wait for all events to be published when shutting down.

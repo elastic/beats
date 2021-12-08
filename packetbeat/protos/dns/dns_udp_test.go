@@ -155,10 +155,12 @@ var (
 		qSubdomain: "131.252.30",
 		qTLD:       "in-addr.arpa",
 		answers:    []string{"github.com"},
-		authorities: []string{"a.root-servers.net", "b.root-servers.net", "c.root-servers.net",
+		authorities: []string{
+			"a.root-servers.net", "b.root-servers.net", "c.root-servers.net",
 			"d.root-servers.net", "e.root-servers.net", "f.root-servers.net", "g.root-servers.net",
 			"h.root-servers.net", "i.root-servers.net", "j.root-servers.net", "k.root-servers.net",
-			"l.root-servers.net", "m.root-servers.net"},
+			"l.root-servers.net", "m.root-servers.net",
+		},
 		request: []byte{
 			0x01, 0x58, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x31, 0x33, 0x31,
 			0x03, 0x32, 0x35, 0x32, 0x02, 0x33, 0x30, 0x03, 0x31, 0x39, 0x32, 0x07, 0x69, 0x6e, 0x2d, 0x61,
