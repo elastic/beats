@@ -146,19 +146,12 @@ func (l *ESLoader) loadTemplate(templateName string, templateType IndexTemplateT
 func (l *ESLoader) templateExists(templateName string, templateType IndexTemplateType) (bool, error) {
 	path := templateLoaderPath[templateType] + templateName
 	status, _, err := l.client.Request("HEAD", path, "", nil, nil)
-	if err != nil {
-		return false, err
-	}
-
 	switch status {
 	case http.StatusNotFound:
 		return false, nil
 	case http.StatusOK:
 		return true, nil
 	default:
-		if err == nil {
-			err = &StatusError{status: status}
-		}
 		return false, err
 	}
 }
