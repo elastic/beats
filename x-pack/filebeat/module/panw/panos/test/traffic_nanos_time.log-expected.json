@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2021-05-26T16:26:47.000Z",
+        "@timestamp": "2021-05-26T14:26:47.000-02:00",
         "client.bytes": 1696,
         "client.ip": "127.0.0.0",
         "client.nat.ip": "0.0.0.0",
@@ -21,12 +21,12 @@
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
-        "event.end": "2021-05-26T16:26:31.000Z",
+        "event.end": "2021-05-26T14:26:31.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
         "event.original": "Oct 30 09:46:42 1,2021-05-26T16:27:07.000000Z,no-serial,TRAFFIC,end,9.1,2021-05-26T16:26:47.000000Z,127.0.0.0,127.0.0.1,0.0.0.0,0.0.0.0,intrazone-default,,,web-browsing,vsys1,untrust,untrust,ethernet1/1,ethernet1/1,Cortex Data Lake,,688290,1,35834,443,35834,20077,0x1400070,tcp,allow,7291,1696,5595,21,2021-05-26T16:26:30.000000Z,1,medium-risk,,620386,0x8800000000000000,US,SG,,14,7,tcp-fin,22,18,0,0,,GP cloud service,from-policy,,,0,,0,1970-01-01T00:00:00.000000Z,N/A,0,0,0,0,6a2f6161-88f2-4afc-8dd5-256bc4505a64,0,0,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
         "event.outcome": "success",
-        "event.start": "2021-05-26T16:26:30.000Z",
+        "event.start": "2021-05-26T14:26:30.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
