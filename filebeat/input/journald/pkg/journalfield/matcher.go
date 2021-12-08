@@ -160,8 +160,7 @@ func ApplyUnitMatchers(j journal, units []string, kernel bool) error {
 		}
 
 		for _, m := range matchers {
-			err := ApplyMatchersOr(j, m)
-			if err != nil {
+			if err := ApplyMatchersOr(j, m); err != nil {
 				return fmt.Errorf("error while setting up unit matcher for %s: %+v", unit, err)
 			}
 		}
@@ -214,7 +213,7 @@ func ApplyIncludeMatches(j journal, m IncludeMatches) error {
 
 	for _, match := range m.Matches {
 		if err := match.Apply(j); err != nil {
-			return err
+			return fmt.Errorf("failed to apply %s expression: %+v", match.str, err)
 		}
 	}
 
