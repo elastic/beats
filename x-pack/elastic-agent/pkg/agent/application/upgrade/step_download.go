@@ -23,7 +23,7 @@ import (
 )
 
 func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI string) (_ string, err error) {
-	span, ctx := apm.StartSpan(ctx, "upgrade", "app.internal")
+	span, ctx := apm.StartSpan(ctx, "downloadArtifact", "app.internal")
 	defer func() {
 		if err != nil {
 			apm.CaptureError(ctx, err).Send()
