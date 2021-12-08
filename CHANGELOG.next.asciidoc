@@ -25,6 +25,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove `auto` from the available options of `setup.ilm.enabled` and set the default value to `true`. {pull}28671[28671]
 - add_process_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
 - add_docker_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
+- Use data streams instead of indices for storing events from Beats. {pull}28450[28450]
+- Remove option `setup.template.type` and always load composable template with data streams. {pull}28450[28450]
+- Remove several ILM options (`rollover_alias` and `pattern`) as data streams does not require index aliases. {pull}28450[28450] 
 - Index template's default_fields setting is only populated with ECS fields. {pull}28596[28596] {issue}28215[28215]
 - Remove `auto` from the available options of `setup.ilm.enabled` and set the default value to `true`. {pull}28671[28671]
 - Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
@@ -103,6 +106,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - `event.category` no longer contains the value `network_traffic` because this is not a valid ECS event category value. {pull}20556[20556]
 - Remove deprecated TLS fields in favor of tls.server.x509 and tls.client.x509 ECS fields. {pull}28487[28487]
 - HTTP: The field `http.request.method` will maintain its original case. {pull}28620[28620]
+- Unify gopacket dependencies. {pull}29167[29167]
 
 *Winlogbeat*
 
@@ -159,6 +163,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system module: Fix panic during initialisation when /proc/stat can't be read. {pull}17569[17569]
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
 - Fix handling of root and relative paths {issue}24430[24430] {pull}28354[28354]
+- system/socket: Fix bugs leading to wrong process being attributed to flows. {pull}29166[29166] {issue}17165[17165]
 
 *Filebeat*
 
@@ -199,6 +204,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Revert usageDetails api version to 2019-01-01. {pull}28995[28995]
 - Fix `threatintel.misp` filters configuration. {issue}27970[27970]
 - Fix opening files on Windows in filestream so open files can be deleted. {issue}29113[29113] {pull}29180[29180]
+- Fix `panw` module ingest errors for GLOBALPROTECT logs {pull}29154[29154]
 
 *Heartbeat*
 
@@ -242,6 +248,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix list_docker.go {pull}28374[28374]
 - Fix in rename processor to ingest metrics for `write.iops` to proper field instead of `write_iops` in rds metricset. {pull}28960[28960]
 - Fix rds metadata in cloudwatch metricset. {pull}29106[29106]
+- Use xpack.enabled on SM modules to write into .monitoring indices when using Metricbeat standalone {pull}28365[28365]
 
 *Packetbeat*
 
@@ -294,6 +301,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update to ECS 8.0 fields. {pull}28620[28620]
 - Add http.pprof.enabled option to libbeat to allow http/pprof endpoints on the socket that libbeat creates for metrics. {issue}21965[21965]
 - Support custom analyzers in fields.yml. {issue}28540[28540] {pull}28926[28926]
+- Support self signed certificates on outputs {pull}29229[29229]
 
 *Auditbeat*
 
@@ -386,6 +394,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Add more DNS error codes to the Sysmon module. {issue}15685[15685]
 - Add support for event language selection from config file {pull}19818[19818]
+- Add configuration option for registry file flush timeout {issue}29001[29001] {pull}29053[29053]
 
 *Elastic Log Driver*
 
