@@ -66,7 +66,7 @@ def runBeats() {
   beats.each { beat ->
     stage(beat) {
       dir("${BASE_DIR}/${beat}"){
-        cmd(label: "${env.COMMAND}", script: "${env.COMMAND}")
+        cmd(label: "${env.COMMAND}", script: "${env.COMMAND} || true")
       }
     }
   }
