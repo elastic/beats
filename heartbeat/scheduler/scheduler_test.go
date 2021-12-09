@@ -85,15 +85,15 @@ func TestScheduler_Start(t *testing.T) {
 
 	executed := make(chan string)
 
-	preAddEvents := uint32(10)
-	s.Add(testSchedule{0}, "add", testTaskTimes(preAddEvents, func(_ context.Context) []TaskFunc {
+	addEvents := uint32(10)
+	s.Add(testSchedule{0}, "add", testTaskTimes(addEvents, func(_ context.Context) []TaskFunc {
 		executed <- "add"
 		cont := func(_ context.Context) []TaskFunc {
-			executed <- "add"
+			executed <- "addCont"
 			return nil
 		}
 		return []TaskFunc{cont}
-	}), "http")
+	}), "http", nil)
 
 	removedEvents := uint32(1)
 	// This function will be removed after being invoked once
@@ -108,7 +108,7 @@ func TestScheduler_Start(t *testing.T) {
 	}
 	// Attempt to execute this twice to see if remove() had any effect
 	removeMtx.Lock()
-	remove, err := s.Add(testSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn), "http")
+	remove, err := s.Add(testSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn), "http", nil)
 	require.NoError(t, err)
 	require.NotNil(t, remove)
 	removeMtx.Unlock()
@@ -121,13 +121,13 @@ func TestScheduler_Start(t *testing.T) {
 			return nil
 		}
 		return []TaskFunc{cont}
-	}), "http")
+	}), "http", nil)
 
 	received := make([]string, 0)
 	// We test for a good number of events in this loop because we want to ensure that the remove() took effect
 	// Otherwise, we might only do 1 preAdd and 1 postAdd event
 	// We double the number of pre/post add events to account for their continuations
-	totalExpected := preAddEvents*2 + removedEvents + postAddEvents*2
+	totalExpected := addEvents*2 + removedEvents + postAddEvents*2
 	for uint32(len(received)) < totalExpected {
 		select {
 		case got := <-executed:
@@ -145,8 +145,8 @@ func TestScheduler_Start(t *testing.T) {
 	}
 
 	// convert with int() because the printed output is nicer than hex
-	assert.Equal(t, int(preAddEvents), int(counts["preAdd"]))
-	assert.Equal(t, int(preAddEvents), int(counts["preAddCont"]))
+	assert.Equal(t, int(addEvents), int(counts["add"]))
+	assert.Equal(t, int(addEvents), int(counts["addCont"]))
 	assert.Equal(t, int(postAddEvents), int(counts["postAdd"]))
 	assert.Equal(t, int(postAddEvents), int(counts["postAddCont"]))
 	assert.Equal(t, int(removedEvents), int(counts["removed"]))
@@ -158,6 +158,7 @@ func TestScheduler_WaitForRunOnce(t *testing.T) {
 	defer s.Stop()
 
 	executed := new(uint32)
+	waits := new(uint32)
 
 	s.Add(testSchedule{0}, "runOnce", func(_ context.Context) []TaskFunc {
 		cont := func(_ context.Context) []TaskFunc {
@@ -167,11 +168,11 @@ func TestScheduler_WaitForRunOnce(t *testing.T) {
 			return nil
 		}
 		return []TaskFunc{cont}
-	}, "http")
+	}, "http", func() { atomic.AddUint32(waits, 1) })
 
 	s.WaitForRunOnce()
-	require.Equal(t, atomic.LoadUint32(executed), uint32(1))
-
+	require.Equal(t, uint32(1), atomic.LoadUint32(executed))
+	require.Equal(t, uint32(1), atomic.LoadUint32(waits))
 }
 
 func TestScheduler_Stop(t *testing.T) {
@@ -184,7 +185,7 @@ func TestScheduler_Stop(t *testing.T) {
 	_, err := s.Add(testSchedule{}, "testPostStop", testTaskTimes(1, func(_ context.Context) []TaskFunc {
 		executed <- struct{}{}
 		return nil
-	}), "http")
+	}), "http", nil)
 
 	assert.Equal(t, ErrAlreadyStopped, err)
 }
@@ -279,7 +280,7 @@ func BenchmarkScheduler(b *testing.B) {
 		_, err := s.Add(sched, "testPostStop", func(_ context.Context) []TaskFunc {
 			executed <- struct{}{}
 			return nil
-		}, "http")
+		}, "http", nil)
 		assert.NoError(b, err)
 	}
 
