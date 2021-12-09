@@ -217,6 +217,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove accidentally included cups library in docker images. {pull}28853[pull]
 - Fix broken monitors with newer versions of image relying on dup3. {pull}28938[pull]
 
+*Journalbeat*
+
+
 *Metricbeat*
 
 - Fix checking tagsFilter using length in cloudwatch metricset. {pull}14525[14525]
