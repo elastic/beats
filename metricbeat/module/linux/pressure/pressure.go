@@ -65,11 +65,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-<<<<<<< HEAD
-		procfs:        procfs,
-=======
 		mod:           sys,
->>>>>>> da8bc7cc5 (Remote global hostfs variables (#29138))
 	}, nil
 }
 
