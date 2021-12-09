@@ -3,9 +3,9 @@ module github.com/elastic/beats/v7
 go 1.17
 
 require (
-	cloud.google.com/go v0.83.0
 	cloud.google.com/go/bigquery v1.8.0
-	cloud.google.com/go/pubsub v1.3.1
+	cloud.google.com/go/monitoring v1.1.0
+	cloud.google.com/go/pubsub v1.17.1
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
 	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
@@ -166,13 +166,13 @@ require (
 	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 	golang.org/x/net v0.0.0-20211020060615-d418f374d309
-	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
+	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/sys v0.0.0-20211102192858-4dd72447c267
 	golang.org/x/text v0.3.7
-	golang.org/x/time v0.0.0-20210611083556-38a9dc6acbc6
+	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac
 	golang.org/x/tools v0.1.7
-	google.golang.org/api v0.48.0
+	google.golang.org/api v0.58.0
 	google.golang.org/genproto v0.0.0-20211021150943-2b146023228c
 	google.golang.org/grpc v1.41.0
 	google.golang.org/protobuf v1.27.1
@@ -194,6 +194,7 @@ require (
 )
 
 require (
+	cloud.google.com/go v0.97.0 // indirect
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.1 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.1 // indirect
@@ -229,7 +230,7 @@ require (
 	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/google/licenseclassifier v0.0.0-20200402202327-879cb1424de0 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
-	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
+	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
 	github.com/googleapis/gnostic v0.4.1 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/hashicorp/cronexpr v1.1.0 // indirect
@@ -245,9 +246,8 @@ require (
 	github.com/jcmturner/gofork v1.0.0 // indirect
 	github.com/jcmturner/gokrb5/v8 v8.4.2 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
-	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
-	github.com/json-iterator/go v1.1.10 // indirect
-	github.com/jstemmer/go-junit-report v0.9.1 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/json-iterator/go v1.1.11 // indirect
 	github.com/karrick/godirwalk v1.15.6 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/markbates/pkger v0.17.0 // indirect
