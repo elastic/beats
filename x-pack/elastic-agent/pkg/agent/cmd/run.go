@@ -142,7 +142,7 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 	}
 	defer control.Stop()
 
-	app, err := application.New(logger, pathConfigFile, rex, statusCtrl, control, agentInfo)
+	app, err := application.New(logger, rex, statusCtrl, control, agentInfo)
 	if err != nil {
 		return err
 	}
