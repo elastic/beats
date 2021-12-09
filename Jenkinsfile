@@ -3,12 +3,11 @@
 @Library('apm@current') _
 
 pipeline {
-  agent { label 'orka && darwin && poc' }
+  agent none
   environment {
     REPO = 'beats'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
     PIPELINE_LOG_LEVEL = 'INFO'
-    COMMAND = "${params.COMMAND}"
     GOPATH = "${env.WORKSPACE}"
     HOME = "${env.WORKSPACE}"
     PATH = "${PATH}:${HOME}/bin"
@@ -16,59 +15,61 @@ pipeline {
   options {
     timestamps()
   }
-  parameters {
-    string(name: 'COMMAND', defaultValue: 'mage build', description: 'What command?')
-  }
   stages {
-    stage('Checkout') {
-      options { skipDefaultCheckout() }
-      steps {
-        deleteDir()
-        gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
-        dir("${BASE_DIR}"){
-          setEnvVar('GO_VERSION', readFile(".go-version").trim())
-          sh '.ci/scripts/install-go.sh'
-        }
-      }
-    }
     stage('Run'){
       options { skipDefaultCheckout() }
-      steps {
-        withMageEnv(version: env.GO_VERSION) {
-          runBeats()
+      matrix {
+        agent { label 'orka && darwin && poc' }
+        axes {
+            axis {
+                name 'beat'
+                values "auditbeat",
+                       "filebeat",
+                       "heartbeat",
+                       "libbeat",
+                       "metricbeat",
+                       "packetbeat",
+                       "x-pack/auditbeat",
+                       "x-pack/elastic-agent",
+                       "x-pack/filebeat",
+                       "x-pack/functionbeat",
+                       "x-pack/heartbeat",
+                       "x-pack/libbeat",
+                       "x-pack/metricbeat",
+                       "x-pack/osquerybeat",
+                       "x-pack/packetbeat"
+            }
+        }
+        stages {
+          stage('Checkout') {
+            options { skipDefaultCheckout() }
+            steps {
+              deleteDir()
+              gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
+              dir("${BASE_DIR}"){
+                setEnvVar('GO_VERSION', readFile(".go-version").trim())
+              }
+            }
+          }
+          stage('build') {
+            steps {
+              runCommand('mage build', "${beat}")
+            }
+          }
+          stage('test') {
+            steps {
+              runCommand('mage run', "${beat}")
+            }
+          }
         }
       }
-    }
-  }
-  post {
-    cleanup {
-      tearDown()
     }
   }
 }
 
-def runBeats() {
-  def beats= ["auditbeat",
-              "filebeat",
-              "heartbeat",
-              "libbeat",
-              "metricbeat",
-              "packetbeat",
-              "x-pack/auditbeat",
-              "x-pack/elastic-agent",
-              "x-pack/filebeat",
-              "x-pack/functionbeat",
-              "x-pack/heartbeat",
-              "x-pack/libbeat",
-              "x-pack/metricbeat",
-              "x-pack/osquerybeat",
-              "x-pack/packetbeat"]
-  beats.each { beat ->
-    stage(beat) {
-      dir("${BASE_DIR}/${beat}"){
-        cmd(label: "${env.COMMAND}", script: "${env.COMMAND} || true")
-      }
-    }
+def runCommand(command, beat) {
+  dir("${BASE_DIR}/${beat}"){
+    cmd(label: "${command}", script: "${command} || true")
   }
 }
 
