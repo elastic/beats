@@ -100,8 +100,9 @@ func install(ctx context.Context, log *logp.Logger, path, dst string, compat boo
 }
 
 func Upgradeable() bool {
-	// Chack for the place-holder file.
-	if EmbeddedInstallerVersion == "0.00" {
+	// This is only set when a real installer is placed in
+	// x-pack/packetbeat/npcap/installer.
+	if EmbeddedInstallerVersion == "" {
 		return false
 	}
 

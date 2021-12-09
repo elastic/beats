@@ -27,13 +27,20 @@ func init() {
 	if err != nil {
 		panic(fmt.Sprintf("failed to set up npcap installer: %v", err))
 	}
-	if len(list) == 0 {
+	var installer string
+	for _, f := range list {
+		name := f.Name()
+		if name != "npcap-0.00.exe" {
+			installer = name
+			break
+		}
+	}
+	if installer == "" {
 		return
 	}
-	if len(list) > 1 {
-		panic(fmt.Sprintf("unexpected number of installers found: want only one but got %d", len(list)))
+	if len(list) > 2 {
+		panic(fmt.Sprintf("unexpected number of installers found: want only one but got %d", len(list)-1))
 	}
-	installer := list[0].Name()
 
 	version := strings.TrimPrefix(installer, "npcap-")
 	version = strings.TrimSuffix(version, ".exe")
