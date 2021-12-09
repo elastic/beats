@@ -19,11 +19,8 @@ package beater
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"net/url"
 	"os"
-	"path"
 	"path/filepath"
 	"runtime"
 	"time"
@@ -51,10 +48,6 @@ func installNpcap(b *beat.Beat) error {
 	if err != nil {
 		return err
 	}
-	rawURI, err := configString(cfg, "npcap.installer_location")
-	if err != nil {
-		return err
-	}
 	installDst, err := configString(cfg, "npcap.install_destination")
 	if err != nil {
 		return err
@@ -65,80 +58,31 @@ func installNpcap(b *beat.Beat) error {
 
 	log := logp.NewLogger("npcap_install")
 
-	// If no location is provided, go ahead and install from the embedded installer.
-	if rawURI == "" {
-		if npcap.Installer == nil {
-			return nil
-		}
-		if !npcap.Upgradeable(npcap.EmbeddedInstallerVersion) {
-			npcap.Installer = nil
-			return nil
-		}
-		tmp, err := os.MkdirTemp("", "")
-		if err != nil {
-			return fmt.Errorf("could not create installation temporary directory: %w", err)
-		}
-		defer func() {
-			// The init sequence duplicates the embedded binary.
-			// Get rid of the part we can. The remainder is in
-			// the packetbeat text section as a string.
-			npcap.Installer = nil
-			// Remove the installer from the file system.
-			os.RemoveAll(tmp)
-		}()
-		installerPath := filepath.Join(tmp, "npcap.exe")
-		err = os.WriteFile(installerPath, npcap.Installer, 0o700)
-		if err != nil {
-			return fmt.Errorf("could not create installation temporary file: %w", err)
-		}
-		return npcap.Install(ctx, log, installerPath, installDst, false)
-	}
-
-	uri, err := url.Parse(rawURI)
-	if err != nil {
-		return err
-	}
-
-	// If a file or bare path is specified, go ahead and install it.
-	if uri.Scheme == "" || uri.Scheme == "file" {
-		return npcap.Install(ctx, log, uri.Path, installDst, false)
-	}
-
-	canFail, err := configBool(cfg, "npcap.ignore_misssing_registry")
-	if err != nil {
-		return err
-	}
-	version, download, wantHash, err := npcap.CurrentVersion(ctx, log, rawURI)
-	if err != nil {
-		if canFail && errors.Is(err, npcap.RegistryNotFound) {
-			log.Warnf("%v: did not install Npcap", err)
-			return nil
-		}
-		return err
-	}
-
-	// Is a more recent version available or are we forcing install.
-	if !npcap.Upgradeable(version) && !reinstall {
+	if npcap.Installer == nil {
 		return nil
 	}
-
-	dir, err := os.MkdirTemp("", "packetbeat-npcap-*")
+	if !reinstall && !npcap.Upgradeable() {
+		npcap.Installer = nil
+		return nil
+	}
+	tmp, err := os.MkdirTemp("", "")
 	if err != nil {
-		return err
+		return fmt.Errorf("could not create installation temporary directory: %w", err)
 	}
-	defer os.RemoveAll(dir)
-	pth := filepath.Join(dir, path.Base(download))
-
-	gotHash, err := npcap.Fetch(ctx, log, download, pth)
+	defer func() {
+		// The init sequence duplicates the embedded binary.
+		// Get rid of the part we can. The remainder is in
+		// the packetbeat text section as a string.
+		npcap.Installer = nil
+		// Remove the installer from the file system.
+		os.RemoveAll(tmp)
+	}()
+	installerPath := filepath.Join(tmp, "npcap.exe")
+	err = os.WriteFile(installerPath, npcap.Installer, 0o700)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not create installation temporary file: %w", err)
 	}
-
-	if gotHash != wantHash {
-		return fmt.Errorf("npcap: hash mismatch for %s: want:%s got:%s", download, wantHash, gotHash)
-	}
-
-	return npcap.Install(ctx, log, pth, installDst, false)
+	return npcap.Install(ctx, log, installerPath, installDst, false)
 }
 
 func configBool(cfg *common.Config, path string) (bool, error) {
