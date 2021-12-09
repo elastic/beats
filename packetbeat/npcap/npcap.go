@@ -33,15 +33,8 @@ package npcap
 import (
 	"bytes"
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"io/ioutil"
-	"net/http"
-	"os"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -52,10 +45,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-// RegistryNotFound is returned by CurrentVersion if the network request
-// returns a 404 status code.
-var RegistryNotFound = errors.New("npcap: registry not found")
-
 var (
 	// Installer holds the embedded installer when run with x-pack.
 	Installer []byte
@@ -63,114 +52,6 @@ var (
 	// EmbeddedInstallerVersion holds the version of the embedded installer.
 	EmbeddedInstallerVersion string
 )
-
-// Fetch downloads the Npcap installer, writes the content to the given filepath
-// and returns the sha256 hash of the downloaded object. If the registry is not
-// found RegistryNotFound is returned.
-func CurrentVersion(ctx context.Context, log *logp.Logger, registry string) (version, url, hash string, err error) {
-	if runtime.GOOS != "windows" {
-		return "", "", "", errors.New("npcap: called Fetch on non-Windows platform")
-	}
-	return currentVersion(ctx, log, registry)
-}
-
-func currentVersion(ctx context.Context, log *logp.Logger, registry string) (version, url, hash string, err error) {
-	req, err := http.NewRequestWithContext(ctx, "GET", registry, nil)
-	if err != nil {
-		return "", "", "", err
-	}
-
-	var client http.Client
-	res, err := client.Do(req)
-	if err != nil {
-		return "", "", "", err
-	}
-	defer res.Body.Close()
-
-	b, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		log.Errorf("failed to read the error response body: %v", err)
-	}
-	b = bytes.TrimSpace(b)
-	if len(b) == 0 {
-		// Give a meaningful error message and make json error if we have no body.
-		b = []byte("empty")
-	}
-	if res.StatusCode != http.StatusOK {
-		if res.StatusCode == http.StatusNotFound {
-			return "", "", "", fmt.Errorf("%w: %s", RegistryNotFound, registry)
-		}
-		if registry == "" {
-			registry = `""`
-		}
-		return "", "", "", fmt.Errorf("npcap: failed to fetch version info at %s, status: %d, message: %s", registry, res.StatusCode, b)
-	}
-
-	var info struct {
-		Version string
-		URL     string
-		Hash    string
-	}
-	err = json.Unmarshal(b, &info)
-	if err != nil {
-		return "", "", "", fmt.Errorf("%w: %#q", err, b)
-	}
-
-	return info.Version, info.URL, info.Hash, nil
-}
-
-// Fetch downloads the Npcap installer, writes the content to the given filepath
-// and returns the sha256 hash of the downloaded object.
-func Fetch(ctx context.Context, log *logp.Logger, url, path string) (hash string, err error) {
-	if runtime.GOOS != "windows" {
-		return "", errors.New("npcap: called Fetch on non-Windows platform")
-	}
-	return fetch(ctx, log, url, path)
-}
-
-func fetch(ctx context.Context, log *logp.Logger, url, path string) (hash string, err error) {
-	log.Infof("download %s to %s", url, path)
-
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
-	if err != nil {
-		return "", err
-	}
-
-	var client http.Client
-	res, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		b, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			log.Errorf("failed to read the error response body: %v", err)
-		}
-		b = bytes.TrimSpace(b)
-		if len(b) == 0 {
-			b = []byte("empty")
-		}
-		if url == "" {
-			url = `""`
-		}
-		return "", fmt.Errorf("npcap: failed to fetch installer at %s, status: %d, message: %s", url, res.StatusCode, b)
-	}
-
-	dst, err := os.Create(path)
-	if err != nil {
-		return "", err
-	}
-	defer dst.Close()
-
-	h := sha256.New()
-	_, err = io.Copy(io.MultiWriter(h, dst), res.Body)
-	if err != nil {
-		return "", err
-	}
-	return hex.EncodeToString(h.Sum(nil)), nil
-}
 
 // Install runs the Npcap installer at the provided path. The install
 // destination is specified by dst and installation using WinPcap
@@ -218,9 +99,9 @@ func install(ctx context.Context, log *logp.Logger, path, dst string, compat boo
 	return reloadWinPCAP()
 }
 
-func Upgradeable(version string) bool {
+func Upgradeable() bool {
 	// Chack for the place-holder file.
-	if version == "0.00" {
+	if EmbeddedInstallerVersion == "0.00" {
 		return false
 	}
 
@@ -239,7 +120,7 @@ func Upgradeable(version string) bool {
 		return true
 	}
 	installed = installed[:idx]
-	return semver.Compare("v"+installed, "v"+version) < 0
+	return semver.Compare("v"+installed, "v"+EmbeddedInstallerVersion) < 0
 }
 
 // Uninstall uninstalls the Npcap tools. The path to the uninstaller can
