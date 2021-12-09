@@ -48,7 +48,7 @@ class TestKeystore(KeystoreBase):
 
         exit_code = self.run_beat()
         assert self.log_contains(
-            "missing field accessing 'output.elasticsearch.hosts")
+            "missing field accessing 'output.elasticsearch.hosts'")
         assert exit_code == 1
 
     def test_keystore_with_nested_key(self):
