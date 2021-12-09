@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2021-05-26T16:26:47.000Z",
+        "@timestamp": "2021-05-26T14:26:47.000-02:00",
         "client.bytes": 1696,
         "client.ip": "127.0.0.0",
         "client.nat.ip": "0.0.0.0",
@@ -21,11 +21,11 @@
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
-        "event.end": "2021-05-26T16:26:31.000Z",
+        "event.end": "2021-05-26T14:26:31.000-02:00",
         "event.kind": "event",
         "event.module": "panw",
         "event.outcome": "success",
-        "event.start": "2021-05-26T16:26:30.000Z",
+        "event.start": "2021-05-26T14:26:30.000-02:00",
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
