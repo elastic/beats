@@ -1,5 +1,5 @@
 - module: containerd
-  metricsets: ["cpu", "memory"]
+  metricsets: ["cpu", "memory", "blkio"]
   enabled: false
   period: 10s
   hosts: ["localhost:1338"]

@@ -1,9 +1,15 @@
 package memory
 
 import (
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/containerd"
 )
 
 const (
@@ -17,13 +23,9 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
-)
 
-// init registers the MetricSet with the central registry.
-// The New method will be called after the setup of the module and before starting to fetch data
-func init() {
 	// Mapping of state metrics
-	mapping := &prometheus.MetricsMapping{
+	mapping = &prometheus.MetricsMapping{
 		Metrics: map[string]prometheus.MetricMap{
 			"container_memory_usage_max_bytes":           prometheus.Metric("usage.max"),
 			"container_memory_usage_usage_bytes":         prometheus.Metric("usage.total"),
@@ -46,9 +48,90 @@ func init() {
 			"container_id": prometheus.KeyLabel("id"),
 		},
 	}
+)
 
-	mb.Registry.MustAddMetricSet("containerd", "memory",
-		getMetricsetFactory(mapping),
+// Metricset for containerd memory is a prometheus based metricset
+type metricset struct {
+	mb.BaseMetricSet
+	prometheusClient prometheus.Prometheus
+	calcPct          bool
+}
+
+// init registers the MetricSet with the central registry.
+// The New method will be called after the setup of the module and before starting to fetch data
+func init() {
+	mb.Registry.MustAddMetricSet("containerd", "memory", New,
 		mb.WithHostParser(hostParser),
+		mb.DefaultMetricSet(),
 	)
+}
+
+// New creates a new instance of the MetricSet. New is responsible for unpacking
+// any MetricSet specific configuration options if there are any.
+func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	cfgwarn.Beta("The containerd cpu metricset is beta.")
+
+	pc, err := prometheus.NewPrometheusClient(base)
+	if err != nil {
+		return nil, err
+	}
+	config := containerd.DefaultConfig()
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
+	return &metricset{
+		BaseMetricSet:    base,
+		prometheusClient: pc,
+		calcPct:          config.CalculatePct,
+	}, nil
+}
+
+// Fetch gathers information from the containerd and reports events with this information.
+func (m *metricset) Fetch(reporter mb.ReporterV2) error {
+	events, err := m.prometheusClient.GetProcessedMetrics(mapping)
+	if err != nil {
+		return errors.Wrap(err, "error getting metrics")
+	}
+
+	for _, event := range events {
+
+		// setting ECS container.id
+		rootFields := common.MapStr{}
+		containerFields := common.MapStr{}
+		var cID string
+		if containerID, ok := event["id"]; ok {
+			cID = (containerID).(string)
+			containerFields.Put("id", cID)
+			event.Delete("id")
+		}
+
+		if len(containerFields) > 0 {
+			rootFields.Put("container", containerFields)
+		}
+
+		// Calculate memory total usage percentage
+		if m.calcPct {
+			inactiveFiles, err := event.GetValue("inactiveFiles")
+			if err == nil {
+				usageTotal, err := event.GetValue("usage.total")
+				if err == nil {
+					memoryLimit, err := event.GetValue("usage.limit")
+					if err == nil {
+						usage := usageTotal.(float64) - inactiveFiles.(float64)
+						memoryUsagePct := usage / memoryLimit.(float64)
+						event.Put("usage.pct", memoryUsagePct)
+						m.Logger().Debugf("memoryUsagePct for %+v is %+v", cID, memoryUsagePct)
+					}
+				}
+			}
+		}
+
+		reporter.Event(mb.Event{
+			RootFields:      rootFields,
+			MetricSetFields: event,
+			Namespace:       "containerd.memory",
+		})
+	}
+	return nil
 }
