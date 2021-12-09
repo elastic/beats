@@ -15,25 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !linux
-// +build !linux
-
-package socket_summary
+package sysinit
 
 import (
-	"github.com/shirou/gopsutil/net"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/helper"
 )
 
-//a stub function for non-linux systems
-//get a list of platform-specific enhancements and apply them to our mapStr object.
-func applyEnhancements(data common.MapStr, sys resolve.Resolver) (common.MapStr, error) {
-	return data, nil
-}
-
-// connections gets connection information
-func connections(kind string) ([]net.ConnectionStat, error) {
-	return net.Connections(kind)
+func InitModule(config string) {
+	if err := helper.CheckAndEnableSeDebugPrivilege(); err != nil {
+		logp.Warn("%v", err)
+	}
 }
