@@ -156,6 +156,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Skip configuration checks in autodiscover for configurations that are already running {pull}29048[29048]
 - Fix `decode_json_processor` to always respect `add_error_key` {pull}29107[29107]
 - Fix `add_labels` flattening of array values. {pull}29211[29211]
+- Overwrite index name in index template correctly. {issue}28571[28571] {pull}29299[29299]
 
 *Auditbeat*
 
