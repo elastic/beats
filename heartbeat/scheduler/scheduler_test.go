@@ -77,7 +77,7 @@ func testTaskTimes(limit uint32, fn TaskFunc) TaskFunc {
 	}
 }
 
-func TestScheduler_Start(t *testing.T) {
+func TestSchedulerRun(t *testing.T) {
 	// We use tarawa runAt because it could expose some weird runAt math if by accident some code
 	// relied on the local TZ.
 	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, false)
@@ -85,11 +85,11 @@ func TestScheduler_Start(t *testing.T) {
 
 	executed := make(chan string)
 
-	addEvents := uint32(10)
-	s.Add(testSchedule{0}, "add", testTaskTimes(addEvents, func(_ context.Context) []TaskFunc {
-		executed <- "add"
+	initialEvents := uint32(10)
+	s.Add(testSchedule{0}, "add", testTaskTimes(initialEvents, func(_ context.Context) []TaskFunc {
+		executed <- "initial"
 		cont := func(_ context.Context) []TaskFunc {
-			executed <- "addCont"
+			executed <- "initialCont"
 			return nil
 		}
 		return []TaskFunc{cont}
@@ -113,11 +113,11 @@ func TestScheduler_Start(t *testing.T) {
 	require.NotNil(t, remove)
 	removeMtx.Unlock()
 
-	postAddEvents := uint32(10)
-	s.Add(testSchedule{}, "postAdd", testTaskTimes(postAddEvents, func(_ context.Context) []TaskFunc {
-		executed <- "postAdd"
+	postRemoveEvents := uint32(10)
+	s.Add(testSchedule{}, "postRemove", testTaskTimes(postRemoveEvents, func(_ context.Context) []TaskFunc {
+		executed <- "postRemove"
 		cont := func(_ context.Context) []TaskFunc {
-			executed <- "postAddCont"
+			executed <- "postRemoveCont"
 			return nil
 		}
 		return []TaskFunc{cont}
@@ -125,9 +125,9 @@ func TestScheduler_Start(t *testing.T) {
 
 	received := make([]string, 0)
 	// We test for a good number of events in this loop because we want to ensure that the remove() took effect
-	// Otherwise, we might only do 1 preAdd and 1 postAdd event
+	// Otherwise, we might only do 1 preAdd and 1 postRemove event
 	// We double the number of pre/post add events to account for their continuations
-	totalExpected := addEvents*2 + removedEvents + postAddEvents*2
+	totalExpected := initialEvents*2 + removedEvents + postRemoveEvents*2
 	for uint32(len(received)) < totalExpected {
 		select {
 		case got := <-executed:
@@ -139,17 +139,17 @@ func TestScheduler_Start(t *testing.T) {
 	}
 
 	// The removed callback should only have been executed once
-	counts := map[string]uint32{"preAdd": 0, "postAdd": 0, "preAddCont": 0, "postAddcont": 0, "removed": 0}
+	counts := map[string]uint32{"initial": 0, "initialCont": 0, "removed": 0, "postRemove": 0, "postRemoveCont": 0}
 	for _, s := range received {
 		counts[s]++
 	}
 
 	// convert with int() because the printed output is nicer than hex
-	assert.Equal(t, int(addEvents), int(counts["add"]))
-	assert.Equal(t, int(addEvents), int(counts["addCont"]))
-	assert.Equal(t, int(postAddEvents), int(counts["postAdd"]))
-	assert.Equal(t, int(postAddEvents), int(counts["postAddCont"]))
+	assert.Equal(t, int(initialEvents), int(counts["initial"]))
+	assert.Equal(t, int(initialEvents), int(counts["initialCont"]))
 	assert.Equal(t, int(removedEvents), int(counts["removed"]))
+	assert.Equal(t, int(postRemoveEvents), int(counts["postRemove"]))
+	assert.Equal(t, int(postRemoveEvents), int(counts["postRemoveCont"]))
 }
 
 func TestScheduler_WaitForRunOnce(t *testing.T) {
