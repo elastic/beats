@@ -18,15 +18,13 @@
 package ksm
 
 import (
-	"path/filepath"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/linux"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -43,7 +41,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	fs string
+	mod resolve.Resolver
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -51,12 +49,11 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The linux pageinfo metricset is beta.")
 
-	sys := base.Module().(linux.LinuxModule)
-	hostfs := sys.GetHostFS()
+	sys := base.Module().(resolve.Resolver)
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		fs:            filepath.Join(hostfs, "/sys/kernel/mm/ksm"),
+		mod:           sys,
 	}, nil
 }
 
@@ -64,7 +61,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	ksmData, err := fetchKSMStats(m.fs)
+	ksmData, err := fetchKSMStats(m.mod.ResolveHostFS("/sys/kernel/mm/ksm"))
 	if err != nil {
 		return errors.Wrap(err, "error fetching KSM stats")
 	}
