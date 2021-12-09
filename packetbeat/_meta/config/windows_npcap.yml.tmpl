@@ -1,3 +1,5 @@
+{{if and (eq .BeatLicense "Elastic License") (eq .GOOS "windows")}}
+
 {{header "Windows Npcap installation settings"}}
 
 # Windows Npcap installation options. These options specify how the Npcap packet
@@ -18,3 +20,4 @@
 #  # By default Npcap will be installed only when a newer version of Npcap is available.
 #  # force_reinstall forces a new installation of Npcap in all cases.
 #  force_reinstall: false
+{{- end -}}
