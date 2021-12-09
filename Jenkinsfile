@@ -17,7 +17,7 @@ pipeline {
     timestamps()
   }
   parameters {
-    string(name: 'COMMAND', defaultValue: 'mage build', description: 'What command?')
+    string(name: 'COMMAND', defaultValue: 'mage unitTest', description: 'What command?')
   }
   stages {
     stage('Checkout') {
