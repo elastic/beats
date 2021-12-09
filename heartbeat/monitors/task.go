@@ -21,8 +21,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
-
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
@@ -39,7 +37,7 @@ type configuredJob struct {
 	config   jobConfig
 	monitor  *Monitor
 	cancelFn context.CancelFunc
-	client   *core.SyncClient
+	client   *WrappedClient
 }
 
 func newConfiguredJob(job jobs.Job, config jobConfig, monitor *Monitor) (*configuredJob, error) {
@@ -76,10 +74,10 @@ func (t *configuredJob) makeSchedulerTaskFunc() scheduler.TaskFunc {
 }
 
 // Start schedules this configuredJob for execution.
-func (t *configuredJob) Start() {
+func (t *configuredJob) Start(client *WrappedClient) {
 	var err error
 
-	t.client, err = core.NewSyncClient(logp.NewLogger("monitor_task"), t.monitor.pipelineConnector, beat.ClientConfig{})
+	t.client = client
 
 	if err != nil {
 		logp.Err("could not start monitor: %v", err)
@@ -87,7 +85,7 @@ func (t *configuredJob) Start() {
 	}
 
 	tf := t.makeSchedulerTaskFunc()
-	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ID, tf, t.config.Type, t.client.Wait)
+	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ID, tf, t.config.Type, client.wait)
 	if err != nil {
 		logp.Err("could not start monitor: %v", err)
 	}
@@ -103,7 +101,7 @@ func (t *configuredJob) Stop() {
 	}
 }
 
-func runPublishJob(job jobs.Job, client *core.SyncClient) []scheduler.TaskFunc {
+func runPublishJob(job jobs.Job, client *WrappedClient) []scheduler.TaskFunc {
 	event := &beat.Event{
 		Fields: common.MapStr{},
 	}

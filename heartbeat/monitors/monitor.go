@@ -19,6 +19,7 @@ package monitors
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 	"sync"
 
 	"github.com/mitchellh/hashstructure"
@@ -43,6 +44,12 @@ const (
 	MON_STOPPED
 )
 
+type WrappedClient struct {
+	Publish func(event beat.Event)
+	Close   func() error
+	wait    func()
+}
+
 // Monitor represents a configured recurring monitoring configuredJob loaded from a config file. Starting it
 // will cause it to run with the given scheduler until Stop() is called.
 type Monitor struct {
@@ -65,6 +72,8 @@ type Monitor struct {
 	// stats is the countersRecorder used to record lifecycle events
 	// for global metrics + telemetry
 	stats plugin.RegistryRecorder
+
+	runOnce bool
 }
 
 // String prints a description of the monitor in a threadsafe way. It is important that this use threadsafe
@@ -74,7 +83,7 @@ func (m *Monitor) String() string {
 }
 
 func checkMonitorConfig(config *common.Config, registrar *plugin.PluginsReg) error {
-	_, err := newMonitor(config, registrar, nil, nil, nil)
+	_, err := newMonitor(config, registrar, nil, nil, nil, false)
 
 	return err
 }
@@ -87,8 +96,9 @@ func newMonitor(
 	pipelineConnector beat.PipelineConnector,
 	taskAdder scheduler.AddTask,
 	onStop func(*Monitor),
+	runOnce bool,
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, taskAdder, onStop)
+	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, taskAdder, onStop, runOnce)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -103,6 +113,7 @@ func newMonitorUnsafe(
 	pipelineConnector beat.PipelineConnector,
 	addTask scheduler.AddTask,
 	onStop func(*Monitor),
+	runOnce bool,
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
@@ -131,6 +142,7 @@ func newMonitorUnsafe(
 		config:            config,
 		stats:             pluginFactory.Stats,
 		state:             MON_INIT,
+		runOnce:           runOnce,
 	}
 
 	if m.stdFields.ID == "" {
@@ -211,7 +223,31 @@ func (m *Monitor) Start() {
 	defer m.internalsMtx.Unlock()
 
 	for _, t := range m.configuredJobs {
-		t.Start()
+		if m.runOnce {
+			client, err := core.NewSyncClient(logp.NewLogger("monitor_task"), t.monitor.pipelineConnector, beat.ClientConfig{})
+			if err != nil {
+				logp.Err("could not start monitor: %v", err)
+				continue
+			}
+			t.Start(&WrappedClient{
+				Publish: func(event beat.Event) {
+					client.Publish(event)
+				},
+				Close: client.Close,
+				wait:  client.Wait,
+			})
+		} else {
+			client, err := m.pipelineConnector.Connect()
+			if err != nil {
+				logp.Err("could not start monitor: %v", err)
+				continue
+			}
+			t.Start(&WrappedClient{
+				Publish: client.Publish,
+				Close:   client.Close,
+				wait:    func() {},
+			})
+		}
 	}
 
 	m.stats.StartMonitor(int64(m.endpoints))

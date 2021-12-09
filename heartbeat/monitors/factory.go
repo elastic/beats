@@ -45,6 +45,7 @@ type RunnerFactory struct {
 	mtx        *sync.Mutex
 	pluginsReg *plugin.PluginsReg
 	logger     *logp.Logger
+	runOnce    bool
 }
 
 type publishSettings struct {
@@ -67,7 +68,7 @@ type publishSettings struct {
 }
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
-func NewFactory(info beat.Info, addTask scheduler.AddTask, pluginsReg *plugin.PluginsReg) *RunnerFactory {
+func NewFactory(info beat.Info, addTask scheduler.AddTask, pluginsReg *plugin.PluginsReg, runOnce bool) *RunnerFactory {
 	return &RunnerFactory{
 		info:       info,
 		addTask:    addTask,
@@ -75,6 +76,7 @@ func NewFactory(info beat.Info, addTask scheduler.AddTask, pluginsReg *plugin.Pl
 		mtx:        &sync.Mutex{},
 		pluginsReg: pluginsReg,
 		logger:     logp.NewLogger("monitor-factory"),
+		runOnce:    runOnce,
 	}
 }
 
@@ -116,7 +118,7 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *common.Config) (cfgfile.Runne
 			}
 		}()
 	}
-	monitor, err := newMonitor(c, f.pluginsReg, p, f.addTask, safeStop)
+	monitor, err := newMonitor(c, f.pluginsReg, p, f.addTask, safeStop, f.runOnce)
 	if err != nil {
 		return nil, err
 	}
