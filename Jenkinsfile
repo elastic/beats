@@ -16,6 +16,9 @@ pipeline {
   options {
     timestamps()
   }
+  triggers {
+    cron('@hourly')
+  }
   parameters {
     string(name: 'COMMAND', defaultValue: 'mage build', description: 'What command?')
   }
