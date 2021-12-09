@@ -19,8 +19,9 @@ package monitors
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 	"sync"
+
+	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
