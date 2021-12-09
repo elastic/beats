@@ -114,17 +114,20 @@ type query struct {
 // any problems or nil.
 func (c *winEventLogConfig) Validate() error {
 	var errs multierror.Errors
-	if c.Name == "" {
-		errs = append(errs, fmt.Errorf("event log is missing a 'name'"))
-	}
 
 	if c.XMLQuery != "" {
+		if c.ID == "" {
+			errs = append(errs, fmt.Errorf("event log is missing an 'id'"))
+		}
+
 		var tmp interface{}
 		if err := xml.Unmarshal([]byte(c.XMLQuery), &tmp); err != nil {
 			errs = append(errs, fmt.Errorf("invalid xml_query: %w", err))
 		}
 
 		switch {
+		case c.Name != "":
+			errs = append(errs, fmt.Errorf("xml_query cannot be used with 'name'"))
 		case c.SimpleQuery.IgnoreOlder != 0:
 			errs = append(errs, fmt.Errorf("xml_query cannot be used with 'ignore_older'"))
 		case c.SimpleQuery.Level != "":
@@ -133,6 +136,10 @@ func (c *winEventLogConfig) Validate() error {
 			errs = append(errs, fmt.Errorf("xml_query cannot be used with 'event_id'"))
 		case len(c.SimpleQuery.Provider) != 0:
 			errs = append(errs, fmt.Errorf("xml_query cannot be used with 'provider'"))
+		}
+	} else {
+		if c.Name == "" {
+			errs = append(errs, fmt.Errorf("event log is missing a 'name'"))
 		}
 	}
 
@@ -147,7 +154,7 @@ var _ EventLog = &winEventLog{}
 type winEventLog struct {
 	config       winEventLogConfig
 	query        string
-	name         string                   // Name identifying this event log.
+	id           string                   // Identifier of this event log.
 	channelName  string                   // Name of the channel from which to read.
 	file         bool                     // Reading from file rather than channel.
 	subscription win.EvtHandle            // Handle to the subscription.
@@ -164,7 +171,7 @@ type winEventLog struct {
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).
 func (l *winEventLog) Name() string {
-	return l.name
+	return l.id
 }
 
 func (l *winEventLog) Open(state checkpoint.EventLogState) error {
@@ -287,7 +294,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 
 		r, _ := l.buildRecordFromXML(l.outputBuf.Bytes(), err)
 		r.Offset = checkpoint.EventLogState{
-			Name:         l.name,
+			Name:         l.id,
 			RecordNumber: r.RecordID,
 			Timestamp:    r.TimeCreated.SystemTime,
 		}
@@ -376,7 +383,7 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 	}
 
 	if l.file {
-		r.File = l.name
+		r.File = l.id
 	}
 
 	if includeXML {
@@ -403,10 +410,15 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 		return nil, err
 	}
 
+	id := c.ID
 	if c.XMLQuery != "" {
 		xmlQuery = c.XMLQuery
+		id = c.ID
 	} else {
 		channelName = c.Name
+		if id == "" {
+			id = c.Name
+		}
 		xmlQuery, err = win.Query{
 			Log:         c.Name,
 			IgnoreOlder: c.SimpleQuery.IgnoreOlder,
@@ -440,7 +452,7 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 	}
 
 	l := &winEventLog{
-		name:        c.Name,
+		id:          id,
 		config:      c,
 		query:       xmlQuery,
 		channelName: channelName,
@@ -448,8 +460,8 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 		maxRead:     c.BatchReadSize,
 		renderBuf:   make([]byte, renderBufferSize),
 		outputBuf:   sys.NewByteBuffer(renderBufferSize),
-		cache:       newMessageFilesCache(c.Name, eventMetadataHandle, freeHandle),
-		logPrefix:   fmt.Sprintf("WinEventLog[%s]", c.Name),
+		cache:       newMessageFilesCache(id, eventMetadataHandle, freeHandle),
+		logPrefix:   fmt.Sprintf("WinEventLog[%s]", id),
 	}
 
 	// Forwarded events should be rendered using RenderEventXML. It is more

@@ -87,7 +87,6 @@ winlogbeat.shutdown_timeout: 30s
 A list of entries (called 'dictionaries' in YAML) that specify which event logs
 to monitor. Each entry in the list defines an event log to monitor as well as
 any information to be associated with the event log (filter, tags, and so on).
-The `name` field is the only required field for each event log.
 
 [source,yaml]
 --------------------------------------------------------------------------------
@@ -137,8 +136,7 @@ channel is a named stream of events that transports events from an event source
 to an event log. Most channels are tied to specific event publishers. Here is an
 example showing how to list all channels using PowerShell.
 
-If a custom XML query is provided, the name will act as an identifier for this
-event log.
+The name key must not be used with custom XML queries.
 
 [source,sh]
 --------------------------------------------------------------------------------
@@ -174,6 +172,26 @@ of how to read from an .evtx file in the <<reading-from-evtx,FAQ>>.
 --------------------------------------------------------------------------------
 winlogbeat.event_logs:
   - name: 'C:\backup\sysmon-2019.08.evtx'
+--------------------------------------------------------------------------------
+
+[float]
+==== `event_logs.id`
+
+A unique identifier for the event log. This key is required when using a custom
+XML query.
+
+In other cases, it can be used to uniquely identify an event log. This is
+useful if multiple event logs are being set up to watch the same channel or file. If an
+ID is not given, the `event_logs.name` value will be used.
+
+This value must be unique.
+
+[source,yaml]
+--------------------------------------------------------------------------------
+winlogbeat.event_logs:
+  - name: Application
+    id: application-logs
+    ignore_older: 168h
 --------------------------------------------------------------------------------
 
 [float]
@@ -341,10 +359,10 @@ Microsoft-Windows-Eventlog
 [float]
 ==== `event_logs.xml_query`
 
-Provide a custom XML query. This option is mutually exclusive with the `event_id`,
+Provide a custom XML query. This option is mutually exclusive with the `name`, `event_id`,
 `ignore_older`, `level`, and `provider` options. These options should be included in
-the XML query directly. Custom XML queries provide more flexibility and advanced
-options than the simpler query options in {beatname_uc}.
+the XML query directly. Furthermore, an `id` must be provided. Custom XML queries
+provide more flexibility and advanced options than the simpler query options in {beatname_uc}.
 *{vista_and_newer}*
 
 Here is a configuration which will collect DHCP server events from multiple channels:
@@ -352,7 +370,7 @@ Here is a configuration which will collect DHCP server events from multiple chan
 [source,yaml]
 --------------------------------------------------------------------------------
 winlogbeat.event_logs:
-  - name: dhcp-server
+  - id: dhcp-server-logs
     xml_query: >
       <QueryList>
         <Query Id="0" Path="DhcpAdminEvents">
