@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
-
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
 
@@ -34,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
 // ErrMonitorDisabled is returned when the monitor plugin is marked as disabled.
@@ -225,7 +224,7 @@ func (m *Monitor) Start() {
 
 	for _, t := range m.configuredJobs {
 		if m.runOnce {
-			client, err := core.NewSyncClient(logp.NewLogger("monitor_task"), t.monitor.pipelineConnector, beat.ClientConfig{})
+			client, err := pipeline.NewSyncClient(logp.NewLogger("monitor_task"), t.monitor.pipelineConnector, beat.ClientConfig{})
 			if err != nil {
 				logp.Err("could not start monitor: %v", err)
 				continue

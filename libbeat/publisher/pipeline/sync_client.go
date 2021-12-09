@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package core
+package pipeline
 
 import (
 	"sync"
@@ -14,9 +14,8 @@ import (
 )
 
 // Client implements the interface used by all the functionbeat function, we only implement a synchronous
-// client. This interface superseed the core beat.Client interface inside functionbeat because our publish
-// and publishAll methods can return an error.
-type Client interface {
+// client. This interface superseed the core beat.Client interface and can return errors on publish.
+type ISyncClient interface {
 	// Publish accepts a unique events and will publish it to the pipeline.
 	Publish(beat.Event) error
 
