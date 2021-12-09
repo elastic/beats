@@ -205,6 +205,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Revert usageDetails api version to 2019-01-01. {pull}28995[28995]
 - Fix `threatintel.misp` filters configuration. {issue}27970[27970]
 - Fix opening files on Windows in filestream so open files can be deleted. {issue}29113[29113] {pull}29180[29180]
+- Fix handling of escaped newlines in the `decode_cef` processor. {issue}16995[16995] {pull}29268[29268]
 - Fix `panw` module ingest errors for GLOBALPROTECT logs {pull}29154[29154]
 
 *Heartbeat*
