@@ -15,30 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package system
+//go:build !linux && !windows
+// +build !linux,!windows
 
-import (
-	"os"
-	"path/filepath"
+package sysinit
 
-	"github.com/elastic/gosigar"
-)
-
-func initModule(config string) {
-	configureHostFS(config)
-}
-
-func configureHostFS(config string) {
-	dir := config
-	if dir == "" {
-		dir = "/"
-	}
-
-	// Set environment variables for gopsutil.
-	os.Setenv("HOST_PROC", filepath.Join(dir, "/proc"))
-	os.Setenv("HOST_SYS", filepath.Join(dir, "/sys"))
-	os.Setenv("HOST_ETC", filepath.Join(dir, "/etc"))
-
-	// Set proc location for gosigar.
-	gosigar.Procd = filepath.Join(dir, "/proc")
+func InitModule(config string) {
+	// Stub method for non-linux.
 }

@@ -113,4 +113,4 @@ A workaround is also required if metricbeat is running inside docker on a hybrid
 Within docker, metricbeat won't be able to see any V2 cgroups components. If you wish
 to monitor cgroups V2 from within docker on a hybrid system, you must mount the unified
 sysfs hierarchy (usually `/sys/fs/cgroups/unified`) inside the container, and then use
-`--system.hostfs` to specify the filesystem root within the container.
+`system.hostfs` to specify the filesystem root within the container.
