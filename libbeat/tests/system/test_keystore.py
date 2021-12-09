@@ -93,4 +93,3 @@ class TestKeystore(KeystoreBase):
 
         assert exit_code == 0
         assert self.log_contains(secret) == False
-#        assert self.log_contains("${%s}" % key)
