@@ -26,10 +26,21 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/npcap"
 )
+
+type npcapConfig struct {
+	NeverInstall       bool          `config:"npcap.never_install"`
+	ForceReinstall     bool          `config:"npcap.force_reinstall"`
+	InstallTimeout     time.Duration `config:"npcap.install_timeout"`
+	InstallDestination string        `config:"npcal.install_destination"`
+}
+
+func (c *npcapConfig) Init() {
+	// Set defaults.
+	c.InstallTimeout = 120 * time.Second
+}
 
 func installNpcap(b *beat.Beat) error {
 	if !b.Info.ElasticLicensed {
@@ -39,21 +50,16 @@ func installNpcap(b *beat.Beat) error {
 		return nil
 	}
 
-	cfg := b.BeatConfig
-	reinstall, err := configBool(cfg, "npcap.force_reinstall")
+	var cfg npcapConfig
+	err := b.BeatConfig.Unpack(&cfg)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to unpack npcap config: %w", err)
 	}
-	timeout, err := configDuration(cfg, "npcap.install_timeout")
-	if err != nil {
-		return err
-	}
-	installDst, err := configString(cfg, "npcap.install_destination")
-	if err != nil {
-		return err
+	if cfg.NeverInstall {
+		return nil
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), cfg.InstallTimeout)
 	defer cancel()
 
 	log := logp.NewLogger("npcap_install")
@@ -61,7 +67,7 @@ func installNpcap(b *beat.Beat) error {
 	if npcap.Installer == nil {
 		return nil
 	}
-	if !reinstall && !npcap.Upgradeable() {
+	if !cfg.ForceReinstall && !npcap.Upgradeable() {
 		npcap.Installer = nil
 		return nil
 	}
@@ -82,52 +88,5 @@ func installNpcap(b *beat.Beat) error {
 	if err != nil {
 		return fmt.Errorf("could not create installation temporary file: %w", err)
 	}
-	return npcap.Install(ctx, log, installerPath, installDst, false)
-}
-
-func configBool(cfg *common.Config, path string) (bool, error) {
-	ok, err := cfg.Has(path, -1)
-	if err != nil {
-		return false, err
-	}
-	if !ok {
-		return false, nil
-	}
-	v, err := cfg.Bool(path, -1)
-	if err != nil {
-		return false, err
-	}
-	return v, nil
-}
-
-func configString(cfg *common.Config, path string) (string, error) {
-	ok, err := cfg.Has(path, -1)
-	if err != nil {
-		return "", err
-	}
-	if !ok {
-		return "", nil
-	}
-	v, err := cfg.String(path, -1)
-	if err != nil {
-		return "", err
-	}
-	return v, nil
-}
-
-func configDuration(cfg *common.Config, path string) (time.Duration, error) {
-	const defaultTimeout = 120 * time.Second
-
-	v, err := configString(cfg, path)
-	if err != nil {
-		return 0, err
-	}
-	if v == "" {
-		return defaultTimeout, nil
-	}
-	d, err := time.ParseDuration(v)
-	if err != nil {
-		return 0, err
-	}
-	return d, nil
+	return npcap.Install(ctx, log, installerPath, cfg.InstallDestination, false)
 }
