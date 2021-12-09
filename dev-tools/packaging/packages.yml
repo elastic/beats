@@ -669,11 +669,13 @@ shared:
       from: 'arm64v8/ubuntu:20.04'
       buildFrom: 'arm64v8/ubuntu:20.04'
 
+  # TODO: Did I must change those to ?
   - &docker_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi8'
       from: 'docker.elastic.co/ubi8/ubi-minimal'
 
+  # TODO: Did I must change those to ?
   - &docker_arm_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi8'
