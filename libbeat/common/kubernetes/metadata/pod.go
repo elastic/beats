@@ -46,10 +46,6 @@ func NewPodMetadataGenerator(
 	namespace MetaGen,
 	addResourceMetadata *AddResourceMetadataConfig) MetaGen {
 
-	if addResourceMetadata == nil {
-		addResourceMetadata = GetDefaultResourceMetadataConfig()
-	}
-
 	return &pod{
 		resource:            NewResourceMetadataGenerator(cfg, client),
 		store:               pods,
