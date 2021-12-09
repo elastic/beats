@@ -57,7 +57,8 @@ packetbeat.interfaces.internal_networks:
 # can stay enabled even after beat is shut down.
 #packetbeat.interfaces.auto_promisc_mode: true
 
-{{template "windows_npcap.yml.tmpl" .}}
+{{- template "windows_npcap.yml.tmpl" .}}
+
 {{header "Flows"}}
 
 packetbeat.flows:
