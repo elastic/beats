@@ -65,7 +65,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				"pulsar_storage_write_latency_le_200":      p.Metric("topic.storage.write.latency.le.200"),
 				"pulsar_storage_write_latency_le_1000":     p.Metric("topic.storage.write.latency.le.1000"),
 				"pulsar_storage_write_latency_le_overflow": p.Metric("topic.storage.write.latency.le.overflow"),
-
 				//subscription
 				"pulsar_subscription_back_log":                    p.Metric("subscription.back.log"),
 				"pulsar_subscription_blocked_on_unacked_messages": p.Metric("subscription.blocked.on.unacked.messages"),
@@ -74,6 +73,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				"pulsar_subscription_msg_rate_redeliver":          p.Metric("subscription.msg.rate.redeliver"),
 				"pulsar_subscription_msg_throughput_out":          p.Metric("subscription.msg.throughput.out"),
 				"pulsar_subscription_unacked_message":             p.Metric("subscription.unacked.message"),
+			},
+
+			Labels: map[string]p.LabelMap{
+				"cluster":      p.KeyLabel("cluster"),
+				"namespace":    p.KeyLabel("namespace"),
+				"topic":        p.KeyLabel("topic"),
+				"subscription": p.KeyLabel("subscription"),
 			},
 		},
 	}, nil
