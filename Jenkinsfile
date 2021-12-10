@@ -13,7 +13,11 @@ pipeline {
     PATH = "${PATH}:${HOME}/bin"
   }
   options {
+    timeout(time: 2, unit: 'HOURS')
     timestamps()
+  }
+  triggers {
+    cron('H */3 * * *')
   }
   stages {
     stage('Run'){
