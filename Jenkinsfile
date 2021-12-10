@@ -14,10 +14,11 @@ pipeline {
     PATH = "${PATH}:${HOME}/bin"
   }
   options {
+    timeout(time: 1, unit: 'HOURS')
     timestamps()
   }
   triggers {
-    cron('@hourly')
+    cron('H */2 * * *')
   }
   parameters {
     string(name: 'COMMAND', defaultValue: 'mage build', description: 'What command?')
