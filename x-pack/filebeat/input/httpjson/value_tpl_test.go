@@ -28,6 +28,18 @@ func TestValueTpl(t *testing.T) {
 		teardown      func()
 	}{
 		{
+			name:  "can access Go types in context",
+			value: `[[.last_response.header.Get "foo"]] [[.last_response.url.params.Get "foo"]] [[.url.Host]] [[.url.Query.Get "bar"]]`,
+			paramCtx: &transformContext{
+				firstEvent:   &common.MapStr{},
+				lastEvent:    &common.MapStr{},
+				lastResponse: newTestResponse(common.MapStr{"param": 25}, http.Header{"Foo": []string{"bar"}}, "http://localhost?foo=bar"),
+			},
+			paramTr:     transformable{"url": newURL("http://localhost?bar=bazz")},
+			paramDefVal: "",
+			expectedVal: "bar bar localhost bazz",
+		},
+		{
 			name:  "can render values from ctx",
 			value: "[[.last_response.body.param]]",
 			paramCtx: &transformContext{
@@ -367,6 +379,21 @@ func TestValueTpl(t *testing.T) {
 			expectedVal:   "",
 			expectedError: errEmptyTemplateResult.Error(),
 		},
+		{
+			name:        "func base64Decode 2 strings",
+			value:       `[[base64Decode "c3RyaW5nMXN0cmluZzI="]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "string1string2",
+		},
+		{
+			name:          "func base64Decode no value",
+			value:         `[[base64Decode ""]]`,
+			paramCtx:      emptyTransformContext(),
+			paramTr:       transformable{},
+			expectedVal:   "",
+			expectedError: errEmptyTemplateResult.Error(),
+		},
 	}
 
 	for _, tc := range cases {
@@ -409,7 +436,7 @@ func newTestResponse(body common.MapStr, header http.Header, url string) *respon
 		resp.header = header
 	}
 	if url != "" {
-		resp.url = newURL(url)
+		resp.url = *(newURL(url))
 	}
 	return resp
 }

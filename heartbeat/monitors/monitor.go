@@ -37,17 +37,22 @@ import (
 // ErrMonitorDisabled is returned when the monitor plugin is marked as disabled.
 var ErrMonitorDisabled = errors.New("monitor not loaded, plugin is disabled")
 
+const (
+	MON_INIT = iota
+	MON_STARTED
+	MON_STOPPED
+)
+
 // Monitor represents a configured recurring monitoring configuredJob loaded from a config file. Starting it
 // will cause it to run with the given scheduler until Stop() is called.
 type Monitor struct {
 	stdFields      stdfields.StdMonitorFields
 	pluginName     string
 	config         *common.Config
-	registrar      *plugin.PluginsReg
-	uniqueName     string
 	scheduler      *scheduler.Scheduler
 	configuredJobs []*configuredJob
 	enabled        bool
+	state          int
 	// endpoints is a count of endpoints this monitor measures.
 	endpoints int
 	// internalsMtx is used to synchronize access to critical
@@ -69,32 +74,21 @@ func (m *Monitor) String() string {
 }
 
 func checkMonitorConfig(config *common.Config, registrar *plugin.PluginsReg) error {
-	m, err := newMonitor(config, registrar, nil, nil)
-	if m != nil {
-		m.Stop() // Stop the monitor to free up the ID from uniqueness checks
-	}
+	_, err := newMonitor(config, registrar, nil, nil, nil)
+
 	return err
 }
 
-// uniqueMonitorIDs is used to keep track of explicitly configured monitor IDs and ensure no duplication within a
-// given heartbeat instance.
-var uniqueMonitorIDs sync.Map
-
-// ErrDuplicateMonitorID is returned when a monitor attempts to start using an ID already in use by another monitor.
-type ErrDuplicateMonitorID struct{ ID string }
-
-func (e ErrDuplicateMonitorID) Error() string {
-	return fmt.Sprintf("monitor ID %s is configured for multiple monitors! IDs must be unique values.", e.ID)
-}
-
-// newMonitor Creates a new monitor, without leaking resources in the event of an error.
+// newMonitor creates a new monitor, without leaking resources in the event of an error.
+// you do not need to call Stop(), it will be safely garbage collected unless Start is called.
 func newMonitor(
 	config *common.Config,
 	registrar *plugin.PluginsReg,
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
+	onStop func(*Monitor),
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, scheduler)
+	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, scheduler, onStop)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -108,6 +102,7 @@ func newMonitorUnsafe(
 	registrar *plugin.PluginsReg,
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
+	onStop func(*Monitor),
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
@@ -135,14 +130,10 @@ func newMonitorUnsafe(
 		internalsMtx:      sync.Mutex{},
 		config:            config,
 		stats:             pluginFactory.Stats,
+		state:             MON_INIT,
 	}
 
-	if m.stdFields.ID != "" {
-		// Ensure we don't have duplicate IDs
-		if _, loaded := uniqueMonitorIDs.LoadOrStore(m.stdFields.ID, m); loaded {
-			return m, ErrDuplicateMonitorID{m.stdFields.ID}
-		}
-	} else {
+	if m.stdFields.ID == "" {
 		// If there's no explicit ID generate one
 		hash, err := m.configHash()
 		if err != nil {
@@ -152,7 +143,14 @@ func newMonitorUnsafe(
 	}
 
 	p, err := pluginFactory.Create(config)
-	m.close = p.Close
+
+	m.close = func() error {
+		if onStop != nil {
+			onStop(m)
+		}
+		return p.Close()
+	}
+
 	wrappedJobs := wrappers.WrapCommon(p.Jobs, m.stdFields)
 	m.endpoints = p.Endpoints
 
@@ -217,14 +215,18 @@ func (m *Monitor) Start() {
 	}
 
 	m.stats.StartMonitor(int64(m.endpoints))
+	m.state = MON_STARTED
 }
 
-// Stop stops the Monitor's execution in its configured scheduler.
-// This is safe to call even if the Monitor was never started.
+// Stop stops the monitor without freeing it in global dedup
+// needed by dedup itself to avoid a reentrant lock.
 func (m *Monitor) Stop() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
-	defer m.freeID()
+
+	if m.state == MON_STOPPED {
+		return
+	}
 
 	for _, t := range m.configuredJobs {
 		t.Stop()
@@ -238,9 +240,5 @@ func (m *Monitor) Stop() {
 	}
 
 	m.stats.StopMonitor(int64(m.endpoints))
-}
-
-func (m *Monitor) freeID() {
-	// Free up the monitor ID for reuse
-	uniqueMonitorIDs.Delete(m.stdFields.ID)
+	m.state = MON_STOPPED
 }

@@ -41,8 +41,8 @@ var testStatus = &client.AgentStatus{
 	},
 }
 
-func ExamplehumanOutput() {
-	humanOutput(os.Stdout, testStatus)
+func ExamplehumanStatusOutput() {
+	humanStatusOutput(os.Stdout, testStatus)
 	// Output:
 	// Status: HEALTHY
 	// Message: (no message)

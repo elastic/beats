@@ -29,8 +29,10 @@ import (
 	"math/big"
 	"math/rand"
 	"os"
+	"os/user"
 	"runtime"
 	"runtime/debug"
+	"strconv"
 	"strings"
 	"time"
 
@@ -45,7 +47,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
@@ -103,6 +104,7 @@ type beatConfig struct {
 
 	// beat internal components configurations
 	HTTP            *common.Config         `config:"http"`
+	HTTPPprof       *common.Config         `config:"http.pprof"`
 	Path            paths.Path             `config:"path"`
 	Logging         *common.Config         `config:"logging"`
 	MetricLogging   *common.Config         `config:"logging.metrics"`
@@ -160,19 +162,14 @@ func Run(settings Settings, bt beat.Creator) error {
 		return errw.Wrap(err, "could not set umask")
 	}
 
-	name := settings.Name
-	idxPrefix := settings.IndexPrefix
-	version := settings.Version
-	elasticLicensed := settings.ElasticLicensed
-
 	return handleError(func() error {
 		defer func() {
 			if r := recover(); r != nil {
-				logp.NewLogger(name).Fatalw("Failed due to panic.",
+				logp.NewLogger(settings.Name).Fatalw("Failed due to panic.",
 					"panic", r, zap.Stack("stack"))
 			}
 		}()
-		b, err := NewBeat(name, idxPrefix, version, elasticLicensed)
+		b, err := NewInitializedBeat(settings)
 		if err != nil {
 			return err
 		}
@@ -183,6 +180,27 @@ func Run(settings Settings, bt beat.Creator) error {
 		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
 		monitoring.NewString(registry, "name").Set(b.Info.Name)
 		monitoring.NewString(registry, "hostname").Set(b.Info.Hostname)
+
+		// Add more beat metadata
+		monitoring.NewString(registry, "binary_arch").Set(runtime.GOARCH)
+		monitoring.NewString(registry, "build_commit").Set(version.Commit())
+		monitoring.NewTimestamp(registry, "build_time").Set(version.BuildTime())
+		monitoring.NewBool(registry, "elastic_licensed").Set(b.Info.ElasticLicensed)
+
+		if u, err := user.Current(); err != nil {
+			if _, ok := err.(user.UnknownUserIdError); ok {
+				// This usually happens if the user UID does not exist in /etc/passwd. It might be the case on K8S
+				// if the user set securityContext.runAsUser to an arbitrary value.
+				monitoring.NewString(registry, "uid").Set(strconv.Itoa(os.Getuid()))
+				monitoring.NewString(registry, "gid").Set(strconv.Itoa(os.Getgid()))
+			} else {
+				return err
+			}
+		} else {
+			monitoring.NewString(registry, "username").Set(u.Username)
+			monitoring.NewString(registry, "uid").Set(u.Uid)
+			monitoring.NewString(registry, "gid").Set(u.Gid)
+		}
 
 		// Add additional info to state registry. This is also reported to monitoring
 		stateRegistry := monitoring.GetNamespace("state").GetRegistry()
@@ -386,10 +404,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	defer logp.Sync()
 	defer logp.Info("%s stopped.", b.Info.Beat)
 
-	err := b.InitWithSettings(settings)
-	if err != nil {
-		return err
-	}
 	defer func() {
 		if err := b.processing.Close(); err != nil {
 			logp.Warn("Failed to close global processing: %v", err)
@@ -405,7 +419,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path.
 	bl := newLocker(b)
-	err = bl.lock()
+	err := bl.lock()
 	if err != nil {
 		return err
 	}
@@ -414,6 +428,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Set Beat ID in registry vars, in case it was loaded from meta file
 	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
 	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())
+	monitoring.NewString(infoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
 
 	serviceRegistry := monitoring.GetNamespace("state").GetRegistry().GetRegistry("service")
 	monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
@@ -431,6 +446,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		}
 		s.Start()
 		defer s.Stop()
+		if b.Config.HTTPPprof.Enabled() {
+			s.AttachPprof()
+		}
 	}
 
 	if err = seccomp.LoadFilter(b.Config.Seccomp); err != nil {
@@ -1111,21 +1129,12 @@ func initPaths(cfg *common.Config) error {
 	// the paths field. After we will unpack the complete configuration and keystore reference
 	// will be correctly replaced.
 	partialConfig := struct {
-		Path   paths.Path `config:"path"`
-		Hostfs string     `config:"system.hostfs"`
+		Path paths.Path `config:"path"`
 	}{}
-
-	if paths.IsCLISet() {
-		cfgwarn.Deprecate("8.0.0", "This flag will be removed in the future and replaced by a config value.")
-	}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
 		return fmt.Errorf("error extracting default paths: %+v", err)
 	}
-
-	// Read the value for hostfs as `system.hostfs`
-	// In the config, there is no `path.hostfs`, as we're merely using the path struct to carry the hostfs variable.
-	partialConfig.Path.Hostfs = partialConfig.Hostfs
 
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
 		return fmt.Errorf("error setting default paths: %+v", err)

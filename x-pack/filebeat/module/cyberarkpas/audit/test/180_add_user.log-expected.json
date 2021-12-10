@@ -9,7 +9,7 @@
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.source_user": "PSMPApp_localhost.localdomain",
-        "cyberarkpas.audit.station": "81.32.170.205",
+        "cyberarkpas.audit.station": "67.43.156.14",
         "cyberarkpas.audit.timestamp": "Mar 10 01:11:20",
         "event.action": "add user",
         "event.category": [
@@ -36,22 +36,19 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "81.32.170.205"
+            "67.43.156.14"
         ],
         "related.user": [
             "PSMPApp_localhost.localdomain"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "81.32.170.205",
-        "source.geo.city_name": "Barcelona",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.3891,
-        "source.geo.location.lon": 2.1611,
-        "source.geo.region_iso_code": "ES-B",
-        "source.geo.region_name": "Barcelona",
-        "source.ip": "81.32.170.205",
+        "source.address": "67.43.156.14",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.14",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -68,7 +65,7 @@
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.source_user": "PSMPGW_localhost.localdomain",
-        "cyberarkpas.audit.station": "81.32.170.205",
+        "cyberarkpas.audit.station": "67.43.156.14",
         "cyberarkpas.audit.timestamp": "Mar 10 01:11:20",
         "event.action": "add user",
         "event.category": [
@@ -88,29 +85,26 @@
         "fileset.name": "audit",
         "host.name": "VAULT",
         "input.type": "log",
-        "log.offset": 581,
+        "log.offset": 580,
         "log.syslog.priority": "5",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "81.32.170.205"
+            "67.43.156.14"
         ],
         "related.user": [
             "PSMPGW_localhost.localdomain"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "81.32.170.205",
-        "source.geo.city_name": "Barcelona",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.3891,
-        "source.geo.location.lon": 2.1611,
-        "source.geo.region_iso_code": "ES-B",
-        "source.geo.region_name": "Barcelona",
-        "source.ip": "81.32.170.205",
+        "source.address": "67.43.156.14",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.14",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -127,7 +121,7 @@
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.source_user": "PSMP_ADB_localhost.localdomain",
-        "cyberarkpas.audit.station": "81.32.170.205",
+        "cyberarkpas.audit.station": "67.43.156.14",
         "cyberarkpas.audit.timestamp": "Mar 10 01:11:35",
         "event.action": "add user",
         "event.category": [
@@ -147,29 +141,26 @@
         "fileset.name": "audit",
         "host.name": "VAULT",
         "input.type": "log",
-        "log.offset": 1161,
+        "log.offset": 1159,
         "log.syslog.priority": "5",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "81.32.170.205"
+            "67.43.156.14"
         ],
         "related.user": [
             "PSMP_ADB_localhost.localdomain"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "81.32.170.205",
-        "source.geo.city_name": "Barcelona",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.3891,
-        "source.geo.location.lon": 2.1611,
-        "source.geo.region_iso_code": "ES-B",
-        "source.geo.region_name": "Barcelona",
-        "source.ip": "81.32.170.205",
+        "source.address": "67.43.156.14",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.14",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -186,7 +177,7 @@
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.source_user": "PSMApp_VAGRANT",
-        "cyberarkpas.audit.station": "81.32.170.205",
+        "cyberarkpas.audit.station": "67.43.156.14",
         "cyberarkpas.audit.timestamp": "Mar 10 09:59:19",
         "event.action": "add user",
         "event.category": [
@@ -206,29 +197,26 @@
         "fileset.name": "audit",
         "host.name": "VAULT",
         "input.type": "log",
-        "log.offset": 1743,
+        "log.offset": 1740,
         "log.syslog.priority": "5",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "81.32.170.205"
+            "67.43.156.14"
         ],
         "related.user": [
             "PSMApp_VAGRANT"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "81.32.170.205",
-        "source.geo.city_name": "Barcelona",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.3891,
-        "source.geo.location.lon": 2.1611,
-        "source.geo.region_iso_code": "ES-B",
-        "source.geo.region_name": "Barcelona",
-        "source.ip": "81.32.170.205",
+        "source.address": "67.43.156.14",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.14",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -245,7 +233,7 @@
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.source_user": "PSMGw_VAGRANT",
-        "cyberarkpas.audit.station": "81.32.170.205",
+        "cyberarkpas.audit.station": "67.43.156.14",
         "cyberarkpas.audit.timestamp": "Mar 10 09:59:27",
         "event.action": "add user",
         "event.category": [
@@ -265,29 +253,26 @@
         "fileset.name": "audit",
         "host.name": "VAULT",
         "input.type": "log",
-        "log.offset": 2309,
+        "log.offset": 2305,
         "log.syslog.priority": "5",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "81.32.170.205"
+            "67.43.156.14"
         ],
         "related.user": [
             "PSMGw_VAGRANT"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "81.32.170.205",
-        "source.geo.city_name": "Barcelona",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.3891,
-        "source.geo.location.lon": 2.1611,
-        "source.geo.region_iso_code": "ES-B",
-        "source.geo.region_name": "Barcelona",
-        "source.ip": "81.32.170.205",
+        "source.address": "67.43.156.14",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.14",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -304,7 +289,7 @@
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.source_user": "PSMApp_ASR-WIN",
-        "cyberarkpas.audit.station": "35.192.121.42",
+        "cyberarkpas.audit.station": "67.43.156.12",
         "cyberarkpas.audit.timestamp": "Mar 10 14:19:06",
         "event.action": "add user",
         "event.category": [
@@ -324,28 +309,26 @@
         "fileset.name": "audit",
         "host.name": "VAULT",
         "input.type": "log",
-        "log.offset": 2874,
+        "log.offset": 2869,
         "log.syslog.priority": "5",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "35.192.121.42"
+            "67.43.156.12"
         ],
         "related.user": [
             "PSMApp_ASR-WIN"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "35.192.121.42",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 38.6583,
-        "source.geo.location.lon": -77.2481,
-        "source.geo.region_iso_code": "US-VA",
-        "source.geo.region_name": "Virginia",
-        "source.ip": "35.192.121.42",
+        "source.address": "67.43.156.12",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.12",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -362,7 +345,7 @@
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.source_user": "PSMGw_ASR-WIN",
-        "cyberarkpas.audit.station": "35.192.121.42",
+        "cyberarkpas.audit.station": "67.43.156.12",
         "cyberarkpas.audit.timestamp": "Mar 10 14:19:15",
         "event.action": "add user",
         "event.category": [
@@ -382,28 +365,26 @@
         "fileset.name": "audit",
         "host.name": "VAULT",
         "input.type": "log",
-        "log.offset": 3440,
+        "log.offset": 3434,
         "log.syslog.priority": "5",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "35.192.121.42"
+            "67.43.156.12"
         ],
         "related.user": [
             "PSMGw_ASR-WIN"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "35.192.121.42",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 38.6583,
-        "source.geo.location.lon": -77.2481,
-        "source.geo.region_iso_code": "US-VA",
-        "source.geo.region_name": "Virginia",
-        "source.ip": "35.192.121.42",
+        "source.address": "67.43.156.12",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.12",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -417,11 +398,11 @@
         "cyberarkpas.audit.iso_timestamp": "2021-03-11T16:59:36Z",
         "cyberarkpas.audit.issuer": "Administrator",
         "cyberarkpas.audit.message": "Add User",
-        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 11 08:59:36</Timestamp>\n    <IsoTimestamp>2021-03-11T16:59:36Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>180</MessageID>\n    <Desc>Add User</Desc>\n    <Severity>Info</Severity>\n    <Issuer>Administrator</Issuer>\n    <Action>Add User</Action>\n    <SourceUser>PSMPApp_VAGRANT</SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>81.32.170.205</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Add User</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 11 08:59:36</Timestamp>\n    <IsoTimestamp>2021-03-11T16:59:36Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>180</MessageID>\n    <Desc>Add User</Desc>\n    <Severity>Info</Severity>\n    <Issuer>Administrator</Issuer>\n    <Action>Add User</Action>\n    <SourceUser>PSMPApp_VAGRANT</SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>67.43.156.14</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Add User</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.source_user": "PSMPApp_VAGRANT",
-        "cyberarkpas.audit.station": "81.32.170.205",
+        "cyberarkpas.audit.station": "67.43.156.14",
         "cyberarkpas.audit.timestamp": "Mar 11 08:59:36",
         "event.action": "add user",
         "event.category": [
@@ -441,29 +422,26 @@
         "fileset.name": "audit",
         "host.name": "VAULT",
         "input.type": "log",
-        "log.offset": 4005,
+        "log.offset": 3998,
         "log.syslog.priority": "5",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "81.32.170.205"
+            "67.43.156.14"
         ],
         "related.user": [
             "PSMPApp_VAGRANT"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "81.32.170.205",
-        "source.geo.city_name": "Barcelona",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.3891,
-        "source.geo.location.lon": 2.1611,
-        "source.geo.region_iso_code": "ES-B",
-        "source.geo.region_name": "Barcelona",
-        "source.ip": "81.32.170.205",
+        "source.address": "67.43.156.14",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.14",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -477,11 +455,11 @@
         "cyberarkpas.audit.iso_timestamp": "2021-03-11T16:59:36Z",
         "cyberarkpas.audit.issuer": "Administrator",
         "cyberarkpas.audit.message": "Add User",
-        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 11 08:59:36</Timestamp>\n    <IsoTimestamp>2021-03-11T16:59:36Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>180</MessageID>\n    <Desc>Add User</Desc>\n    <Severity>Info</Severity>\n    <Issuer>Administrator</Issuer>\n    <Action>Add User</Action>\n    <SourceUser>PSMPGW_VAGRANT</SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>81.32.170.205</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Add User</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 11 08:59:36</Timestamp>\n    <IsoTimestamp>2021-03-11T16:59:36Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>180</MessageID>\n    <Desc>Add User</Desc>\n    <Severity>Info</Severity>\n    <Issuer>Administrator</Issuer>\n    <Action>Add User</Action>\n    <SourceUser>PSMPGW_VAGRANT</SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>67.43.156.14</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Add User</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.source_user": "PSMPGW_VAGRANT",
-        "cyberarkpas.audit.station": "81.32.170.205",
+        "cyberarkpas.audit.station": "67.43.156.14",
         "cyberarkpas.audit.timestamp": "Mar 11 08:59:36",
         "event.action": "add user",
         "event.category": [
@@ -501,29 +479,26 @@
         "fileset.name": "audit",
         "host.name": "VAULT",
         "input.type": "log",
-        "log.offset": 5419,
+        "log.offset": 5410,
         "log.syslog.priority": "5",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "81.32.170.205"
+            "67.43.156.14"
         ],
         "related.user": [
             "PSMPGW_VAGRANT"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "81.32.170.205",
-        "source.geo.city_name": "Barcelona",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.3891,
-        "source.geo.location.lon": 2.1611,
-        "source.geo.region_iso_code": "ES-B",
-        "source.geo.region_name": "Barcelona",
-        "source.ip": "81.32.170.205",
+        "source.address": "67.43.156.14",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "BT",
+        "source.geo.country_name": "Bhutan",
+        "source.geo.location.lat": 27.5,
+        "source.geo.location.lon": 90.5,
+        "source.ip": "67.43.156.14",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -537,11 +512,11 @@
         "cyberarkpas.audit.iso_timestamp": "2021-03-14T12:57:16Z",
         "cyberarkpas.audit.issuer": "Administrator",
         "cyberarkpas.audit.message": "Add User",
-        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 14 05:57:16</Timestamp>\n    <IsoTimestamp>2021-03-14T12:57:16Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>180</MessageID>\n    <Desc>Add User</Desc>\n    <Severity>Info</Severity>\n    <Issuer>Administrator</Issuer>\n    <Action>Add User</Action>\n    <SourceUser>PSMPGW_SSH</SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>34.71.250.247</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Add User</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 14 05:57:16</Timestamp>\n    <IsoTimestamp>2021-03-14T12:57:16Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>180</MessageID>\n    <Desc>Add User</Desc>\n    <Severity>Info</Severity>\n    <Issuer>Administrator</Issuer>\n    <Action>Add User</Action>\n    <SourceUser>PSMPGW_SSH</SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>81.2.69.143</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Add User</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.source_user": "PSMPGW_SSH",
-        "cyberarkpas.audit.station": "34.71.250.247",
+        "cyberarkpas.audit.station": "81.2.69.143",
         "cyberarkpas.audit.timestamp": "Mar 14 05:57:16",
         "event.action": "add user",
         "event.category": [
@@ -561,26 +536,29 @@
         "fileset.name": "audit",
         "host.name": "VAULT",
         "input.type": "log",
-        "log.offset": 6831,
+        "log.offset": 6820,
         "log.syslog.priority": "5",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "34.71.250.247"
+            "81.2.69.143"
         ],
         "related.user": [
             "PSMPGW_SSH"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "34.71.250.247",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 37.751,
-        "source.geo.location.lon": -97.822,
-        "source.ip": "34.71.250.247",
+        "source.address": "81.2.69.143",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5142,
+        "source.geo.location.lon": -0.0931,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "81.2.69.143",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -594,11 +572,11 @@
         "cyberarkpas.audit.iso_timestamp": "2021-03-14T12:57:16Z",
         "cyberarkpas.audit.issuer": "Administrator",
         "cyberarkpas.audit.message": "Add User",
-        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 14 05:57:16</Timestamp>\n    <IsoTimestamp>2021-03-14T12:57:16Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>180</MessageID>\n    <Desc>Add User</Desc>\n    <Severity>Info</Severity>\n    <Issuer>Administrator</Issuer>\n    <Action>Add User</Action>\n    <SourceUser>PSMPApp_SSH</SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>34.71.250.247</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Add User</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 14 05:57:16</Timestamp>\n    <IsoTimestamp>2021-03-14T12:57:16Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>180</MessageID>\n    <Desc>Add User</Desc>\n    <Severity>Info</Severity>\n    <Issuer>Administrator</Issuer>\n    <Action>Add User</Action>\n    <SourceUser>PSMPApp_SSH</SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>81.2.69.143</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Add User</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.source_user": "PSMPApp_SSH",
-        "cyberarkpas.audit.station": "34.71.250.247",
+        "cyberarkpas.audit.station": "81.2.69.143",
         "cyberarkpas.audit.timestamp": "Mar 14 05:57:16",
         "event.action": "add user",
         "event.category": [
@@ -618,26 +596,29 @@
         "fileset.name": "audit",
         "host.name": "VAULT",
         "input.type": "log",
-        "log.offset": 8235,
+        "log.offset": 8220,
         "log.syslog.priority": "5",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "34.71.250.247"
+            "81.2.69.143"
         ],
         "related.user": [
             "PSMPApp_SSH"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "34.71.250.247",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 37.751,
-        "source.geo.location.lon": -97.822,
-        "source.ip": "34.71.250.247",
+        "source.address": "81.2.69.143",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5142,
+        "source.geo.location.lon": -0.0931,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "81.2.69.143",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"
@@ -651,11 +632,11 @@
         "cyberarkpas.audit.iso_timestamp": "2021-03-14T12:57:21Z",
         "cyberarkpas.audit.issuer": "Administrator",
         "cyberarkpas.audit.message": "Add User",
-        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 14 05:57:21</Timestamp>\n    <IsoTimestamp>2021-03-14T12:57:21Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>180</MessageID>\n    <Desc>Add User</Desc>\n    <Severity>Info</Severity>\n    <Issuer>Administrator</Issuer>\n    <Action>Add User</Action>\n    <SourceUser>PSMP_ADB_asr-cyberark-psm-ssh</SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>34.71.250.247</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Add User</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 14 05:57:21</Timestamp>\n    <IsoTimestamp>2021-03-14T12:57:21Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>180</MessageID>\n    <Desc>Add User</Desc>\n    <Severity>Info</Severity>\n    <Issuer>Administrator</Issuer>\n    <Action>Add User</Action>\n    <SourceUser>PSMP_ADB_asr-cyberark-psm-ssh</SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>81.2.69.143</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Add User</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
         "cyberarkpas.audit.rfc5424": true,
         "cyberarkpas.audit.severity": "Info",
         "cyberarkpas.audit.source_user": "PSMP_ADB_asr-cyberark-psm-ssh",
-        "cyberarkpas.audit.station": "34.71.250.247",
+        "cyberarkpas.audit.station": "81.2.69.143",
         "cyberarkpas.audit.timestamp": "Mar 14 05:57:21",
         "event.action": "add user",
         "event.category": [
@@ -675,26 +656,29 @@
         "fileset.name": "audit",
         "host.name": "VAULT",
         "input.type": "log",
-        "log.offset": 9641,
+        "log.offset": 9622,
         "log.syslog.priority": "5",
         "observer.hostname": "VAULT",
         "observer.product": "Vault",
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "34.71.250.247"
+            "81.2.69.143"
         ],
         "related.user": [
             "PSMP_ADB_asr-cyberark-psm-ssh"
         ],
         "service.type": "cyberarkpas",
-        "source.address": "34.71.250.247",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 37.751,
-        "source.geo.location.lon": -97.822,
-        "source.ip": "34.71.250.247",
+        "source.address": "81.2.69.143",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5142,
+        "source.geo.location.lon": -0.0931,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "81.2.69.143",
         "tags": [
             "cyberarkpas.audit",
             "forwarded"

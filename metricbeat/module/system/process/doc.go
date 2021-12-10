@@ -46,7 +46,9 @@ An example event looks as following:
       },
       "name": "ReportCrash",
       "pid": 97801,
-      "ppid": 1,
+      "parent": {
+        "pid": 1
+      },
       "state": "running",
       "username": "elastic"
     }

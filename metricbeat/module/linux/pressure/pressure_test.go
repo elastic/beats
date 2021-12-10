@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux
 // +build linux
 
 package pressure
@@ -27,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v7/metricbeat/module/linux"
 )
 
 func TestFetch(t *testing.T) {

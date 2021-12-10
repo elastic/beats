@@ -33,6 +33,37 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         self.wait_until(lambda: self.log_contains("heartbeat is running"))
         heartbeat_proc.check_kill_and_wait()
 
+    def test_run_once(self):
+        """
+        Basic test with exiting Heartbeat normally
+        """
+
+        config = {
+            "run_once": True,
+            "monitors": [
+                {
+                    "type": "http",
+                    "id": "http-check",
+                    "urls": ["http://localhost:9200"],
+                },
+                {
+                    "type": "tcp",
+                    "id": "tcp-check",
+                    "hosts": ["localhost:9200"],
+                }
+            ]
+        }
+
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            **config
+        )
+
+        heartbeat_proc = self.start_beat()
+        self.wait_until(lambda: self.output_has(lines=2))
+        self.wait_until(lambda: self.log_contains("Ending run_once run"))
+        heartbeat_proc.check_wait()
+
     def test_disabled(self):
         """
         Basic test against a disabled monitor
@@ -54,7 +85,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         )
 
         heartbeat_proc = self.start_beat()
-        self.wait_until(lambda: self.log_contains("skipping disabled monitor"))
+        self.wait_until(lambda: self.log_contains("heartbeat is running"))
         heartbeat_proc.check_kill_and_wait()
 
     def test_fields_under_root(self):
@@ -163,9 +194,9 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         return doc
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    def test_template(self):
+    def test_index_management(self):
         """
-        Test that the template can be loaded with `setup --template`
+        Test that the template can be loaded with `setup --index-management`
         """
         es = Elasticsearch([self.get_elasticsearch_url()])
         self.render_config_template(
@@ -175,7 +206,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
             }],
             elasticsearch={"host": self.get_elasticsearch_url()},
         )
-        exit_code = self.run_beat(extra_args=["setup", "--template"])
+        exit_code = self.run_beat(extra_args=["setup", "--index-management"])
 
         assert exit_code == 0
         assert self.log_contains('Loaded index template')

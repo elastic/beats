@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build (linux && 386) || (linux && amd64)
 // +build linux,386 linux,amd64
 
 package socket
@@ -185,6 +186,15 @@ var sharedKProbes = []helper.ProbeDef{
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(commitCreds) }),
 	},
 
+	{
+		Probe: tracing.Probe{
+			Type:      tracing.TypeKRetProbe,
+			Name:      "clone3_ret",
+			Address:   "{{.DO_FORK}}",
+			Fetchargs: "retval={{.RET}}",
+		},
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(forkRet) }),
+	},
 	/***************************************************************************
 	 * IPv4
 	 **************************************************************************/

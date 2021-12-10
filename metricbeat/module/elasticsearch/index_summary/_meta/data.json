@@ -2,68 +2,68 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "elasticsearch": {
         "cluster": {
-            "id": "8l_zoGznQRmtoX9iSC-goA",
+            "id": "WocBBA0QRma0sGpdQ7vLfQ",
             "name": "docker-cluster"
         },
         "index": {
             "summary": {
                 "primaries": {
                     "docs": {
-                        "count": 1257,
-                        "deleted": 11
+                        "count": 74,
+                        "deleted": 1424
                     },
                     "indexing": {
                         "index": {
-                            "count": 1885
+                            "count": 1495
                         }
                     },
                     "search": {
                         "query": {
-                            "count": 81,
+                            "count": 15307,
                             "time": {
-                                "ms": 39
+                                "ms": 2912
                             }
                         }
                     },
                     "segments": {
-                        "count": 20,
+                        "count": 21,
                         "memory": {
-                            "bytes": 190357
+                            "bytes": 70532
                         }
                     },
                     "store": {
                         "size": {
-                            "bytes": 1686190
+                            "bytes": 44131181
                         }
                     }
                 },
                 "total": {
                     "docs": {
-                        "count": 1257,
-                        "deleted": 11
+                        "count": 74,
+                        "deleted": 1424
                     },
                     "indexing": {
                         "index": {
-                            "count": 1885
+                            "count": 1495
                         }
                     },
                     "search": {
                         "query": {
-                            "count": 81,
+                            "count": 15307,
                             "time": {
-                                "ms": 39
+                                "ms": 2912
                             }
                         }
                     },
                     "segments": {
-                        "count": 20,
+                        "count": 21,
                         "memory": {
-                            "bytes": 190357
+                            "bytes": 70532
                         }
                     },
                     "store": {
                         "size": {
-                            "bytes": 1686190
+                            "bytes": 44131181
                         }
                     }
                 }
@@ -80,7 +80,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:32943",
+        "address": "172.19.0.2:9200",
         "name": "elasticsearch",
         "type": "elasticsearch"
     }

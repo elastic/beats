@@ -2050,14 +2050,14 @@ processors:
 - rename:
     ignore_failure: true
     field: auditd.log.ppid
-    target_field: process.ppid
+    target_field: process.parent.pid
 - convert:
     ignore_missing: true
     field: process.pid
     type: long
 - convert:
     ignore_missing: true
-    field: process.ppid
+    field: process.parent.pid
     type: long
 - rename:
     ignore_failure: true

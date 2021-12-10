@@ -1595,6 +1595,32 @@ var security = (function () {
         [0x00010000, 'Delete']
     ];
 
+    // https://docs.microsoft.com/en-us/windows/win32/secauthz/access-rights-and-access-masks
+    var accessMaskDescriptions = [
+        [0x00000001, 'Create Child'],
+        [0x00000002, 'Delete Child'],
+        [0x00000004, 'List Contents'],
+        [0x00000008, 'SELF'],
+        [0x00000010, 'Read Property'],
+        [0x00000020, 'Write Property'],
+        [0x00000040, 'Delete Treee'],
+        [0x00000080, 'List Object'],
+        [0x00000100, 'Control Access'],
+        [0x00010000, 'DELETE'],
+        [0x00020000, 'READ_CONTROL'],
+        [0x00040000, 'WRITE_DAC'],
+        [0x00080000, 'WRITE_OWNER'],
+        [0x00100000, 'SYNCHRONIZE'],
+        [0x00F00000, 'STANDARD_RIGHTS_REQUIRED'],
+        [0x001F0000, 'STANDARD_RIGHTS_ALL'],
+        [0x0000FFFF, 'SPECIFIC_RIGHTS_ALL'],
+        [0x01000000, 'ADS_RIGHT_ACCESS_SYSTEM_SECURITY'],
+        [0x10000000, 'ADS_RIGHT_GENERIC_ALL'],
+        [0x20000000, 'ADS_RIGHT_GENERIC_EXECUTE'],
+        [0x40000000, 'ADS_RIGHT_GENERIC_WRITE'],
+        [0x80000000, 'ADS_RIGHT_GENERIC_READ']
+    ];
+
     // lookupMessageCode returns the string associated with the code. key should
     // be the name of the field in evt containing the code (e.g. %%2313).
     var lookupMessageCode = function (evt, key) {
@@ -1844,6 +1870,22 @@ var security = (function () {
         }
     };
 
+    var translateAccessMask = function(mask) {
+        if (!mask) {
+            return;
+        }
+        var accessCode = parseInt(mask);
+        var accessResult = [];
+        for (var i = 0; i < accessMaskDescriptions.length; i++) {
+            if ((accessCode | accessMaskDescriptions[i][0]) === accessCode) {
+                accessResult.push(accessMaskDescriptions[i][1]);
+            }
+        }
+        if (accessResult) {
+            return accessResult;
+        }
+    };
+
     var addSessionData = new processor.Chain()
         .Convert({
             fields: [
@@ -1907,14 +1949,14 @@ var security = (function () {
 
     var copyTargetUser = function(evt) {
         var targetUserId = evt.Get("winlog.event_data.TargetUserSid");
+        if (!targetUserId) targetUserId = evt.Get("winlog.event_data.TargetSid");
         if (targetUserId) {
             if (evt.Get("user.id")) evt.Put("user.target.id", targetUserId);
             else evt.Put("user.id", targetUserId);
         }
-
         var targetUserName = evt.Get("winlog.event_data.TargetUserName");
         if (targetUserName) {
-            if (/.@*/.test(targetUserName)) {
+            if (targetUserName.indexOf('@')>0) {
                 targetUserName = targetUserName.split('@')[0];
             }
 
@@ -1930,6 +1972,71 @@ var security = (function () {
         }
     }
 
+    var removeIfEmptyOrHyphen = function(evt, key) {
+        var val = evt.Get(key);
+        if (!val || val === "-") {
+            evt.Delete(key);
+            return true;
+        }
+        return false;
+    }
+
+    var copyTargetUserToEffective = new processor.Chain()
+        .Convert({
+            fields: [
+                {from: "winlog.event_data.TargetUserSid", to: "user.effective.id"},
+                {from: "winlog.event_data.TargetUserName", to: "user.effective.name"},
+                {from: "winlog.event_data.TargetDomainName", to: "user.effective.domain"},
+            ],
+            ignore_missing: true,
+        })
+        .Add(function(evt) {
+            var user = evt.Get("winlog.event_data.TargetUserName");
+            if (user) {
+                if (user.indexOf('@')>0) {
+                    user = user.split('@')[0];
+                    evt.Put('user.effective.name', user);
+                }
+            }
+        })
+        .Add(function(evt) {
+            if (!removeIfEmptyOrHyphen(evt, "user.effective.name")) {
+                evt.AppendTo("related.user", evt.Get("user.effective.name"));
+            }
+            removeIfEmptyOrHyphen(evt, "user.effective.domain");
+            removeIfEmptyOrHyphen(evt, "user.effective.id");
+        })
+        .Build();
+
+    var copyTargetUserToTarget = new processor.Chain()
+        .Convert({
+            fields: [
+                {from: "winlog.event_data.TargetSid", to: "user.target.id"},
+                {from: "winlog.event_data.TargetUserName", to: "user.target.name"},
+                {from: "winlog.event_data.TargetDomainName", to: "user.target.domain"},
+            ],
+            ignore_missing: true,
+        })
+        .Add(function(evt) {
+            var user = evt.Get("winlog.event_data.TargetUserName");
+            if (user) {
+                if (user.indexOf('@')>0) {
+                    user = user.split('@')[0];
+                    evt.Put('user.target.name', user);
+                }
+                evt.AppendTo('related.user', user);
+            }
+        })
+        .Add(function(evt) {
+            if (!removeIfEmptyOrHyphen(evt, "user.target.name")) {
+                evt.AppendTo("related.user", evt.Get("user.target.name"));
+            }
+            removeIfEmptyOrHyphen(evt, "user.target.domain");
+            removeIfEmptyOrHyphen(evt, "user.target.id");
+        })
+        .Build();
+
+
     var copyMemberToUser = function(evt) {
         var member = evt.Get("winlog.event_data.MemberName");
         if (!member) {
@@ -1940,6 +2047,11 @@ var security = (function () {
 
         evt.AppendTo("related.user", userName);
         evt.Put("user.target.name", userName);
+
+        var domainName = member.split(',')[3];
+        if (domainName) {
+            evt.Put("user.target.domain", domainName.replace('DC=', '').replace('dc=', ''));
+        }
     }
 
     var copyTargetUserToGroup = new processor.Chain()
@@ -2130,10 +2242,11 @@ var security = (function () {
 
     // Handles both 4648
     var event4648 = new processor.Chain()
-        .Add(copyTargetUser)
+        .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
+        .Add(copyTargetUserToEffective)
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.SubjectUserName");
             if (user) {
@@ -2173,16 +2286,8 @@ var security = (function () {
         .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
         .Add(renameNewProcessFields)
+        .Add(copyTargetUserToEffective)
         .Add(addEventFields)
-        .Add(function(evt) {
-            var user = evt.Get("winlog.event_data.TargetUserName");
-            if (user) {
-                var res = /^-$/.test(user);
-                    if (!res) {
-                        evt.AppendTo('related.user', user);
-                    }
-            }
-        })
         .Build();
 
     var event4689 = new processor.Chain()
@@ -2206,10 +2311,7 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addUACDescription)
         .Add(addEventFields)
-        .Add(function(evt) {
-            var user = evt.Get("winlog.event_data.TargetUserName");
-            evt.AppendTo('related.user', user);
-        })
+        .Add(copyTargetUserToTarget)
         .Build();
 
     var userRenamed = new processor.Chain()
@@ -2221,6 +2323,12 @@ var security = (function () {
             evt.AppendTo('related.user', userNew);
             var userOld = evt.Get("winlog.event_data.OldTargetUserName");
             evt.AppendTo('related.user', userOld);
+            if (userOld) {
+                evt.Put('user.target.name', userOld);
+            }
+            if (userNew) {
+                evt.Put('user.changes.name', userNew);
+            }
         })
         .Build();
 
@@ -2323,22 +2431,44 @@ var security = (function () {
             evt.Put("winlog.event_data.PrivilegeList", privs.split(/\s+/));
         })
         .Add(function(evt){
-            var maskCodes = evt.Get("winlog.event_data.AccessMask");
-            if (!maskCodes) {
+            var accessMask = evt.Get("winlog.event_data.AccessMask");
+            if (!accessMask) {
                 return;
             }
-            var maskList = maskCodes.replace(/\s+/g, '').split("%%").filter(String);
-            evt.Put("winlog.event_data.AccessMask", maskList);
-            var maskResults = [];
-            for (var j = 0; j < maskList.length; j++) {
-                var description = msobjsMessageTable[maskList[j]];
-                if (description === undefined) {
-                    return;
-                }
-                maskResults.push(description);
+            var accessDescriptions = translateAccessMask(accessMask);
+            if (!accessDescriptions) {
+                return;
             }
-            evt.Put("winlog.event_data.AccessMaskDescription", maskResults);
+            if (accessDescriptions.length > 0) {
+                evt.Put("winlog.event_data.AccessMaskDescription", accessDescriptions);
+            }
         })
+        .Add(function(evt){
+            var listNames = ["AccessList", "AccessMask"]
+            for (var i = 0; i < listNames.length; i++) {
+                var listContents = evt.Get("winlog.event_data." + listNames[i])
+                if (!listContents) {
+                    continue;
+                }
+                var listDescription = evt.Get("winlog.event_data." + listNames[i] + "Description")
+                if (listDescription) {
+                    continue;
+                }
+
+                var items = listContents.replace(/\s+/g, '').split("%%").filter(String);
+                evt.Put("winlog.event_data." + listNames[i], items)
+                var results = [];
+                for (var j = 0; j < items.length; j++) {
+                    var description = msobjsMessageTable[items[j]];
+                    if (description === undefined) {
+                        continue;
+                    }
+                    results.push(description);
+                }
+                evt.Put("winlog.event_data." + listNames[i] + "Description", results);
+            }
+        })
+
         .Build();
 
     var trustDomainMgmtEvts = new processor.Chain()
@@ -2359,6 +2489,7 @@ var security = (function () {
         .Add(copySubjectUserLogonId)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
+        .Add(copyTargetUserToTarget)
         .Add(function(evt) {
             var oldSd = evt.Get("winlog.event_data.OldSd");
             var newSd = evt.Get("winlog.event_data.NewSd");

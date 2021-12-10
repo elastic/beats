@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration && (darwin || freebsd || linux || openbsd || windows)
 // +build !integration
 // +build darwin freebsd linux openbsd windows
 
@@ -59,7 +60,7 @@ func TestFileSystemList(t *testing.T) {
 			assert.True(t, (stat.Used >= 0))
 
 			if runtime.GOOS != "windows" {
-				assert.NotEqual(t, "", stat.SysTypeName)
+				assert.NotEqual(t, "", fs.SysTypeName)
 			}
 		}
 	}

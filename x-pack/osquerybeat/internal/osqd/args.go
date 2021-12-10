@@ -79,7 +79,20 @@ var protectedFlags = Flags{
 
 	// The delimiter for a full query name that is concatenated as "pack_" + {{pack name}} + "_" + {{query name}} by default
 	"pack_delimiter": "_",
-	"config_refresh": 10,
+
+	// Refresh config every 60 seconds
+	// The previous setting was 10 seconds which is unnecessary frequent.
+	// Osquery does not expect that frequent policy/configuration changes
+	// and can tolerate non real-time configuration change application.
+	"config_refresh": 60,
+}
+
+func init() {
+	// Append platform specific flags
+	plArgs := platformArgs()
+	for k, v := range plArgs {
+		protectedFlags[k] = v
+	}
 }
 
 func convertToArgs(flags Flags) Args {

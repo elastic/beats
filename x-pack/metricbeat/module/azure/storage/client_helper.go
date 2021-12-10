@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-10-01/resources"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
@@ -18,7 +18,7 @@ const resourceIDExtension = "/default"
 const serviceTypeNamespaceExtension = "Services"
 
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
-func mapMetrics(client *azure.Client, resources []resources.GenericResource, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
+func mapMetrics(client *azure.Client, resources []resources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
 	var metrics []azure.Metric
 	// list all storage account namespaces for this metricset
 	namespaces := []string{defaultStorageAccountNamespace}

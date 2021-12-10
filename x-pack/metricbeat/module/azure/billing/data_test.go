@@ -8,7 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
+	prevConsumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
+	consumption "github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 	"github.com/Azure/go-autorest/autorest/date"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
@@ -36,7 +37,7 @@ func TestEventMapping(t *testing.T) {
 		ChargeType:       "Actual",
 		ConfidenceLevels: nil,
 	}
-	var prop1 = consumption.UsageDetailProperties{
+	var prop1 = prevConsumption.UsageDetailProperties{
 		InstanceName:     &name,
 		SubscriptionName: &name,
 		AccountName:      &name,
@@ -47,7 +48,7 @@ func TestEventMapping(t *testing.T) {
 		UsageEnd:         &startDate,
 	}
 	usage := Usage{
-		UsageDetails: []consumption.UsageDetail{
+		UsageDetails: []prevConsumption.UsageDetail{
 			{
 				UsageDetailProperties: &prop1,
 				ID:                    nil,
@@ -73,7 +74,7 @@ func TestEventMapping(t *testing.T) {
 				Tags:               nil,
 			}},
 	}
-	events := EventsMapping(usage)
+	events := EventsMapping("sub", usage)
 	assert.Equal(t, len(events), 2)
 	for _, event := range events {
 

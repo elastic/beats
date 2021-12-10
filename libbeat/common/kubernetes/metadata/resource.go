@@ -85,7 +85,7 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 		return nil
 	}
 
-	labelMap := common.MapStr{}
+	var labelMap common.MapStr
 	if len(r.config.IncludeLabels) == 0 {
 		labelMap = GenerateMap(accessor.GetLabels(), r.config.LabelsDedot)
 	} else {
@@ -107,7 +107,6 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 	}
 
 	if accessor.GetNamespace() != "" {
-		// TODO make this namespace.name in 8.0
 		safemapstr.Put(meta, "namespace", accessor.GetNamespace())
 	}
 

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
+	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 
 	"github.com/shopspring/decimal"
 
@@ -17,7 +17,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-func EventsMapping(results Usage) []mb.Event {
+func EventsMapping(subscriptionId string, results Usage) []mb.Event {
 	var events []mb.Event
 	if len(results.UsageDetails) > 0 {
 		for _, usageDetail := range results.UsageDetails {
@@ -75,6 +75,9 @@ func EventsMapping(results Usage) []mb.Event {
 		event := mb.Event{
 			RootFields: common.MapStr{
 				"cloud.provider": "azure",
+			},
+			ModuleFields: common.MapStr{
+				"subscription_id": subscriptionId,
 			},
 			MetricSetFields: common.MapStr{
 				"actual_cost":   actualCost,

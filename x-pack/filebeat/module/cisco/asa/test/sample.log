@@ -69,19 +69,19 @@ Jan 14 2015 13:16:14: %ASA-4-338008: Dynamic Filter dropped blacklisted TCP traf
 Nov 16 2009 14:12:35: %ASA-5-304001: 10.30.30.30 Accessed URL 192.0.2.1:/app
 Nov 16 2009 14:12:36: %ASA-5-304001: 10.5.111.32 Accessed URL 192.0.2.32:http://example.com
 Nov 16 2009 14:12:37: %ASA-5-304002: Access denied URL http://www.example.net/images/favicon.ico SRC 10.69.6.39 DEST 192.0.0.19 on interface inside
-Jan 13 2021 19:12:37: %ASA-6-302013: Built inbound TCP connection 27215708 for internet:10.2.3.4/49926 (1.2.3.4/49926)(LOCAL\username) to vlan-42:1.2.3.4/80 (1.2.3.4/80) (username)
+Jan 13 2021 19:12:37: %ASA-6-302013: Built inbound TCP connection 27215708 for internet:10.2.3.4/49926 (81.2.69.143/49926)(LOCAL\username) to vlan-42:81.2.69.143/80 (81.2.69.143/80) (username)
 Jan 13 2021 19:12:37: %ASA-5-304001: USER001@192.168.0.1(LOCAL\USER001) Accessed URL 172.17.6.211:http://testingserver.com/somewebpage.html
-Jan 13 2021 19:12:37: %ASA-5-302013: Built inbound TCP connection 195207391 for OUTSIDE:85.0.0.1/12312 (62.0.0.1/34534)(LOCAL\USER001) to OUTSIDE:81.0.0.1/443 (81.0.0.1/443) (USER001)
-Jan 13 2021 19:12:37: %ASA-5-302013: Built inbound TCP connection 195207391 for OUTSIDE:85.0.0.1/12312 (62.0.0.1/34534)(LOCAL\user@domain.tld) to OUTSIDE:81.0.0.1/443 (81.0.0.1/443) (user@domain.tld)
-Jan 13 2021 19:12:37: %ASA-5-302020: Built inbound ICMP connection for faddr 85.0.0.1/0(LOCAL\USER001) gaddr 81.0.0.1/0 laddr 81.0.0.1/0 (USER001) type 3 code 3
-Jan 13 2021 19:12:37: %ASA-5-302020: Built inbound ICMP connection for faddr 85.0.0.1/0(LOCAL\user@domain.tld) gaddr 81.0.0.1/0 laddr 81.0.0.1/0 (user@domain.tld) type 3 code 3
-Jan 13 2021 19:12:37: %ASA-5-302020: Built inbound ICMP connection for faddr 85.0.0.1/0(AD\USER002) gaddr 81.0.0.1/0 laddr 81.0.0.1/0 (USER002) type 3 code 3
+Jan 13 2021 19:12:37: %ASA-5-302013: Built inbound TCP connection 195207391 for OUTSIDE:1.128.3.4/12312 (62.0.0.1/34534)(LOCAL\USER001) to OUTSIDE:89.160.20.156/443 (89.160.20.156/443) (USER001)
+Jan 13 2021 19:12:37: %ASA-5-302013: Built inbound TCP connection 195207391 for OUTSIDE:1.128.3.4/12312 (62.0.0.1/34534)(LOCAL\user@domain.tld) to OUTSIDE:89.160.20.156/443 (89.160.20.156/443) (user@domain.tld)
+Jan 13 2021 19:12:37: %ASA-5-302020: Built inbound ICMP connection for faddr 1.128.3.4/0(LOCAL\USER001) gaddr 89.160.20.156/0 laddr 89.160.20.156/0 (USER001) type 3 code 3
+Jan 13 2021 19:12:37: %ASA-5-302020: Built inbound ICMP connection for faddr 1.128.3.4/0(LOCAL\user@domain.tld) gaddr 89.160.20.156/0 laddr 89.160.20.156/0 (user@domain.tld) type 3 code 3
+Jan 13 2021 19:12:37: %ASA-5-302020: Built inbound ICMP connection for faddr 1.128.3.4/0(AD\USER002) gaddr 89.160.20.156/0 laddr 89.160.20.156/0 (USER002) type 3 code 3
 Jan 15 2021 19:12:37: %ASA-6-305012: Teardown dynamic TCP translation from OUTSIDE:192.168.0.1/59677(LOCAL\USER001) to OUTSIDE:75.0.0.1/18449 duration 0:00:00
 Jan 15 2021 19:12:37: %ASA-6-302021: Teardown ICMP connection for faddr ff02::1/0 gaddr fe80::2205:baff:fe9d:f637/0 laddr fe80::2205:baff:fe9d:f637/0 type 134 code 0
 Jan 15 2021 19:12:37: %ASA-6-302013: Built inbound TCP connection 251933191 for OUTSIDE:fe00::fede:bbe1/62477 (fe00::fede:bbe1/62477) to OUTSIDE:2a03:2880:f253:cb:face:b00c:0:43fe/443 (2a03:2880:f253:cb:face:b00c:0:43fe/443) (soc@danskecommodities.com)
-Jan 15 2021 19:12:37: %ASA-6-305012: Teardown dynamic TCP translation from OUTSIDE:81.0.0.1/50120(LOCAL\domain\USER001) to OUTSIDE:181.0.0.1/50120 duration 0:02:05
-Jan 15 2021 19:12:37: %ASA-6-302014: Teardown TCP connection 261246338 for OUTSIDE:81.0.0.1/50120(LOCAL\domain\USER001) to OUTSIDE:40.0.0.1/443 duration 0:02:05 bytes 9610 TCP FINs from OUTSIDE (domain\USER001)
-Jan 15 2021 19:12:37: %ASA-6-302015: Built inbound UDP connection 261311655 for OUTSIDE:81.0.0.1/63790 (82.0.0.1/63790)(LOCAL\domain\USER001) to INSIDE:192.168.0.1/53 (192.168.0.1/53) (domain\USER001)
-Jan 15 2021 19:12:37: %ASA-6-302016: Teardown UDP connection 261311655 for OUTSIDE:81.0.0.1/63790(LOCAL\domain\USER001) to INSIDE:192.168.0.1/53 duration 0:00:00 bytes 139 (domain\USER001)
-Jan 15 2021 19:12:37: %ASA-6-302013: Built inbound TCP connection 261246338 for OUTSIDE:81.0.0.1/50120 (82.0.0.1/50120)(LOCAL\domain\USER001) to OUTSIDE:40.0.0.1/443 (40.0.0.1/443) (domain\USER001)
-Jul 29 2021 08:35:29: %ASA-6-602304: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xABCXYZ) between 12.12.12.12 and 12.12.12.12 (user= 12.12.12.12) has been deleted.
+Jan 15 2021 19:12:37: %ASA-6-305012: Teardown dynamic TCP translation from OUTSIDE:89.160.20.156/50120(LOCAL\domain\USER001) to OUTSIDE:189.160.20.156/50120 duration 0:02:05
+Jan 15 2021 19:12:37: %ASA-6-302014: Teardown TCP connection 261246338 for OUTSIDE:89.160.20.156/50120(LOCAL\domain\USER001) to OUTSIDE:40.0.0.1/443 duration 0:02:05 bytes 9610 TCP FINs from OUTSIDE (domain\USER001)
+Jan 15 2021 19:12:37: %ASA-6-302015: Built inbound UDP connection 261311655 for OUTSIDE:89.160.20.156/63790 (67.43.156.13/63790)(LOCAL\domain\USER001) to INSIDE:192.168.0.1/53 (192.168.0.1/53) (domain\USER001)
+Jan 15 2021 19:12:37: %ASA-6-302016: Teardown UDP connection 261311655 for OUTSIDE:89.160.20.156/63790(LOCAL\domain\USER001) to INSIDE:192.168.0.1/53 duration 0:00:00 bytes 139 (domain\USER001)
+Jan 15 2021 19:12:37: %ASA-6-302013: Built inbound TCP connection 261246338 for OUTSIDE:89.160.20.156/50120 (67.43.156.13/50120)(LOCAL\domain\USER001) to OUTSIDE:40.0.0.1/443 (40.0.0.1/443) (domain\USER001)
+Jul 29 2021 08:35:29: %ASA-6-602304: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xABCXYZ) between 81.2.69.1452 and 81.2.69.1452 (user= 81.2.69.1452) has been deleted.

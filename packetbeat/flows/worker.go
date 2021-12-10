@@ -107,7 +107,7 @@ func makeWorker(
 		if align > 0 {
 			// round time to nearest 10 seconds for alignment
 			aligned := time.Unix(((time.Now().Unix()+(align-1))/align)*align, 0)
-			waitStart := aligned.Sub(time.Now())
+			waitStart := time.Until(aligned)
 			debugf("worker wait start(%v): %v", aligned, waitStart)
 			if cont := w.sleep(waitStart); !cont {
 				return

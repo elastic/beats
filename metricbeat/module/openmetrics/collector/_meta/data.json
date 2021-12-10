@@ -15,7 +15,7 @@
             "job": "openmetrics"
         },
         "metrics": {
-            "node_network_carrier": 0
+            "up": 1
         }
     },
     "service": {

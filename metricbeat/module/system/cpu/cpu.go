@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build darwin || freebsd || linux || openbsd || windows || aix
 // +build darwin freebsd linux openbsd windows aix
 
 package cpu
@@ -23,6 +24,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/cpu"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -57,11 +59,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if config.CPUTicks != nil && *config.CPUTicks {
 		config.Metrics = append(config.Metrics, "ticks")
 	}
-
+	sys := base.Module().(resolve.Resolver)
 	return &MetricSet{
 		BaseMetricSet: base,
 		opts:          opts,
-		cpu:           metrics.New(""),
+		cpu:           metrics.New(sys),
 	}, nil
 }
 

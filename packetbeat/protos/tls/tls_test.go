@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package tls
@@ -324,6 +325,7 @@ func TestCompletedHandshake(t *testing.T) {
 
 	// Then a change cypher spec message
 	reqData, err = hex.DecodeString(rawChangeCipherSpec)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 0, private)
 	assert.NotNil(t, private)
@@ -333,6 +335,24 @@ func TestCompletedHandshake(t *testing.T) {
 	private = tls.Parse(&req, tcpTuple, 1, private)
 	assert.NotNil(t, private)
 	assert.NotEmpty(t, results.events)
+
+	// #19039
+	// If tls.detailed.client_certificate or
+	// tls.detailed.server_certificate
+	// are present they are removed in favor of
+	// tls.client.x509 and tls.server.x509
+	// check if the resultant event indeed has no
+	// client_certificate and has the corresponding
+	// x509 entries
+	assert.Equal(t, true, tls.includeDetailedFields,
+		"Turn on includeDetailedFields or the following tests will fail")
+	event := results.events[0]
+	flatEvent := event.Fields.Flatten()
+	_, err = flatEvent.GetValue("tls.detailed.client_certificate.subject.common_name")
+	assert.NotNil(t, err, "Expected tls.detailed.client_certificate to be removed")
+	// check the existence of a key
+	_, err = flatEvent.GetValue("tls.client.x509.version_number")
+	assert.Nil(t, err)
 }
 
 func TestTLS13VersionNegotiation(t *testing.T) {
@@ -374,6 +394,7 @@ func TestTLS13VersionNegotiation(t *testing.T) {
 			"9a75ab618828f1b9e418d168130100002e00330024001d002070b27700b360aa" +
 			"3941a22da86901c00e174dc3d83e13cf4159b34b3de6809372002b0002030414" +
 			"0303000101")
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 1, private)
 	assert.NotNil(t, private)
@@ -381,6 +402,7 @@ func TestTLS13VersionNegotiation(t *testing.T) {
 
 	// Then a change cypher spec from the client
 	reqData, err = hex.DecodeString(rawChangeCipherSpec)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 0, private)
 	assert.NotNil(t, private)
@@ -413,6 +435,7 @@ func TestLegacyVersionNegotiation(t *testing.T) {
 
 	// Then a server hello + change cypher spec
 	reqData, err = hex.DecodeString(rawServerHello + rawChangeCipherSpec)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 1, private)
 	assert.NotNil(t, private)
@@ -420,6 +443,7 @@ func TestLegacyVersionNegotiation(t *testing.T) {
 
 	// Then a change cypher spec from the client
 	reqData, err = hex.DecodeString(rawChangeCipherSpec)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 0, private)
 	assert.NotNil(t, private)

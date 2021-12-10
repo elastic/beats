@@ -20,11 +20,12 @@ package memory
 import (
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 // get is the linux implementation for fetching Memory data
-func get(rootfs string) (Memory, error) {
+func get(rootfs resolve.Resolver) (Memory, error) {
 	table, err := ParseMeminfo(rootfs)
 	if err != nil {
 		return Memory{}, errors.Wrap(err, "error fetching meminfo")
@@ -33,13 +34,14 @@ func get(rootfs string) (Memory, error) {
 	memData := Memory{}
 
 	var free, cached uint64
+	var ok bool
 	if total, ok := table["MemTotal"]; ok {
 		memData.Total = opt.UintWith(total)
 	}
-	if free, ok := table["MemFree"]; ok {
+	if free, ok = table["MemFree"]; ok {
 		memData.Free = opt.UintWith(free)
 	}
-	if cached, ok := table["Cached"]; ok {
+	if cached, ok = table["Cached"]; ok {
 		memData.Cached = opt.UintWith(cached)
 	}
 

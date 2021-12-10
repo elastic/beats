@@ -15,7 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build darwin freebsd linux windows
+//go:build darwin || freebsd || linux || windows || aix
+// +build darwin freebsd linux windows aix
 
 package network
 
@@ -25,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 func TestFetch(t *testing.T) {

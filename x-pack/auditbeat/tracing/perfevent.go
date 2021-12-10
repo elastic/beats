@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux
 // +build linux
 
 package tracing
@@ -98,7 +99,8 @@ func NewPerfChannel(cfg ...PerfChannelConf) (channel *PerfChannel, err error) {
 		streams:     make(map[uint64]stream),
 		pid:         perf.AllThreads,
 		attr: perf.Attr{
-			Type: perf.TracepointEvent,
+			Type:    perf.TracepointEvent,
+			ClockID: unix.CLOCK_MONOTONIC,
 			SampleFormat: perf.SampleFormat{
 				Raw:      true,
 				StreamID: true,

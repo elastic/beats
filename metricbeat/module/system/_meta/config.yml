@@ -17,8 +17,8 @@
   process.include_top_n:
     by_cpu: 5      # include top 5 processes by CPU
     by_memory: 5   # include top 5 processes by memory
-  # Configure the mount point of the host’s filesystem for use in monitoring a host from within a container
-  #system.hostfs: "/hostfs"
+# Configure the mount point of the host’s filesystem for use in monitoring a host from within a container
+# hostfs: "/hostfs"
 
 - module: system
   period: 1m

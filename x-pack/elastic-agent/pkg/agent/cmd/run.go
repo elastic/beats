@@ -142,10 +142,12 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 	}
 	defer control.Stop()
 
-	app, err := application.New(logger, pathConfigFile, rex, statusCtrl, control, agentInfo)
+	app, err := application.New(logger, rex, statusCtrl, control, agentInfo)
 	if err != nil {
 		return err
 	}
+
+	control.SetRouteFn(app.Routes)
 
 	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS(), cfg.Settings.MonitoringConfig, app)
 	if err != nil {
@@ -310,6 +312,10 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 		return nil, errors.New(err, "could not start the HTTP server for the API")
 	}
 	s.Start()
+
+	if cfg.Pprof {
+		s.AttachPprof()
+	}
 
 	// return server stopper
 	return s.Stop, nil

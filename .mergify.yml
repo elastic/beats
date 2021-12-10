@@ -1,8 +1,12 @@
+queue_rules:
+  - name: default
+    conditions:
+      - check-success=beats-ci/pr-merge
 pull_request_rules:
   - name: forward-port patches to master branch
     conditions:
       - merged
-      - label=backport-v8.0.0
+      - label=backport-v8.1.0
     actions:
       backport:
         assignees:
@@ -14,6 +18,8 @@ pull_request_rules:
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: ask to resolve conflict
     conditions:
+      - -merged
+      - -closed
       - conflict
     actions:
         comment:
@@ -26,9 +32,9 @@ pull_request_rules:
             git merge upstream/{{base}}
             git push upstream {{head}}
             ```
-  - name: automatic approval for mergify pull requests with bump updates
+  - name: automatic approval for automated pull requests with bump updates
     conditions:
-      - author=mergify[bot]
+      - author=apmmachine
       - check-success=beats-ci/pr-merge
       - label=automation
       - files~=^testing/environments/snapshot.*\.yml$
@@ -41,10 +47,11 @@ pull_request_rules:
       - check-success=beats-ci/pr-merge
       - label=automation
       - files~=^testing/environments/snapshot.*\.yml$
+      - "#approved-reviews-by>=1"
     actions:
-      merge:
+      queue:
         method: squash
-        strict: smart+fasttrack
+        name: default
   - name: delete upstream branch after merging changes on testing/environments/snapshot* or it's closed
     conditions:
       - or:
@@ -84,10 +91,11 @@ pull_request_rules:
       - label=automation
       - files~=^\.mergify\.yml$
       - head~=^add-backport-next.*
+      - "#approved-reviews-by>=1"
     actions:
-      merge:
+      queue:
         method: squash
-        strict: smart+fasttrack
+        name: default
   - name: delete upstream branch with changes on ^.mergify.yml that has been merged or closed
     conditions:
       - or:
@@ -99,10 +107,24 @@ pull_request_rules:
         - files~=^\.mergify\.yml$
     actions:
       delete_head_branch:
+  - name: notify the backport has not been merged yet
+    conditions:
+      - -merged
+      - -closed
+      - author=mergify[bot]
+      - "#check-success>0"
+      - schedule=Mon-Mon 06:00-10:00[Europe/Paris]
+      - "#assignee>=1"
+    actions:
+      comment:
+        message: |
+          This pull request has not been merged yet. Could you please review and merge it @{{ assignee | join(', @') }}? 🙏
   - name: notify the backport policy
     conditions:
       - -label~=^backport
       - base=master
+      - -merged
+      - -closed
     actions:
       comment:
         message: |
@@ -118,23 +140,12 @@ pull_request_rules:
   - name: remove-backport label
     conditions:
       - label~=backport-v
+      - -merged
+      - -closed
     actions:
       label:
         remove:
           - backport-skip
-  - name: backport patches to 7.x branch
-    conditions:
-      - merged
-      - label=backport-v7.16.0
-    actions:
-      backport:
-        assignees:
-          - "{{ author }}"
-        branches:
-          - "7.x"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 7.14 branch
     conditions:
       - merged
@@ -158,6 +169,32 @@ pull_request_rules:
           - "{{ author }}"
         branches:
           - "7.15"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 7.16 branch
+    conditions:
+      - merged
+      - label=backport-v7.16.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.16"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.0 branch
+    conditions:
+      - merged
+      - label=backport-v8.0.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.0"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"

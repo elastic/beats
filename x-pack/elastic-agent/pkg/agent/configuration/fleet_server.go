@@ -13,12 +13,13 @@ import (
 
 // FleetServerConfig is the configuration written so Elastic Agent can run Fleet Server.
 type FleetServerConfig struct {
-	Bootstrap bool                     `config:"bootstrap" yaml:"bootstrap,omitempty"`
-	Policy    *FleetServerPolicyConfig `config:"policy" yaml:"policy,omitempty"`
-	Output    FleetServerOutputConfig  `config:"output" yaml:"output,omitempty"`
-	Host      string                   `config:"host" yaml:"host,omitempty"`
-	Port      uint16                   `config:"port" yaml:"port,omitempty"`
-	TLS       *tlscommon.Config        `config:"ssl" yaml:"ssl,omitempty"`
+	Bootstrap    bool                     `config:"bootstrap" yaml:"bootstrap,omitempty"`
+	Policy       *FleetServerPolicyConfig `config:"policy" yaml:"policy,omitempty"`
+	Output       FleetServerOutputConfig  `config:"output" yaml:"output,omitempty"`
+	Host         string                   `config:"host" yaml:"host,omitempty"`
+	Port         uint16                   `config:"port" yaml:"port,omitempty"`
+	InternalPort uint16                   `config:"internal_port" yaml:"internal_port,omitempty"`
+	TLS          *tlscommon.Config        `config:"ssl" yaml:"ssl,omitempty"`
 }
 
 // FleetServerPolicyConfig is the configuration for the policy Fleet Server should run on.
@@ -47,7 +48,7 @@ type Elasticsearch struct {
 }
 
 // ElasticsearchFromConnStr returns an Elasticsearch configuration from the connection string.
-func ElasticsearchFromConnStr(conn string, serviceToken string) (Elasticsearch, error) {
+func ElasticsearchFromConnStr(conn string, serviceToken string, insecure bool) (Elasticsearch, error) {
 	u, err := url.Parse(conn)
 	if err != nil {
 		return Elasticsearch{}, err
@@ -63,6 +64,11 @@ func ElasticsearchFromConnStr(conn string, serviceToken string) (Elasticsearch, 
 		Hosts:    []string{u.Host},
 		Path:     u.Path,
 		TLS:      nil,
+	}
+	if insecure {
+		cfg.TLS = &tlscommon.Config{
+			VerificationMode: tlscommon.VerifyNone,
+		}
 	}
 	if serviceToken != "" {
 		cfg.ServiceToken = serviceToken

@@ -105,6 +105,13 @@ only be adjusted when there are multiple Filebeats or multiple Filebeat inputs
 collecting logs from the same region and AWS account.
 
 [float]
+==== `latency`
+Some AWS services send logs to CloudWatch with a latency to process larger than
+`aws-cloudwatch` input `scan_frequency`. This case, please specify a `latency`
+parameter so collection start time and end time will be shifted by the given
+latency amount.
+
+[float]
 ==== `aws credentials`
 In order to make AWS API calls, `aws-cloudwatch` input requires AWS credentials.
 Please see <<aws-credentials-config,AWS credentials options>> for more details.

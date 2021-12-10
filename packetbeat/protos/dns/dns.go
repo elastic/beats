@@ -59,17 +59,9 @@ type dnsPlugin struct {
 	watcher procs.ProcessesWatcher
 }
 
-var (
-	debugf = logp.MakeDebug("dns")
-)
+var debugf = logp.MakeDebug("dns")
 
 const maxDNSTupleRawSize = 16 + 16 + 2 + 2 + 4 + 1
-
-// Constants used to associate the DNS QR flag with a meaningful value.
-const (
-	query    = false
-	response = true
-)
 
 // Transport protocol.
 type transport uint8
@@ -203,13 +195,12 @@ func (dns *dnsPlugin) getTransaction(k hashableDNSTuple) *dnsTransaction {
 }
 
 type dnsTransaction struct {
-	ts           time.Time // Time when the request was received.
-	tuple        dnsTuple  // Key used to track this transaction in the transactionsMap.
-	responseTime int32     // Elapsed time in milliseconds between the request and response.
-	src          common.Endpoint
-	dst          common.Endpoint
-	transport    transport
-	notes        []string
+	ts        time.Time // Time when the request was received.
+	tuple     dnsTuple  // Key used to track this transaction in the transactionsMap.
+	src       common.Endpoint
+	dst       common.Endpoint
+	transport transport
+	notes     []string
 
 	request  *dnsMessage
 	response *dnsMessage
@@ -615,6 +606,9 @@ func rrsToMapStrs(records []mkdns.RR, ipList bool) ([]common.MapStr, []string) {
 		mapStr["ttl"] = strconv.FormatInt(int64(rrHeader.Ttl), 10)
 		mapStrSlice = append(mapStrSlice, mapStr)
 	}
+	if len(mapStrSlice) == 0 {
+		mapStrSlice = nil
+	}
 	return mapStrSlice, allIPs
 }
 
@@ -687,10 +681,19 @@ func rrToMapStr(rr mkdns.RR, ipList bool) (common.MapStr, []string) {
 		} else {
 			debugf("Rdata for the unhandled RR type %s could not be fetched", dnsTypeToString(rrType))
 		}
+
+	// Don't attempt to render IPs for answers that are incomplete.
 	case *mkdns.A:
+		if x.A == nil {
+			break
+		}
 		mapStr["data"] = appendIP(x.A.String())
 	case *mkdns.AAAA:
+		if x.AAAA == nil {
+			break
+		}
 		mapStr["data"] = appendIP(x.AAAA.String())
+
 	case *mkdns.CNAME:
 		mapStr["data"] = trimRightDot(x.Target)
 	case *mkdns.DNSKEY:

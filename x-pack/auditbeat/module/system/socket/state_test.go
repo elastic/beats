@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build (linux && 386) || (linux && amd64)
 // +build linux,386 linux,amd64
 
 package socket
@@ -28,19 +29,19 @@ import (
 type logWrapper testing.T
 
 func (l *logWrapper) Errorf(format string, args ...interface{}) {
-	l.Logf("error: "+format, args)
+	l.Logf("error: "+format, args...)
 }
 
 func (l *logWrapper) Warnf(format string, args ...interface{}) {
-	l.Logf("warning: "+format, args)
+	l.Logf("warning: "+format, args...)
 }
 
 func (l *logWrapper) Infof(format string, args ...interface{}) {
-	l.Logf("info: "+format, args)
+	l.Logf("info: "+format, args...)
 }
 
 func (l *logWrapper) Debugf(format string, args ...interface{}) {
-	l.Logf("debug: "+format, args)
+	l.Logf("debug: "+format, args...)
 }
 
 func TestTCPConnWithProcess(t *testing.T) {

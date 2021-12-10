@@ -671,10 +671,10 @@
                                                 "85528f23-48f2-462f-8075-eaddd94b21f2": {
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Average of aws.rds.read_io.ops_per_sec",
+                                                    "label": "Average of aws.rds.read.iops",
                                                     "operationType": "average",
                                                     "scale": "ratio",
-                                                    "sourceField": "aws.rds.read_io.ops_per_sec"
+                                                    "sourceField": "aws.rds.read.iops"
                                                 },
                                                 "b9e82720-e098-4dd7-ac5b-f3becccd344a": {
                                                     "dataType": "date",

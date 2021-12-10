@@ -31,49 +31,13 @@ import (
 func TestDefaultSupport_Init(t *testing.T) {
 	info := beat.Info{Beat: "test", Version: "9.9.9"}
 
-	t.Run("mode from config", func(t *testing.T) {
-		cases := map[string]Mode{
-			"true":  ModeEnabled,
-			"false": ModeDisabled,
-			"auto":  ModeAuto,
-		}
-		for setting, expected := range cases {
-			expected := expected
-			t.Run(setting, func(t *testing.T) {
-				cfg := common.MustNewConfigFrom(map[string]interface{}{
-					"enabled":        setting,
-					"rollover_alias": "test",
-				})
-
-				s, err := DefaultSupport(nil, info, cfg)
-				require.NoError(t, err)
-				assert.Equal(t, expected, s.Mode())
-			})
-		}
-	})
-
-	t.Run("with an empty rollover_alias", func(t *testing.T) {
-		_, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
-			map[string]interface{}{
-				"enabled":        true,
-				"rollover_alias": "",
-				"pattern":        "01",
-				"check_exists":   false,
-				"overwrite":      true,
-			},
-		))
-		require.Error(t, err)
-	})
-
 	t.Run("with custom config", func(t *testing.T) {
 		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
 			map[string]interface{}{
-				"enabled":        true,
-				"name":           "test-%{[agent.version]}",
-				"rollover_alias": "alias",
-				"pattern":        "01",
-				"check_exists":   false,
-				"overwrite":      true,
+				"enabled":      true,
+				"name":         "test-%{[agent.version]}",
+				"check_exists": false,
+				"overwrite":    true,
 			},
 		))
 		require.NoError(t, err)
@@ -82,19 +46,16 @@ func TestDefaultSupport_Init(t *testing.T) {
 		assert := assert.New(t)
 		assert.Equal(true, s.overwrite)
 		assert.Equal(false, s.checkExists)
-		assert.Equal(ModeEnabled, s.Mode())
+		assert.Equal(true, s.Enabled())
 		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
-		assert.Equal(Alias{Name: "alias", Pattern: "01"}, s.Alias())
 	})
 
 	t.Run("with custom alias config with fieldref", func(t *testing.T) {
 		tmp, err := DefaultSupport(nil, info, common.MustNewConfigFrom(
 			map[string]interface{}{
-				"enabled":        true,
-				"rollover_alias": "alias-%{[agent.version]}",
-				"pattern":        "01",
-				"check_exists":   false,
-				"overwrite":      true,
+				"enabled":      true,
+				"check_exists": false,
+				"overwrite":    true,
 			},
 		))
 		require.NoError(t, err)
@@ -103,9 +64,8 @@ func TestDefaultSupport_Init(t *testing.T) {
 		assert := assert.New(t)
 		assert.Equal(true, s.overwrite)
 		assert.Equal(false, s.checkExists)
-		assert.Equal(ModeEnabled, s.Mode())
+		assert.Equal(true, s.Enabled())
 		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
-		assert.Equal(Alias{Name: "alias-9.9.9", Pattern: "01"}, s.Alias())
 	})
 
 	t.Run("with default alias", func(t *testing.T) {
@@ -123,9 +83,8 @@ func TestDefaultSupport_Init(t *testing.T) {
 		assert := assert.New(t)
 		assert.Equal(true, s.overwrite)
 		assert.Equal(false, s.checkExists)
-		assert.Equal(ModeEnabled, s.Mode())
+		assert.Equal(true, s.Enabled())
 		assert.Equal(DefaultPolicy, common.MapStr(s.Policy().Body))
-		assert.Equal(Alias{Name: "test-9.9.9", Pattern: "01"}, s.Alias())
 	})
 
 	t.Run("load external policy", func(t *testing.T) {
@@ -150,32 +109,26 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 		},
 		"disabled via handler": {
 			calls: []onCall{
-				onCheckILMEnabled(ModeAuto).Return(false, nil),
+				onCheckILMEnabled(true).Return(false, ErrESILMDisabled),
 			},
+			err: true,
 		},
 		"enabled via handler": {
 			calls: []onCall{
-				onCheckILMEnabled(ModeAuto).Return(true, nil),
+				onCheckILMEnabled(true).Return(true, nil),
 			},
 			enabled: true,
 		},
 		"handler confirms enabled flag": {
 			calls: []onCall{
-				onCheckILMEnabled(ModeEnabled).Return(true, nil),
+				onCheckILMEnabled(true).Return(true, nil),
 			},
 			cfg:     map[string]interface{}{"enabled": true},
 			enabled: true,
 		},
-		"fail enabled": {
-			calls: []onCall{
-				onCheckILMEnabled(ModeEnabled).Return(false, nil),
-			},
-			cfg:  map[string]interface{}{"enabled": true},
-			fail: ErrESILMDisabled,
-		},
 		"io error": {
 			calls: []onCall{
-				onCheckILMEnabled(ModeAuto).Return(false, errors.New("ups")),
+				onCheckILMEnabled(true).Return(false, errors.New("ups")),
 			},
 			cfg: map[string]interface{}{},
 			err: true,
@@ -204,80 +157,6 @@ func TestDefaultSupport_Manager_Enabled(t *testing.T) {
 			}
 
 			assert.Equal(t, test.enabled, enabled)
-			h.AssertExpectations(t)
-		})
-	}
-}
-
-func TestDefaultSupport_Manager_EnsureAlias(t *testing.T) {
-	alias := Alias{
-		Name:    "test-9.9.9",
-		Pattern: ilmDefaultPattern,
-	}
-
-	cases := map[string]struct {
-		calls []onCall
-		cfg   map[string]interface{}
-		fail  error
-	}{
-		"create new alias": {
-			calls: []onCall{
-				onHasAlias(alias.Name).Return(false, nil),
-				onCreateAlias(alias).Return(nil),
-			},
-		},
-		"alias already exists": {
-			calls: []onCall{
-				onHasAlias(alias.Name).Return(true, nil),
-			},
-		},
-		"fail": {
-			calls: []onCall{
-				onHasAlias(alias.Name).Return(false, nil),
-				onCreateAlias(alias).Return(errOf(ErrRequestFailed)),
-			},
-			fail: ErrRequestFailed,
-		},
-		"overwrite non-existent": {
-			calls: []onCall{
-				onCreateAlias(alias).Return(nil),
-			},
-			fail: nil,
-			cfg:  map[string]interface{}{"check_exists": true, "overwrite": true},
-		},
-		"try overwrite existing": {
-			calls: []onCall{
-				onCreateAlias(alias).Return(errOf(ErrAliasAlreadyExists)),
-			},
-			fail: nil, // we detect that that the alias exists, and call it a day.
-			cfg:  map[string]interface{}{"check_exists": true, "overwrite": true},
-		},
-		"fail to overwrite": {
-			calls: []onCall{
-				onCreateAlias(alias).Return(errOf(ErrAliasCreateFailed)),
-			},
-			fail: ErrAliasCreateFailed,
-			cfg:  map[string]interface{}{"check_exists": true, "overwrite": true},
-		},
-	}
-
-	for name, test := range cases {
-		t.Run(name, func(t *testing.T) {
-			cfg := test.cfg
-			if cfg == nil {
-				cfg = map[string]interface{}{"alias": "test"}
-			}
-
-			h := newMockHandler(test.calls...)
-			m := createManager(t, h, test.cfg)
-			err := m.EnsureAlias()
-
-			if test.fail == nil {
-				require.NoError(t, err)
-			} else {
-				require.Error(t, err)
-				assert.Equal(t, test.fail, ErrReason(err))
-			}
 			h.AssertExpectations(t)
 		})
 	}

@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package node_stats
@@ -34,7 +35,6 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-
 	files, err := filepath.Glob("./_meta/test/node_stats.*.json")
 	require.NoError(t, err)
 
@@ -43,7 +43,7 @@ func TestEventMapping(t *testing.T) {
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, input)
+		err = eventMapping(reporter, input, true)
 
 		require.NoError(t, err, f)
 		require.True(t, len(reporter.GetEvents()) >= 1, f)

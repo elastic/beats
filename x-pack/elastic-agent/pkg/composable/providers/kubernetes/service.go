@@ -44,7 +44,7 @@ func NewServiceEventer(
 	logger *logp.Logger,
 	client k8s.Interface,
 	scope string) (Eventer, error) {
-	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Service{}, kubernetes.WatchOptions{
+	watcher, err := kubernetes.NewNamedWatcher("agent-service", client, &kubernetes.Service{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
 		HonorReSyncs: true,
@@ -54,7 +54,7 @@ func NewServiceEventer(
 	}
 
 	metaConf := metadata.GetDefaultResourceMetadataConfig()
-	namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+	namespaceWatcher, err := kubernetes.NewNamedWatcher("agent-namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
 		SyncTimeout: cfg.SyncPeriod,
 		Namespace:   cfg.Namespace,
 	}, nil)
@@ -191,10 +191,8 @@ func generateServiceData(
 	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr).Clone())
 
 	if len(namespaceAnnotations) != 0 {
-		// TODO: convert it to namespace.annotations for 8.0
 		k8sMapping["namespace_annotations"] = namespaceAnnotations
 	}
-
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
 	for k, v := range service.GetObjectMeta().GetAnnotations() {

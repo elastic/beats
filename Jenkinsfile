@@ -26,7 +26,7 @@ pipeline {
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
   options {
-    timeout(time: 4, unit: 'HOURS')
+    timeout(time: 6, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '60', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
@@ -141,11 +141,9 @@ pipeline {
     stage('Packaging') {
       options { skipDefaultCheckout() }
       when {
-        // Always when running builds on branches/tags
         // On a PR basis, skip if changes are only related to docs.
         // Always when forcing the input parameter
         anyOf {
-          not { changeRequest() }                           // If no PR
           allOf {                                           // If PR and no docs changes
             expression { return env.ONLY_DOCS == "false" }
             changeRequest()
@@ -203,8 +201,22 @@ def runLinting() {
     }
   }
   mapParallelTasks['default'] = { cmd(label: 'make check-default', script: 'make check-default') }
-
+  mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)
+}
+
+def runPreCommit() {
+  return {
+    withNode(labels: 'ubuntu-18 && immutable', forceWorkspace: true){
+      withGithubNotify(context: 'Check pre-commit', tab: 'tests') {
+        deleteDir()
+        unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+        dir("${BASE_DIR}"){
+          preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
+        }
+      }
+    }
+  }
 }
 
 def runBuildAndTest(Map args = [:]) {
@@ -279,13 +291,13 @@ def generateStages(Map args = [:]) {
 def cloud(Map args = [:]) {
   withGithubNotify(context: args.context) {
     withNode(labels: args.label, forceWorkspace: true){
-      startCloudTestEnv(name: args.directory, dirs: args.dirs)
+      startCloudTestEnv(name: args.directory, dirs: args.dirs, withAWS: args.withAWS)
     }
-    withCloudTestEnv() {
+    withCloudTestEnv(args) {
       try {
         target(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id)
       } finally {
-        terraformCleanup(name: args.directory, dir: args.directory)
+        terraformCleanup(name: args.directory, dir: args.directory, withAWS: args.withAWS)
       }
     }
   }
@@ -419,8 +431,6 @@ def pushCIDockerImages(Map args = [:]) {
       tagAndPush(beatName: 'filebeat', arch: arch)
     } else if (beatsFolder.endsWith('heartbeat')) {
       tagAndPush(beatName: 'heartbeat', arch: arch)
-    } else if ("${beatsFolder}" == "journalbeat"){
-      tagAndPush(beatName: 'journalbeat', arch: arch)
     } else if (beatsFolder.endsWith('metricbeat')) {
       tagAndPush(beatName: 'metricbeat', arch: arch)
     } else if ("${beatsFolder}" == "packetbeat"){
@@ -515,14 +525,33 @@ def getBeatsName(baseDir) {
 }
 
 /**
+* This method runs the end 2 end testing
+*/
+def e2e(Map args = [:]) {
+  if (!args.e2e?.get('enabled', false)) { return }
+  // Skip running the tests on branches or tags if configured.
+  if (!isPR() && args.e2e?.get('when', false)) {
+    if (isBranch() && !args.e2e.when.get('branches', true)) { return }
+    if (isTag() && !args.e2e.when.get('tags', true)) { return }
+  }
+  if (args.e2e.get('entrypoint', '')?.trim()) {
+    e2e_with_entrypoint(args)
+  } else {
+    runE2E(testMatrixFile: args.e2e?.get('testMatrixFile', ''),
+           beatVersion: "${env.VERSION}-SNAPSHOT",
+           gitHubCheckName: "e2e-${args.context}",
+           gitHubCheckRepo: env.REPO,
+           gitHubCheckSha1: env.GIT_BASE_COMMIT)
+  }
+}
+
+/**
 * This method runs the end 2 end testing in the same worker where the packages have been
 * generated, this should help to speed up the things
 */
-def e2e(Map args = [:]) {
-  def enabled = args.e2e?.get('enabled', false)
+def e2e_with_entrypoint(Map args = [:]) {
   def entrypoint = args.e2e?.get('entrypoint')
   def dockerLogFile = "docker_logs_${entrypoint}.log"
-  if (!enabled) { return }
   dir("${env.WORKSPACE}/src/github.com/elastic/e2e-testing") {
     // TBC with the target branch if running on a PR basis.
     git(branch: 'master', credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken', url: 'https://github.com/elastic/e2e-testing.git')
@@ -536,14 +565,12 @@ def e2e(Map args = [:]) {
               "LOG_LEVEL=TRACE"]) {
       def status = 0
       filebeat(output: dockerLogFile){
-        status = sh(script: ".ci/scripts/${entrypoint}",
-                    label: "Run functional tests ${entrypoint}",
-                    returnStatus: true)
-      }
-      junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
-      archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
-      if (status != 0) {
-        error("ERROR: functional tests for ${args?.directory?.trim()} has failed. See the test report and ${dockerLogFile}.")
+        try {
+          sh(script: ".ci/scripts/${entrypoint}", label: "Run functional tests ${entrypoint}")
+        } finally {
+          junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
+          archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
+        }
       }
     }
   }
@@ -581,18 +608,14 @@ def target(Map args = [:]) {
             cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
           }
         }
-        // TODO:
-        // Packaging should happen only after the e2e?
+        // Publish packages should happen always to easily consume those artifacts if the
+        // e2e were triggered and failed.
         if (isPackaging) {
           publishPackages("${directory}")
+          pushCIDockerImages(beatsFolder: "${directory}", arch: dockerArch)
         }
         if(isE2E) {
           e2e(args)
-        }
-        // TODO:
-        // push docker images should happen only after the e2e?
-        if (isPackaging) {
-          pushCIDockerImages(beatsFolder: "${directory}", arch: dockerArch)
         }
       }
     }
@@ -804,20 +827,23 @@ def archiveTestOutput(Map args = [:]) {
       catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
         withMageEnv(version: "${env.GO_VERSION}"){
           dir(directory){
-            cmd(label: "Archive system tests files", script: 'mage packageSystemTests')
+            cmd(label: "Archive system tests files", script: 'mage packageSystemTests', returnStatus: true)
           }
         }
+
         def fileName = 'build/system-tests-*.tar.gz' // see dev-tools/mage/target/common/package.go#PackageSystemTests method
         def files = findFiles(glob: "${fileName}")
-        files.each { file ->
-          echo "${file.name}"
+
+        if (files?.length > 0) {
+          googleStorageUploadExt(
+            bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
+            credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+            pattern: "${fileName}",
+            sharedPublicly: true
+          )
+        } else {
+          log(level: 'WARN', text: "There are no system-tests files to upload Google Storage}")
         }
-        googleStorageUploadExt(
-          bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
-          credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-          pattern: "${fileName}",
-          sharedPublicly: true
-        )
       }
     }
   }
@@ -840,14 +866,15 @@ def tarAndUploadArtifacts(Map args = [:]) {
 * This method executes a closure with credentials for cloud test
 * environments.
 */
-def withCloudTestEnv(Closure body) {
+def withCloudTestEnv(Map args = [:], Closure body) {
   def maskedVars = []
   def testTags = "${env.TEST_TAGS}"
 
   // Allow AWS credentials when the build was configured to do so with:
   //   - the cloudtests build parameters
   //   - the aws github label
-  if (params.allCloudTests || params.awsCloudTests || matchesPrLabel(label: 'aws')) {
+  //   - forced with the cloud argument aws github label
+  if (params.allCloudTests || params.awsCloudTests || matchesPrLabel(label: 'aws') || args.get('withAWS', false)) {
     testTags = "${testTags},aws"
     def aws = getVaultSecret(secret: "${AWS_ACCOUNT_SECRET}").data
     if (!aws.containsKey('access_key')) {
@@ -861,6 +888,7 @@ def withCloudTestEnv(Closure body) {
       [var: "AWS_ACCESS_KEY_ID", password: aws.access_key],
       [var: "AWS_SECRET_ACCESS_KEY", password: aws.secret_key],
     ])
+    log(level: 'INFO', text: 'withCloudTestEnv: it has been configured to run in AWS.')
   }
 
   withEnv([
@@ -886,7 +914,7 @@ def startCloudTestEnv(Map args = [:]) {
   String name = normalise(args.name)
   def dirs = args.get('dirs',[])
   stage("${name}-prepare-cloud-env"){
-    withCloudTestEnv() {
+    withCloudTestEnv(args) {
       withBeatsEnv(archive: false, withModule: false) {
         try {
           dirs?.each { folder ->
@@ -929,7 +957,7 @@ def terraformCleanup(Map args = [:]) {
   String name = normalise(args.name)
   String directory = args.dir
   stage("${name}-tear-down-cloud-env"){
-    withCloudTestEnv() {
+    withCloudTestEnv(args) {
       withBeatsEnv(archive: false, withModule: false) {
         unstash("terraform-${name}")
         retryWithSleep(retries: 2, seconds: 5, backoff: true) {
@@ -1054,6 +1082,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
   public run(Map args = [:]){
     steps.stageStatusCache(args){
       def withModule = args.content.get('withModule', false)
+      def withAWS = args.content.get('withAWS', false)
       //
       // What's the retry policy for fighting the flakiness:
       //   1) Lint/Packaging/Cloud/k8sTest stages don't retry, since their failures are normally legitim
@@ -1112,7 +1141,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
         steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)
       }
       if(args?.content?.containsKey('cloud')) {
-        steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id)
+        steps.cloud(context: args.context, command: args.content.cloud, directory: args.project, label: args.label, withModule: withModule, dirs: args.content.dirs, id: args.id, withAWS: withAWS)
       }
     }
   }

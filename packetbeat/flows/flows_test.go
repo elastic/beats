@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package flows
@@ -55,12 +56,16 @@ func TestFlowsCounting(t *testing.T) {
 	assert.NoError(t, err)
 
 	uint1, err := module.NewUint("uint1")
+	assert.NoError(t, err)
 	uint2, err := module.NewUint("uint2")
+	assert.NoError(t, err)
 	int1, err := module.NewInt("int1")
+	assert.NoError(t, err)
 	int2, err := module.NewInt("int2")
+	assert.NoError(t, err)
 	float1, err := module.NewFloat("float1")
+	assert.NoError(t, err)
 	float2, err := module.NewFloat("float2")
-
 	assert.NoError(t, err)
 
 	pub := &flowsChan{make(chan []beat.Event, 1)}
