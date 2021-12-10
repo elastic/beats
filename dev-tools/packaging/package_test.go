@@ -23,6 +23,7 @@ package dev_tools
 import (
 	"archive/tar"
 	"archive/zip"
+	"bufio"
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
@@ -169,7 +170,7 @@ func checkTar(t *testing.T, file string) {
 }
 
 func checkZip(t *testing.T, file string) {
-	p, err := readZip(file)
+	p, err := readZip(t, file, checkNpcapNotices)
 	if err != nil {
 		t.Error(err)
 		return
@@ -181,6 +182,34 @@ func checkZip(t *testing.T, file string) {
 	checkModulesDPresent(t, "", p)
 	checkModulesPermissions(t, p)
 	checkLicensesPresent(t, "", p)
+}
+
+var npcapConfigPattern = regexp.MustCompile("Windows Npcap installation settings")
+
+func checkNpcapNotices(pkg, file string, contents io.Reader) error {
+	if !strings.Contains(pkg, "packetbeat") || !strings.Contains(pkg, "windows") {
+		return nil
+	}
+
+	wantNotices := strings.Contains(pkg, "windows")
+
+	// If the packetbeat README.md is made to be generated
+	// conditionally then it should also be checked here.
+	pkg = filepath.Base(pkg)
+	file, err := filepath.Rel(pkg[:len(pkg)-len(filepath.Ext(pkg))], file)
+	if err != nil {
+		return err
+	}
+	switch file {
+	case "packetbeat.yml", "packetbeat.reference.yml":
+		if npcapConfigPattern.MatchReader(bufio.NewReader(contents)) != wantNotices {
+			if wantNotices {
+				return fmt.Errorf("Npcap config section not found in config file %s in %s", file, pkg)
+			}
+			return fmt.Errorf("unexpected Npcap config section found in config file %s in %s", file, pkg)
+		}
+	}
+	return nil
 }
 
 func checkDocker(t *testing.T, file string) {
@@ -623,7 +652,11 @@ func readTarContents(tarName string, data io.Reader) (*packageFile, error) {
 	return p, nil
 }
 
-func readZip(zipFile string) (*packageFile, error) {
+// inspector is a file contents inspector. It vets the contents of the file
+// within a package for a requirement and returns an error if it is not met.
+type inspector func(pkg, file string, contents io.Reader) error
+
+func readZip(t *testing.T, zipFile string, inspectors ...inspector) (*packageFile, error) {
 	r, err := zip.OpenReader(zipFile)
 	if err != nil {
 		return nil, err
@@ -635,6 +668,18 @@ func readZip(zipFile string) (*packageFile, error) {
 		p.Contents[f.Name] = packageEntry{
 			File: f.Name,
 			Mode: f.Mode(),
+		}
+		for _, inspect := range inspectors {
+			r, err := f.Open()
+			if err != nil {
+				t.Errorf("failed to open %s in %s: %v", f.Name, zipFile, err)
+				break
+			}
+			err = inspect(zipFile, f.Name, r)
+			if err != nil {
+				t.Error(err)
+			}
+			r.Close()
 		}
 	}
 
@@ -740,7 +785,6 @@ func readDockerManifest(r io.Reader) (*dockerManifest, error) {
 	err = json.Unmarshal(data, &manifests)
 	if err != nil {
 		return nil, err
-
 	}
 
 	if len(manifests) != 1 {
