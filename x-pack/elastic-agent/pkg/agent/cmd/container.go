@@ -674,12 +674,6 @@ func runLegacyAPMServer(streams *cli.IOStreams, path string) (*process.Info, err
 		return nil, errors.New("expected one directory")
 	}
 	apmDir := filepath.Join(path, files[0].Name())
-	// Extract the ingest pipeline definition to the HOME_DIR
-	if home := os.Getenv("HOME_PATH"); home != "" {
-		if err := syncDir(filepath.Join(apmDir, "ingest"), filepath.Join(home, "ingest")); err != nil {
-			return nil, fmt.Errorf("syncing APM ingest directory to HOME_PATH(%s) failed: %s", home, err)
-		}
-	}
 	// Start apm-server process respecting path ENVs
 	apmBinary := filepath.Join(apmDir, spec.Cmd)
 	log, err := logger.New("apm-server", false)

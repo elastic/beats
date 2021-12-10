@@ -24,6 +24,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 )
 
 // func TestData(t *testing.T) {
@@ -47,8 +49,7 @@ import (
 // }
 
 func TestTopo(t *testing.T) {
-	hostfs := "./testdata/"
-
+	hostfs := resolve.NewTestResolver("./testdata")
 	cpus, err := topoPkgCPUMap(hostfs)
 	assert.NoError(t, err)
 	good := map[int][]int{

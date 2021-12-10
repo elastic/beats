@@ -100,7 +100,7 @@
         ]
     },
     {
-        "@timestamp": "2014-04-15T09:34:34.000-04:00",
+        "@timestamp": "2014-04-15T11:34:34.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1926,7 +1926,7 @@
         ]
     },
     {
-        "@timestamp": "2018-04-15T09:34:34.000-04:00",
+        "@timestamp": "2018-04-15T11:34:34.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",

@@ -91,6 +91,7 @@
 - Snapshot artifact lookup will use agent.download proxy settings. {issue}27903[27903] {pull}27904[27904]
 - Fix lazy acker to only add new actions to the batch. {pull}27981[27981]
 - Allow HTTP metrics to run in bootstrap mode. Add ability to adjust timeouts for Fleet Server. {pull}28260[28260]
+- Fix agent configuration overwritten by default fleet config. {pull}29297[29297]
 
 ==== New features
 
@@ -151,3 +152,4 @@
 - Add `KIBANA_FLEET_SERVICE_TOKEN` to Elastic Agent container. {pull}28096[28096]
 - Allow pprof endpoints for elastic-agent or beats if enabled. {pull}28983[28983] {pull}29155[29155]
 - Add --fleet-server-es-ca-trusted-fingerprint flag to allow agent/fleet-server to work with elasticsearch clusters using self signed certs. {pull}29128[29128]
+- Discover changes in Kubernetes nodes metadata as soon as they happen. {pull}23139[23139]
