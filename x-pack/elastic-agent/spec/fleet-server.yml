@@ -32,6 +32,7 @@ rules:
       selectors:
         - fleet.server.host
         - fleet.server.port
+        - fleet.server.internal_port
         - fleet.server.ssl
       path: inputs.0.server
 

@@ -23,7 +23,6 @@ Beat  | Description
 [Filebeat](https://github.com/elastic/beats/tree/master/filebeat) | Tails and ships log files
 [Functionbeat](https://github.com/elastic/beats/tree/master/x-pack/functionbeat) | Read and ships events from serverless infrastructure.
 [Heartbeat](https://github.com/elastic/beats/tree/master/heartbeat) | Ping remote services for availability
-[Journalbeat](https://github.com/elastic/beats/tree/master/journalbeat) | Read and ships event from Journald.
 [Metricbeat](https://github.com/elastic/beats/tree/master/metricbeat) | Fetches sets of metrics from the operating system and services
 [Packetbeat](https://github.com/elastic/beats/tree/master/packetbeat) | Monitors the network and applications by sniffing packets
 [Winlogbeat](https://github.com/elastic/beats/tree/master/winlogbeat) | Fetches and ships Windows Event logs
@@ -45,7 +44,6 @@ on the [elastic.co site](https://www.elastic.co/guide/):
 * [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html)
 * [Functionbeat](https://www.elastic.co/guide/en/beats/functionbeat/current/index.html)
 * [Heartbeat](https://www.elastic.co/guide/en/beats/heartbeat/current/index.html)
-* [Journalbeat](https://www.elastic.co/guide/en/beats/journalbeat/current/index.html)
 * [Metricbeat](https://www.elastic.co/guide/en/beats/metricbeat/current/index.html)
 * [Packetbeat](https://www.elastic.co/guide/en/beats/packetbeat/current/index.html)
 * [Winlogbeat](https://www.elastic.co/guide/en/beats/winlogbeat/current/index.html)
