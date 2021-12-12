@@ -105,6 +105,7 @@ type beatConfig struct {
 
 	// beat internal components configurations
 	HTTP            *common.Config         `config:"http"`
+	HTTPPprof       *common.Config         `config:"http.pprof"`
 	Path            paths.Path             `config:"path"`
 	Logging         *common.Config         `config:"logging"`
 	MetricLogging   *common.Config         `config:"logging.metrics"`
@@ -162,19 +163,14 @@ func Run(settings Settings, bt beat.Creator) error {
 		return errw.Wrap(err, "could not set umask")
 	}
 
-	name := settings.Name
-	idxPrefix := settings.IndexPrefix
-	agentVersion := settings.Version
-	elasticLicensed := settings.ElasticLicensed
-
 	return handleError(func() error {
 		defer func() {
 			if r := recover(); r != nil {
-				logp.NewLogger(name).Fatalw("Failed due to panic.",
+				logp.NewLogger(settings.Name).Fatalw("Failed due to panic.",
 					"panic", r, zap.Stack("stack"))
 			}
 		}()
-		b, err := NewBeat(name, idxPrefix, agentVersion, elasticLicensed)
+		b, err := NewInitializedBeat(settings)
 		if err != nil {
 			return err
 		}
@@ -409,10 +405,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	defer logp.Sync()
 	defer logp.Info("%s stopped.", b.Info.Beat)
 
-	err := b.InitWithSettings(settings)
-	if err != nil {
-		return err
-	}
 	defer func() {
 		if err := b.processing.Close(); err != nil {
 			logp.Warn("Failed to close global processing: %v", err)
@@ -428,7 +420,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path.
 	bl := newLocker(b)
-	err = bl.lock()
+	err := bl.lock()
 	if err != nil {
 		return err
 	}
@@ -455,6 +447,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		}
 		s.Start()
 		defer s.Stop()
+		if b.Config.HTTPPprof.Enabled() {
+			s.AttachPprof()
+		}
 	}
 
 	if err = seccomp.LoadFilter(b.Config.Seccomp); err != nil {
