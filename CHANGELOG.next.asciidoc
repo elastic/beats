@@ -94,6 +94,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix discovery of Nomad allocations with multiple events during startup. {pull}28700[28700]
 - Allows disable pod events enrichment with deployment name {pull}28521[28521]
 - Fix `fingerprint` processor to give it access to the `@timestamp` field. {issue}28683[28683]
+- Allow `clone3` syscall in seccomp filters. {pull}28117[28117]
 - Fix the wrong beat name on monitoring and state endpoint {issue}27755[27755]
 - Skip configuration checks in autodiscover for configurations that are already running {pull}29048[29048]
 - Fix `decode_json_processor` to always respect `add_error_key` {pull}29107[29107]
