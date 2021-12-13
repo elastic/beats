@@ -61,6 +61,7 @@ pipeline {
           stage('prepare') {
             options { skipDefaultCheckout() }
             steps {
+              deleteDir()
               unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
             }
           }
