@@ -3,6 +3,22 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.16.1]]
+=== Beats version 7.16.1
+https://github.com/elastic/beats/compare/v7.16.0...v7.16.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Overwrite index name in index template correctly. {issue}28571[28571] {pull}29299[29299]
+
+==== Added
+
+*Filebeat*
+
+- Add elapsed time information to `aws-s3` input errors and log messages. {pull}29328[29328]
+
 [[release-notes-7.16.0]]
 === Beats version 7.16.0
 https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
