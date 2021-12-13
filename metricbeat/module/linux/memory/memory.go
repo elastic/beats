@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -39,15 +40,17 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
+	mod resolve.Resolver
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The linux memory metricset is beta.")
-
+	sys := base.Module().(resolve.Resolver)
 	return &MetricSet{
 		BaseMetricSet: base,
+		mod:           sys,
 	}, nil
 }
 
@@ -56,7 +59,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	rootEvent := common.MapStr{}
-	err := FetchLinuxMemStats(rootEvent)
+	err := FetchLinuxMemStats(rootEvent, m.mod)
 	if err != nil {
 		return errors.Wrap(err, "error fetching memory stats")
 	}
