@@ -45,7 +45,7 @@ type journald struct {
 	CursorSeekFallback journalread.SeekMode
 	Matches            journalfield.IncludeMatches
 	Units              []string
-	Kernel             bool
+	Transports         []string
 	Identifiers        []string
 	SaveRemoteHostname bool
 	Parsers            parser.Config
@@ -109,7 +109,7 @@ func configure(cfg *common.Config) ([]cursor.Source, cursor.Input, error) {
 		CursorSeekFallback: config.CursorSeekFallback,
 		Matches:            config.Matches,
 		Units:              config.Units,
-		Kernel:             config.Kernel,
+		Transports:         config.Transports,
 		Identifiers:        config.Identifiers,
 		SaveRemoteHostname: config.SaveRemoteHostname,
 		Parsers:            config.Parsers,
@@ -163,7 +163,7 @@ func (inp *journald) Run(
 func (inp *journald) open(log *logp.Logger, canceler input.Canceler, src cursor.Source) (*journalread.Reader, error) {
 	backoff := backoff.NewExpBackoff(canceler.Done(), inp.Backoff, inp.MaxBackoff)
 	reader, err := journalread.Open(log, src.Name(), backoff,
-		withFilters(inp.Matches), withUnits(inp.Units, inp.Kernel), withSyslogIdentifiers(inp.Identifiers))
+		withFilters(inp.Matches), withUnits(inp.Units), withTransports(inp.Transports), withSyslogIdentifiers(inp.Identifiers))
 	if err != nil {
 		return nil, sderr.Wrap(err, "failed to create reader for %{path} journal", src.Name())
 	}
@@ -197,9 +197,15 @@ func withFilters(filters journalfield.IncludeMatches) func(*sdjournal.Journal) e
 	}
 }
 
-func withUnits(units []string, kernel bool) func(*sdjournal.Journal) error {
+func withUnits(units []string) func(*sdjournal.Journal) error {
 	return func(j *sdjournal.Journal) error {
-		return journalfield.ApplyUnitMatchers(j, units, kernel)
+		return journalfield.ApplyUnitMatchers(j, units)
+	}
+}
+
+func withTransports(transports []string) func(*sdjournal.Journal) error {
+	return func(j *sdjournal.Journal) error {
+		return journalfield.ApplyTransportMatcher(j, transports)
 	}
 }
 
