@@ -20,6 +20,17 @@ pipeline {
     cron('H */3 * * *')
   }
   stages {
+    stage('Checkout') {
+      options { skipDefaultCheckout() }
+      steps {
+        deleteDir()
+        gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
+        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+        dir("${BASE_DIR}"){
+          setEnvVar('GO_VERSION', readFile(".go-version").trim())
+        }
+      }
+    }
     stage('Run'){
       options { skipDefaultCheckout() }
       matrix {
@@ -45,18 +56,9 @@ pipeline {
             }
         }
         stages {
-          stage('Checkout') {
-            options { skipDefaultCheckout() }
-            steps {
-              deleteDir()
-              gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
-              dir("${BASE_DIR}"){
-                setEnvVar('GO_VERSION', readFile(".go-version").trim())
-              }
-            }
-          }
           stage('build') {
             steps {
+              unstash 'source'
               runCommand('mage build', "${beat}")
             }
           }
