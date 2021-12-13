@@ -189,27 +189,24 @@ func ApplySyslogIdentifierMatcher(j journal, identifiers []string) error {
 
 // ApplyIncludeMatches adds advanced filtering to journals.
 func ApplyIncludeMatches(j journal, m IncludeMatches) error {
-	if len(m.OR) > 0 {
-		for _, or := range m.OR {
-			if err := ApplyIncludeMatches(j, or); err != nil {
-				return err
-			}
-			if err := j.AddDisjunction(); err != nil {
-				return fmt.Errorf("error adding disjunction to journal: %v", err)
-			}
+	for _, or := range m.OR {
+		if err := ApplyIncludeMatches(j, or); err != nil {
+			return err
+		}
+		if err := j.AddDisjunction(); err != nil {
+			return fmt.Errorf("error adding disjunction to journal: %v", err)
 		}
 	}
 
-	if len(m.AND) > 0 {
-		for _, and := range m.AND {
-			if err := ApplyIncludeMatches(j, and); err != nil {
-				return err
-			}
-			if err := j.AddConjunction(); err != nil {
-				return fmt.Errorf("error adding conjunction to journal: %v", err)
-			}
+	for _, and := range m.AND {
+		if err := ApplyIncludeMatches(j, and); err != nil {
+			return err
+		}
+		if err := j.AddConjunction(); err != nil {
+			return fmt.Errorf("error adding conjunction to journal: %v", err)
 		}
 	}
+
 
 	for _, match := range m.Matches {
 		if err := match.Apply(j); err != nil {
