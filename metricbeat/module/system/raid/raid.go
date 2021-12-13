@@ -18,15 +18,12 @@
 package raid
 
 import (
-	"path/filepath"
-
 	"github.com/pkg/errors"
-	"github.com/prometheus/procfs"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/beats/v7/metricbeat/module/system"
 	"github.com/elastic/beats/v7/metricbeat/module/system/raid/blockinfo"
 )
 
@@ -39,38 +36,17 @@ func init() {
 // MetricSet contains proc fs data.
 type MetricSet struct {
 	mb.BaseMetricSet
-	fs       procfs.FS
-	sysblock string
+	mod resolve.Resolver
 }
 
 // New creates a new instance of the raid metricset.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
-	// Additional configuration options
-	config := struct {
-		MountPoint string `config:"raid.mount_point"`
-	}{}
-
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
-	}
-	sys := base.Module().(system.SystemModule)
-	if config.MountPoint == "" {
-		config.MountPoint = sys.GetHostFS()
-	}
-
-	mountPoint := filepath.Join(config.MountPoint, procfs.DefaultMountPoint)
-	fs, err := procfs.NewFS(mountPoint)
-	if err != nil {
-		return nil, err
-	}
-
-	sysMountPoint := filepath.Join(config.MountPoint, "/sys/block")
-
+	sys := base.Module().(resolve.Resolver)
 	return &MetricSet{
 		BaseMetricSet: base,
-		fs:            fs,
-		sysblock:      sysMountPoint,
+
+		mod: sys,
 	}, nil
 }
 
@@ -84,7 +60,7 @@ func blockto1024(b int64) int64 {
 
 // Fetch fetches one event for each device
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	devices, err := blockinfo.ListAll(m.sysblock)
+	devices, err := blockinfo.ListAll(m.mod.ResolveHostFS("/sys/block"))
 	if err != nil {
 		return errors.Wrap(err, "failed to parse sysfs")
 	}
