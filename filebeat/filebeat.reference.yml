@@ -982,11 +982,12 @@ filebeat.inputs:
   # List of syslog identifiers
   #syslog_identifiers: ["audit"]
 
-  # List of units
+  # Collect events from the service and messages about the service,
+  # including coredumps.
   #units: ["docker.service"]
 
-  # If kernel entries are need to be forwarded if units are configured
-  #kernel: false
+  # The list of transports (_TRANSPORT field of journald entries)
+  #transports: ["audit"]
 
   # Parsers are also supported, here is an example of the multiline
   # parser.
