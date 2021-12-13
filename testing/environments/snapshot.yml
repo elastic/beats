@@ -16,9 +16,6 @@ services:
     - "xpack.security.enabled=true"
       # We want something as unlimited compilation rate, but 'unlimited' is not valid.
     - "script.max_compilations_rate=100000/1m"
-    - "script.context.ingest.cache_max_size=2000"
-    - "script.context.processor_conditional.cache_max_size=2000"
-    - "script.context.template.cache_max_size=2000"
     - "action.destructive_requires_name=false"
     # Disable geoip updates to prevent golden file test failures when the database
     # changes and prevent race conditions between tests and database updates.
