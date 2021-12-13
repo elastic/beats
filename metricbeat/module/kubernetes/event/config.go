@@ -42,6 +42,6 @@ func defaultKubernetesEventsConfig() kubeEventsConfig {
 		SyncPeriod:       10 * time.Minute,
 		LabelsDedot:      true,
 		AnnotationsDedot: true,
-		SkipOlder: true,
+		SkipOlder:        true,
 	}
 }
