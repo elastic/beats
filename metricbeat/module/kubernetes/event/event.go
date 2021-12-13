@@ -41,6 +41,7 @@ type MetricSet struct {
 	watcher      kubernetes.Watcher
 	watchOptions kubernetes.WatchOptions
 	dedotConfig  dedotConfig
+	skipOlder    bool
 }
 
 // dedotConfig defines LabelsDedot and AnnotationsDedot.
@@ -87,6 +88,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		dedotConfig:   dedotConfig,
 		watcher:       watcher,
 		watchOptions:  watchOptions,
+		skipOlder:     true,
 	}, nil
 }
 
@@ -104,10 +106,10 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 		DeleteFunc: nil,
 	}
 	m.watcher.AddEventHandler(kubernetes.FilteringResourceEventHandler{
-		// skip events happened before watch
 		FilterFunc: func(obj interface{}) bool {
 			eve := obj.(*kubernetes.Event)
-			if kubernetes.Time(&eve.LastTimestamp).Before(now) {
+			// if skipOlder, skip events happened before watch
+			if m.skipOlder && kubernetes.Time(&eve.LastTimestamp).Before(now) {
 				return false
 			}
 			return true
