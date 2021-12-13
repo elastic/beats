@@ -3,7 +3,7 @@
 @Library('apm@current') _
 
 pipeline {
-  agent none
+  agent { label "master" }
   environment {
     REPO = 'beats'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
@@ -67,6 +67,11 @@ pipeline {
           }
         }
       }
+    }
+  }
+  post {
+    cleanup {
+      deleteDir()
     }
   }
 }
