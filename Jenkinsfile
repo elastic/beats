@@ -74,7 +74,7 @@ pipeline {
           stage('test') {
             options { skipDefaultCheckout() }
             steps {
-              runCommand('mage run', "${beat}")
+              runCommand('mage unitTest', "${beat}")
             }
           }
         }
