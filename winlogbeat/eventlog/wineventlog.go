@@ -402,7 +402,6 @@ func newEventLogging(options *common.Config) (EventLog, error) {
 // using the Windows Event Log.
 func newWinEventLog(options *common.Config) (EventLog, error) {
 	var xmlQuery string
-	var channelName string
 	var err error
 
 	c := defaultWinEventLogConfig
@@ -415,7 +414,6 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 		xmlQuery = c.XMLQuery
 		id = c.ID
 	} else {
-		channelName = c.Name
 		if id == "" {
 			id = c.Name
 		}
@@ -455,7 +453,7 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 		id:          id,
 		config:      c,
 		query:       xmlQuery,
-		channelName: channelName,
+		channelName: c.Name,
 		file:        filepath.IsAbs(c.Name),
 		maxRead:     c.BatchReadSize,
 		renderBuf:   make([]byte, renderBufferSize),
