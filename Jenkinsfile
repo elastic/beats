@@ -57,12 +57,14 @@ pipeline {
         }
         stages {
           stage('build') {
+            options { skipDefaultCheckout() }
             steps {
               unstash 'source'
               runCommand('mage build', "${beat}")
             }
           }
           stage('test') {
+            options { skipDefaultCheckout() }
             steps {
               runCommand('mage run', "${beat}")
             }
