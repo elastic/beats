@@ -36,6 +36,7 @@ https://github.com/elastic/beats/compare/v7.15.2...v7.16.0[View commits]
 - Skip configuration checks in autodiscover for configurations that are already running {pull}29048[29048]
 - Fix `decode_json_processor` to always respect `add_error_key` {pull}29107[29107]
 - Fix `add_labels` flattening of array values. {pull}29211[29211]
+- Skip `add_kubernetes_metadata` processor when Kubernetes metadata are already present {pull}27689[27689]
 
 *Auditbeat*
 
@@ -181,7 +182,6 @@ https://github.com/elastic/beats/compare/v7.15.1...v7.15.2[View commits]
 - Remove unnecessary escaping step in dashboard loading, so they can be displayed in Kibana. {pull}28395[28395]
 - Fix AWS proxy_url config from url to string type.  {pull}28725[28725]
 - Fix `fingerprint` processor to give it access to the `@timestamp` field. {issue}28683[28683]
-- Skip `add_kubernetes_metadata` processor when Kubernetes metadata are already present {pull}27689[27689]
 
 *Filebeat*
 
