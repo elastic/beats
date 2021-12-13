@@ -17,7 +17,7 @@ type KubeFetcher struct {
 func NewKubeFetcher(kubeconfig string, interval time.Duration) (Fetcher, error) {
 	client, err := kubernetes.GetKubernetesClient(kubeconfig, kubernetes.KubeClientOptions{})
 	if err != nil {
-		return nil, fmt.Errorf("fail to get k8sclient client: %s", err.Error())
+		return nil, fmt.Errorf("could not get k8s client: %w", err)
 	}
 
 	logp.Info("Client initiated.")
@@ -26,7 +26,6 @@ func NewKubeFetcher(kubeconfig string, interval time.Duration) (Fetcher, error) 
 		SyncTimeout: interval,
 		Namespace:   "kube-system",
 	}
-
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, watchOptions, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating k8s client set: %v", err)
