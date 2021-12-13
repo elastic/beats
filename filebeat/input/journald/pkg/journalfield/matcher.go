@@ -137,7 +137,7 @@ func ApplyMatchersOr(j journal, matchers []Matcher) error {
 	return nil
 }
 
-// ApplySyslogIdentifierMatcher adds unit based filtering to the journal reader.
+// ApplyUnitMatchers adds unit based filtering to the journal reader.
 func ApplyUnitMatchers(j journal, units []string, kernel bool) error {
 	for _, unit := range units {
 		matchers := [][]Matcher{
