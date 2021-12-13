@@ -973,14 +973,14 @@ filebeat.inputs:
   #id: service-foo
 
   # You may wish to have separate inputs for each service. You can use
-  # include_matches to specify a list of filter expressions that are
+  # include_matches.or to specify a list of filter expressions that are
   # applied as a logical OR. You may specify filter
   #include_matches.or:
     #- equals:
       #- _SYSTEMD_UNIT=foo.service
 
   # List of syslog identifiers
-  #identifiers: ["audit"]
+  #syslog_identifiers: ["audit"]
 
   # List of units
   #units: ["docker.service"]

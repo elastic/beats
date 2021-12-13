@@ -39,7 +39,7 @@ type MatcherBuilder struct {
 // IncludeMatches stores the advanced matching configuratio
 // provided by the user.
 type IncludeMatches struct {
-	Matches []Matcher        `config:"equals"`
+	Matches []Matcher        `config:"match"`
 	AND     []IncludeMatches `config:"and"`
 	OR      []IncludeMatches `config:"or"`
 }
@@ -50,8 +50,12 @@ type journal interface {
 	AddConjunction() error
 }
 
-var defaultBuilder = MatcherBuilder{Conversions: journaldEventFields}
-var kernelMatcher = Matcher{"_TRANSPORT=kernel"}
+var (
+	defaultBuilder = MatcherBuilder{Conversions: journaldEventFields}
+	coreDumpMsgID  = MustBuildMatcher("message_id=fc2e22bc6ee647b6b90729ab34a250b1")
+	journaldUID    = MustBuildMatcher("journald.uid=0")
+	journaldPID    = MustBuildMatcher("journald.pid=1")
+)
 
 // Build creates a new Matcher using the configured conversion table.
 // If no table has been configured the internal default table will be used.
@@ -139,23 +143,44 @@ func ApplyMatchersOr(j journal, matchers []Matcher) error {
 
 // ApplyUnitMatchers adds unit based filtering to the journal reader.
 func ApplyUnitMatchers(j journal, units []string, kernel bool) error {
+	systemdUnit, err := BuildMatcher("systemd.unit=" + unit)
+	if err != nil {
+		return fmt.Errorf("failed to build matcher for _SYSTEMD_UNIT: %+w", err)
+	}
+	coredumpUnit, err := BuildMatcher("journald.coredump.unit=" + unit)
+	if err != nil {
+		return fmt.Errorf("failed to build matcher for COREDUMP_UNIT: %+w", err)
+	}
+	journaldUnit, err := BuildMatcher("journald.unit=" + unit)
+	if err != nil {
+		return fmt.Errorf("failed to build matcher for UNIT: %+w", err)
+	}
+	journaldObjectUnit, err := BuildMatcher("journald.object.systemd.unit=" + unit)
+	if err != nil {
+		return fmt.Errorf("failed to build matcher for OBJECT_SYSTEMD_UNIT: %+w", err)
+	}
+
 	for _, unit := range units {
 		matchers := [][]Matcher{
+			// match for the messages of the service
 			[]Matcher{
-				MustBuildMatcher("systemd.unit=" + unit),
+				systemdUnit,
 			},
+			// match for the coredumps of the service
 			[]Matcher{
-				MustBuildMatcher("message_id=fc2e22bc6ee647b6b90729ab34a250b1"),
-				MustBuildMatcher("journald.uid=1"),
-				MustBuildMatcher("journald.coredump.unit=" + unit),
+				coreDumpMsgID,
+				journaldUID,
+				coredumpUnit,
 			},
+			// match for messages about the service with PID value of 1
 			[]Matcher{
-				MustBuildMatcher("journald.pid=1"),
-				MustBuildMatcher("journald.unit=" + unit),
+				journaldPID,
+				journaldUnit,
 			},
+			// match for messages about the service from authorized daemons
 			[]Matcher{
-				MustBuildMatcher("journald.uid=1"),
-				MustBuildMatcher("journald.object.systemd.unit=" + unit),
+				journaldUID,
+				journaldObjectUnit,
 			},
 		}
 
@@ -167,12 +192,27 @@ func ApplyUnitMatchers(j journal, units []string, kernel bool) error {
 
 	}
 
-	if kernel {
-		if err := ApplyMatchersOr(j, []Matcher{kernelMatcher}); err != nil {
-			return fmt.Errorf("error while adding kernel transport to matchers: %+v", err)
-		}
+	return nil
+
+}
+
+// ApplyTransportMatcher adds matchers for the configured transports.
+func ApplyTransportMatcher(j journal, transports []string) error {
+	if len(transports) == 0 {
+		return nil
 	}
 
+	transportMatchers := make([]Matcher, len(transports))
+	for i, transport := range transports {
+		transportMatcher, err := BuildMatcher("_TRANSPORT=" + transport)
+		if err != nil {
+			return err
+		}
+		transportMatchers[i] = transportMatcher
+	}
+	if err := ApplyMatchersOr(j, transportMatchers); err != nil {
+		return fmt.Errorf("error while adding kernel transport to matchers: %+v", err)
+	}
 	return nil
 
 }

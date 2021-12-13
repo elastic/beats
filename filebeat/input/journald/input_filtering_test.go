@@ -134,9 +134,9 @@ func TestInputIncludeMatches(t *testing.T) {
 		includeMatches   map[string]interface{}
 		expectedMessages []string
 	}{
-		"single equals condition": {
+		"single match condition": {
 			includeMatches: map[string]interface{}{
-				"equals": []string{
+				"match": []string{
 					"syslog.facility=3",
 				},
 			},
@@ -150,9 +150,9 @@ func TestInputIncludeMatches(t *testing.T) {
 				"6th line",
 			},
 		},
-		"multiple equals condition": {
+		"multiple match condition": {
 			includeMatches: map[string]interface{}{
-				"equals": []string{
+				"match": []string{
 					"journald.process.name=systemd",
 					"syslog.facility=3",
 				},
@@ -165,7 +165,7 @@ func TestInputIncludeMatches(t *testing.T) {
 			includeMatches: map[string]interface{}{
 				"and": []map[string]interface{}{
 					map[string]interface{}{
-						"equals": []string{
+						"match": []string{
 							"syslog.facility=3",
 							"message=6th line",
 						},
@@ -180,7 +180,7 @@ func TestInputIncludeMatches(t *testing.T) {
 			includeMatches: map[string]interface{}{
 				"or": []map[string]interface{}{
 					map[string]interface{}{
-						"equals": []string{
+						"match": []string{
 							"message=5th line",
 							"message=6th line",
 						},

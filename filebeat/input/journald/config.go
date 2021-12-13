@@ -54,7 +54,7 @@ type config struct {
 	// Kernel stores whether kernel messages should be monitored
 	Kernel bool `config:"kernel"`
 	// Identifiers stores the syslog identifiers to watch
-	Identifiers []string `config:"identifiers"`
+	Identifiers []string `config:"syslog_identifiers"`
 
 	// SaveRemoteHostname defines if the original source of the entry needs to be saved.
 	SaveRemoteHostname bool `config:"save_remote_hostname"`
