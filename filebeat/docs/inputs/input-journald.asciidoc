@@ -25,7 +25,7 @@ journal.
 
 You may wish to have separate inputs for each service. You can use
 `include_matches` to specify filtering expressions.
-A good way to list the journald fields that are available for
+A good way to list the https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html[journald fields] that are available for
 filtering messages is to run `journalctl -o json` to output logs and metadata as
 JSON. This example collects logs from the `vault.service` systemd unit.
 
