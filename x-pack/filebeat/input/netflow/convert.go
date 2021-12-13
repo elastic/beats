@@ -196,6 +196,10 @@ func flowToBeatEvent(flow record.Record, internalNetworks []string) (event beat.
 		ecsSource["ip"] = ip
 		relatedIP = append(relatedIP, ip)
 		ecsSource["locality"] = getIPLocality(internalNetworks, ip).String()
+	} else if ip, found := getKeyIP(flow.Fields, "sourceIPv6Address"); found {
+		ecsSource["ip"] = ip
+		relatedIP = append(relatedIP, ip)
+		ecsSource["locality"] = getIPLocality(internalNetworks, ip).String()
 	}
 	if sourcePort, found := getKeyUint64(flow.Fields, "sourceTransportPort"); found {
 		ecsSource["port"] = sourcePort
@@ -206,6 +210,10 @@ func flowToBeatEvent(flow record.Record, internalNetworks []string) (event beat.
 
 	// ECS Fields -- destination
 	if ip, found := getKeyIP(flow.Fields, "destinationIPv4Address"); found {
+		ecsDest["ip"] = ip
+		relatedIP = append(relatedIP, ip)
+		ecsDest["locality"] = getIPLocality(internalNetworks, ip).String()
+	} else if ip, found := getKeyIP(flow.Fields, "destinationIPv6Address"); found {
 		ecsDest["ip"] = ip
 		relatedIP = append(relatedIP, ip)
 		ecsDest["locality"] = getIPLocality(internalNetworks, ip).String()
