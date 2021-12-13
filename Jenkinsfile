@@ -79,7 +79,9 @@ pipeline {
 }
 
 def runCommand(command, beat) {
-  dir("${BASE_DIR}/${beat}"){
-    cmd(label: "${command}", script: "${command} || true")
+  withMageEnv(version: env.GO_VERSION) {
+    dir("${BASE_DIR}/${beat}"){
+      cmd(label: "${command}", script: "${command} || true")
+    }
   }
 }
