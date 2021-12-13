@@ -5,9 +5,11 @@
 package netflow
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/binary"
 	"net"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -329,9 +331,29 @@ func flowToBeatEvent(flow record.Record, internalNetworks []string) (event beat.
 		event.Fields["network"] = ecsNetwork
 	}
 	if len(relatedIP) > 0 {
-		event.Fields["related"] = common.MapStr{"ip": relatedIP}
+		event.Fields["related"] = common.MapStr{"ip": uniqueIPs(relatedIP)}
 	}
 	return
+}
+
+// unique returns ips lexically sorted and with repeated elements
+// omitted.
+func uniqueIPs(ips []net.IP) []net.IP {
+	if len(ips) < 2 {
+		return ips
+	}
+	sort.Slice(ips, func(i, j int) bool { return bytes.Compare(ips[i], ips[j]) < 0 })
+	curr := 0
+	for i, ip := range ips {
+		if ip.Equal(ips[curr]) {
+			continue
+		}
+		curr++
+		if curr < i {
+			ips[curr], ips[i] = ips[i], nil
+		}
+	}
+	return ips[:curr+1]
 }
 
 func getKeyUint64(dict record.Map, key string) (value uint64, found bool) {
