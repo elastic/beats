@@ -24,99 +24,81 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
-type Batch interface {
-	publisher.Batch
-
-	reduceTTL() bool
+type retryer interface {
+	retry(batch *ttlBatch, decreaseTTL bool)
 }
 
-type batch struct {
+type ttlBatch struct {
 	original queue.Batch
-	ctx      *batchContext
-	ttl      int
-	events   []publisher.Event
-}
 
-type batchContext struct {
-	observer outputObserver
-	retryer  *retryer
+	// The internal hook back to the eventConsumer, used to implement the
+	// publisher.Batch retry interface.
+	retryer retryer
+
+	// How many retries until we drop this batch. -1 means it can't be dropped.
+	ttl int
+
+	// The cached events returned from original.Events(). If some but not
+	// all of the events are ACKed, those ones are removed from the list.
+	events []publisher.Event
 }
 
 var batchPool = sync.Pool{
 	New: func() interface{} {
-		return &batch{}
+		return &ttlBatch{}
 	},
 }
 
-func newBatch(ctx *batchContext, original queue.Batch, ttl int) *batch {
+func newBatch(retryer retryer, original queue.Batch, ttl int) *ttlBatch {
 	if original == nil {
 		panic("empty batch")
 	}
 
-	b := batchPool.Get().(*batch)
-	*b = batch{
+	b := batchPool.Get().(*ttlBatch)
+	*b = ttlBatch{
 		original: original,
-		ctx:      ctx,
+		retryer:  retryer,
 		ttl:      ttl,
 		events:   original.Events(),
 	}
 	return b
 }
 
-func releaseBatch(b *batch) {
-	*b = batch{} // clear batch
+func releaseBatch(b *ttlBatch) {
+	*b = ttlBatch{} // clear batch
 	batchPool.Put(b)
 }
 
-func (b *batch) Events() []publisher.Event {
+func (b *ttlBatch) Events() []publisher.Event {
 	return b.events
 }
 
-func (b *batch) ACK() {
-	if b.ctx != nil {
-		b.ctx.observer.outBatchACKed(len(b.events))
-	}
+func (b *ttlBatch) ACK() {
 	b.original.ACK()
 	releaseBatch(b)
 }
 
-func (b *batch) Drop() {
+func (b *ttlBatch) Drop() {
 	b.original.ACK()
 	releaseBatch(b)
 }
 
-func (b *batch) Retry() {
-	b.ctx.retryer.retry(b)
+func (b *ttlBatch) Retry() {
+	b.retryer.retry(b, true)
 }
 
-func (b *batch) Cancelled() {
-	b.ctx.retryer.cancelled(b)
+func (b *ttlBatch) Cancelled() {
+	b.retryer.retry(b, false)
 }
 
-func (b *batch) RetryEvents(events []publisher.Event) {
-	b.updEvents(events)
-	b.Retry()
-}
-
-func (b *batch) CancelledEvents(events []publisher.Event) {
-	b.updEvents(events)
-	b.Cancelled()
-}
-
-func (b *batch) updEvents(events []publisher.Event) {
-	l1 := len(b.events)
-	l2 := len(events)
-	if l1 > l2 {
-		// report subset of events not to be retried as ACKed
-		b.ctx.observer.outBatchACKed(l1 - l2)
-	}
-
+func (b *ttlBatch) RetryEvents(events []publisher.Event) {
 	b.events = events
+	b.Retry()
 }
 
 // reduceTTL reduces the time to live for all events that have no 'guaranteed'
 // sending requirements.  reduceTTL returns true if the batch is still alive.
-func (b *batch) reduceTTL() bool {
+func (b *ttlBatch) reduceTTL() bool {
 	if b.ttl <= 0 {
 		return true
 	}

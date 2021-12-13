@@ -27,12 +27,13 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/gosigar/sys/windows"
 )
 
 // Get fetches Windows CPU system times
-func Get(_ string) (CPUMetrics, error) {
+func Get(_ resolve.Resolver) (CPUMetrics, error) {
 	idle, kernel, user, err := windows.GetSystemTimes()
 	if err != nil {
 		return CPUMetrics{}, errors.Wrap(err, "GetSystemTimes failed")
