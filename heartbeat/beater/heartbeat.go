@@ -97,6 +97,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	if bt.config.RunOnce {
 		bt.scheduler.WaitForRunOnce()
+		logp.Info("Ending run_once run")
 		return nil
 	}
 
