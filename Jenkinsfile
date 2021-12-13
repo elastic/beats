@@ -17,9 +17,6 @@ pipeline {
     timeout(time: 1, unit: 'HOURS')
     timestamps()
   }
-  triggers {
-    cron('H */2 * * *')
-  }
   parameters {
     string(name: 'COMMAND', defaultValue: 'mage build', description: 'What command?')
   }
