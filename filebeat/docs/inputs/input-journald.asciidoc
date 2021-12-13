@@ -142,7 +142,7 @@ is `field=value`. {beatname_uc} fetches all events that exactly match the
 expressions. Pattern matching is not supported.
 
 If you configured a filter expression, only entries with this field set will be iterated.
-If the filter expressions apply to different fields, only entries with both fields set like this will be iterated.
+If the filter expressions apply to different fields, only entries with all fields set will be iterated.
 If they apply to the same fields, only entries where the field takes one of the specified values will be iterated.
 
 `equals`: List of filter expressions to match fields.
