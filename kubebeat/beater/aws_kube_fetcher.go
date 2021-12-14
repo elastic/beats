@@ -61,6 +61,9 @@ func (f AwsKubeFetcher) Fetch() ([]interface{}, error) {
 	lbData, err := f.GetLoadBalancerInformation()
 	results = append(results, lbData)
 
+	nodeData, err := f.GetNodeInformation()
+	results = append(results, nodeData)
+
 	return results, err
 }
 
