@@ -34,7 +34,7 @@ JSON. This example collects logs from the `vault.service` systemd unit.
 {beatname_lc}.inputs:
 - type: journald
   id: service-vault
-  include_matches.equals:
+  include_matches.match:
     - _SYSTEMD_UNIT=vault.service
 ----
 
@@ -48,7 +48,7 @@ possible.
 {beatname_lc}.inputs:
 - type: journald
   id: iptables
-  include_matches.equals:
+  include_matches.match:
     - _TRANSPORT=kernel
   processors:
     - drop_event:
@@ -134,6 +134,25 @@ If you have old log files and want to skip lines, start {beatname_uc} with
 {beatname_uc}.
 
 [float]
+[id="{beatname_lc}-input-{type}-units"]
+==== `units`
+
+Iterate only the entries of the units specified in this option. The iterated entries include
+messages from the units, messages about the units by authorized daemons and coredumps.
+
+[float]
+[id="{beatname_lc}-input-{type}-syslog-identifiers"]
+==== `syslog_identifiers`
+
+Read only the entries with the selected syslog identifiers.
+
+[float]
+[id="{beatname_lc}-input-{type}-syslog-identifiers"]
+==== `transports`
+
+Collect the messages using the specified transports. Example: syslog.
+
+[float]
 [id="{beatname_lc}-input-{type}-include-matches"]
 ==== `include_matches`
 
@@ -141,11 +160,11 @@ A collection of filter expressions used to match fields. The format of the expre
 is `field=value`. {beatname_uc} fetches all events that exactly match the
 expressions. Pattern matching is not supported.
 
-If you configured a filter expression, only entries with this field set will be iterated.
+If you configured a filter expression, only entries with this field set will be iterated by the journald reader of Filebeat.
 If the filter expressions apply to different fields, only entries with all fields set will be iterated.
 If they apply to the same fields, only entries where the field takes one of the specified values will be iterated.
 
-`equals`: List of filter expressions to match fields.
+`match`: List of filter expressions to match fields.
 `or`: The filter expressions listed under `or` are connected with a disjunction (or).
 `and`: The filter expressions listed under `and` are connected with a conjunction (and).
 
@@ -157,7 +176,7 @@ The following include matches configuration reads all `systemd` syslog entries:
 ["source","yaml",subs="attributes"]
 ----
 include_matches.and:
-- equals:
+- match:
   - "journald.process.name=systemd"
   - "systemd.transport=syslog"
 ----
