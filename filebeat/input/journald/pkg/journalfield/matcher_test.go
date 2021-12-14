@@ -99,6 +99,6 @@ func TestApplyUnit(t *testing.T) {
 	}
 	defer journal.Close()
 
-	err = ApplyUnitMatchers(journal, []string{"docker.service"}, false)
+	err = ApplyUnitMatchers(journal, []string{"docker.service"})
 	require.NoError(t, err)
 }

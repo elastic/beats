@@ -142,25 +142,25 @@ func ApplyMatchersOr(j journal, matchers []Matcher) error {
 }
 
 // ApplyUnitMatchers adds unit based filtering to the journal reader.
-func ApplyUnitMatchers(j journal, units []string, kernel bool) error {
-	systemdUnit, err := BuildMatcher("systemd.unit=" + unit)
-	if err != nil {
-		return fmt.Errorf("failed to build matcher for _SYSTEMD_UNIT: %+w", err)
-	}
-	coredumpUnit, err := BuildMatcher("journald.coredump.unit=" + unit)
-	if err != nil {
-		return fmt.Errorf("failed to build matcher for COREDUMP_UNIT: %+w", err)
-	}
-	journaldUnit, err := BuildMatcher("journald.unit=" + unit)
-	if err != nil {
-		return fmt.Errorf("failed to build matcher for UNIT: %+w", err)
-	}
-	journaldObjectUnit, err := BuildMatcher("journald.object.systemd.unit=" + unit)
-	if err != nil {
-		return fmt.Errorf("failed to build matcher for OBJECT_SYSTEMD_UNIT: %+w", err)
-	}
-
+func ApplyUnitMatchers(j journal, units []string) error {
 	for _, unit := range units {
+		systemdUnit, err := BuildMatcher("systemd.unit=" + unit)
+		if err != nil {
+			return fmt.Errorf("failed to build matcher for _SYSTEMD_UNIT: %+w", err)
+		}
+		coredumpUnit, err := BuildMatcher("journald.coredump.unit=" + unit)
+		if err != nil {
+			return fmt.Errorf("failed to build matcher for COREDUMP_UNIT: %+w", err)
+		}
+		journaldUnit, err := BuildMatcher("journald.unit=" + unit)
+		if err != nil {
+			return fmt.Errorf("failed to build matcher for UNIT: %+w", err)
+		}
+		journaldObjectUnit, err := BuildMatcher("journald.object.systemd.unit=" + unit)
+		if err != nil {
+			return fmt.Errorf("failed to build matcher for OBJECT_SYSTEMD_UNIT: %+w", err)
+		}
+
 		matchers := [][]Matcher{
 			// match for the messages of the service
 			[]Matcher{
@@ -211,7 +211,7 @@ func ApplyTransportMatcher(j journal, transports []string) error {
 		transportMatchers[i] = transportMatcher
 	}
 	if err := ApplyMatchersOr(j, transportMatchers); err != nil {
-		return fmt.Errorf("error while adding kernel transport to matchers: %+v", err)
+		return fmt.Errorf("error while adding %+v transport to matchers: %+v", transports, err)
 	}
 	return nil
 
@@ -246,7 +246,6 @@ func ApplyIncludeMatches(j journal, m IncludeMatches) error {
 			return fmt.Errorf("error adding conjunction to journal: %v", err)
 		}
 	}
-
 
 	for _, match := range m.Matches {
 		if err := match.Apply(j); err != nil {

@@ -52,8 +52,8 @@ func TestInputSyslogIdentifier(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 			inp := env.mustCreateInput(common.MapStr{
-				"paths":       []string{path.Join("testdata", "input-multiline-parser.journal")},
-				"identifiers": testCase.identifiers,
+				"paths":              []string{path.Join("testdata", "input-multiline-parser.journal")},
+				"syslog_identifiers": testCase.identifiers,
 			})
 
 			ctx, cancelInput := context.WithCancel(context.Background())
