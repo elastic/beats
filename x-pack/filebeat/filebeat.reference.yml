@@ -160,6 +160,12 @@ filebeat.modules:
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
 
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
+
   cloudwatch:
     enabled: false
 
@@ -211,6 +217,12 @@ filebeat.modules:
 
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
 
   ec2:
     enabled: false
@@ -264,6 +276,12 @@ filebeat.modules:
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
 
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
+
   elb:
     enabled: false
 
@@ -315,6 +333,12 @@ filebeat.modules:
 
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
 
   s3access:
     enabled: false
@@ -368,6 +392,12 @@ filebeat.modules:
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
 
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
+
   vpcflow:
     enabled: false
 
@@ -419,6 +449,12 @@ filebeat.modules:
 
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
 
 #----------------------------- AWS Fargate Module -----------------------------
 - module: awsfargate
@@ -475,6 +511,12 @@ filebeat.modules:
     # Time used to sleep between AWS FilterLogEvents API calls inside the same collection period
     # Default api_sleep is 200 ms
     #var.api_sleep: 200ms
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
 
 #-------------------------------- Azure Module --------------------------------
 - module: azure

@@ -56,6 +56,14 @@ session_token: {{ .session_token }}
 role_arn: {{ .role_arn }}
 {{ end }}
 
+{{ if .proxy_url }}
+proxy_url: {{ .proxy_url }}
+{{ end }}
+
+{{ if .ssl }}
+ssl: {{ .ssl | tojson }}
+{{ end }}
+
 processors:
   - add_fields:
       target: ''

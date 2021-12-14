@@ -81,6 +81,10 @@ max_number_of_messages: {{ .max_number_of_messages }}
 proxy_url: {{ .proxy_url }}
 {{ end }}
 
+{{ if .ssl }}
+ssl: {{ .ssl | tojson }}
+{{ end }}
+
 tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
