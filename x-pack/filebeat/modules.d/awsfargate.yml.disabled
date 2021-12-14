@@ -55,3 +55,9 @@
     # Time used to sleep between AWS FilterLogEvents API calls inside the same collection period
     # Default api_sleep is 200 ms
     #var.api_sleep: 200ms
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
