@@ -5,7 +5,11 @@
 package blkio
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/containerd"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 
@@ -56,6 +60,7 @@ var (
 type metricset struct {
 	mb.BaseMetricSet
 	prometheusClient prometheus.Prometheus
+	mod              containerd.Module
 }
 
 // init registers the MetricSet with the central registry.
@@ -77,17 +82,26 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	mod, ok := base.Module().(containerd.Module)
+	if !ok {
+		return nil, fmt.Errorf("must be child of kubernetes module")
+	}
 	return &metricset{
 		BaseMetricSet:    base,
 		prometheusClient: pc,
+		mod:              mod,
 	}, nil
 }
 
 // Fetch gathers information from the containerd and reports events with this information.
 func (m *metricset) Fetch(reporter mb.ReporterV2) error {
-	events, err := m.prometheusClient.GetProcessedMetrics(mapping)
+	families, err := m.mod.GetContainerdMetricsFamilies(m.prometheusClient)
 	if err != nil {
-		return errors.Wrap(err, "error getting metrics")
+		return errors.Wrap(err, "error getting families")
+	}
+	events, err := m.prometheusClient.ProcessMetrics(families, mapping)
+	if err != nil {
+		return errors.Wrap(err, "error getting events")
 	}
 	for _, event := range events {
 
