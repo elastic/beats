@@ -495,7 +495,7 @@
         "user.name": "maxmustermann"
     },
     {
-        "@timestamp": "2021-10-22T16:10:05.000Z",
+        "@timestamp": "2021-10-22T14:10:05.000-02:00",
         "client.address": "10.2.2.2",
         "client.ip": "10.2.2.2",
         "client.nat.ip": "10.1.1.1",
@@ -553,7 +553,7 @@
         "user.name": "host"
     },
     {
-        "@timestamp": "2021-11-09T21:45:14.000Z",
+        "@timestamp": "2021-11-09T19:45:14.000-02:00",
         "client.address": "10.4.4.4",
         "client.ip": "10.4.4.4",
         "client.nat.ip": "10.3.3.3",
@@ -611,7 +611,7 @@
         "user.name": "user"
     },
     {
-        "@timestamp": "2021-11-09T21:45:14.000Z",
+        "@timestamp": "2021-11-09T19:45:14.000-02:00",
         "event.code": "gateway-tunnel-latency",
         "event.dataset": "panw.panos",
         "event.duration": 0,

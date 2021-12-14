@@ -6,7 +6,7 @@ pull_request_rules:
   - name: forward-port patches to master branch
     conditions:
       - merged
-      - label=backport-v8.1.0
+      - label=forwardport-master
     actions:
       backport:
         assignees:
