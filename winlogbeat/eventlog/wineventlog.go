@@ -412,7 +412,6 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 	id := c.ID
 	if c.XMLQuery != "" {
 		xmlQuery = c.XMLQuery
-		id = c.ID
 	} else {
 		if id == "" {
 			id = c.Name
