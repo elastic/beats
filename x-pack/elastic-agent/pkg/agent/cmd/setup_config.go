@@ -40,12 +40,13 @@ type fleetServerConfig struct {
 }
 
 type elasticsearchConfig struct {
-	CA           string `config:"ca"`
-	Host         string `config:"host"`
-	Username     string `config:"username"`
-	Password     string `config:"password"`
-	ServiceToken string `config:"service_token"`
-	Insecure     bool   `config:"insecure"`
+	CA                   string `config:"ca"`
+	CATrustedFingerprint string `config:"ca_trusted_fingerprint"`
+	Host                 string `config:"host"`
+	Username             string `config:"username"`
+	Password             string `config:"password"`
+	ServiceToken         string `config:"service_token"`
+	Insecure             bool   `config:"insecure"`
 }
 
 type kibanaConfig struct {
@@ -91,12 +92,13 @@ func defaultAccessConfig() (setupConfig, error) {
 			Cert:    envWithDefault("", "FLEET_SERVER_CERT"),
 			CertKey: envWithDefault("", "FLEET_SERVER_CERT_KEY"),
 			Elasticsearch: elasticsearchConfig{
-				Host:         envWithDefault("http://elasticsearch:9200", "FLEET_SERVER_ELASTICSEARCH_HOST", "ELASTICSEARCH_HOST"),
-				Username:     envWithDefault("elastic", "FLEET_SERVER_ELASTICSEARCH_USERNAME", "ELASTICSEARCH_USERNAME"),
-				Password:     envWithDefault("changeme", "FLEET_SERVER_ELASTICSEARCH_PASSWORD", "ELASTICSEARCH_PASSWORD"),
-				ServiceToken: envWithDefault("", "FLEET_SERVER_SERVICE_TOKEN"),
-				CA:           envWithDefault("", "FLEET_SERVER_ELASTICSEARCH_CA", "ELASTICSEARCH_CA"),
-				Insecure:     envBool("FLEET_SERVER_ELASTICSEARCH_INSECURE"),
+				Host:                 envWithDefault("http://elasticsearch:9200", "FLEET_SERVER_ELASTICSEARCH_HOST", "ELASTICSEARCH_HOST"),
+				Username:             envWithDefault("elastic", "FLEET_SERVER_ELASTICSEARCH_USERNAME", "ELASTICSEARCH_USERNAME"),
+				Password:             envWithDefault("changeme", "FLEET_SERVER_ELASTICSEARCH_PASSWORD", "ELASTICSEARCH_PASSWORD"),
+				ServiceToken:         envWithDefault("", "FLEET_SERVER_SERVICE_TOKEN"),
+				CA:                   envWithDefault("", "FLEET_SERVER_ELASTICSEARCH_CA", "ELASTICSEARCH_CA"),
+				CATrustedFingerprint: envWithDefault("", "FLEET_SERVER_ELASTICSEARCH_CA_TRUSTED_FINGERPRINT"),
+				Insecure:             envBool("FLEET_SERVER_ELASTICSEARCH_INSECURE"),
 			},
 			Enable:       envBool("FLEET_SERVER_ENABLE"),
 			Host:         envWithDefault("", "FLEET_SERVER_HOST"),
