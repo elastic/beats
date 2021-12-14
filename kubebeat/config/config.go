@@ -24,7 +24,7 @@ var DefaultConfig = Config{
 		"/hostfs/etc/kubernetes/manifests/kube-scheduler.yaml",
 		"/hostfs/etc/systemd/system/kubelet.service.d/10-kubeadm.conf",
 		"/hostfs/var/lib/kubelet/config.yaml",
-		"/hostfs/var/lib/etcd",
-		"/hostfs/etc/kubernetes/pki",
+		"/hostfs/var/lib/etcd/**",
+		"/hostfs/etc/kubernetes/pki/**",
 	},
 }
