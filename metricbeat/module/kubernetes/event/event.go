@@ -88,7 +88,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		dedotConfig:   dedotConfig,
 		watcher:       watcher,
 		watchOptions:  watchOptions,
-		skipOlder:     true,
+		skipOlder:     config.SkipOlder,
 	}, nil
 }
 
