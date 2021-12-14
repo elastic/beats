@@ -22,11 +22,21 @@ import (
 )
 
 type kubeEventsConfig struct {
+<<<<<<< HEAD
 	KubeConfig       string        `config:"kube_config"`
 	Namespace        string        `config:"namespace"`
 	SyncPeriod       time.Duration `config:"sync_period"`
 	LabelsDedot      bool          `config:"labels.dedot"`
 	AnnotationsDedot bool          `config:"annotations.dedot"`
+=======
+	KubeConfig        string                       `config:"kube_config"`
+	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
+	Namespace         string                       `config:"namespace"`
+	SyncPeriod        time.Duration                `config:"sync_period"`
+	LabelsDedot       bool                         `config:"labels.dedot"`
+	AnnotationsDedot  bool                         `config:"annotations.dedot"`
+	SkipOlder         bool                         `config:"skip_older"`
+>>>>>>> 9b893e88c (Add option to skip older k8s events (#29396))
 }
 
 type Enabled struct {
@@ -38,5 +48,6 @@ func defaultKubernetesEventsConfig() kubeEventsConfig {
 		SyncPeriod:       10 * time.Minute,
 		LabelsDedot:      true,
 		AnnotationsDedot: true,
+		SkipOlder:        true,
 	}
 }
