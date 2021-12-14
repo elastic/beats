@@ -1,19 +1,18 @@
 package beater
 
 import (
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"os"
 	"os/user"
 	"strconv"
 	"syscall"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // FileSystemFetcher implement the Fetcher interface
 // The FileSystemFetcher meant to fetch file/directories from the file system and ship it
 // to the Kubebeat
 type FileSystemFetcher struct {
-	filesPaths []string // Files and directories paths for the fetcher to extract info from
+	inputFilePatterns []string // Files and directories paths for the fetcher to extract info from
 }
 
 const (
@@ -33,30 +32,37 @@ type FileSystemResourceData struct {
 
 func NewFileFetcher(filesPaths []string) Fetcher {
 	return &FileSystemFetcher{
-		filesPaths: filesPaths,
+		inputFilePatterns: filesPaths,
 	}
 }
 
 func (f *FileSystemFetcher) Fetch() ([]interface{}, error) {
 	results := make([]interface{}, 0)
 
-	for _, filePath := range f.filesPaths {
-		info, err := os.Stat(filePath)
-
-		// If errors occur during file system resource, just skip on the file and log the error
+	// Input files might contain glob pattern
+	for _, filePattern := range f.inputFilePatterns {
+		matchedFiles, err := Glob(filePattern)
 		if err != nil {
-			logp.Err("Failed to fetch %s, error - %+v", filePath, err)
-			continue
+			logp.Err("Failed to find matched glob for %s, error - %+v", filePattern, err)
 		}
-
-		result := FromFileInfo(info, filePath)
-		results = append(results, result)
+		for _, file := range matchedFiles {
+			resource := f.fetchSystemResource(file)
+			results = append(results, resource)
+		}
 	}
-
 	return results, nil
 }
 
-func (f *FileSystemFetcher) Stop() {
+func (f *FileSystemFetcher) fetchSystemResource(filePath string) interface{} {
+
+	info, err := os.Stat(filePath)
+	if err != nil {
+		logp.Err("Failed to fetch %s, error - %+v", filePath, err)
+		return nil
+	}
+	file := FromFileInfo(info, filePath)
+
+	return file
 }
 
 func FromFileInfo(info os.FileInfo, path string) FileSystemResourceData {
@@ -84,4 +90,7 @@ func FromFileInfo(info os.FileInfo, path string) FileSystemResourceData {
 	}
 
 	return data
+}
+
+func (f *FileSystemFetcher) Stop() {
 }

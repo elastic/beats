@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -14,12 +15,13 @@ import (
 // against it. It sends the cache to an output channel at the defined interval.
 type Data struct {
 	interval time.Duration
-	output   chan interface{}
+	output   chan map[string][]interface{}
 
 	ctx      context.Context
 	cancel   context.CancelFunc
 	state    map[string][]interface{}
 	fetchers map[string]Fetcher
+	wg       *sync.WaitGroup
 }
 
 // NewData returns a new Data instance with the given interval.
@@ -28,7 +30,7 @@ func NewData(ctx context.Context, interval time.Duration) *Data {
 
 	return &Data{
 		interval: interval,
-		output:   make(chan interface{}),
+		output:   make(chan map[string][]interface{}),
 		ctx:      ctx,
 		cancel:   cancel,
 		state:    make(map[string][]interface{}),
@@ -37,7 +39,7 @@ func NewData(ctx context.Context, interval time.Duration) *Data {
 }
 
 // Output returns the output channel.
-func (d *Data) Output() <-chan interface{} {
+func (d *Data) Output() <-chan map[string][]interface{} {
 	return d.output
 }
 
@@ -55,16 +57,27 @@ func (d *Data) RegisterFetcher(key string, f Fetcher) error {
 func (d *Data) Run() error {
 	updates := make(chan update)
 
+	var wg sync.WaitGroup
+	d.wg = &wg
+
 	for key, fetcher := range d.fetchers {
-		go d.fetchWorker(updates, key, fetcher)
+		wg.Add(1)
+		go func(k string, f Fetcher) {
+			defer wg.Done()
+			d.fetchWorker(updates, k, f)
+		}(key, fetcher)
 	}
 
-	go d.fetchManager(updates)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		d.fetchManager(updates)
+	}()
 
 	return nil
 }
 
-// update is a sigle update sent from a worker to a manager.
+// update is a single update sent from a worker to a manager.
 type update struct {
 	key string
 	val []interface{}
@@ -122,6 +135,8 @@ func (d *Data) Stop() {
 		fetcher.Stop()
 		logp.L().Infof("Fetcher for key %q stopped", key)
 	}
+
+	d.wg.Wait()
 }
 
 // copy makes a copy of the given map.
