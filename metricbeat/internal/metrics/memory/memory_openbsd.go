@@ -35,6 +35,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
@@ -157,7 +158,7 @@ type Swapent struct {
 	sw_path     []byte
 }
 
-func get(_ string) (Memory, error) {
+func get(_ resolve.Resolver) (Memory, error) {
 
 	memData := Memory{}
 

@@ -24,11 +24,12 @@ import (
 	"github.com/shirou/gopsutil/net"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 )
 
 //a stub function for non-linux systems
 //get a list of platform-specific enhancements and apply them to our mapStr object.
-func applyEnhancements(data common.MapStr) (common.MapStr, error) {
+func applyEnhancements(data common.MapStr, sys resolve.Resolver) (common.MapStr, error) {
 	return data, nil
 }
 
