@@ -56,10 +56,10 @@
     },
     {
         "@timestamp": "2019-10-09T10:20:15.000-02:00",
-        "client.ip": "67.240.185.235",
+        "client.ip": "89.160.20.112",
         "event.dataset": "panw.panos",
         "event.module": "panw",
-        "event.original": "1,2019/10/09 10:20:15,001234567890002,HIPMATCH,0,2304,2019/10/09 10:20:15,ira,vsys1,oh-C02ABCDEFGH4,Mac,67.240.185.235,GP-HIP-PROFILE,1,profile,0,0,0123456789,0x0,0,0,0,0,,SumoRedfw01a,1,0.0.0.0,gh:85:90:99:5a:40,C02ABCDEFGH",
+        "event.original": "1,2019/10/09 10:20:15,001234567890002,HIPMATCH,0,2304,2019/10/09 10:20:15,ira,vsys1,oh-C02ABCDEFGH4,Mac,89.160.20.112,GP-HIP-PROFILE,1,profile,0,0,0123456789,0x0,0,0,0,0,,SumoRedfw01a,1,0.0.0.0,gh:85:90:99:5a:40,C02ABCDEFGH",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "panos",
@@ -93,24 +93,24 @@
             "oh-C02ABCDEFGH4"
         ],
         "related.ip": [
-            "67.240.185.235"
+            "89.160.20.112"
         ],
         "related.user": [
             "ira"
         ],
         "service.type": "panw",
-        "source.address": "67.240.185.235",
-        "source.as.number": 11351,
-        "source.as.organization.name": "Charter Communications Inc",
-        "source.geo.city_name": "Portland",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 43.6598,
-        "source.geo.location.lon": -70.2547,
-        "source.geo.region_iso_code": "US-ME",
-        "source.geo.region_name": "Maine",
-        "source.ip": "67.240.185.235",
+        "source.address": "89.160.20.112",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.112",
         "source.user.name": "ira",
         "tags": [
             "forwarded",
