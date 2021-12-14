@@ -15,7 +15,7 @@ func TestElbProvider(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	elbProvider := ElbProvider{}
+	elbProvider := ELBProvider{}
 
 	ctx, cancel := context.WithTimeout(context.TODO(), 30*time.Second)
 	defer cancel()

@@ -7,16 +7,17 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type ElbProvider struct {
+type ELBProvider struct {
 }
 
-func (provider ElbProvider) DescribeLoadBalancer(cfg aws.Config, ctx context.Context, balancersNames []string) (*elasticloadbalancing.DescribeLoadBalancersOutput, error) {
+/// DescribeLoadBalancer method will return up to 400 results
+/// If we will ever want to increase this number, DescribeLoadBalancers support paginated requests
+func (provider ELBProvider) DescribeLoadBalancer(cfg aws.Config, ctx context.Context, balancersNames []string) (*elasticloadbalancing.DescribeLoadBalancersOutput, error) {
 	svc := elasticloadbalancing.NewFromConfig(cfg)
 	input := &elasticloadbalancing.DescribeLoadBalancersInput{
 		LoadBalancerNames: balancersNames,
 	}
 
-	// TODO - There is next marker for large responses
 	response, err := svc.DescribeLoadBalancers(ctx, input)
 	if err != nil {
 		logp.Err("Failed to describe cluster %s from ecr, error - %+v", balancersNames, err)

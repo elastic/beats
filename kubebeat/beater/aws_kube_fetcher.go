@@ -17,21 +17,17 @@ import (
 )
 
 type AwsKubeFetcher struct {
-	cfg         aws.Config
-	ecrFetcher  ECRDataFetcher
-	kubeClient  k8s.Interface
-	eks         EKSProvider
 	clusterName string
-	elb         ElbProvider
+	cfg         aws.Config
+	kubeClient  k8s.Interface
+	ecrProvider ECRDataFetcher
+	eks         EKSProvider
+	elb         ELBProvider
 }
 
-func NewAwsKubeFetcherFetcher(kubeConfigPath string, clusterName string) Fetcher {
+func NewAwsKubeFetcherFetcher(kubeconfig string, clusterName string) Fetcher {
 
-	if kubeConfigPath == "" {
-		kubeConfigPath = kubernetes.GetKubeConfigEnvironmentVariable()
-	}
-
-	kubernetesClient, err := kubernetes.GetKubernetesClient(kubeConfigPath, kubernetes.KubeClientOptions{})
+	kubernetesClient, err := kubernetes.GetKubernetesClient(kubeconfig, kubernetes.KubeClientOptions{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,11 +36,11 @@ func NewAwsKubeFetcherFetcher(kubeConfigPath string, clusterName string) Fetcher
 
 	ecr := ECRDataFetcher{}
 	eks := EKSProvider{}
-	elb := ElbProvider{}
+	elb := ELBProvider{}
 
 	return &AwsKubeFetcher{
 		cfg:         cfg,
-		ecrFetcher:  ecr,
+		ecrProvider: ecr,
 		kubeClient:  kubernetesClient,
 		eks:         eks,
 		elb:         elb,
@@ -54,7 +50,6 @@ func NewAwsKubeFetcherFetcher(kubeConfigPath string, clusterName string) Fetcher
 
 func (f AwsKubeFetcher) Fetch() ([]interface{}, error) {
 
-	//Get Images for ECR
 	results := make([]interface{}, 0)
 
 	repositories, err := f.GetECRInformation()
@@ -76,9 +71,9 @@ func (f AwsKubeFetcher) Fetch() ([]interface{}, error) {
 func (f AwsKubeFetcher) GetClusterInfo() (*eks.DescribeClusterOutput, error) {
 
 	// https://github.com/kubernetes/client-go/issues/530
-	// Probably we will need to ask for the cluster name via user input
+	// Currently we could not auto-detected the cluster name
 
-	// TODO - Need to use all namespaces with leader election
+	// TODO - leader election
 	ctx2, cancel2 := context.WithTimeout(context.TODO(), 30*time.Second)
 	defer cancel2()
 
@@ -95,8 +90,8 @@ func (f AwsKubeFetcher) GetECRInformation() ([]types.Repository, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), 30*time.Second)
 	defer cancel()
 
-	// TODO - Need to use all namespaces with leader election
-	podsList, err := f.kubeClient.CoreV1().Pods("default").List(ctx, metav1.ListOptions{})
+	// TODO - Need to use leader election
+	podsList, err := f.kubeClient.CoreV1().Pods("").List(ctx, metav1.ListOptions{})
 	if err != nil {
 		logp.Err("Failed to get pods  - %+v", err)
 		return nil, err
@@ -120,7 +115,7 @@ func (f AwsKubeFetcher) GetECRInformation() ([]types.Repository, error) {
 	ctx2, cancel2 := context.WithTimeout(context.TODO(), 30*time.Second)
 	defer cancel2()
 
-	repositories, err := f.ecrFetcher.DescribeAllRepositories(f.cfg, ctx2, repo)
+	repositories, err := f.ecrProvider.DescribeAllRepositories(f.cfg, ctx2, repo)
 	return repositories, err
 }
 
@@ -130,8 +125,8 @@ func (f AwsKubeFetcher) GetLoadBalancerInformation() (*elasticloadbalancing.Desc
 	ctx, cancel := context.WithTimeout(context.TODO(), 30*time.Second)
 	defer cancel()
 
-	// TODO - Need to use all namespaces with leader election
-	services, err := f.kubeClient.CoreV1().Services("default").List(ctx, metav1.ListOptions{})
+	// TODO - leader election
+	services, err := f.kubeClient.CoreV1().Services("").List(ctx, metav1.ListOptions{})
 	loadBalancers := make([]string, 0)
 	for _, service := range services.Items {
 
@@ -145,7 +140,7 @@ func (f AwsKubeFetcher) GetLoadBalancerInformation() (*elasticloadbalancing.Desc
 		log.Printf("bla bla %v", service.Name)
 	}
 	if err != nil {
-		logp.Err("Failed to get pods  - %+v", err)
+		logp.Err("Failed to get all services  - %+v", err)
 		return nil, err
 	}
 
@@ -170,7 +165,7 @@ func (f AwsKubeFetcher) GetNodeInformation() ([]interface{}, error) {
 		nodesInfo = append(nodesInfo, node)
 	}
 	if err != nil {
-		logp.Err("Failed to get pods  - %+v", err)
+		logp.Err("Failed to get all nodes information  - %+v", err)
 		return nil, err
 	}
 

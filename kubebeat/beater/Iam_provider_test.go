@@ -16,7 +16,7 @@ func TestIamFetcherFetchRolePolicies(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	feather := IamFetcher{}
+	feather := IamProvider{}
 
 	ctx, cancel := context.WithTimeout(context.TODO(), 30*time.Second)
 	defer cancel()

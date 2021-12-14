@@ -11,6 +11,8 @@ import (
 type ECRDataFetcher struct {
 }
 
+/// This method will return a maximum of 100 repository
+/// If we will ever wish to change it, DescribeRepositories returns results in paginated manner
 func (e ECRDataFetcher) DescribeAllRepositories(cfg aws.Config, ctx context.Context, repoNames []string) ([]types.Repository, error) {
 	svc := ecr.NewFromConfig(cfg)
 	input := &ecr.DescribeRepositoriesInput{
@@ -19,7 +21,7 @@ func (e ECRDataFetcher) DescribeAllRepositories(cfg aws.Config, ctx context.Cont
 
 	response, err := svc.DescribeRepositories(ctx, input)
 	if err != nil {
-		logp.Err("Failed to fetch %s from ecr, error - %+v", repoNames, err)
+		logp.Err("Failed to fetch repository:%s from ecr, error - %+v", repoNames, err)
 		return nil, err
 	}
 

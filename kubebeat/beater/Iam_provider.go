@@ -9,14 +9,10 @@ import (
 	"time"
 )
 
-type IamFetcher struct {
+type IamProvider struct {
 }
 
-func (f IamFetcher) GetIamRolePermissions(cfg aws.Config, ctx context.Context, roleName string) (interface{}, error) {
-
-	//List attached policy
-	//iam list-attached-role-policies --role-name  chime-poc-NodeInstanceRole-ZI3XYU5TCY9X
-	//For each policy we will s
+func (f IamProvider) GetIamRolePermissions(cfg aws.Config, ctx context.Context, roleName string) (interface{}, error) {
 
 	results := make([]interface{}, 0)
 	policiesIdentifiers, err := f.getAllRolePolicies(cfg, ctx, roleName)
@@ -43,7 +39,7 @@ func (f IamFetcher) GetIamRolePermissions(cfg aws.Config, ctx context.Context, r
 	return results, nil
 }
 
-func (f IamFetcher) getAllRolePolicies(cfg aws.Config, ctx context.Context, roleName string) ([]types2.AttachedPolicy, error) {
+func (f IamProvider) getAllRolePolicies(cfg aws.Config, ctx context.Context, roleName string) ([]types2.AttachedPolicy, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), 30*time.Second)
 	defer cancel()
 
