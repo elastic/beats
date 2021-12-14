@@ -314,7 +314,7 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 	}
 	s.Start()
 
-	if cfg.Pprof {
+	if cfg.Pprof != nil && cfg.Pprof.Enabled {
 		s.AttachPprof()
 	}
 
