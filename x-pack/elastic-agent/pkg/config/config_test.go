@@ -25,10 +25,9 @@ func TestInputsResolveNOOP(t *testing.T) {
 	contents := map[string]interface{}{
 		"outputs": map[string]interface{}{
 			"default": map[string]interface{}{
-				"type":     "elasticsearch",
-				"hosts":    []interface{}{"127.0.0.1:9200"},
-				"username": "elastic",
-				"password": "changeme",
+				"type":          "elasticsearch",
+				"hosts":         []interface{}{"127.0.0.1:9200"},
+				"service_token": "test",
 			},
 		},
 		"inputs": []interface{}{

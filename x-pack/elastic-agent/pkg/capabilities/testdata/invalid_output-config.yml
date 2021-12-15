@@ -1,8 +1,7 @@
 outputs:
   default:
     hosts: [127.0.0.1:9200]
-    username: elastic
-    password: changeme
+    service_toke: test
 
 inputs:
   - type: system/metrics
