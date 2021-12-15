@@ -7,14 +7,11 @@ package httpjson
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"reflect"
 	"regexp"
-	"strings"
 
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -219,15 +216,17 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		st             []string
 		err            error
 		b              []byte
+		url            string
 	)
 	// perform each requestFactory
 	for i, rf := range r.requestFactory {
 		// iterate over collected ids from last response
 		if i != 0 {
+			url = rf.url.String()
 			// perform request over collected ids
 			for _, s := range st {
 				// reformat urls of requestFactory using ids
-				rf.url, err = generateNewUrl(rf.replace, rf.url.String(), []byte(s))
+				rf.url, err = generateNewUrl(rf.replace, url, []byte(s))
 				if err != nil {
 					return fmt.Errorf("failed to generate new URL: %w", err)
 				}
@@ -281,7 +280,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 
 	eventsCh, err := r.responseProcessor.startProcessing(stdCtx, trCtx, finalHttpResps)
 	if err != nil {
-		return err
+		r.log.Errorf("error recieving eventCh: %v", err)
 	}
 
 	trCtx.clearIntervalData()
@@ -315,95 +314,4 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 	r.log.Infof("request finished: %d events published", n)
 
 	return nil
-}
-
-// getJSON returns array of string values from json string
-func getJSON(b, str string) ([]string, error) {
-	strArr := strings.Split(str, ".")
-	bNew := []byte(b)
-	newIn, err := jsonInterface(string(b[0]), strArr[0], bNew)
-	if err != nil {
-		return nil, fmt.Errorf("error while parsing json: %v", err)
-	}
-	var strArray []string
-	for i, sr := range strArr {
-		switch sr {
-		case "#":
-			newIn, err = jsonArr(strArr[i+1], newIn)
-			if err != nil {
-				return nil, fmt.Errorf("error while parsing json: %v", err)
-			}
-			for _, ir := range newIn.([]interface{}) {
-				if reflect.TypeOf(ir).String() == "string" {
-					strArray = append(strArray, ir.(string))
-				} else {
-					final, err := jsonNorm(strArr[i+2], ir)
-					if err != nil {
-						return nil, fmt.Errorf("error while parsing json: %v", err)
-					}
-					strArray = append(strArray, final.(string))
-				}
-			}
-		default:
-			newIn, err = jsonNorm(sr, newIn)
-			if err != nil {
-				return nil, fmt.Errorf("error while parsing json: %v", err)
-			}
-			if len(strArr) == i+1 {
-				strArray = append(strArray, newIn.(string))
-			}
-		}
-		if sr == "#" {
-			break
-		}
-	}
-	return strArray, nil
-}
-
-// jsonArr returns array of interface value from interface
-func jsonArr(sr string, bNew interface{}) ([]interface{}, error) {
-	var str []interface{}
-	if bNew.([]interface{}) != nil {
-		for _, i := range bNew.([]interface{}) {
-			str = append(str, i.(map[string]interface{})[sr])
-		}
-	} else {
-		return nil, fmt.Errorf("error while parsing json")
-	}
-
-	return str, nil
-}
-
-// jsonInterface returns interface from byte json
-func jsonInterface(str, comStr string, bNew []byte) (interface{}, error) {
-	var data map[string]interface{}
-	if str == "{" && comStr != "#" {
-		err := json.Unmarshal(bNew, &data)
-		if err != nil {
-			return nil, err
-		}
-	} else if str == "[" && comStr == "#" {
-		var data1 []interface{}
-		err := json.Unmarshal(bNew, &data1)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing Array of json: ")
-		}
-		return data1, nil
-	} else if str == comStr && comStr != "#" {
-		err := json.Unmarshal(bNew, &data)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		return nil, fmt.Errorf("error parsing json: ")
-	}
-	return data, nil
-}
-
-// jsonNorm returns interface value from interface
-func jsonNorm(sr string, bNew interface{}) (interface{}, error) {
-	if reflect.TypeOf(bNew).String() != "map[string]interface {}" {
-		return nil, fmt.Errorf("error while parsing json")
-	}
-	return bNew.(map[string]interface{})[sr], nil
 }
