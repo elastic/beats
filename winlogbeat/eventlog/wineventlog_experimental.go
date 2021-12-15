@@ -255,14 +255,14 @@ func newWinEventLogExp(options *common.Config) (EventLog, error) {
 	}
 
 	id := c.ID
+	if id == "" {
+		id = c.Name
+	}
+
 	if c.XMLQuery != "" {
 		xmlQuery = c.XMLQuery
 		log = logp.NewLogger("wineventlog").With("id", id)
 	} else {
-		if id == "" {
-			id = c.Name
-		}
-
 		queryLog := c.Name
 		if info, err := os.Stat(c.Name); err == nil && info.Mode().IsRegular() {
 			path, err := filepath.Abs(c.Name)

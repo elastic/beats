@@ -120,8 +120,8 @@ func (c *winEventLogConfig) Validate() error {
 			errs = append(errs, fmt.Errorf("event log is missing an 'id'"))
 		}
 
-		var tmp interface{}
-		if err := xml.Unmarshal([]byte(c.XMLQuery), &tmp); err != nil {
+		// Check for XML syntax errors. This does not check the validity of the query itself.
+		if err := xml.Unmarshal([]byte(c.XMLQuery), &struct{}{}); err != nil {
 			errs = append(errs, fmt.Errorf("invalid xml_query: %w", err))
 		}
 
@@ -137,10 +137,8 @@ func (c *winEventLogConfig) Validate() error {
 		case len(c.SimpleQuery.Provider) != 0:
 			errs = append(errs, fmt.Errorf("xml_query cannot be used with 'provider'"))
 		}
-	} else {
-		if c.Name == "" {
-			errs = append(errs, fmt.Errorf("event log is missing a 'name'"))
-		}
+	} else if c.Name == "" {
+		errs = append(errs, fmt.Errorf("event log is missing a 'name'"))
 	}
 
 	return errs.Err()
@@ -410,12 +408,13 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 	}
 
 	id := c.ID
+	if id == "" {
+		id = c.Name
+	}
+
 	if c.XMLQuery != "" {
 		xmlQuery = c.XMLQuery
 	} else {
-		if id == "" {
-			id = c.Name
-		}
 		xmlQuery, err = win.Query{
 			Log:         c.Name,
 			IgnoreOlder: c.SimpleQuery.IgnoreOlder,
