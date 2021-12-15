@@ -111,6 +111,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add service resource in k8s cluster role. {pull}20546[20546]
 - Fix `fingerprint` processor to give it access to the `@timestamp` field. {issue}28683[28683]
 - Fix the wrong beat name on monitoring and state endpoint {issue}27755[27755]
+- Skip configuration checks in autodiscover for configurations that are already running {pull}29048[29048]
+- Fix `decode_json_processor` to always respect `add_error_key` {pull}29107[29107]
+- Fix `add_labels` flattening of array values. {pull}29211[29211]
+- Overwrite index name in index template correctly. {issue}28571[28571] {pull}29299[29299]
 
 *Auditbeat*
 
@@ -227,6 +231,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add http.pprof.enabled option to libbeat to allow http/pprof endpoints on the socket that libbeat creates for metrics. {issue}21965[21965]
 - Support custom analyzers in fields.yml. {issue}28540[28540] {pull}28926[28926]
 - Support self signed certificates on outputs {pull}29229[29229]
+- Add FIPS configuration option for all AWS API calls. {pull}[28899]
 
 *Auditbeat*
 
