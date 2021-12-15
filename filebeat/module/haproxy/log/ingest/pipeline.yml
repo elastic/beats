@@ -17,7 +17,7 @@ processors:
       %{NOTSPACE:haproxy.http.response.captured_cookie} %{NOTSPACE:haproxy.termination_state}
       %{NUMBER:haproxy.connections.active:long}/%{NUMBER:haproxy.connections.frontend:long}/%{NUMBER:haproxy.connections.backend:long}/%{NUMBER:haproxy.connections.server:long}/%{NUMBER:haproxy.connections.retries:long}
       %{NUMBER:haproxy.server_queue:long}/%{NUMBER:haproxy.backend_queue:long} (\{%{DATA:haproxy.http.request.captured_headers}\}
-      \{%{DATA:haproxy.http.response.captured_headers}\} |\{%{DATA}\} )?"%{GREEDYDATA:haproxy.http.request.raw_request_line}"( %{TLS_PROTO})?( %{TLS_CIPHER})?'
+      \{%{DATA:haproxy.http.response.captured_headers}\} |\{%{DATA}\} )?"%{GREEDYDATA:haproxy.http.request.raw_request_line}"( %{TLS_PROTO})?( %{TLS_CIPHER})?( %{NOTSPACE:http.request.id})?'
     - '(%{NOTSPACE:process.name}\[%{NUMBER:process.pid:long}\]: )?(%{IP:source.address}|-):%{NUMBER:source.port:long}
       \[%{NOTSPACE:haproxy.request_date}\] %{NOTSPACE:haproxy.frontend_name}/%{NOTSPACE:haproxy.bind_name}
       %{GREEDYDATA:haproxy.error_message}'
