@@ -21,6 +21,8 @@ var:
   - name: scan_frequency
   - name: api_timeout
   - name: api_sleep
+  - name: proxy_url
+  - name: ssl
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/{{.input}}.yml

@@ -6,11 +6,35 @@ package aws
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
+
+func TestInitializeAWSConfig(t *testing.T) {
+	inputConfig := ConfigAWS{
+		AccessKeyID:     "123",
+		SecretAccessKey: "abc",
+		TLS: &tlscommon.Config{
+			VerificationMode: 1,
+		},
+		ProxyUrl: "http://proxy:3128",
+	}
+	awsConfig, err := InitializeAWSConfig(inputConfig)
+	assert.NoError(t, err)
+
+	retrievedAWSConfig, err := awsConfig.Credentials.Retrieve(context.Background())
+	assert.NoError(t, err)
+
+	assert.Equal(t, inputConfig.AccessKeyID, retrievedAWSConfig.AccessKeyID)
+	assert.Equal(t, inputConfig.SecretAccessKey, retrievedAWSConfig.SecretAccessKey)
+	assert.Equal(t, true, awsConfig.HTTPClient.(*http.Client).Transport.(*http.Transport).TLSClientConfig.InsecureSkipVerify)
+	assert.NotNil(t, awsConfig.HTTPClient.(*http.Client).Transport.(*http.Transport).Proxy)
+}
 
 func TestGetAWSCredentials(t *testing.T) {
 	inputConfig := ConfigAWS{
@@ -86,8 +110,6 @@ func TestEnrichAWSConfigWithEndpoint(t *testing.T) {
 		})
 	}
 }
-<<<<<<< HEAD
-=======
 
 func TestCreateServiceName(t *testing.T) {
 	cases := []struct {
@@ -173,4 +195,3 @@ func TestDefaultRegion(t *testing.T) {
 		})
 	}
 }
->>>>>>> 81ed8f848 (Add default region config to AWS (#29415))
