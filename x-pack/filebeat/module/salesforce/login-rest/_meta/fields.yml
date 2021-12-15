@@ -1,0 +1,50 @@
+- name: salesforce.login
+  type: group
+  release: beta
+  description: >
+    Fileset for ingesting Salesforce Login (REST) logs.
+  fields:
+    - name: authentication_method_reference
+      type: keyword
+      description: >
+        The authentication method used by a third-party identification provider for an OpenID Connect single sign-on protocol. This field is available in API version 51.0 and later.
+    - name: client_ip
+      type: keyword
+      description: >
+        The IP address of the client that’s using Salesforce services. A Salesforce internal IP (such as a login from Salesforce Workbench or AppExchange) is shown as “Salesforce.com IP”.
+    - name: cpu_time
+      type: keyword
+      description: >
+        The CPU time in milliseconds used to complete the request. This field indicates the amount of activity taking place in the app server layer.
+    - name: db_total_time
+      type: keyword
+      description: >
+        The time in nanoseconds for a database round trip. Includes time spent in the JDBC driver, network to the database, and DB_CPU_TIME. Compare this field to CPU_TIME to determine whether performance issues are occurring in the database layer or in your own code.
+    - name: event_type
+      type: keyword
+      description: >
+        The type of event. The value is always Login.
+    - name: organization_id
+      type: keyword
+      description: >
+        The 15-character ID of the organization.
+    - name: request_id
+      type: keyword
+      description: >
+        The unique ID of a single transaction. A transaction can contain one or more events. Each event in a given transaction has the same REQUEST_ID.
+    - name: request_status
+      type: keyword
+      description: >
+        The status of the request for a page view or user interface action.
+    - name: run_time
+      type: keyword
+      description: >
+        The amount of time that the request took in milliseconds.
+    - name: uri_id_derived
+      type: keyword
+      description: >
+        The 18-character case insensitive ID of the URI of the page that’s receiving the request.
+    - name: user_id_derived
+      type: keyword
+      description: >
+        The 18-character case insensitive ID of the user who’s using Salesforce services through the UI or the API.

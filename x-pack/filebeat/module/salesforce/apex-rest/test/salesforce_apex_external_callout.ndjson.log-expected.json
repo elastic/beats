@@ -1,0 +1,46 @@
+{
+  "docs": [
+    {
+      "doc": {
+        "_index": "_index",
+        "_type": "_doc",
+        "_id": "_id",
+        "_source": {
+          "salesforce": {
+            "access_mode": "rest",
+            "apex": {
+              "event_type": "ExternalCustomApexCallout",
+              "select": "(ColumnSelection:[aggregation=NONE, columnName=DisplayUrl, tableName=HealthcareBlog], ColumnSelection:[aggregation=NONE, columnName=ExternalId, tableName=HealthcareBlog])",
+              "offset": 0,
+              "subqueries": "",
+              "organization_id": "00D5j000000VI3n",
+              "orderby": "(Order:[columnName=ExternalId, direction=ASCENDING, tableName=HealthcareBlog], Order:[columnName=ExternalId, direction=ASCENDING, tableName=HealthcareBlog])",
+              "throughput": "",
+              "rows": "",
+              "request_id": "TID:10799890000ce8142a",
+              "rows_fetched": ""
+            }
+          },
+          "@timestamp": "2021-11-10T10:11:09.997Z",
+          "event": {
+            "duration": 13,
+            "ingested": "2021-12-09T11:47:31.534284618Z",
+            "kind": "event",
+            "module": "salesforce",
+            "action": "apex-external-custom-callout",
+            "type": "connection",
+            "category": "network",
+            "dataset": "salesforce.apex",
+            "outcome": "failure"
+          },
+          "user": {
+            "id": "0055j000000utlP"
+          }
+        },
+        "_ingest": {
+          "timestamp": "2021-12-09T11:47:31.534284618Z"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,190 @@
+- name: salesforce.apex
+  type: group
+  release: beta
+  description: >
+    Fileset for ingesting Salesforce Apex logs.
+  fields:
+    - name: action
+      type: keyword
+      description: >
+        Action performed by the callout.
+    - name: callout_time
+      type: keyword
+      description: >
+        Time spent waiting on webservice callouts, in milliseconds.
+    - name: class_name
+      type: keyword
+      description: >
+        The Apex class name. If the class is part of a managed package, this string includes the package namespace.
+    - name: client_name
+      type: keyword
+      description: >
+        The name of the client that’s using Salesforce services. This field is an optional parameter that can be passed in API calls. If blank, the caller didnt specify a client in the CallOptions header.
+    - name: cpu_time
+      type: keyword
+      description: >
+        The CPU time in milliseconds used to complete the request.
+    - name: db_blocks
+      type: keyword
+      description: >
+        Indicates how much activity is occurring in the database. A high value for this field suggests that adding indexes or filters on your queries would benefit performance.
+    - name: db_cpu_time
+      type: keyword
+      description: >
+        The CPU time in milliseconds to complete the request. Indicates the amount of activity taking place in the database layer during the request.
+    - name: db_total_time
+      type: keyword
+      description: >
+        Time (in milliseconds) spent waiting for database processing in aggregate for all operations in the request. Compare this field to CPU_TIME to determine whether performance issues are occurring in the database layer or in your own code.
+    - name: entity
+      type: keyword
+      description: >
+        Name of the external object being accessed.
+    - name: entity_name
+      type: keyword
+      description: >
+        The name of the object affected by the trigger.
+    - name: entry_point
+      type: keyword
+      description: >
+        The entry point for this Apex execution.
+    - name: event_type
+      type: keyword
+      description: >
+        The type of event. The value is always ApexCallout.
+    - name: execute_ms
+      type: keyword
+      description: >
+        How long it took (in milliseconds) for Salesforce to prepare and execute the query. Available in API version 42.0 and later.
+    - name: fetch_ms
+      type: keyword
+      description: >
+        How long it took (in milliseconds) to retrieve the query results from the external system. Available in API version 42.0 and later.
+    - name: filter
+      type: keyword
+      description: >
+        Field expressions to filter which rows to return. Corresponds to WHERE in SOQL queries.
+    - name: is_long_running_request
+      type: keyword
+      description: >
+        Indicates whether the request is counted against your org’s concurrent long-running Apex request limit (true) or not (false).
+    - name: limit
+      type: keyword
+      description: >
+        Maximum number of rows to return for a query. Corresponds to LIMIT in SOQL queries.
+    - name: limit_usage_percent
+      type: keyword
+      description: >
+        The percentage of Apex SOAP calls that were made against the organization’s limit.
+    - name: login_key
+      type: keyword
+      description: >
+        The string that ties together all events in a given user’s login session. It starts with a login event and ends with either a logout event or the user session expiring.
+    - name: media_type
+      type: keyword
+      description: >
+        The media type of the response.
+    - name: message
+      type: keyword
+      description: >
+        Error or warning message associated with the failed call.
+    - name: method_name
+      type: keyword
+      description: >
+        The name of the calling Apex method.
+    - name: number_fields
+      type: keyword
+      description: >
+        The number of fields or columns, where applicable.
+    - name: number_soql_queries
+      type: keyword
+      description: >
+        The number of SOQL queries that were executed during the event.
+    - name: offset
+      type: keyword
+      description: >
+        Number of rows to skip when paging through a result set. Corresponds to OFFSET in SOQL queries.
+    - name: orderby
+      type: keyword
+      description: >
+        Field or column to use for sorting query results, and whether to sort the results in ascending (default) or descending order. Corresponds to ORDER BY in SOQL queries.
+    - name: organization_id
+      type: keyword
+      description: >
+        The 15-character ID of the organization.
+    - name: query
+      type: keyword
+      description: >
+        The SOQL query, if one was performed.
+    - name: quiddity
+      type: keyword
+      description: >
+        The type of outer execution associated with this event.
+    - name: request.id
+      type: keyword
+      description: >
+        The unique ID of a single transaction. A transaction can contain one or more events. Each event in a given transaction has the same REQUEST_ID.
+    - name: request.status
+      type: keyword
+      description: >
+        The status of the request for a page view or user interface action.
+    - name: rows.total
+      type: keyword
+      description: >
+        Total number of records in the result set. The value is always -1 if the custom adapter’s DataSource.Provider class doesn’t declare the QUERY_TOTAL_SIZE capability.
+    - name: rows.fetched
+      type: keyword
+      description: >
+        Number of rows fetched by the callout. Available in API version 42.0 and later.
+    - name: rows.processed
+      type: keyword
+      description: >
+        The number of rows that were processed in the request.
+    - name: run_time
+      type: keyword
+      description: >
+        Not used for this event type. Use the TIME field instead.
+    - name: select
+      type: keyword
+      description: >
+        Comma-separated list of fields being queried. Corresponds to SELECT in SOQL queries.
+    - name: subqueries
+      type: keyword
+      description: >
+        Reserved for future use.
+    - name: throughput
+      type: keyword
+      description: >
+        Number of records retrieved in one second.
+    - name: triggerid
+      type: keyword
+      description: >
+        The 15-character ID of the trigger that was fired.
+    - name: trigger.name
+      type: keyword
+      description: >
+        For triggers coming from managed packages, TRIGGER_NAME includes a namespace prefix separated with a . character. If no namespace prefix is present, the trigger is from an unmanaged trigger.
+    - name: trigger.type
+      type: keyword
+      description: >
+        The type of this trigger.
+    - name: type
+      type: keyword
+      description: >
+        The type of Apex callout.
+    - name: uri
+      type: keyword
+      description: >
+        The URI of the page that’s receiving the request.
+    - name: uri_id_derived
+      type: keyword
+      description: >
+        The 18-character case-safe ID of the URI of the page that’s receiving the request.
+    - name: user_agent
+      type: keyword
+      description: >
+        The numeric code for the type of client used to make the request (for example, the browser, application, or API).
+    - name: user_id_derived
+      type: keyword
+      description: >
+        The 18-character case-safe ID of the user who’s using Salesforce services through the UI or the API.

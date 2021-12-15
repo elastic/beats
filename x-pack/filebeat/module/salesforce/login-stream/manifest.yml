@@ -1,0 +1,9 @@
+module_version: 1.0
+
+var:
+  - name: tags
+    default: [salesforce-login-stream, forwarded]
+  
+ingest_pipeline:
+  - ingest/pipeline.yml
+input: config/login-stream.yml

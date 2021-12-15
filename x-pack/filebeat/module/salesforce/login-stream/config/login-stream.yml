@@ -1,0 +1,22 @@
+type: cometd
+
+channel_name: /event/LoginEventStream
+auth.oauth2:
+  client.id: {{ .client_id }}
+  client.secret: {{ .client_secret }}
+  token_url: {{ .token_url }}
+  user: {{ .user }}
+  password: {{ .password }}
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - decode_json_fields:
+      fields: [message]
+      target: "json"
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0
+  - add_locale: ~

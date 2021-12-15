@@ -1,22 +1,16 @@
 - module: salesforce
-  # All logs
-  login:
+
+  apex-rest:
     enabled: false
 
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-
-    # Variable which specifies if data collection should be done using httpjson input or not.
-    # var.httpjson.enabled: true
-
-    # Variable which specifies if data collection should be done using cometd input or not.
-    # var.cometd.enabled: true
-
     # Oauth Client ID
-    # var.clientid: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    # var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
     # Oauth Client Secret
-    # var.clientsecret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    # var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    # var.token_url: "https://login.salesforce.com/services/oauth2/token"
 
     # Oauth User, should include the User mail
     # var.user: "abc.xyz@mail.com"
@@ -26,17 +20,102 @@
 
     # URL, should include the instance_url
     # var.url: "https://instance_id.my.salesforce.com"
-  
-  logout:
+      
+  login-rest:
     enabled: false
 
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
     # Oauth Client ID
-    # var.clientid: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    # var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
     # Oauth Client Secret
-    # var.clientsecret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    # var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    # var.token_url: "https://login.salesforce.com/services/oauth2/token"
+
+    # Oauth User, should include the User mail
+    # var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    # var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    # var.url: "https://instance_id.my.salesforce.com"
+
+  login-stream:
+    enabled: false
+
+    # Oauth Client ID
+    # var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    # var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    # var.token_url: "https://login.salesforce.com/services/oauth2/token"
+
+    # Oauth User, should include the User mail
+    # var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    # var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    # var.url: "https://instance_id.my.salesforce.com"
+
+  logout-rest:
+    enabled: false
+
+    # Oauth Client ID
+    # var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    # var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    # var.token_url: "https://login.salesforce.com/services/oauth2/token"
+
+    # Oauth User, should include the User mail
+    # var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    # var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    # var.url: "https://instance_id.my.salesforce.com"
+
+  logout-stream:
+    enabled: false
+
+    # Oauth Client ID
+    # var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    # var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    # var.token_url: "https://login.salesforce.com/services/oauth2/token"
+
+    # Oauth User, should include the User mail
+    # var.user: "abc.xyz@mail.com"
+
+    # Oauth password, should include the User password
+    # var.password: "P@$$W0₹D"
+
+    # URL, should include the instance_url
+    # var.url: "https://instance_id.my.salesforce.com"
+
+  setupaudittrail-rest:
+    enabled: false
+
+    # Oauth Client ID
+    # var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Client Secret
+    # var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    # Oauth Token URL
+    # var.token_url: "https://login.salesforce.com/services/oauth2/token"
 
     # Oauth User, should include the User mail
     # var.user: "abc.xyz@mail.com"
