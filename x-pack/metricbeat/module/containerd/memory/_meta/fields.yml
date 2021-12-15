@@ -4,6 +4,11 @@
   description: >
     memory
   fields:
+    - name: workingset.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Memory working set percentage.
     - name: rss
       type: long
       format: bytes
@@ -38,7 +43,7 @@
           type: scaled_float
           format: percent
           description: >
-            Memory usage percentage.
+            Total allocated memory percentage.
         - name: total
           type: long
           format: bytes
