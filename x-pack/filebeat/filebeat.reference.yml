@@ -151,6 +151,9 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
+
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
@@ -159,6 +162,12 @@ filebeat.modules:
 
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
 
   cloudwatch:
     enabled: false
@@ -203,6 +212,9 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
+
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
@@ -211,6 +223,12 @@ filebeat.modules:
 
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
 
   ec2:
     enabled: false
@@ -255,6 +273,9 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
+
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
@@ -263,6 +284,12 @@ filebeat.modules:
 
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
 
   elb:
     enabled: false
@@ -307,6 +334,9 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
+
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
@@ -315,6 +345,12 @@ filebeat.modules:
 
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
 
   s3access:
     enabled: false
@@ -359,6 +395,9 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
+
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
@@ -367,6 +406,12 @@ filebeat.modules:
 
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
 
   vpcflow:
     enabled: false
@@ -411,6 +456,9 @@ filebeat.modules:
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
+
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
@@ -419,6 +467,12 @@ filebeat.modules:
 
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
 
 #----------------------------- AWS Fargate Module -----------------------------
 - module: awsfargate
@@ -475,6 +529,12 @@ filebeat.modules:
     # Time used to sleep between AWS FilterLogEvents API calls inside the same collection period
     # Default api_sleep is 200 ms
     #var.api_sleep: 200ms
+
+    # URL to proxy AWS API calls
+    #var.proxy_url: http://proxy:3128
+
+    # Configures the SSL settings, ie. set trusted CAs, ignore certificate verification....
+    #var.ssl:
 
 #-------------------------------- Azure Module --------------------------------
 - module: azure
@@ -3610,6 +3670,13 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
+
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
 
@@ -3741,6 +3808,13 @@ output.elasticsearch:
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
+
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -3943,6 +4017,13 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
+
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
 
@@ -4106,6 +4187,13 @@ output.elasticsearch:
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
+
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
 
 
 # -------------------------------- File Output ---------------------------------
@@ -4394,6 +4482,13 @@ setup.kibana:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
+
 
 # ================================== Logging ===================================
 
@@ -4591,6 +4686,13 @@ logging.files:
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
+
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true

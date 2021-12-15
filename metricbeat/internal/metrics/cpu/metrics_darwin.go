@@ -21,11 +21,12 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/cpu"
 
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 // Get is the Darwin implementation of Get
-func Get(_ string) (CPUMetrics, error) {
+func Get(_ resolve.Resolver) (CPUMetrics, error) {
 	// We're using the gopsutil library here.
 	// The code used by both gosigar and go-sysinfo appears to be
 	// the same code as gopsutil, including copy-pasted comments.

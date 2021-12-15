@@ -36,6 +36,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 )
 
+var addResourceMetadata = GetDefaultResourceMetadataConfig()
+
 func TestPod_Generate(t *testing.T) {
 	client := k8sfake.NewSimpleClientset()
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
@@ -374,7 +376,7 @@ func TestPod_Generate(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	metagen := NewPodMetadataGenerator(config, nil, client, nil, nil, nil)
+	metagen := NewPodMetadataGenerator(config, nil, client, nil, nil, addResourceMetadata)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
@@ -496,7 +498,7 @@ func TestPod_GenerateFromName(t *testing.T) {
 		assert.NoError(t, err)
 		pods := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		pods.Add(test.input)
-		metagen := NewPodMetadataGenerator(config, pods, client, nil, nil, nil)
+		metagen := NewPodMetadataGenerator(config, pods, client, nil, nil, addResourceMetadata)
 
 		accessor, err := meta.Accessor(test.input)
 		require.NoError(t, err)
@@ -618,7 +620,7 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 		namespaces.Add(test.namespace)
 		nsMeta := NewNamespaceMetadataGenerator(config, namespaces, client)
 
-		metagen := NewPodMetadataGenerator(config, pods, client, nodeMeta, nsMeta, nil)
+		metagen := NewPodMetadataGenerator(config, pods, client, nodeMeta, nsMeta, addResourceMetadata)
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
 		})
