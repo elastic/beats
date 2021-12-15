@@ -147,7 +147,7 @@ messages from the units, messages about the units by authorized daemons and core
 Read only the entries with the selected syslog identifiers.
 
 [float]
-[id="{beatname_lc}-input-{type}-syslog-identifiers"]
+[id="{beatname_lc}-input-{type}-transports"]
 ==== `transports`
 
 Collect the messages using the specified transports. Example: syslog.
