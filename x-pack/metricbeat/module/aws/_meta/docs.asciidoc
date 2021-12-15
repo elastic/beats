@@ -58,6 +58,24 @@ If endpoint is specified, `regions` config becomes required. For example:
     - ec2
 ----
 
+* *fips_enabled*
+
+Enforces the use of FIPS service endpoints. See <<aws-credentials-config,AWS credentials options>> for more information.
+
+[source,yaml]
+----
+- module: aws
+  period: 5m
+  fips_enabled: true
+  regions:
+    - us-east-1
+    - us-east-2
+    - us-west-1
+    - us-west-2
+  metricsets:
+    - ec2
+----
+
 The aws module comes with a predefined dashboard. For example:
 
 image::./images/metricbeat-aws-overview.png[]

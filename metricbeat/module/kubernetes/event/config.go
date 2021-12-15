@@ -27,6 +27,7 @@ type kubeEventsConfig struct {
 	SyncPeriod       time.Duration `config:"sync_period"`
 	LabelsDedot      bool          `config:"labels.dedot"`
 	AnnotationsDedot bool          `config:"annotations.dedot"`
+	SkipOlder        bool          `config:"skip_older"`
 }
 
 type Enabled struct {
@@ -38,5 +39,6 @@ func defaultKubernetesEventsConfig() kubeEventsConfig {
 		SyncPeriod:       10 * time.Minute,
 		LabelsDedot:      true,
 		AnnotationsDedot: true,
+		SkipOlder:        true,
 	}
 }
