@@ -680,7 +680,9 @@ def withBeatsEnv(Map args = [:], Closure body) {
       dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dockerLogin(secret: "${DOCKERHUB_SECRET}", registry: 'docker.io')
     }
-    dumpVariables()
+    if (nodeOS().contains('darwin')) {
+      sh 'env | sort'
+    }
     withMageEnv(version: "${env.GO_VERSION}"){
       dir("${env.BASE_DIR}") {
         // Go/Mage installation is not anymore configured with env variables and installed
