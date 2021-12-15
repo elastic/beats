@@ -3,8 +3,8 @@ package beater
 import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/ecr/types"
+	"github.com/aws/aws-sdk-go-v2/aws/external"
+	"github.com/aws/aws-sdk-go-v2/service/ecr"
 	"github.com/aws/aws-sdk-go-v2/service/eks"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancing"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
@@ -32,8 +32,10 @@ func NewAwsKubeFetcherFetcher(kubeconfig string, clusterName string) Fetcher {
 		log.Fatal(err)
 	}
 
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-
+	cfg, err := external.LoadDefaultAWSConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
 	ecr := ECRDataFetcher{}
 	eks := EKSProvider{}
 	elb := ELBProvider{}
@@ -58,7 +60,7 @@ func (f AwsKubeFetcher) Fetch() ([]interface{}, error) {
 	data, err := f.GetClusterInfo()
 	results = append(results, data)
 
-	lbData, err := f.GetLoadBalancerInformation()
+	lbData, err := f.GetLoadBalancerDescriptions()
 	results = append(results, lbData)
 
 	nodeData, err := f.GetNodeInformation()
@@ -71,7 +73,7 @@ func (f AwsKubeFetcher) Fetch() ([]interface{}, error) {
 // 5.3.1 - Ensure Kubernetes Secrets are encrypted using Customer Master Keys (CMKs) managed in AWS KMS (Automated)
 // 5.4.1 - Restrict Access to the Control Plane Endpoint (Manual)
 // 5.4.2 - Ensure clusters are created with Private Endpoint Enabled and Public Access Disabled (Manual)
-func (f AwsKubeFetcher) GetClusterInfo() (*eks.DescribeClusterOutput, error) {
+func (f AwsKubeFetcher) GetClusterInfo() (*eks.DescribeClusterResponse, error) {
 
 	// https://github.com/kubernetes/client-go/issues/530
 	// Currently we could not auto-detected the cluster name
@@ -88,42 +90,23 @@ func (f AwsKubeFetcher) GetClusterInfo() (*eks.DescribeClusterOutput, error) {
 }
 
 // EKS benchmark 5.1.1 -  Ensure Image Vulnerability Scanning using Amazon ECR image scanning or a third party provider (Manual)
-func (f AwsKubeFetcher) GetECRInformation() ([]types.Repository, error) {
-
-	ctx, cancel := context.WithTimeout(context.TODO(), 30*time.Second)
-	defer cancel()
+func (f AwsKubeFetcher) GetECRInformation() ([]ecr.Repository, error) {
 
 	// TODO - Need to use leader election
-	podsList, err := f.kubeClient.CoreV1().Pods("").List(ctx, metav1.ListOptions{})
-	if err != nil {
-		logp.Err("Failed to get pods  - %+v", err)
-		return nil, err
-	}
 
-	repo := make([]string, 0)
-	for _, pod := range podsList.Items {
+	// TODO - Currently we do not know how to extract the ECR repository out of the image
+	// When we do, we need to scan all the pods and gets their images
+	// Otherwise it will get repositories that are not associated with this cluser
+	ctx2, cancel := context.WithTimeout(context.TODO(), 150*time.Second)
+	defer cancel()
 
-		for _, container := range pod.Spec.Containers {
+	repositories, err := f.ecrProvider.DescribeRepositories(f.cfg, ctx2, nil)
 
-			// Takes only aws images
-			if strings.Contains(container.Image, "amazonaws") {
-
-				// TODO - Have to refactor or to use the scanning results
-				repositoryName := strings.Split(container.Image, "/")[1]
-				repo = append(repo, repositoryName)
-			}
-		}
-	}
-
-	ctx2, cancel2 := context.WithTimeout(context.TODO(), 30*time.Second)
-	defer cancel2()
-
-	repositories, err := f.ecrProvider.DescribeAllRepositories(f.cfg, ctx2, repo)
 	return repositories, err
 }
 
 // EKS benchmark 5.4.5 -  Encrypt traffic to HTTPS load balancers with TLS certificates (Manual)
-func (f AwsKubeFetcher) GetLoadBalancerInformation() (*elasticloadbalancing.DescribeLoadBalancersOutput, error) {
+func (f AwsKubeFetcher) GetLoadBalancerDescriptions() ([]elasticloadbalancing.LoadBalancerDescription, error) {
 
 	ctx, cancel := context.WithTimeout(context.TODO(), 30*time.Second)
 	defer cancel()
@@ -151,6 +134,7 @@ func (f AwsKubeFetcher) GetLoadBalancerInformation() (*elasticloadbalancing.Desc
 	defer cancel2()
 
 	result, err := f.elb.DescribeLoadBalancer(f.cfg, ctx2, loadBalancers)
+
 	return result, err
 }
 

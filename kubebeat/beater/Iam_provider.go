@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/iam"
-	types2 "github.com/aws/aws-sdk-go-v2/service/iam/types"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"time"
 )
@@ -21,14 +20,15 @@ func (f IamProvider) GetIamRolePermissions(cfg aws.Config, ctx context.Context, 
 		return nil, err
 	}
 
-	svc := iam.NewFromConfig(cfg)
+	svc := iam.New(cfg)
 	for _, policyId := range policiesIdentifiers {
 
 		input := &iam.GetRolePolicyInput{
 			PolicyName: policyId.PolicyName,
 			RoleName:   &roleName,
 		}
-		policy, err := svc.GetRolePolicy(ctx, input)
+		req := svc.GetRolePolicyRequest(input)
+		policy, err := req.Send(ctx)
 		if err != nil {
 			logp.Err("Failed to get policy %s - %+v", *policyId.PolicyName, err)
 			continue
@@ -39,16 +39,17 @@ func (f IamProvider) GetIamRolePermissions(cfg aws.Config, ctx context.Context, 
 	return results, nil
 }
 
-func (f IamProvider) getAllRolePolicies(cfg aws.Config, ctx context.Context, roleName string) ([]types2.AttachedPolicy, error) {
+func (f IamProvider) getAllRolePolicies(cfg aws.Config, ctx context.Context, roleName string) ([]iam.AttachedPolicy, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), 30*time.Second)
 	defer cancel()
 
-	svc := iam.NewFromConfig(cfg)
+	svc := iam.New(cfg)
 	input := &iam.ListAttachedRolePoliciesInput{
 		RoleName: &roleName,
 	}
 
-	allPolicies, err := svc.ListAttachedRolePolicies(ctx, input)
+	req := svc.ListAttachedRolePoliciesRequest(input)
+	allPolicies, err := req.Send(ctx)
 	if err != nil {
 		logp.Err("Failed to list role %s policies - %+v", roleName, err)
 		return nil, err

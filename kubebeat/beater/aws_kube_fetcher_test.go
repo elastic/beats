@@ -10,7 +10,7 @@ import (
 
 const clusterName = "EKS-Elastic-agent-demo"
 
-func TestAwsKubeFetcherEnsureImageVulnerabilityScanning(t *testing.T) {
+func TestAwsKubeFetcherGetECRInformation(t *testing.T) {
 
 	kubeConfig := GetConfigPath()
 	fetcher := NewAwsKubeFetcherFetcher(kubeConfig, clusterName)
@@ -30,12 +30,12 @@ func TestAwsKubeFetcherGetClusterInfo(t *testing.T) {
 	assert.NotEmpty(t, results)
 }
 
-func TestAwsKubeFetcherVerifyEncryptTrafficToLoadBalancers(t *testing.T) {
+func TestAwsKubeFetcherGetLoadBalancerInformation(t *testing.T) {
 
 	kubeConfig := GetConfigPath()
 	fetcher := NewAwsKubeFetcherFetcher(kubeConfig, clusterName)
 	awsFetcher := fetcher.(*AwsKubeFetcher)
-	results, err := awsFetcher.GetLoadBalancerInformation()
+	results, err := awsFetcher.GetLoadBalancerDescriptions()
 	assert.Nil(t, err, "failed to get load balancer info: %v", err)
 	assert.NotEmpty(t, results)
 }

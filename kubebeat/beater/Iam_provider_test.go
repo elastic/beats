@@ -2,9 +2,8 @@ package beater
 
 import (
 	"context"
-	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/stretchr/testify/assert"
-	"log"
 	"testing"
 	"time"
 )
@@ -12,15 +11,14 @@ import (
 func TestIamFetcherFetchRolePolicies(t *testing.T) {
 
 	role := "chime-poc-NodeInstanceRole-ZI3XYU5TCY9X"
-	cfg, err := config.LoadDefaultConfig(context.TODO())
+	cfg, err := external.LoadDefaultAWSConfig()
 	if err != nil {
-		log.Fatal(err)
+		assert.Fail(t, "Couldn't retrieve data from ecr", err)
 	}
 	feather := IamProvider{}
 
 	ctx, cancel := context.WithTimeout(context.TODO(), 30*time.Second)
 	defer cancel()
-
 
 	results, err := feather.GetIamRolePermissions(cfg, ctx, role)
 

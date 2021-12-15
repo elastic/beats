@@ -2,7 +2,7 @@ package beater
 
 import (
 	"context"
-	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
@@ -11,7 +11,7 @@ import (
 
 func TestEksDataProvider(t *testing.T) {
 
-	cfg, err := config.LoadDefaultConfig(context.TODO())
+	cfg, err := external.LoadDefaultAWSConfig()
 	if err != nil {
 		log.Fatal(err)
 	}

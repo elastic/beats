@@ -2,7 +2,7 @@ package beater
 
 import (
 	"context"
-	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
@@ -11,13 +11,13 @@ import (
 
 func TestElbProvider(t *testing.T) {
 
-	cfg, err := config.LoadDefaultConfig(context.TODO())
+	cfg, err := external.LoadDefaultAWSConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 	elbProvider := ELBProvider{}
 
-	ctx, cancel := context.WithTimeout(context.TODO(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.TODO(), 60*time.Second)
 	defer cancel()
 
 	clusterName := []string{"adda9cdc89b13452e92d48be46858d37"}
