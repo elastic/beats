@@ -989,7 +989,7 @@ def normalise(String directory) {
 */
 def dumpVariables(){
   echo "### MAGE DUMP ###"
-  cmd(label: 'Dump mage variables', script: 'mage dumpVariables || true')
+  cmd(label: 'Dump mage variables', script: 'mage dumpVariables')
   echo "### END MAGE DUMP ###"
   echo """
   ### ENV DUMP ###
