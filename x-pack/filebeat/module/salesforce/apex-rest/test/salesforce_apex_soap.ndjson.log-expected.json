@@ -1,0 +1,63 @@
+{
+  "docs": [
+    {
+      "doc": {
+        "_index": "_index",
+        "_type": "_doc",
+        "_id": "_id",
+        "_source": {
+          "salesforce": {
+            "access_mode": "rest",
+            "apex": {
+              "request_status": "S",
+              "uri_id_derived": "",
+              "cpu_time": 17,
+              "user_id_derived": "0055j000000utlPAAQ",
+              "login_key": "1HQDaq9tglsI4Nlo",
+              "event_type": "ApexSoap",
+              "method_name": "getContactIdAndNames",
+              "query": "",
+              "organization_id": "00D5j000000VI3n",
+              "db_total_time": 14928037,
+              "request_id": "4fMTLXm8qV3kTVl1cJNxMV"
+            }
+          },
+          "@timestamp": "2021-11-09T11:48:38.534Z",
+          "source": {
+            "geo": {
+              "continent_name": "Asia",
+              "region_iso_code": "IN-GJ",
+              "city_name": "Khambhat",
+              "country_iso_code": "IN",
+              "country_name": "India",
+              "region_name": "Gujarat",
+              "location": {
+                "lon": 72.6256,
+                "lat": 22.3143
+              }
+            },
+            "ip": "43.224.11.237"
+          },
+          "event": {
+            "duration": 36,
+            "ingested": "2021-12-09T12:01:24.401313803Z",
+            "kind": "event",
+            "module": "salesforce",
+            "action": "apex-soap",
+            "type": "connection",
+            "category": "network",
+            "dataset": "salesforce.apex",
+            "url": "APEXSOAP"
+          },
+          "user": {
+            "roles": "Standard",
+            "id": "0055j000000utlP"
+          }
+        },
+        "_ingest": {
+          "timestamp": "2021-12-09T12:01:24.401313803Z"
+        }
+      }
+    }
+  ]
+}

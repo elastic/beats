@@ -1,0 +1,8 @@
+module_version: 1.0
+
+var:
+  - name: tags
+    default: [salesforce-logout-stream, forwarded]
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/logout-stream.yml

@@ -1,0 +1,88 @@
+{
+  "docs": [
+    {
+      "doc": {
+        "_index": "_index",
+        "_type": "_doc",
+        "_id": "_id",
+        "_source": {
+          "salesforce": {
+            "login": {
+              "session_level": "STANDARD",
+              "login_key": "o3vhFaSRBb0OzpCl",
+              "evaluation_time": 0,
+              "application": "elastic integration",
+              "login_type": "Remote Access 2.0",
+              "api_type": "N/A",
+              "login_history_id": "0Ya5j00000GLxCdCAL",
+              "created_by_id": "0055j000000q9s7AAA",
+              "api_version": "N/A",
+              "client_version": "N/A",
+              "login_geo_id": "04F5j00000FadrI"
+            },
+            "access_mode": "stream"
+          },
+          "@timestamp": "2021-10-19T11:47:22.000Z",
+          "related": {
+            "ip": [
+              "123.201.231.106"
+            ]
+          },
+          "http": {
+            "request": {
+              "method": "POST",
+              "body": {
+                "content": "{}"
+              }
+            }
+          },
+          "tls": {
+            "cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+            "version": "1.2",
+            "version_protocol": "TLS"
+          },
+          "source": {
+            "geo": {
+              "country_name": "India",
+              "city_name": "Surat",
+              "location": {
+                "lon": 72.8293,
+                "lat": 21.1888
+              },
+              "region_name": "Gujarat",
+              "country_iso_code": "IN",
+              "postal_code": "395007"
+            },
+            "ip": "123.201.231.106"
+          },
+          "event": {
+            "ingested": "2021-12-14T10:22:39.935387334Z",
+            "created": "2021-10-19T11:47:30.000Z",
+            "kind": "event",
+            "module": "salesforce",
+            "action": "login-attempt",
+            "type": "info",
+            "category": "authentication",
+            "dataset": "salesforce.login",
+            "outcome": "success",
+            "url": "login.salesforce.com"
+          },
+          "user": {
+            "email": "kush.rana@elastic.co",
+            "roles": "Standard",
+            "id": "0055j000000utlPAAQ"
+          },
+          "user_agent": {
+            "os": {
+              "platform": "Unknown"
+            },
+            "name": "Unknown"
+          }
+        },
+        "_ingest": {
+          "timestamp": "2021-12-14T10:22:39.935387334Z"
+        }
+      }
+    }
+  ]
+}

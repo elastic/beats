@@ -1,0 +1,38 @@
+type: httpjson
+
+interval: {{ .interval }}
+request.method: GET
+auth.oauth2:
+  enabled: true
+  client.id: {{ .client_id }}
+  client.secret: {{ .client_secret }}
+  token_url: {{ .token_url }}
+  user: {{ .user }}
+  password: {{ .password }}
+request.url: {{ .url }}/services/data/v52.0/query
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
+request.transforms:
+  - set:
+      target: url.params.q
+      value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND LogDate > [[.cursor.last_published_apex]] AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') ORDER BY LogDate ASC NULLS FIRST"
+      default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') ORDER BY LogDate ASC NULLS FIRST"
+chain:
+  - step:
+      request.url: {{ .url }}/services/data/v52.0/sobjects/EventLogFile/records.#.Id/LogFile
+      request.method: GET
+      replace: records.#.Id
+cursor:
+  last_published_apex:
+    value: '[[.last_event.TIMESTAMP_DERIVED]]'
+
+processors:
+  - decode_json_fields:
+      fields: [message]
+      target: "json"
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0
+  - add_locale: ~

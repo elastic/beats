@@ -1,0 +1,138 @@
+---
+description: Pipeline for parsing Salesforce SetupAuditTrail logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- remove:
+    field:
+      - message
+    ignore_missing: true
+
+- set:
+    field: salesforce.access_mode
+    value: rest
+    ignore_failure: true
+
+- date:
+    field: json.CreatedDate
+    target_field: "@timestamp"
+    formats:
+    - ISO8601
+    ignore_failure: true
+
+- rename:
+    field: json.attributes.type
+    target_field: salesforce.setup_audit_trail.event_type
+    ignore_missing: true
+- rename:
+    field: json.CreatedByContext
+    target_field: salesforce.setup_audit_trail.created_by_context
+    ignore_missing: true
+- rename:
+    field: json.CreatedById
+    target_field: salesforce.setup_audit_trail.created_by_id
+    ignore_missing: true
+- rename:
+    field: json.CreatedByIssuer
+    target_field: salesforce.setup_audit_trail.created_by_issuer
+    ignore_missing: true
+- rename:
+    field: json.DelegateUser
+    target_field: salesforce.setup_audit_trail.delegate_user
+    ignore_missing: true
+- rename:
+    field: json.Display
+    target_field: salesforce.setup_audit_trail.display
+    ignore_missing: true
+- rename:
+    field: json.ResponsibleNamespacePrefix
+    target_field: salesforce.setup_audit_trail.responsible_namespace_prefix
+    ignore_missing: true
+- rename:
+    field: json.Section
+    target_field: salesforce.setup_audit_trail.section
+    ignore_missing: true
+
+#######################
+## ECS Event Mapping ##
+#######################
+
+- rename:
+    field: json.Id
+    target_field: event.id
+    ignore_missing: true
+- rename:
+    field: json.Action
+    target_field: event.action
+    ignore_missing: true
+- rename:
+    field: json.attributes.url
+    target_field: event.url
+    ignore_missing: true    
+- date:
+    field: json.CreatedDate
+    target_field: event.created
+    formats: 
+    - ISO8601
+    ignore_failure: true
+- set:
+    field: event.type
+    value: "admin"
+- set:
+    field: event.kind
+    value: "event"
+- set:
+    field: event.dataset
+    value: "salesforce.setupaudittrail"
+- set:
+    field: event.module
+    value: "salesforce"
+
+######################
+## ECS User Mapping ##
+######################
+
+- set:
+    field: user.id
+    copy_from: salesforce.setup_audit_trail.created_by_id
+    ignore_failure: true
+- set:
+    field: temp
+    copy_from: salesforce.setup_audit_trail.display
+    ignore_failure: true
+- dissect:
+    field: temp
+    pattern: "For user %{user.target.user.name}, %{?}"
+    ignore_failure: true
+
+#############
+## Cleanup ##
+#############
+
+- script:
+    description: Drops null/empty values recursively
+    lang: painless
+    source: |
+        boolean dropEmptyFields(Object object) {
+            if (object == null || object == "") {
+                return true;
+            } else if (object instanceof Map) {
+                ((Map) object).values().removeIf(value -> dropEmptyFields(value));
+                return (((Map) object).size() == 0);
+            } else if (object instanceof List) {
+                ((List) object).removeIf(value -> dropEmptyFields(value));
+                return (((List) object).length == 0);
+            }
+            return false;
+        }
+        dropEmptyFields(ctx);
+- remove:
+    field:
+      - json
+      - temp
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{_ingest.on_failure_message}}'

@@ -1,0 +1,11 @@
+module_version: 1.0
+
+var:
+  - name: interval
+    default: 1h
+  - name: tags
+    default: [salesforce-logout-rest, forwarded]
+  - name: proxy_url
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/logout-rest.yml

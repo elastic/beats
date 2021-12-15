@@ -1,0 +1,68 @@
+{
+  "docs": [
+    {
+      "doc": {
+        "_index": "_index",
+        "_type": "_doc",
+        "_id": "_id",
+        "_source": {
+          "salesforce": {
+            "access_mode": "rest",
+            "logout": {
+              "session_level": "STANDARD(db=1,api=STANDARD)",
+              "organization_by_id": "00D5j000000VI3n",
+              "resolution_type": 9999,
+              "user_id_derived": "0055j000000utlPAAQ",
+              "app_type": 1000,
+              "login_key": "OKyrFuSUIZVr9YzF",
+              "event_type": "Logout",
+              "platform_type": 1015,
+              "browser_type": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36",
+              "session_type": "UI",
+              "client_version": 9998,
+              "user_initiated_logout": 1
+            }
+          },
+          "@timestamp": "2021-10-19T05:07:07.128Z",
+          "related": {
+            "ip": [
+              "123.201.231.42"
+            ]
+          },
+          "source": {
+            "geo": {
+              "continent_name": "Asia",
+              "region_iso_code": "IN-GJ",
+              "city_name": "Navsari",
+              "country_iso_code": "IN",
+              "country_name": "India",
+              "region_name": "Gujarat",
+              "location": {
+                "lon": 72.9257,
+                "lat": 20.9468
+              }
+            },
+            "ip": "123.201.231.42"
+          },
+          "event": {
+            "ingested": "2021-12-14T10:28:11.360868016Z",
+            "code": "4exLFFQZNa5xxFl1cJNwOV",
+            "kind": "event",
+            "module": "salesforce",
+            "action": "logout",
+            "type": "info",
+            "category": "authentication",
+            "dataset": "salesforce.logout"
+          },
+          "user": {
+            "roles": "Standard(db=S,api=Standard)",
+            "id": "0055j000000utlP"
+          }
+        },
+        "_ingest": {
+          "timestamp": "2021-12-14T10:28:11.360868016Z"
+        }
+      }
+    }
+  ]
+}

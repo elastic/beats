@@ -1,0 +1,38 @@
+type: httpjson
+
+interval: {{ .interval }}
+request.method: GET
+auth.oauth2:
+  enabled: true
+  client.id: {{ .client_id }}
+  client.secret: {{ .client_secret }}
+  token_url: {{ .token_url }}
+  user: {{ .user }}
+  password: {{ .password }}
+request.url: {{ .url }}/services/data/v52.0/query
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
+request.transforms:
+  - set:
+      target: url.params.q
+      value: "SELECT Action,CreatedByContext,CreatedById,CreatedByIssuer,CreatedDate,DelegateUser,Display,Id,ResponsibleNamespacePrefix,Section FROM SetupAuditTrail WHERE CreatedDate > [[.cursor.last_published_setupaudittrail]] ORDER BY CreatedDate ASC NULLS FIRST"
+      default: "SELECT Action,CreatedByContext,CreatedById,CreatedByIssuer,CreatedDate,DelegateUser,Display,Id,ResponsibleNamespacePrefix,Section FROM SetupAuditTrail ORDER BY CreatedDate ASC NULLS FIRST"
+response.split:
+  target: body.records
+cursor:
+  last_published_setupaudittrail:
+    value: '[[.last_event.CreatedDate]]'
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - decode_json_fields:
+      fields: [message]
+      target: "json"
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0
+  - add_locale: ~

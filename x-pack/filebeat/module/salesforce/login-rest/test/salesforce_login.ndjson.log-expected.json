@@ -1,0 +1,76 @@
+{
+  "docs": [
+    {
+      "doc": {
+        "_index": "_index",
+        "_type": "_doc",
+        "_id": "_id",
+        "_source": {
+          "salesforce": {
+            "login": {
+              "cpu_time": 54,
+              "user_id_derived": "0055j000000utlPAAQ",
+              "login_key": "iQzw40l45YkJUNKj",
+              "event_type": "Login",
+              "run_time": 94,
+              "organization_id": "00D5j000000VI3n",
+              "client_ip": "43.224.11.237",
+              "db_total_time": 37142518,
+              "api_version": 9998,
+              "request_id": "4exJslfc21z80-l1cJOnxV"
+            },
+            "access_mode": "rest"
+          },
+          "@timestamp": "2021-10-19T04:42:04.256Z",
+          "related": {
+            "ip": [
+              "43.224.11.237"
+            ]
+          },
+          "tls": {
+            "cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+            "version": "1.2",
+            "version_protocol": "TLS"
+          },
+          "source": {
+            "geo": {
+              "continent_name": "Asia",
+              "region_iso_code": "IN-GJ",
+              "city_name": "Khambhat",
+              "country_iso_code": "IN",
+              "country_name": "India",
+              "region_name": "Gujarat",
+              "location": {
+                "lon": 72.6256,
+                "lat": 22.3143
+              }
+            },
+            "ip": "43.224.11.237"
+          },
+          "event": {
+            "ingested": "2021-12-14T10:17:15.769277803Z",
+            "kind": "event",
+            "module": "salesforce",
+            "action": "login-attempt",
+            "type": "info",
+            "category": "authentication",
+            "dataset": "salesforce.login",
+            "url": "/index.jsp",
+            "outcome": "success"
+          },
+          "user": {
+            "email": "kush.rana@elastic.co",
+            "roles": "Standard",
+            "id": "0055j000000utlP"
+          },
+          "user_agent": {
+            "name": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36"
+          }
+        },
+        "_ingest": {
+          "timestamp": "2021-12-14T10:17:15.769277803Z"
+        }
+      }
+    }
+  ]
+}
