@@ -46,10 +46,13 @@ spec:
           runAsUser: 0
         resources:
           limits:
-            memory: 200Mi
+            memory: 1536mi
           requests:
-            cpu: 100m
-            memory: 100Mi
+            # for synthetics, 2 full cores is a good starting point for relatively consistent perform of a single concurrent check
+            # For lightweight checks much less is fine
+            cpu: 2000m 
+            # A high value like this is encouraged for browser based monitors. Lightweight checks use substantially less
+            memory: 1536Mi 
         volumeMounts:
         - name: config
           mountPath: /etc/heartbeat.yml
