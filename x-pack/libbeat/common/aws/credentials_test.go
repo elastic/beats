@@ -86,3 +86,91 @@ func TestEnrichAWSConfigWithEndpoint(t *testing.T) {
 		})
 	}
 }
+<<<<<<< HEAD
+=======
+
+func TestCreateServiceName(t *testing.T) {
+	cases := []struct {
+		title               string
+		serviceName         string
+		fips_enabled        bool
+		region              string
+		expectedServiceName string
+	}{
+		{
+			"S3 - non-fips - us-east-1",
+			"s3",
+			false,
+			"us-east-1",
+			"s3",
+		},
+		{
+			"S3 - non-fips - us-gov-east-1",
+			"s3",
+			false,
+			"us-gov-east-1",
+			"s3",
+		},
+		{
+			"S3 - fips - us-gov-east-1",
+			"s3",
+			true,
+			"us-gov-east-1",
+			"s3-fips",
+		},
+		{
+			"EC2 - fips - us-gov-east-1",
+			"ec2",
+			true,
+			"us-gov-east-1",
+			"ec2",
+		},
+		{
+			"EC2 - fips - us-east-1",
+			"ec2",
+			true,
+			"us-east-1",
+			"ec2-fips",
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			serviceName := CreateServiceName(c.serviceName, c.fips_enabled, c.region)
+			assert.Equal(t, c.expectedServiceName, serviceName)
+		})
+	}
+}
+
+func TestDefaultRegion(t *testing.T) {
+	cases := []struct {
+		title          string
+		region         string
+		expectedRegion string
+	}{
+		{
+			"No default region set",
+			"",
+			"us-east-1",
+		},
+		{
+			"us-west-1 region set as default",
+			"us-west-1",
+			"us-west-1",
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.title, func(t *testing.T) {
+			inputConfig := ConfigAWS{
+				AccessKeyID:     "123",
+				SecretAccessKey: "abc",
+			}
+			if c.region != "" {
+				inputConfig.DefaultRegion = c.region
+			}
+			awsConfig, err := InitializeAWSConfig(inputConfig)
+			assert.NoError(t, err)
+			assert.Equal(t, c.expectedRegion, awsConfig.Region)
+		})
+	}
+}
+>>>>>>> 81ed8f848 (Add default region config to AWS (#29415))

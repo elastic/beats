@@ -13,6 +13,7 @@ var:
   - name: visibility_timeout
   - name: api_timeout
   - name: endpoint
+  - name: default_region
   - name: access_key_id
   - name: secret_access_key
   - name: session_token

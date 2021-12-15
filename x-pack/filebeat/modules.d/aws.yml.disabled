@@ -57,6 +57,9 @@
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
+
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
@@ -108,6 +111,9 @@
 
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
+
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
@@ -161,6 +167,9 @@
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
+
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
@@ -212,6 +221,9 @@
 
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
+
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
@@ -265,6 +277,9 @@
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
 
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
+
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
 
@@ -316,6 +331,9 @@
 
     # Custom endpoint used to access AWS APIs
     #var.endpoint: amazonaws.com
+
+    # Default region to query if no other region is set
+    #var.default_region: us-east-1
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb

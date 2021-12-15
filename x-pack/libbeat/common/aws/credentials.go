@@ -21,6 +21,7 @@ import (
 
 // ConfigAWS is a structure defined for AWS credentials
 type ConfigAWS struct {
+<<<<<<< HEAD
 	AccessKeyID          string `config:"access_key_id"`
 	SecretAccessKey      string `config:"secret_access_key"`
 	SessionToken         string `config:"session_token"`
@@ -29,11 +30,35 @@ type ConfigAWS struct {
 	Endpoint             string `config:"endpoint"`
 	RoleArn              string `config:"role_arn"`
 	ProxyUrl             string `config:"proxy_url"`
+=======
+	AccessKeyID          string            `config:"access_key_id"`
+	SecretAccessKey      string            `config:"secret_access_key"`
+	SessionToken         string            `config:"session_token"`
+	ProfileName          string            `config:"credential_profile_name"`
+	SharedCredentialFile string            `config:"shared_credential_file"`
+	Endpoint             string            `config:"endpoint"`
+	RoleArn              string            `config:"role_arn"`
+	ProxyUrl             string            `config:"proxy_url"`
+	FIPSEnabled          bool              `config:"fips_enabled"`
+	TLS                  *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty" json:"ssl,omitempty"`
+	DefaultRegion        string            `config:"default_region"`
+>>>>>>> 81ed8f848 (Add default region config to AWS (#29415))
 }
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
 func InitializeAWSConfig(config ConfigAWS) (awssdk.Config, error) {
 	AWSConfig, _ := GetAWSCredentials(config)
+<<<<<<< HEAD
+=======
+	if AWSConfig.Region == "" {
+		if config.DefaultRegion != "" {
+			AWSConfig.Region = config.DefaultRegion
+		} else {
+			AWSConfig.Region = "us-east-1"
+		}
+	}
+	var proxy func(*http.Request) (*url.URL, error)
+>>>>>>> 81ed8f848 (Add default region config to AWS (#29415))
 	if config.ProxyUrl != "" {
 		proxyUrl, err := httpcommon.NewProxyURIFromString(config.ProxyUrl)
 		if err != nil {
@@ -80,11 +105,6 @@ func getAccessKeys(config ConfigAWS) awssdk.Config {
 		Value: awsCredentials,
 	}
 
-	// Set default region if empty to make initial aws api call
-	if awsConfig.Region == "" {
-		awsConfig.Region = "us-east-1"
-	}
-
 	// Assume IAM role if iam_role config parameter is given
 	if config.RoleArn != "" {
 		logger.Debug("Using role arn and access keys for AWS credential")
@@ -116,11 +136,6 @@ func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 	awsConfig, err := external.LoadDefaultAWSConfig(options...)
 	if err != nil {
 		return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed with shared credential profile given")
-	}
-
-	// Set default region if empty to make initial aws api call
-	if awsConfig.Region == "" {
-		awsConfig.Region = "us-east-1"
 	}
 
 	// Assume IAM role if iam_role config parameter is given
