@@ -32,11 +32,6 @@ func init() {
 
 	devtools.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
 	devtools.BeatLicense = "Elastic License"
-	if devtools.Platform.GOOS == "windows" {
-		// Explicitly hold at ELv1 to satisfy Npcap licensing on Windows.
-		// Do not alter this without checking with the licensing policy.
-		devtools.BeatLicense = "Elastic License"
-	}
 }
 
 // Update updates the generated files.
