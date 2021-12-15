@@ -38,7 +38,7 @@ func init() {
 
 type Module interface {
 	mb.Module
-	GetContainerdMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error)
+	GetContainerdMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, time.Time, error)
 }
 
 type familiesCache struct {
@@ -85,7 +85,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	}
 }
 
-func (m *module) GetContainerdMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error) {
+func (m *module) GetContainerdMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, time.Time, error) {
 	m.containerdMetricsCache.lock.Lock()
 	defer m.containerdMetricsCache.lock.Unlock()
 
@@ -100,7 +100,7 @@ func (m *module) GetContainerdMetricsFamilies(prometheus p.Prometheus) ([]*dto.M
 		familiesCache.lastFetchTimestamp = now
 	}
 
-	return familiesCache.sharedFamilies, familiesCache.lastFetchErr
+	return familiesCache.sharedFamilies, familiesCache.lastFetchTimestamp, familiesCache.lastFetchErr
 }
 
 func generateCacheHash(host []string) (uint64, error) {

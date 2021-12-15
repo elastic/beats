@@ -95,7 +95,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch gathers information from the containerd and reports events with this information.
 func (m *metricset) Fetch(reporter mb.ReporterV2) error {
-	families, err := m.mod.GetContainerdMetricsFamilies(m.prometheusClient)
+	families, _, err := m.mod.GetContainerdMetricsFamilies(m.prometheusClient)
 	if err != nil {
 		return errors.Wrap(err, "error getting families")
 	}

@@ -4,6 +4,10 @@
     Containerd Runtime CPU metrics.
   release: beta
   fields:
+    - name: system.total
+      type: double
+        description: >
+          Total user and system CPU time spent in seconds.
     - name: usage
       type: group
       fields:
