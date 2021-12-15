@@ -27,6 +27,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/kibana"
@@ -426,6 +427,7 @@ func buildFleetServerConnStr(cfg fleetServerConfig) (string, error) {
 	if cfg.Elasticsearch.ServiceToken != "" {
 		return fmt.Sprintf("%s://%s%s", u.Scheme, u.Host, path), nil
 	}
+	cfgwarn.Deprecate("8.0.0", "Support for basic authorization (FLEET_SERVER_ELASTICSEARCH_USERNAME:FLEET_SERVER_ELASTICSEARCH_PASSWORD) is deprecated. Please use FLEET_SERVER_SERVICE_TOKEN instead.")
 	return fmt.Sprintf("%s://%s:%s@%s%s", u.Scheme, cfg.Elasticsearch.Username, cfg.Elasticsearch.Password, u.Host, path), nil
 }
 

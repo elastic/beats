@@ -7,6 +7,7 @@ package configuration
 import (
 	"net/url"
 
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
@@ -81,6 +82,7 @@ func ElasticsearchFromConnStr(conn string, serviceToken string, insecure bool) (
 	if !ok {
 		return Elasticsearch{}, errors.New("invalid connection string: must include a password unless a service token is provided")
 	}
+	cfgwarn.Deprecate("8.0.0", "Support for basic authorization (username:password) is deprecated. Please use service_token.")
 	cfg.Username = u.User.Username()
 	cfg.Password = password
 	return cfg, nil
