@@ -1,5 +1,5 @@
 # Module: okta
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.16/filebeat-module-okta.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.17/filebeat-module-okta.html
 
 - module: okta
   system:

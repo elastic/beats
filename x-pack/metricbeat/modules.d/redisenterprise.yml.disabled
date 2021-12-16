@@ -1,5 +1,5 @@
 # Module: redisenterprise
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.16/metricbeat-module-redisenterprise.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.17/metricbeat-module-redisenterprise.html
 
 - module: redisenterprise
   metricsets:

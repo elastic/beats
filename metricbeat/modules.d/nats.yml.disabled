@@ -1,5 +1,5 @@
 # Module: nats
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.16/metricbeat-module-nats.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.17/metricbeat-module-nats.html
 
 - module: nats
   metricsets:

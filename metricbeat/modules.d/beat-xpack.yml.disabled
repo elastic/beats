@@ -1,5 +1,5 @@
 # Module: beat
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.16/metricbeat-module-beat.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.17/metricbeat-module-beat.html
 
 - module: beat
   xpack.enabled: true

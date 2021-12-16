@@ -1,5 +1,5 @@
 # Module: activemq
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.16/filebeat-module-activemq.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.17/filebeat-module-activemq.html
 
 - module: activemq
   # Audit logs
