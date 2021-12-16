@@ -111,7 +111,6 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	perContainerCpus := make(map[string]int)
-
 	if m.calcPct {
 		for _, event := range events {
 			if _, err = event.GetValue("cpu"); err == nil {
