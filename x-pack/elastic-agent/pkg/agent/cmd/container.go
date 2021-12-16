@@ -96,6 +96,7 @@ The following actions are possible and grouped based on the actions.
   FLEET_SERVER_ELASTICSEARCH_USERNAME - elasticsearch username for Fleet Server [$ELASTICSEARCH_USERNAME]
   FLEET_SERVER_ELASTICSEARCH_PASSWORD - elasticsearch password for Fleet Server [$ELASTICSEARCH_PASSWORD]
   FLEET_SERVER_ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch [$ELASTICSEARCH_CA]
+  FLEET_SERVER_ELASTICSEARCH_CA_TRUSTED_FINGERPRINT - The sha-256 fingerprint value of the certificate authority to trust
   FLEET_SERVER_ELASTICSEARCH_INSECURE - disables cert validation for communication with Elasticsearch
   FLEET_SERVER_SERVICE_TOKEN - service token to use for communication with elasticsearch
   FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself ("Default Fleet Server policy" used when undefined)
@@ -358,6 +359,9 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		}
 		if cfg.FleetServer.Elasticsearch.CA != "" {
 			args = append(args, "--fleet-server-es-ca", cfg.FleetServer.Elasticsearch.CA)
+		}
+		if cfg.FleetServer.Elasticsearch.CATrustedFingerprint != "" {
+			args = append(args, "--fleet-server-es-ca-trusted-fingerprint", cfg.FleetServer.Elasticsearch.CATrustedFingerprint)
 		}
 		if cfg.FleetServer.Host != "" {
 			args = append(args, "--fleet-server-host", cfg.FleetServer.Host)
@@ -670,12 +674,6 @@ func runLegacyAPMServer(streams *cli.IOStreams, path string) (*process.Info, err
 		return nil, errors.New("expected one directory")
 	}
 	apmDir := filepath.Join(path, files[0].Name())
-	// Extract the ingest pipeline definition to the HOME_DIR
-	if home := os.Getenv("HOME_PATH"); home != "" {
-		if err := syncDir(filepath.Join(apmDir, "ingest"), filepath.Join(home, "ingest")); err != nil {
-			return nil, fmt.Errorf("syncing APM ingest directory to HOME_PATH(%s) failed: %s", home, err)
-		}
-	}
 	// Start apm-server process respecting path ENVs
 	apmBinary := filepath.Join(apmDir, spec.Cmd)
 	log, err := logger.New("apm-server", false)

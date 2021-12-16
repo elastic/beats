@@ -15,7 +15,7 @@ type MonitoringConfig struct {
 	LogMetrics     bool                  `yaml:"-" config:"-"`
 	HTTP           *MonitoringHTTPConfig `yaml:"http" config:"http"`
 	Namespace      string                `yaml:"namespace" config:"namespace"`
-	Pprof          bool                  `yaml:"pprof" config:"pprof"`
+	Pprof          *PprofConfig          `yaml:"pprof" config:"pprof"`
 }
 
 // MonitoringHTTPConfig is a config defining HTTP endpoint published by agent
@@ -25,6 +25,13 @@ type MonitoringHTTPConfig struct {
 	Enabled bool   `yaml:"enabled" config:"enabled"`
 	Host    string `yaml:"host" config:"host"`
 	Port    int    `yaml:"port" config:"port" validate:"min=0,max=65535,nonzero"`
+}
+
+// PprofConfig is a struct for the pprof enablement flag.
+// It is a nil struct by default to allow the agent to use the a value that the user has injected into fleet.yml as the source of truth that is passed to beats
+// TODO get this value from Kibana?
+type PprofConfig struct {
+	Enabled bool `yaml:"enabled" config:"enabled"`
 }
 
 // DefaultConfig creates a config with pre-set default values.
@@ -39,6 +46,5 @@ func DefaultConfig() *MonitoringConfig {
 			Port:    defaultPort,
 		},
 		Namespace: defaultNamespace,
-		Pprof:     true,
 	}
 }

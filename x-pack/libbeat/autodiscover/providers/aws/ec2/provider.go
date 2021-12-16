@@ -64,8 +64,9 @@ func AutodiscoverBuilder(
 	if config.Regions == nil {
 		// set default region to make initial aws api call
 		awsCfg.Region = "us-west-1"
+		ec2ServiceName := awscommon.CreateServiceName("ec2", config.AWSConfig.FIPSEnabled, awsCfg.Region)
 		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
-			config.AWSConfig.Endpoint, "ec2", awsCfg.Region, awsCfg))
+			config.AWSConfig.Endpoint, ec2ServiceName, awsCfg.Region, awsCfg))
 
 		completeRegionsList, err := awsauto.GetRegions(svcEC2)
 		if err != nil {
@@ -81,8 +82,9 @@ func AutodiscoverBuilder(
 			logp.Error(errors.Wrap(err, "error loading AWS config for aws_ec2 autodiscover provider"))
 		}
 		awsCfg.Region = region
+		ec2ServiceName := awscommon.CreateServiceName("ec2", config.AWSConfig.FIPSEnabled, region)
 		clients = append(clients, ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
-			config.AWSConfig.Endpoint, "ec2", region, awsCfg)))
+			config.AWSConfig.Endpoint, ec2ServiceName, region, awsCfg)))
 	}
 
 	return internalBuilder(uuid, bus, config, newAPIFetcher(clients), keystore)

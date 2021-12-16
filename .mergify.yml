@@ -1,8 +1,12 @@
+queue_rules:
+  - name: default
+    conditions:
+      - check-success=beats-ci/pr-merge
 pull_request_rules:
   - name: forward-port patches to master branch
     conditions:
       - merged
-      - label=backport-v8.1.0
+      - label=forwardport-master
     actions:
       backport:
         assignees:
@@ -14,6 +18,8 @@ pull_request_rules:
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: ask to resolve conflict
     conditions:
+      - -merged
+      - -closed
       - conflict
     actions:
         comment:
@@ -43,9 +49,9 @@ pull_request_rules:
       - files~=^testing/environments/snapshot.*\.yml$
       - "#approved-reviews-by>=1"
     actions:
-      merge:
+      queue:
         method: squash
-        strict: false
+        name: default
   - name: delete upstream branch after merging changes on testing/environments/snapshot* or it's closed
     conditions:
       - or:
@@ -87,9 +93,9 @@ pull_request_rules:
       - head~=^add-backport-next.*
       - "#approved-reviews-by>=1"
     actions:
-      merge:
+      queue:
         method: squash
-        strict: false
+        name: default
   - name: delete upstream branch with changes on ^.mergify.yml that has been merged or closed
     conditions:
       - or:

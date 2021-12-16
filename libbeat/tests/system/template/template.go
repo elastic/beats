@@ -65,10 +65,10 @@ func testTemplateDefaultFieldLength(beatName string, elasticLicensed bool) func(
 
 		templateMap := tmpl.Generate(fields, nil, nil)
 
-		v, _ := templateMap.GetValue("settings.index.query.default_field")
+		v, _ := templateMap.GetValue("template.settings.index.query.default_field")
 		defaultValue, ok := v.([]string)
 		if !ok {
-			t.Fatalf("settings.index.query.default_field value has an unexpected type: %T", v)
+			t.Fatalf("template.settings.index.query.default_field value has an unexpected type: %T", v)
 		}
 
 		if len(defaultValue) > MaxDefaultFieldLength {

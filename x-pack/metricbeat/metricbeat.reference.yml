@@ -80,7 +80,7 @@ metricbeat.modules:
   processes: ['.*']
 
   # Configure the mount point of the host’s filesystem for use in monitoring a host from within a container
-  #system.hostfs: "/hostfs"
+  #hostfs: "/hostfs"
 
   # Configure the metric types that are included by these metricsets.
   cpu.metrics:  ["percentages","normalized_percentages"]  # The other available option is ticks.
@@ -881,6 +881,16 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  # To configure additionally node and namespace metadata, added to pod, service and container resource types,
+  # `add_resource_metadata` can be defined.
+  # By default all labels will be included while annotations are not added by default.
+  # add_resource_metadata:
+  #   namespace:
+  #     include_labels: ["namespacelabel1"]
+  #   node:
+  #     include_labels: ["nodelabel2"]
+  #     include_annotations: ["nodeannotation1"]
+  #   deployment: false
   # Kubernetes client QPS and burst can be configured additionally
   #kube_client_options:
   #  qps: 5
@@ -915,6 +925,38 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  # To configure additionally node and namespace metadata, added to pod, service and container resource types,
+  # `add_resource_metadata` can be defined.
+  # By default all labels will be included while annotations are not added by default.
+  # add_resource_metadata:
+  #   namespace:
+  #     include_labels: ["namespacelabel1"]
+  #   node:
+  #     include_labels: ["nodelabel2"]
+  #     include_annotations: ["nodeannotation1"]
+  #   deployment: false
+  # Kubernetes client QPS and burst can be configured additionally
+  #kube_client_options:
+  #  qps: 5
+  #  burst: 10
+
+# Kubernetes Events
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - event
+  period: 10s
+  # Skip events older than Metricbeat's statup time is enabled by default.
+  # Setting to false the skip_older setting will stop filtering older events.
+  # This setting is also useful went Event's timestamps are not populated properly.
+  #skip_older: false
+  # If kube_config is not set, KUBECONFIG environment variable will be checked
+  # and if not present it will fall back to InCluster
+  #kube_config: ~/.kube/config
+  # Set the namespace to watch for events
+  #namespace: staging
+  # Set the sync period of the watchers
+  #sync_period: 10m
   # Kubernetes client QPS and burst can be configured additionally
   #kube_client_options:
   #  qps: 5
@@ -931,8 +973,6 @@ metricbeat.modules:
   ssl.certificate_authorities:
     - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
   period: 30s
-
-
 
 # Kubernetes proxy server
 # (when running metricbeat locally at hosts or as a daemonset + host network)
@@ -1866,6 +1906,13 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
+
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
 
@@ -1997,6 +2044,13 @@ output.elasticsearch:
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
+
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -2199,6 +2253,13 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
+
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
 
@@ -2363,6 +2424,13 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
+
 
 # -------------------------------- File Output ---------------------------------
 #output.file:
@@ -2498,19 +2566,13 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Select the kind of index template. From Elasticsearch 7.8, it is possible to
-# use component templates. Available options: legacy, component, index.
-# By default metricbeat uses the legacy index templates.
-#setup.template.type: legacy
-
 # Template name. By default the template name is "metricbeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
 #setup.template.name: "metricbeat-%{[agent.version]}"
 
-# Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
-# The first part is the version of the beat and then -* is used to match all daily indices.
+# Template pattern. By default the template pattern is "metricbeat-%{[agent.version]}" to apply to the default index settings.
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.pattern: "metricbeat-%{[agent.version]}-*"
+#setup.template.pattern: "metricbeat-%{[agent.version]}"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
@@ -2557,17 +2619,8 @@ setup.template.settings:
 # output.elasticsearch.index is ignored, and the write alias is used to set the
 # index name.
 
-# Enable ILM support. Valid values are true, false, and auto. When set to auto
-# (the default), the Beat uses index lifecycle management when it connects to a
-# cluster that supports ILM; otherwise, it creates daily indices.
-#setup.ilm.enabled: auto
-
-# Set the prefix used in the index lifecycle write alias name. The default alias
-# name is 'metricbeat-%{[agent.version]}'.
-#setup.ilm.rollover_alias: 'metricbeat'
-
-# Set the rollover index pattern. The default is "%{now/d}-000001".
-#setup.ilm.pattern: "{now/d}-000001"
+# Enable ILM support. Valid values are true, false.
+#setup.ilm.enabled: true
 
 # Set the lifecycle policy name. The default policy name is
 # 'beatname'.
@@ -2664,6 +2717,13 @@ setup.kibana:
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
+
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
 
 
 # ================================== Logging ===================================
@@ -2862,6 +2922,13 @@ logging.files:
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
+
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
