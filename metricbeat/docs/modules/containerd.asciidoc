@@ -24,10 +24,11 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: containerd
-  metricsets: ["cpu"]
+  metricsets: ["cpu", "memory", "blkio"]
   enabled: false
   period: 10s
   hosts: ["localhost:1338"]
+  calcpct: true
 
 ----
 
@@ -36,7 +37,15 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-containerd-blkio,blkio>>
+
 * <<metricbeat-metricset-containerd-cpu,cpu>>
 
+* <<metricbeat-metricset-containerd-memory,memory>>
+
+include::containerd/blkio.asciidoc[]
+
 include::containerd/cpu.asciidoc[]
+
+include::containerd/memory.asciidoc[]
 
