@@ -152,6 +152,15 @@ Read only the entries with the selected syslog identifiers.
 
 Collect the messages using the specified transports. Example: syslog.
 
+Valid transports:
+
+* audit: messages from the kernel audit subsystem
+* driver: internally generated messages
+* syslog: messages received via the local syslog socket with the syslog protocol
+* journal: messages received via the native journal protocol
+* stdout: messages from a service's standard output or error output
+* kernel: messages from the kernel
+
 [float]
 [id="{beatname_lc}-input-{type}-include-matches"]
 ==== `include_matches`
