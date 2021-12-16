@@ -138,7 +138,8 @@ If you have old log files and want to skip lines, start {beatname_uc} with
 ==== `units`
 
 Iterate only the entries of the units specified in this option. The iterated entries include
-messages from the units, messages about the units by authorized daemons and coredumps.
+messages from the units, messages about the units by authorized daemons and coredumps. However,
+it does not match systemd user units.
 
 [float]
 [id="{beatname_lc}-input-{type}-syslog-identifiers"]

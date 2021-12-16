@@ -183,6 +183,11 @@ func ApplyUnitMatchers(j journal, units []string) error {
 				journaldObjectUnit,
 			},
 		}
+		if strings.HasSuffix(unit, ".slice") {
+			if sliceMatcher, err := BuildMatcher("systemd.slice=" + unit); err != nil {
+				matchers = append(matchers, []Matcher{sliceMatcher})
+			}
+		}
 
 		for _, m := range matchers {
 			if err := ApplyMatchersOr(j, m); err != nil {
