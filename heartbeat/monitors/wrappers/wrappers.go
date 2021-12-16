@@ -150,7 +150,7 @@ func addMonitorStatus(monitorType string, summaryOnly bool) jobs.JobWrapper {
 			if summaryOnly {
 				hasSummary, _ := event.Fields.HasKey("summary.up")
 				if !hasSummary {
-					return nil, nil
+					return cont, nil
 				}
 			}
 
