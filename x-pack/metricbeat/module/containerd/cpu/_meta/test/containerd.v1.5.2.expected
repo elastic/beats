@@ -204,40 +204,6 @@
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"usage": {
-				"kernel": {
-					"ns": 532180000000,
-					"pct": 5.257648295643049e-9
-				},
-				"total": {
-					"ns": 1236339003984,
-					"pct": 1.2214355400679284e-8
-				},
-				"user": {
-					"ns": 525470000000,
-					"pct": 5.19135715342845e-9
-				}
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "containerd.cpu",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
-			}
-		},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"usage": {
 				"cpu": {
 					"3": {
 						"ns": 101195506344
@@ -356,6 +322,40 @@
 					}
 				},
 				"percpu": {}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.cpu",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+			}
+		},
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"usage": {
+				"kernel": {
+					"ns": 532180000000,
+					"pct": 0
+				},
+				"total": {
+					"ns": 1236339003984,
+					"pct": 0
+				},
+				"user": {
+					"ns": 525470000000,
+					"pct": 0
+				}
 			}
 		},
 		"Index": "",

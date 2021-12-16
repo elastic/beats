@@ -139,7 +139,10 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 				contCpus = 1
 			}
 			// calculate timestamp delta
-			timestampDelta := timestamp.UnixNano() - m.preTimestamp.UnixNano()
+			timestampDelta := int64(0)
+			if !m.preTimestamp.IsZero() {
+				timestampDelta = timestamp.UnixNano() - m.preTimestamp.UnixNano()
+			}
 			// Calculate cpu total usage percentage
 			cpuUsageTotal, err := event.GetValue("usage.total.ns")
 			if err == nil {
