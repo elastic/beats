@@ -150,4 +150,4 @@
 - Add diagnostics collect command to gather beat metadata, config, policy, and logs and bundle it into an archive. {pull}28461[28461]
 - Add `KIBANA_FLEET_SERVICE_TOKEN` to Elastic Agent container. {pull}28096[28096]
 - Allow pprof endpoints for elastic-agent or beats if enabled. {pull}28983[28983] {pull}29155[29155]
-- Mark username/password settings as deprecated. {pull}29434[29434]
+- Mark username/password settings for fleet-server as deprecated. {pull}29434[29434]

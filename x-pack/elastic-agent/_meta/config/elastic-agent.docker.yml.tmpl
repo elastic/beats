@@ -5,11 +5,8 @@ outputs:
   default:
     type: elasticsearch
     hosts: '${ELASTICSEARCH_HOSTS:http://elasticsearch:9200}'
-    service_token: '${FLEET_SERVER_SERVICE_TOKEN}'
-    # Basic auth (username:password) is deprecated.
-    # Please user service_token instead.
-    #username: '${ELASTICSEARCH_USERNAME:elastic}'
-    #password: '${ELASTICSEARCH_PASSWORD:changeme}'
+    username: '${ELASTICSEARCH_USERNAME:elastic}'
+    password: '${ELASTICSEARCH_PASSWORD:changeme}'
 
 inputs:
   - type: system/metrics
@@ -46,10 +43,9 @@ inputs:
 
 #     # optional values
 #     #protocol: "https"
-#     #service_token: "example-token"
-#     # Note that basic auth is deprecated and will be removed in 8.0
+#     #service_token: "${FLEET_SERVER_SERVICE_TOKEN}"
+#     # Note that fleet-server basic auth is deprecated and will be removed in 8.0
 #     # service_token should be used instead.
-#     #username: "elastic"
 #     #username: "elastic"
 #     #password: "changeme"
 #     #path: ""

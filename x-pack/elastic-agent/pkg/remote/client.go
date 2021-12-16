@@ -17,7 +17,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -62,7 +61,6 @@ func NewConfigFromURL(kURL string) (Config, error) {
 
 	var username, password string
 	if u.User != nil {
-		cfgwarn.Deprecate("8.0.0", "Support for basic authorization is deprecated. Please use api keys.")
 		username = u.User.Username()
 		// _ is true when password is set.
 		password, _ = u.User.Password()
@@ -128,7 +126,6 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 		}
 
 		if cfg.IsBasicAuth() {
-			cfgwarn.Deprecate("8.0.0", "Support for basic authorization is deprecated. Please use api keys.")
 			// Pass basic auth credentials to all the underlying calls.
 			transport = NewBasicAuthRoundTripper(transport, cfg.Username, cfg.Password)
 		}
