@@ -39,7 +39,6 @@ const (
 )
 
 var (
-	out    chan TriggerEvent
 	status = Status{[]string{}, "", false}
 	wg     sync.WaitGroup
 )
@@ -70,7 +69,7 @@ func (in *cometdInput) run() error {
 	if err != nil {
 		return fmt.Errorf("error while getting Salesforce credentials: %v", err)
 	}
-	out, err = b.TopicToChannel(ctx, creds, in.config.ChannelName, in.log)
+	in.out, err = b.TopicToChannel(ctx, creds, in.config.ChannelName, in.log, in.out)
 	if err != nil {
 		return fmt.Errorf("failed to subscribe to channel: %v", err)
 	}
@@ -78,7 +77,7 @@ func (in *cometdInput) run() error {
 	var event Event
 	for {
 		select {
-		case e := <-out:
+		case e := <-in.out:
 			if !e.Successful {
 				if e.Data.Object == nil {
 					return nil
@@ -93,6 +92,7 @@ func (in *cometdInput) run() error {
 				}
 				if ok := in.outlet.OnEvent(makeEvent(event.EventId, string(msg))); !ok {
 					in.log.Debug("OnEvent returned false. Stopping input worker.")
+					close(in.out)
 					cancel()
 					return fmt.Errorf("error ingesting data to elasticsearch")
 				}
@@ -148,6 +148,9 @@ func NewInput(
 		ackedCount:   atomic.NewUint32(0),
 	}
 
+	// Creating a new channel for cometd input
+	in.out = make(chan TriggerEvent)
+
 	// Build outlet for events.
 	in.outlet, err = connector.Connect(cfg)
 	if err != nil {
@@ -159,7 +162,7 @@ func NewInput(
 
 // Stop stops the input and waits for it to fully stop.
 func (in *cometdInput) Stop() {
-	close(out)
+	close(in.out)
 	in.workerCancel()
 	in.workerWg.Wait()
 }
@@ -184,6 +187,7 @@ type cometdInput struct {
 	ackedCount *atomic.Uint32                   // Total number of successfully ACKed messages.
 	Transport  httpcommon.HTTPTransportSettings `config:",inline"`
 	Retry      retryConfig                      `config:"retry"`
+	out        chan TriggerEvent
 }
 
 // TriggerEvent describes an event received from Bayeaux Endpoint
@@ -353,8 +357,7 @@ func (b *Bayeux) subscribe(topic string, Replay int, log *logp.Logger) (Subscrip
 	return sub, nil
 }
 
-func (b *Bayeux) connect(log *logp.Logger) (chan TriggerEvent, error) {
-	out = make(chan TriggerEvent)
+func (b *Bayeux) connect(out chan TriggerEvent, log *logp.Logger) (chan TriggerEvent, error) {
 	go func() {
 		for {
 			postBody := fmt.Sprintf(`{"channel": "/meta/connect", "connectionType": "long-polling", "clientId": "%s"} `, b.id.clientID)
@@ -409,14 +412,14 @@ func (o *oAuth2Config) GetSalesforceCredentials() (Credentials, error) {
 	return creds, nil
 }
 
-func (b *Bayeux) TopicToChannel(ctx context.Context, creds Credentials, topic string, log *logp.Logger) (chan TriggerEvent, error) {
+func (b *Bayeux) TopicToChannel(ctx context.Context, creds Credentials, topic string, log *logp.Logger, out chan TriggerEvent) (chan TriggerEvent, error) {
 	b.creds = creds
 	err := b.getClientID()
 	if err != nil {
 		return make(chan TriggerEvent), fmt.Errorf("error while getting client ID: %v", err)
 	}
 	b.subscribe(topic, Replay, log)
-	c, err := b.connect(log)
+	c, err := b.connect(out, log)
 	if err != nil {
 		return make(chan TriggerEvent), fmt.Errorf("error while creating a connection: %v", err)
 	}
