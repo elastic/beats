@@ -65,15 +65,15 @@ func CustomizePackaging() {
 					return err
 				}
 
-				license, err := os.ReadFile(devtools.XPackBeatDir("npcap/installer/LICENSE"))
-				if err != nil {
-					return err
-				}
 				if spec.OS == "windows" && spec.License == "Elastic License" {
+					license, err := os.ReadFile(devtools.XPackBeatDir("npcap/installer/LICENSE"))
+					if err != nil {
+						return err
+					}
 					notice = append(notice, license...)
 				}
 
-				return os.WriteFile(spec.MustExpand("{{.PackageDir}}/NOTICE.txt"), notice, 0o644)
+				return os.WriteFile(devtools.CreateDir(spec.MustExpand("{{.PackageDir}}/NOTICE.txt")), notice, 0o644)
 			},
 		}
 	)
