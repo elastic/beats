@@ -1,4 +1,4 @@
-[![Build Status](https://beats-ci.elastic.co/job/Beats/job/beats/job/7.16/badge/icon)](https://beats-ci.elastic.co/job/Beats/job/beats/job/7.16/)
+[![Build Status](https://beats-ci.elastic.co/job/Beats/job/beats/job/7.17/badge/icon)](https://beats-ci.elastic.co/job/Beats/job/beats/job/7.17/)
 [![GoReportCard](http://goreportcard.com/badge/elastic/beats)](http://goreportcard.com/report/elastic/beats)
 [![codecov.io](https://codecov.io/github/elastic/beats/coverage.svg?branch=master)](https://codecov.io/github/elastic/beats?branch=master)
 
@@ -71,7 +71,7 @@ Please start by reading our [CONTRIBUTING](CONTRIBUTING.md) file.
 If you are creating a new Beat, you don't need to submit the code to this
 repository. You can simply start working in a new repository and make use of the
 libbeat packages, by following our [developer
-guide](https://www.elastic.co/guide/en/beats/libbeat/7.16/new-beat.html).
+guide](https://www.elastic.co/guide/en/beats/libbeat/7.17/new-beat.html).
 After you have a working prototype, open a pull request to add your Beat to the
 list of [community
 Beats](https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc).
