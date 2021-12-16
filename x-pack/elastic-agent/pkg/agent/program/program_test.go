@@ -31,14 +31,16 @@ func TestGroupBy(t *testing.T) {
 		sConfig := map[string]interface{}{
 			"outputs": map[string]interface{}{
 				"special": map[string]interface{}{
-					"type":          "elasticsearch",
-					"hosts":         "xxx",
-					"service_token": "testtoken",
+					"type":     "elasticsearch",
+					"hosts":    "xxx",
+					"username": "myusername",
+					"password": "mypassword",
 				},
 				"infosec1": map[string]interface{}{
-					"type":          "elasticsearch",
-					"hosts":         "yyy",
-					"service_token": "anothertoken",
+					"type":     "elasticsearch",
+					"hosts":    "yyy",
+					"username": "anotherusername",
+					"password": "anotherpassword",
 				},
 			},
 
@@ -70,8 +72,9 @@ func TestGroupBy(t *testing.T) {
 		c1 := transpiler.MustNewAST(map[string]interface{}{
 			"output": map[string]interface{}{
 				"elasticsearch": map[string]interface{}{
-					"hosts":         "xxx",
-					"service_token": "testtoken",
+					"hosts":    "xxx",
+					"username": "myusername",
+					"password": "mypassword",
 				},
 			},
 			"inputs": []map[string]interface{}{
@@ -90,8 +93,9 @@ func TestGroupBy(t *testing.T) {
 		c2, _ := transpiler.NewAST(map[string]interface{}{
 			"output": map[string]interface{}{
 				"elasticsearch": map[string]interface{}{
-					"hosts":         "yyy",
-					"service_token": "anothertoken",
+					"hosts":    "yyy",
+					"username": "anotherusername",
+					"password": "anotherpassword",
 				},
 			},
 			"inputs": []map[string]interface{}{
@@ -122,14 +126,16 @@ func TestGroupBy(t *testing.T) {
 			},
 			"outputs": map[string]interface{}{
 				"default": map[string]interface{}{
-					"type":          "elasticsearch",
-					"hosts":         "xxx",
-					"service_token": "testtoken",
+					"type":     "elasticsearch",
+					"hosts":    "xxx",
+					"username": "myusername",
+					"password": "mypassword",
 				},
 				"infosec1": map[string]interface{}{
-					"type":          "elasticsearch",
-					"hosts":         "yyy",
-					"service_token": "anothertoken",
+					"type":     "elasticsearch",
+					"hosts":    "yyy",
+					"username": "anotherusername",
+					"password": "anotherpassword",
 				},
 			},
 
@@ -162,14 +168,16 @@ func TestGroupBy(t *testing.T) {
 		sConfig := map[string]interface{}{
 			"outputs": map[string]interface{}{
 				"default": map[string]interface{}{
-					"type":          "elasticsearch",
-					"hosts":         "xxx",
-					"service_token": "testtoken",
+					"type":     "elasticsearch",
+					"hosts":    "xxx",
+					"username": "myusername",
+					"password": "mypassword",
 				},
 				"infosec1": map[string]interface{}{
-					"type":          "elasticsearch",
-					"hosts":         "yyy",
-					"service_token": "anothertoken",
+					"type":     "elasticsearch",
+					"hosts":    "yyy",
+					"username": "anotherusername",
+					"password": "anotherpassword",
 				},
 			},
 			"inputs": []map[string]interface{}{
@@ -198,8 +206,9 @@ func TestGroupBy(t *testing.T) {
 		c1 := transpiler.MustNewAST(map[string]interface{}{
 			"output": map[string]interface{}{
 				"elasticsearch": map[string]interface{}{
-					"hosts":         "xxx",
-					"service_token": "testtoken",
+					"hosts":    "xxx",
+					"username": "myusername",
+					"password": "mypassword",
 				},
 			},
 			"inputs": []map[string]interface{}{
@@ -232,14 +241,16 @@ func TestGroupBy(t *testing.T) {
 		sConfig := map[string]interface{}{
 			"outputs": map[string]interface{}{
 				"default": map[string]interface{}{
-					"type":          "elasticsearch",
-					"hosts":         "xxx",
-					"service_token": "testtoken",
+					"type":     "elasticsearch",
+					"hosts":    "xxx",
+					"username": "myusername",
+					"password": "mypassword",
 				},
 				"infosec1": map[string]interface{}{
-					"type":          "elasticsearch",
-					"hosts":         "yyy",
-					"service_token": "anothertoken",
+					"type":     "elasticsearch",
+					"hosts":    "yyy",
+					"username": "anotherusername",
+					"password": "anotherpassword",
 				},
 			},
 			"inputs": []map[string]interface{}{
@@ -270,8 +281,9 @@ func TestGroupBy(t *testing.T) {
 		c1 := transpiler.MustNewAST(map[string]interface{}{
 			"output": map[string]interface{}{
 				"elasticsearch": map[string]interface{}{
-					"hosts":         "xxx",
-					"service_token": "testtoken",
+					"hosts":    "xxx",
+					"username": "myusername",
+					"password": "mypassword",
 				},
 			},
 			"inputs": []map[string]interface{}{
@@ -289,8 +301,9 @@ func TestGroupBy(t *testing.T) {
 		c2, _ := transpiler.NewAST(map[string]interface{}{
 			"output": map[string]interface{}{
 				"elasticsearch": map[string]interface{}{
-					"hosts":         "yyy",
-					"service_token": "anothertoken",
+					"hosts":    "yyy",
+					"username": "anotherusername",
+					"password": "anotherpassword",
 				},
 			},
 			"inputs": []map[string]interface{}{
@@ -316,14 +329,16 @@ func TestGroupBy(t *testing.T) {
 		sConfig := map[string]interface{}{
 			"outputs": map[string]interface{}{
 				"default": map[string]interface{}{
-					"type":          "elasticsearch",
-					"hosts":         "xxx",
-					"service_token": "testtoken",
+					"type":     "elasticsearch",
+					"hosts":    "xxx",
+					"username": "myusername",
+					"password": "mypassword",
 				},
 				"infosec1": map[string]interface{}{
-					"type":          "elasticsearch",
-					"hosts":         "yyy",
-					"service_token": "anothertoken",
+					"type":     "elasticsearch",
+					"hosts":    "yyy",
+					"username": "anotherusername",
+					"password": "anotherpassword",
 				},
 			},
 			"datasources": []map[string]interface{}{},
@@ -341,14 +356,16 @@ func TestGroupBy(t *testing.T) {
 		sConfig := map[string]interface{}{
 			"outputs": map[string]interface{}{
 				"default": map[string]interface{}{
-					"type":          "elasticsearch",
-					"hosts":         "xxx",
-					"service_token": "testtoken",
+					"type":     "elasticsearch",
+					"hosts":    "xxx",
+					"username": "myusername",
+					"password": "mypassword",
 				},
 				"infosec1": map[string]interface{}{
-					"type":          "elasticsearch",
-					"hosts":         "yyy",
-					"service_token": "anothertoken",
+					"type":     "elasticsearch",
+					"hosts":    "yyy",
+					"username": "anotherusername",
+					"password": "anotherpassword",
 				},
 			},
 		}

@@ -2,7 +2,8 @@ outputs:
   default:
     type: elasticsearch
     hosts: [127.0.0.1:9200]
-    service_token: test
+    username: elastic
+    password: changeme
 
 inputs:
   - type: system/metrics

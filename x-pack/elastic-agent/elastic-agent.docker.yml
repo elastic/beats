@@ -5,6 +5,8 @@ outputs:
   default:
     type: elasticsearch
     hosts: '${ELASTICSEARCH_HOSTS:http://elasticsearch:9200}'
+    username: '${ELASTICSEARCH_USERNAME:elastic}'
+    password: '${ELASTICSEARCH_PASSWORD:changeme}'
 
 inputs:
   - type: system/metrics
@@ -41,6 +43,7 @@ inputs:
 
 #     # optional values
 #     #protocol: "https"
+#     #service_token: "${FLEET_SERVER_SERVICE_TOKEN}"
 #     #path: ""
 #     #ssl.verification_mode: full
 #     #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]

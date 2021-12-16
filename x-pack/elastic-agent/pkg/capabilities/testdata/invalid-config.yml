@@ -2,7 +2,8 @@ outputs:
   default:
     type: elasticsearch
     hosts: [127.0.0.1:9200]
-    service_toke: test
+    username: elastic
+    password: changeme
 
 inputs:
   - data_stream.namespace: default
