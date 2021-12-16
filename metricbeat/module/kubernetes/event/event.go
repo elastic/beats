@@ -110,8 +110,8 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 			eve := obj.(*kubernetes.Event)
 			// if fields are null they are decoded to `0001-01-01 00:00:00 +0000 UTC`
 			// so we need to check if they are valid first
-			lastTimestampValid := kubernetes.Time(&eve.LastTimestamp).Year() > 1
-			eventTimeValid := kubernetes.MicroTime(&eve.EventTime).Year() > 1
+			lastTimestampValid := !kubernetes.Time(&eve.LastTimestamp).IsZero()
+			eventTimeValid := !kubernetes.MicroTime(&eve.EventTime).IsZero()
 			// if skipOlder, skip events happened before watch
 			if m.skipOlder && kubernetes.Time(&eve.LastTimestamp).Before(now) && lastTimestampValid {
 				return false
