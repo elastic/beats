@@ -69,7 +69,9 @@ func CustomizePackaging() {
 				if err != nil {
 					return err
 				}
-				notice = append(notice, license...)
+				if spec.OS == "windows" && spec.License == "Elastic License" {
+					notice = append(notice, license...)
+				}
 
 				return os.WriteFile(spec.MustExpand("{{.PackageDir}}/NOTICE.txt"), notice, 0o644)
 			},
@@ -82,9 +84,7 @@ func CustomizePackaging() {
 			case devtools.TarGz, devtools.Zip:
 				args.Spec.ReplaceFile("{{.BeatName}}.yml", configYml)
 				args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfigYml)
-				if devtools.BeatLicense == "Elastic License" && args.OS == "windows" {
-					args.Spec.ReplaceFile("NOTICE.txt", npcapNoticeTxt)
-				}
+				args.Spec.ReplaceFile("NOTICE.txt", npcapNoticeTxt)
 			case devtools.Deb, devtools.RPM, devtools.DMG:
 				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", configYml)
 				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfigYml)
