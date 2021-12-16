@@ -94,6 +94,11 @@ func Time(t *metav1.Time) time.Time {
 	return t.Time
 }
 
+// MicroTime extracts time from k8s.MicroTime type
+func MicroTime(t *metav1.MicroTime) time.Time {
+	return t.Time
+}
+
 // ContainerID parses the container ID to get the actual ID string
 func ContainerID(s PodContainerStatus) string {
 	cID, _ := ContainerIDWithRuntime(s)
