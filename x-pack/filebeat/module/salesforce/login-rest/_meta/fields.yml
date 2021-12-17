@@ -4,6 +4,18 @@
   description: >
     Fileset for ingesting Salesforce Login (REST) logs.
   fields:
+    - name: api_type
+      type: keyword
+      description: >
+        The type of API request.
+    - name: api_version
+      type: keyword
+      description: >
+        The version of the API that’s being used.
+    - name: login_key
+      type: keyword
+      description: >
+        The string that ties together all events in a given user’s login session. It starts with a login event and ends with either a logout event or the user session expiring.
     - name: authentication_method_reference
       type: keyword
       description: >

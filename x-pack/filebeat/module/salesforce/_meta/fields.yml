@@ -3,35 +3,3 @@
   description: >
     Salesforce Module
   fields:
-    - name: access_mode
-      type: keyword
-      description: >
-        The mode of collecting logs from Salesforce - "rest" or "stream".
-    - name: login
-      type: group
-      description: >
-        The common fields Salesforce login - "rest" or "stream".
-      field:
-        - name: api_type
-          type: keyword
-          description: >
-            The type of API request.
-        - name: api_version
-          type: keyword
-          description: >
-            The version of the API that’s being used.
-        - name: login_key
-          type: keyword
-          description: >
-            The string that ties together all events in a given user’s login session. It starts with a login event and ends with either a logout event or the user session expiring.
-    
-    - name: logout
-      type: group
-      description: >
-        The common fields Salesforce logout - "rest" or "stream".
-      fields:
-        - name: session_level
-          type: keyword
-          description: >
-            Indicates the session-level security of the session that the user is logging out of for this event. Session-level security controls user access to features that support it, such as connected apps and reporting. Possible values are: HIGH_ASSURANCE, LOW, STANDARD
-        

@@ -8,10 +8,6 @@
       type: keyword
       description: >
         Unavailable
-    - name: login_key
-      type: keyword
-      description: >
-        The string that ties together all events in a given user’s login session. It starts with a login event and ends with either a logout event or the user session expiring.
     - name: related_event_identifier
       type: keyword
       description: >

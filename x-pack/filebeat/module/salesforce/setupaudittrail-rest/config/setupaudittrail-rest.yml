@@ -9,7 +9,10 @@ auth.oauth2:
   token_url: {{ .token_url }}
   user: {{ .user }}
   password: {{ .password }}
-request.url: {{ .url }}/services/data/v52.0/query
+# Query params will be overwritten by request.transforms from start of the input and 
+# it is to indicate that this url is for SetupAuditTratil type of events as cursor stores the url as source.
+# Each filebeat input cursor source needs to be uniquely identified with a name.
+request.url: {{ .url }}/services/data/v52.0/query?q=setupaudittrail+rest
 {{ if .proxy_url }}
 request.proxy_url: {{ .proxy_url }}
 {{ end }}

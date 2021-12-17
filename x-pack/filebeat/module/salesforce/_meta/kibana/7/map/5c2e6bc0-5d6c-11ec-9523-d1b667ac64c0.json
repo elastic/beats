@@ -1,0 +1,142 @@
+{
+    "attributes": {
+        "description": "",
+        "layerListJSON": [
+            {
+                "alpha": 1,
+                "id": "166258a6-0b30-4bd1-8a12-67f32cfbeb97",
+                "includeInFitToBounds": true,
+                "label": null,
+                "maxZoom": 24,
+                "minZoom": 0,
+                "sourceDescriptor": {
+                    "isAutoSelect": true,
+                    "type": "EMS_TMS"
+                },
+                "style": {
+                    "type": "TILE"
+                },
+                "type": "VECTOR_TILE",
+                "visible": true
+            },
+            {
+                "alpha": 0.75,
+                "id": "696a68f4-f7f0-4720-9c7a-eac4f6cba560",
+                "includeInFitToBounds": true,
+                "label": null,
+                "maxZoom": 24,
+                "minZoom": 0,
+                "sourceDescriptor": {
+                    "applyForceRefresh": true,
+                    "applyGlobalQuery": true,
+                    "applyGlobalTime": true,
+                    "geoField": "source.geo.location",
+                    "id": "608c9dc4-0997-4e15-af24-9334271838bb",
+                    "indexPatternRefName": "layer_1_source_index_pattern",
+                    "metrics": [
+                        {
+                            "type": "count"
+                        }
+                    ],
+                    "requestType": "heatmap",
+                    "resolution": "COARSE",
+                    "type": "ES_GEO_GRID"
+                },
+                "style": {
+                    "colorRampName": "theclassic",
+                    "type": "HEATMAP"
+                },
+                "type": "HEATMAP",
+                "visible": true
+            }
+        ],
+        "mapStateJSON": {
+            "center": {
+                "lat": 23.00882,
+                "lon": 13.35724
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "filebeat-*",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                            "query": "salesforce.login"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.dataset": "salesforce.login"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "refreshConfig": {
+                "interval": 900000,
+                "isPaused": false
+            },
+            "settings": {
+                "autoFitToDataBounds": false,
+                "backgroundColor": "#ffffff",
+                "browserLocation": {
+                    "zoom": 2
+                },
+                "disableInteractive": false,
+                "disableTooltipControl": false,
+                "fixedLocation": {
+                    "lat": 0,
+                    "lon": 0,
+                    "zoom": 2
+                },
+                "hideLayerControl": false,
+                "hideToolbarOverlay": false,
+                "hideViewControl": false,
+                "initialLocation": "LAST_SAVED_LOCATION",
+                "maxZoom": 24,
+                "minZoom": 0,
+                "showScaleControl": false,
+                "showSpatialFilters": true,
+                "showTimesliderToggleButton": true,
+                "spatialFiltersAlpa": 0.3,
+                "spatialFiltersFillColor": "#DA8B45",
+                "spatialFiltersLineColor": "#DA8B45"
+            },
+            "timeFilters": {
+                "from": "2021-10-21T02:19:14.117Z",
+                "to": "2021-10-22T10:30:00.000Z"
+            },
+            "zoom": 1.25
+        },
+        "title": "[Filebeat Salesforce][Login] Salesforce activity by region",
+        "uiStateJSON": {
+            "isLayerTOCOpen": true,
+            "openTOCDetails": []
+        }
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "5c2e6bc0-5d6c-11ec-9523-d1b667ac64c0",
+    "migrationVersion": {
+        "map": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "layer_1_source_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "map",
+    "updated_at": "2021-12-17T10:39:08.695Z",
+    "version": "WzIzNDYyLDJd"
+}

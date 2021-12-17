@@ -1,0 +1,71 @@
+{
+    "attributes": {
+        "columns": [
+            "source.ip",
+            "source.geo.city_name",
+            "user.id"
+        ],
+        "description": "",
+        "grid": {},
+        "hideChart": false,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "salesforce.logout"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.dataset": "salesforce.logout"
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "[Filebeat Salesforce][Logout] Logout Logs Table"
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "b3b98110-5d92-11ec-9523-d1b667ac64c0",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-12-17T10:39:10.754Z",
+    "version": "WzIzNDg5LDJd"
+}
