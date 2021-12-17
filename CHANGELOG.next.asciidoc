@@ -11,7 +11,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Remove the non-ECS `agent.hostname` field. Use the `agent.name` or `agent.id` fields for an identifier. {issue}16377[16377] {pull}18328[18328]
-- Make error message about locked data path actionable. {pull}18667[18667]
 - Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
 - Remove deprecated/undocumented IncludeCreatorMetadata setting from kubernetes metadata config options {pull}28006[28006]
 - Remove deprecated fields from kubernetes module {pull}28046[28046]
@@ -39,12 +38,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - With the default configuration the following modules will no longer send the `host` field that contains information about the host on which Filebeat is running. You can revert this change by configuring tags for the module and omitting `forwarded` from the list. {issue}13920[13920]
-- Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
 - With the default configuration the cloud modules (aws, azure, googlecloud, o365, okta)
 - With the default configuration the cef and panw modules will no longer send the `host`
-- Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
 - Add `while_pattern` type to multiline reader. {pull}19662[19662]
-- Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
 
 *Heartbeat*
 
