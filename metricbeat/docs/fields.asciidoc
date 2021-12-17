@@ -10268,6 +10268,16 @@ Information and statistics about containerd's running containers.
 
 
 
+*`containerd.namespace`*::
++
+--
+Containerd namespace
+
+
+type: keyword
+
+--
+
 [float]
 === blkio
 
