@@ -9,15 +9,20 @@ auth.oauth2:
   token_url: {{ .token_url }}
   user: {{ .user }}
   password: {{ .password }}
-request.url: {{ .url }}/services/data/v52.0/query
+# Query params will be overwritten by request.transforms from start of the input and 
+# it is to indicate that this url is for Logout type of events as cursor stores the url as source.
+# Each filebeat input cursor source needs to be uniquely identified with a name.
+request.url: {{ .url }}/services/data/v52.0/query?q=logout+rest
 {{ if .proxy_url }}
 request.proxy_url: {{ .proxy_url }}
 {{ end }}
 request.transforms:
   - set:
       target: url.params.q
-      value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Logout' AND LogDate > [[.cursor.last_published_logout]] ORDER BY LogDate ASC NULLS FIRST"
-      default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Logout' ORDER BY LogDate ASC NULLS FIRST"
+      value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Logout' AND CreatedDate > [[.cursor.last_published_logout]] ORDER BY CreatedDate ASC NULLS FIRST"
+      default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Logout' ORDER BY CreatedDate ASC NULLS FIRST"
+response.split:
+  target: body.records
 chain:
   - step:
       request.url: {{ .url }}/services/data/v52.0/sobjects/EventLogFile/records.#.Id/LogFile
@@ -25,7 +30,10 @@ chain:
       replace: records.#.Id
 cursor:
   last_published_logout:
-    value: '[[.last_event.TIMESTAMP_DERIVED]]'
+    value: '[[.last_event.CreatedDate]]'
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
   - decode_json_fields:

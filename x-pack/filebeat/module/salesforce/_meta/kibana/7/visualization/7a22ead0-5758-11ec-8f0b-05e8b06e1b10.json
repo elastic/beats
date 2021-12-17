@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "[Filebeat salesforce] Dashboards",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 12,
+                "markdown": "[Apex Dashboard](#/dashboard/salesforce-59ef0af0-5749-11ec-8f0b-05e8b06e1b10) | [Login Dashboard](#/dashboard/salesforce-1659aef0-574c-11ec-8f0b-05e8b06e1b10) | [Logout Dashboard](#/dashboard/salesforce-6c750440-5749-11ec-8f0b-05e8b06e1b10) | [SetupAuditTrail Dashboard](#/dashboard/salesforce-790da810-5749-11ec-8f0b-05e8b06e1b10)",
+                "openLinksInNewTab": false
+            },
+            "title": "[Filebeat salesforce] Dashboards",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "7a22ead0-5758-11ec-8f0b-05e8b06e1b10",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-12-17T10:39:08.695Z",
+    "version": "WzIzNDU4LDJd"
+}

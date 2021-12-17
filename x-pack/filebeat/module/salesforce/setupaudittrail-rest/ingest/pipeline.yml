@@ -98,11 +98,11 @@ processors:
     copy_from: salesforce.setup_audit_trail.created_by_id
     ignore_failure: true
 - set:
-    field: temp
+    field: temp_setup_audit_trail_display
     copy_from: salesforce.setup_audit_trail.display
     ignore_failure: true
 - dissect:
-    field: temp
+    field: temp_setup_audit_trail_display
     pattern: "For user %{user.target.user.name}, %{?}"
     ignore_failure: true
 
@@ -130,7 +130,7 @@ processors:
 - remove:
     field:
       - json
-      - temp
+      - temp_setup_audit_trail_display
     ignore_missing: true
 on_failure:
 - set:

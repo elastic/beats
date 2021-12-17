@@ -7,6 +7,9 @@ auth.oauth2:
   user: {{ .user }}
   password: {{ .password }}
 
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
 processors:
   - decode_json_fields:
       fields: [message]
