@@ -78,13 +78,13 @@ func ExportPipelines(info beat.Info, version common.Version, directory string) e
 		}
 		f, err := os.Create(filepath.Join(directory, pipeline.id+".json"))
 		if err != nil {
-			return fmt.Errorf("unable to create file to export pipeline to: %+v", err)
+			return fmt.Errorf("unable to create file to export pipeline to: %w", err)
 		}
 		enc := json.NewEncoder(f)
 		enc.SetEscapeHTML(false)
 		err = enc.Encode(pipeline.contents)
 		if err != nil {
-			return fmt.Errorf("unable to JSON encode pipeline %s: %+v", f.Name(), err)
+			return fmt.Errorf("unable to JSON encode pipeline %s: %w", f.Name(), err)
 		}
 	}
 	return nil
@@ -158,7 +158,7 @@ func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipel
 	for _, pipeline := range pipelines {
 		err = fileset.LoadPipeline(esClient, pipeline.id, pipeline.contents, overwritePipelines, log)
 		if err != nil {
-			err = fmt.Errorf("error loading pipeline %s: %v", pipeline.id, err)
+			err = fmt.Errorf("error loading pipeline %s: %w", pipeline.id, err)
 			break
 		}
 		pipelineIDsLoaded = append(pipelineIDsLoaded, pipeline.id)
@@ -193,15 +193,15 @@ func applyTemplates(prefix string, version string, filename string, original []b
 	switch extension := strings.ToLower(filepath.Ext(filename)); extension {
 	case ".json":
 		if err = json.Unmarshal([]byte(encodedString), &content); err != nil {
-			return nil, fmt.Errorf("Error JSON decoding the pipeline file: %s: %v", filename, err)
+			return nil, fmt.Errorf("Error JSON decoding the pipeline file: %s: %w", filename, err)
 		}
 	case ".yaml", ".yml":
 		if err = yaml.Unmarshal([]byte(encodedString), &content); err != nil {
-			return nil, fmt.Errorf("Error YAML decoding the pipeline file: %s: %v", filename, err)
+			return nil, fmt.Errorf("Error YAML decoding the pipeline file: %s: %w", filename, err)
 		}
 		newContent, err := fileset.FixYAMLMaps(content)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to sanitize the YAML pipeline file: %s: %v", filename, err)
+			return nil, fmt.Errorf("Failed to sanitize the YAML pipeline file: %s: %w", filename, err)
 		}
 		content = newContent.(map[string]interface{})
 	default:
