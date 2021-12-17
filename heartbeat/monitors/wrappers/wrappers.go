@@ -51,7 +51,7 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []j
 		jobs.WrapAll(
 			js,
 			addMonitorMeta(stdMonFields, len(js) > 1),
-			addMonitorStatus(stdMonFields.Type),
+			addMonitorStatus(stdMonFields.Type, false),
 			addMonitorDuration,
 		),
 		func() jobs.JobWrapper {
@@ -66,7 +66,7 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.
 	return jobs.WrapAll(
 		js,
 		addMonitorMeta(stdMonFields, len(js) > 1),
-		addMonitorStatus(stdMonFields.Type),
+		addMonitorStatus(stdMonFields.Type, true),
 	)
 }
 
@@ -142,11 +142,17 @@ func timespan(started time.Time, sched *schedule.Schedule, timeout time.Duration
 // by the original Job will be set as a field. The original error will not be
 // passed through as a return value. Errors may still be present but only if there
 // is an actual error wrapping the error.
-
-func addMonitorStatus(monitorType string) jobs.JobWrapper {
+func addMonitorStatus(monitorType string, summaryOnly bool) jobs.JobWrapper {
 	return func(origJob jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, err := origJob(event)
+
+			if summaryOnly {
+				hasSummary, _ := event.Fields.HasKey("summary.up")
+				if !hasSummary {
+					return cont, nil
+				}
+			}
 
 			fields := common.MapStr{
 				"monitor": common.MapStr{
