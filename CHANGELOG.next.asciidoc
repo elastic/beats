@@ -11,7 +11,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Remove the non-ECS `agent.hostname` field. Use the `agent.name` or `agent.id` fields for an identifier. {issue}16377[16377] {pull}18328[18328]
-- Make error message about locked data path actionable. {pull}18667[18667]
 - Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
 - Remove deprecated/undocumented IncludeCreatorMetadata setting from kubernetes metadata config options {pull}28006[28006]
 - Remove deprecated fields from kubernetes module {pull}28046[28046]
@@ -38,12 +37,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - With the default configuration the following modules will no longer send the `host` field that contains information about the host on which Filebeat is running. You can revert this change by configuring tags for the module and omitting `forwarded` from the list. {issue}13920[13920]
-- Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
 - With the default configuration the cloud modules (aws, azure, googlecloud, o365, okta)
 - With the default configuration the cef and panw modules will no longer send the `host`
-- Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
 - Add `while_pattern` type to multiline reader. {pull}19662[19662]
-- Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
 
 *Heartbeat*
 
@@ -149,6 +145,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `threatintel.misp` filters configuration. {issue}27970[27970]
 - Fix handling of escaped newlines in the `decode_cef` processor. {issue}16995[16995] {pull}29268[29268]
 - Fix `panw` module ingest errors for GLOBALPROTECT logs {pull}29154[29154]
+- aws-s3: Stop trying to increase SQS message visibility after ReceiptHandleIsInvalid errors. {pull}29480[29480]
 - Fix handling of IPv6 addresses in netflow flow events. {issue}19210[19210] {pull}29383[29383]
 
 *Heartbeat*
@@ -187,6 +184,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Groups same timestamp metric values to one event in the app_insights metricset. {pull}20403[20403]
 - Use xpack.enabled on SM modules to write into .monitoring indices when using Metricbeat standalone {pull}28365[28365]
 - Fix in rename processor to ingest metrics for `write.iops` to proper field instead of `write_iops` in rds metricset. {pull}28960[28960]
+- Enhance filter check in kubernetes event metricset. {pull}29470[29470]
 
 *Packetbeat*
 
@@ -230,6 +228,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Support self signed certificates on outputs {pull}29229[29229]
 - Update k8s library {pull}29394[29394]
 - Add FIPS configuration option for all AWS API calls. {pull}[28899]
+- Add `default_region` config to AWS common module. {pull}[29415]
 
 *Auditbeat*
 
@@ -266,6 +265,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
 - Add support for parsers on journald input {pull}29070[29070]
 - Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
+- Update Cisco module to enable TCP input. {issue}26118[26118] {issue}28821[28821] {pull}26159[26159]
 
 *Heartbeat*
 
@@ -294,6 +294,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Add more DNS error codes to the Sysmon module. {issue}15685[15685]
 - Add configuration option for registry file flush timeout {issue}29001[29001] {pull}29053[29053]
+- Add support for custom XML queries {issue}1054[1054] {pull}29330[29330]
 
 *Elastic Log Driver*
 

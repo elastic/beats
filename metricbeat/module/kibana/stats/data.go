@@ -123,7 +123,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		event.Error = elastic.MakeErrorForMissingField("cluster_uuid", elastic.Kibana)
 		return event.Error
 	}
-	event.ModuleFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
+	event.RootFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
 
 	// Set service ID
 	uuid, err := dataFields.GetValue("uuid")
