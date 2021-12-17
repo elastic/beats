@@ -39,6 +39,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
@@ -47,7 +48,7 @@ type xswUsage struct {
 }
 
 // get is the darwin implementation for fetching Memory data
-func get(_ string) (Memory, error) {
+func get(_ resolve.Resolver) (Memory, error) {
 	var vmstat C.vm_statistics_data_t
 
 	mem := Memory{}
