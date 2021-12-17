@@ -52,7 +52,15 @@ func ParseRedisInfo(info string) map[string]string {
 		// Values are separated by :
 		parts := ParseRedisLine(value, ":")
 		if len(parts) == 2 {
-			values[parts[0]] = parts[1]
+			if strings.Contains(parts[0], "cmdstat_") {
+				cmdstats := ParseRedisCommandStats(parts[0], parts[1])
+				for k, v := range cmdstats {
+					key := parts[0] + "_" + k
+					values[key] = v
+				}
+			} else {
+				values[parts[0]] = parts[1]
+			}
 		}
 	}
 	return values
@@ -61,6 +69,22 @@ func ParseRedisInfo(info string) map[string]string {
 // ParseRedisLine parses a single line returned by INFO
 func ParseRedisLine(s string, delimiter string) []string {
 	return strings.Split(s, delimiter)
+}
+
+// ParseRedisCommandStats parses a map of stats returned by INFO COMMANDSTATS
+func ParseRedisCommandStats(key string, s string) map[string]string {
+	// calls=XX,usec=XXX,usec_per_call=XXX
+	results := strings.Split(s, ",")
+
+	values := map[string]string{}
+
+	for _, value := range results {
+		parts := strings.Split(value, "=")
+		if len(parts) == 2 {
+			values[parts[0]] = parts[1]
+		}
+	}
+	return values
 }
 
 // FetchRedisInfo returns a map of requested stats.

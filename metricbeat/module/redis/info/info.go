@@ -59,8 +59,8 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 	}()
 
-	// Fetch default INFO.
-	info, err := redis.FetchRedisInfo("default", conn)
+	// Fetch all INFO.
+	info, err := redis.FetchRedisInfo("all", conn)
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch redis info")
 	}
