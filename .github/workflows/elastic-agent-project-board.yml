@@ -14,8 +14,10 @@ jobs:
         with:
           headers: '{"GraphQL-Features": "projects_next_graphql"}'
           query: |
-             updateIssue(input: {id:$contentid, projectIds:$projectid}) {
-              clientMutationId
+            mutation add_to_project($projectid:String!,$contentid:String!) {
+               updateIssue(input: {id:$contentid, projectIds:$projectid}) {
+                clientMutationId
+              }
              }
           projectid: ${{ env.PROJECT_ID }}
           contentid: ${{ github.event.issue.node_id }}
@@ -32,9 +34,11 @@ jobs:
         with:
           headers: '{"GraphQL-Features": "projects_next_graphql"}'
           query: |
-             updateIssue(input: {id:$contentid, projectIds:$projectid}) {
-              clientMutationId
-             } 
+             mutation add_to_project($projectid:String!,$contentid:String!) {
+               updateIssue(input: {id:$contentid, projectIds:$projectid}) {
+                clientMutationId
+              }
+             }
           projectid: ${{ env.PROJECT_ID }}
           contentid: ${{ github.event.issue.node_id }}
         env:
