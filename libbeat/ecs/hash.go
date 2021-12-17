@@ -40,4 +40,10 @@ type Hash struct {
 
 	// SSDEEP hash.
 	Ssdeep string `ecs:"ssdeep"`
+
+	// SHA384 hash.
+	Sha384 string `ecs:"sha384"`
+
+	// TLSH hash.
+	Tlsh string `ecs:"tlsh"`
 }
