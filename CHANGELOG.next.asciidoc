@@ -10,54 +10,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Make error message about locked data path actionable. {pull}18667[18667]
-- Fix panic with inline SSL when the certificate or key were small than 256 bytes. {pull}23820[23820]
-- Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
-- Remove deprecated/undocumented IncludeCreatorMetadata setting from kubernetes metadata config options {pull}28006[28006]
-- Remove deprecated fields from kubernetes module {pull}28046[28046]
-- Remove deprecated config option aws_partition. {pull}28120[28120]
-- Improve stats API {pull}27963[27963]
-- Libbeat: logp package forces ECS compliant logs. Logs are JSON formatted. Options to enable ECS/JSON have been removed. {issue}15544[15544] {pull}28573[28573]
-- Update docker client. {pull}28716[28716]
-- Remove `auto` from the available options of `setup.ilm.enabled` and set the default value to `true`. {pull}28671[28671]
-- add_process_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
-- add_docker_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
-- Use data streams instead of indices for storing events from Beats. {pull}28450[28450]
-- Remove option `setup.template.type` and always load composable template with data streams. {pull}28450[28450]
-- Remove several ILM options (`rollover_alias` and `pattern`) as data streams does not require index aliases. {pull}28450[28450]
-- Index template's default_fields setting is only populated with ECS fields. {pull}28596[28596] {issue}28215[28215]
-- Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
-- Remove options `logging.files.suffix` and default to datetime endings. {pull}28927[28927]
-
 *Auditbeat*
 
-- File integrity dataset (macOS): Replace unnecessary `file.origin.raw` (type keyword) with `file.origin.text` (type `text`). {issue}12423[12423] {pull}15630[15630]
-- Change event.kind=error to event.kind=event to comply with ECS. {issue}18870[18870] {pull}20685[20685]
-
 *Filebeat*
-
-- Preserve case of http.request.method.  ECS prior to 1.6 specified normalizing to lowercase, which lost information. Affects filesets: apache/access, elasticsearch/audit, iis/access, iis/error, nginx/access, nginx/ingress_controller, aws/elb, suricata/eve, zeek/http. {issue}18154[18154] {pull}18359[18359]
-- Disable the option of running --machine-learning on its own. {pull}20241[20241]
-- Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
 
 *Heartbeat*
 - Only add monitor.status to browser events when summary. {pull}29460[29460]
 
 *Metricbeat*
 
-- kubernetes.container.cpu.limit.cores and kubernetes.container.cpu.requests.cores are now floats. {issue}11975[11975]
-
 *Packetbeat*
-
 
 *Winlogbeat*
 
-- Add support to Sysmon file delete events (event ID 23). {issue}18094[18094]
-- Improve ECS field mappings in Sysmon module. `related.hash`, `related.ip`, and `related.user` are now populated. {issue}18364[18364]
-- Improve ECS field mappings in Sysmon module. Hashes are now also populated to the corresponding `process.hash`, `process.pe.imphash`, `file.hash`, or `file.pe.imphash`. {issue}18364[18364]
-- Improve ECS field mappings in Sysmon module. `file.name`, `file.directory`, and `file.extension` are now populated. {issue}18364[18364]
-- Improve ECS field mappings in Sysmon module. `rule.name` is populated for all events when present. {issue}18364[18364]
-- Fix unprefixed fields in `fields.yml` for Powershell module {issue}18984[18984]
 
 *Functionbeat*
 
