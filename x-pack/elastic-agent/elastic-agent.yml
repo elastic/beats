@@ -12,8 +12,8 @@ outputs:
     type: elasticsearch
     hosts: [127.0.0.1:9200]
     api_key: "example-key"
-    # username: elastic
-    # password: changeme
+    #username: elastic
+    #password: changeme
 
 inputs:
   - type: system/metrics
