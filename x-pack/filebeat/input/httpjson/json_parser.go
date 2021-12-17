@@ -11,80 +11,102 @@ import (
 	"strings"
 )
 
-// getJSON returns array of string values from json string
-func getJSON(b, str string) ([]string, error) {
-	strArr := strings.Split(str, ".")
-	bNew := []byte(b)
-	newIn, err := jsonInterface(string(b[0]), strArr[0], bNew)
+// parse returns array of string values from json string
+func parse(jsonbyte, keyField string) ([]string, error) {
+	keys := strings.Split(keyField, ".")
+	jsonbytes := []byte(jsonbyte)
+	jsoninterface, err := jsonInterface(string(jsonbyte[0]), keys[0], jsonbytes)
 	if err != nil {
 		return nil, fmt.Errorf("error while parsing json: %v", err)
 	}
-	var strArray []string
-	for i, sr := range strArr {
-		switch sr {
+	var values []string
+	for i, key := range keys {
+		switch key {
 		case "#":
-			newIn, err = jsonArr(strArr[i+1], newIn)
+			jsoninterface, err = jsonArr(keys[i+1], jsoninterface)
 			if err != nil {
 				return nil, fmt.Errorf("error while parsing json: %v", err)
 			}
-			for _, ir := range newIn.([]interface{}) {
+			// interate over []interface{}
+			for _, ir := range jsoninterface.([]interface{}) {
 				if reflect.TypeOf(ir).String() == "string" {
-					strArray = append(strArray, ir.(string))
+					values = append(values, ir.(string))
 				} else {
-					final, err := jsonNorm(strArr[i+2], ir)
+					final, err := jsonNorm(keys[i+2], ir)
 					if err != nil {
 						return nil, fmt.Errorf("error while parsing json: %v", err)
 					}
-					strArray = append(strArray, final.(string))
+					values = append(values, final.(string))
 				}
 			}
 		default:
-			newIn, err = jsonNorm(sr, newIn)
+			jsoninterface, err = jsonNorm(key, jsoninterface)
 			if err != nil {
 				return nil, fmt.Errorf("error while parsing json: %v", err)
 			}
-			if len(strArr) == i+1 {
-				strArray = append(strArray, newIn.(string))
+			if len(keys) == i+1 {
+				values = append(values, jsoninterface.(string))
 			}
 		}
-		if sr == "#" {
+		if key == "#" {
 			break
 		}
 	}
-	return strArray, nil
+	return values, nil
 }
 
 // jsonArr returns array of interface value from interface
-func jsonArr(sr string, bNew interface{}) ([]interface{}, error) {
-	var str []interface{}
-	if bNew.([]interface{}) != nil {
-		for _, i := range bNew.([]interface{}) {
-			str = append(str, i.(map[string]interface{})[sr])
+// input:
+// key=a,
+// inf=
+// [
+// 	{
+// 		"a": "a_value_1",
+// 	},
+// 	{
+// 		"a": "a_value_2",
+// 	},
+// ]
+// output:
+// ["a_value_1", "a_value_2"]
+func jsonArr(key string, inf interface{}) ([]interface{}, error) {
+	var infs []interface{}
+	if inf.([]interface{}) != nil {
+		for _, i := range inf.([]interface{}) {
+			infs = append(infs, i.(map[string]interface{})[key])
 		}
 	} else {
 		return nil, fmt.Errorf("error while parsing json")
 	}
 
-	return str, nil
+	return infs, nil
 }
 
 // jsonInterface returns interface from byte json
-func jsonInterface(str, comStr string, bNew []byte) (interface{}, error) {
+// input:
+// key={
+// comkey=a
+// jsonbytes={"a":"a_value"}
+// output:
+// map[string]interface{}{
+// 	"a": "a_value",
+// }
+func jsonInterface(key, comkey string, jsonbytes []byte) (interface{}, error) {
 	var data map[string]interface{}
-	if str == "{" && comStr != "#" {
-		err := json.Unmarshal(bNew, &data)
+	if key == "{" && comkey != "#" {
+		err := json.Unmarshal(jsonbytes, &data)
 		if err != nil {
 			return nil, err
 		}
-	} else if str == "[" && comStr == "#" {
+	} else if key == "[" && comkey == "#" {
 		var data1 []interface{}
-		err := json.Unmarshal(bNew, &data1)
+		err := json.Unmarshal(jsonbytes, &data1)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing Array of json: ")
 		}
 		return data1, nil
-	} else if str == comStr && comStr != "#" {
-		err := json.Unmarshal(bNew, &data)
+	} else if key == comkey && comkey != "#" {
+		err := json.Unmarshal(jsonbytes, &data)
 		if err != nil {
 			return nil, err
 		}
@@ -95,9 +117,27 @@ func jsonInterface(str, comStr string, bNew []byte) (interface{}, error) {
 }
 
 // jsonNorm returns interface value from interface
-func jsonNorm(sr string, bNew interface{}) (interface{}, error) {
-	if reflect.TypeOf(bNew).String() != "map[string]interface {}" {
+// input:
+// key=a
+// inf=map[string]interface{}{
+// 	"a": "a_value",
+// }
+// output:
+// a_value
+
+// input:
+// key=a
+// inf=map[string]interface{}{
+// 	"a": map[string]interface{}{
+// 		"b": "b_value",
+// 	},
+// }
+// map[string]interface{}{
+// 	"b": "b_value",
+// }
+func jsonNorm(key string, inf interface{}) (interface{}, error) {
+	if reflect.TypeOf(inf).String() != "map[string]interface {}" {
 		return nil, fmt.Errorf("error while parsing json")
 	}
-	return bNew.(map[string]interface{})[sr], nil
+	return inf.(map[string]interface{})[key], nil
 }

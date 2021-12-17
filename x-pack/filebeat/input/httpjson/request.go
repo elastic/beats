@@ -210,23 +210,29 @@ func generateNewUrl(replacement string, oldUrl string, str []byte) (url.URL, err
 
 func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher) error {
 	var (
-		httpResp       *http.Response
-		ArrayhttpResp  []*http.Response
-		finalHttpResps []*http.Response
-		st             []string
-		err            error
-		b              []byte
-		url            string
+		n                 int
+		ids               []string
+		err               error
+		split             *split
+		urlCopy           url.URL
+		urlString         string
+		httpResp          *http.Response
+		intermediateResps []*http.Response
+		finalResps        []*http.Response
 	)
-	// perform each requestFactory
 	for i, rf := range r.requestFactory {
 		// iterate over collected ids from last response
 		if i != 0 {
-			url = rf.url.String()
+			if len(ids) == 0 {
+				n = 0
+				continue
+			}
+			urlCopy = rf.url
+			urlString = rf.url.String()
 			// perform request over collected ids
-			for _, s := range st {
+			for _, s := range ids {
 				// reformat urls of requestFactory using ids
-				rf.url, err = generateNewUrl(rf.replace, url, []byte(s))
+				rf.url, err = generateNewUrl(rf.replace, urlString, []byte(s))
 				if err != nil {
 					return fmt.Errorf("failed to generate new URL: %w", err)
 				}
@@ -237,11 +243,35 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 					return fmt.Errorf("failed to execute http client.Do: %w", err)
 				}
 				// store data according to response type
-				if i+1 == len(r.requestFactory) && len(st) != 0 {
-					finalHttpResps = append(finalHttpResps, httpResp)
+				if i+1 == len(r.requestFactory) && len(ids) != 0 {
+					finalResps = append(finalResps, httpResp)
 				} else {
-					ArrayhttpResp = append(ArrayhttpResp, httpResp)
+					intermediateResps = append(intermediateResps, httpResp)
 				}
+			}
+			rf.url = urlCopy
+
+			if i+1 == len(r.requestFactory) {
+				split = r.responseProcessor.split
+				r.responseProcessor.split = nil
+				n, err = r.processAndPublishEvents(0, stdCtx, trCtx, publisher, finalResps)
+				if err != nil {
+					return err
+				}
+				r.responseProcessor.split = split
+				continue
+			} else {
+				ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactory[i+1].replace)
+				if err != nil {
+					return err
+				}
+				split = r.responseProcessor.split
+				r.responseProcessor.split = nil
+				n, err = r.processAndPublishEvents(1, stdCtx, trCtx, publisher, intermediateResps)
+				if err != nil {
+					return err
+				}
+				r.responseProcessor.split = split
 			}
 		} else {
 			// perform and store regular call responses
@@ -250,27 +280,19 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				return fmt.Errorf("failed to execute http client.Do: %w", err)
 			}
 			if len(r.requestFactory) <= 1 {
-				finalHttpResps = append(finalHttpResps, httpResp)
-			} else {
-				ArrayhttpResp = append(ArrayhttpResp, httpResp)
-			}
-		}
-
-		// parse and store ids from collected responses
-		if i+1 < len(r.requestFactory) {
-			st = nil
-			// collect ids from all responses
-			for _, resp := range ArrayhttpResp {
-				if resp.Body != nil {
-					b, err = ioutil.ReadAll(resp.Body)
-					if err != nil {
-						return err
-					}
+				finalResps = append(finalResps, httpResp)
+				n, err = r.processAndPublishEvents(0, stdCtx, trCtx, publisher, finalResps)
+				if err != nil {
+					return err
 				}
-				// Restore the io.ReadCloser to its original state
-				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
-				// get replace values from collected json
-				st, err = getJSON(string(b), r.requestFactory[i+1].replace)
+				continue
+			} else {
+				intermediateResps = append(intermediateResps, httpResp)
+				ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactory[i+1].replace)
+				if err != nil {
+					return err
+				}
+				n, err = r.processAndPublishEvents(1, stdCtx, trCtx, publisher, intermediateResps)
 				if err != nil {
 					return err
 				}
@@ -278,7 +300,39 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		}
 	}
 
-	eventsCh, err := r.responseProcessor.startProcessing(stdCtx, trCtx, finalHttpResps)
+	httpResp.Body.Close()
+	r.log.Infof("request finished: %d events published", n)
+
+	return nil
+}
+
+// getIdsFromResponses returns ids from responses
+func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, replace string) ([]string, error) {
+	var b []byte
+	var ids []string
+	var err error
+	// collect ids from all responses
+	for _, resp := range intermediateResps {
+		if resp.Body != nil {
+			b, err = ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, fmt.Errorf("error while reading response body: %v", err)
+			}
+		}
+		// Restore the io.ReadCloser to its original state
+		resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+		// get replace values from collected json
+		ids, err = parse(string(b), replace)
+		if err != nil {
+			return nil, fmt.Errorf("error while getting keys: %v", err)
+		}
+	}
+	return ids, nil
+}
+
+// processAndPublishEvents process and publish events based on response type
+func (r *requester) processAndPublishEvents(publish int, stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, finalResps []*http.Response) (int, error) {
+	eventsCh, err := r.responseProcessor.startProcessing(stdCtx, trCtx, finalResps)
 	if err != nil {
 		r.log.Errorf("error recieving eventCh: %v", err)
 	}
@@ -292,15 +346,17 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			continue
 		}
 
-		event, err := makeEvent(maybeMsg.msg)
-		if err != nil {
-			r.log.Errorf("error creating event: %v", maybeMsg)
-			continue
-		}
+		if publish == 0 {
+			event, err := makeEvent(maybeMsg.msg)
+			if err != nil {
+				r.log.Errorf("error creating event: %v", maybeMsg)
+				continue
+			}
 
-		if err := publisher.Publish(event, trCtx.cursorMap()); err != nil {
-			r.log.Errorf("error publishing event: %v", err)
-			continue
+			if err := publisher.Publish(event, trCtx.cursorMap()); err != nil {
+				r.log.Errorf("error publishing event: %v", err)
+				continue
+			}
 		}
 		if len(*trCtx.firstEventClone()) == 0 {
 			trCtx.updateFirstEvent(maybeMsg.msg)
@@ -309,9 +365,5 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		trCtx.updateCursor()
 		n++
 	}
-
-	httpResp.Body.Close()
-	r.log.Infof("request finished: %d events published", n)
-
-	return nil
+	return n, nil
 }
