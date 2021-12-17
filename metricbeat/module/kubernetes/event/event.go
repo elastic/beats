@@ -108,8 +108,16 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 	m.watcher.AddEventHandler(kubernetes.FilteringResourceEventHandler{
 		FilterFunc: func(obj interface{}) bool {
 			eve := obj.(*kubernetes.Event)
+			// if fields are null they are decoded to `0001-01-01 00:00:00 +0000 UTC`
+			// so we need to check if they are valid first
+			lastTimestampValid := !kubernetes.Time(&eve.LastTimestamp).IsZero()
+			eventTimeValid := !kubernetes.MicroTime(&eve.EventTime).IsZero()
 			// if skipOlder, skip events happened before watch
-			if m.skipOlder && kubernetes.Time(&eve.LastTimestamp).Before(now) {
+			if m.skipOlder && kubernetes.Time(&eve.LastTimestamp).Before(now) && lastTimestampValid {
+				return false
+			} else if m.skipOlder && kubernetes.MicroTime(&eve.EventTime).Before(now) && eventTimeValid {
+				// there might be cases that `LastTimestamp` is not a valid number so double check
+				// with `EventTime`
 				return false
 			}
 			return true
