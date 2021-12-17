@@ -13,7 +13,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -52,6 +51,7 @@ var (
 		Labels: map[string]prometheus.LabelMap{
 			"container_id": prometheus.KeyLabel("id"),
 			"device":       prometheus.KeyLabel("device"),
+			"namespace":    prometheus.KeyLabel("namespace"),
 		},
 	}
 )
@@ -104,23 +104,12 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error getting events")
 	}
 	for _, event := range events {
-
-		// setting ECS container.id
-		rootFields := common.MapStr{}
-		containerFields := common.MapStr{}
-		var cID string
-		if containerID, ok := event["id"]; ok {
-			cID = (containerID).(string)
-			containerFields.Put("id", cID)
-			event.Delete("id")
-		}
-
-		if len(containerFields) > 0 {
-			rootFields.Put("container", containerFields)
-		}
+		// setting ECS container.id and containerd.namespace
+		rootFields, moduleFields, _ := containerd.SetCIDandNamespace(event)
 
 		reporter.Event(mb.Event{
 			RootFields:      rootFields,
+			ModuleFields:    moduleFields,
 			MetricSetFields: event,
 			Namespace:       "containerd.blkio",
 		})

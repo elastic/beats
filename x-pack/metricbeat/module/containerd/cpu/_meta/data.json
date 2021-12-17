@@ -7,13 +7,14 @@
         "cpu": {
             "usage": {
                 "cpu": {
-                    "10": {
-                        "ns": 106709905770
+                    "4": {
+                        "ns": 105731762224
                     }
                 },
                 "percpu": {}
             }
-        }
+        },
+        "namespace": "k8s.io"
     },
     "event": {
         "dataset": "containerd.cpu",

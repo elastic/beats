@@ -5,7 +5,9 @@
 				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
 			}
 		},
-		"ModuleFields": null,
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
 		"MetricSetFields": {
 			"usage": {
 				"cpu": {
@@ -33,7 +35,9 @@
 				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
 			}
 		},
-		"ModuleFields": null,
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
 		"MetricSetFields": {
 			"usage": {
 				"cpu": {
@@ -61,35 +65,9 @@
 				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
 			}
 		},
-		"ModuleFields": null,
-		"MetricSetFields": {
-			"usage": {
-				"cpu": {
-					"8": {
-						"ns": 104266711568
-					}
-				},
-				"percpu": {}
-			}
+		"ModuleFields": {
+			"namespace": "k8s.io"
 		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "containerd.cpu",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
-			}
-		},
-		"ModuleFields": null,
 		"MetricSetFields": {
 			"usage": {
 				"cpu": {
@@ -117,7 +95,39 @@
 				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
 			}
 		},
-		"ModuleFields": null,
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
+		"MetricSetFields": {
+			"usage": {
+				"cpu": {
+					"8": {
+						"ns": 104266711568
+					}
+				},
+				"percpu": {}
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "containerd.cpu",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+			}
+		},
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
 		"MetricSetFields": {
 			"usage": {
 				"cpu": {
@@ -145,7 +155,9 @@
 				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
 			}
 		},
-		"ModuleFields": null,
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
 		"MetricSetFields": {
 			"usage": {
 				"cpu": {
@@ -173,7 +185,9 @@
 				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
 			}
 		},
-		"ModuleFields": null,
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
 		"MetricSetFields": {
 			"usage": {
 				"cpu": {
@@ -201,7 +215,9 @@
 				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
 			}
 		},
-		"ModuleFields": null,
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
 		"MetricSetFields": {
 			"usage": {
 				"cpu": {
@@ -229,7 +245,9 @@
 				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
 			}
 		},
-		"ModuleFields": null,
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
 		"MetricSetFields": {
 			"usage": {
 				"cpu": {
@@ -257,7 +275,9 @@
 				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
 			}
 		},
-		"ModuleFields": null,
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
 		"MetricSetFields": {
 			"usage": {
 				"cpu": {
@@ -285,7 +305,9 @@
 				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
 			}
 		},
-		"ModuleFields": null,
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
 		"MetricSetFields": {
 			"usage": {
 				"cpu": {
@@ -313,7 +335,9 @@
 				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
 			}
 		},
-		"ModuleFields": null,
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
 		"MetricSetFields": {
 			"usage": {
 				"cpu": {
@@ -341,7 +365,9 @@
 				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
 			}
 		},
-		"ModuleFields": null,
+		"ModuleFields": {
+			"namespace": "k8s.io"
+		},
 		"MetricSetFields": {
 			"usage": {
 				"kernel": {

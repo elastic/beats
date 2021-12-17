@@ -9,3 +9,7 @@
       description: >
         Information and statistics about containerd's running containers.
       fields:
+        - name: namespace
+          type: keyword
+          description: >
+            Containerd namespace

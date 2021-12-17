@@ -43,6 +43,7 @@ var (
 		},
 		Labels: map[string]prometheus.LabelMap{
 			"container_id": prometheus.KeyLabel("id"),
+			"namespace":    prometheus.KeyLabel("namespace"),
 			"cpu":          prometheus.KeyLabel("cpu"),
 		},
 	}
@@ -121,18 +122,9 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	for _, event := range events {
-		// setting ECS container.id
-		rootFields := common.MapStr{}
-		containerFields := common.MapStr{}
-		var cID string
-		if containerID, ok := event["id"]; ok {
-			cID = (containerID).(string)
-			containerFields.Put("id", cID)
-			event.Delete("id")
-		}
-		if len(containerFields) > 0 {
-			rootFields.Put("container", containerFields)
-		}
+		// setting ECS container.id and containerd.namespace
+		rootFields, moduleFields, cID := containerd.SetCIDandNamespace(event)
+
 		if m.calcPct {
 			contCpus, ok := perContainerCpus[cID]
 			if !ok {
@@ -188,6 +180,7 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 
 		reporter.Event(mb.Event{
 			RootFields:      rootFields,
+			ModuleFields:    moduleFields,
 			MetricSetFields: event,
 			Namespace:       "containerd.cpu",
 		})
