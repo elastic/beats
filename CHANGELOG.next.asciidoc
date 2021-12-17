@@ -33,70 +33,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 
-- system/package: Fix parsing of Installed-Size field of DEB packages. {issue}16661[16661] {pull}17188[17188]
-- system module: Fix panic during initialisation when /proc/stat can't be read. {pull}17569[17569]
-- system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
-- system/socket: Fix bugs leading to wrong process being attributed to flows. {pull}29166[29166] {issue}17165[17165]
-
 *Filebeat*
 
-- cisco/asa fileset: Fix parsing of 302021 message code. {pull}14519[14519]
-- Fix filebeat azure dashboards, event category should be `Alert`. {pull}14668[14668]
-- Fix s3 input with cloudtrail fileset reading json file. {issue}16374[16374] {pull}16441[16441]
-- Add queue_url definition in manifest file for aws module. {pull}16640{16640}
-- Fix `elasticsearch.gc` fileset to not collect _all_ logs when Elasticsearch is running in Docker. {issue}13164[13164] {issue}16583[16583] {pull}17164[17164]
-- Fixed a mapping exception when ingesting CEF logs that used the spriv or dpriv extensions. {issue}17216[17216] {pull}17220[17220]
-- Fix issue 17734 to retry on rate-limit error in the Filebeat httpjson input. {issue}17734[17734] {pull}17735[17735]
-- Remove migrationVersion map 7.7.0 reference from Kibana dashboard file to fix backward compatibility issues. {pull}17425[17425]
-- Fixed `cloudfoundry.access` to have the correct `cloudfoundry.app.id` contents. {pull}17847[17847]
-- Fixing `ingress_controller.` fields to be of type keyword instead of text. {issue}17834[17834]
-- Fixed typo in log message. {pull}17897[17897]
-- Fix `o365` module ignoring `var.api` settings. {pull}18948[18948]
-- Fix S3 input to trim delimiter /n from each log line. {pull}19972[19972]
-- Fix s3 input parsing json file without expand_event_list_from_field. {issue}19902[19902] {pull}19962[19962]
-- Fix s3 input parsing json file without expand_event_list_from_field. {issue}19902[19902] {pull}19962[19962] {pull}20370[20370]
-- Fix millisecond timestamp normalization issues in CrowdStrike module {issue}20035[20035], {pull}20138[20138]
-- Fix support for message code 106100 in Cisco ASA and FTD. {issue}19350[19350] {pull}20245[20245]
-- Fix `fortinet` setting `event.timezone` to the system one when no `tz` field present {pull}20273[20273]
-- Fix `okta` geoip lookup in pipeline for `destination.ip` {pull}20454[20454]
-- Fix mapping exception in the `googlecloud/audit` dataset pipeline. {issue}18465[18465] {pull}20465[20465]
-- Fix `cisco` asa and ftd parsing of messages 106102 and 106103. {pull}20469[20469]
 - Resolve issue with @timestamp for defender_atp. {pull}28272[28272]
-- Fix `threatintel.misp` filters configuration. {issue}27970[27970]
 - Fix handling of escaped newlines in the `decode_cef` processor. {issue}16995[16995] {pull}29268[29268]
-- Fix `panw` module ingest errors for GLOBALPROTECT logs {pull}29154[29154]
 
 *Heartbeat*
 
 
 *Metricbeat*
-
-- Fix checking tagsFilter using length in cloudwatch metricset. {pull}14525[14525]
-- Log bulk failures from bulk API requests to monitoring cluster. {issue}14303[14303] {pull}14356[14356]
-- Fix skipping protocol scheme by light modules. {pull}16205[pull]
-- Revert changes in `docker` module: add size flag to docker.container. {pull}16600[16600]
-- Fix detection and logging of some error cases with light modules. {pull}14706[14706]
-- Reduce memory usage in `elasticsearch/index` metricset. {issue}16503[16503] {pull}16538[16538]
-- Fix issue in Jolokia module when mbean contains multiple quoted properties. {issue}17375[17375] {pull}17374[17374]
-- Fix azure storage dashboards. {pull}17590[17590]
-- Metricbeat no longer needs to be started strictly after Logstash for `logstash-xpack` module to report correct data. {issue}17261[17261] {pull}17497[17497]
-- Fix pubsub metricset to collect all GA stage metrics from gcp stackdriver. {issue}17154[17154] {pull}17600[17600]
-- Add privileged option so as mb to access data dir in Openshift. {pull}17606[17606]
-- Fix "ID" event generator of Google Cloud module {issue}17160[17160] {pull}17608[17608]
-- Add privileged option for Auditbeat in Openshift {pull}17637[17637]
-- Fix storage metricset to allow config without region/zone. {issue}17623[17623] {pull}17624[17624]
-- Fix overflow on Prometheus rates when new buckets are added on the go. {pull}17753[17753]
-- Remove specific win32 api errors from events in perfmon. {issue}18292[18292] {pull}18361[18361]
-- Remove required for region/zone and make stackdriver a metricset in googlecloud. {issue}16785[16785] {pull}18398[18398]
-- Fix application_pool metricset after pdh changes. {pull}18477[18477]
-- Fix panic on `metricbeat test modules` when modules are configured in `metricbeat.modules`. {issue}18789[18789] {pull}18797[18797]
-- Fix getting gcp compute instance metadata with partial zone/region in config. {pull}18757[18757]
-- Add missing network.sent_packets_count metric into compute metricset in googlecloud module. {pull}18802[18802]
-- Fix compute and pubsub dashboard for googlecloud module. {issue}18962[18962] {pull}18980[18980]
-- Fix crash on vsphere module when Host information is not available. {issue}18996[18996] {pull}19078[19078]
-- Modify doc for app_insights metricset to contain example of config. {pull}20185[20185]
-- Add required option for `metrics` in app_insights. {pull}20406[20406]
-- Groups same timestamp metric values to one event in the app_insights metricset. {pull}20403[20403]
 
 *Packetbeat*
 
@@ -114,58 +59,17 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Decouple Debug logging from fail_on_error logic for rename, copy, truncate processors {pull}12451[12451]
-- Fingerprint processor adds a new xxhash hashing algorithm {pull}15418[15418]
-- Update documentation for system.process.memory fields to include clarification on Windows os's. {pull}17268[17268]
-- Add keystore support for autodiscover static configurations. {pull]16306[16306]
-- When using the `decode_json_fields` processor, decoded fields are now deep-merged into existing event. {pull}17958[17958]
-- Add keystore support for autodiscover static configurations. {pull]16306[16306]
-- Add TLS support to Kerberos authentication in Elasticsearch. {pull}18607[18607]
-- Set index.max_docvalue_fields_search in index template to increase value to 200 fields. {issue}20215[20215]
 
 *Auditbeat*
 
-- Reference kubernetes manifests include configuration for auditd and enrichment with kubernetes metadata. {pull}17431[17431]
-
 *Filebeat*
 
-- `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
-- Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
-- move create-[module,fileset,fields] to mage and enable in x-pack/filebeat {pull}15836[15836]
-- Work on e2e ACK's for the azure-eventhub input {issue}15671[15671] {pull}16215[16215]
-- Add a TLS test and more debug output to httpjson input {pull}16315[16315]
-- Add an SSL config example in config.yml for filebeat MISP module. {pull}16320[16320]
-- Added documentation for running Filebeat in Cloud Foundry. {pull}17275[17275]
-- Release Google Cloud module as GA. {pull}17511[17511]
-- Update filebeat httpjson input to support pagination via Header and Okta module. {pull}16354[16354]
-- Change the `json.*` input settings implementation to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
-- Add support for array parsing in azure-eventhub input. {pull}18585[18585]
-- Improved performance of PANW sample dashboards. {issue}19031[19031] {pull}19032[19032]
-- Add event.ingested for CrowdStrike module {pull}20138[20138]
-- Add support for additional fields and FirewallMatchEvent type events in CrowdStrike module {pull}20138[20138]
-- Added feature to modules to adapt Ingest Node pipelines for compatibility with older Elasticsearch versions by
-
-- Azure signinlogs - Add support for ManagedIdentitySignInLogs, NonInteractiveUserSignInLogs, and ServicePrincipalSignInLogs. {issue}23653[23653]
-- Add `text/csv` decoder to `httpjson` input {pull}28564[28564]
-- Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
-- Add support for '/var/log/pods/' path for add_kubernetes_metadata processor with `resource_type: pod`. {pull}28868[28868]
-- Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
-- Add support for parsers on journald input {pull}29070[29070]
-- Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
 - Update Cisco module to enable TCP input. {issue}26118[26118] {issue}28821[28821] {pull}26159[26159]
 
 *Heartbeat*
 
 
 *Metricbeat*
-
-- Move the windows pdh implementation from perfmon to a shared location in order for future modules/metricsets to make use of. {pull}15503[15503]
-- Add `key/value` mode for SQL module. {issue}15770[15770] {pull]15845[15845]
-- Add database_account azure metricset. {issue}15758[15758]
-- Release Zookeeper/connection module as GA. {issue}14281[14281] {pull}17043[17043]
-- Add dashboard for pubsub metricset in googlecloud module. {pull}17161[17161]
-- Added documentation for running Metricbeat in Cloud Foundry. {pull}17275[17275]
-- Add memory metrics into compute googlecloud. {pull}18802[18802]
 
 *Packetbeat*
 
