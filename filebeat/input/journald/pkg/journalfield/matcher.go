@@ -142,6 +142,8 @@ func ApplyMatchersOr(j journal, matchers []Matcher) error {
 }
 
 // ApplyUnitMatchers adds unit based filtering to the journal reader.
+// Filtering is similar to what systemd does here:
+// https://github.com/systemd/systemd/blob/641e2124de6047e6010cd2925ea22fba29b25309/src/shared/logs-show.c#L1409-L1455
 func ApplyUnitMatchers(j journal, units []string) error {
 	for _, unit := range units {
 		systemdUnit, err := BuildMatcher("systemd.unit=" + unit)
