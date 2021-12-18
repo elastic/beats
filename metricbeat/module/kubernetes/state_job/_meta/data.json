@@ -1,0 +1,45 @@
+{
+  "@timestamp": "2021-06-24T13:52:28.941Z",
+  "event": {
+    "dataset": "kubernetes.job",
+    "module": "kubernetes",
+    "duration": 159363320
+  },
+  "metricset": {
+    "name": "state_job",
+    "period": 10000
+  },
+  "service": {
+    "address": "http://localhost:8080/metrics",
+    "type": "kubernetes"
+  },
+  "kubernetes": {
+    "namespace": "parallel-ns",
+    "job": {
+      "status": {
+        "complete": "true"
+      },
+      "parallelism": {
+        "desired": 5
+      },
+      "owner": {
+        "kind": "CronJob",
+        "name": "sleep-5-parallel-cron",
+        "is_controller": "true"
+      },
+      "name": "sleep-5-parallel-cron-27075669",
+      "completions": {
+        "desired": 20
+      },
+      "time": {
+        "created": "2021-06-24T13:09:00.000Z",
+        "completed": "2021-06-24T13:38:57.000Z"
+      },
+      "pods": {
+        "active": 0,
+        "succeeded": 20,
+        "failed": 0
+      }
+    }
+  }
+}

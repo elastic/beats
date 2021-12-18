@@ -1,0 +1,112 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Number of HTTP Requests [Metricbeat CouchDB] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": "couchdb"
+                },
+                "id": "caae9780-b951-11e9-8945-b5f393c4775d",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(82,174,177,1)",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "caae9781-b951-11e9-8945-b5f393c4775d",
+                        "label": "requests",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.httpd.requests",
+                                "id": "caae9782-b951-11e9-8945-b5f393c4775d",
+                                "type": "max"
+                            },
+                            {
+                                "field": "caae9782-b951-11e9-8945-b5f393c4775d",
+                                "id": "caae9784-b951-11e9-8945-b5f393c4775d",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "caae9784-b951-11e9-8945-b5f393c4775d",
+                                "id": "caae9783-b951-11e9-8945-b5f393c4775d",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(237,193,119,1)",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "caae9785-b951-11e9-8945-b5f393c4775d",
+                        "label": "bulk_requests",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.httpd.bulk_requests",
+                                "id": "caae9786-b951-11e9-8945-b5f393c4775d",
+                                "type": "max"
+                            },
+                            {
+                                "field": "caae9786-b951-11e9-8945-b5f393c4775d",
+                                "id": "caae9788-b951-11e9-8945-b5f393c4775d",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "caae9788-b951-11e9-8945-b5f393c4775d",
+                                "id": "caae9787-b951-11e9-8945-b5f393c4775d",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Number of HTTP Requests [Metricbeat CouchDB] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "06018310-b952-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:06.496Z",
+    "version": "WzM3NTYsMV0="
+}
