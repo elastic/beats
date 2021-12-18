@@ -428,7 +428,6 @@ func TestInlineBrowserJob(t *testing.T) {
 							"id":          testMonFields.ID,
 							"name":        testMonFields.Name,
 							"type":        fields.Type,
-							"status":      "up",
 							"check_group": "inline-check-group",
 						},
 					}),
@@ -450,7 +449,7 @@ var suiteBrowserJobValues = struct {
 	checkGroup: "journey-1-check-group",
 }
 
-func makeSuiteBrowserJob(t *testing.T, u string) jobs.Job {
+func makeSuiteBrowserJob(t *testing.T, u string, summary bool, suiteErr error) jobs.Job {
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
 	return func(event *beat.Event) (i []jobs.Job, e error) {
@@ -462,7 +461,18 @@ func makeSuiteBrowserJob(t *testing.T, u string) jobs.Job {
 				"check_group": suiteBrowserJobValues.checkGroup,
 			},
 		})
-		return nil, nil
+		if summary {
+			sumFields := common.MapStr{"up": 0, "down": 0}
+			if suiteErr == nil {
+				sumFields["up"] = 1
+			} else {
+				sumFields["down"] = 1
+			}
+			eventext.MergeEventFields(event, common.MapStr{
+				"summary": sumFields,
+			})
+		}
+		return nil, suiteErr
 	}
 }
 
@@ -470,30 +480,65 @@ func TestSuiteBrowserJob(t *testing.T) {
 	fields := testBrowserMonFields
 	urlStr := "http://foo.com"
 	urlU, _ := url.Parse(urlStr)
+	expectedMonFields := lookslike.MustCompile(map[string]interface{}{
+		"monitor": map[string]interface{}{
+			"id":          fmt.Sprintf("%s-%s", testMonFields.ID, suiteBrowserJobValues.id),
+			"name":        fmt.Sprintf("%s - %s", testMonFields.Name, suiteBrowserJobValues.name),
+			"type":        fields.Type,
+			"check_group": suiteBrowserJobValues.checkGroup,
+			"timespan": common.MapStr{
+				"gte": hbtestllext.IsTime,
+				"lt":  hbtestllext.IsTime,
+			},
+		},
+		"url": URLFields(urlU),
+	})
 	testCommonWrap(t, testDef{
-		"simple",
+		"simple", // has no summary fields!
 		fields,
-		[]jobs.Job{makeSuiteBrowserJob(t, urlStr)},
+		[]jobs.Job{makeSuiteBrowserJob(t, urlStr, false, nil)},
 		[]validator.Validator{
-			lookslike.Compose(
-				urlValidator(t, urlStr),
-				lookslike.Strict(
+			lookslike.Strict(
+				lookslike.Compose(
+					urlValidator(t, urlStr),
+					expectedMonFields,
+				))},
+		nil,
+	})
+	testCommonWrap(t, testDef{
+		"with up summary",
+		fields,
+		[]jobs.Job{makeSuiteBrowserJob(t, urlStr, true, nil)},
+		[]validator.Validator{
+			lookslike.Strict(
+				lookslike.Compose(
+					urlValidator(t, urlStr),
+					expectedMonFields,
 					lookslike.MustCompile(map[string]interface{}{
-						"monitor": map[string]interface{}{
-							"id":          fmt.Sprintf("%s-%s", testMonFields.ID, suiteBrowserJobValues.id),
-							"name":        fmt.Sprintf("%s - %s", testMonFields.Name, suiteBrowserJobValues.name),
-							"type":        fields.Type,
-							"check_group": suiteBrowserJobValues.checkGroup,
-							"status":      "up",
-							"timespan": common.MapStr{
-								"gte": hbtestllext.IsTime,
-								"lt":  hbtestllext.IsTime,
-							},
-						},
-						"url": URLFields(urlU),
+						"monitor": map[string]interface{}{"status": "up"},
+						"summary": map[string]interface{}{"up": 1, "down": 0},
 					}),
-				),
-			)},
+				))},
+		nil,
+	})
+	testCommonWrap(t, testDef{
+		"with down summary",
+		fields,
+		[]jobs.Job{makeSuiteBrowserJob(t, urlStr, true, fmt.Errorf("testerr"))},
+		[]validator.Validator{
+			lookslike.Strict(
+				lookslike.Compose(
+					urlValidator(t, urlStr),
+					expectedMonFields,
+					lookslike.MustCompile(map[string]interface{}{
+						"monitor": map[string]interface{}{"status": "down"},
+						"summary": map[string]interface{}{"up": 0, "down": 1},
+						"error": map[string]interface{}{
+							"type":    isdef.IsString,
+							"message": "testerr",
+						},
+					}),
+				))},
 		nil,
 	})
 }
