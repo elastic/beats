@@ -13,6 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/version"
 )
 
 func TestValueTpl(t *testing.T) {
@@ -393,6 +394,34 @@ func TestValueTpl(t *testing.T) {
 			paramTr:       transformable{},
 			expectedVal:   "",
 			expectedError: errEmptyTemplateResult.Error(),
+		},
+		{
+			name:        "func userAgent no values",
+			value:       `[[userAgent]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "Elastic-Filebeat/" + version.GetDefaultVersion() + " (linux; amd64; unknown; 0001-01-01 00:00:00 +0000 UTC)",
+		},
+		{
+			name:        "func userAgent blank value",
+			value:       `[[userAgent ""]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "Elastic-Filebeat/" + version.GetDefaultVersion() + " (linux; amd64; unknown; 0001-01-01 00:00:00 +0000 UTC)",
+		},
+		{
+			name:        "func userAgent 1 value",
+			value:       `[[userAgent "integration_name/1.2.3"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "Elastic-Filebeat/" + version.GetDefaultVersion() + " (linux; amd64; unknown; 0001-01-01 00:00:00 +0000 UTC; integration_name/1.2.3)",
+		},
+		{
+			name:        "func userAgent 2 value",
+			value:       `[[userAgent "integration_name/1.2.3" "test"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "Elastic-Filebeat/" + version.GetDefaultVersion() + " (linux; amd64; unknown; 0001-01-01 00:00:00 +0000 UTC; integration_name/1.2.3; test)",
 		},
 	}
 

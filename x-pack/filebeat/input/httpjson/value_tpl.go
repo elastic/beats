@@ -23,6 +23,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -66,6 +67,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"sprintf":             fmt.Sprintf,
 			"hmacBase64":          hmacStringBase64,
 			"uuid":                uuidString,
+			"userAgent":           userAgentString,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -359,4 +361,8 @@ func join(v interface{}, sep string) string {
 
 	// return the stringified single value
 	return fmt.Sprint(v)
+}
+
+func userAgentString(values ...string) string {
+	return useragent.UserAgent("Filebeat", values...)
 }

@@ -20,15 +20,24 @@ package useragent
 import (
 	"fmt"
 	"runtime"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/version"
 )
 
 // UserAgent takes the capitalized name of the current beat and returns
 // an RFC compliant user agent string for that beat.
-func UserAgent(beatNameCapitalized string) string {
-	return fmt.Sprintf("Elastic-%s/%s (%s; %s; %s; %s)",
-		beatNameCapitalized,
-		version.GetDefaultVersion(), runtime.GOOS, runtime.GOARCH,
-		version.Commit(), version.BuildTime())
+func UserAgent(beatNameCapitalized string, additional_agents ...string) string {
+	var builder strings.Builder
+	fmt.Fprintf(&builder, "Elastic-%s/%s ", beatNameCapitalized, version.GetDefaultVersion())
+	fmt.Fprintf(&builder, "(%s; %s; %s; %s", runtime.GOOS, runtime.GOARCH, version.Commit(), version.BuildTime())
+	if additional_agents != nil {
+		for i := 0; i < len(additional_agents); i++ {
+			if additional_agents[i] != "" {
+				fmt.Fprintf(&builder, "; %s", additional_agents[i])
+			}
+		}
+	}
+	builder.WriteString(")")
+	return builder.String()
 }
