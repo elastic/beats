@@ -3,6 +3,116 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.16.2]]
+=== Beats version 7.16.2
+https://github.com/elastic/beats/compare/v7.16.1...v7.16.2[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+*Filebeat*
+
+- Resolve issue with @timestamp for defender_atp. {pull}28272[28272]
+- Fix handling of escaped newlines in the `decode_cef` processor. {issue}16995[16995] {pull}29268[29268]
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+*Filebeat*
+
+- Update Cisco module to enable TCP input. {issue}26118[26118] {issue}28821[28821] {pull}26159[26159]
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+*Packetbeat*
+
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+- Add configuration option for registry file flush timeout {issue}29001[29001] {pull}29053[29053]
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+*Journalbeat*
+
+
+
+
+
+
 [[release-notes-7.16.1]]
 === Beats version 7.16.1
 https://github.com/elastic/beats/compare/v7.16.0...v7.16.1[View commits]
