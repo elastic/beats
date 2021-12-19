@@ -139,9 +139,9 @@ func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[st
 		args...,
 	)
 
-	err = dumpDockerComposeLogs(dir, mageTarget, composeEnv)
+	err = saveDockerComposeLogs(dir, mageTarget, composeEnv)
 	if err != nil && testErr == nil {
-		// dumping docker-compose logs failed but the test didn't.
+		// saving docker-compose logs failed but the test didn't.
 		return err
 	}
 
@@ -166,7 +166,7 @@ func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[st
 	return testErr
 }
 
-func dumpDockerComposeLogs(rootDir string, mageTarget string, composeEnv map[string]string) error {
+func saveDockerComposeLogs(rootDir string, mageTarget string, composeEnv map[string]string) error {
 	var (
 		composeLogDir      = filepath.Join(rootDir, "build", "system-tests", "docker-logs")
 		composeLogFileName = filepath.Join(composeLogDir, "TEST-docker-compose-"+mageTarget+".log")
