@@ -344,20 +344,20 @@ func NewPushMetricSetV2WithContext(t testing.TB, config interface{}) mb.PushMetr
 	return pushMetricSet
 }
 
-// capturingPushReporterV2 stores all the events and errors from a metricset's
+// CapturingPushReporterV2 stores all the events and errors from a metricset's
 // Run method.
-type capturingPushReporterV2 struct {
+type CapturingPushReporterV2 struct {
 	context.Context
 	eventsC chan mb.Event
 }
 
-func newCapturingPushReporterV2(ctx context.Context) *capturingPushReporterV2 {
-	return &capturingPushReporterV2{Context: ctx, eventsC: make(chan mb.Event)}
+func newCapturingPushReporterV2(ctx context.Context) *CapturingPushReporterV2 {
+	return &CapturingPushReporterV2{Context: ctx, eventsC: make(chan mb.Event)}
 }
 
 // report writes an event to the output channel and returns true. If the output
 // is closed it returns false.
-func (r *capturingPushReporterV2) report(event mb.Event) bool {
+func (r *CapturingPushReporterV2) report(event mb.Event) bool {
 	select {
 	case <-r.Done():
 		// Publisher is stopped.
@@ -368,16 +368,16 @@ func (r *capturingPushReporterV2) report(event mb.Event) bool {
 }
 
 // Event stores the passed-in event into the events array
-func (r *capturingPushReporterV2) Event(event mb.Event) bool {
+func (r *CapturingPushReporterV2) Event(event mb.Event) bool {
 	return r.report(event)
 }
 
 // Error stores the given error into the errors array.
-func (r *capturingPushReporterV2) Error(err error) bool {
+func (r *CapturingPushReporterV2) Error(err error) bool {
 	return r.report(mb.Event{Error: err})
 }
 
-func (r *capturingPushReporterV2) capture(waitEvents int) []mb.Event {
+func (r *CapturingPushReporterV2) capture(waitEvents int) []mb.Event {
 	var events []mb.Event
 	for {
 		select {
@@ -393,7 +393,8 @@ func (r *capturingPushReporterV2) capture(waitEvents int) []mb.Event {
 	}
 }
 
-func (r *capturingPushReporterV2) blockingCapture(waitEvents int) []mb.Event {
+// BlockingCapture blocks until waitEvents n of events are captured
+func (r *CapturingPushReporterV2) BlockingCapture(waitEvents int) []mb.Event {
 	var events []mb.Event
 	for {
 		select {
@@ -418,13 +419,9 @@ func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.Push
 	return r.capture(waitEvents)
 }
 
-// RunPushMetricSetV2BlockingWait runs the given push metricset
-// and block wait for the number of waitEvents
-func RunPushMetricSetV2BlockingWait(waitEvents int, metricSet mb.PushMetricSetV2) []mb.Event {
-	r := newCapturingPushReporterV2(context.Background())
-
-	go metricSet.Run(r)
-	return r.blockingCapture(waitEvents)
+// GetCapturingPushReporterV2 is a factory for a capturing push metricset
+func GetCapturingPushReporterV2() mb.PushReporterV2 {
+	return newCapturingPushReporterV2(context.Background())
 }
 
 // RunPushMetricSetV2WithContext run the given push metricset for the specific amount of
