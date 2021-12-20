@@ -42,15 +42,17 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct {
 		ActiveOnly bool `config:"index_recovery.active_only"`
+		XPack      bool `config:"xpack.enabled"`
 	}{
 		ActiveOnly: true,
+		XPack:      false,
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
 
 	localRecoveryPath := recoveryPath
-	if config.ActiveOnly {
+	if !config.XPack && config.ActiveOnly {
 		localRecoveryPath = localRecoveryPath + "?active_only=true"
 	}
 

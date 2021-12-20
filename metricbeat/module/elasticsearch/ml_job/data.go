@@ -81,7 +81,6 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		event.ModuleFields = common.MapStr{}
 		event.ModuleFields.Put("cluster.name", info.ClusterName)
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
-		event.ModuleFields.Put("node.id", info.Name)
 
 		event.MetricSetFields, _ = schema.Apply(job)
 

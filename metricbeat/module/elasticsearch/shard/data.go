@@ -117,6 +117,7 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 						errs = append(errs, errors.Wrap(err, "failure getting source node information"))
 						continue
 					}
+					event.ModuleFields.Put("node.name", sourceNode["name"])
 					event.MetricSetFields.Put("source_node", sourceNode)
 				}
 
