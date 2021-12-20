@@ -202,6 +202,9 @@ endif::[]
   Different Beats that refer to the same leader lease will be competitors in holding the lease
   and only one will be elected as leader each time.
 
+The configuration of templates and conditions is similar to that of the Docker provider. Configuration templates can
+contain variables from the autodiscover event. They can be accessed under data namespace.
+
 These are the fields available within config templating. The `kubernetes.*` fields will be available on each emitted event.
 
 [float]
@@ -276,9 +279,6 @@ For example:
   },
 }
 -------------------------------------------------------------------------------------
-
-The configuration of templates and conditions is similar to that of the Docker provider. Configuration templates can
-contain variables from the autodiscover event. They can be accessed under data namespace.
 
 ifeval::["{beatname_lc}"=="metricbeat"]
 Example:
