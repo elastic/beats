@@ -122,7 +122,7 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 				usageTotal, err := event.GetValue("usage.total")
 				if err == nil {
 					memoryLimit, err := event.GetValue("usage.limit")
-					if err == nil {
+					if err == nil && memoryLimit.(float64) != 0.0 {
 						// calculate working set memory usage
 						workingSetUsage := usageTotal.(float64) - inactiveFiles.(float64)
 						workingSetUsagePct := workingSetUsage / memoryLimit.(float64)
