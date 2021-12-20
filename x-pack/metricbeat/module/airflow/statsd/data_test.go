@@ -9,7 +9,6 @@ import (
 	"net"
 	"runtime"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -36,7 +35,7 @@ func getConfig() map[string]interface{} {
 		"host":       STATSD_HOST,
 		"port":       STATSD_PORT,
 		"period":     "100ms",
-		"ttl":        "0s",
+		"ttl":        "1ms",
 	}
 }
 
@@ -60,7 +59,7 @@ func TestData(t *testing.T) {
 	var events []mb.Event
 	done := make(chan interface{})
 	go func() {
-		events = mbtest.RunPushMetricSetV2(30*time.Second, 1, ms)
+		events = mbtest.RunPushMetricSetV2BlockingWait(1, ms)
 		close(done)
 	}()
 

@@ -393,6 +393,19 @@ func (r *capturingPushReporterV2) capture(waitEvents int) []mb.Event {
 	}
 }
 
+func (r *capturingPushReporterV2) blockingCapture(waitEvents int) []mb.Event {
+	var events []mb.Event
+	for {
+		select {
+		case e := <-r.eventsC:
+			events = append(events, e)
+			if waitEvents > 0 && len(events) >= waitEvents {
+				return events
+			}
+		}
+	}
+}
+
 // RunPushMetricSetV2 run the given push metricset for the specific amount of
 // time and returns all of the events and errors that occur during that period.
 func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.PushMetricSetV2) []mb.Event {
@@ -403,6 +416,15 @@ func RunPushMetricSetV2(timeout time.Duration, waitEvents int, metricSet mb.Push
 
 	go metricSet.Run(r)
 	return r.capture(waitEvents)
+}
+
+// RunPushMetricSetV2BlockingWait runs the given push metricset
+// and block wait for the number of waitEvents
+func RunPushMetricSetV2BlockingWait(waitEvents int, metricSet mb.PushMetricSetV2) []mb.Event {
+	r := newCapturingPushReporterV2(context.Background())
+
+	go metricSet.Run(r)
+	return r.blockingCapture(waitEvents)
 }
 
 // RunPushMetricSetV2WithContext run the given push metricset for the specific amount of
