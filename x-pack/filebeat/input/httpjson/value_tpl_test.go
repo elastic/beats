@@ -6,6 +6,7 @@ package httpjson
 
 import (
 	"net/http"
+	"runtime"
 	"testing"
 	"time"
 
@@ -422,6 +423,41 @@ func TestValueTpl(t *testing.T) {
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
 			expectedVal: "Elastic-Filebeat/" + version.GetDefaultVersion() + " (linux; amd64; unknown; 0001-01-01 00:00:00 +0000 UTC; integration_name/1.2.3; test)",
+		},
+		{
+			name:        "func beatInfo GOOS",
+			value:       `[[beatInfo.goos]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: runtime.GOOS,
+		},
+		{
+			name:        "func beatInfo Arch",
+			value:       `[[beatInfo.goarch]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: runtime.GOARCH,
+		},
+		{
+			name:        "func beatInfo Commit",
+			value:       `[[beatInfo.commit]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: version.Commit(),
+		},
+		{
+			name:        "func beatInfo Build Time",
+			value:       `[[beatInfo.buildtime]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: version.BuildTime().String(),
+		},
+		{
+			name:        "func beatInfo Version",
+			value:       `[[beatInfo.version]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: version.GetDefaultVersion(),
 		},
 	}
 
