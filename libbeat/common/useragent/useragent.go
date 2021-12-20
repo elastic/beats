@@ -30,14 +30,19 @@ import (
 func UserAgent(beatNameCapitalized string, additional_agents ...string) string {
 	var builder strings.Builder
 	fmt.Fprintf(&builder, "Elastic-%s/%s ", beatNameCapitalized, version.GetDefaultVersion())
-	fmt.Fprintf(&builder, "(%s; %s; %s; %s", runtime.GOOS, runtime.GOARCH, version.Commit(), version.BuildTime())
+	uaValues := []string{
+		runtime.GOOS,
+		runtime.GOARCH,
+		version.Commit(),
+		version.BuildTime().String(),
+	}
 	if additional_agents != nil {
-		for i := 0; i < len(additional_agents); i++ {
-			if additional_agents[i] != "" {
-				fmt.Fprintf(&builder, "; %s", additional_agents[i])
+		for _, val := range additional_agents {
+			if val != "" {
+				uaValues = append(uaValues, val)
 			}
 		}
 	}
-	builder.WriteString(")")
+	fmt.Fprintf(&builder, "(%s)", strings.Join(uaValues, "; "))
 	return builder.String()
 }
