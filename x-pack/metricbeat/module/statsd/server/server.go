@@ -198,6 +198,7 @@ func (m *MetricSet) ServerStart() {
 		return
 	}
 	m.server.Start()
+	m.serverStarted = true
 }
 
 // ServerStop stops the underlying m.server
@@ -207,6 +208,7 @@ func (m *MetricSet) ServerStop() {
 	}
 
 	m.server.Stop()
+	m.serverStarted = false
 }
 
 // Run method provides the module with a reporter with which events can be reported.
