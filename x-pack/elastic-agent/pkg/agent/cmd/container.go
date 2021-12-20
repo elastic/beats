@@ -94,8 +94,8 @@ The following actions are possible and grouped based on the actions.
 
   FLEET_SERVER_ENABLE - set to 1 enables bootstrapping of Fleet Server inside Elastic Agent (forces FLEET_ENROLL enabled)
   FLEET_SERVER_ELASTICSEARCH_HOST - elasticsearch host for Fleet Server to communicate with [$ELASTICSEARCH_HOST]
-  FLEET_SERVER_ELASTICSEARCH_USERNAME - elasticsearch username for Fleet Server [$ELASTICSEARCH_USERNAME]
-  FLEET_SERVER_ELASTICSEARCH_PASSWORD - elasticsearch password for Fleet Server [$ELASTICSEARCH_PASSWORD]
+  FLEET_SERVER_ELASTICSEARCH_USERNAME - elasticsearch username for Fleet Server. Deprecated, use FLEET_SERVICE_SERVICE_TOKEN instead. [$ELASTICSEARCH_USERNAME]
+  FLEET_SERVER_ELASTICSEARCH_PASSWORD - elasticsearch password for Fleet Server. Deprecated, use FLEET_SERVICE_SERVICE_TOKEN instead. [$ELASTICSEARCH_PASSWORD]
   FLEET_SERVER_ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch [$ELASTICSEARCH_CA]
   FLEET_SERVER_ELASTICSEARCH_INSECURE - disables cert validation for communication with Elasticsearch
   FLEET_SERVER_SERVICE_TOKEN - service token to use for communication with elasticsearch
@@ -123,8 +123,8 @@ The following environment variables are provided as a convenience to prevent a l
 be used when the same credentials will be used across all the possible actions above.
 
   ELASTICSEARCH_HOST - elasticsearch host [http://elasticsearch:9200]
-  ELASTICSEARCH_USERNAME - elasticsearch username [elastic]
-  ELASTICSEARCH_PASSWORD - elasticsearch password [changeme]
+  ELASTICSEARCH_USERNAME - elasticsearch username. Deprecated, use FLEET_SERVER_SERVICE_TOKEN instead. [elastic]
+  ELASTICSEARCH_PASSWORD - elasticsearch password. Deprecated, use FLEET_SERVER_SERVICE_TOKEN instead. [changeme]
   ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch
   KIBANA_HOST - kibana host [http://kibana:5601]
   KIBANA_USERNAME - kibana username [$ELASTICSEARCH_USERNAME]
