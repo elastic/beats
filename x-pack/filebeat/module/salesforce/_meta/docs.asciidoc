@@ -20,6 +20,8 @@ It includes the following filesets for receiving logs:
 - `apex-rest` fileset: supports Salesforce Apex logs received from the REST API.
 - `setupaudittrail-rest` fileset: supports logs generated when admins make in your org’s Setup area.
 
+Note: We can leverage the inputs provided above to collect the rest of the events from the Salesforce REST or Streaming API.
+
 include::../include/what-happens.asciidoc[]
 
 include::../include/gs-link.asciidoc[]
