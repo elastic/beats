@@ -149,7 +149,7 @@ func readFile(filename string, info beat.Info) (p pipeline, err error) {
 	return p, nil
 }
 
-// Load uses esClient to load pipelines to Elasticsearch
+// load uses esClient to load pipelines to Elasticsearch
 // cluster.  Will only overwrite existing pipelines if
 // overwritePipelines is true.
 func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipelines bool, log *logp.Logger) (err error) {
