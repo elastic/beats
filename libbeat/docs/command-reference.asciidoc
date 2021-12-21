@@ -293,7 +293,7 @@ endif::export_pipeline[]
 ifdef::export_pipeline[]
 {export-command-short-desc}. You can use this
 command to quickly view your configuration, see the contents of the index
-template and the ILM policy, export a dashboard from {kib} or export ingest
+template and the ILM policy, export a dashboard from {kib}, or export ingest
 pipelines.
 endif::export_pipeline[]
 
