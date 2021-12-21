@@ -41959,6 +41959,18 @@ format: bytes
 
 --
 
+*`kubernetes.container.memory.workingset.limit.pct`*::
++
+--
+Working set memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited)
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`kubernetes.container.memory.pagefaults`*::
 +
 --
@@ -43020,6 +43032,18 @@ Total working set memory
 type: double
 
 format: bytes
+
+--
+
+*`kubernetes.pod.memory.working_set.limit.pct`*::
++
+--
+Working set memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited)
+
+
+type: scaled_float
+
+format: percent
 
 --
 
