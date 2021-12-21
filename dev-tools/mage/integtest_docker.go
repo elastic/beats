@@ -184,8 +184,8 @@ func saveDockerComposeLogs(rootDir string, mageTarget string, composeEnv map[str
 
 	_, err = sh.Exec(
 		composeEnv,
-		composeLogFile,
-		composeLogFile,
+		composeLogFile, // stdout
+		composeLogFile, // stderr
 		"docker-compose",
 		"-p", dockerComposeProjectName(),
 		"logs",
