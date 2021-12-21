@@ -18,56 +18,13 @@
 package linux
 
 import (
-	"time"
-
-	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/elastic/beats/v7/metricbeat/internal/sysinit"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 func init() {
 	// Register the ModuleFactory function for the "system" module.
-	if err := mb.Registry.AddModule("linux", NewModule); err != nil {
+	if err := mb.Registry.AddModule("linux", sysinit.InitSystemModule); err != nil {
 		panic(err)
 	}
-}
-
-type LinuxModule interface {
-	GetHostFS() string
-}
-
-// Module defines the base module config used in `linux`
-type Module struct {
-	mb.BaseModule
-	HostFS string `config:"hostfs"`
-	Period time.Duration
-}
-
-// NewModule initializes a new module
-func NewModule(base mb.BaseModule) (mb.Module, error) {
-	// This only needs to be configured once for all system modules.
-
-	config := struct {
-		Hostfs string        `config:"hostfs"`
-		Period time.Duration `config:"period"`
-	}{}
-
-	if err := base.UnpackConfig(&config); err != nil {
-		return nil, err
-	}
-
-	dir := config.Hostfs
-	if dir == "" {
-		dir = "/"
-	}
-
-	// Steer towards system.hostfs, since the two behave fundamentally the same, and system.hostfs has a CLI flag that many users may default to.
-	if len(paths.Paths.Hostfs) > 2 {
-		dir = paths.Paths.Hostfs
-	}
-
-	return &Module{BaseModule: base, HostFS: dir, Period: config.Period}, nil
-}
-
-func (m Module) GetHostFS() string {
-	return m.HostFS
 }

@@ -234,10 +234,8 @@ func (o *Operator) getMonitoringFilebeatConfig(outputType string, output interfa
 				},
 			},
 			"paths": []string{
-				filepath.Join(paths.Home(), "logs", "elastic-agent-json.log"),
-				filepath.Join(paths.Home(), "logs", "elastic-agent-json.log*"),
-				filepath.Join(paths.Home(), "logs", "elastic-agent-watcher-json.log"),
-				filepath.Join(paths.Home(), "logs", "elastic-agent-watcher-json.log*"),
+				filepath.Join(paths.Home(), "logs", "elastic-agent-*.ndjson"),
+				filepath.Join(paths.Home(), "logs", "elastic-agent-watcher-*.ndjson"),
 			},
 			"index": fmt.Sprintf("logs-elastic_agent-%s", monitoringNamespace),
 			"processors": []map[string]interface{}{

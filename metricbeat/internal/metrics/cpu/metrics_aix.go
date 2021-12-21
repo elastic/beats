@@ -38,6 +38,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
@@ -59,7 +60,7 @@ func tick2msec(val uint64) uint64 {
 }
 
 // Get returns a metrics object for CPU data
-func Get(_ string) (CPUMetrics, error) {
+func Get(_ resolve.Resolver) (CPUMetrics, error) {
 
 	totals, err := getCPUTotals()
 	if err != nil {

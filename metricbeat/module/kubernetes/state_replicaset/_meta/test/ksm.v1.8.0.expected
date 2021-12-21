@@ -2,18 +2,16 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			}
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
-			"name": "kube-state-metrics-898d4db8d",
+			"name": "coredns-5644d7b6d9",
 			"replicas": {
-				"available": 1,
-				"desired": 1,
-				"labeled": 1,
+				"available": 2,
+				"desired": 2,
+				"labeled": 2,
 				"observed": 1,
-				"ready": 1
+				"ready": 2
 			}
 		},
 		"Index": "",
@@ -30,18 +28,16 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			}
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
-			"name": "coredns-5644d7b6d9",
+			"name": "kube-state-metrics-898d4db8d",
 			"replicas": {
-				"available": 2,
-				"desired": 2,
-				"labeled": 2,
+				"available": 1,
+				"desired": 1,
+				"labeled": 1,
 				"observed": 1,
-				"ready": 2
+				"ready": 1
 			}
 		},
 		"Index": "",

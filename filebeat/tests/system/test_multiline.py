@@ -148,11 +148,11 @@ connection <0.23893.109>, channel 3 - soft error:
 
         # Checks line 3 is sent
         assert True == self.log_contains(
-            "MetaDataMappingService.java:388", "output/filebeat")
+            "MetaDataMappingService.java:388", "output/filebeat-" + self.today + ".ndjson")
 
         # Checks line 4 is not sent anymore
         assert False == self.log_contains(
-            "InternalClusterService.java:388", "output/filebeat")
+            "InternalClusterService.java:388", "output/filebeat-" + self.today + ".ndjson")
 
         # Check that output file has the same number of lines as the log file
         assert 20 == len(output)
@@ -231,10 +231,10 @@ connection <0.23893.109>, channel 3 - soft error:
         output = self.read_output()
 
         # Check that first 60 chars are sent
-        assert True == self.log_contains("cluster.metadata", "output/filebeat")
+        assert True == self.log_contains("cluster.metadata", "output/filebeat-" + self.today + ".ndjson")
 
         # Checks that chars afterwards are not sent
-        assert False == self.log_contains("Zach", "output/filebeat")
+        assert False == self.log_contains("Zach", "output/filebeat-" + self.today + ".ndjson")
 
         # Check that output file has the same number of lines as the log file
         assert 20 == len(output)
