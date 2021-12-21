@@ -72,6 +72,7 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 					ModuleFields: common.MapStr{},
 				}
 
+				event.ModuleFields.Put("cluster.state.id", stateData.StateID)
 				event.ModuleFields.Put("cluster.stats.state.state_uuid", stateData.StateID)
 				event.ModuleFields.Put("cluster.id", stateData.ClusterID)
 				event.ModuleFields.Put("cluster.name", stateData.ClusterName)

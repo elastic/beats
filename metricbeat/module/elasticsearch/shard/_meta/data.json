@@ -4,6 +4,9 @@
         "cluster": {
             "id": "WocBBA0QRma0sGpdQ7vLfQ",
             "name": "docker-cluster",
+            "state": {
+                "id": "XNIdeSZxQwyItvGfR5fHSw"
+            },
             "stats": {
                 "state": {
                     "state_uuid": "XNIdeSZxQwyItvGfR5fHSw"
