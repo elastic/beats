@@ -17,6 +17,8 @@
 
 package kubernetes
 
+import v1 "k8s.io/api/core/v1"
+
 type Summary struct {
 	Node struct {
 		CPU struct {
@@ -134,3 +136,6 @@ type Summary struct {
 		} `json:"volume"`
 	} `json:"pods"`
 }
+
+// PodContainerStatus data
+type PodContainerStatus = v1.ContainerStatus

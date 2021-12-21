@@ -198,6 +198,14 @@ func NewContainerMetadataEnricher(
 			pod := r.(*kubernetes.Pod)
 			meta := metaGen.Generate(pod)
 
+			statuses := make(map[string]*kubernetes.PodContainerStatus)
+			mapStatuses := func(s []kubernetes.PodContainerStatus) {
+				for i := range s {
+					statuses[s[i].Name] = &s[i]
+				}
+			}
+			mapStatuses(pod.Status.ContainerStatuses)
+			mapStatuses(pod.Status.InitContainerStatuses)
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				cuid := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 
@@ -215,7 +223,11 @@ func NewContainerMetadataEnricher(
 
 				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				m[id] = meta
+				if s, ok := statuses[container.Name]; ok {
+					PerfMetrics.ContainerID.SetStringVal(cuid, s.ContainerID)
+				}
 			}
+
 		},
 		// delete
 		func(m map[string]common.MapStr, r kubernetes.Resource) {

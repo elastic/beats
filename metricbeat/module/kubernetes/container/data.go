@@ -129,6 +129,10 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 			coresLimit := perfMetrics.ContainerCoresLimit.GetWithDefault(cuid, nodeCores)
 			memLimit := perfMetrics.ContainerMemLimit.GetWithDefault(cuid, nodeMem)
 
+			cid := perfMetrics.ContainerID.GetStringValWithDefault(cuid, "")
+			if cid != "" {
+				containerEvent.Put("id", cid)
+			}
 			if coresLimit > 0 {
 				containerEvent.Put("cpu.usage.limit.pct", float64(container.CPU.UsageNanoCores)/1e9/coresLimit)
 			}
