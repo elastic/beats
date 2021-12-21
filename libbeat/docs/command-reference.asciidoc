@@ -36,7 +36,7 @@ endif::serverless[]
 endif::export_pipeline[]
 
 ifdef::export_pipeline[]
-:export-command-short-desc: Exports the configuration, index template, pipeline or ILM policy to stdout
+:export-command-short-desc: Exports the configuration, index template, pipeline, or ILM policy to stdout
 endif::export_pipeline[]
 
 :help-command-short-desc: Shows help for any command
