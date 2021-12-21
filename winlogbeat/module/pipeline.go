@@ -38,7 +38,7 @@ import (
 )
 
 var PipelinesFS *embed.FS
-var errNoFS = errors.New("no ebedded file system")
+var errNoFS = errors.New("no embedded file system")
 
 const logName = "pipeline"
 
