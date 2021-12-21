@@ -7,7 +7,14 @@ Fleet Server up and running under Elastic Agent.
 Upon `install` or `enroll` with Elastic Agent will bootstrap a Fleet Server
 when the `--fleet-server-es` command-line option is provided. In this mode
 Elastic Agent will only communicate with its local Fleet Server and expose
-the Fleet Server over the `:8220` port.
+the Fleet Server over the `:8221` port.
+
+`:8221` is only bound to the localhost of the machine/container and cannot
+be accessed remotely. The `:8220` port is also bound but is bound on `0.0.0.0`
+to allow remote connections from external Elastic Agents that wish to enroll
+and communication. The `:8221` port is reserved for communication between the
+Elastic Agent and the Fleet Server on the host. This ensures that the local
+Elastic Agent has priority in check-ins with the Fleet Server.
 
 [float]
 [[fleet-server-operating-modes]]
