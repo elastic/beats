@@ -222,6 +222,8 @@ func NewContainerMetadataEnricher(
 				}
 
 				if s, ok := statuses[container.Name]; ok {
+					// Extracting id and runtime ECS fields from ContainerID
+					// which is in the form of <container.runtime>://<container.id>
 					split := strings.Index(s.ContainerID, "://")
 					if split != -1 {
 						meta.Put("container.id", s.ContainerID[split+3:])
