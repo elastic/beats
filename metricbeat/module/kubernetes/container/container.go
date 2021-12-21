@@ -19,9 +19,7 @@ package container
 
 import (
 	"fmt"
-	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -108,33 +106,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	for _, event := range events {
 
-		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
-		// copy to ECS fields the kubernetes.container.image, kubernetes.container.name
-		containerFields := common.MapStr{}
-		if containerID, ok := event["id"]; ok {
-			cID := (containerID).(string)
-			split := strings.Index(cID, "://")
-			if split != -1 {
-				containerFields.Put("runtime", cID[:split])
-				containerFields.Put("id", cID[split+3:])
-			}
-		}
-
 		e, err := util.CreateEvent(event, "kubernetes.container")
 		if err != nil {
 			m.Logger().Error(err)
-		}
-
-		if len(containerFields) > 0 {
-			if e.RootFields != nil {
-				e.RootFields.DeepUpdate(common.MapStr{
-					"container": containerFields,
-				})
-			} else {
-				e.RootFields = common.MapStr{
-					"container": containerFields,
-				}
-			}
 		}
 
 		if reported := reporter.Event(e); !reported {

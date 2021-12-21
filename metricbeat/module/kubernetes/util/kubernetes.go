@@ -221,11 +221,15 @@ func NewContainerMetadataEnricher(
 					}
 				}
 
+				if s, ok := statuses[container.Name]; ok {
+					split := strings.Index(s.ContainerID, "://")
+					if split != -1 {
+						meta.Put("container.id", s.ContainerID[split+3:])
+						meta.Put("container.runtime", s.ContainerID[:split])
+					}
+				}
 				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				m[id] = meta
-				if s, ok := statuses[container.Name]; ok {
-					PerfMetrics.ContainerID.SetStringVal(cuid, s.ContainerID)
-				}
 			}
 
 		},

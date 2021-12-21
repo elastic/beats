@@ -40,8 +40,6 @@ func NewPerfMetricsCache() *PerfMetricsCache {
 
 		ContainerMemLimit:   newValueMap(defaultTimeout),
 		ContainerCoresLimit: newValueMap(defaultTimeout),
-
-		ContainerID: newValueMap(defaultTimeout),
 	}
 }
 
@@ -52,8 +50,6 @@ type PerfMetricsCache struct {
 
 	ContainerMemLimit   *valueMap
 	ContainerCoresLimit *valueMap
-
-	ContainerID *valueMap
 }
 
 // Start cache workers
@@ -62,7 +58,6 @@ func (c *PerfMetricsCache) Start() {
 	c.NodeCoresAllocatable.Start()
 	c.ContainerMemLimit.Start()
 	c.ContainerCoresLimit.Start()
-	c.ContainerID.Start()
 }
 
 // Stop cache workers
@@ -71,7 +66,6 @@ func (c *PerfMetricsCache) Stop() {
 	c.NodeCoresAllocatable.Stop()
 	c.ContainerMemLimit.Stop()
 	c.ContainerCoresLimit.Stop()
-	c.ContainerID.Stop()
 }
 
 type valueMap struct {
@@ -102,20 +96,6 @@ func (m *valueMap) GetWithDefault(name string, def float64) float64 {
 
 // Set value
 func (m *valueMap) Set(name string, val float64) {
-	m.cache.PutWithTimeout(name, val, m.timeout)
-}
-
-// Get string value
-func (m *valueMap) GetStringValWithDefault(name string, def string) string {
-	v := m.cache.Get(name)
-	if v, ok := v.(string); ok {
-		return v
-	}
-	return def
-}
-
-// Set string value
-func (m *valueMap) SetStringVal(name string, val string) {
 	m.cache.PutWithTimeout(name, val, m.timeout)
 }
 
