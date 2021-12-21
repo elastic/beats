@@ -42,8 +42,7 @@ import (
 
 const pipelinesWarning = "Winlogbeat is unable to load the ingest pipelines" +
 	" because the Elasticsearch output is not configured/enabled. If you have" +
-	" already loaded the ingest pipelines or are using Logstash pipelines, you" +
-	" can ignore this warning."
+	" already loaded the ingest pipelines, you can ignore this warning."
 
 // Time the application was started.
 var startTime = time.Now().UTC()

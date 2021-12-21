@@ -47,25 +47,21 @@ type pipeline struct {
 	contents map[string]interface{}
 }
 
-// Upload reads all pipelines stored in winlogbeat executable adapts
-// pipeline for a given ES version, converts to JSON if necessary and
-// creates or updates ingest pipeline in ES
+// Upload reads all pipelines embedded in the Winlogbeat executable
+// and adapts the pipeline for a given ES version, converts to JSON if
+// necessary and creates or updates ingest pipeline in ES.
 func UploadPipelines(info beat.Info, esClient *eslegclient.Connection, overwritePipelines bool) error {
-	log := logp.NewLogger(logName)
 	pipelines, err := readAll(info)
 	if err != nil {
 		return err
 	}
-	return load(esClient, pipelines, overwritePipelines, log)
+	return load(esClient, pipelines, overwritePipelines)
 }
 
-// Export reads all pipelines stored in winlogbeat executable adapts
-// pipelines for a given ES version and writes the converted pipelines
-// to the given directory in JSON format
+// Export reads all pipelines embedded in the Winlogbeat executable
+// and adapts the pipelines for a given ES version and writes the
+// converted pipelines to the given directory in JSON format.
 func ExportPipelines(info beat.Info, version common.Version, directory string) error {
-	if !info.ElasticLicensed {
-		return nil
-	}
 	log := logp.NewLogger(logName)
 	pipelines, err := readAll(info)
 	if err != nil {
@@ -149,11 +145,13 @@ func readFile(filename string, info beat.Info) (p pipeline, err error) {
 	return p, nil
 }
 
-// load uses esClient to load pipelines to Elasticsearch
-// cluster.  Will only overwrite existing pipelines if
-// overwritePipelines is true.
-func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipelines bool, log *logp.Logger) (err error) {
+// load uses esClient to load pipelines to Elasticsearch cluster.
+// Will only overwrite existing pipelines if overwritePipelines is
+// true.  An error in loading one of the pipelines will cause the
+// successfully loaded ones to be deleted.
+func load(esClient *eslegclient.Connection, pipelines []pipeline, overwritePipelines bool) (err error) {
 	var pipelineIDsLoaded []string
+	log := logp.NewLogger(logName)
 
 	for _, pipeline := range pipelines {
 		err = fileset.LoadPipeline(esClient, pipeline.id, pipeline.contents, overwritePipelines, log)
