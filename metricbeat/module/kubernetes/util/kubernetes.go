@@ -231,7 +231,6 @@ func NewContainerMetadataEnricher(
 				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				m[id] = meta
 			}
-
 		},
 		// delete
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
