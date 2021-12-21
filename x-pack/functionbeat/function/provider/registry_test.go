@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 )
@@ -49,8 +50,10 @@ type mockFunction struct {
 	name string
 }
 
-func (mf *mockFunction) Run(ctx context.Context, client core.Client, t telemetry.T) error { return nil }
-func (mf *mockFunction) Name() string                                                     { return mf.name }
+func (mf *mockFunction) Run(ctx context.Context, client pipeline.ISyncClient, t telemetry.T) error {
+	return nil
+}
+func (mf *mockFunction) Name() string { return mf.name }
 
 func testProviderLookup(t *testing.T) {
 	name := "myprovider"
