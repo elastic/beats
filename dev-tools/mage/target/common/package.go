@@ -30,8 +30,10 @@ import (
 func PackageSystemTests() error {
 	excludeds := []string{".ci", ".git", ".github", "vendor", "dev-tools"}
 
-	// include run as it's the directory we want to compress
-	systemTestsDir := filepath.Join("build", "system-tests", "run")
+	// include run and docker-logs as they are the directories we want to compress
+	systemTestsDir := filepath.Join("build", "system-tests")
+	systemTestsRunDir := filepath.Join(systemTestsDir, "run")
+	systemTestsLogDir := filepath.Join(systemTestsDir, "docker-logs")
 	files, err := devtools.FindFilesRecursive(func(path string, _ os.FileInfo) bool {
 		base := filepath.Base(path)
 		for _, excluded := range excludeds {
@@ -40,7 +42,7 @@ func PackageSystemTests() error {
 			}
 		}
 
-		return strings.HasPrefix(path, systemTestsDir)
+		return strings.HasPrefix(path, systemTestsRunDir) || strings.HasPrefix(path, systemTestsLogDir)
 	})
 	if err != nil {
 		return err
