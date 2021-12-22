@@ -43,7 +43,7 @@ func newStatusCommand(_ []string, streams *cli.IOStreams) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String("output", "human", "Output the status information in either human, json, or yaml (default: human)")
+	cmd.Flags().String("output", "human", "Output the status information in either human, json, or yaml")
 
 	return cmd
 }

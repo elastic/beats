@@ -64,7 +64,7 @@ func newDiagnosticsCommand(s []string, streams *cli.IOStreams) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().String("output", "human", "Output the diagnostics information in either human, json, or yaml (default: human)")
+	cmd.Flags().String("output", "human", "Output the diagnostics information in either human, json, or yaml.")
 	cmd.AddCommand(newDiagnosticsCollectCommandWithArgs(s, streams))
 	cmd.AddCommand(newDiagnosticsPprofCommandWithArgs(s, streams))
 
@@ -107,9 +107,9 @@ func newDiagnosticsCollectCommandWithArgs(_ []string, streams *cli.IOStreams) *c
 	}
 
 	cmd.Flags().StringP("file", "f", "", "name of the output diagnostics zip archive")
-	cmd.Flags().String("output", "yaml", "Output the collected information in either json, or yaml (default: yaml)") // replace output flag with different options
+	cmd.Flags().String("output", "yaml", "Output the collected information in either json, or yaml") // replace output flag with different options
 	cmd.Flags().Bool("pprof", false, "Collect all pprof data from all running applications.")
-	cmd.Flags().Duration("pprof-duration", time.Second*30, "The duration to collect trace and profiling data from the debug/pprof endpoints. (default: 30s)")
+	cmd.Flags().Duration("pprof-duration", time.Second*30, "The duration to collect trace and profiling data from the debug/pprof endpoints.")
 	cmd.Flags().Duration("timeout", time.Second*30, "The timeout for the diagnostics collect command, will be either 30s or 30s+pprof-duration by default. Should be longer then pprof-duration when pprof is enabled as the command needs time to process/archive the response.")
 
 	return cmd
@@ -141,7 +141,7 @@ func newDiagnosticsPprofCommandWithArgs(_ []string, streams *cli.IOStreams) *cob
 
 	cmd.Flags().StringP("file", "f", "", "name of the output file, stdout if unspecified.")
 	cmd.Flags().String("pprof-type", "profile", "Collect all pprof data from all running applications. Select one of [allocs, block, cmdline, goroutine, heap, mutex, profile, threadcreate, trace]")
-	cmd.Flags().Duration("pprof-duration", time.Second*30, "The duration to collect trace and profiling data from the debug/pprof endpoints. (default: 30s)")
+	cmd.Flags().Duration("pprof-duration", time.Second*30, "The duration to collect trace and profiling data from the debug/pprof endpoints.")
 	cmd.Flags().Duration("timeout", time.Second*60, "The timeout for the pprof collect command, defaults to 30s+pprof-duration by default. Should be longer then pprof-duration as the command needs time to process the response.")
 	cmd.Flags().String("pprof-application", "elastic-agent", "Application name to collect pprof data from.")
 	cmd.Flags().String("pprof-route-key", "default", "Route key to collect pprof data from.")
