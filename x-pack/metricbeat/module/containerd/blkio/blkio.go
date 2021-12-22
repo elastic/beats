@@ -7,6 +7,8 @@ package blkio
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/containerd"
@@ -104,8 +106,17 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error getting events")
 	}
 	for _, event := range events {
-		// setting ECS container.id and containerd.namespace
-		rootFields, moduleFields, _ := containerd.SetCIDandNamespace(event)
+		// setting ECS container.id and module field containerd.namespace
+		containerFields := common.MapStr{}
+		moduleFields := common.MapStr{}
+		rootFields := common.MapStr{}
+
+		cID := containerd.GetAndDeleteCid(event)
+		namespace := containerd.GetAndDeleteNamespace(event)
+
+		containerFields.Put("id", cID)
+		rootFields.Put("container", containerFields)
+		moduleFields.Put("namespace", namespace)
 
 		reporter.Event(mb.Event{
 			RootFields:      rootFields,

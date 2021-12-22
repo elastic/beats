@@ -91,7 +91,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet:              base,
 		prometheusClient:           pc,
 		mod:                        mod,
-		calcPct:                    config.CalculatePct,
+		calcPct:                    config.CalculateCpuPct,
 		preTimestamp:               time.Time{},
 		preContainerCpuTotalUsage:  map[string]float64{},
 		preContainerCpuKernelUsage: map[string]float64{},
@@ -122,8 +122,17 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	for _, event := range events {
-		// setting ECS container.id and containerd.namespace
-		rootFields, moduleFields, cID := containerd.SetCIDandNamespace(event)
+		// setting ECS container.id and module field containerd.namespace
+		containerFields := common.MapStr{}
+		moduleFields := common.MapStr{}
+		rootFields := common.MapStr{}
+
+		cID := containerd.GetAndDeleteCid(event)
+		namespace := containerd.GetAndDeleteNamespace(event)
+
+		containerFields.Put("id", cID)
+		rootFields.Put("container", containerFields)
+		moduleFields.Put("namespace", namespace)
 
 		if m.calcPct {
 			contCpus, ok := perContainerCpus[cID]

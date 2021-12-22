@@ -6,12 +6,14 @@ package containerd
 
 // Config contains the config needed for containerd
 type Config struct {
-	CalculatePct bool `config:"calcpct"`
+	CalculateCpuPct bool `config:"calcpct.cpu"`
+	CalculateMemPct bool `config:"calcpct.memory"`
 }
 
 // DefaultConfig returns default module config
 func DefaultConfig() Config {
 	return Config{
-		CalculatePct: true,
+		CalculateCpuPct: true,
+		CalculateMemPct: true,
 	}
 }
