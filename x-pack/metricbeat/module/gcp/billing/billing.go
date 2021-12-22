@@ -302,7 +302,7 @@ func getCurrentDate() string {
 }
 
 func generateEventID(currentDate string, rowItems []bigquery.Value) string {
-	// create eventID using hash of current_date + invoice_month + project_id + cost_type
+	// create eventID using hash of current_date + invoice.month + project.id + project.name
 	// This will prevent more than one billing metric getting collected in the same day.
 	eventID := currentDate + rowItems[0].(string) + rowItems[1].(string) + rowItems[2].(string)
 	h := sha256.New()
