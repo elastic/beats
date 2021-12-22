@@ -10,9 +10,41 @@
         "name":"memory",
         "rtt":44269
     },
-    "containerd":{
-        "memory":{
-            "example": "memory"
+    "containerd": {
+        "namespace": "k8s.io",
+        "memory": {
+            "activeFiles": 0,
+            "workingset": {
+                "pct": 0.07224264705882352
+            },
+            "swap": {
+                "limit": 9223372036854772000,
+                "total": 49373184,
+                "max": 49848320,
+                "fail": {
+                    "count": 0
+                }
+            },
+            "kernel": {
+                "limit": 9223372036854772000,
+                "fail": {
+                    "count": 0
+                },
+                "max": 843776,
+                "total": 827392
+            },
+            "rss": 13651968,
+            "cache": 33792000,
+            "usage": {
+                "fail": {
+                    "count": 0
+                },
+                "limit": 178257920,
+                "total": 49373184,
+                "pct": 0.27697610294117647,
+                "max": 49848320
+            },
+            "inactiveFiles": 36495360
         }
     },
     "type":"metricsets"

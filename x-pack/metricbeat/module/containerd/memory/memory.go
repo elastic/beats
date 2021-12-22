@@ -129,22 +129,24 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 		// Calculate memory total usage percentage
 		if m.calcPct {
 			inactiveFiles, err := event.GetValue("inactiveFiles")
-			if err == nil {
-				usageTotal, err := event.GetValue("usage.total")
-				if err == nil {
-					memoryLimit, err := event.GetValue("usage.limit")
-					mLfloat, ok := memoryLimit.(float64)
-					if err == nil && ok && mLfloat != 0.0 {
-						// calculate working set memory usage
-						workingSetUsage := usageTotal.(float64) - inactiveFiles.(float64)
-						workingSetUsagePct := workingSetUsage / mLfloat
-						event.Put("workingset.pct", workingSetUsagePct)
+			if err != nil {
+				continue
+			}
+			usageTotal, err := event.GetValue("usage.total")
+			if err != nil {
+				continue
+			}
+			memoryLimit, err := event.GetValue("usage.limit")
+			mLfloat, ok := memoryLimit.(float64)
+			if err == nil && ok && mLfloat != 0.0 {
+				// calculate working set memory usage
+				workingSetUsage := usageTotal.(float64) - inactiveFiles.(float64)
+				workingSetUsagePct := workingSetUsage / mLfloat
+				event.Put("workingset.pct", workingSetUsagePct)
 
-						memoryUsagePct := usageTotal.(float64) / mLfloat
-						event.Put("usage.pct", memoryUsagePct)
-						m.Logger().Debugf("memoryUsagePct for %+v is %+v", cID, memoryUsagePct)
-					}
-				}
+				memoryUsagePct := usageTotal.(float64) / mLfloat
+				event.Put("usage.pct", memoryUsagePct)
+				m.Logger().Debugf("memoryUsagePct for %+v is %+v", cID, memoryUsagePct)
 			}
 		}
 
