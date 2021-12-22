@@ -18,7 +18,6 @@
 package useragent
 
 import (
-	"fmt"
 	"runtime"
 	"strings"
 
@@ -27,22 +26,24 @@ import (
 
 // UserAgent takes the capitalized name of the current beat and returns
 // an RFC compliant user agent string for that beat.
-func UserAgent(beatNameCapitalized string, additional_agents ...string) string {
+func UserAgent(beatNameCapitalized string, additionalComments ...string) string {
 	var builder strings.Builder
-	fmt.Fprintf(&builder, "Elastic-%s/%s ", beatNameCapitalized, version.GetDefaultVersion())
+	builder.WriteString("Elastic-" + beatNameCapitalized + "/" + version.GetDefaultVersion() + " ")
 	uaValues := []string{
 		runtime.GOOS,
 		runtime.GOARCH,
 		version.Commit(),
 		version.BuildTime().String(),
 	}
-	if additional_agents != nil {
-		for _, val := range additional_agents {
+	if additionalComments != nil {
+		for _, val := range additionalComments {
 			if val != "" {
 				uaValues = append(uaValues, val)
 			}
 		}
 	}
-	fmt.Fprintf(&builder, "(%s)", strings.Join(uaValues, "; "))
+	builder.WriteByte('(')
+	builder.WriteString(strings.Join(uaValues, "; "))
+	builder.WriteByte(')')
 	return builder.String()
 }
