@@ -23,6 +23,23 @@ start/stop events. This ensures you don't need to worry about state, but only de
 
 The Docker autodiscover provider watches for Docker containers to start and stop.
 
+It has the following settings:
+
+`host`:: (Optional) Docker socket (UNIX or TCP socket). It uses
+`unix:///var/run/docker.sock` by default.
+`ssl`:: (Optional) SSL configuration to use when connecting to the Docker
+socket.
+`cleanup_timeout`:: (Optional) Specify the time of inactivity before stopping the
+running configuration for a container,
+ifeval::["{beatname_lc}"=="filebeat"]
+ 60s by default.
+endif::[]
+ifeval::["{beatname_lc}"!="filebeat"]
+ disabled by default.
+endif::[]
+`labels.dedot`:: (Optional) Default to be false. If set to true, replace dots in
+ labels with `_`.
+
 
 These are the fields available within config templating. The `docker.*` fields will be available on each emitted event.
 event:
@@ -109,24 +126,6 @@ autodiscover.providers:
             paths:
               - "/mnt/logs/${data.docker.container.id}/*.log"
 -------------------------------------------------------------------------------------
-
-It has the following settings:
-
-`host`:: (Optional) Docker socket (UNIX or TCP socket). It uses
-`unix:///var/run/docker.sock` by default.
-`ssl`:: (Optional) SSL configuration to use when connecting to the Docker
-socket.
-`cleanup_timeout`:: (Optional) Specify the time of inactivity before stopping the
-running configuration for a container,
-ifeval::["{beatname_lc}"=="filebeat"]
- 60s by default.
-endif::[]
-ifeval::["{beatname_lc}"!="filebeat"]
- disabled by default.
-endif::[]
-`labels.dedot`:: (Optional) Default to be false. If set to true, replace dots in
- labels with `_`.
-
 =======================================
 endif::[]
 
