@@ -110,13 +110,17 @@ var (
 	}
 )
 
-func eventMapping(r mb.ReporterV2, info beat.Info, content []byte, isXpack bool) error {
+func eventMapping(r mb.ReporterV2, info beat.Info, clusterUUID string, content []byte, isXpack bool) error {
 	event := mb.Event{
 		RootFields:      common.MapStr{},
 		ModuleFields:    common.MapStr{},
 		MetricSetFields: common.MapStr{},
 	}
 	event.RootFields.Put("service.name", beat.ModuleName)
+
+	if clusterUUID != "" {
+		event.RootFields.Put("elasticsearch.cluster.id", clusterUUID)
+	}
 
 	event.ModuleFields = common.MapStr{}
 	event.ModuleFields.Put("id", info.UUID)

@@ -119,6 +119,11 @@
         },
         "type": "metricbeat"
     },
+    "elasticsearch": {
+        "cluster": {
+            "id": "foobar"
+        }
+    },
     "event": {
         "dataset": "beat.stats",
         "duration": 115000,
