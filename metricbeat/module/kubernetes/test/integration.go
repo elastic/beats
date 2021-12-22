@@ -53,10 +53,10 @@ func GetKubeStateMetricsConfig(t *testing.T, metricSetName string) map[string]in
 func GetKubeStateMetricsConfigWithMetaDisabled(t *testing.T, metricSetName string) map[string]interface{} {
 	t.Helper()
 	return map[string]interface{}{
-		"module":     "kubernetes",
-		"metricsets": []string{metricSetName},
-		"host":       "${NODE_NAME}",
-		"hosts":      []string{"kube-state-metrics:8080"},
+		"module":       "kubernetes",
+		"metricsets":   []string{metricSetName},
+		"host":         "${NODE_NAME}",
+		"hosts":        []string{"kube-state-metrics:8080"},
 		"add_metadata": false,
 	}
 }
