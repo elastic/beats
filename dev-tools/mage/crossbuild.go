@@ -171,7 +171,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 		mg.Deps(func() error { return gotool.Mod.Download() })
 	}
 
-	// Build the magefile for Linux so we can run it inside the container.
+	// Build the magefile for Linux, so we can run it inside the container.
 	mg.Deps(buildMage)
 
 	log.Println("crossBuild: Platform list =", params.Platforms)
@@ -183,8 +183,11 @@ func CrossBuild(options ...CrossBuildOption) error {
 		builder := GolangCrossBuilder{buildPlatform.Name, params.Target, params.InDir, params.ImageSelector}
 		if params.Serial {
 			if err := builder.Build(); err != nil {
-				return errors.Wrapf(err, "failed cross-building target=%v for platform=%v %v", params.ImageSelector,
-					params.Target, buildPlatform.Name)
+				// TODO(AndersonQ): find out what is the correct way to print functions.
+				return errors.Wrapf(err, "failed cross-building target=%v for platform=%v %v",
+					params.ImageSelector,
+					params.Target,
+					buildPlatform.Name)
 			}
 		} else {
 			deps = append(deps, builder.Build)

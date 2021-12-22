@@ -315,7 +315,7 @@ func Package() {
 
 	var requiredPackages []string
 	for _, p := range platformPackages {
-		// TODO(Anderson): Should it fail or log a warning if p.platform isn't on platformPackages?
+		// TODO(AndersonQ): Should it fail or log a warning if p.platform isn't on platformPackages?
 		if _, enabled := devtools.Platforms.Get(p.platform); enabled {
 			requiredPackages = append(requiredPackages, p.packages)
 		}
