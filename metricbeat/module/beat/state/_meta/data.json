@@ -40,6 +40,11 @@
             }
         }
     },
+    "elasticsearch": {
+        "cluster": {
+            "id": "foobar"
+        }
+    },
     "event": {
         "dataset": "beat.state",
         "duration": 115000,
@@ -57,5 +62,5 @@
     "service": {
         "address": "172.19.0.2:5066",
         "type": "beat"
-    }
+    },
 }
