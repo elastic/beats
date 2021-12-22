@@ -65,7 +65,7 @@ func init() {
 	}
 }
 
-// CrossBuildOption defines a option to the CrossBuild target.
+// CrossBuildOption defines an option to the CrossBuild target.
 type CrossBuildOption func(params *crossBuildParams)
 
 // ImageSelectorFunc returns the name of the builder image.

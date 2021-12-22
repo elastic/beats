@@ -63,7 +63,7 @@ var (
 	PLATFORMS    = EnvOr("PLATFORMS", "")
 	PACKAGES     = EnvOr("PACKAGES", "")
 
-	// CrossBuildMountModcache, if true, mounts $GOPATH/pkg/mod into
+	// CrossBuildMountModcache set to true, mounts $GOPATH/pkg/mod into
 	// the crossbuild images at /go/pkg/mod, read-only.
 	CrossBuildMountModcache = true
 
