@@ -316,6 +316,19 @@ ifdef::autodiscoverJolokia[]
 The Jolokia autodiscover provider uses Jolokia Discovery to find agents running
 in your host or your network.
 
+The configuration of this provider consists in a set of network interfaces, as
+well as a set of templates as in other providers. The network interfaces will be
+the ones used for discovery probes, each item of `interfaces` has these settings:
+
+`name`:: the name of the interface (e.g. `br0`), it can contain a wildcard
+  as suffix to apply the same settings to multiple network interfaces of
+  the same type (e.g. `br*`).
+`interval`:: time between probes (defaults to 10s)
+ `grace_period`:: time since the last reply to consider an instance stopped
+  (defaults to 30s)
+`probe_timeout`:: max time to wait for responses since a probe is sent
+  (defaults to 1s)
+
 Jolokia Discovery mechanism is supported by any Jolokia agent since version
 1.2.0, it is enabled by default when Jolokia is included in the application as
 a JVM agent, but disabled in other cases as the OSGI or WAR (Java EE) agents.
@@ -345,19 +358,6 @@ These are the available fields during within config templating. The `jolokia.*` 
   * jolokia.server.vendor
   * jolokia.server.version
   * jolokia.url
-
-The configuration of this provider consists in a set of network interfaces, as
-well as a set of templates as in other providers. The network interfaces will be
-the ones used for discovery probes, they have these settings:
-
-`name`:: the name of the interface (e.g. `br0`), it can contain a wildcard
-  as suffix to apply the same settings to multiple network interfaces of
-  the same type (e.g. `br*`).
-`interval`:: time between probes (defaults to 10s)
- `grace_period`:: time since the last reply to consider an instance stopped
-  (defaults to 30s)
-`probe_timeout`:: max time to wait for responses since a probe is sent
-  (defaults to 1s)
 
 include::../../{beatname_lc}/docs/autodiscover-jolokia-config.asciidoc[]
 endif::autodiscoverJolokia[]
