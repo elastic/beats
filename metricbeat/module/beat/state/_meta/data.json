@@ -62,5 +62,5 @@
     "service": {
         "address": "172.19.0.2:5066",
         "type": "beat"
-    },
+    }
 }
