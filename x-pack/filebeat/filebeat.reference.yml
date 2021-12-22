@@ -4220,7 +4220,7 @@ output.elasticsearch:
   #path: "/tmp/filebeat"
 
   # Name of the generated files. The default is `filebeat` and it generates
-  # files: `filebeat`, `filebeat.1`, `filebeat.2`, etc.
+  # files: `filebeat-{datetime}.ndjson`, `filebeat-{datetime}-1.ndjson`, etc.
   #filename: filebeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
@@ -4238,6 +4238,7 @@ output.elasticsearch:
   
   # Configure automatic file rotation on every startup. The default is true.
   #rotate_on_startup: true
+
 # ------------------------------- Console Output -------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.
