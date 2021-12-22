@@ -88,10 +88,14 @@ var (
 					"total":     c.Int("total"),
 				}),
 			}),
-			"config": c.Dict("config.module", s.Schema{
-				"running": c.Int("running"),
-				"starts":  c.Int("starts"),
-				"stops":   c.Int("stops"),
+			"config": c.Dict("config", s.Schema{
+				"module": c.Dict("module", s.Schema{
+					"running": c.Int("running"),
+					"starts":  c.Int("starts"),
+					"stops":   c.Int("stops"),
+				}),
+				"reloads": c.Int("reloads"),
+				"scans":   c.Int("scans"),
 			}),
 		}),
 		"state": c.Dict("metricbeat.beat.state", s.Schema{
