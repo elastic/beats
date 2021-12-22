@@ -433,7 +433,8 @@ metricbeat.modules:
   enabled: false
   period: 10s
   hosts: ["localhost:1338"]
-  calcpct: true
+  calcpct.cpu: true
+  calcpct.memory: true
 
 
 #------------------------------- Coredns Module -------------------------------
