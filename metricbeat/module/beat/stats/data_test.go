@@ -42,7 +42,7 @@ func TestEventMapping(t *testing.T) {
 		Beat: "helloworld",
 	}
 
-        clusterUUID := "foo"
+	clusterUUID := "foo"
 
 	for _, f := range files {
 		input, err := ioutil.ReadFile(f)
