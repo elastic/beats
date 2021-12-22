@@ -8707,6 +8707,13 @@ type: short
 
 --
 
+*`beat.stats.libbeat.config.reloads`*::
++
+--
+type: short
+
+--
+
 [float]
 === output
 
