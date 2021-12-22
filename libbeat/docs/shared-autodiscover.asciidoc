@@ -197,7 +197,7 @@ endif::[]
   making the provider to enable the provided templates only when it will gain the leader lease.
   This setting can only be combined with `cluster` scope. When `unique` is enabled enabled, `resource`
   and `add_resource_metadata` settings are not taken into account.
-`leader_lease`:: (Optional) Defaults to `{beatname_lc}-cluster-leader`. This will be name of the lock lease.
+`leader_lease`:: (Optional) Defaults to +{beatname_lc}-cluster-leader+. This will be name of the lock lease.
   One can monitor the status of the lease with `kubectl describe lease beats-cluster-leader`.
   Different Beats that refer to the same leader lease will be competitors in holding the lease
   and only one will be elected as leader each time.
