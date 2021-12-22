@@ -456,6 +456,10 @@ agent {
   means that the local node where filebeat is allocated will service filebeat's requests.
   Defaults to `true`.
 
+The configuration of templates and conditions is similar to that of the Docker provider.
+Configuration templates can contain variables from the autodiscover event. They can be accessed under
+`data` namespace.
+
 These are the available fields during config templating. The `nomad.*` fields will be available
 on each emitted event.
 
@@ -519,10 +523,6 @@ For example:
   ...
 }
 -------------------------------------------------------------------------------------
-
-The configuration of templates and conditions is similar to that of the Docker provider.
-Configuration templates can contain variables from the autodiscover event. They can be accessed under
-`data` namespace.
 
 include::../../{beatname_lc}/docs/autodiscover-nomad-config.asciidoc[]
 
