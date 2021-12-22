@@ -617,7 +617,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
 
   if(isUnix()) {
     gox_flags = (isArm() && is64arm()) ? '-arch arm' : '-arch amd64'
-    path = "${env.WORKSPACE}/bin:${env.PATH}"
+    path = "${env.WORKSPACE}/bin:${env.PATH}:/usr/local/bin"
     magefile = "${WORKSPACE}/.magefile"
     pythonEnv = "${WORKSPACE}/python-env"
     testResults = '**/build/TEST*.xml'
