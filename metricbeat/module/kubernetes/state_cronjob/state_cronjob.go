@@ -20,9 +20,9 @@ package state_cronjob
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
@@ -44,6 +44,7 @@ type CronJobMetricSet struct {
 	prometheus p.Prometheus
 	mapping    *p.MetricsMapping
 	mod        k8smod.Module
+	enricher   util.Enricher
 }
 
 // NewCronJobMetricSet returns a prometheus based metricset for CronJobs
@@ -62,6 +63,7 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		mod:           mod,
+		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.CronJob{}, false),
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 				"kube_cronjob_info":                           p.InfoMetric(),
@@ -86,35 +88,40 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // module rooted fields at the event that gets reported
 //
 // Copied from other kube state metrics.
-func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) error {
+func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) {
+	m.enricher.Start()
+
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
-		return errors.Wrap(err, "error getting family metrics")
+		m.Logger().Error(err)
+		reporter.Error(err)
+		return
 	}
 	events, err := m.prometheus.ProcessMetrics(families, m.mapping)
 	if err != nil {
-		return errors.Wrap(err, "error getting metrics")
+		m.Logger().Error(err)
+		reporter.Error(err)
+		return
 	}
 
+	m.enricher.Enrich(events)
 	for _, event := range events {
-		var moduleFieldsMapStr common.MapStr
-		moduleFields, ok := event[mb.ModuleDataKey]
-		if ok {
-			moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
-			if !ok {
-				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
-			}
+		e, err := util.CreateEvent(event, "kubernetes.cronjob")
+		if err != nil {
+			m.Logger().Error(err)
 		}
-		delete(event, mb.ModuleDataKey)
 
-		if reported := reporter.Event(mb.Event{
-			MetricSetFields: event,
-			ModuleFields:    moduleFieldsMapStr,
-			Namespace:       "kubernetes.cronjob",
-		}); !reported {
-			return nil
+		if reported := reporter.Event(e); !reported {
+			m.Logger().Debug("error trying to emit event")
+			return
 		}
 	}
 
+	return
+}
+
+// Close stops this metricset
+func (m *CronJobMetricSet) Close() error {
+	m.enricher.Stop()
 	return nil
 }
