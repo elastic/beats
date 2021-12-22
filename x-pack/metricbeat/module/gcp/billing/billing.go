@@ -8,6 +8,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -49,7 +50,8 @@ type MetricSet struct {
 type config struct {
 	Period              time.Duration `config:"period" validate:"required"`
 	ProjectID           string        `config:"project_id" validate:"required"`
-	CredentialsFilePath string        `config:"credentials_file_path" validate:"required"`
+	CredentialsFilePath string        `config:"credentials_file_path"`
+	CredentialsJSON     string        `config:"credentials_json"`
 	DatasetID           string        `config:"dataset_id" validate:"required"`
 	TablePattern        string        `config:"table_pattern"`
 	CostType            string        `config:"cost_type"`
@@ -57,6 +59,10 @@ type config struct {
 
 // Validate checks for deprecated config options
 func (c config) Validate() error {
+	if c.CredentialsFilePath == "" && c.CredentialsJSON == "" {
+		return errors.New("no credentials_file_path or credentials_json specified")
+	}
+
 	if c.CostType != "" {
 		// cost_type can only be regular, tax, adjustment, or rounding error
 		costTypes := []string{"regular", "tax", "adjustment", "rounding error"}
@@ -106,7 +112,17 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	// find current month
 	month := getCurrentMonth()
 
-	opt := []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
+	var opt []option.ClientOption
+	if m.config.CredentialsFilePath != "" && m.config.CredentialsJSON != "" {
+		return errors.New("both credentials_file_path and credentials_json specified, you must use only one of them")
+	} else if m.config.CredentialsFilePath != "" {
+		opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
+	} else if m.config.CredentialsJSON != "" {
+		opt = []option.ClientOption{option.WithCredentialsJSON([]byte(m.config.CredentialsJSON))}
+	} else {
+		return errors.New("no credentials_file_path or credentials_json specified")
+	}
+
 	client, err := bigquery.NewClient(ctx, m.config.ProjectID, opt...)
 	if err != nil {
 		return fmt.Errorf("gerror creating bigquery client: %w", err)
