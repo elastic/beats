@@ -46,13 +46,10 @@
             },
             "libbeat": {
                 "config": {
-                    "module": {
-                        "running": 3,
-                        "starts": 3,
-                        "stops": 0
-                    },
-                    "reloads": 1,
-                    "scans": 1
+                    "running": 3,
+                    "starts": 3,
+                    "stops": 0,
+                    "reloads": 1
                 },
                 "output": {
                     "events": {

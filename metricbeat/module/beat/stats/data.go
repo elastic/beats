@@ -89,13 +89,10 @@ var (
 				}),
 			}),
 			"config": c.Dict("config", s.Schema{
-				"module": c.Dict("module", s.Schema{
-					"running": c.Int("running"),
-					"starts":  c.Int("starts"),
-					"stops":   c.Int("stops"),
-				}),
+				"running": c.Int("module.running"),
+				"starts":  c.Int("module.starts"),
+				"stops":   c.Int("module.stops"),
 				"reloads": c.Int("reloads"),
-				"scans":   c.Int("scans"),
 			}),
 		}),
 		"state": c.Dict("metricbeat.beat.state", s.Schema{
