@@ -73,6 +73,7 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 				}
 
 				event.ModuleFields.Put("cluster.state.id", stateData.StateID)
+				event.ModuleFields.Put("cluster.stats.state.state_uuid", stateData.StateID)
 				event.ModuleFields.Put("cluster.id", stateData.ClusterID)
 				event.ModuleFields.Put("cluster.name", stateData.ClusterName)
 
@@ -117,6 +118,7 @@ func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 						errs = append(errs, errors.Wrap(err, "failure getting source node information"))
 						continue
 					}
+					event.ModuleFields.Put("node.name", sourceNode["name"])
 					event.MetricSetFields.Put("source_node", sourceNode)
 				}
 
