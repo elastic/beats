@@ -4,11 +4,11 @@
 
 package httpjson
 
-type chainsConfig struct {
-	Step stepsConfig `config:"step" validate:"required"`
+type chainConfig struct {
+	Step stepConfig `config:"step" validate:"required"`
 }
 
-type stepsConfig struct {
+type stepConfig struct {
 	Auth     authConfig     `config:"auth,omitempty"`
 	Request  requestConfig  `config:"request"`
 	Response responseConfig `config:"response,omitempty"`

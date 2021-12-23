@@ -74,13 +74,13 @@ func newResponseProcessor(config *responseConfig, pagination *pagination, log *l
 	return rp
 }
 
-func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resp []*http.Response) (<-chan maybeMsg, error) {
+func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response) (<-chan maybeMsg, error) {
 	ch := make(chan maybeMsg)
 
 	go func() {
 		defer close(ch)
 
-		for i, httpResp := range resp {
+		for i, httpResp := range resps {
 			iter := rp.pagination.newPageIterator(stdCtx, trCtx, httpResp)
 			for {
 				page, hasNext, err := iter.next()
@@ -90,7 +90,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 				}
 
 				if !hasNext {
-					if i+1 != len(resp) {
+					if i+1 != len(resps) {
 						break
 					}
 					return

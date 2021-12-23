@@ -17,7 +17,7 @@ type config struct {
 	Request  *requestConfig  `config:"request" validate:"required"`
 	Response *responseConfig `config:"response"`
 	Cursor   cursorConfig    `config:"cursor"`
-	Chain    []chainsConfig  `config:"chain"`
+	Chain    []chainConfig   `config:"chain"`
 }
 
 type cursorConfig map[string]cursorEntry

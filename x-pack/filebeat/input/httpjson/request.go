@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -39,7 +39,7 @@ func (c *httpClient) do(stdCtx context.Context, trCtx *transformContext, req *ht
 		return nil, fmt.Errorf("failed to execute http client.Do: %w", err)
 	}
 	if resp.StatusCode > 399 {
-		body, _ := ioutil.ReadAll(resp.Body)
+		body, _ := io.ReadAll(resp.Body)
 		resp.Body.Close()
 		return nil, fmt.Errorf("server responded with status code %d: %s", resp.StatusCode, string(body))
 	}
@@ -92,12 +92,12 @@ type requestFactory struct {
 	replace    string
 }
 
-func newRequestFactory(config *requestConfig, configChain []chainsConfig, authConfig *authConfig, log *logp.Logger) []*requestFactory {
+func newRequestFactory(config *requestConfig, configChains []chainConfig, authConfig *authConfig, log *logp.Logger) []*requestFactory {
 	// config validation already checked for errors here
-	var rf []*requestFactory
+	var rfs []*requestFactory
 	ts, _ := newBasicTransformsFromConfig(config.Transforms, requestNamespace, log)
 	// regular call requestFactory object
-	rfs := &requestFactory{
+	rf := &requestFactory{
 		url:        *config.URL.URL,
 		method:     config.Method,
 		body:       config.Body,
@@ -106,13 +106,13 @@ func newRequestFactory(config *requestConfig, configChain []chainsConfig, authCo
 		encoder:    registeredEncoders[config.EncodeAs],
 	}
 	if authConfig != nil && authConfig.Basic.isEnabled() {
-		rfs.user = authConfig.Basic.User
-		rfs.password = authConfig.Basic.Password
+		rf.user = authConfig.Basic.User
+		rf.password = authConfig.Basic.Password
 	}
-	rf = append(rf, rfs)
-	for _, ch := range configChain {
+	rfs = append(rfs, rf)
+	for _, ch := range configChains {
 		// chain calls requestFactory object
-		rfs := &requestFactory{
+		rf := &requestFactory{
 			url:        *ch.Step.Request.URL.URL,
 			method:     ch.Step.Request.Method,
 			body:       ch.Step.Request.Body,
@@ -121,9 +121,9 @@ func newRequestFactory(config *requestConfig, configChain []chainsConfig, authCo
 			encoder:    registeredEncoders[config.EncodeAs],
 			replace:    ch.Step.Replace,
 		}
-		rf = append(rf, rfs)
+		rfs = append(rfs, rf)
 	}
-	return rf
+	return rfs
 }
 
 func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx *transformContext) (*http.Request, error) {
@@ -164,7 +164,7 @@ func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx *transfor
 type requester struct {
 	log               *logp.Logger
 	client            *httpClient
-	requestFactory    []*requestFactory
+	requestFactories  []*requestFactory
 	responseProcessor *responseProcessor
 }
 
@@ -176,7 +176,7 @@ func newRequester(
 	return &requester{
 		log:               log,
 		client:            client,
-		requestFactory:    requestFactory,
+		requestFactories:  requestFactory,
 		responseProcessor: responseProcessor,
 	}
 }
@@ -194,13 +194,13 @@ func (rf *requestFactory) collectResponse(stdCtx context.Context, trCtx *transfo
 	return httpResp, nil
 }
 
-// generateNewUrl returns new url value using replacement from oldUrl with str ids
-func generateNewUrl(replacement string, oldUrl string, str []byte) (url.URL, error) {
+// generateNewUrl returns new url value using replacement from oldUrl with ids
+func generateNewUrl(replacement string, oldUrl string, ids []byte) (url.URL, error) {
 	reg, err := regexp.Compile(replacement)
 	if err != nil {
 		return url.URL{}, fmt.Errorf("failed to create regex on provided value: %w", err)
 	}
-	newUrl, err := url.Parse(string(reg.ReplaceAll([]byte(oldUrl), str)))
+	newUrl, err := url.Parse(string(reg.ReplaceAll([]byte(oldUrl), ids)))
 	if err != nil {
 		return url.URL{}, fmt.Errorf("failed to replace value in url: %w", err)
 	}
@@ -220,9 +220,34 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		intermediateResps []*http.Response
 		finalResps        []*http.Response
 	)
-	for i, rf := range r.requestFactory {
+	rfSize := len(r.requestFactories)
+	for i, rf := range r.requestFactories {
 		// iterate over collected ids from last response
-		if i != 0 {
+		if i == 0 {
+			// perform and store regular call responses
+			httpResp, err = rf.collectResponse(stdCtx, trCtx, r, publisher)
+			if err != nil {
+				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
+			}
+			if rfSize == 1 {
+				finalResps = append(finalResps, httpResp)
+				n, err = r.processAndPublishEvents(stdCtx, trCtx, publisher, finalResps, true)
+				if err != nil {
+					return err
+				}
+				continue
+			} else {
+				intermediateResps = append(intermediateResps, httpResp)
+				ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[i+1].replace)
+				if err != nil {
+					return err
+				}
+				n, err = r.processAndPublishEvents(stdCtx, trCtx, publisher, intermediateResps, false)
+				if err != nil {
+					return err
+				}
+			}
+		} else {
 			if len(ids) == 0 {
 				n = 0
 				continue
@@ -230,9 +255,9 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			urlCopy = rf.url
 			urlString = rf.url.String()
 			// perform request over collected ids
-			for _, s := range ids {
+			for _, id := range ids {
 				// reformat urls of requestFactory using ids
-				rf.url, err = generateNewUrl(rf.replace, urlString, []byte(s))
+				rf.url, err = generateNewUrl(rf.replace, urlString, []byte(id))
 				if err != nil {
 					return fmt.Errorf("failed to generate new URL: %w", err)
 				}
@@ -240,10 +265,10 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				// collect data from new urls
 				httpResp, err = rf.collectResponse(stdCtx, trCtx, r, publisher)
 				if err != nil {
-					return fmt.Errorf("failed to execute http client.Do: %w", err)
+					return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 				}
 				// store data according to response type
-				if i+1 == len(r.requestFactory) && len(ids) != 0 {
+				if rfSize == i+1 && len(ids) != 0 {
 					finalResps = append(finalResps, httpResp)
 				} else {
 					intermediateResps = append(intermediateResps, httpResp)
@@ -251,51 +276,27 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			}
 			rf.url = urlCopy
 
-			if i+1 == len(r.requestFactory) {
+			if rfSize == i+1 {
 				split = r.responseProcessor.split
 				r.responseProcessor.split = nil
-				n, err = r.processAndPublishEvents(0, stdCtx, trCtx, publisher, finalResps)
+				n, err = r.processAndPublishEvents(stdCtx, trCtx, publisher, finalResps, true)
 				if err != nil {
 					return err
 				}
 				r.responseProcessor.split = split
 				continue
 			} else {
-				ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactory[i+1].replace)
+				ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[i+1].replace)
 				if err != nil {
 					return err
 				}
 				split = r.responseProcessor.split
 				r.responseProcessor.split = nil
-				n, err = r.processAndPublishEvents(1, stdCtx, trCtx, publisher, intermediateResps)
+				n, err = r.processAndPublishEvents(stdCtx, trCtx, publisher, intermediateResps, false)
 				if err != nil {
 					return err
 				}
 				r.responseProcessor.split = split
-			}
-		} else {
-			// perform and store regular call responses
-			httpResp, err = rf.collectResponse(stdCtx, trCtx, r, publisher)
-			if err != nil {
-				return fmt.Errorf("failed to execute http client.Do: %w", err)
-			}
-			if len(r.requestFactory) <= 1 {
-				finalResps = append(finalResps, httpResp)
-				n, err = r.processAndPublishEvents(0, stdCtx, trCtx, publisher, finalResps)
-				if err != nil {
-					return err
-				}
-				continue
-			} else {
-				intermediateResps = append(intermediateResps, httpResp)
-				ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactory[i+1].replace)
-				if err != nil {
-					return err
-				}
-				n, err = r.processAndPublishEvents(1, stdCtx, trCtx, publisher, intermediateResps)
-				if err != nil {
-					return err
-				}
 			}
 		}
 	}
@@ -314,13 +315,12 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 	// collect ids from all responses
 	for _, resp := range intermediateResps {
 		if resp.Body != nil {
-			b, err = ioutil.ReadAll(resp.Body)
+			b, err = io.ReadAll(resp.Body)
 			if err != nil {
 				return nil, fmt.Errorf("error while reading response body: %v", err)
 			}
 		}
-		// Restore the io.ReadCloser to its original state
-		resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+
 		// get replace values from collected json
 		ids, err = parse(string(b), replace)
 		if err != nil {
@@ -331,10 +331,10 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 }
 
 // processAndPublishEvents process and publish events based on response type
-func (r *requester) processAndPublishEvents(publish int, stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, finalResps []*http.Response) (int, error) {
+func (r *requester) processAndPublishEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, finalResps []*http.Response, publish bool) (int, error) {
 	eventsCh, err := r.responseProcessor.startProcessing(stdCtx, trCtx, finalResps)
 	if err != nil {
-		r.log.Errorf("error recieving eventCh: %v", err)
+		return 0, fmt.Errorf("error recieving eventCh: %v", err)
 	}
 
 	trCtx.clearIntervalData()
@@ -346,7 +346,7 @@ func (r *requester) processAndPublishEvents(publish int, stdCtx context.Context,
 			continue
 		}
 
-		if publish == 0 {
+		if publish {
 			event, err := makeEvent(maybeMsg.msg)
 			if err != nil {
 				r.log.Errorf("error creating event: %v", maybeMsg)
