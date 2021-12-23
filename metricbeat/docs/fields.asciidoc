@@ -7622,6 +7622,13 @@ type: keyword
 
 --
 
+*`beat.state.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
+
 
 *`beat.state.host.containerized`*::
 +
@@ -7712,6 +7719,13 @@ type: keyword
 Beat stats
 
 
+
+*`beat.stats.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
 
 
 
