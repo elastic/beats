@@ -69,7 +69,8 @@ var (
 
 func eventMapping(r mb.ReporterV2, info beat.Info, content []byte, isXpack bool) error {
 	event := mb.Event{
-		RootFields: common.MapStr{},
+		RootFields:   common.MapStr{},
+		ModuleFields: common.MapStr{},
 	}
 
 	var data map[string]interface{}
