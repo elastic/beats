@@ -54,7 +54,6 @@ data:
               - event
             period: 10s
             add_metadata: true
-            skip_older: true
           - data_stream:
               dataset: kubernetes.state_container
               type: metrics
