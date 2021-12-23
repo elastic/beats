@@ -7535,6 +7535,13 @@ type: keyword
 
 --
 
+*`beat.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
+
 [float]
 === state
 
@@ -7616,13 +7623,6 @@ type: keyword
 --
 
 *`beat.state.cluster.uuid`*::
-+
---
-type: keyword
-
---
-
-*`beat.state.elasticsearch.cluster.id`*::
 +
 --
 type: keyword
@@ -7719,13 +7719,6 @@ type: keyword
 Beat stats
 
 
-
-*`beat.stats.elasticsearch.cluster.id`*::
-+
---
-type: keyword
-
---
 
 
 
@@ -40668,6 +40661,13 @@ alias to: service.id
 
 --
 
+
+*`kibana.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
 
 [float]
 === settings

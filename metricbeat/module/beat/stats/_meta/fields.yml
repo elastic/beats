@@ -4,8 +4,6 @@
     Beat stats
   release: ga
   fields:
-    - name: elasticsearch.cluster.id
-      type: keyword
     - name: apm_server
       type: group
       fields:
