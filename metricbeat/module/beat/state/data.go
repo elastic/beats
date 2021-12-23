@@ -85,9 +85,10 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte, isXpack bool)
 		if isOutputES(data) {
 			clusterUUID = getClusterUUID(data)
 			if clusterUUID != "" {
+                                event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
+
 				if event.MetricSetFields != nil {
 					event.MetricSetFields.Put("cluster.uuid", clusterUUID)
-					event.RootFields.Put("elasticsearch.cluster.id", clusterUUID)
 				}
 			}
 		}

@@ -119,13 +119,12 @@ func eventMapping(r mb.ReporterV2, info beat.Info, clusterUUID string, content [
 	}
 	event.RootFields.Put("service.name", beat.ModuleName)
 
-	if clusterUUID != "" {
-		event.RootFields.Put("elasticsearch.cluster.id", clusterUUID)
-	}
-
-	event.ModuleFields = common.MapStr{}
 	event.ModuleFields.Put("id", info.UUID)
 	event.ModuleFields.Put("type", info.Beat)
+
+	if clusterUUID != "" {
+		event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
+	}
 
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)

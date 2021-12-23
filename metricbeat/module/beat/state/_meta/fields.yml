@@ -35,6 +35,8 @@
           type: keyword
     - name: cluster.uuid
       type: keyword
+    - name: elasticsearch.cluster.id
+      type: keyword
     - name: host
       type: group
       fields:
