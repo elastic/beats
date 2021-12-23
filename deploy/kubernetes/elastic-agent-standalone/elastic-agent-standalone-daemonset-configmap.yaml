@@ -238,9 +238,7 @@ data:
               type: logs
             prospector.scanner.symlinks: true
             parsers:
-              - container:
-                  stream: all
-                  format: auto
+              - container: ~
               # - ndjson:
               #     target: json
               # - multiline:
