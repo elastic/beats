@@ -76,8 +76,12 @@ func WithFields(key string, value interface{}) FieldOptions {
 // example if kind=namespace namespace.labels key will be added
 func WithMetadata(kind string) FieldOptions {
 	return func(meta common.MapStr) {
-		safemapstr.Put(meta, strings.ToLower(kind)+".labels", meta["labels"])
-		safemapstr.Put(meta, strings.ToLower(kind)+".annotations", meta["annotations"])
+		if meta["labels"] != nil {
+			safemapstr.Put(meta, strings.ToLower(kind)+".labels", meta["labels"])
+		}
+		if meta["annotations"] != nil {
+			safemapstr.Put(meta, strings.ToLower(kind)+".annotations", meta["annotations"])
+		}
 	}
 }
 

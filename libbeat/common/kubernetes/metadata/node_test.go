@@ -81,11 +81,10 @@ func TestNode_Generate(t *testing.T) {
 		},
 	}
 
-	// cfg := common.NewConfig()
-	nodeConfig, _ := common.NewConfigFrom(map[string]interface{}{
-		"include_annotations": []string{"key1"},
+	cfg, _ := common.NewConfigFrom(Config{
+		IncludeAnnotations: []string{"key2"},
 	})
-	metagen := NewNodeMetadataGenerator(nodeConfig, nil, client)
+	metagen := NewNodeMetadataGenerator(cfg, nil, client)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
@@ -140,13 +139,12 @@ func TestNode_GenerateFromName(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		// cfg := common.NewConfig()
-		nodeConfig, _ := common.NewConfigFrom(map[string]interface{}{
-			"include_annotations": []string{"key"},
+		cfg, _ := common.NewConfigFrom(Config{
+			IncludeAnnotations: []string{"key"},
 		})
 		nodes := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		nodes.Add(test.input)
-		metagen := NewNodeMetadataGenerator(nodeConfig, nodes, client)
+		metagen := NewNodeMetadataGenerator(cfg, nodes, client)
 
 		accessor, err := meta.Accessor(test.input)
 		require.NoError(t, err)
