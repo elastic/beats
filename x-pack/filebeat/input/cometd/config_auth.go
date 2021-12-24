@@ -5,15 +5,13 @@
 package cometd
 
 import (
-	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
-
-	"golang.org/x/oauth2"
+	"net/url"
 )
-
-const authStyleInParams = 1
 
 type authConfig struct {
 	OAuth2 *oAuth2Config `config:"oauth2"`
@@ -30,22 +28,37 @@ type oAuth2Config struct {
 	TokenURL       string              `config:"token_url"`
 }
 
+type credentials struct {
+	AccessToken string `json:"access_token"`
+	InstanceURL string `json:"instance_url"`
+	IssuedAt    string `json:"issued_at"`
+	ID          string `json:"id"`
+	TokenType   string `json:"token_type"`
+	Signature   string `json:"signature"`
+}
+
 // Client wraps the given http.Client and returns a new one that will use the oauth authentication.
-func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.Client, error) {
-	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
-	conf := &oauth2.Config{
-		ClientID:     o.ClientID,
-		ClientSecret: o.ClientSecret,
-		Endpoint: oauth2.Endpoint{
-			TokenURL:  o.TokenURL,
-			AuthStyle: authStyleInParams,
-		},
-	}
-	token, err := conf.PasswordCredentialsToken(ctx, o.User, o.Password)
+func (o *oAuth2Config) client() (credentials, error) {
+	route := o.TokenURL
+	params := url.Values{"grant_type": {"password"},
+		"client_id":     {o.ClientID},
+		"client_secret": {o.ClientSecret},
+		"username":      {o.User},
+		"password":      {o.Password}}
+	response, err := http.PostForm(route, params)
 	if err != nil {
-		return nil, fmt.Errorf("oauth2 client: error loading credentials using user and password: %w", err)
+		return credentials{}, fmt.Errorf("error while sending http request: %v", err)
 	}
-	return conf.Client(ctx, token), nil
+	decoder := json.NewDecoder(response.Body)
+	var creds credentials
+	if err := decoder.Decode(&creds); err == io.EOF {
+		return credentials{}, fmt.Errorf("reached end of response: %v", err)
+	} else if err != nil {
+		return credentials{}, fmt.Errorf("error while reading response: %v", err)
+	} else if creds.AccessToken == "" {
+		return credentials{}, fmt.Errorf("unable to fetch access token")
+	}
+	return creds, nil
 }
 
 // Validate checks if oauth2 config is valid.
