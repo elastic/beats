@@ -65,7 +65,7 @@
 #  - add_docker_metadata:
 #      host: "unix:///var/run/docker.sock"
 #      match_fields: ["system.process.cgroup.id"]
-#      match_pids: ["process.pid", "process.ppid"]
+#      match_pids: ["process.pid", "process.parent.pid"]
 #      match_source: true
 #      match_source_index: 4
 #      match_short_id: false

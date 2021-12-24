@@ -131,7 +131,8 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 // Run runs the input
 func (in *awsCloudWatchInput) Run() {
 	// Please see https://docs.aws.amazon.com/general/latest/gr/cwl_region.html for more info on Amazon CloudWatch Logs endpoints.
-	cwConfig := awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, "logs", in.config.RegionName, in.awsConfig)
+	logsServiceName := awscommon.CreateServiceName("logs", in.config.AwsConfig.FIPSEnabled, in.config.RegionName)
+	cwConfig := awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, logsServiceName, in.config.RegionName, in.awsConfig)
 	svc := cloudwatchlogs.New(cwConfig)
 
 	var logGroupNames []string
@@ -222,7 +223,7 @@ func (in *awsCloudWatchInput) getLogGroupNames(svc cloudwatchlogsiface.ClientAPI
 // getLogEventsFromCloudWatch uses FilterLogEvents API to collect logs from CloudWatch
 func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface.ClientAPI) error {
 	currentTime := time.Now()
-	startTime, endTime := getStartPosition(in.config.StartPosition, currentTime, in.prevEndTime, in.config.ScanFrequency)
+	startTime, endTime := getStartPosition(in.config.StartPosition, currentTime, in.prevEndTime, in.config.ScanFrequency, in.config.Latency)
 	in.logger.Debugf("start_position = %s, startTime = %v, endTime = %v", in.config.StartPosition, time.Unix(startTime/1000, 0), time.Unix(endTime/1000, 0))
 
 	// overwrite prevEndTime using new endTime
@@ -274,7 +275,12 @@ func (in *awsCloudWatchInput) constructFilterLogEventsInput(startTime int64, end
 	return filterLogEventsInput
 }
 
-func getStartPosition(startPosition string, currentTime time.Time, prevEndTime int64, scanFrequency time.Duration) (startTime int64, endTime int64) {
+func getStartPosition(startPosition string, currentTime time.Time, prevEndTime int64, scanFrequency time.Duration, latency time.Duration) (startTime int64, endTime int64) {
+	if latency != 0 {
+		// add latency if config is not 0
+		currentTime = currentTime.Add(latency * -1)
+	}
+
 	switch startPosition {
 	case "beginning":
 		if prevEndTime != int64(0) {

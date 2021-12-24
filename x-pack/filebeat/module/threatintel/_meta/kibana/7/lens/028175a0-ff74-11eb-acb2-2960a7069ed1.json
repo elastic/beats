@@ -28,7 +28,7 @@
                                         "size": 5
                                     },
                                     "scale": "ordinal",
-                                    "sourceField": "threatintel.indicator.provider"
+                                    "sourceField": "threat.indicator.provider"
                                 },
                                 "11576d1f-5400-4a71-bf04-681099e755d5": {
                                     "dataType": "number",

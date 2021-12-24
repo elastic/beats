@@ -11,7 +11,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "SYSDBA",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -30,7 +29,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "SYSDBA"
     },
     {
         "@timestamp": "2020-10-07T17:05:33.000Z",
@@ -44,7 +44,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "SYSDBA",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -63,7 +62,8 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "SYSDBA"
     },
     {
         "@timestamp": "2020-10-07T17:05:42.000Z",
@@ -77,7 +77,6 @@
         "event.timezone": "-04:00",
         "event.type": "access",
         "fileset.name": "database_audit",
-        "host.user.roles": "SYSDBA",
         "input.type": "log",
         "log.flags": [
             "multiline"
@@ -97,6 +96,7 @@
         "service.type": "oracle",
         "tags": [
             "oracle-database-audit"
-        ]
+        ],
+        "user.roles": "SYSDBA"
     }
 ]

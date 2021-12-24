@@ -72,6 +72,14 @@ type ProcMeta struct {
 	Error              string
 }
 
+// ProcPProf returns pprof data for a process.
+type ProcPProf struct {
+	Name     string
+	RouteKey string
+	Result   []byte
+	Error    string
+}
+
 // AgentStatus is the current status of the Elastic Agent.
 type AgentStatus struct {
 	Status       Status
@@ -95,6 +103,8 @@ type Client interface {
 	Upgrade(ctx context.Context, version string, sourceURI string) (string, error)
 	// ProcMeta gathers running process meta-data.
 	ProcMeta(ctx context.Context) ([]ProcMeta, error)
+	// Pprof gathers data from the /debug/pprof/ endpoints specified.
+	Pprof(ctx context.Context, d time.Duration, pprofTypes []proto.PprofOption, appName, routeKey string) (map[string][]ProcPProf, error)
 }
 
 // client manages the state and communication to the Elastic Agent.
@@ -246,4 +256,30 @@ func (c *client) ProcMeta(ctx context.Context) ([]ProcMeta, error) {
 		procMeta = append(procMeta, meta)
 	}
 	return procMeta, nil
+}
+
+// Pprof gathers /debug/pprof data and returns a map of pprof-type: ProcPProf data
+func (c *client) Pprof(ctx context.Context, d time.Duration, pprofTypes []proto.PprofOption, appName, routeKey string) (map[string][]ProcPProf, error) {
+	resp, err := c.client.Pprof(ctx, &proto.PprofRequest{
+		PprofType:     pprofTypes,
+		TraceDuration: d.String(),
+		AppName:       appName,
+		RouteKey:      routeKey,
+	})
+	if err != nil {
+		return nil, err
+	}
+	res := map[string][]ProcPProf{}
+	for _, pType := range pprofTypes {
+		res[pType.String()] = make([]ProcPProf, 0)
+	}
+	for _, r := range resp.Results {
+		res[r.PprofType.String()] = append(res[r.PprofType.String()], ProcPProf{
+			Name:     r.AppName,
+			RouteKey: r.RouteKey,
+			Result:   r.Result,
+			Error:    r.Error,
+		})
+	}
+	return res, nil
 }

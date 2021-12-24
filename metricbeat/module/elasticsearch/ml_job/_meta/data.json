@@ -2,27 +2,28 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "elasticsearch": {
         "cluster": {
-            "id": "8l_zoGznQRmtoX9iSC-goA",
+            "id": "WocBBA0QRma0sGpdQ7vLfQ",
             "name": "docker-cluster"
         },
         "ml": {
             "job": {
                 "data_counts": {
                     "invalid_date_count": 0,
-                    "processed_record_count": 1216
+                    "processed_record_count": 0
                 },
                 "forecasts_stats": {
-                    "total": 1
+                    "total": 0
                 },
-                "id": "low_request_rate",
+                "id": "total-requests",
                 "model_size": {
                     "memory_status": "ok"
                 },
-                "state": "opened"
+                "state": "closed"
             }
         },
         "node": {
-            "id": "a14cf47ef7f2"
+            "id": "27fb1c2fd783",
+            "name": "node-1"
         }
     },
     "event": {
@@ -35,7 +36,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:38585",
+        "address": "172.19.0.2:9200",
         "name": "elasticsearch",
         "type": "elasticsearch"
     }

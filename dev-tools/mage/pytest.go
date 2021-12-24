@@ -41,7 +41,8 @@ import (
 // to point to somewhere on C:\.
 
 const (
-	libbeatRequirements = "{{ elastic_beats_dir}}/libbeat/tests/system/requirements.txt"
+	libbeatRequirements    = "{{ elastic_beats_dir}}/libbeat/tests/system/requirements.txt"
+	aixLibbeatRequirements = "{{ elastic_beats_dir}}/libbeat/tests/system/requirements_aix.txt"
 )
 
 var (
@@ -199,11 +200,12 @@ func PythonVirtualenv() (string, error) {
 	pythonVirtualenvLock.Lock()
 	defer pythonVirtualenvLock.Unlock()
 
-	// When upgrading pip we might run into an error with the cryptography package
-	// (pip dependency) will not compile if no recent rust development environment is available.
-	// We set `CRYPTOGRAPHY_DONT_BUILD_RUST=1`, to disable the need for python.
-	// See: https://github.com/pyca/cryptography/issues/5771
-	os.Setenv("CRYPTOGRAPHY_DONT_BUILD_RUST", "1")
+	// Certain docker requirements simply won't build on AIX
+	// Skipping them here will obviously break the components that require docker-compose,
+	// But at least the components that don't require it will still run
+	if runtime.GOOS == "aix" {
+		VirtualenvReqs[0] = aixLibbeatRequirements
+	}
 
 	// Determine the location of the virtualenv.
 	ve, err := pythonVirtualenvPath()

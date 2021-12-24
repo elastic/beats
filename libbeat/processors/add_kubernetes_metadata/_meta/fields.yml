@@ -6,6 +6,7 @@
   anchor: kubernetes-processor
   fields:
     - name: kubernetes
+      default_field: true
       type: group
       fields:
         - name: pod.name
@@ -24,28 +25,9 @@
             Kubernetes Pod IP
 
         - name: namespace
-          type: group
-          fields:
-            - name: name
-              type: keyword
-              description: >
-                Kubernetes namespace name
-            - name: uuid
-              type: keyword
-              description: >
-                Kubernetes namespace uuid
-            - name: labels.*
-              type: object
-              object_type: keyword
-              object_type_mapping_type: "*"
-              description: >
-                Kubernetes namespace labels map
-            - name: annotations.*
-              type: object
-              object_type: keyword
-              object_type_mapping_type: "*"
-              description: >
-                Kubernetes namespace annotations map
+          type: keyword
+          description: >
+            Kubernetes namespace
 
         - name: node.name
           type: keyword

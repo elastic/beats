@@ -27,11 +27,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 func TestGetMemory(t *testing.T) {
-	mem, err := Get("")
+	mem, err := Get(resolve.NewTestResolver(""))
 
 	assert.NotNil(t, mem)
 	assert.NoError(t, err)
@@ -57,7 +58,7 @@ func TestGetSwap(t *testing.T) {
 		return //no load data on freebsd
 	}
 
-	mem, err := Get("")
+	mem, err := Get(resolve.NewTestResolver(""))
 
 	assert.NotNil(t, mem)
 	assert.NoError(t, err)
@@ -100,4 +101,25 @@ func TestActualMemPercentage(t *testing.T) {
 	m.fillPercentages()
 	assert.Equal(t, m.Actual.Used.Pct.ValueOr(0), 0.7143)
 
+}
+
+func TestMeminfoParse(t *testing.T) {
+	// Make sure we're manually calculating Actual correctly on linux
+	if runtime.GOOS == "linux" {
+		mem, err := Get(resolve.NewTestResolver("./oldkern"))
+		assert.NoError(t, err)
+
+		assert.Equal(t, uint64(27307106304), mem.Cached.ValueOr(0))
+		assert.Equal(t, uint64(52983070720), mem.Actual.Free.ValueOr(0))
+		assert.Equal(t, uint64(10137726976), mem.Actual.Used.Bytes.ValueOr(0))
+	}
+}
+
+func TestMeminfoPct(t *testing.T) {
+	if runtime.GOOS == "linux" {
+		memRaw, err := Get(resolve.NewTestResolver("./oldkern"))
+		assert.NoError(t, err)
+		assert.Equal(t, float64(0.1606), memRaw.Actual.Used.Pct.ValueOr(0))
+		assert.Equal(t, float64(0.5933), memRaw.Used.Pct.ValueOr(0))
+	}
 }

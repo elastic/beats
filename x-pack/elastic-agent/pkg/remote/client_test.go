@@ -160,58 +160,6 @@ func TestHTTPClient(t *testing.T) {
 		},
 	))
 
-	t.Run("Basic auth when credentials are valid", withServer(
-		func(t *testing.T) *http.ServeMux {
-			msg := `{ message: "hello" }`
-			mux := http.NewServeMux()
-			mux.HandleFunc("/echo-hello", basicAuthHandler(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(http.StatusOK)
-				fmt.Fprint(w, msg)
-			}, "hello", "world", "testing"))
-			return mux
-		}, func(t *testing.T, host string) {
-			cfg := config.MustNewConfigFrom(map[string]interface{}{
-				"username": "hello",
-				"password": "world",
-				"host":     host,
-			})
-
-			client, err := NewWithRawConfig(nil, cfg, nil)
-			require.NoError(t, err)
-			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
-			require.NoError(t, err)
-
-			body, err := ioutil.ReadAll(resp.Body)
-			require.NoError(t, err)
-			defer resp.Body.Close()
-			assert.Equal(t, `{ message: "hello" }`, string(body))
-		},
-	))
-
-	t.Run("Basic auth when credentials are invalid", withServer(
-		func(t *testing.T) *http.ServeMux {
-			msg := `{ message: "hello" }`
-			mux := http.NewServeMux()
-			mux.HandleFunc("/echo-hello", basicAuthHandler(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(http.StatusOK)
-				fmt.Fprint(w, msg)
-			}, "hello", "world", "testing"))
-			return mux
-		}, func(t *testing.T, host string) {
-			cfg := config.MustNewConfigFrom(map[string]interface{}{
-				"username": "bye",
-				"password": "world",
-				"host":     host,
-			})
-
-			client, err := NewWithRawConfig(nil, cfg, nil)
-			require.NoError(t, err)
-			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
-			require.NoError(t, err)
-			assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
-		},
-	))
-
 	t.Run("Custom user agent", withServer(
 		func(t *testing.T) *http.ServeMux {
 			msg := `{ message: "hello" }`
@@ -277,6 +225,33 @@ func TestHTTPClient(t *testing.T) {
 			}
 
 			assert.Equal(t, 1, len(debugger.messages))
+		},
+	))
+
+	t.Run("RequestId", withServer(
+		func(t *testing.T) *http.ServeMux {
+			msg := `{ message: "hello" }`
+			mux := http.NewServeMux()
+			mux.HandleFunc("/echo-hello", func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				fmt.Fprint(w, msg)
+				require.NotEmpty(t, r.Header.Get("X-Request-ID"))
+			})
+			return mux
+		}, func(t *testing.T, host string) {
+			cfg := config.MustNewConfigFrom(map[string]interface{}{
+				"host": host,
+			})
+
+			client, err := NewWithRawConfig(nil, cfg, nil)
+			require.NoError(t, err)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
+			require.NoError(t, err)
+
+			body, err := ioutil.ReadAll(resp.Body)
+			require.NoError(t, err)
+			defer resp.Body.Close()
+			assert.Equal(t, `{ message: "hello" }`, string(body))
 		},
 	))
 }
@@ -370,19 +345,6 @@ func withServer(m func(t *testing.T) *http.ServeMux, test func(t *testing.T, hos
 		s := httptest.NewServer(m(t))
 		defer s.Close()
 		test(t, s.Listener.Addr().String())
-	}
-}
-
-func basicAuthHandler(handler http.HandlerFunc, username, password, realm string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		u, p, ok := r.BasicAuth()
-
-		if !ok || u != username || p != password {
-			w.Header().Set("WWW-Authenticate", `Basic realm="`+realm+`"`)
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-		handler(w, r)
 	}
 }
 

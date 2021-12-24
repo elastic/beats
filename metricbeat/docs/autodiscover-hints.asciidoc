@@ -161,7 +161,7 @@ annotations:
 -------------------------------------------------------------------------------------
 
 The above configuration would spin up two metricbeat module configurations to ensure that the endpoint "/metrics/p1" is
-polled every 60s whereas the "/metrics" endpoint is polled every 60s.
+polled every 5s whereas the "/metrics" endpoint is polled every 60s.
 
 [float]
 =====  Namespace Defaults

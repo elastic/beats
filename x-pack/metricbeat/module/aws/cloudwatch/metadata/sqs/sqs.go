@@ -22,9 +22,10 @@ import (
 const metadataPrefix = "aws.sqs.queue"
 
 // AddMetadata adds metadata for SQS queues from a specific region
-func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, events map[string]mb.Event) map[string]mb.Event {
+func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) map[string]mb.Event {
+	sqsServiceName := awscommon.CreateServiceName("sqs", fips_enabled, regionName)
 	svc := sqs.New(awscommon.EnrichAWSConfigWithEndpoint(
-		endpoint, "sqs", regionName, awsConfig))
+		endpoint, sqsServiceName, regionName, awsConfig))
 
 	// Get queueUrls for each region
 	queueURLs, err := getQueueUrls(svc)
@@ -40,7 +41,7 @@ func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, ev
 		if _, ok := events[queueName]; !ok {
 			continue
 		}
-		events[queueName].RootFields.Put(metadataPrefix+"name", queueName)
+		events[queueName].RootFields.Put(metadataPrefix+".name", queueName)
 	}
 	return events
 }

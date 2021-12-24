@@ -71,9 +71,10 @@ func defaultConfig() Config {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	server    serverhelper.Server
-	processor *metricProcessor
-	mappings  map[string]StatsdMapping
+	server        serverhelper.Server
+	serverStarted bool
+	processor     *metricProcessor
+	mappings      map[string]StatsdMapping
 }
 
 // New create a new instance of the MetricSet
@@ -102,6 +103,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		mappings:      mappings,
 		processor:     processor,
 	}, nil
+}
+
+// Host returns the hostname or other module specific value that identifies a
+// specific host or service instance from which to collect metrics.
+func (b *MetricSet) Host() string {
+	return b.server.(*udp.UdpServer).GetHost()
 }
 
 func buildMappings(config []StatsdMapping) (map[string]StatsdMapping, error) {
@@ -185,13 +192,32 @@ func (m *MetricSet) getEvents() []*mb.Event {
 	return events
 }
 
+// ServerStart starts the underlying m.server
+func (m *MetricSet) ServerStart() {
+	if m.serverStarted {
+		return
+	}
+	m.server.Start()
+	m.serverStarted = true
+}
+
+// ServerStop stops the underlying m.server
+func (m *MetricSet) ServerStop() {
+	if !m.serverStarted {
+		return
+	}
+
+	m.server.Stop()
+	m.serverStarted = false
+}
+
 // Run method provides the module with a reporter with which events can be reported.
 func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	period := m.Module().Config().Period
 
 	// Start event watcher
-	m.server.Start()
-	defer m.server.Stop()
+	m.ServerStart()
+	defer m.ServerStop()
 
 	reportPeriod := time.NewTicker(period)
 	for {

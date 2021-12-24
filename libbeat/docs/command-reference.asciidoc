@@ -706,7 +706,8 @@ endif::[]
 
 *`--system.hostfs MOUNT_POINT`*::
 
-Specifies the mount point of the host's filesystem for use in monitoring a host.
+Specifies the mount point of the host's filesystem for use in monitoring a host. 
+This flag is depricated, and an alternate hostfs should be specified via the `hostfs` module config value.
 
 
 ifeval::["{beatname_lc}"=="packetbeat"]
@@ -801,16 +802,6 @@ ifdef::apm-server[]
 *`--pipelines`*::
 Registers the <<configuring-ingest-node,pipeline>> definitions set in `ingest/pipeline/definition.json`.
 endif::apm-server[]
-
-*`--template`*::
-deprecated:[7.2]
-Sets up the index template only.
-It is recommended to use `--index-management` instead.
-
-*`--ilm-policy`*::
-deprecated:[7.2]
-Sets up the index lifecycle management policy.
-It is recommended to use `--index-management` instead.
 
 {global-flags}
 

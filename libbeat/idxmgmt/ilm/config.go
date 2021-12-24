@@ -18,10 +18,6 @@
 package ilm
 
 import (
-	"fmt"
-	"strconv"
-	"strings"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -29,11 +25,9 @@ import (
 
 // Config is used for unpacking a common.Config.
 type Config struct {
-	Mode          Mode                     `config:"enabled"`
-	PolicyName    fmtstr.EventFormatString `config:"policy_name"`
-	PolicyFile    string                   `config:"policy_file"`
-	RolloverAlias fmtstr.EventFormatString `config:"rollover_alias"`
-	Pattern       string                   `config:"pattern"`
+	Enabled    bool                     `config:"enabled"`
+	PolicyName fmtstr.EventFormatString `config:"policy_name"`
+	PolicyFile string                   `config:"policy_file"`
 
 	// CheckExists can disable the check for an existing policy. Check required
 	// read_ilm privileges.  If check is disabled the policy will only be
@@ -43,22 +37,6 @@ type Config struct {
 	// Enable always overwrite policy mode. This required manage_ilm privileges.
 	Overwrite bool `config:"overwrite"`
 }
-
-//Mode is used for enumerating the ilm mode.
-type Mode uint8
-
-const (
-	//ModeAuto enum 'auto'
-	ModeAuto Mode = iota
-
-	//ModeEnabled enum 'true'
-	ModeEnabled
-
-	//ModeDisabled enum 'false'
-	ModeDisabled
-)
-
-const ilmDefaultPattern = "{now/d}-000001"
 
 // DefaultPolicy defines the default policy to be used if no custom policy is
 // configured.
@@ -79,47 +57,18 @@ var DefaultPolicy = common.MapStr{
 	},
 }
 
-//Unpack creates enumeration value true, false or auto
-func (m *Mode) Unpack(in string) error {
-	in = strings.ToLower(in)
-
-	if in == "auto" {
-		*m = ModeAuto
-		return nil
-	}
-
-	b, err := strconv.ParseBool(in)
-	if err != nil {
-		return fmt.Errorf("ilm.enabled` mode '%v' is invalid (try auto, true, false)", in)
-	}
-
-	if b {
-		*m = ModeEnabled
-	} else {
-		*m = ModeDisabled
-	}
-	return nil
-}
-
 //Validate verifies that expected config options are given and valid
 func (cfg *Config) Validate() error {
-	if cfg.RolloverAlias.IsEmpty() && cfg.Mode != ModeDisabled {
-		return fmt.Errorf("rollover_alias must be set when ILM is not disabled")
-	}
 	return nil
 }
 
 func defaultConfig(info beat.Info) Config {
-	name := info.Beat + "-%{[agent.version]}"
-	aliasFmt := fmtstr.MustCompileEvent(name)
 	policyFmt := fmtstr.MustCompileEvent(info.Beat)
 
 	return Config{
-		Mode:          ModeAuto,
-		PolicyName:    *policyFmt,
-		RolloverAlias: *aliasFmt,
-		Pattern:       ilmDefaultPattern,
-		PolicyFile:    "",
-		CheckExists:   true,
+		Enabled:     true,
+		PolicyName:  *policyFmt,
+		PolicyFile:  "",
+		CheckExists: true,
 	}
 }

@@ -54,7 +54,7 @@
   alias6: true
   alias: true
 
-- from: docker.container.labels # TODO: How to map these?
+- from: docker.container.labels  # TODO: How to map these?
   to: container.labels
   alias6: false
   alias: true
@@ -115,8 +115,8 @@
 
 - from: source
   to:
-    - log.file.path
-    - log.source.address
+  - log.file.path
+  - log.source.address
   alias: false
   beat: filebeat
 
@@ -428,7 +428,7 @@
   beat: filebeat
 
 - from: suricata.eve.timestamp
-  to: "@timestamp"
+  to: '@timestamp'
   alias: true
   beat: filebeat
 
@@ -476,7 +476,7 @@
   beat: filebeat
 
 - from: system.auth.timestamp
-  to: "@timestamp"
+  to: '@timestamp'
   alias: true
   beat: filebeat
 
@@ -1599,6 +1599,7 @@
   alias: true
   beat: metricbeat
 
+
 ### Redis
 
 - from: php_fpm.status.pid
@@ -1872,7 +1873,7 @@
 - from: method
   to: http.request.method
   alias: false
-  comment: Field is used by serveral protocols.
+  comment: Field is used by several protocols.
   beat: packetbeat
 
 - from: path
@@ -1883,7 +1884,7 @@
 - from: real_ip
   to: network.forwarded_ip
   alias: false
-  comment: Field is used by serveral protocols.
+  comment: Field is used by several protocols.
   beat: packetbeat
 
 ## MySQL
@@ -1891,7 +1892,7 @@
   to: status
   alias: false
   comment: >
-    Status reflects whether or not an error occured. Its values are either
+    Status reflects whether or not an error occurred. Its values are either
     OK or Error.
   beat: packetbeat
 
@@ -1952,20 +1953,6 @@
   to: url.port
   alias: true
   beat: heartbeat
-
-# Journalbeat
-- from: host.name
-  to: host.hostname
-  alias: false
-  beat: journalbeat
-  comment: This field should not be renamed as it would cause issue some Beats and Journalbeat does not have dashboards
-  # This field should not be renamed as it would cause issue some Beats and Journalbeat does not have dashboards
-  rename: false
-
-- from: read_timestamp
-  to: event.created
-  alias: true
-  beat: journalbeat
 
 ## Winlogbeat
 

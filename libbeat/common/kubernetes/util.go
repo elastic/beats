@@ -24,6 +24,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
@@ -65,7 +68,7 @@ func GetKubeConfigEnvironmentVariable() string {
 // GetKubernetesClient returns a kubernetes client. If inCluster is true, it returns an
 // in cluster configuration based on the secrets mounted in the Pod. If kubeConfig is passed,
 // it parses the config file to get the config required to build a client.
-func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
+func GetKubernetesClient(kubeconfig string, opt KubeClientOptions) (kubernetes.Interface, error) {
 	if kubeconfig == "" {
 		kubeconfig = GetKubeConfigEnvironmentVariable()
 	}
@@ -74,7 +77,8 @@ func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to build kube config due to error: %+v", err)
 	}
-
+	cfg.QPS = opt.QPS
+	cfg.Burst = opt.Burst
 	client, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("unable to build kubernetes clientset: %+v", err)
@@ -191,7 +195,7 @@ func discoverByMachineId(nd *DiscoverKubernetesNodeParams, ctx context.Context) 
 	return
 }
 
-//GetMachineID returns the machine-id
+// GetMachineID returns the machine-idadd_kubernetes_metadata/indexers_test.go
 // borrowed from machineID of cadvisor.
 func (hd *DefaultDiscoveryUtils) GetMachineID() string {
 	for _, file := range []string{
@@ -224,4 +228,110 @@ func InClusterNamespace() (string, error) {
 		return "", err
 	}
 	return strings.TrimSpace(string(data)), nil
+}
+
+type ContainerInPod struct {
+	ID      string
+	Runtime string
+	Spec    Container
+	Status  PodContainerStatus
+}
+
+// GetContainersInPod returns all the containers defined in a pod and their statuses.
+// It includes init and ephemeral containers.
+func GetContainersInPod(pod *Pod) []*ContainerInPod {
+	var containers []*ContainerInPod
+	for _, c := range pod.Spec.Containers {
+		containers = append(containers, &ContainerInPod{Spec: c})
+	}
+	for _, c := range pod.Spec.InitContainers {
+		containers = append(containers, &ContainerInPod{Spec: c})
+	}
+	for _, c := range pod.Spec.EphemeralContainers {
+		c := Container(c.EphemeralContainerCommon)
+		containers = append(containers, &ContainerInPod{Spec: c})
+	}
+
+	statuses := make(map[string]*PodContainerStatus)
+	mapStatuses := func(s []PodContainerStatus) {
+		for i := range s {
+			statuses[s[i].Name] = &s[i]
+		}
+	}
+	mapStatuses(pod.Status.ContainerStatuses)
+	mapStatuses(pod.Status.InitContainerStatuses)
+	mapStatuses(pod.Status.EphemeralContainerStatuses)
+	for _, c := range containers {
+		if s, ok := statuses[c.Spec.Name]; ok {
+			c.ID, c.Runtime = ContainerIDWithRuntime(*s)
+			c.Status = *s
+		}
+	}
+
+	return containers
+}
+
+// PodAnnotations returns the annotations in a pod
+func PodAnnotations(pod *Pod) common.MapStr {
+	annotations := common.MapStr{}
+	for k, v := range pod.GetObjectMeta().GetAnnotations() {
+		safemapstr.Put(annotations, k, v)
+	}
+	return annotations
+}
+
+// PodNamespaceAnnotations returns the annotations of the namespace of the pod
+func PodNamespaceAnnotations(pod *Pod, watcher Watcher) common.MapStr {
+	if watcher == nil {
+		return nil
+	}
+
+	rawNs, ok, err := watcher.Store().GetByKey(pod.Namespace)
+	if !ok || err != nil {
+		return nil
+	}
+
+	namespace, ok := rawNs.(*Namespace)
+	if !ok {
+		return nil
+	}
+
+	annotations := common.MapStr{}
+	for k, v := range namespace.GetAnnotations() {
+		safemapstr.Put(annotations, k, v)
+	}
+	return annotations
+}
+
+// PodTerminating returns true if a pod is marked for deletion or is in a phase beyond running.
+func PodTerminating(pod *Pod) bool {
+	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
+		return true
+	}
+
+	switch pod.Status.Phase {
+	case PodRunning, PodPending:
+	default:
+		return true
+	}
+
+	return false
+}
+
+// PodTerminated returns true if a pod is terminated, this method considers a
+// pod as terminated if none of its containers are running (or going to be running).
+func PodTerminated(pod *Pod, containers []*ContainerInPod) bool {
+	// Pod is not marked for termination, so it is not terminated.
+	if !PodTerminating(pod) {
+		return false
+	}
+
+	// If any container is running, the pod is not terminated yet.
+	for _, container := range containers {
+		if container.Status.State.Running != nil {
+			return false
+		}
+	}
+
+	return true
 }

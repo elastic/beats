@@ -18,12 +18,14 @@ pipeline {
     cron('H H(1-2) * * 0')
   }
   stages {
-    stage('Nighly beats builds') {
+    stage('Weekly beats builds') {
       steps {
         runBuild(quietPeriod: 0, job: 'Beats/beats/master')
-        runBuild(quietPeriod: 1000, job: 'Beats/beats/7.x')
-        // <minor> is an alias to be replaced with the latest release branch
-        runBuild(quietPeriod: 2000, job: 'Beats/beats/7.<minor>')
+        // This should be `current_8` bump.getCurrentMinorReleaseFor8
+        runBuild(quietPeriod: 1000, job: 'Beats/beats/8.0')
+        // This should be `current_7` bump.getCurrentMinorReleaseFor7 or
+        // `next_minor_7`  bump.getNextMinorReleaseFor7
+        runBuild(quietPeriod: 2000, job: 'Beats/beats/7.16')
       }
     }
   }
@@ -36,9 +38,5 @@ pipeline {
 
 def runBuild(Map args = [:]) {
   def jobName = args.job
-  if (jobName.contains('7.<minor>')) {
-    def parts = stackVersions.release().split('\\.')
-    jobName = args.job.replaceAll('<minor>', parts[1])
-  }
   build(quietPeriod: args.quietPeriod, job: jobName, parameters: [booleanParam(name: 'awsCloudTests', value: true)], wait: false, propagate: false)
 }

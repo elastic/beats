@@ -103,7 +103,7 @@ var (
 	})
 )
 
-func eventMapping(r mb.ReporterV2, content []byte) error {
+func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -123,7 +123,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		event.Error = elastic.MakeErrorForMissingField("cluster_uuid", elastic.Kibana)
 		return event.Error
 	}
-	event.ModuleFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
+	event.RootFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
 
 	// Set service ID
 	uuid, err := dataFields.GetValue("uuid")
@@ -167,6 +167,13 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	dataFields.Delete("kibana")
 
 	event.MetricSetFields = dataFields
+
+	// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+	// When using Agent, the index name is overwritten anyways.
+	if isXpack {
+		index := elastic.MakeXPackMonitoringIndexName(elastic.Kibana)
+		event.Index = index
+	}
 
 	r.Event(event)
 

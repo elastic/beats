@@ -77,6 +77,12 @@ func main() {
 	}
 	Headers["Elastic"] = string(content)
 
+	content, err = ioutil.ReadFile("ELASTIC-LICENSE-2.0-header.txt")
+	if err != nil {
+		panic("could not read Elastic License 2.0 license.")
+	}
+	Headers["Elasticv2"] = string(content)
+
 	var buf bytes.Buffer
 	Template.Execute(&buf, data{
 		License:  Headers["ASL2"],
