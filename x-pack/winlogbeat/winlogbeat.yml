@@ -121,8 +121,8 @@ output.elasticsearch:
   #username: "elastic"
   #password: "changeme"
 
-  # Pipeline to route events to security, sysmon or powershell pipelines
-  pipeline: "winlogbeat-%{[agent.version]}-default-default-routing"
+  # Pipeline to route events to security, sysmon, or powershell pipelines.
+  pipeline: "winlogbeat-%{[agent.version]}-routing"
 
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:

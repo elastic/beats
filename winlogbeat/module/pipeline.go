@@ -139,7 +139,7 @@ func readFile(filename string, info beat.Info) (p pipeline, err error) {
 		return pipeline{}, err
 	}
 	p = pipeline{
-		id:       fileset.FormatPipelineID(info.IndexPrefix, "default", "default", filename, info.Version),
+		id:       fileset.FormatPipelineID(info.IndexPrefix, "", "", filename, info.Version),
 		contents: updatedContent,
 	}
 	return p, nil
@@ -179,8 +179,8 @@ func applyTemplates(prefix string, version string, filename string, original []b
 	vars := map[string]interface{}{
 		"builtin": map[string]interface{}{
 			"prefix":      prefix,
-			"module":      "default",
-			"fileset":     "default",
+			"module":      "",
+			"fileset":     "",
 			"beatVersion": version,
 		},
 	}

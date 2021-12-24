@@ -12,4 +12,4 @@ output.elasticsearch:
   #password: "changeme"
 
   # Pipeline to route events to security, sysmon, or powershell pipelines.
-  pipeline: "winlogbeat-%{[agent.version]}-default-default-routing"
+  pipeline: "winlogbeat-%{[agent.version]}-routing"

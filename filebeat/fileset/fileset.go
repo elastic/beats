@@ -510,6 +510,9 @@ func FixYAMLMaps(elem interface{}) (_ interface{}, err error) {
 
 // FormatPipelineID generates the ID to be used for the pipeline ID in Elasticsearch
 func FormatPipelineID(prefix, module, fileset, path, version string) string {
+	if module == "" && fileset == "" {
+		return fmt.Sprintf("%s-%s-%s", prefix, version, removeExt(filepath.Base(path)))
+	}
 	return fmt.Sprintf("%s-%s-%s-%s-%s", prefix, version, module, fileset, removeExt(filepath.Base(path)))
 }
 
