@@ -35,11 +35,9 @@ func UserAgent(beatNameCapitalized string, additionalComments ...string) string 
 		version.Commit(),
 		version.BuildTime().String(),
 	}
-	if additionalComments != nil {
-		for _, val := range additionalComments {
-			if val != "" {
-				uaValues = append(uaValues, val)
-			}
+	for _, val := range additionalComments {
+		if val != "" {
+			uaValues = append(uaValues, val)
 		}
 	}
 	builder.WriteByte('(')
