@@ -25,7 +25,8 @@ pipeline {
         runBuild(quietPeriod: 1000, job: 'Beats/beats/8.0')
         // This should be `current_7` bump.getCurrentMinorReleaseFor7 or
         // `next_minor_7`  bump.getNextMinorReleaseFor7
-        runBuild(quietPeriod: 2000, job: 'Beats/beats/7.16')
+        runBuild(quietPeriod: 2000, job: 'Beats/beats/7.17')
+        runBuild(quietPeriod: 3000, job: 'Beats/beats/7.16')
       }
     }
   }
