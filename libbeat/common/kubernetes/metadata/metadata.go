@@ -72,11 +72,12 @@ func WithFields(key string, value interface{}) FieldOptions {
 	}
 }
 
-// WithLabels FieldOption allows adding labels under sub-resource(kind)
+// WithMetadata FieldOption allows adding labels and annotations under sub-resource(kind)
 // example if kind=namespace namespace.labels key will be added
-func WithLabels(kind string) FieldOptions {
+func WithMetadata(kind string) FieldOptions {
 	return func(meta common.MapStr) {
 		safemapstr.Put(meta, strings.ToLower(kind)+".labels", meta["labels"])
+		safemapstr.Put(meta, strings.ToLower(kind)+".annotations", meta["annotations"])
 	}
 }
 

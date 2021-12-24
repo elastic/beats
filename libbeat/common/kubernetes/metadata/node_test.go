@@ -52,7 +52,10 @@ func TestNode_Generate(t *testing.T) {
 					Labels: map[string]string{
 						"foo": "bar",
 					},
-					Annotations: map[string]string{},
+					Annotations: map[string]string{
+						"key1": "value1",
+						"key2": "value2",
+					},
 				},
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "Node",
@@ -71,12 +74,18 @@ func TestNode_Generate(t *testing.T) {
 				"labels": common.MapStr{
 					"foo": "bar",
 				},
+				"annotations": common.MapStr{
+					"key2": "value2",
+				},
 			}},
 		},
 	}
 
-	cfg := common.NewConfig()
-	metagen := NewNodeMetadataGenerator(cfg, nil, client)
+	// cfg := common.NewConfig()
+	nodeConfig, _ := common.NewConfigFrom(map[string]interface{}{
+		"include_annotations": []string{"key1"},
+	})
+	metagen := NewNodeMetadataGenerator(nodeConfig, nil, client)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
@@ -102,7 +111,9 @@ func TestNode_GenerateFromName(t *testing.T) {
 					Labels: map[string]string{
 						"foo": "bar",
 					},
-					Annotations: map[string]string{},
+					Annotations: map[string]string{
+						"key": "value",
+					},
 				},
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "Node",
@@ -121,15 +132,21 @@ func TestNode_GenerateFromName(t *testing.T) {
 				"labels": common.MapStr{
 					"foo": "bar",
 				},
+				"annotations": common.MapStr{
+					"key": "value",
+				},
 			},
 		},
 	}
 
 	for _, test := range tests {
-		cfg := common.NewConfig()
+		// cfg := common.NewConfig()
+		nodeConfig, _ := common.NewConfigFrom(map[string]interface{}{
+			"include_annotations": []string{"key"},
+		})
 		nodes := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		nodes.Add(test.input)
-		metagen := NewNodeMetadataGenerator(cfg, nodes, client)
+		metagen := NewNodeMetadataGenerator(nodeConfig, nodes, client)
 
 		accessor, err := meta.Accessor(test.input)
 		require.NoError(t, err)

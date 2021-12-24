@@ -737,7 +737,9 @@ func TestPod_GenerateWithNodeNamespaceWithAddResourceConfig(t *testing.T) {
 						"nodekey":  "nodevalue",
 						"nodekey2": "nodevalue2",
 					},
-					Annotations: map[string]string{},
+					Annotations: map[string]string{
+						"node.annotation": "node.value",
+					},
 				},
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "Node",
@@ -755,7 +757,9 @@ func TestPod_GenerateWithNodeNamespaceWithAddResourceConfig(t *testing.T) {
 						"app.kubernetes.io/name": "kube-state-metrics",
 						"nskey2":                 "nsvalue2",
 					},
-					Annotations: map[string]string{},
+					Annotations: map[string]string{
+						"ns.annotation": "ns.value",
+					},
 				},
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "Namespace",
@@ -773,6 +777,9 @@ func TestPod_GenerateWithNodeNamespaceWithAddResourceConfig(t *testing.T) {
 				"namespace_labels": common.MapStr{
 					"app_kubernetes_io/name": "kube-state-metrics",
 				},
+				"namespace_annotations": common.MapStr{
+					"ns_annotation": "ns.value",
+				},
 				"node": common.MapStr{
 					"name": "testnode",
 					"uid":  uid,
@@ -780,6 +787,9 @@ func TestPod_GenerateWithNodeNamespaceWithAddResourceConfig(t *testing.T) {
 						"nodekey2": "nodevalue2",
 					},
 					"hostname": "node1",
+					"annotations": common.MapStr{
+						"node_annotation": "node.value",
+					},
 				},
 				"labels": common.MapStr{
 					"app_kubernetes_io/component": "exporter",
@@ -802,10 +812,12 @@ func TestPod_GenerateWithNodeNamespaceWithAddResourceConfig(t *testing.T) {
 		assert.NoError(t, err)
 
 		namespaceConfig, _ := common.NewConfigFrom(map[string]interface{}{
-			"include_labels": []string{"app.kubernetes.io/name"},
+			"include_labels":      []string{"app.kubernetes.io/name"},
+			"include_annotations": []string{"ns.annotation"},
 		})
 		nodeConfig, _ := common.NewConfigFrom(map[string]interface{}{
-			"include_labels": []string{"nodekey2"},
+			"include_labels":      []string{"nodekey2"},
+			"include_annotations": []string{"node.annotation"},
 		})
 		metaConfig := AddResourceMetadataConfig{
 			Namespace:  namespaceConfig,
