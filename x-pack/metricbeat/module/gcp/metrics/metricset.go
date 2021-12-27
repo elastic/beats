@@ -165,6 +165,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
 	for _, sdc := range m.MetricsConfig {
 		m.Logger().Debugf("metrics config: %v", sdc)
+		// m.metricsMeta contains all metrics to be collected, not just the one in the current MetricsConfig.
+		// this loop filters the metrics in metricsMeta so requester.Metrics can collect only the appropriate
+		// ones.
+		// See https://github.com/elastic/beats/pull/29514
 		metricsToCollect := map[string]metricMeta{}
 		for _, v := range sdc.MetricTypes {
 			metricsToCollect[sdc.AddPrefixTo(v)] = m.metricsMeta[sdc.AddPrefixTo(v)]
