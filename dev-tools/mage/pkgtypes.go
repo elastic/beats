@@ -436,12 +436,12 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 			}
 
 			f.Source = filepath.Join(s.packageDir, filepath.Base(f.Target))
-			if err = ioutil.WriteFile(createDir(f.Source), []byte(content), 0644); err != nil {
+			if err = ioutil.WriteFile(CreateDir(f.Source), []byte(content), 0644); err != nil {
 				panic(errors.Wrapf(err, "failed to write file containing content for target=%v", target))
 			}
 		case f.Template != "":
 			f.Source = filepath.Join(s.packageDir, filepath.Base(f.Template))
-			if err := s.ExpandFile(f.Template, createDir(f.Source)); err != nil {
+			if err := s.ExpandFile(f.Template, CreateDir(f.Source)); err != nil {
 				panic(errors.Wrapf(err, "failed to expand template file for target=%v", target))
 			}
 		default:
@@ -579,7 +579,7 @@ func PackageZip(spec PackageSpec) error {
 	spec.OutputFile = Zip.AddFileExtension(spec.OutputFile)
 
 	// Write the zip file.
-	if err := ioutil.WriteFile(createDir(spec.OutputFile), buf.Bytes(), 0644); err != nil {
+	if err := ioutil.WriteFile(CreateDir(spec.OutputFile), buf.Bytes(), 0644); err != nil {
 		return errors.Wrap(err, "failed to write zip file")
 	}
 
@@ -645,7 +645,7 @@ func PackageTarGz(spec PackageSpec) error {
 
 	// Open the output file.
 	log.Println("Creating output file at", spec.OutputFile)
-	outFile, err := os.Create(createDir(spec.OutputFile))
+	outFile, err := os.Create(CreateDir(spec.OutputFile))
 	if err != nil {
 		return err
 	}
