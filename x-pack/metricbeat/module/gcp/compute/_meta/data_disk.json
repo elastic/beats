@@ -2,16 +2,19 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloud": {
         "account": {
-            "id": "elastic-apm",
-            "name": "elastic-apm"
+            "id": "elastic-obs-integrations-dev",
+            "name": "elastic-obs-integrations-dev"
         },
         "instance": {
-            "id": "4281532529829668842",
-            "name": "synthetics-service"
+            "id": "4751091017865185079",
+            "name": "gke-cluster-1-default-pool-6617a8aa-5clh"
+        },
+        "machine": {
+            "type": "e2-medium"
         },
         "provider": "gcp"
     },
-    "cloud.availability_zone": "us-central1-a",
+    "cloud.availability_zone": "us-central1-c",
     "cloud.region": "us-central1",
     "event": {
         "dataset": "gcp.compute",
@@ -22,40 +25,35 @@
         "compute": {
             "instance": {
                 "disk": {
-                    "read_bytes_count": {
-                        "value": 0
+                    "read": {
+                        "bytes": 0
                     },
                     "read_ops_count": {
                         "value": 0
                     },
-                    "write_bytes_count": {
-                        "value": 0
+                    "write": {
+                        "bytes": 188360
                     },
                     "write_ops_count": {
-                        "value": 0
+                        "value": 31
                     }
                 }
             }
         },
         "labels": {
             "metrics": {
-                "device_name": "synthetics-service",
+                "device_name": "gke-cluster-1-default-pool-6617a8aa-5clh",
                 "device_type": "permanent",
-                "storage_type": "pd-balanced"
+                "storage_type": "pd-standard"
+            },
+            "user": {
+                "goog-gke-node": ""
             }
         }
     },
     "host": {
-        "disk": {
-            "read": {
-                "bytes": 0
-            },
-            "write": {
-                "bytes": 0
-            }
-        },
-        "id": "4281532529829668842",
-        "name": "synthetics-service"
+        "id": "4751091017865185079",
+        "name": "gke-cluster-1-default-pool-6617a8aa-5clh"
     },
     "metricset": {
         "name": "compute",

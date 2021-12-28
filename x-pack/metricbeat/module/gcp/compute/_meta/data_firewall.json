@@ -2,17 +2,20 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloud": {
         "account": {
-            "id": "elastic-observability",
-            "name": "elastic-observability"
+            "id": "elastic-obs-integrations-dev",
+            "name": "elastic-obs-integrations-dev"
         },
         "instance": {
-            "id": "8825965883407652424",
-            "name": "heartbeat-los-angeles"
+            "id": "4751091017865185079",
+            "name": "gke-cluster-1-default-pool-6617a8aa-5clh"
+        },
+        "machine": {
+            "type": "e2-medium"
         },
         "provider": "gcp"
     },
-    "cloud.availability_zone": "us-west2-a",
-    "cloud.region": "us-west2",
+    "cloud.availability_zone": "us-central1-c",
+    "cloud.region": "us-central1",
     "event": {
         "dataset": "gcp.compute",
         "duration": 115000,
@@ -21,38 +24,55 @@
     "gcp": {
         "compute": {
             "firewall": {
-                "dropped_bytes_count": {
-                    "value": 1048
+                "dropped": {
+                    "bytes": 421
                 },
                 "dropped_packets_count": {
-                    "value": 11
+                    "value": 4
                 }
             },
             "instance": {
                 "cpu": {
                     "reserved_cores": {
-                        "value": 0.2
+                        "value": 1
+                    },
+                    "usage": {
+                        "pct": 0.07259952346383708
                     },
                     "usage_time": {
-                        "value": 0.6634917643386871
-                    },
-                    "utilization": {
-                        "value": 0.05529098036155725
+                        "sec": 4.355971407830225
+                    }
+                },
+                "memory": {
+                    "balloon": {
+                        "ram_size": {
+                            "value": 4128378880
+                        },
+                        "ram_used": {
+                            "value": 2190848000
+                        },
+                        "swap_in": {
+                            "bytes": 0
+                        },
+                        "swap_out": {
+                            "bytes": 0
+                        }
                     }
                 },
                 "uptime": {
-                    "value": 60
+                    "sec": 60.00000000000091
                 }
             }
         },
-        "labels": {}
+        "labels": {
+            "user": {
+                "goog-gke-node": ""
+            }
+        }
     },
     "host": {
-        "cpu": {
-            "usage": 0.05529098036155725
-        },
-        "id": "8825965883407652424",
-        "name": "heartbeat-los-angeles"
+        "id": "4751091017865185079",
+        "name": "gke-cluster-1-default-pool-6617a8aa-5clh"
     },
     "metricset": {
         "name": "compute",

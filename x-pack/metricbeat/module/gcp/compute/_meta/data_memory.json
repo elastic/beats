@@ -2,19 +2,19 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloud": {
         "account": {
-            "id": "elastic-observability",
-            "name": "elastic-observability"
+            "id": "elastic-obs-integrations-dev",
+            "name": "elastic-obs-integrations-dev"
         },
         "instance": {
-            "id": "5754458766588945165",
-            "name": "ks-instance1"
+            "id": "6420544719921039159",
+            "name": "gke-cluster-1-default-pool-6617a8aa-gg9b"
         },
         "machine": {
-            "type": "e2-micro"
+            "type": "e2-medium"
         },
         "provider": "gcp"
     },
-    "cloud.availability_zone": "us-central1-a",
+    "cloud.availability_zone": "us-central1-c",
     "cloud.region": "us-central1",
     "event": {
         "dataset": "gcp.compute",
@@ -24,11 +24,11 @@
     "gcp": {
         "compute": {
             "firewall": {
-                "dropped_bytes_count": {
-                    "value": 838
+                "dropped": {
+                    "bytes": 244
                 },
                 "dropped_packets_count": {
-                    "value": 7
+                    "value": 4
                 }
             },
             "instance": {
@@ -36,46 +36,43 @@
                     "reserved_cores": {
                         "value": 1
                     },
-                    "usage_time": {
-                        "value": 3.7590914278189302
+                    "usage": {
+                        "pct": 0.09843307610429974
                     },
-                    "utilization": {
-                        "value": 0.06265152379698218
+                    "usage_time": {
+                        "sec": 5.905984566257985
                     }
                 },
                 "memory": {
                     "balloon": {
                         "ram_size": {
-                            "value": 4140253184
+                            "value": 4128387072
                         },
                         "ram_used": {
-                            "value": 841588736
+                            "value": 2110885888
                         },
-                        "swap_in_bytes_count": {
-                            "value": 0
+                        "swap_in": {
+                            "bytes": 0
                         },
-                        "swap_out_bytes_count": {
-                            "value": 0
+                        "swap_out": {
+                            "bytes": 0
                         }
                     }
                 },
                 "uptime": {
-                    "value": 60.00000000023283
+                    "sec": 60
                 }
             }
         },
         "labels": {
             "user": {
-                "created-by": "ks"
+                "goog-gke-node": ""
             }
         }
     },
     "host": {
-        "cpu": {
-            "pct": 0.06265152379698218
-        },
-        "id": "5754458766588945165",
-        "name": "ks-instance1"
+        "id": "6420544719921039159",
+        "name": "gke-cluster-1-default-pool-6617a8aa-gg9b"
     },
     "metricset": {
         "name": "compute",

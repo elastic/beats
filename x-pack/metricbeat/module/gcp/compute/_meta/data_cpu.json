@@ -2,12 +2,15 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloud": {
         "account": {
-            "id": "elastic-observability",
-            "name": "elastic-observability"
+            "id": "elastic-obs-integrations-dev",
+            "name": "elastic-obs-integrations-dev"
         },
         "instance": {
-            "id": "7206859884978665190",
-            "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-rt8n"
+            "id": "4751091017865185079",
+            "name": "gke-cluster-1-default-pool-6617a8aa-5clh"
+        },
+        "machine": {
+            "type": "e2-medium"
         },
         "provider": "gcp"
     },
@@ -21,38 +24,55 @@
     "gcp": {
         "compute": {
             "firewall": {
-                "dropped_bytes_count": {
-                    "value": 409
+                "dropped": {
+                    "bytes": 421
                 },
                 "dropped_packets_count": {
-                    "value": 7
+                    "value": 4
                 }
             },
             "instance": {
                 "cpu": {
                     "reserved_cores": {
-                        "value": 4
+                        "value": 1
+                    },
+                    "usage": {
+                        "pct": 0.07259952346383708
                     },
                     "usage_time": {
-                        "value": 20.02221798910068
-                    },
-                    "utilization": {
-                        "value": 0.0834259082879195
+                        "sec": 4.355971407830225
+                    }
+                },
+                "memory": {
+                    "balloon": {
+                        "ram_size": {
+                            "value": 4128378880
+                        },
+                        "ram_used": {
+                            "value": 2190848000
+                        },
+                        "swap_in": {
+                            "bytes": 0
+                        },
+                        "swap_out": {
+                            "bytes": 0
+                        }
                     }
                 },
                 "uptime": {
-                    "value": 60
+                    "sec": 60.00000000000091
                 }
             }
         },
-        "labels": {}
+        "labels": {
+            "user": {
+                "goog-gke-node": ""
+            }
+        }
     },
     "host": {
-        "cpu": {
-            "usage": 0.0834259082879195
-        },
-        "id": "7206859884978665190",
-        "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-rt8n"
+        "id": "4751091017865185079",
+        "name": "gke-cluster-1-default-pool-6617a8aa-5clh"
     },
     "metricset": {
         "name": "compute",

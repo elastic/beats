@@ -2,12 +2,15 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloud": {
         "account": {
-            "id": "elastic-observability",
-            "name": "elastic-observability"
+            "id": "elastic-obs-integrations-dev",
+            "name": "elastic-obs-integrations-dev"
         },
         "instance": {
-            "id": "1113015278728017638",
-            "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-58mx"
+            "id": "4751091017865185079",
+            "name": "gke-cluster-1-default-pool-6617a8aa-5clh"
+        },
+        "machine": {
+            "type": "e2-medium"
         },
         "provider": "gcp"
     },
@@ -22,40 +25,33 @@
         "compute": {
             "instance": {
                 "network": {
-                    "received_bytes_count": {
-                        "value": 9519
+                    "egress": {
+                        "bytes": 305306,
+                        "packets": {
+                            "count": 614
+                        }
                     },
-                    "received_packets_count": {
-                        "value": 134
-                    },
-                    "sent_bytes_count": {
-                        "value": 0
-                    },
-                    "sent_packets_count": {
-                        "value": 0
+                    "ingress": {
+                        "bytes": 242536,
+                        "packets": {
+                            "count": 593
+                        }
                     }
                 }
             }
         },
         "labels": {
             "metrics": {
-                "loadbalanced": "true"
+                "loadbalanced": "false"
+            },
+            "user": {
+                "goog-gke-node": ""
             }
         }
     },
     "host": {
-        "id": "1113015278728017638",
-        "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-58mx",
-        "network": {
-            "egress": {
-                "bytes": 9519,
-                "packets": 134
-            },
-            "ingress": {
-                "bytes": 0,
-                "packets": 0
-            }
-        }
+        "id": "4751091017865185079",
+        "name": "gke-cluster-1-default-pool-6617a8aa-5clh"
     },
     "metricset": {
         "name": "compute",

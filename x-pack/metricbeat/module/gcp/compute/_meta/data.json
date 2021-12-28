@@ -2,12 +2,15 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloud": {
         "account": {
-            "id": "elastic-observability",
-            "name": "elastic-observability"
+            "id": "elastic-obs-integrations-dev",
+            "name": "elastic-obs-integrations-dev"
         },
         "instance": {
-            "id": "1113015278728017638",
-            "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-58mx"
+            "id": "5015840966723454775",
+            "name": "gke-cluster-1-default-pool-6617a8aa-x9hp"
+        },
+        "machine": {
+            "type": "e2-medium"
         },
         "provider": "gcp"
     },
@@ -22,40 +25,35 @@
         "compute": {
             "instance": {
                 "disk": {
-                    "read_bytes_count": {
-                        "value": 989296850
+                    "read": {
+                        "bytes": 0
                     },
                     "read_ops_count": {
-                        "value": 14862
+                        "value": 0
                     },
-                    "write_bytes_count": {
-                        "value": 1323095
+                    "write": {
+                        "bytes": 301312
                     },
                     "write_ops_count": {
-                        "value": 105
+                        "value": 56
                     }
                 }
             }
         },
         "labels": {
             "metrics": {
-                "device_name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-58mx",
+                "device_name": "gke-cluster-1-default-pool-6617a8aa-x9hp",
                 "device_type": "permanent",
                 "storage_type": "pd-standard"
+            },
+            "user": {
+                "goog-gke-node": ""
             }
         }
     },
     "host": {
-        "disk": {
-            "read": {
-                "bytes": 989296850
-            },
-            "write": {
-                "bytes": 1323095
-            }
-        },
-        "id": "1113015278728017638",
-        "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-58mx"
+        "id": "5015840966723454775",
+        "name": "gke-cluster-1-default-pool-6617a8aa-x9hp"
     },
     "metricset": {
         "name": "compute",
