@@ -76,6 +76,8 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 			je.checkGroup = makeUuid()
 			je.journey = se.Journey
 			je.start = event.Timestamp
+		case "cmd/status":
+			fallthrough
 		case "journey/end":
 			je.end = event.Timestamp
 		}
@@ -112,6 +114,9 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	}
 
 	switch se.Type {
+	case "cmd/status":
+		je.journeyComplete = false
+		return je.createSummary(event)
 	case "journey/end":
 		je.journeyComplete = true
 		return je.createSummary(event)
@@ -155,23 +160,24 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		down = 0
 	}
 
+	eventext.MergeEventFields(event, common.MapStr{
+		"url": je.urlFields,
+		"synthetics": common.MapStr{
+			"type":    "heartbeat/summary",
+			"journey": je.journey,
+		},
+		"monitor": common.MapStr{
+			"duration": common.MapStr{
+				"us": int64(je.end.Sub(je.start) / time.Microsecond),
+			},
+		},
+		"summary": common.MapStr{
+			"up":   up,
+			"down": down,
+		},
+	})
+
 	if je.journeyComplete {
-		eventext.MergeEventFields(event, common.MapStr{
-			"url": je.urlFields,
-			"synthetics": common.MapStr{
-				"type":    "heartbeat/summary",
-				"journey": je.journey,
-			},
-			"monitor": common.MapStr{
-				"duration": common.MapStr{
-					"us": int64(je.end.Sub(je.start) / time.Microsecond),
-				},
-			},
-			"summary": common.MapStr{
-				"up":   up,
-				"down": down,
-			},
-		})
 		return je.firstError
 	}
 

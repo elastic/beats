@@ -122,6 +122,24 @@ func TestEnrichSynthEvent(t *testing.T) {
 		check   func(t *testing.T, e *beat.Event, je *journeyEnricher)
 	}{
 		{
+			"cmd/status",
+			&journeyEnricher{},
+			&SynthEvent{
+				Type:  "cmd/status",
+				Error: &SynthError{Name: "cmdexit", Message: "cmd err msg"},
+			},
+			true,
+			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
+				v := lookslike.MustCompile(map[string]interface{}{
+					"summary": map[string]int{
+						"up":   0,
+						"down": 1,
+					},
+				})
+				testslike.Test(t, v, e.Fields)
+			},
+		},
+		{
 			"journey/end",
 			&journeyEnricher{},
 			&SynthEvent{Type: "journey/end"},
