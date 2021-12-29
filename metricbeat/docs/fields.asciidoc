@@ -46325,6 +46325,13 @@ alias to: logstash.node.state.pipeline.hash
 --
 
 
+*`logstash.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
+
 [float]
 === node
 
