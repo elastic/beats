@@ -328,16 +328,21 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 	return run(streams, logToStderr)
 }
 
+// TokenResp is used to decode a response for generating a service token
 type TokenResp struct {
 	Created bool    `json:"created"`
 	Token   TokenKV `json:"token"`
 }
 
+// TokenKV contains the name and value of a service token
 type TokenKV struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
 }
 
+// ensureServiceToken will ensure that the cfg specified has the service_token attributes filled.
+//
+// If no token is specified it will use the elasticsearch username/password to request a new token from elasticsearch.
 func ensureServiceToken(streams *cli.IOStreams, cfg *setupConfig) error {
 	// There's already a service token
 	if cfg.Kibana.Fleet.ServiceToken != "" || cfg.FleetServer.Elasticsearch.ServiceToken != "" {
