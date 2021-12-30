@@ -43,6 +43,8 @@ type elasticsearchConfig struct {
 	CA                   string `config:"ca"`
 	CATrustedFingerprint string `config:"ca_trusted_fingerprint"`
 	Host                 string `config:"host"`
+	Username             string `config:"username"`
+	Password             string `config:"password"`
 	ServiceToken         string `config:"service_token"`
 	Insecure             bool   `config:"insecure"`
 }
@@ -89,6 +91,8 @@ func defaultAccessConfig() (setupConfig, error) {
 			CertKey: envWithDefault("", "FLEET_SERVER_CERT_KEY"),
 			Elasticsearch: elasticsearchConfig{
 				Host:                 envWithDefault("http://elasticsearch:9200", "FLEET_SERVER_ELASTICSEARCH_HOST", "ELASTICSEARCH_HOST"),
+				Username:             envWithDefault("elastic", "FLEET_SERVER_ELASTICSEARCH_USERNAME", "ELASTICSEARCH_USERNAME"),
+				Password:             envWithDefault("changeme", "FLEET_SERVER_ELASTICSEARCH_PASSWORD", "ELASTICSEARCH_PASSWORD"),
 				ServiceToken:         envWithDefault("", "FLEET_SERVER_SERVICE_TOKEN"),
 				CA:                   envWithDefault("", "FLEET_SERVER_ELASTICSEARCH_CA", "ELASTICSEARCH_CA"),
 				CATrustedFingerprint: envWithDefault("", "FLEET_SERVER_ELASTICSEARCH_CA_TRUSTED_FINGERPRINT"),
@@ -104,10 +108,7 @@ func defaultAccessConfig() (setupConfig, error) {
 		},
 		Kibana: kibanaConfig{
 			Fleet: kibanaFleetConfig{
-				// Remove FLEET_SETUP in 8.x
-				// The FLEET_SETUP environment variable boolean is a fallback to the old name. The name was updated to
-				// reflect that its setting up Fleet in Kibana versus setting up Fleet Server.
-				Setup:        envBool("KIBANA_FLEET_SETUP", "FLEET_SETUP"),
+				Setup:        envBool("KIBANA_FLEET_SETUP"),
 				Host:         envWithDefault("http://kibana:5601", "KIBANA_FLEET_HOST", "KIBANA_HOST"),
 				ServiceToken: envWithDefault("", "KIBANA_FLEET_SERVICE_TOKEN", "FLEET_SERVER_SERVICE_TOKEN"),
 				CA:           envWithDefault("", "KIBANA_FLEET_CA", "KIBANA_CA", "ELASTICSEARCH_CA"),
