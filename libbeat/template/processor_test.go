@@ -727,6 +727,18 @@ func TestProcessDefaultField(t *testing.T) {
 				},
 			},
 		},
+		// Ensure that text_only_keyword fields can be added to default_field
+		mapping.Field{
+			Name:         "a_match_only_text_field",
+			Type:         "match_only_text",
+			DefaultField: &enableDefaultField,
+		},
+		// Ensure that wildcard fields can be added to default_field
+		mapping.Field{
+			Name:         "a_wildcard_field",
+			Type:         "wildcard",
+			DefaultField: &enableDefaultField,
+		},
 	}
 
 	version, err := common.NewVersion("7.0.0")
@@ -741,6 +753,8 @@ func TestProcessDefaultField(t *testing.T) {
 	}
 
 	expectedFields := []string{
+		"a_match_only_text_field",
+		"a_wildcard_field",
 		"bar",
 		"foo",
 		"nested.bar",
