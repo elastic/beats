@@ -18,6 +18,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/service"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
@@ -90,6 +91,7 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 		return err
 	}
 
+	cfg.Settings.LoggingConfig.Level = logp.DebugLevel
 	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig, true)
 	if err != nil {
 		return err
@@ -150,7 +152,11 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 	control.SetRouteFn(app.Routes)
 	control.SetMonitoringCfg(cfg.Settings.MonitoringConfig)
 
-	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS(), cfg.Settings.MonitoringConfig, app)
+	serverStopFn, err := setupMetrics(
+		agentInfo,
+		logger, cfg.Settings.DownloadConfig.OS(),
+		cfg.Settings.MonitoringConfig,
+		app)
 	if err != nil {
 		return err
 	}
@@ -326,7 +332,12 @@ func isProcessStatsEnabled(cfg *monitoringCfg.MonitoringHTTPConfig) bool {
 	return cfg != nil && cfg.Enabled
 }
 
-func tryDelayEnroll(ctx context.Context, logger *logger.Logger, cfg *configuration.Configuration, override cfgOverrider) (*configuration.Configuration, error) {
+func tryDelayEnroll(
+	ctx context.Context,
+	logger *logger.Logger,
+	cfg *configuration.Configuration,
+	override cfgOverrider) (*configuration.Configuration, error) {
+
 	enrollPath := paths.AgentEnrollFile()
 	if _, err := os.Stat(enrollPath); err != nil {
 		// no enrollment file exists or failed to stat it; nothing to do

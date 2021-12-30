@@ -14,6 +14,7 @@ import (
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -151,7 +152,16 @@ func (a *Application) Stop() {
 
 	if srvState != nil {
 		// signal stop through GRPC, wait and kill is performed later in gracefulKill
-		srvState.Stop(a.processConfig.StopTimeout)
+		if err := srvState.Stop(a.processConfig.StopTimeout); err != nil {
+			err := fmt.Errorf("failed to stop after %s: %w", a.processConfig.StopTimeout, err)
+			a.setState(
+				state.Failed,
+				err.Error(),
+				nil)
+
+			a.logger.Error(err)
+		}
+
 	}
 
 	a.appLock.Lock()
@@ -279,8 +289,13 @@ func (a *Application) gracefulKill(proc *process.Info) {
 		return
 	}
 
+	alog := logp.NewLogger("anderson")
+	alog.Infof("[gracefulKill][%s] invoked", a.Name())
+
 	// send stop signal to request stop
-	proc.Stop()
+	if err := proc.Stop(); err != nil {
+		a.logger.Error(fmt.Errorf("failed to stop %s: %w", a.Name(), err))
+	}
 
 	var wg sync.WaitGroup
 	doneChan := make(chan struct{})
@@ -290,6 +305,7 @@ func (a *Application) gracefulKill(proc *process.Info) {
 
 		if _, err := proc.Process.Wait(); err != nil {
 			// process is not a child - some OSs requires process to be child
+			alog.Infof("[gracefulKill][externalProcess][%s] closing it", a.Name())
 			a.externalProcess(proc.Process)
 		}
 		close(doneChan)
@@ -304,6 +320,9 @@ func (a *Application) gracefulKill(proc *process.Info) {
 	select {
 	case <-doneChan:
 	case <-t.C:
+		alog.Infof("[gracefulKill][%s] killing it", a.Name())
+		a.logger.Infof("gracefulKill timed out after %d, killing %s",
+			procExitTimeout, a.Name())
 		_ = proc.Process.Kill()
 	}
 }

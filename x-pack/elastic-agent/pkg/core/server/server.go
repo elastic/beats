@@ -580,8 +580,9 @@ func (as *ApplicationState) Stop(timeout time.Duration) error {
 		s := as.status
 		doneChan := as.checkinDone
 		as.checkinLock.RUnlock()
-		if (wasConn && doneChan == nil) || (!wasConn && s == proto.StateObserved_STOPPING && doneChan == nil) {
-			// either occurred
+		if (wasConn && doneChan == nil) ||
+			(!wasConn && s == proto.StateObserved_STOPPING && doneChan == nil) {
+			// either occurred:
 			// * client was connected then disconnected on stop
 			// * client was not connected; connected; received stopping; then disconnected
 			as.Destroy()
