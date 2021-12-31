@@ -1557,6 +1557,11 @@ var sysmon = (function () {
                     from: "winlog.event_data.QueryStatus",
                     to: "sysmon.dns.status",
                 },
+                {
+                    from: "winlog.user.identifier",
+                    to: "user.id",
+                    type: "string",
+                },
             ],
             mode: "rename",
             ignore_missing: true,
