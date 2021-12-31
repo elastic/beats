@@ -41,6 +41,8 @@ data:
       hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
+      #To enable elastic search cloud endpoint for SSL/TLS, uncomment below line
+      #protocol: "https"
 ---
 apiVersion: apps/v1
 kind: DaemonSet
