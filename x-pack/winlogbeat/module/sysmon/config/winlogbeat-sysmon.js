@@ -812,6 +812,11 @@ var sysmon = (function () {
                     to: "source.ip",
                     type: "ip",
                 },
+				{
+                    from: "winlog.event_data.SourceIp",
+                    to: "source.address",
+                    type: "string",
+                },
                 {
                     from: "winlog.event_data.SourceHostname",
                     to: "source.domain",
