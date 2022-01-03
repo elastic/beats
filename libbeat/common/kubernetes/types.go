@@ -116,3 +116,17 @@ func ContainerIDWithRuntime(s PodContainerStatus) (string, string) {
 	}
 	return "", ""
 }
+
+func EventLastTimestamp(eve *Event) metav1.Time {
+	lastTimestamp := eve.LastTimestamp
+	if lastTimestamp.IsZero() {
+		if eve.Series != nil && !eve.Series.LastObservedTime.IsZero() {
+			lastTimestamp = metav1.Time(eve.Series.LastObservedTime)
+		} else if !eve.EventTime.IsZero() {
+			lastTimestamp = metav1.Time(eve.EventTime)
+		} else {
+			lastTimestamp = eve.CreationTimestamp
+		}
+	}
+	return lastTimestamp
+}

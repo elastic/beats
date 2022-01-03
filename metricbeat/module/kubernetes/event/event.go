@@ -131,6 +131,18 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 	return
 }
 
+func getEventCount(eve *kubernetes.Event) int32 {
+	count := eve.Count
+	if count == 0 {
+		if eve.Series != nil && eve.Series.Count != 0 {
+			count = eve.Series.Count
+		} else {
+			count = 1
+		}
+	}
+	return count
+}
+
 func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig) common.MapStr {
 	eventMeta := common.MapStr{
 		"timestamp": common.MapStr{
@@ -176,7 +188,7 @@ func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig) com
 		"message": eve.Message,
 		"reason":  eve.Reason,
 		"type":    eve.Type,
-		"count":   eve.Count,
+		"count":   getEventCount(eve),
 		"source": common.MapStr{
 			"host":      eve.Source.Host,
 			"component": eve.Source.Component,
@@ -193,8 +205,14 @@ func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig) com
 
 	tsMap := make(common.MapStr)
 
-	tsMap["first_occurrence"] = kubernetes.Time(&eve.FirstTimestamp).UTC()
-	tsMap["last_occurrence"] = kubernetes.Time(&eve.LastTimestamp).UTC()
+	lastTimestamp := kubernetes.EventLastTimestamp(eve)
+	tsMap["first_occurrence"] = func() time.Time {
+		if eve.FirstTimestamp.IsZero() {
+			return kubernetes.Time(&lastTimestamp).UTC()
+		}
+		return kubernetes.Time(&eve.FirstTimestamp).UTC()
+	}()
+	tsMap["last_occurrence"] = kubernetes.Time(&lastTimestamp).UTC()
 
 	if len(tsMap) != 0 {
 		output["timestamp"] = tsMap
