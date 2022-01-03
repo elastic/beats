@@ -1203,7 +1203,7 @@ output.elasticsearch:
   #path: "/tmp/heartbeat"
 
   # Name of the generated files. The default is `heartbeat` and it generates
-  # files: `heartbeat`, `heartbeat.1`, `heartbeat.2`, etc.
+  # files: `heartbeat-{datetime}.ndjson`, `heartbeat-{datetime}-1.ndjson`, etc.
   #filename: heartbeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
@@ -1221,6 +1221,7 @@ output.elasticsearch:
   
   # Configure automatic file rotation on every startup. The default is true.
   #rotate_on_startup: true
+
 # ------------------------------- Console Output -------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.

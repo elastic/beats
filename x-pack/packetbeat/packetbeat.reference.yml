@@ -1552,7 +1552,7 @@ output.elasticsearch:
   #path: "/tmp/packetbeat"
 
   # Name of the generated files. The default is `packetbeat` and it generates
-  # files: `packetbeat`, `packetbeat.1`, `packetbeat.2`, etc.
+  # files: `packetbeat-{datetime}.ndjson`, `packetbeat-{datetime}-1.ndjson`, etc.
   #filename: packetbeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
@@ -1570,6 +1570,7 @@ output.elasticsearch:
   
   # Configure automatic file rotation on every startup. The default is true.
   #rotate_on_startup: true
+
 # ------------------------------- Console Output -------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.

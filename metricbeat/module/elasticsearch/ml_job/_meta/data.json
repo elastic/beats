@@ -22,7 +22,8 @@
             }
         },
         "node": {
-            "id": "27fb1c2fd783"
+            "id": "27fb1c2fd783",
+            "name": "node-1"
         }
     },
     "event": {
