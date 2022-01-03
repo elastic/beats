@@ -14,6 +14,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
@@ -105,7 +106,9 @@ func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI,
 }
 
 func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) error {
-	log := p.log.With("message_id", *msg.MessageId)
+	log := p.log.With(
+		"message_id", *msg.MessageId,
+		"message_receipt_time", time.Now().UTC())
 
 	keepaliveCtx, keepaliveCancel := context.WithCancel(ctx)
 	defer keepaliveCancel()
@@ -137,7 +140,7 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) 
 			if receiveCount, err := strconv.Atoi(v); err == nil && receiveCount >= p.maxReceiveCount {
 				processingErr = nonRetryableErrorWrap(fmt.Errorf(
 					"sqs ApproximateReceiveCount <%v> exceeds threshold %v: %w",
-					receiveCount, p.maxReceiveCount, err))
+					receiveCount, p.maxReceiveCount, processingErr))
 			}
 		}
 	}
@@ -180,6 +183,17 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 
 			// Renew visibility.
 			if err := p.sqs.ChangeMessageVisibility(ctx, msg, p.sqsVisibilityTimeout); err != nil {
+				var awsErr awserr.Error
+				if errors.As(err, &awsErr) {
+					switch awsErr.Code() {
+					case sqs.ErrCodeReceiptHandleIsInvalid:
+						log.Warnw("Failed to extend message visibility timeout "+
+							"because SQS receipt handle is no longer valid. "+
+							"Stopping SQS message keepalive routine.", "error", err)
+						return
+					}
+				}
+
 				log.Warnw("Failed to extend message visibility timeout.", "error", err)
 			}
 		}
