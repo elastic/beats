@@ -34,7 +34,7 @@ be set and containerd daemon needs to be restarted.
 [float]
 === Compatibility
 
-The Conatinerd module is tested with the following versions of Containerd:
+The Containerd module is tested with the following versions of Containerd:
 v1.5.2
 
 [float]
