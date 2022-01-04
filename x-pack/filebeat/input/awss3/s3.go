@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -44,7 +45,7 @@ type s3Poller struct {
 	region               string
 	provider             string
 	bucketPollInterval   time.Duration
-	workerSem            *sem
+	workerSem            *awscommon.Sem
 	s3                   s3API
 	log                  *logp.Logger
 	metrics              *inputMetrics
@@ -77,7 +78,7 @@ func newS3Poller(log *logp.Logger,
 		region:               awsRegion,
 		provider:             provider,
 		bucketPollInterval:   bucketPollInterval,
-		workerSem:            newSem(numberOfWorkers),
+		workerSem:            awscommon.NewSem(numberOfWorkers),
 		s3:                   s3,
 		log:                  log,
 		metrics:              metrics,

@@ -25,6 +25,7 @@ type config struct {
 	APITimeout                time.Duration       `config:"api_timeout" validate:"min=0,nonzero"`
 	APISleep                  time.Duration       `config:"api_sleep" validate:"min=0,nonzero"`
 	Latency                   time.Duration       `config:"latency"`
+	NumberOfWorkers           int                 `config:"number_of_workers"`
 	AwsConfig                 awscommon.ConfigAWS `config:",inline"`
 }
 
@@ -33,10 +34,11 @@ func defaultConfig() config {
 		ForwarderConfig: harvester.ForwarderConfig{
 			Type: "aws-cloudwatch",
 		},
-		StartPosition: "beginning",
-		ScanFrequency: 10 * time.Second,
-		APITimeout:    120 * time.Second,
-		APISleep:      200 * time.Millisecond, // FilterLogEvents has a limit of 5 transactions per second (TPS)/account/Region: 1s / 5 = 200 ms
+		StartPosition:   "beginning",
+		ScanFrequency:   10 * time.Second,
+		APITimeout:      120 * time.Second,
+		APISleep:        200 * time.Millisecond, // FilterLogEvents has a limit of 5 transactions per second (TPS)/account/Region: 1s / 5 = 200 ms
+		NumberOfWorkers: 5,
 	}
 }
 

@@ -42,21 +42,25 @@ func init() {
 	}
 }
 
-// awsCloudWatchInput is a input for AWS CloudWatch logs
+// awsCloudWatchInput is an input for AWS CloudWatch logs
 type awsCloudWatchInput struct {
 	config    config
 	awsConfig awssdk.Config
 
 	logger   *logp.Logger
 	outlet   channel.Outleter // Output of received aws-cloudwatch logs.
-	inputCtx *channelContext
+	inputCtx context.Context
 
-	workerOnce sync.Once      // Guarantees that the worker goroutine is only started once.
-	workerWg   sync.WaitGroup // Waits on aws-cloudwatch worker goroutine.
-	stopOnce   sync.Once
-	close      chan struct{}
+	workerWg     sync.WaitGroup     // Waits on aws-cloudwatch worker goroutine.
+	workerCtx    context.Context    // Worker goroutine context. It's cancelled when the input stops or the worker exits.
+	workerCancel context.CancelFunc // Used to signal that the worker should stop.
+	stopOnce     sync.Once
+	close        chan struct{}
 
+	startTime   int64
+	endTime     int64
 	prevEndTime int64 // track previous endTime for each iteration.
+	workerSem   *awscommon.Sem
 }
 
 // channelContext implements context.Context by wrapping a channel
@@ -77,8 +81,8 @@ func (c *channelContext) Err() error {
 func (c *channelContext) Value(key interface{}) interface{} { return nil }
 
 // NewInput creates a new aws-cloudwatch input
-func NewInput(cfg *common.Config, connector channel.Connector, context input.Context) (input.Input, error) {
-	cfgwarn.Beta("aws-clouwatch input type is used")
+func NewInput(cfg *common.Config, connector channel.Connector, ctx input.Context) (input.Input, error) {
+	cfgwarn.Beta("aws-cloudwatch input type is used")
 	logger := logp.NewLogger(inputName)
 
 	// Extract and validate the input's configuration.
@@ -109,13 +113,33 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 	awsConfig.Region = config.RegionName
 
 	closeChannel := make(chan struct{})
+	// Wrap input.Context's Done channel with a context.Context. This goroutine
+	// stops with the parent closes the Done channel.
+	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
+	go func() {
+		defer cancelInputCtx()
+		select {
+		case <-ctx.Done:
+		case <-inputCtx.Done():
+		}
+	}()
+
+	// If the input ever needs to be made restartable, then context would need
+	// to be recreated with each restart.
+	workerCtx, workerCancel := context.WithCancel(inputCtx)
+
 	in := &awsCloudWatchInput{
-		config:      config,
-		awsConfig:   awsConfig,
-		logger:      logger,
-		close:       closeChannel,
-		inputCtx:    &channelContext{closeChannel},
-		prevEndTime: int64(0),
+		config:       config,
+		awsConfig:    awsConfig,
+		logger:       logger,
+		close:        closeChannel,
+		inputCtx:     inputCtx,
+		workerCtx:    workerCtx,
+		workerCancel: workerCancel,
+		startTime:    int64(0),
+		endTime:      int64(0),
+		prevEndTime:  int64(0),
+		workerSem:    awscommon.NewSem(config.NumberOfWorkers),
 	}
 
 	// Build outlet for events.
@@ -135,48 +159,80 @@ func (in *awsCloudWatchInput) Run() {
 	cwConfig := awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, logsServiceName, in.config.RegionName, in.awsConfig)
 	svc := cloudwatchlogs.New(cwConfig)
 
-	var logGroupNames []string
-	var err error
-	if in.config.LogGroupNamePrefix != "" {
-		logGroupNames, err = in.getLogGroupNames(svc)
-		if err != nil {
-			in.logger.Error("getLogGroupNames failed: ", err)
-			return
-		}
-	} else {
-		logGroupNames = []string{in.config.LogGroupName}
+	logGroupNames, err := in.getLogGroupNames(svc)
+	if err != nil {
+		in.logger.Error("getLogGroupNames failed: ", err)
+		return
 	}
 
-	for _, logGroup := range logGroupNames {
-		in.config.LogGroupName = logGroup
-		in.workerOnce.Do(func() {
-			in.workerWg.Add(1)
-			go func() {
-				in.logger.Infof("aws-cloudwatch input worker for log group: '%v' has started", in.config.LogGroupName)
-				defer in.logger.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", in.config.LogGroupName)
-				defer in.workerWg.Done()
-				in.run(svc)
-			}()
-		})
-	}
-}
-
-func (in *awsCloudWatchInput) run(svc cloudwatchlogsiface.ClientAPI) {
+	// This loop tries to keep the workers busy as much as possible while
+	// honoring the number in config opposed to a simpler loop that does one
+	// listing, sequentially processes every object and then does another listing
+	logGroupCount := 0
+	start := true
 	for in.inputCtx.Err() == nil {
-		err := in.getLogEventsFromCloudWatch(svc)
+		if logGroupCount == 0 {
+			currentTime := time.Now()
+			in.startTime, in.endTime = getStartPosition(in.config.StartPosition, currentTime, in.prevEndTime, in.config.ScanFrequency, in.config.Latency)
+			in.logger.Debugf("start_position = %s, startTime = %v, endTime = %v", in.config.StartPosition, time.Unix(in.startTime/1000, 0), time.Unix(in.endTime/1000, 0))
+			in.prevEndTime = in.endTime
+		}
+
+		if start == false {
+			in.logger.Debugf("sleeping for %v before checking new logs", in.config.ScanFrequency)
+			time.Sleep(in.config.ScanFrequency)
+			in.logger.Debug("done sleeping")
+		}
+		start = false
+
+		// Determine how many workers are available.
+		availableWorkers, err := in.workerSem.AcquireContext(in.config.NumberOfWorkers, in.inputCtx)
 		if err != nil {
-			var aerr *awssdk.RequestCanceledError
-			if errors.As(err, &aerr) {
-				continue
-			}
-			in.logger.Error("getLogEventsFromCloudWatch failed: ", err)
+			break
+		}
+
+		if availableWorkers == 0 {
 			continue
 		}
 
-		in.logger.Debugf("sleeping for %v before checking new logs", in.config.ScanFrequency)
-		time.Sleep(in.config.ScanFrequency)
-		in.logger.Debug("done sleeping")
+		// Process each log group name asynchronously with a goroutine.
+		for i := 0; i < in.config.NumberOfWorkers; i++ {
+			if logGroupCount >= len(logGroupNames) {
+				// reset logGroupCount
+				logGroupCount = 0
+				break
+			}
+
+			lg := logGroupNames[logGroupCount]
+			in.workerWg.Add(1)
+			go func(logGroup string, startTime int64, endTime int64) {
+				defer func() {
+					in.logger.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", logGroup)
+					in.workerWg.Done()
+					in.workerSem.Release(1)
+					in.workerCancel()
+				}()
+				in.logger.Infof("aws-cloudwatch input worker for log group: '%v' has started", logGroup)
+				in.run(svc, logGroup, startTime, endTime)
+			}(lg, in.startTime, in.endTime)
+			logGroupCount++
+		}
 	}
+	// Wait for all workers to finish.
+	in.workerWg.Wait()
+}
+
+func (in *awsCloudWatchInput) run(svc cloudwatchlogsiface.ClientAPI, logGroup string, startTime int64, endTime int64) error {
+	err := in.getLogEventsFromCloudWatch(svc, logGroup, startTime, endTime)
+	if err != nil {
+		var err *awssdk.RequestCanceledError
+		if errors.As(err, &err) {
+			return err
+		}
+		in.logger.Error("getLogEventsFromCloudWatch failed: ", err)
+		return err
+	}
+	return nil
 }
 
 func parseARN(logGroupARN string) (string, string, error) {
@@ -196,6 +252,10 @@ func parseARN(logGroupARN string) (string, string, error) {
 
 // getLogGroupNames uses DescribeLogGroups API to retrieve all log group names
 func (in *awsCloudWatchInput) getLogGroupNames(svc cloudwatchlogsiface.ClientAPI) ([]string, error) {
+	if in.config.LogGroupNamePrefix == "" {
+		return []string{in.config.LogGroupName}, nil
+	}
+
 	// construct DescribeLogGroupsInput
 	filterLogEventsInput := &cloudwatchlogs.DescribeLogGroupsInput{
 		LogGroupNamePrefix: awssdk.String(in.config.LogGroupNamePrefix),
@@ -221,16 +281,9 @@ func (in *awsCloudWatchInput) getLogGroupNames(svc cloudwatchlogsiface.ClientAPI
 }
 
 // getLogEventsFromCloudWatch uses FilterLogEvents API to collect logs from CloudWatch
-func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface.ClientAPI) error {
-	currentTime := time.Now()
-	startTime, endTime := getStartPosition(in.config.StartPosition, currentTime, in.prevEndTime, in.config.ScanFrequency, in.config.Latency)
-	in.logger.Debugf("start_position = %s, startTime = %v, endTime = %v", in.config.StartPosition, time.Unix(startTime/1000, 0), time.Unix(endTime/1000, 0))
-
-	// overwrite prevEndTime using new endTime
-	in.prevEndTime = endTime
-
+func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface.ClientAPI, logGroup string, startTime int64, endTime int64) error {
 	// construct FilterLogEventsInput
-	filterLogEventsInput := in.constructFilterLogEventsInput(startTime, endTime)
+	filterLogEventsInput := in.constructFilterLogEventsInput(startTime, endTime, logGroup)
 
 	// make API request
 	req := svc.FilterLogEventsRequest(filterLogEventsInput)
@@ -240,7 +293,7 @@ func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface
 
 		logEvents := page.Events
 		in.logger.Debugf("Processing #%v events", len(logEvents))
-		err := in.processLogEvents(logEvents)
+		err := in.processLogEvents(logEvents, logGroup)
 		if err != nil {
 			err = errors.Wrap(err, "processLogEvents failed")
 			in.logger.Error(err)
@@ -258,9 +311,9 @@ func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface
 	return nil
 }
 
-func (in *awsCloudWatchInput) constructFilterLogEventsInput(startTime int64, endTime int64) *cloudwatchlogs.FilterLogEventsInput {
+func (in *awsCloudWatchInput) constructFilterLogEventsInput(startTime int64, endTime int64, logGroup string) *cloudwatchlogs.FilterLogEventsInput {
 	filterLogEventsInput := &cloudwatchlogs.FilterLogEventsInput{
-		LogGroupName: awssdk.String(in.config.LogGroupName),
+		LogGroupName: awssdk.String(logGroup),
 		StartTime:    awssdk.Int64(startTime),
 		EndTime:      awssdk.Int64(endTime),
 	}
@@ -296,9 +349,9 @@ func getStartPosition(startPosition string, currentTime time.Time, prevEndTime i
 	return
 }
 
-func (in *awsCloudWatchInput) processLogEvents(logEvents []cloudwatchlogs.FilteredLogEvent) error {
+func (in *awsCloudWatchInput) processLogEvents(logEvents []cloudwatchlogs.FilteredLogEvent, logGroup string) error {
 	for _, logEvent := range logEvents {
-		event := createEvent(logEvent, in.config.LogGroupName, in.config.RegionName)
+		event := createEvent(logEvent, logGroup, in.config.RegionName)
 		err := in.forwardEvent(event)
 		if err != nil {
 			err = errors.Wrap(err, "forwardEvent failed")

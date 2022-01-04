@@ -2,22 +2,22 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package awss3
+package aws
 
 import (
 	"context"
 	"sync"
 )
 
-type sem struct {
+type Sem struct {
 	mutex     *sync.Mutex
 	cond      sync.Cond
 	available int
 }
 
-func newSem(n int) *sem {
+func NewSem(n int) *Sem {
 	var m sync.Mutex
-	return &sem{
+	return &Sem{
 		available: n,
 		mutex:     &m,
 		cond: sync.Cond{
@@ -26,7 +26,7 @@ func newSem(n int) *sem {
 	}
 }
 
-func (s *sem) AcquireContext(n int, ctx context.Context) (int, error) {
+func (s *Sem) AcquireContext(n int, ctx context.Context) (int, error) {
 	acquireC := make(chan int, 1)
 	go func() {
 		defer close(acquireC)
@@ -41,7 +41,7 @@ func (s *sem) AcquireContext(n int, ctx context.Context) (int, error) {
 	}
 }
 
-func (s *sem) Acquire(n int) int {
+func (s *Sem) Acquire(n int) int {
 	if n <= 0 {
 		return 0
 	}
@@ -63,7 +63,7 @@ func (s *sem) Acquire(n int) int {
 	return n
 }
 
-func (s *sem) Release(n int) {
+func (s *Sem) Release(n int) {
 	if n <= 0 {
 		return
 	}
@@ -75,7 +75,7 @@ func (s *sem) Release(n int) {
 	s.cond.Signal()
 }
 
-func (s *sem) Available() int {
+func (s *Sem) Available() int {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
