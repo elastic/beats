@@ -87,13 +87,8 @@ following command enables the +{modulename}+ module config:
 include::{libbeat-dir}/tab-widgets/enable-modules-widget.asciidoc[]
 --
 
-<<<<<<< HEAD
-. In the module configs under `modules.d`, change the module settings to match
+. In the module config under `modules.d`, change the module settings to match
 your environment.
-=======
-. In the module config under `modules.d`, enable the desired datasets and
-change the module settings to match your environment.
->>>>>>> 827e152b35 (Fix example command to avoid showing system module under windows (#29569))
 +
 For example, log locations are set based on the OS. If your logs aren't in
 default locations, set the `paths` variable:
