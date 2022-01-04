@@ -857,7 +857,9 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	return nil
 }
 
-// checkElasticsearchVersion TODO
+// checkElasticsearchVersion registers a global callback to make sure ES instance we are connecting
+// to is at least on the same version as the Beat.
+// If the check is disabled or the output is not Elasticsearch, nothing happens.
 func (b *Beat) checkElasticsearchVersion() {
 	if b.Config.Output.Name() != "elasticsearch" || b.isConnectionToOlderVersionAllowed() {
 		return
