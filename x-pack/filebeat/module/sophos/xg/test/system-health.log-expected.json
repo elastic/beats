@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2018-06-05T15:10:00.000-02:00",
         "event.code": "127626618031",
         "event.dataset": "sophos.xg",
         "event.kind": "event",
@@ -37,7 +36,6 @@
         ]
     },
     {
-        "@timestamp": "2018-06-05T15:10:00.000-02:00",
         "event.code": "127726618031",
         "event.dataset": "sophos.xg",
         "event.kind": "event",
@@ -75,7 +73,6 @@
         ]
     },
     {
-        "@timestamp": "2018-06-05T15:10:00.000-02:00",
         "event.code": "123526618031",
         "event.dataset": "sophos.xg",
         "event.kind": "event",
@@ -117,7 +114,6 @@
         ]
     },
     {
-        "@timestamp": "2018-06-05T15:10:00.000-02:00",
         "event.code": "127826618031",
         "event.dataset": "sophos.xg",
         "event.kind": "event",
@@ -155,7 +151,6 @@
         ]
     },
     {
-        "@timestamp": "2018-06-05T15:10:00.000-02:00",
         "event.code": "127926618031",
         "event.dataset": "sophos.xg",
         "event.kind": "event",

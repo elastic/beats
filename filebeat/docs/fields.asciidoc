@@ -143282,6 +143282,16 @@ type: keyword
 
 --
 
+*`sophos.xg.ether_type`*::
++
+--
+The ethernet frame type
+
+
+type: keyword
+
+--
+
 [[exported-fields-squid]]
 == Squid fields
 
