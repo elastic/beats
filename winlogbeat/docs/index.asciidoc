@@ -21,6 +21,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :no_decode_cef_processor:
 :no_decode_csv_fields_processor:
 :include_translate_sid_processor:
+:export_pipeline:
 
 include::{libbeat-dir}/shared-beats-attributes.asciidoc[]
 
