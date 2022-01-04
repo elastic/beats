@@ -326,6 +326,8 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	logSystemInfo(b.Info)
 	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
 
+	b.checkElasticsearchVersion()
+
 	err = b.registerESIndexManagement()
 	if err != nil {
 		return nil, err
@@ -853,6 +855,35 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	}
 
 	return nil
+}
+
+// checkElasticsearchVersion TODO
+func (b *Beat) checkElasticsearchVersion() {
+	if b.Config.Output.Name() != "elasticsearch" || b.isConnectionToOlderVersionAllowed() {
+		return
+	}
+
+	elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
+		esVersion := conn.GetVersion()
+		beatVersion, err := common.NewVersion(b.Info.Version)
+		if err != nil {
+			return err
+		}
+		if esVersion.LessThan(beatVersion) {
+			return elasticsearch.ErrTooOld
+		}
+		return nil
+	})
+}
+
+func (b *Beat) isConnectionToOlderVersionAllowed() bool {
+	config := struct {
+		AllowOlder bool `config:"allow_older_versions"`
+	}{false}
+
+	b.Config.Output.Config().Unpack(&config)
+
+	return config.AllowOlder
 }
 
 // registerESIndexManagement registers the loading of the template and ILM
