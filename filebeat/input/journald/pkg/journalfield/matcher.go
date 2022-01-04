@@ -52,9 +52,9 @@ type journal interface {
 
 var (
 	defaultBuilder = MatcherBuilder{Conversions: journaldEventFields}
-	coreDumpMsgID  = MustBuildMatcher("message_id=fc2e22bc6ee647b6b90729ab34a250b1")
-	journaldUID    = MustBuildMatcher("journald.uid=0")
-	journaldPID    = MustBuildMatcher("journald.pid=1")
+	coreDumpMsgID  = MustBuildMatcher("message_id=fc2e22bc6ee647b6b90729ab34a250b1") // matcher for messages from coredumps
+	journaldUID    = MustBuildMatcher("journald.uid=0")                              // matcher for messages from root (UID 0)
+	journaldPID    = MustBuildMatcher("journald.pid=1")                              // matcher for messages from init process (PID 1)
 )
 
 // Build creates a new Matcher using the configured conversion table.
