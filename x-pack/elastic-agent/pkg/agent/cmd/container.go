@@ -79,8 +79,6 @@ The following actions are possible and grouped based on the actions.
   The following vars are need in the scenario that Elastic Agent should automatically fetch its own token.
 
   KIBANA_FLEET_HOST - kibana host to enable create enrollment token on [$KIBANA_HOST]
-  KIBANA_FLEET_USERNAME - kibana username to create enrollment token [$KIBANA_USERNAME]
-  KIBANA_FLEET_PASSWORD - kibana password to create enrollment token [$KIBANA_PASSWORD]
   FLEET_TOKEN_NAME - token name to use for fetching token from Kibana. This requires Kibana configs to be set.
   FLEET_TOKEN_POLICY_NAME - token policy name to use for fetching token from Kibana. This requires Kibana configs to be set.
 
@@ -93,8 +91,6 @@ The following actions are possible and grouped based on the actions.
 
   FLEET_SERVER_ENABLE - set to 1 enables bootstrapping of Fleet Server inside Elastic Agent (forces FLEET_ENROLL enabled)
   FLEET_SERVER_ELASTICSEARCH_HOST - elasticsearch host for Fleet Server to communicate with [$ELASTICSEARCH_HOST]
-  FLEET_SERVER_ELASTICSEARCH_USERNAME - elasticsearch username for Fleet Server [$ELASTICSEARCH_USERNAME]
-  FLEET_SERVER_ELASTICSEARCH_PASSWORD - elasticsearch password for Fleet Server [$ELASTICSEARCH_PASSWORD]
   FLEET_SERVER_ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch [$ELASTICSEARCH_CA]
   FLEET_SERVER_ELASTICSEARCH_CA_TRUSTED_FINGERPRINT - The sha-256 fingerprint value of the certificate authority to trust
   FLEET_SERVER_ELASTICSEARCH_INSECURE - disables cert validation for communication with Elasticsearch
@@ -113,8 +109,6 @@ The following actions are possible and grouped based on the actions.
 
   KIBANA_FLEET_SETUP - set to 1 enables the setup of Fleet in Kibana by Elastic Agent. This was previously FLEET_SETUP.
   KIBANA_FLEET_HOST - Kibana host accessible from fleet-server. [$KIBANA_HOST]
-  KIBANA_FLEET_USERNAME - kibana username to enable Fleet [$KIBANA_USERNAME]
-  KIBANA_FLEET_PASSWORD - kibana password to enable Fleet [$KIBANA_PASSWORD]
   KIBANA_FLEET_CA - path to certificate authority to use with communicate with Kibana [$KIBANA_CA]
   KIBANA_REQUEST_RETRY_SLEEP - specifies sleep duration taken when agent performs a request to kibana [default 1s]
   KIBANA_REQUEST_RETRY_COUNT - specifies number of retries agent performs when executing a request to kibana [default 30]
@@ -123,12 +117,8 @@ The following environment variables are provided as a convenience to prevent a l
 be used when the same credentials will be used across all the possible actions above.
 
   ELASTICSEARCH_HOST - elasticsearch host [http://elasticsearch:9200]
-  ELASTICSEARCH_USERNAME - elasticsearch username [elastic]
-  ELASTICSEARCH_PASSWORD - elasticsearch password [changeme]
   ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch
   KIBANA_HOST - kibana host [http://kibana:5601]
-  KIBANA_USERNAME - kibana username [$ELASTICSEARCH_USERNAME]
-  KIBANA_PASSWORD - kibana password [$ELASTICSEARCH_PASSWORD]
   KIBANA_CA - path to certificate authority to use with communicate with Kibana [$ELASTICSEARCH_CA]
 
 
@@ -427,10 +417,7 @@ func buildFleetServerConnStr(cfg fleetServerConfig) (string, error) {
 	if u.Path != "" {
 		path += "/" + strings.TrimLeft(u.Path, "/")
 	}
-	if cfg.Elasticsearch.ServiceToken != "" {
-		return fmt.Sprintf("%s://%s%s", u.Scheme, u.Host, path), nil
-	}
-	return fmt.Sprintf("%s://%s:%s@%s%s", u.Scheme, cfg.Elasticsearch.Username, cfg.Elasticsearch.Password, u.Host, path), nil
+	return fmt.Sprintf("%s://%s%s", u.Scheme, u.Host, path), nil
 }
 
 func kibanaSetup(cfg setupConfig, client *kibana.Client, streams *cli.IOStreams) error {
@@ -485,8 +472,6 @@ func kibanaClient(cfg kibanaConfig, headers map[string]string) (*kibana.Client, 
 
 	return kibana.NewClientWithConfigDefault(&kibana.ClientConfig{
 		Host:          cfg.Fleet.Host,
-		Username:      cfg.Fleet.Username,
-		Password:      cfg.Fleet.Password,
 		ServiceToken:  cfg.Fleet.ServiceToken,
 		IgnoreVersion: true,
 		Transport:     transport,

@@ -36,9 +36,6 @@ stages:
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
-    goIntegTest:
-        mage: "mage goIntegTest"
-        stage: mandatory
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.

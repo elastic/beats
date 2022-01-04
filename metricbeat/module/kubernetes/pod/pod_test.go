@@ -64,9 +64,10 @@ func TestEventMapping(t *testing.T) {
 		"cpu.usage.node.pct":  0.005631997,
 		"cpu.usage.limit.pct": 0.005631997,
 
-		"memory.usage.bytes":     1462272,
-		"memory.usage.node.pct":  0.01,
-		"memory.usage.limit.pct": 0.1,
+		"memory.usage.bytes":           1462272,
+		"memory.usage.node.pct":        0.01,
+		"memory.usage.limit.pct":       0.1,
+		"memory.working_set.limit.pct": 0.09943977591036414,
 	}
 
 	for k, v := range testCases {

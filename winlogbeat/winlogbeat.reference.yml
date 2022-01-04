@@ -20,6 +20,11 @@
 # batch of events has been published successfully. The default value is 5s.
 #winlogbeat.registry_flush: 5s
 
+# By default Ingest pipelines are not updated if a pipeline with the same ID
+# already exists. If this option is enabled Winlogbeat overwrites pipelines
+# every time a new Elasticsearch connection is established.
+#winlogbeat.overwrite_pipelines: false
+
 # event_logs specifies a list of event logs to monitor as well as any
 # accompanying options. The YAML data type of event_logs is a list of
 # dictionaries.
@@ -988,7 +993,7 @@ output.elasticsearch:
   #path: "/tmp/winlogbeat"
 
   # Name of the generated files. The default is `winlogbeat` and it generates
-  # files: `winlogbeat`, `winlogbeat.1`, `winlogbeat.2`, etc.
+  # files: `winlogbeat-{datetime}.ndjson`, `winlogbeat-{datetime}-1.ndjson`, etc.
   #filename: winlogbeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
@@ -1006,6 +1011,7 @@ output.elasticsearch:
   
   # Configure automatic file rotation on every startup. The default is true.
   #rotate_on_startup: true
+
 # ------------------------------- Console Output -------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.
