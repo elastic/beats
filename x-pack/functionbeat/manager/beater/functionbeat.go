@@ -51,6 +51,8 @@ func (bt *Functionbeat) Run(b *beat.Beat) error {
 	bt.log.Info("Functionbeat is running")
 	defer bt.log.Info("Functionbeat stopped running")
 
+	bt.log.Warn("Functionbeat is going to be removed in 8.1")
+
 	return nil
 }
 
