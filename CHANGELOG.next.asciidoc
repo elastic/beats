@@ -54,7 +54,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated config option perfmon.counters from windows/perfmon metricset. {pull}28282[28282]
 - Remove deprecated fields in Redis module. {issue}11835[11835] {pull}28246[28246]
 - system/process metricset: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
-- Remove overriding of index pattern on the Kubernetes overview dashboard.
+- Remove overriding of index pattern on the Kubernetes overview dashboard. {pull}29676[29676]
 
 *Packetbeat*
 
