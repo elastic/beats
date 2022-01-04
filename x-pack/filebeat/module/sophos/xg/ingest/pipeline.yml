@@ -6,7 +6,7 @@ processors:
 - grok:
     field: message
     patterns:
-    - '%{SYSLOG5424PRI}%{GREEDYDATA:log.original}$'
+    - '%{SYSLOG5424PRI}(%{SYSLOGTIMESTAMP} %{NOTSPACE} )?%{GREEDYDATA:log.original}$'
 
 # optimize fields / strings in log.original for KV processor
 - gsub:
@@ -17,7 +17,7 @@ processors:
 # split Sophos-XG fields
 - kv:
     field: log.original
-    field_split: " (?=[a-zA-Z0-9\\_\\-]+=)"
+    field_split: " (?=[a-zA-Z0-9_]+=)"
     value_split: "="
     prefix: "sophos.xg."
     ignore_missing: true
@@ -248,6 +248,10 @@ processors:
     - sophos.xg.dir_disp
     - sophos.xg.srczone
     - sophos.xg.dstzone
+    - sophos.xg.log_occurrence
+    - sophos.xg.nat_rule_id
+    - sophos.xg.in_display_interface
+    - sophos.xg.out_display_interface
     - syslog5424_pri
     ignore_missing: true
 
