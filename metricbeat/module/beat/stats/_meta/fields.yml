@@ -392,6 +392,8 @@
               type: short
             - name: stops
               type: short
+            - name: reloads
+              type: short
         - name: output
           type: group
           description: >

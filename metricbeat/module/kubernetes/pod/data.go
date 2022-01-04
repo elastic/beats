@@ -128,6 +128,8 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 			}
 			if memLimit > 0 {
 				podEvent.Put("memory.usage.limit.pct", float64(usageMem)/memLimit)
+				podEvent.Put("memory.working_set.limit.pct", float64(workingSet)/memLimit)
+
 			}
 		}
 
@@ -137,6 +139,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 			}
 			if memLimit > 0 {
 				podEvent.Put("memory.usage.limit.pct", float64(workingSet)/memLimit)
+				podEvent.Put("memory.working_set.limit.pct", float64(workingSet)/memLimit)
 			}
 		}
 

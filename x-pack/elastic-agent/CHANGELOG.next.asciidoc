@@ -14,6 +14,7 @@
 - Default to port 80 and 443 for Kibana and Fleet Server connections. {pull}25723[25723]
 - Remove deprecated/undocumented IncludeCreatorMetadata setting from kubernetes metadata config options {pull}28006[28006]
 - The `/processes/<subprocess>` endpoint proxies to the subprocess's monitoring endpoint, instead of querying its `/stats` endpoint {pull}28165[28165]
+- Remove username/password for fleet-server authentication. {pull}29458[29458]
 
 ==== Bugfixes
 - Fix rename *ConfigChange to *PolicyChange to align on changes in the UI. {pull}20779[20779]
