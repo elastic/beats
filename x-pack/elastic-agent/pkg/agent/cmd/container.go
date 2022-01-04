@@ -29,7 +29,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -95,8 +94,6 @@ The following actions are possible and grouped based on the actions.
   FLEET_SERVER_ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch [$ELASTICSEARCH_CA]
   FLEET_SERVER_ELASTICSEARCH_CA_TRUSTED_FINGERPRINT - The sha-256 fingerprint value of the certificate authority to trust
   FLEET_SERVER_ELASTICSEARCH_INSECURE - disables cert validation for communication with Elasticsearch
-  FLEET_SERVER_ELASTICSEARCH_USERNAME - elasticsearch username for generating a service token for Fleet Server [$ELASTICSEARCH_USERNAME]
-  FLEET_SERVER_ELASTICSEARCH_PASSWORD - elasticsearch password for generating a service token for Fleet Server [$ELASTICSEARCH_PASSWORD]
   FLEET_SERVER_SERVICE_TOKEN - service token to use for communication with elasticsearch
   FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself ("Default Fleet Server policy" used when undefined)
   FLEET_SERVER_HOST - binding host for Fleet Server HTTP (overrides the policy). By default this is 0.0.0.0.
@@ -112,6 +109,8 @@ The following actions are possible and grouped based on the actions.
 
   KIBANA_FLEET_SETUP - set to 1 enables the setup of Fleet in Kibana by Elastic Agent. This was previously FLEET_SETUP.
   KIBANA_FLEET_HOST - Kibana host accessible from fleet-server. [$KIBANA_HOST]
+  KIBANA_FLEET_USERNAME - kibana username to service token [$KIBANA_USERNAME]
+  KIBANA_FLEET_PASSWORD - kibana password to service token [$KIBANA_PASSWORD]
   KIBANA_FLEET_CA - path to certificate authority to use with communicate with Kibana [$KIBANA_CA]
   KIBANA_REQUEST_RETRY_SLEEP - specifies sleep duration taken when agent performs a request to kibana [default 1s]
   KIBANA_REQUEST_RETRY_COUNT - specifies number of retries agent performs when executing a request to kibana [default 30]
@@ -124,6 +123,8 @@ be used when the same credentials will be used across all the possible actions a
   ELASTICSEARCH_PASSWORD - elasticsearch password [changeme]
   ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch
   KIBANA_HOST - kibana host [http://kibana:5601]
+  KIBANA_FLEET_USERNAME - kibana username to enable Fleet [$ELASTICSEARCH_USERNAME]
+  KIBANA_FLEET_PASSWORD - kibana password to enable Fleet [$ELASTICSEARCH_PASSWORD]
   KIBANA_CA - path to certificate authority to use with communicate with Kibana [$ELASTICSEARCH_CA]
 
 
@@ -278,6 +279,7 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		if err != nil {
 			return err
 		}
+
 		logInfo(streams, "Performing setup of Fleet in Kibana\n")
 		err = kibanaSetup(cfg, client, streams)
 		if err != nil {
@@ -330,80 +332,43 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 
 // TokenResp is used to decode a response for generating a service token
 type TokenResp struct {
-	Created bool    `json:"created"`
-	Token   TokenKV `json:"token"`
-}
-
-// TokenKV contains the name and value of a service token
-type TokenKV struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
 }
 
 // ensureServiceToken will ensure that the cfg specified has the service_token attributes filled.
 //
-// If no token is specified it will use the elasticsearch username/password to request a new token from elasticsearch.
+// If no token is specified it will use the elasticsearch username/password to request a new token from Kibana
 func ensureServiceToken(streams *cli.IOStreams, cfg *setupConfig) error {
 	// There's already a service token
 	if cfg.Kibana.Fleet.ServiceToken != "" || cfg.FleetServer.Elasticsearch.ServiceToken != "" {
 		return nil
 	}
-	if cfg.FleetServer.Elasticsearch.Username == "" || cfg.FleetServer.Elasticsearch.Password == "" {
+	if cfg.Kibana.Fleet.Username == "" || cfg.Kibana.Fleet.Password == "" {
 		return fmt.Errorf("username/password must be provided to retrieve service token")
 	}
 
-	logInfo(streams, "Requesting service_token from Elasticsearch.")
-	// assemble tls config for Elasticsearch
-	var tls *tlscommon.Config
-	if cfg.FleetServer.Elasticsearch.CA != "" || cfg.FleetServer.Elasticsearch.CATrustedFingerprint != "" || cfg.FleetServer.Elasticsearch.Insecure {
-		tls = &tlscommon.Config{
-			CATrustedFingerprint: cfg.FleetServer.Elasticsearch.CATrustedFingerprint,
-			VerificationMode:     tlscommon.VerifyFull,
-		}
-		if cfg.FleetServer.Elasticsearch.Insecure {
-			tls.VerificationMode = tlscommon.VerifyNone
-		}
-		if cfg.FleetServer.Elasticsearch.CA != "" {
-			tls.CAs = []string{cfg.FleetServer.Elasticsearch.CA}
-		}
-	}
-
-	transport := httpcommon.DefaultHTTPTransportSettings()
-	transport.TLS = tls
-	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL:       cfg.FleetServer.Elasticsearch.Host,
-		Beatname:  "Elastic-Agent",
-		Transport: transport,
-	})
+	logInfo(streams, "Requesting service_token from Kibana.")
+	client, err := kibanaClient(cfg.Kibana, cfg.Kibana.Headers)
 	if err != nil {
 		return err
 	}
-	conn.Username = cfg.FleetServer.Elasticsearch.Username
-	conn.Password = cfg.FleetServer.Elasticsearch.Password
 
-	url := cfg.FleetServer.Elasticsearch.Host
-	if strings.HasSuffix(url, "/") {
-		url = url + "_security/service/elastic/fleet-server/credential/token"
-	} else {
-		url = url + "/_security/service/elastic/fleet-server/credential/token"
-	}
-
-	// get security-token
-	status, body, err := conn.RequestURL("POST", url, nil)
+	code, r, err := client.Connection.Request("POST", "/api/fleet/service-tokens", nil, nil, nil)
 	if err != nil {
-		return fmt.Errorf("request to get security token from elasticsearch failed: %w", err)
+		return fmt.Errorf("request to get security token from Kibana failed: %w", err)
 	}
-	if status >= 400 {
-		return fmt.Errorf("request to get security token from elasticsearch failed with status %d, body: %s", status, string(body))
+	if code >= 400 {
+		return fmt.Errorf("request to get security token from Kibana failed with status %d, body: %s", code, string(r))
 	}
-	tr := TokenResp{}
-	err = json.Unmarshal(body, &tr)
+	t := TokenResp{}
+	err = json.Unmarshal(r, &t)
 	if err != nil {
 		return fmt.Errorf("unable to decode response: %w", err)
 	}
-	logInfo(streams, "Created service_token named:", tr.Token.Name)
-	cfg.Kibana.Fleet.ServiceToken = tr.Token.Value
-	cfg.FleetServer.Elasticsearch.ServiceToken = tr.Token.Value
+	logInfo(streams, "Created service_token named:", t.Name)
+	cfg.Kibana.Fleet.ServiceToken = t.Value
+	cfg.FleetServer.Elasticsearch.ServiceToken = t.Value
 	return nil
 }
 
@@ -561,6 +526,8 @@ func kibanaClient(cfg kibanaConfig, headers map[string]string) (*kibana.Client, 
 
 	return kibana.NewClientWithConfigDefault(&kibana.ClientConfig{
 		Host:          cfg.Fleet.Host,
+		Username:      cfg.Fleet.Username,
+		Password:      cfg.Fleet.Password,
 		ServiceToken:  cfg.Fleet.ServiceToken,
 		IgnoreVersion: true,
 		Transport:     transport,
