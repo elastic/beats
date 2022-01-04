@@ -36,6 +36,7 @@ const (
 	// API Paths
 	StatusPath   = "api/status"
 	StatsPath    = "api/stats"
+	MetricsPath    = "api/metrics"
 	SettingsPath = "api/settings"
 )
 
@@ -45,12 +46,16 @@ var (
 	v6_7_2 = common.MustNewVersion("6.7.2")
 	v7_0_0 = common.MustNewVersion("7.0.0")
 	v7_0_1 = common.MustNewVersion("7.0.1")
+	v8_1_0 = common.MustNewVersion("8.1.0")
 
 	// StatsAPIAvailableVersion is the version of Kibana since when the stats API is available
 	StatsAPIAvailableVersion = v6_4_0
 
 	// SettingsAPIAvailableVersion is the version of Kibana since when the settings API is available
 	SettingsAPIAvailableVersion = v6_5_0
+
+	// SettingsAPIAvailableVersion is the version of Kibana since when the settings API is available
+	MetricsAPIAvailableVersion = v8_1_0
 )
 
 func init() {
@@ -94,6 +99,11 @@ func IsStatsAPIAvailable(currentKibanaVersion *common.Version) bool {
 // IsSettingsAPIAvailable returns whether the settings API is available in the given version of Kibana
 func IsSettingsAPIAvailable(currentKibanaVersion *common.Version) bool {
 	return elastic.IsFeatureAvailable(currentKibanaVersion, SettingsAPIAvailableVersion)
+}
+
+// IsMetricsAPIAvailable returns whether the stats API is available in the given version of Kibana
+func IsMetricsAPIAvailable(currentKibanaVersion *common.Version) bool {
+	return elastic.IsFeatureAvailable(currentKibanaVersion, MetricsAPIAvailableVersion)
 }
 
 // IsUsageExcludable returns whether the stats API supports the exclude_usage parameter in the

@@ -1,0 +1,31 @@
+- name: metrics
+  type: group
+  description: >
+    Kibana metrics
+  release: ga
+  fields:
+    - name: kibana
+      type: group
+      fields:
+        - name: status
+          type: keyword
+    - name: task_manager
+      type: group
+      fields:
+      - name: pending
+        type: long
+    - name: rule
+      type: group
+      fields:
+        - name: name
+          type: keyword
+        - name: id
+          type: keyword
+        - name: lastExecutionDuration
+          type: keyword
+        - name: averageDrift
+          type: long
+        - name: lastExecutionTimeout
+          type: date
+        - name: totalExecutions
+          type: long
