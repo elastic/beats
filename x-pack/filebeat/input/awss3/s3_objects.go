@@ -120,23 +120,22 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	}
 
 	// Metrics and Logging
-	{
-		p.log.Debug("Begin S3 object processing.")
-		p.metrics.s3ObjectsRequestedTotal.Inc()
-		p.metrics.s3ObjectsInflight.Inc()
-		start := time.Now()
-		defer func() {
-			elapsed := time.Since(start)
-			p.metrics.s3ObjectsInflight.Dec()
-			p.metrics.s3ObjectProcessingTime.Update(elapsed.Nanoseconds())
-			p.log.Debugw("End S3 object processing.", "elapsed_time_ns", elapsed)
-		}()
-	}
+	p.log.Debug("Begin S3 object processing.")
+	p.metrics.s3ObjectsRequestedTotal.Inc()
+	p.metrics.s3ObjectsInflight.Inc()
+	start := time.Now()
+	defer func() {
+		elapsed := time.Since(start)
+		p.metrics.s3ObjectsInflight.Dec()
+		p.metrics.s3ObjectProcessingTime.Update(elapsed.Nanoseconds())
+		p.log.Debugw("End S3 object processing.", "elapsed_time_ns", elapsed)
+	}()
 
 	// Request object (download).
 	contentType, meta, body, err := p.download()
 	if err != nil {
-		return errors.Wrap(err, "failed to get s3 object")
+		return errors.Wrapf(err, "failed to get s3 object (elasped_time_ns=%d)",
+			time.Since(start).Nanoseconds())
 	}
 	defer body.Close()
 	p.s3Metadata = meta
@@ -159,7 +158,8 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 		err = p.readFile(reader)
 	}
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "failed reading s3 object (elasped_time_ns=%d)",
+			time.Since(start).Nanoseconds())
 	}
 
 	return nil

@@ -103,7 +103,6 @@ func DefaultLoggingConfig() *Config {
 	cfg.ToFiles = true
 	cfg.Files.Path = paths.Logs()
 	cfg.Files.Name = agentName
-	cfg.Files.Suffix = file.SuffixDate
 
 	return &cfg
 }
@@ -115,7 +114,7 @@ func makeInternalFileOutput(cfg *Config) (zapcore.Core, error) {
 	// defaultCfg is used to set the defaults for the file rotation of the internal logging
 	// these settings cannot be changed by a user configuration
 	defaultCfg := logp.DefaultConfig(logp.DefaultEnvironment)
-	filename := filepath.Join(paths.Home(), "logs", fmt.Sprintf("%s-json.log", cfg.Beat))
+	filename := filepath.Join(paths.Home(), "logs", cfg.Beat)
 
 	rotator, err := file.NewFileRotator(filename,
 		file.MaxSizeBytes(defaultCfg.Files.MaxSize),
@@ -124,7 +123,6 @@ func makeInternalFileOutput(cfg *Config) (zapcore.Core, error) {
 		file.Interval(defaultCfg.Files.Interval),
 		file.RotateOnStartup(defaultCfg.Files.RotateOnStartup),
 		file.RedirectStderr(defaultCfg.Files.RedirectStderr),
-		file.Suffix(cfg.Files.Suffix),
 	)
 	if err != nil {
 		return nil, errors.New("failed to create internal file rotator")

@@ -13,6 +13,7 @@ var:
   - name: visibility_timeout
   - name: api_timeout
   - name: endpoint
+  - name: default_region
   - name: access_key_id
   - name: secret_access_key
   - name: session_token
@@ -28,6 +29,7 @@ var:
   - name: fips_enabled
   - name: proxy_url
   - name: max_number_of_messages
+  - name: ssl
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/{{.input}}.yml

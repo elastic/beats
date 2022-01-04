@@ -44,7 +44,7 @@ stages:
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-          - "macosx&&x86_64"
+          - "orka && darwin && poc"
         when:                  ## Override the top-level when.
             comments:
                 - "/test auditbeat for macos"

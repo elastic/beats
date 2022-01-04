@@ -59,9 +59,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 
 		podEvent := common.MapStr{
 			mb.ModuleDataKey: common.MapStr{
-				"namespace": common.MapStr{
-					"name": pod.PodRef.Namespace,
-				},
+				"namespace": pod.PodRef.Namespace,
 				"node": common.MapStr{
 					"name": node.NodeName,
 				},
@@ -130,6 +128,8 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 			}
 			if memLimit > 0 {
 				podEvent.Put("memory.usage.limit.pct", float64(usageMem)/memLimit)
+				podEvent.Put("memory.working_set.limit.pct", float64(workingSet)/memLimit)
+
 			}
 		}
 
@@ -139,6 +139,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 			}
 			if memLimit > 0 {
 				podEvent.Put("memory.usage.limit.pct", float64(workingSet)/memLimit)
+				podEvent.Put("memory.working_set.limit.pct", float64(workingSet)/memLimit)
 			}
 		}
 

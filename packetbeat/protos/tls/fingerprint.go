@@ -36,8 +36,10 @@ type FingerprintAlgorithm struct {
 	algo AlgorithmFactory
 }
 
-var hashMap = make(map[string]*FingerprintAlgorithm)
-var hashNames []string
+var (
+	hashMap   = make(map[string]*FingerprintAlgorithm)
+	hashNames []string
+)
 
 func init() {
 	registerAlgo(func() hash.Hash { return md5.New() }, "md5", "")

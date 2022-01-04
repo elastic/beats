@@ -38,27 +38,12 @@ exclude_files: [".gz$"]
 
 {{ end }}
 
-tags: {{.tags | tojson}}
-publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+tags:
+{{if .preserve_original_event}}
+  - preserve_original_event
+{{end}}
+{{range $val := .tags}}
+  - {{$val}}
+{{end}}
 
-processors:
-  - decode_json_fields:
-      fields: [message]
-      target: json
-  - fingerprint:
-      fields:
-        - event.dataset
-        - json.entity.id
-      target_field: "@metadata._id"
-      encoding: base64
-  - add_fields:
-      target: ''
-      fields:
-        ecs.version: 1.12.0
-  - script:
-      lang: javascript
-      id: set_opt_type
-      source: >
-        function process(event) {
-            event.Put("@metadata.op_type", "index");
-        }
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}

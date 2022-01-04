@@ -107,15 +107,15 @@ Example:
 path.logs: /var/log/beats
 ------------------------------------------------------------------------------
 
+ifeval::["{beatname_lc}"=="metricbeat"]
 [float]
 ==== `system.hostfs`
 
 Specifies the mount point of the host's filesystem for use in monitoring a host.
 This can either be set in the config, or with the `--system.hostfs` CLI flag. This is used for cgroup self-monitoring.
-ifeval::["{beatname_lc}"=="metricbeat"]
-This is also used by the system module to read files from `/proc` and `/sys`.
-endif::[]
 
+This is also used by the system module to read files from `/proc` and `/sys`.
+This option is deprecated and will be removed in a future release. To set the filesystem root, use the `hostfs` flag inside the module-level config.
 
 Example:
 
@@ -123,3 +123,4 @@ Example:
 ------------------------------------------------------------------------------
 system.hostfs: /mount/rootfs
 ------------------------------------------------------------------------------
+endif::[]

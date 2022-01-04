@@ -3,13 +3,39 @@
 		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
+				"addonmanager_kubernetes_io_mode": "Reconcile",
+				"app": "kubernetes-dashboard",
+				"kubernetes_io_minikube_addons": "dashboard",
+				"kubernetes_io_minikube_addons_endpoint": "dashboard"
+			},
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"cluster_ip": "10.109.175.127",
+			"created": "2018-05-30T16:24:44.000Z",
+			"name": "kubernetes-dashboard",
+			"type": "NodePort"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.service",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"labels": {
 				"k8s_app": "kube-dns",
 				"kubernetes_io_cluster_service": "true",
 				"kubernetes_io_name": "KubeDNS"
 			},
-			"namespace": {
-				"name": "kube-system"
-			}
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
 			"cluster_ip": "10.96.0.10",
@@ -35,9 +61,7 @@
 				"component": "apiserver",
 				"provider": "kubernetes"
 			},
-			"namespace": {
-				"name": "default"
-			}
+			"namespace": "default"
 		},
 		"MetricSetFields": {
 			"cluster_ip": "10.96.0.1",
@@ -60,41 +84,9 @@
 		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
-				"addonmanager_kubernetes_io_mode": "Reconcile",
-				"app": "kubernetes-dashboard",
-				"kubernetes_io_minikube_addons": "dashboard",
-				"kubernetes_io_minikube_addons_endpoint": "dashboard"
-			},
-			"namespace": {
-				"name": "kube-system"
-			}
-		},
-		"MetricSetFields": {
-			"cluster_ip": "10.109.175.127",
-			"created": "2018-05-30T16:24:44.000Z",
-			"name": "kubernetes-dashboard",
-			"type": "NodePort"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.service",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"labels": {
 				"k8s_app": "kube-state-metrics"
 			},
-			"namespace": {
-				"name": "kube-system"
-			}
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
 			"cluster_ip": "10.108.182.194",

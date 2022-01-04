@@ -31,7 +31,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "Indicator Type",
-                        "field": "threatintel.indicator.type",
+                        "field": "threat.indicator.type",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",
@@ -48,7 +48,7 @@
                     "id": "3",
                     "params": {
                         "customLabel": "Indicator Value",
-                        "field": "threatintel.threatq.indicator_value",
+                        "field": "threatq.indicator_value",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",
