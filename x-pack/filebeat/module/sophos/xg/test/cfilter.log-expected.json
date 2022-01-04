@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2017-01-31T14:03:33.000-02:00",
         "client.ip": "10.198.47.71",
         "client.port": 9444,
         "destination.ip": "182.79.221.19",
@@ -70,7 +69,6 @@
         "url.scheme": "https"
     },
     {
-        "@timestamp": "2017-02-01T18:20:21.000-02:00",
         "client.ip": "216.160.83.57",
         "client.port": 46719,
         "destination.ip": "216.58.197.44",
@@ -97,7 +95,7 @@
         "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 654,
+        "log.offset": 653,
         "network.transport": "tcp",
         "observer.product": "XG",
         "observer.serial_number": "S110000E28BA631",
@@ -146,7 +144,6 @@
         "url.scheme": "http"
     },
     {
-        "@timestamp": "2017-02-01T18:13:29.000-02:00",
         "client.ip": "216.160.83.57",
         "client.port": 49128,
         "destination.ip": "74.125.130.188",
@@ -173,7 +170,7 @@
         "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 1229,
+        "log.offset": 1227,
         "network.transport": "tcp",
         "observer.product": "XG",
         "observer.serial_number": "S110016E28BA631",
@@ -223,7 +220,6 @@
         ]
     },
     {
-        "@timestamp": "2020-05-18T14:38:51.000-02:00",
         "client.ip": "172.17.34.10",
         "client.port": 62851,
         "destination.ip": "13.79.168.201",
@@ -249,7 +245,7 @@
         "http.response.status_code": "400",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 1867,
+        "log.offset": 1864,
         "network.transport": "tcp",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
@@ -291,7 +287,6 @@
         "url.scheme": "https"
     },
     {
-        "@timestamp": "2020-05-18T14:38:52.000-02:00",
         "client.ip": "172.16.34.15",
         "client.port": 60471,
         "destination.ip": "40.90.137.127",
@@ -319,7 +314,7 @@
         "http.response.status_code": "200",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 2762,
+        "log.offset": 2758,
         "network.transport": "tcp",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
@@ -361,7 +356,6 @@
         "url.scheme": "https"
     },
     {
-        "@timestamp": "2020-05-18T14:38:53.000-02:00",
         "client.ip": "1.128.3.4",
         "client.port": 65391,
         "destination.ip": "91.228.167.133",
@@ -387,7 +381,7 @@
         "http.response.status_code": "304",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 3571,
+        "log.offset": 3566,
         "network.transport": "tcp",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
@@ -434,7 +428,6 @@
         "user_agent.original": "EFSW Update (Windows; U; 64bit; BPC 7.1.12010.0; OS: 10.0.17763 SP 0.0 NT; TDB 45511; CL 1.1.1; x64s; APP efsw; PX 1; PUA 1; CD 1; RA 1; PEV 0; UNS 1; UBR 1158; HVCI 0; SHA256 1; WU 3; HWF: 01009DAA-757A-D666-EFD2-92DD0D501284; PLOC de_de; PCODE 211.0.0; "
     },
     {
-        "@timestamp": "2016-12-02T18:50:20.000-02:00",
         "client.ip": "10.108.108.49",
         "event.action": "alert",
         "event.category": [
@@ -452,7 +445,7 @@
         "host.name": "my_fancy_host",
         "input.type": "log",
         "log.level": "alert",
-        "log.offset": 4703,
+        "log.offset": 4697,
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
@@ -488,7 +481,6 @@
         ]
     },
     {
-        "@timestamp": "2016-12-02T18:50:20.000-02:00",
         "client.ip": "192.168.73.220",
         "client.port": 37832,
         "destination.ip": "64.233.189.147",
@@ -513,7 +505,7 @@
         "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 5265,
+        "log.offset": 5258,
         "network.transport": "tcp",
         "observer.product": "XG",
         "observer.serial_number": "C01001K234RXPA1",
@@ -559,7 +551,6 @@
         "url.scheme": "http"
     },
     {
-        "@timestamp": "2016-12-02T18:50:22.000-02:00",
         "client.ip": "192.168.73.220",
         "client.port": 46322,
         "destination.ip": "64.233.188.94",
@@ -584,7 +575,7 @@
         "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 5880,
+        "log.offset": 5872,
         "network.transport": "tcp",
         "observer.product": "XG",
         "observer.serial_number": "C01001K234RXPA1",
