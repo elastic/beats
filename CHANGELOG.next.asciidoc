@@ -44,6 +44,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Auditbeat*
 
 - system/socket: Fix startup errors on newer 5.x kernels due to missing _do_fork function. {issue}29607[29607] {pull}29744[29744]
+- system/package: Fix parsing of Installed-Size field of DEB packages. {issue}16661[16661] {pull}17188[17188]
+- system module: Fix panic during initialisation when /proc/stat can't be read. {pull}17569[17569]
+- system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
+- system/socket: Fix bugs leading to wrong process being attributed to flows. {pull}29166[29166] {issue}17165[17165]
+- system/socket: Fix process name and arg truncation for long names, paths and args lists. {issue}24667[24667] {pull}29410[29410]
 
 *Filebeat*
 
