@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2017-01-31T18:44:31.000-02:00",
         "client.ip": "10.198.47.71",
         "client.port": 22623,
         "destination.ip": "46.161.30.47",
@@ -65,7 +64,6 @@
         "url.original": "46.161.30.47"
     },
     {
-        "@timestamp": "2020-05-18T14:38:34.000-02:00",
         "client.ip": "172.16.34.24",
         "client.port": 57579,
         "destination.ip": "13.226.155.22",
@@ -92,7 +90,7 @@
         "host.name": "my_fancy_host",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 489,
+        "log.offset": 488,
         "network.transport": "tcp",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123456",
@@ -130,7 +128,6 @@
         "url.scheme": "http"
     },
     {
-        "@timestamp": "2020-05-18T14:38:35.000-02:00",
         "client.ip": "172.16.34.24",
         "client.port": 57540,
         "destination.ip": "13.226.155.22",
@@ -157,7 +154,7 @@
         "host.name": "some_other_host.local",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 991,
+        "log.offset": 989,
         "network.transport": "tcp",
         "observer.product": "XG",
         "observer.serial_number": "1234567890123457",
@@ -195,7 +192,6 @@
         "url.scheme": "http"
     },
     {
-        "@timestamp": "2018-06-05T08:49:00.000-02:00",
         "client.ip": "10.198.32.89",
         "client.port": 0,
         "destination.ip": "82.211.30.202",
@@ -222,7 +218,7 @@
         "host.name": "firewall.localgroup.local",
         "input.type": "log",
         "log.level": "notification",
-        "log.offset": 1493,
+        "log.offset": 1490,
         "network.transport": "icmp",
         "observer.product": "XG",
         "observer.serial_number": "C30006T22TGR89B",
