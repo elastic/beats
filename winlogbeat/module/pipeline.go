@@ -37,7 +37,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+// PipelinesFS is used from the x-pack/winlogbeat code to inject modules. The
+// OSS version does not have modules.
 var PipelinesFS *embed.FS
+
 var errNoFS = errors.New("no embedded file system")
 
 const logName = "pipeline"
@@ -47,7 +50,7 @@ type pipeline struct {
 	contents map[string]interface{}
 }
 
-// Upload reads all pipelines embedded in the Winlogbeat executable
+// UploadPipelines reads all pipelines embedded in the Winlogbeat executable
 // and adapts the pipeline for a given ES version, converts to JSON if
 // necessary and creates or updates ingest pipeline in ES.
 func UploadPipelines(info beat.Info, esClient *eslegclient.Connection, overwritePipelines bool) error {
@@ -58,7 +61,7 @@ func UploadPipelines(info beat.Info, esClient *eslegclient.Connection, overwrite
 	return load(esClient, pipelines, overwritePipelines)
 }
 
-// Export reads all pipelines embedded in the Winlogbeat executable
+// ExportPipelines reads all pipelines embedded in the Winlogbeat executable
 // and adapts the pipelines for a given ES version and writes the
 // converted pipelines to the given directory in JSON format.
 func ExportPipelines(info beat.Info, version common.Version, directory string) error {
@@ -191,19 +194,19 @@ func applyTemplates(prefix string, version string, filename string, original []b
 	switch extension := strings.ToLower(filepath.Ext(filename)); extension {
 	case ".json":
 		if err = json.Unmarshal([]byte(encodedString), &content); err != nil {
-			return nil, fmt.Errorf("Error JSON decoding the pipeline file: %s: %w", filename, err)
+			return nil, fmt.Errorf("error JSON decoding the pipeline file: %s: %w", filename, err)
 		}
 	case ".yaml", ".yml":
 		if err = yaml.Unmarshal([]byte(encodedString), &content); err != nil {
-			return nil, fmt.Errorf("Error YAML decoding the pipeline file: %s: %w", filename, err)
+			return nil, fmt.Errorf("error YAML decoding the pipeline file: %s: %w", filename, err)
 		}
 		newContent, err := fileset.FixYAMLMaps(content)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to sanitize the YAML pipeline file: %s: %w", filename, err)
+			return nil, fmt.Errorf("failed to sanitize the YAML pipeline file: %s: %w", filename, err)
 		}
 		content = newContent.(map[string]interface{})
 	default:
-		return nil, fmt.Errorf("Unsupported extension '%s' for pipeline file: %s", extension, filename)
+		return nil, fmt.Errorf("unsupported extension '%s' for pipeline file: %s", extension, filename)
 	}
 	return content, nil
 }
