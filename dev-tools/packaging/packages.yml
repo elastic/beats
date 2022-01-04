@@ -475,8 +475,8 @@ shared:
   - &agent_docker_spec
     <<: *agent_binary_spec
     extra_vars:
-      from: 'centos:7'
-      buildFrom: 'centos:7'
+      from: 'ubuntu:20.04'
+      buildFrom: 'ubuntu:20.04'
       dockerfile: 'Dockerfile.elastic-agent.tmpl'
       docker_entrypoint: 'docker-entrypoint.elastic-agent.tmpl'
       user: '{{ .BeatName }}'
@@ -495,8 +495,8 @@ shared:
   - &agent_docker_arm_spec
     <<: *agent_docker_spec
     extra_vars:
-      from: 'arm64v8/centos:7'
-      buildFrom: 'arm64v8/centos:7'
+      from: 'arm64v8/ubuntu:20.04'
+      buildFrom: 'arm64v8/ubuntu:20.04'
 
   - &agent_docker_cloud_spec
     <<: *agent_docker_spec
@@ -653,8 +653,8 @@ shared:
   - &docker_spec
     <<: *binary_spec
     extra_vars:
-      from: 'centos:7'
-      buildFrom: 'centos:7'
+      from: 'ubuntu:20.04'
+      buildFrom: 'ubuntu:20.04'
       user: '{{ .BeatName }}'
       linux_capabilities: ''
     files:
@@ -666,14 +666,16 @@ shared:
   - &docker_arm_spec
     <<: *docker_spec
     extra_vars:
-      from: 'arm64v8/centos:7'
-      buildFrom: 'arm64v8/centos:7'
+      from: 'arm64v8/ubuntu:20.04'
+      buildFrom: 'arm64v8/ubuntu:20.04'
 
+  # TODO: Did I must change those to ?
   - &docker_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi8'
       from: 'docker.elastic.co/ubi8/ubi-minimal'
 
+  # TODO: Did I must change those to ?
   - &docker_arm_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi8'
