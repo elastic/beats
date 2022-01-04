@@ -45,7 +45,7 @@ ifdef::has_modules_command[]
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo chown root {beatname_lc}.yml <1>
-sudo chown root modules.d/system.yml <1>
+sudo chown root modules.d/{modulename}.yml <1>
 sudo ./{beatname_lc} -e
 ----------------------------------------------------------------------
 <1> You'll be running {beatname_uc} as root, so you need to change ownership of the
@@ -94,7 +94,7 @@ ifdef::has_modules_command[]
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo chown root /usr/local/etc/{beatname_lc}/{beatname_lc}.yml <1>
-sudo chown root /usr/local/etc/{beatname_lc}/modules.d/system.yml <1>
+sudo chown root /usr/local/etc/{beatname_lc}/modules.d/{modulename}.yml <1>
 sudo {beatname_lc} -e
 ----------------------------------------------------------------------
 <1> You'll be running {beatname_uc} as root, so you need to change ownership of the
@@ -124,7 +124,7 @@ ifdef::has_modules_command[]
 ["source","sh",subs="attributes,callouts"]
 ----------------------------------------------------------------------
 sudo chown root {beatname_lc}.yml <1>
-sudo chown root modules.d/system.yml <1>
+sudo chown root modules.d/{modulename}.yml <1>
 sudo ./{beatname_lc} -e
 ----------------------------------------------------------------------
 <1> You'll be running {beatname_uc} as root, so you need to change ownership of the
