@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-07-23T23:48:56.000Z",
         "cisco.umbrella.amp_disposition": "MalwareName",
         "cisco.umbrella.av_detections": "AVDetectionName",
         "cisco.umbrella.categories": "Business Services",
@@ -41,7 +40,6 @@
         "user_agent.original": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
     },
     {
-        "@timestamp": "2020-07-23T23:48:56.000Z",
         "cisco.umbrella.amp_disposition": "MalwareName",
         "cisco.umbrella.av_detections": "AVDetectionName",
         "cisco.umbrella.categories": "Business Services",
@@ -82,7 +80,6 @@
         "user_agent.original": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
     },
     {
-        "@timestamp": "2017-10-02T23:52:53.000Z",
         "cisco.umbrella.amp_score": "Networks",
         "cisco.umbrella.identities": "elasticuser",
         "destination.address": "1.1.1.91",

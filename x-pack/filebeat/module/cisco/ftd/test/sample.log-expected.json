@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2013-04-15T09:36:50.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "acl_dmz",
@@ -50,7 +49,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-15T09:36:50.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "acl_dmz",
@@ -100,7 +98,6 @@
         ]
     },
     {
-        "@timestamp": "2014-04-15T11:34:34.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -151,7 +148,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-24T16:00:28.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "inside",
@@ -206,7 +202,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-24T16:00:27.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "inside",
@@ -261,7 +256,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305011",
         "cisco.ftd.source_interface": "outside",
@@ -308,7 +302,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.connection_id": "89743274",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.mapped_destination_ip": "10.123.3.42",
@@ -362,7 +355,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305011",
         "cisco.ftd.source_interface": "outside",
@@ -409,7 +401,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.connection_id": "89743275",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.mapped_destination_ip": "10.123.1.35",
@@ -465,7 +456,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305011",
         "cisco.ftd.source_interface": "outside",
@@ -512,7 +502,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.connection_id": "89743276",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.mapped_destination_ip": "10.123.3.130",
@@ -568,7 +557,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.connection_id": "89743275",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
@@ -621,7 +609,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.connection_id": "666",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.destination_username": "user2",
@@ -683,7 +670,6 @@
         "user.name": "user2"
     },
     {
-        "@timestamp": "2011-06-04T21:59:52.000-02:00",
         "cisco.ftd.mapped_source_ip": "192.168.132.46",
         "cisco.ftd.message_id": "302021",
         "destination.address": "172.24.177.29",
@@ -731,7 +717,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305011",
         "cisco.ftd.source_interface": "inside",
@@ -778,7 +763,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-29T12:59:50.000-02:00",
         "cisco.ftd.connection_id": "89743277",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.mapped_destination_ip": "10.0.0.130",
@@ -834,7 +818,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:33.000-02:00",
         "cisco.ftd.message_id": "106007",
         "destination.address": "10.1.2.60",
         "destination.ip": "10.1.2.60",
@@ -881,7 +864,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:38.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -931,7 +913,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:38.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -981,7 +962,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:39.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1031,7 +1011,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:39.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1081,7 +1060,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:39.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1131,7 +1109,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:40.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1181,7 +1158,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:41.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1231,7 +1207,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:47.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1281,7 +1256,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:48.000-02:00",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1331,7 +1305,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:22:56.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1381,7 +1354,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:02.000-02:00",
         "cisco.ftd.message_id": "106006",
         "cisco.ftd.source_interface": "inside",
         "destination.address": "10.1.2.42",
@@ -1429,7 +1401,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:03.000-02:00",
         "cisco.ftd.message_id": "106007",
         "destination.address": "10.1.5.60",
         "destination.ip": "10.1.5.60",
@@ -1476,7 +1447,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:06.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1526,7 +1496,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:08.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1576,7 +1545,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:15.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1626,7 +1594,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:24.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1676,7 +1643,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:34.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1726,7 +1692,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:40.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "acl_out",
@@ -1776,7 +1741,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:41.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "acl_out",
@@ -1826,7 +1790,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:43.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1876,7 +1839,6 @@
         ]
     },
     {
-        "@timestamp": "2013-04-30T09:23:43.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1926,7 +1888,6 @@
         ]
     },
     {
-        "@timestamp": "2018-04-15T11:34:34.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1977,7 +1938,6 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:24.000-02:00",
         "cisco.ftd.connection_id": "447235",
         "cisco.ftd.destination_interface": "identity",
         "cisco.ftd.mapped_destination_ip": "10.0.13.13",
@@ -2035,7 +1995,6 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:24.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "dmz",
@@ -2090,7 +2049,6 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:24.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "dmz",
@@ -2145,7 +2103,6 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:31.000-02:00",
         "cisco.ftd.connection_id": "447236",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.mapped_destination_host": "OCSP_Server",
@@ -2202,7 +2159,6 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:31.000-02:00",
         "cisco.ftd.connection_id": "447236",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.mapped_destination_host": "OCSP_Server",
@@ -2259,7 +2215,6 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:31.000-02:00",
         "cisco.ftd.connection_id": "447236",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.message_id": "302014",
@@ -2318,7 +2273,6 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:38.000-02:00",
         "cisco.ftd.connection_id": "447234",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.message_id": "302014",
@@ -2377,7 +2331,6 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:38.000-02:00",
         "cisco.ftd.connection_id": "447234",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.message_id": "302014",
@@ -2436,7 +2389,6 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:38.000-02:00",
         "cisco.ftd.message_id": "106015",
         "cisco.ftd.source_interface": "outside",
         "destination.address": "192.168.1.34",
@@ -2488,7 +2440,6 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:38.000-02:00",
         "cisco.ftd.message_id": "106015",
         "cisco.ftd.source_interface": "outside",
         "destination.address": "192.168.1.34",
@@ -2540,7 +2491,6 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:39.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "dmz",
@@ -2595,7 +2545,6 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:53.000-02:00",
         "cisco.ftd.connection_id": "447237",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.mapped_destination_ip": "192.168.1.34",
@@ -2653,7 +2602,6 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:53.000-02:00",
         "cisco.ftd.connection_id": "447237",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.mapped_destination_ip": "192.168.1.34",
@@ -2711,7 +2659,6 @@
         ]
     },
     {
-        "@timestamp": "2018-12-11T08:01:53.000-02:00",
         "cisco.ftd.connection_id": "447237",
         "cisco.ftd.destination_interface": "dmz",
         "cisco.ftd.message_id": "302014",
@@ -2770,7 +2717,6 @@
         ]
     },
     {
-        "@timestamp": "2012-08-15T23:30:09.000-02:00",
         "cisco.ftd.connection_id": "40",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "302016",
@@ -2823,7 +2769,6 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:50:53.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
         "destination.address": "192.88.99.47",
@@ -2870,7 +2815,6 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:51:01.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
         "destination.address": "192.88.99.57",
@@ -2917,7 +2861,6 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:51:05.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
         "destination.address": "192.88.99.47",
@@ -2964,7 +2907,6 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:51:05.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
         "destination.address": "192.88.99.47",
@@ -3011,7 +2953,6 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:51:06.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
         "destination.address": "192.88.99.57",
@@ -3058,7 +2999,6 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:51:17.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
         "destination.address": "192.88.99.57",
@@ -3105,7 +3045,6 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:52:48.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
         "destination.address": "192.168.1.255",
@@ -3152,7 +3091,6 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:53:00.000-02:00",
         "cisco.ftd.message_id": "106016",
         "cisco.ftd.source_interface": "Mobile_Traffic",
         "destination.address": "192.168.1.255",
@@ -3199,7 +3137,6 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:53:01.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "PERMIT_IN",
@@ -3254,7 +3191,6 @@
         ]
     },
     {
-        "@timestamp": "2014-09-12T06:53:02.000-02:00",
         "cisco.ftd.icmp_code": 3,
         "cisco.ftd.icmp_type": 3,
         "cisco.ftd.message_id": "313001",
@@ -3302,7 +3238,6 @@
         ]
     },
     {
-        "@timestamp": "2015-01-14T13:16:13.000-02:00",
         "cisco.ftd.icmp_type": 0,
         "cisco.ftd.message_id": "313004",
         "cisco.ftd.source_interface": "inside",
@@ -3348,7 +3283,6 @@
         ]
     },
     {
-        "@timestamp": "2015-01-14T13:16:14.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.mapped_destination_ip": "192.88.99.129",
         "cisco.ftd.mapped_destination_port": 80,
@@ -3410,7 +3344,6 @@
         ]
     },
     {
-        "@timestamp": "2015-01-14T13:16:14.000-02:00",
         "cisco.ftd.destination_interface": "outsidet",
         "cisco.ftd.mapped_destination_ip": "192.0.2.225",
         "cisco.ftd.mapped_destination_port": 80,
@@ -3469,7 +3402,6 @@
         ]
     },
     {
-        "@timestamp": "2015-01-14T13:16:14.000-02:00",
         "cisco.ftd.destination_interface": "outsidet",
         "cisco.ftd.mapped_destination_ip": "192.0.2.223",
         "cisco.ftd.mapped_destination_port": 8080,
@@ -3528,7 +3460,6 @@
         ]
     },
     {
-        "@timestamp": "2009-11-16T14:12:35.000-02:00",
         "cisco.ftd.message_id": "304001",
         "destination.address": "192.0.2.1",
         "destination.ip": "192.0.2.1",
@@ -3570,7 +3501,6 @@
         "url.path": "/app"
     },
     {
-        "@timestamp": "2009-11-16T14:12:36.000-02:00",
         "cisco.ftd.message_id": "304001",
         "destination.address": "192.0.2.32",
         "destination.ip": "192.0.2.32",
@@ -3614,7 +3544,6 @@
         "url.scheme": "http"
     },
     {
-        "@timestamp": "2009-11-16T14:12:37.000-02:00",
         "cisco.ftd.message_id": "304002",
         "cisco.ftd.source_interface": "inside",
         "destination.address": "192.0.0.19",

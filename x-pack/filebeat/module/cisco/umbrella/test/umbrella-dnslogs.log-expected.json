@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2020-07-23T23:49:54.000Z",
         "cisco.umbrella.blocked_categories": "SomeIdentityType",
         "cisco.umbrella.categories": "elastic.co.",
         "cisco.umbrella.identities": [
@@ -45,7 +44,6 @@
         "source.user.name": "elasticuser"
     },
     {
-        "@timestamp": "2020-07-23T23:50:25.000Z",
         "cisco.umbrella.blocked_categories": "SomeIdentityType",
         "cisco.umbrella.categories": "elastic.co/something.",
         "cisco.umbrella.identities": [
@@ -90,7 +88,6 @@
         "source.user.name": "elasticuser"
     },
     {
-        "@timestamp": "2021-05-14T19:39:58.000Z",
         "cisco.umbrella.categories": "Infrastructure",
         "cisco.umbrella.identities": [
             "Elastic User (ElasticUser@elastic.co)",
