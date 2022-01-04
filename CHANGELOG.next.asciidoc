@@ -26,6 +26,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Index template's default_fields setting is only populated with ECS fields. {pull}28596[28596] {issue}28215[28215]
 - Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
 - Remove options `logging.files.suffix` and default to datetime endings. {pull}28927[28927]
+- Remove Journalbeat. Use `journald` input of Filebeat instead. {pull}29131[29131]
+- `include_matches` option of `journald` input no longer accepts a list of string. {pull}29294[29294]
 - Add job.name in pods controlled by Jobs {pull}28954[28954]
 
 *Auditbeat*
@@ -148,6 +150,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
 - Add support for parsers on journald input {pull}29070[29070]
 - Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
+- Add support for filtering in journald input with `unit`, `kernel`, `identifiers` and `include_matches`. {pull}29294[29294]
 - Add new `userAgent` and `beatInfo` template functions for httpjson input {pull}29528[29528]
 
 *Heartbeat*
