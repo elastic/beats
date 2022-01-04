@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2019-10-04T15:27:55.000-02:00",
         "cisco.asa.destination_interface": "OUTSIDE",
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "AL-DMZ-LB-IN",
@@ -53,7 +52,6 @@
         ]
     },
     {
-        "@timestamp": "2020-01-01T10:42:53.000-02:00",
         "cisco.asa.mapped_source_host": "mydomain.example.net",
         "cisco.asa.message_id": "302021",
         "destination.address": "172.24.177.29",
@@ -102,7 +100,6 @@
         ]
     },
     {
-        "@timestamp": "2020-01-02T11:33:20.000-02:00",
         "cisco.asa.destination_interface": "wan",
         "cisco.asa.mapped_destination_host": "www.example.org",
         "cisco.asa.mapped_destination_port": 80,
