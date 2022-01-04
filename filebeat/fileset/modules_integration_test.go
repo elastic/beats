@@ -62,7 +62,7 @@ func TestLoadPipeline(t *testing.T) {
 	}
 
 	log := logp.NewLogger(logName)
-	err := loadPipeline(client, "my-pipeline-id", content, false, log)
+	err := LoadPipeline(client, "my-pipeline-id", content, false, log)
 	require.NoError(t, err)
 
 	status, _, err := client.Request("GET", "/_ingest/pipeline/my-pipeline-id", "", nil, nil)
@@ -71,12 +71,12 @@ func TestLoadPipeline(t *testing.T) {
 
 	// loading again shouldn't actually update the pipeline
 	content["description"] = "describe pipeline 2"
-	err = loadPipeline(client, "my-pipeline-id", content, false, log)
+	err = LoadPipeline(client, "my-pipeline-id", content, false, log)
 	require.NoError(t, err)
 	checkUploadedPipeline(t, client, "describe pipeline")
 
 	// loading again updates the pipeline
-	err = loadPipeline(client, "my-pipeline-id", content, true, log)
+	err = LoadPipeline(client, "my-pipeline-id", content, true, log)
 	require.NoError(t, err)
 	checkUploadedPipeline(t, client, "describe pipeline 2")
 }
