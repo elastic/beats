@@ -10,13 +10,13 @@
         "input.type": "log",
         "log.offset": 0,
         "process.args": [
-            "-F",
-            "-S",
-            "-a",
-            "arch=b32",
             "auditctl",
-            "execve",
-            "exit,always"
+            "-a",
+            "exit,always",
+            "-F",
+            "arch=b32",
+            "-S",
+            "execve"
         ],
         "process.args_count": 7,
         "process.executable": "auditctl",
@@ -33,9 +33,9 @@
         "input.type": "log",
         "log.offset": 131,
         "process.args": [
+            "auditctl",
             "-e",
-            "1",
-            "auditctl"
+            "1"
         ],
         "process.args_count": 3,
         "process.executable": "auditctl",
@@ -52,19 +52,19 @@
         "input.type": "log",
         "log.offset": 210,
         "process.args": [
-            "66",
+            "ip",
+            "route",
+            "ls",
+            "table",
+            "local",
+            "type",
+            "local",
+            "scope",
+            "host",
             "dev",
             "eth0",
-            "host",
-            "ip",
-            "local",
-            "local",
-            "ls",
             "proto",
-            "route",
-            "scope",
-            "table",
-            "type"
+            "66"
         ],
         "process.args_count": 13,
         "process.executable": "ip",
@@ -81,9 +81,9 @@
         "input.type": "log",
         "log.offset": 393,
         "process.args": [
+            "/usr/sbin/sshd",
             "-D",
-            "-R",
-            "/usr/sbin/sshd"
+            "-R"
         ],
         "process.args_count": 3,
         "process.executable": "/usr/sbin/sshd",
@@ -101,8 +101,8 @@
         "log.offset": 479,
         "process.args": [
             "/usr/sbin/unix_chkpwd",
-            "chkexpiry",
-            "some_user"
+            "some_user",
+            "chkexpiry"
         ],
         "process.args_count": 3,
         "process.executable": "/usr/sbin/unix_chkpwd",
@@ -136,8 +136,8 @@
         "input.type": "log",
         "log.offset": 647,
         "process.args": [
-            "-un",
-            "id"
+            "id",
+            "-un"
         ],
         "process.args_count": 2,
         "process.executable": "id",
@@ -171,8 +171,8 @@
         "input.type": "log",
         "log.offset": 787,
         "process.args": [
-            "-gn",
-            "id"
+            "id",
+            "-gn"
         ],
         "process.args_count": 2,
         "process.executable": "id",
@@ -189,8 +189,8 @@
         "input.type": "log",
         "log.offset": 854,
         "process.args": [
-            "-un",
-            "id"
+            "id",
+            "-un"
         ],
         "process.args_count": 2,
         "process.executable": "id",
@@ -207,9 +207,9 @@
         "input.type": "log",
         "log.offset": 921,
         "process.args": [
-            "-c",
             "/bin/sh",
-            "/usr/libexec/grepconf.sh"
+            "/usr/libexec/grepconf.sh",
+            "-c"
         ],
         "process.args_count": 3,
         "process.executable": "/bin/sh",
@@ -226,10 +226,10 @@
         "input.type": "log",
         "log.offset": 1022,
         "process.args": [
+            "grep",
             "-qsi",
-            "/etc/GREP_COLORS",
             "^COLOR.*none",
-            "grep"
+            "/etc/GREP_COLORS"
         ],
         "process.args_count": 4,
         "process.executable": "grep",
@@ -246,8 +246,8 @@
         "input.type": "log",
         "log.offset": 1132,
         "process.args": [
-            "-s",
-            "/usr/bin/tty"
+            "/usr/bin/tty",
+            "-s"
         ],
         "process.args_count": 2,
         "process.executable": "/usr/bin/tty",
@@ -282,9 +282,9 @@
         "input.type": "log",
         "log.offset": 1289,
         "process.args": [
+            "/usr/bin/dircolors",
             "--sh",
-            "/etc/DIR_COLORS.256color",
-            "/usr/bin/dircolors"
+            "/etc/DIR_COLORS.256color"
         ],
         "process.args_count": 3,
         "process.executable": "/usr/bin/dircolors",
@@ -301,10 +301,10 @@
         "input.type": "log",
         "log.offset": 1403,
         "process.args": [
-            "-qi",
-            "/etc/DIR_COLORS.256color",
             "/usr/bin/grep",
-            "^COLOR.*none"
+            "-qi",
+            "^COLOR.*none",
+            "/etc/DIR_COLORS.256color"
         ],
         "process.args_count": 4,
         "process.executable": "/usr/bin/grep",
@@ -321,8 +321,8 @@
         "input.type": "log",
         "log.offset": 1529,
         "process.args": [
-            "-u",
-            "/usr/bin/id"
+            "/usr/bin/id",
+            "-u"
         ],
         "process.args_count": 2,
         "process.executable": "/usr/bin/id",
@@ -339,8 +339,8 @@
         "input.type": "log",
         "log.offset": 1604,
         "process.args": [
-            "/home/some_user",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -357,8 +357,8 @@
         "input.type": "log",
         "log.offset": 1697,
         "process.args": [
-            "/home/some_user/.ssh",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -375,8 +375,8 @@
         "input.type": "log",
         "log.offset": 1795,
         "process.args": [
-            "/home/some_user/.ssh/authorized_keys",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh/authorized_keys"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -411,8 +411,8 @@
         "input.type": "log",
         "log.offset": 2015,
         "process.args": [
-            "audit.yaml",
-            "vim"
+            "vim",
+            "audit.yaml"
         ],
         "process.args_count": 2,
         "process.executable": "vim",
@@ -429,19 +429,19 @@
         "input.type": "log",
         "log.offset": 2090,
         "process.args": [
-            "66",
+            "ip",
+            "route",
+            "ls",
+            "table",
+            "local",
+            "type",
+            "local",
+            "scope",
+            "host",
             "dev",
             "eth0",
-            "host",
-            "ip",
-            "local",
-            "local",
-            "ls",
             "proto",
-            "route",
-            "scope",
-            "table",
-            "type"
+            "66"
         ],
         "process.args_count": 13,
         "process.executable": "ip",
@@ -458,10 +458,10 @@
         "input.type": "log",
         "log.offset": 2273,
         "process.args": [
-            "-config",
+            "sudo",
             "./go-audit",
-            "audit.yaml",
-            "sudo"
+            "-config",
+            "audit.yaml"
         ],
         "process.args_count": 4,
         "process.executable": "sudo",
@@ -478,8 +478,8 @@
         "input.type": "log",
         "log.offset": 2378,
         "process.args": [
-            "-config",
             "./go-audit",
+            "-config",
             "audit.yaml"
         ],
         "process.args_count": 3,
@@ -497,8 +497,8 @@
         "input.type": "log",
         "log.offset": 2473,
         "process.args": [
-            "-D",
-            "auditctl"
+            "auditctl",
+            "-D"
         ],
         "process.args_count": 2,
         "process.executable": "auditctl",
@@ -515,13 +515,13 @@
         "input.type": "log",
         "log.offset": 2545,
         "process.args": [
-            "-F",
-            "-S",
-            "-a",
-            "arch=b32",
             "auditctl",
-            "execve",
-            "exit,always"
+            "-a",
+            "exit,always",
+            "-F",
+            "arch=b32",
+            "-S",
+            "execve"
         ],
         "process.args_count": 7,
         "process.executable": "auditctl",
@@ -538,9 +538,9 @@
         "input.type": "log",
         "log.offset": 2676,
         "process.args": [
+            "auditctl",
             "-e",
-            "1",
-            "auditctl"
+            "1"
         ],
         "process.args_count": 3,
         "process.executable": "auditctl",
@@ -557,8 +557,8 @@
         "input.type": "log",
         "log.offset": 2755,
         "process.args": [
-            "-h",
-            "./go-audit"
+            "./go-audit",
+            "-h"
         ],
         "process.args_count": 2,
         "process.executable": "./go-audit",
@@ -575,8 +575,8 @@
         "input.type": "log",
         "log.offset": 2829,
         "process.args": [
-            "su",
-            "sudo"
+            "sudo",
+            "su"
         ],
         "process.args_count": 2,
         "process.executable": "sudo",
@@ -627,9 +627,9 @@
         "input.type": "log",
         "log.offset": 3015,
         "process.args": [
-            "-c",
             "/bin/sh",
-            "/usr/libexec/grepconf.sh"
+            "/usr/libexec/grepconf.sh",
+            "-c"
         ],
         "process.args_count": 3,
         "process.executable": "/bin/sh",
@@ -646,10 +646,10 @@
         "input.type": "log",
         "log.offset": 3116,
         "process.args": [
+            "grep",
             "-qsi",
-            "/etc/GREP_COLORS",
             "^COLOR.*none",
-            "grep"
+            "/etc/GREP_COLORS"
         ],
         "process.args_count": 4,
         "process.executable": "grep",
@@ -666,8 +666,8 @@
         "input.type": "log",
         "log.offset": 3226,
         "process.args": [
-            "-s",
-            "/usr/bin/tty"
+            "/usr/bin/tty",
+            "-s"
         ],
         "process.args_count": 2,
         "process.executable": "/usr/bin/tty",
@@ -702,9 +702,9 @@
         "input.type": "log",
         "log.offset": 3383,
         "process.args": [
+            "/usr/bin/dircolors",
             "--sh",
-            "/etc/DIR_COLORS.256color",
-            "/usr/bin/dircolors"
+            "/etc/DIR_COLORS.256color"
         ],
         "process.args_count": 3,
         "process.executable": "/usr/bin/dircolors",
@@ -721,10 +721,10 @@
         "input.type": "log",
         "log.offset": 3497,
         "process.args": [
-            "-qi",
-            "/etc/DIR_COLORS.256color",
             "/usr/bin/grep",
-            "^COLOR.*none"
+            "-qi",
+            "^COLOR.*none",
+            "/etc/DIR_COLORS.256color"
         ],
         "process.args_count": 4,
         "process.executable": "/usr/bin/grep",
@@ -741,8 +741,8 @@
         "input.type": "log",
         "log.offset": 3623,
         "process.args": [
-            "-u",
-            "/usr/bin/id"
+            "/usr/bin/id",
+            "-u"
         ],
         "process.args_count": 2,
         "process.executable": "/usr/bin/id",
@@ -759,8 +759,8 @@
         "input.type": "log",
         "log.offset": 3698,
         "process.args": [
-            "-h",
-            "./go-audit"
+            "./go-audit",
+            "-h"
         ],
         "process.args_count": 2,
         "process.executable": "./go-audit",
@@ -777,19 +777,19 @@
         "input.type": "log",
         "log.offset": 3772,
         "process.args": [
-            "66",
+            "ip",
+            "route",
+            "ls",
+            "table",
+            "local",
+            "type",
+            "local",
+            "scope",
+            "host",
             "dev",
             "eth0",
-            "host",
-            "ip",
-            "local",
-            "local",
-            "ls",
             "proto",
-            "route",
-            "scope",
-            "table",
-            "type"
+            "66"
         ],
         "process.args_count": 13,
         "process.executable": "ip",
@@ -806,8 +806,8 @@
         "input.type": "log",
         "log.offset": 3955,
         "process.args": [
-            "/home/some_user",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -824,8 +824,8 @@
         "input.type": "log",
         "log.offset": 4048,
         "process.args": [
-            "/home/some_user/.ssh",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -842,8 +842,8 @@
         "input.type": "log",
         "log.offset": 4146,
         "process.args": [
-            "/home/some_user/.ssh/authorized_keys",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh/authorized_keys"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -878,19 +878,19 @@
         "input.type": "log",
         "log.offset": 4366,
         "process.args": [
-            "66",
+            "ip",
+            "route",
+            "ls",
+            "table",
+            "local",
+            "type",
+            "local",
+            "scope",
+            "host",
             "dev",
             "eth0",
-            "host",
-            "ip",
-            "local",
-            "local",
-            "ls",
             "proto",
-            "route",
-            "scope",
-            "table",
-            "type"
+            "66"
         ],
         "process.args_count": 13,
         "process.executable": "ip",
@@ -907,8 +907,8 @@
         "input.type": "log",
         "log.offset": 4549,
         "process.args": [
-            "/home/some_user",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -925,8 +925,8 @@
         "input.type": "log",
         "log.offset": 4642,
         "process.args": [
-            "/home/some_user/.ssh",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -943,8 +943,8 @@
         "input.type": "log",
         "log.offset": 4740,
         "process.args": [
-            "/home/some_user/.ssh/authorized_keys",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh/authorized_keys"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -979,19 +979,19 @@
         "input.type": "log",
         "log.offset": 4960,
         "process.args": [
-            "66",
+            "ip",
+            "route",
+            "ls",
+            "table",
+            "local",
+            "type",
+            "local",
+            "scope",
+            "host",
             "dev",
             "eth0",
-            "host",
-            "ip",
-            "local",
-            "local",
-            "ls",
             "proto",
-            "route",
-            "scope",
-            "table",
-            "type"
+            "66"
         ],
         "process.args_count": 13,
         "process.executable": "ip",
@@ -1008,19 +1008,19 @@
         "input.type": "log",
         "log.offset": 5143,
         "process.args": [
-            "66",
+            "ip",
+            "route",
+            "ls",
+            "table",
+            "local",
+            "type",
+            "local",
+            "scope",
+            "host",
             "dev",
             "eth0",
-            "host",
-            "ip",
-            "local",
-            "local",
-            "ls",
             "proto",
-            "route",
-            "scope",
-            "table",
-            "type"
+            "66"
         ],
         "process.args_count": 13,
         "process.executable": "ip",
@@ -1037,8 +1037,8 @@
         "input.type": "log",
         "log.offset": 5326,
         "process.args": [
-            "/home/some_user",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1055,8 +1055,8 @@
         "input.type": "log",
         "log.offset": 5419,
         "process.args": [
-            "/home/some_user/.ssh",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1073,8 +1073,8 @@
         "input.type": "log",
         "log.offset": 5517,
         "process.args": [
-            "/home/some_user/.ssh/authorized_keys",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh/authorized_keys"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1109,19 +1109,19 @@
         "input.type": "log",
         "log.offset": 5737,
         "process.args": [
-            "66",
+            "ip",
+            "route",
+            "ls",
+            "table",
+            "local",
+            "type",
+            "local",
+            "scope",
+            "host",
             "dev",
             "eth0",
-            "host",
-            "ip",
-            "local",
-            "local",
-            "ls",
             "proto",
-            "route",
-            "scope",
-            "table",
-            "type"
+            "66"
         ],
         "process.args_count": 13,
         "process.executable": "ip",
@@ -1138,8 +1138,8 @@
         "input.type": "log",
         "log.offset": 5920,
         "process.args": [
-            "/home/some_user",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1156,8 +1156,8 @@
         "input.type": "log",
         "log.offset": 6013,
         "process.args": [
-            "/home/some_user/.ssh",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1174,8 +1174,8 @@
         "input.type": "log",
         "log.offset": 6111,
         "process.args": [
-            "/home/some_user/.ssh/authorized_keys",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh/authorized_keys"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1210,19 +1210,19 @@
         "input.type": "log",
         "log.offset": 6331,
         "process.args": [
-            "66",
+            "ip",
+            "route",
+            "ls",
+            "table",
+            "local",
+            "type",
+            "local",
+            "scope",
+            "host",
             "dev",
             "eth0",
-            "host",
-            "ip",
-            "local",
-            "local",
-            "ls",
             "proto",
-            "route",
-            "scope",
-            "table",
-            "type"
+            "66"
         ],
         "process.args_count": 13,
         "process.executable": "ip",
@@ -1239,8 +1239,8 @@
         "input.type": "log",
         "log.offset": 6514,
         "process.args": [
-            "audit.yaml",
-            "vim"
+            "vim",
+            "audit.yaml"
         ],
         "process.args_count": 2,
         "process.executable": "vim",
@@ -1257,19 +1257,19 @@
         "input.type": "log",
         "log.offset": 6589,
         "process.args": [
-            "66",
+            "ip",
+            "route",
+            "ls",
+            "table",
+            "local",
+            "type",
+            "local",
+            "scope",
+            "host",
             "dev",
             "eth0",
-            "host",
-            "ip",
-            "local",
-            "local",
-            "ls",
             "proto",
-            "route",
-            "scope",
-            "table",
-            "type"
+            "66"
         ],
         "process.args_count": 13,
         "process.executable": "ip",
@@ -1286,8 +1286,8 @@
         "input.type": "log",
         "log.offset": 6772,
         "process.args": [
-            "/home/some_user",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1304,8 +1304,8 @@
         "input.type": "log",
         "log.offset": 6865,
         "process.args": [
-            "/home/some_user/.ssh",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1322,8 +1322,8 @@
         "input.type": "log",
         "log.offset": 6963,
         "process.args": [
-            "/home/some_user/.ssh/authorized_keys",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh/authorized_keys"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1358,19 +1358,19 @@
         "input.type": "log",
         "log.offset": 7183,
         "process.args": [
-            "66",
+            "ip",
+            "route",
+            "ls",
+            "table",
+            "local",
+            "type",
+            "local",
+            "scope",
+            "host",
             "dev",
             "eth0",
-            "host",
-            "ip",
-            "local",
-            "local",
-            "ls",
             "proto",
-            "route",
-            "scope",
-            "table",
-            "type"
+            "66"
         ],
         "process.args_count": 13,
         "process.executable": "ip",
@@ -1387,8 +1387,8 @@
         "input.type": "log",
         "log.offset": 7366,
         "process.args": [
-            "/home/some_user",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1405,8 +1405,8 @@
         "input.type": "log",
         "log.offset": 7459,
         "process.args": [
-            "/home/some_user/.ssh",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1423,8 +1423,8 @@
         "input.type": "log",
         "log.offset": 7557,
         "process.args": [
-            "/home/some_user/.ssh/authorized_keys",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh/authorized_keys"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1459,19 +1459,19 @@
         "input.type": "log",
         "log.offset": 7777,
         "process.args": [
-            "66",
+            "ip",
+            "route",
+            "ls",
+            "table",
+            "local",
+            "type",
+            "local",
+            "scope",
+            "host",
             "dev",
             "eth0",
-            "host",
-            "ip",
-            "local",
-            "local",
-            "ls",
             "proto",
-            "route",
-            "scope",
-            "table",
-            "type"
+            "66"
         ],
         "process.args_count": 13,
         "process.executable": "ip",
@@ -1488,8 +1488,8 @@
         "input.type": "log",
         "log.offset": 7960,
         "process.args": [
-            "--clean",
-            "/usr/bin/systemd-tmpfiles"
+            "/usr/bin/systemd-tmpfiles",
+            "--clean"
         ],
         "process.args_count": 2,
         "process.executable": "/usr/bin/systemd-tmpfiles",
@@ -1506,8 +1506,8 @@
         "input.type": "log",
         "log.offset": 8054,
         "process.args": [
-            "/home/some_user",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1524,8 +1524,8 @@
         "input.type": "log",
         "log.offset": 8147,
         "process.args": [
-            "/home/some_user/.ssh",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1542,8 +1542,8 @@
         "input.type": "log",
         "log.offset": 8245,
         "process.args": [
-            "/home/some_user/.ssh/authorized_keys",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh/authorized_keys"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1578,19 +1578,19 @@
         "input.type": "log",
         "log.offset": 8465,
         "process.args": [
-            "66",
+            "ip",
+            "route",
+            "ls",
+            "table",
+            "local",
+            "type",
+            "local",
+            "scope",
+            "host",
             "dev",
             "eth0",
-            "host",
-            "ip",
-            "local",
-            "local",
-            "ls",
             "proto",
-            "route",
-            "scope",
-            "table",
-            "type"
+            "66"
         ],
         "process.args_count": 13,
         "process.executable": "ip",
@@ -1607,19 +1607,19 @@
         "input.type": "log",
         "log.offset": 8648,
         "process.args": [
-            "66",
+            "ip",
+            "route",
+            "ls",
+            "table",
+            "local",
+            "type",
+            "local",
+            "scope",
+            "host",
             "dev",
             "eth0",
-            "host",
-            "ip",
-            "local",
-            "local",
-            "ls",
             "proto",
-            "route",
-            "scope",
-            "table",
-            "type"
+            "66"
         ],
         "process.args_count": 13,
         "process.executable": "ip",
@@ -1636,8 +1636,8 @@
         "input.type": "log",
         "log.offset": 8831,
         "process.args": [
-            "/home/some_user",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1654,8 +1654,8 @@
         "input.type": "log",
         "log.offset": 8924,
         "process.args": [
-            "/home/some_user/.ssh",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1672,8 +1672,8 @@
         "input.type": "log",
         "log.offset": 9022,
         "process.args": [
-            "/home/some_user/.ssh/authorized_keys",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh/authorized_keys"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1708,19 +1708,19 @@
         "input.type": "log",
         "log.offset": 9242,
         "process.args": [
-            "66",
+            "ip",
+            "route",
+            "ls",
+            "table",
+            "local",
+            "type",
+            "local",
+            "scope",
+            "host",
             "dev",
             "eth0",
-            "host",
-            "ip",
-            "local",
-            "local",
-            "ls",
             "proto",
-            "route",
-            "scope",
-            "table",
-            "type"
+            "66"
         ],
         "process.args_count": 13,
         "process.executable": "ip",
@@ -1737,8 +1737,8 @@
         "input.type": "log",
         "log.offset": 9425,
         "process.args": [
-            "/home/some_user",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1755,8 +1755,8 @@
         "input.type": "log",
         "log.offset": 9518,
         "process.args": [
-            "/home/some_user/.ssh",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1773,8 +1773,8 @@
         "input.type": "log",
         "log.offset": 9616,
         "process.args": [
-            "/home/some_user/.ssh/authorized_keys",
-            "/sbin/restorecon"
+            "/sbin/restorecon",
+            "/home/some_user/.ssh/authorized_keys"
         ],
         "process.args_count": 2,
         "process.executable": "/sbin/restorecon",
@@ -1809,7 +1809,16 @@
         "input.type": "log",
         "log.offset": 9836,
         "process.args": [
+            "/sbin/test",
             "/arg1",
+            "/arg2",
+            "/arg3",
+            "/arg4",
+            "/arg5",
+            "/arg6",
+            "/arg7",
+            "/arg8",
+            "/arg9",
             "/arg10",
             "/arg11",
             "/arg12",
@@ -1820,7 +1829,6 @@
             "/arg17",
             "/arg18",
             "/arg19",
-            "/arg2",
             "/arg20",
             "/arg21",
             "/arg22",
@@ -1831,7 +1839,6 @@
             "/arg27",
             "/arg28",
             "/arg29",
-            "/arg3",
             "/arg30",
             "/arg31",
             "/arg32",
@@ -1842,7 +1849,6 @@
             "/arg37",
             "/arg38",
             "/arg39",
-            "/arg4",
             "/arg40",
             "/arg41",
             "/arg42",
@@ -1853,7 +1859,6 @@
             "/arg47",
             "/arg48",
             "/arg49",
-            "/arg5",
             "/arg50",
             "/arg51",
             "/arg52",
@@ -1864,7 +1869,6 @@
             "/arg57",
             "/arg58",
             "/arg59",
-            "/arg6",
             "/arg60",
             "/arg61",
             "/arg62",
@@ -1875,7 +1879,6 @@
             "/arg67",
             "/arg68",
             "/arg69",
-            "/arg7",
             "/arg70",
             "/arg71",
             "/arg72",
@@ -1886,7 +1889,6 @@
             "/arg77",
             "/arg78",
             "/arg79",
-            "/arg8",
             "/arg80",
             "/arg81",
             "/arg82",
@@ -1897,7 +1899,6 @@
             "/arg87",
             "/arg88",
             "/arg89",
-            "/arg9",
             "/arg90",
             "/arg91",
             "/arg92",
@@ -1907,8 +1908,7 @@
             "/arg96",
             "/arg97",
             "/arg98",
-            "/arg99",
-            "/sbin/test"
+            "/arg99"
         ],
         "process.args_count": 101,
         "process.executable": "/sbin/test",
