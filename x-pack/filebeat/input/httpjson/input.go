@@ -111,7 +111,7 @@ func run(
 		return err
 	}
 
-	requestFactory := newRequestFactory(config.Request, config.Chain, config.Auth, log)
+	requestFactory := newRequestFactory(config, log)
 	pagination := newPagination(config, httpClient, log)
 	responseProcessor := newResponseProcessor(config.Response, pagination, log)
 	requester := newRequester(httpClient, requestFactory, responseProcessor, log)

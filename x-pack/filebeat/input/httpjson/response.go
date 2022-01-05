@@ -130,7 +130,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 						case errEmptyRootField:
 							// root field not found, most likely the response is empty
 							rp.log.Debug(err)
-							return
+							continue
 						default:
 							rp.log.Debug("split operation failed")
 							ch <- maybeMsg{err: err}

@@ -90,36 +90,39 @@ type requestFactory struct {
 	log        *logp.Logger
 	encoder    encoderFunc
 	replace    string
+	split      *split
 }
 
-func newRequestFactory(config *requestConfig, configChains []chainConfig, authConfig *authConfig, log *logp.Logger) []*requestFactory {
+func newRequestFactory(config config, log *logp.Logger) []*requestFactory {
 	// config validation already checked for errors here
 	var rfs []*requestFactory
-	ts, _ := newBasicTransformsFromConfig(config.Transforms, requestNamespace, log)
+	ts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
 	// regular call requestFactory object
 	rf := &requestFactory{
-		url:        *config.URL.URL,
-		method:     config.Method,
-		body:       config.Body,
+		url:        *config.Request.URL.URL,
+		method:     config.Request.Method,
+		body:       config.Request.Body,
 		transforms: ts,
 		log:        log,
-		encoder:    registeredEncoders[config.EncodeAs],
+		encoder:    registeredEncoders[config.Request.EncodeAs],
 	}
-	if authConfig != nil && authConfig.Basic.isEnabled() {
-		rf.user = authConfig.Basic.User
-		rf.password = authConfig.Basic.Password
+	if config.Auth != nil && config.Auth.Basic.isEnabled() {
+		rf.user = config.Auth.Basic.User
+		rf.password = config.Auth.Basic.Password
 	}
 	rfs = append(rfs, rf)
-	for _, ch := range configChains {
+	for _, ch := range config.Chain {
 		// chain calls requestFactory object
+		split, _ := newSplitResponse(ch.Step.Response.Split, log)
 		rf := &requestFactory{
 			url:        *ch.Step.Request.URL.URL,
 			method:     ch.Step.Request.Method,
 			body:       ch.Step.Request.Body,
 			transforms: ts,
 			log:        log,
-			encoder:    registeredEncoders[config.EncodeAs],
+			encoder:    registeredEncoders[config.Request.EncodeAs],
 			replace:    ch.Step.Replace,
+			split:      split,
 		}
 		rfs = append(rfs, rf)
 	}
@@ -195,12 +198,12 @@ func (rf *requestFactory) collectResponse(stdCtx context.Context, trCtx *transfo
 }
 
 // generateNewUrl returns new url value using replacement from oldUrl with ids
-func generateNewUrl(replacement string, oldUrl string, ids []byte) (url.URL, error) {
+func generateNewUrl(replacement, oldUrl, ids string) (url.URL, error) {
 	reg, err := regexp.Compile(replacement)
 	if err != nil {
 		return url.URL{}, fmt.Errorf("failed to create regex on provided value: %w", err)
 	}
-	newUrl, err := url.Parse(string(reg.ReplaceAll([]byte(oldUrl), ids)))
+	newUrl, err := url.Parse(reg.ReplaceAllString(oldUrl, ids))
 	if err != nil {
 		return url.URL{}, fmt.Errorf("failed to replace value in url: %w", err)
 	}
@@ -257,7 +260,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			// perform request over collected ids
 			for _, id := range ids {
 				// reformat urls of requestFactory using ids
-				rf.url, err = generateNewUrl(rf.replace, urlString, []byte(id))
+				rf.url, err = generateNewUrl(rf.replace, urlString, id)
 				if err != nil {
 					return fmt.Errorf("failed to generate new URL: %w", err)
 				}
@@ -268,7 +271,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 					return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 				}
 				// store data according to response type
-				if rfSize == i+1 && len(ids) != 0 {
+				if i == rfSize-1 && len(ids) != 0 {
 					finalResps = append(finalResps, httpResp)
 				} else {
 					intermediateResps = append(intermediateResps, httpResp)
@@ -276,9 +279,9 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			}
 			rf.url = urlCopy
 
-			if rfSize == i+1 {
+			if i == rfSize-1 {
 				split = r.responseProcessor.split
-				r.responseProcessor.split = nil
+				r.responseProcessor.split = rf.split
 				n, err = r.processAndPublishEvents(stdCtx, trCtx, publisher, finalResps, true)
 				if err != nil {
 					return err
@@ -291,7 +294,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 					return err
 				}
 				split = r.responseProcessor.split
-				r.responseProcessor.split = nil
+				r.responseProcessor.split = rf.split
 				n, err = r.processAndPublishEvents(stdCtx, trCtx, publisher, intermediateResps, false)
 				if err != nil {
 					return err
@@ -301,7 +304,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		}
 	}
 
-	httpResp.Body.Close()
+	defer httpResp.Body.Close()
 	r.log.Infof("request finished: %d events published", n)
 
 	return nil
@@ -317,14 +320,14 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 		if resp.Body != nil {
 			b, err = io.ReadAll(resp.Body)
 			if err != nil {
-				return nil, fmt.Errorf("error while reading response body: %v", err)
+				return nil, fmt.Errorf("error while reading response body: %w", err)
 			}
 		}
 
 		// get replace values from collected json
 		ids, err = parse(string(b), replace)
 		if err != nil {
-			return nil, fmt.Errorf("error while getting keys: %v", err)
+			return nil, fmt.Errorf("error while getting keys: %w", err)
 		}
 	}
 	return ids, nil
@@ -334,7 +337,7 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 func (r *requester) processAndPublishEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, finalResps []*http.Response, publish bool) (int, error) {
 	eventsCh, err := r.responseProcessor.startProcessing(stdCtx, trCtx, finalResps)
 	if err != nil {
-		return 0, fmt.Errorf("error recieving eventCh: %v", err)
+		return 0, fmt.Errorf("error starting response processor: %w", err)
 	}
 
 	trCtx.clearIntervalData()

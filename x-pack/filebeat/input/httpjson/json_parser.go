@@ -7,45 +7,67 @@ package httpjson
 import (
 	"encoding/json"
 	"fmt"
-	"reflect"
 	"strings"
 )
 
 // parse returns array of string values from json string
-func parse(jsonbyte, keyField string) ([]string, error) {
-	keys := strings.Split(keyField, ".")
-	jsonbytes := []byte(jsonbyte)
-	jsoninterface, err := jsonInterface(string(jsonbyte[0]), keys[0], jsonbytes)
+func parse(rawJSON, key string) ([]string, error) {
+	var data interface{}
+	err := json.Unmarshal([]byte(rawJSON), &data)
 	if err != nil {
-		return nil, fmt.Errorf("error while parsing json: %v", err)
+		return nil, err
 	}
-	var values []string
-	for i, key := range keys {
+	if err != nil {
+		return nil, fmt.Errorf("error while parsing json: %w", err)
+	}
+	values, err := parseInterface(data, key)
+	if err != nil {
+		return nil, fmt.Errorf("error while parsing json: %w", err)
+	}
+	return values, nil
+}
+
+func parseInterface(data interface{}, key string) (values []string, err error) {
+	splitKey := strings.Split(key, ".")
+	for i, key := range splitKey {
 		switch key {
 		case "#":
-			jsoninterface, err = jsonArr(keys[i+1], jsoninterface)
-			if err != nil {
-				return nil, fmt.Errorf("error while parsing json: %v", err)
-			}
-			// interate over []interface{}
-			for _, ir := range jsoninterface.([]interface{}) {
-				if reflect.TypeOf(ir).String() == "string" {
-					values = append(values, ir.(string))
-				} else {
-					final, err := jsonNorm(keys[i+2], ir)
-					if err != nil {
-						return nil, fmt.Errorf("error while parsing json: %v", err)
-					}
-					values = append(values, final.(string))
+			// '#' means it's an array and we want to get the
+			// next key from each object in the array
+			if tmp, ok := data.([]interface{}); ok {
+				data, err = jsonArr(splitKey[i+1], tmp)
+				if err != nil {
+					return nil, fmt.Errorf("error while parsing json: %w", err)
 				}
 			}
-		default:
-			jsoninterface, err = jsonNorm(key, jsoninterface)
-			if err != nil {
-				return nil, fmt.Errorf("error while parsing json: %v", err)
+			// interate over []interface{}
+			if _, ok := data.([]interface{}); ok {
+				for _, jsoninterface := range data.([]interface{}) {
+					if _, ok := jsoninterface.(string); ok {
+						values = append(values, jsoninterface.(string))
+					} else {
+						joinKey := strings.Join(splitKey[i+2:], ".")
+						final, err := parseInterface(jsoninterface, joinKey)
+						if err != nil {
+							return nil, fmt.Errorf("error while parsing json: %w", err)
+						}
+						values = append(values, final...)
+					}
+				}
+			} else {
+				return nil, fmt.Errorf("error while parsing json: %w", err)
 			}
-			if len(keys) == i+1 {
-				values = append(values, jsoninterface.(string))
+		default:
+			// default assumes it's a JSON object, so it expects a
+			// map[string]interface{}
+			data, err = jsonNorm(key, data)
+			if err != nil {
+				return nil, fmt.Errorf("json is: %w", err)
+			}
+			if len(splitKey) == i+1 {
+				if _, ok := data.(string); ok {
+					values = append(values, data.(string))
+				}
 			}
 		}
 		if key == "#" {
@@ -58,7 +80,7 @@ func parse(jsonbyte, keyField string) ([]string, error) {
 // jsonArr returns array of interface value from interface
 // input:
 // key=a,
-// inf=
+// arrayInterface=
 // [
 // 	{
 // 		"a": "a_value_1",
@@ -69,57 +91,26 @@ func parse(jsonbyte, keyField string) ([]string, error) {
 // ]
 // output:
 // ["a_value_1", "a_value_2"]
-func jsonArr(key string, inf interface{}) ([]interface{}, error) {
-	var infs []interface{}
-	if inf.([]interface{}) != nil {
-		for _, i := range inf.([]interface{}) {
-			infs = append(infs, i.(map[string]interface{})[key])
+func jsonArr(key string, arrayInterface []interface{}) ([]interface{}, error) {
+	var arrayInterfaces []interface{}
+	for _, interfaces := range arrayInterface {
+		if _, ok := interfaces.(map[string]interface{}); ok {
+			if _, ok := interfaces.(map[string]interface{})[key]; ok {
+				arrayInterfaces = append(arrayInterfaces, interfaces.(map[string]interface{})[key])
+			} else {
+				return nil, fmt.Errorf("key field not found")
+			}
+		} else {
+			return nil, fmt.Errorf("invalid key")
 		}
-	} else {
-		return nil, fmt.Errorf("error while parsing json")
 	}
-
-	return infs, nil
-}
-
-// jsonInterface returns interface from byte json
-// input:
-// key={
-// comkey=a
-// jsonbytes={"a":"a_value"}
-// output:
-// map[string]interface{}{
-// 	"a": "a_value",
-// }
-func jsonInterface(key, comkey string, jsonbytes []byte) (interface{}, error) {
-	var data map[string]interface{}
-	if key == "{" && comkey != "#" {
-		err := json.Unmarshal(jsonbytes, &data)
-		if err != nil {
-			return nil, err
-		}
-	} else if key == "[" && comkey == "#" {
-		var data1 []interface{}
-		err := json.Unmarshal(jsonbytes, &data1)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing Array of json: ")
-		}
-		return data1, nil
-	} else if key == comkey && comkey != "#" {
-		err := json.Unmarshal(jsonbytes, &data)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		return nil, fmt.Errorf("error parsing json: ")
-	}
-	return data, nil
+	return arrayInterfaces, nil
 }
 
 // jsonNorm returns interface value from interface
 // input:
 // key=a
-// inf=map[string]interface{}{
+// mapStr=map[string]interface{}{
 // 	"a": "a_value",
 // }
 // output:
@@ -127,7 +118,7 @@ func jsonInterface(key, comkey string, jsonbytes []byte) (interface{}, error) {
 
 // input:
 // key=a
-// inf=map[string]interface{}{
+// mapStr=map[string]interface{}{
 // 	"a": map[string]interface{}{
 // 		"b": "b_value",
 // 	},
@@ -135,9 +126,11 @@ func jsonInterface(key, comkey string, jsonbytes []byte) (interface{}, error) {
 // map[string]interface{}{
 // 	"b": "b_value",
 // }
-func jsonNorm(key string, inf interface{}) (interface{}, error) {
-	if reflect.TypeOf(inf).String() != "map[string]interface {}" {
-		return nil, fmt.Errorf("error while parsing json")
+func jsonNorm(key string, mapStr interface{}) (interface{}, error) {
+	if _, ok := mapStr.(map[string]interface{}); ok {
+		if _, ok := mapStr.(map[string]interface{})[key]; ok {
+			return mapStr.(map[string]interface{})[key], nil
+		}
 	}
-	return inf.(map[string]interface{})[key], nil
+	return nil, fmt.Errorf("key field not found")
 }
