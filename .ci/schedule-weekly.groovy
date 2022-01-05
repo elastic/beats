@@ -20,13 +20,9 @@ pipeline {
   stages {
     stage('Weekly beats builds') {
       steps {
-        runBuild(quietPeriod: 0, job: 'Beats/beats/master')
-        // This should be `current_8` bump.getCurrentMinorReleaseFor8
-        runBuild(quietPeriod: 1000, job: 'Beats/beats/8.0')
-        // This should be `current_7` bump.getCurrentMinorReleaseFor7 or
-        // `next_minor_7`  bump.getNextMinorReleaseFor7
-        runBuild(quietPeriod: 2000, job: 'Beats/beats/7.17')
-        runBuild(quietPeriod: 3000, job: 'Beats/beats/7.16')
+        runBuild(quietPeriod: 0, branch: 'master')
+        runBuild(quietPeriod: 1000, branch: '8.<minor>')
+        runBuild(quietPeriod: 2000, branch: '7.<minor>')
       }
     }
   }
@@ -38,6 +34,13 @@ pipeline {
 }
 
 def runBuild(Map args = [:]) {
-  def jobName = args.job
-  build(quietPeriod: args.quietPeriod, job: jobName, parameters: [booleanParam(name: 'awsCloudTests', value: true)], wait: false, propagate: false)
+  def branch = args.branch
+  // special macro to look for the latest minor version
+  if (branch.contains('8.<minor>')) {
+    branch = bumpUtils.getMajorMinor(bumpUtils.getCurrentMinorReleaseFor8())
+  }
+  if (branch.contains('7.<minor>')) {
+    branch = bumpUtils.getMajorMinor(bumpUtils.getCurrentMinorReleaseFor7())
+  }
+  build(quietPeriod: args.quietPeriod, job: "Beats/beats/${branch}", parameters: [booleanParam(name: 'awsCloudTests', value: true)], wait: false, propagate: false)
 }
