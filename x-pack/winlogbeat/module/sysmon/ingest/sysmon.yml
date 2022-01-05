@@ -626,6 +626,12 @@ processors:
       ignore_failure: true
       ignore_missing: true
       if: ctx?.winlog?.event_data?.SourceIp != null && ctx?.winlog?.event_data?.SourceIp != ""
+  - set:
+      field: source.address
+      copy_from: winlog.event_data.SourceIp
+      ignore_empty_value: true
+      ignore_failure: true
+      if: ctx?.winlog?.event_data?.SourceIp != null && ctx?.winlog?.event_data?.SourceIp != "" && ctx.event.code == "3"
   - rename:
       field: winlog.event_data.SourceHostname
       target_field: source.domain
