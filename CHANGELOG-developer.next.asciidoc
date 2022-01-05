@@ -14,9 +14,9 @@ Note: This changelog documents the current changes which are not yet present in
 an actual release.
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v7.0.0-rc2..master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v7.0.0-rc2..main[Check the HEAD diff]
 
-The list below covers the major changes between 7.0.0-rc2 and master only.
+The list below covers the major changes between 7.0.0-rc2 and main only.
 
 ==== Breaking changes
 

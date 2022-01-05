@@ -20,7 +20,7 @@ pipeline {
   stages {
     stage('Nighly beats builds') {
       steps {
-        runBuild(quietPeriod: 0, job: 'Beats/beats/master')
+        runBuild(quietPeriod: 0, job: 'Beats/beats/main')
         // This should be `current_8` bump.getCurrentMinorReleaseFor8
         runBuild(quietPeriod: 2000, job: 'Beats/beats/8.0')
         // This should be `current_7` bump.getCurrentMinorReleaseFor7 or

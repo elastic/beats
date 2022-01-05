@@ -3,8 +3,8 @@
 ## Testing on Kubernetes
 
 ### Prerequisites
-- create kubernetes cluster using kind, check [here](https://github.com/elastic/beats/blob/master/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
-- deploy ELK stack, check [here](https://github.com/elastic/beats/blob/master/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
+- create kubernetes cluster using kind, check [here](https://github.com/elastic/beats/blob/main/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
+- deploy ELK stack, check [here](https://github.com/elastic/beats/blob/main/metricbeat/module/kubernetes/_meta/test/docs/README.md) for details
 
 ## Playground Filebeat Pod
 
