@@ -20,9 +20,7 @@ pipeline {
   stages {
     stage('Nighly beats builds') {
       steps {
-        runBuild(quietPeriod: 0, branch: 'master')
-        runBuild(quietPeriod: 2000, branch: '8.<minor>')
-        runBuild(quietPeriod: 4000, branch: '7.<next-minor>')
+        runBuilds(quietPeriodFactor: 2000, branches: ['master', '8.<minor>', '7.<minor>', '7.<next-minor>'])
       }
     }
   }
@@ -33,17 +31,37 @@ pipeline {
   }
 }
 
-def runBuild(Map args = [:]) {
-  def branch = args.branch
+def runBuilds(Map args = [:]) {
+  def branches = []
+  // Expand macros and filter duplicated matches.
+  args.branches.each { branch ->
+    def branchName = getBranchName(branch)
+    if (!branches.contains(branchName)) {
+      branches << branchName
+    }
+  }
+
+  def quietPeriod = 0
+  branches.each { branch ->
+    build(quietPeriod: quietPeriod, job: "Beats/beats/${branch}", parameters: [booleanParam(name: 'macosTest', value: true)], wait: false, propagate: false)
+    // Increate the quiet period for the next iteration
+    quietPeriod += quietPeriodFactor
+  }
+}
+
+def getBranchName(branch) {
   // special macro to look for the latest minor version
   if (branch.contains('8.<minor>')) {
-    branch = bumpUtils.getMajorMinor(bumpUtils.getCurrentMinorReleaseFor8())
+   return bumpUtils.getMajorMinor(bumpUtils.getCurrentMinorReleaseFor8())
+  }
+  if (branch.contains('8.<next-minor>')) {
+    return bumpUtils.getMajorMinor(bumpUtils.getNextMinorReleaseFor8())
   }
   if (branch.contains('7.<minor>')) {
-    branch = bumpUtils.getMajorMinor(bumpUtils.getCurrentMinorReleaseFor7())
+    return bumpUtils.getMajorMinor(bumpUtils.getCurrentMinorReleaseFor7())
   }
   if (branch.contains('7.<next-minor>')) {
-    branch = bumpUtils.getMajorMinor(bumpUtils.getNextMinorReleaseFor7())
+    return bumpUtils.getMajorMinor(bumpUtils.getNextMinorReleaseFor7())
   }
-  build(quietPeriod: args.quietPeriod, job: "Beats/beats/${branch}", parameters: [booleanParam(name: 'macosTest', value: true)], wait: false, propagate: false)
+  return branch
 }
