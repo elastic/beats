@@ -23,6 +23,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"strings"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -62,21 +63,26 @@ var (
 		"delimiter": FramingDelimiter,
 		"rfc6587":   FramingRFC6587,
 	}
+
+	framingTypeNames []string
 )
+
+func init() {
+	framingTypeNames := make([]string, 0, len(framingTypes))
+	for t := range framingTypes {
+		framingTypeNames = append(framingTypeNames, t)
+	}
+}
 
 // Unpack unpacks the FramingType string value.
 func (f *FramingType) Unpack(value string) error {
+	value = strings.ToLower(value)
+
 	ft, ok := framingTypes[value]
 	if !ok {
-		availableTypes := make([]string, len(framingTypes))
-		i := 0
-		for t := range framingTypes {
-			availableTypes[i] = t
-			i++
-		}
-		return fmt.Errorf("invalid framing type '%s', supported types: %v", value, availableTypes)
-
+		return fmt.Errorf("invalid framing type %q, the supported types are [%v]", value, strings.Join(framingTypeNames, ", "))
 	}
+
 	*f = ft
 	return nil
 }
