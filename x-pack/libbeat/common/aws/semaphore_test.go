@@ -12,7 +12,7 @@ import (
 )
 
 func TestSemaphore(t *testing.T) {
-	s := newSem(5)
+	s := NewSem(5)
 
 	assert.Equal(t, s.Acquire(5), 5)
 
