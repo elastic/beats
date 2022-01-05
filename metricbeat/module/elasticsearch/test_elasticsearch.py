@@ -145,7 +145,7 @@ class Test(metricbeat.BaseTest):
             t = doc["metricset"]["name"]
             if t != "cluster_stats":
                 continue
-            license = doc["license"]
+            license = doc["elasticsearch"]["stats"]["license"]
             issue_date = license["issue_date_in_millis"]
             self.assertIsNot(type(issue_date), float)
 
