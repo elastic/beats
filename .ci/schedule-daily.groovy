@@ -22,7 +22,7 @@ pipeline {
       steps {
         runBuild(quietPeriod: 0, branch: 'master')
         runBuild(quietPeriod: 2000, branch: '8.<minor>')
-        runBuild(quietPeriod: 4000, branch: '7.<minor>')
+        runBuild(quietPeriod: 2000, branch: '7.<next-minor>')
       }
     }
   }
@@ -41,6 +41,9 @@ def runBuild(Map args = [:]) {
   }
   if (branch.contains('7.<minor>')) {
     branch = bumpUtils.getMajorMinor(bumpUtils.getCurrentMinorReleaseFor7())
+  }
+  if (branch.contains('7.<next-minor>')) {
+    branch = bumpUtils.getMajorMinor(bumpUtils.getNextMinorReleaseFor7())
   }
   build(quietPeriod: args.quietPeriod, job: "Beats/beats/${branch}", parameters: [booleanParam(name: 'macosTest', value: true)], wait: false, propagate: false)
 }
