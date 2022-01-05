@@ -22,7 +22,7 @@ pipeline {
       steps {
         runBuild(quietPeriod: 0, branch: 'master')
         runBuild(quietPeriod: 2000, branch: '8.<minor>')
-        runBuild(quietPeriod: 2000, branch: '7.<next-minor>')
+        runBuild(quietPeriod: 4000, branch: '7.<next-minor>')
       }
     }
   }
