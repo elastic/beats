@@ -175,6 +175,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 - Add support for custom XML queries {issue}1054[1054] {pull}29330[29330]
+- Add source.address to Sysmon EventID 3 {pull}29703[29703]
 
 *Elastic Log Driver*
 
