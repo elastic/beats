@@ -1,4 +1,4 @@
-:modulename: apache mysql
+:modulename: nginx
 
 [id="{beatname_lc}-installation-configuration"]
 == {beatname_uc} quick start: installation and configuration
@@ -82,8 +82,8 @@ include::{libbeat-dir}/tab-widgets/list-modules-widget.asciidoc[]
 default configuration without enabling additional modules, {beatname_uc}
 collects system metrics only.
 +
-The following command enables the `apache` and `mysql` configs in the
-`modules.d` directory:
+The following command enables the +{modulename}+ config in the `modules.d`
+directory:
 +
 --
 include::{libbeat-dir}/tab-widgets/enable-modules-widget.asciidoc[]
@@ -92,7 +92,7 @@ include::{libbeat-dir}/tab-widgets/enable-modules-widget.asciidoc[]
 See the <<modules-command>> to learn more about this command. If you are using a
 Docker image, see <<running-on-docker>>.
 
-. In the module configs under `modules.d`, change the module settings to match
+. In the module config under `modules.d`, change the module settings to match
 your environment. See <<module-config-options>> for more about available
 settings.
 

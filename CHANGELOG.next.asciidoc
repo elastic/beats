@@ -26,6 +26,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Index template's default_fields setting is only populated with ECS fields. {pull}28596[28596] {issue}28215[28215]
 - Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
 - Remove options `logging.files.suffix` and default to datetime endings. {pull}28927[28927]
+- Remove Journalbeat. Use `journald` input of Filebeat instead. {pull}29131[29131]
+- `include_matches` option of `journald` input no longer accepts a list of string. {pull}29294[29294]
+- Add job.name in pods controlled by Jobs {pull}28954[28954]
 
 *Auditbeat*
 
@@ -70,6 +73,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS field mappings in Sysmon module. `file.name`, `file.directory`, and `file.extension` are now populated. {issue}18364[18364]
 - Improve ECS field mappings in Sysmon module. `rule.name` is populated for all events when present. {issue}18364[18364]
 - Remove top level `hash` property from sysmon events {pull}20653[20653]
+- Move module processing from local Javascript processor to ingest node {issue}29184[29184] {pull}29435[29435]
 
 *Functionbeat*
 
@@ -78,13 +82,21 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Fields of type `match_only_text` (i.e. `message`) and `wildcard` were missing from the template's default_field list. {issue}29633[29633] {pull}29634[29634]
+
 *Auditbeat*
 
+- system/package: Fix parsing of Installed-Size field of DEB packages. {issue}16661[16661] {pull}17188[17188]
+- system module: Fix panic during initialisation when /proc/stat can't be read. {pull}17569[17569]
+- system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
+- system/socket: Fix bugs leading to wrong process being attributed to flows. {pull}29166[29166] {issue}17165[17165]
+- system/socket: Fix process name and arg truncation for long names, paths and args lists. {issue}24667[24667] {pull}29410[29410]
 
 *Filebeat*
 
 - aws-s3: Stop trying to increase SQS message visibility after ReceiptHandleIsInvalid errors. {pull}29480[29480]
 - Fix handling of IPv6 addresses in netflow flow events. {issue}19210[19210] {pull}29383[29383]
+- Fix `sophos` KV splitting and syslog header handling {issue}24237[24237] {pull}29331[29331]
 - Undo deletion of endpoint config from cloudtrail fileset in {pull}29415[29415]. {pull}29450[29450]
 
 *Heartbeat*
@@ -96,6 +108,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Use xpack.enabled on SM modules to write into .monitoring indices when using Metricbeat standalone {pull}28365[28365]
 - Fix in rename processor to ingest metrics for `write.iops` to proper field instead of `write_iops` in rds metricset. {pull}28960[28960]
 - Enhance filter check in kubernetes event metricset. {pull}29470[29470]
+- Fix gcp metrics metricset apply aligner to all metric_types {pull}29514[29513]
+- Extract correct index property in kibana.stats metricset {pull}29622[29622]
 
 *Packetbeat*
 
@@ -124,6 +138,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update k8s library {pull}29394[29394]
 - Add FIPS configuration option for all AWS API calls. {pull}28899[28899]
 - Add `default_region` config to AWS common module. {pull}29415[29415]
+- Add support for latest k8s versions v1.23 and v1.22 {pull}29575[29575]
 
 *Auditbeat*
 
@@ -136,6 +151,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
 - Add support for parsers on journald input {pull}29070[29070]
 - Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
+- Add support for filtering in journald input with `unit`, `kernel`, `identifiers` and `include_matches`. {pull}29294[29294]
+- Add new `userAgent` and `beatInfo` template functions for httpjson input {pull}29528[29528]
 
 *Heartbeat*
 
@@ -148,6 +165,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `containerd` module with `cpu`, `memory`, `blkio` metricsets. {pull}29247[29247]
 - Add `container.id` and `container.runtime` ECS fields in container metricset. {pull}29560[29560]
 - Add `memory.workingset.limit.pct` field in Kubernetes container/pod metricset. {pull}29547[29547]
+- Add `elasticsearch.cluster.id` field to Beat and Kibana modules. {pull}29577[29577]
+- Add `elasticsearch.cluster.id` field to Logstash module. {pull}29625[29625]
 
 *Packetbeat*
 

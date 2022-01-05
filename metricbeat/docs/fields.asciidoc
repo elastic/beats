@@ -7536,6 +7536,13 @@ type: keyword
 
 --
 
+*`beat.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
+
 [float]
 === state
 
@@ -8702,6 +8709,13 @@ type: short
 --
 
 *`beat.stats.libbeat.config.stops`*::
++
+--
+type: short
+
+--
+
+*`beat.stats.libbeat.config.reloads`*::
 +
 --
 type: short
@@ -41102,6 +41116,13 @@ alias to: service.id
 --
 
 
+*`kibana.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
+
 [float]
 === settings
 
@@ -46757,6 +46778,13 @@ alias to: logstash.node.state.pipeline.hash
 
 --
 
+
+*`logstash.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
 
 [float]
 === node

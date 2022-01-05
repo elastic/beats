@@ -123,36 +123,6 @@ func NewDebugRoundTripper(wrapped http.RoundTripper, log debugLogger) http.Round
 	return &DebugRoundTripper{rt: wrapped, log: log}
 }
 
-// BasicAuthRoundTripper wraps any request using a basic auth.
-type BasicAuthRoundTripper struct {
-	rt       http.RoundTripper
-	username string
-	password string
-}
-
-// RoundTrip add username and password on every request send to the remove service.
-func (r *BasicAuthRoundTripper) RoundTrip(
-	req *http.Request,
-) (*http.Response, error) {
-	// if we already have authorization set on the request we do not force our username, password.
-	const key = "Authorization"
-
-	if len(req.Header.Get(key)) > 0 {
-		return r.rt.RoundTrip(req)
-	}
-
-	req.SetBasicAuth(r.username, r.password)
-	return r.rt.RoundTrip(req)
-}
-
-// NewBasicAuthRoundTripper returns a Basic Auth round tripper.
-func NewBasicAuthRoundTripper(
-	wrapped http.RoundTripper,
-	username, password string,
-) http.RoundTripper {
-	return &BasicAuthRoundTripper{rt: wrapped, username: username, password: password}
-}
-
 func prettyBody(data []byte) []byte {
 	var pretty bytes.Buffer
 
