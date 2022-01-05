@@ -145,9 +145,10 @@ func (l *Listener) initListen(ctx context.Context) error {
 
 func (l *Listener) run() {
 	l.log.Debug("Start accepting connections")
-	defer l.log.Debug("Stopped accepting connections")
-
-	defer l.Listener.Close()
+	defer func() {
+		l.Listener.Close()
+		l.log.Debug("Stopped accepting connections")
+	}()
 
 	for {
 		conn, err := l.Listener.Accept()
