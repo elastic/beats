@@ -93,6 +93,7 @@
 - Fix lazy acker to only add new actions to the batch. {pull}27981[27981]
 - Allow HTTP metrics to run in bootstrap mode. Add ability to adjust timeouts for Fleet Server. {pull}28260[28260]
 - Fix agent configuration overwritten by default fleet config. {pull}29297[29297]
+- Allow agent containers to use basic auth to create a service token. {pull}29651[29651]
 
 ==== New features
 
