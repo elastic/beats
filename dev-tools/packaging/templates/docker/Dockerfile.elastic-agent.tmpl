@@ -27,14 +27,6 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_s
 {{- end }}
     true
 
-{{- if .linux_capabilities }}
-# Since the beat is stored at the other end of a symlink we must follow the symlink first
-# For security reasons setcap does not support symlinks. This is smart in the general case
-# but in our specific case since we're building a trusted image from trusted binaries this is
-# fine. Thus, we use readlink to follow the link and setcap on the actual binary
-RUN readlink -f {{ $beatBinary }} | xargs setcap {{ .linux_capabilities }}
-{{- end }}
-
 FROM {{ .from }}
 
 ENV BEAT_SETUID_AS={{ .user }}
@@ -45,7 +37,7 @@ RUN for iter in {1..10}; do microdnf update -y && microdnf install -y shadow-uti
 
 RUN for iter in {1..10}; do \
         apt-get update -y && \
-        DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes ca-certificates curl && \
+        DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes ca-certificates curl libcap2-bin xz-utils && \
         apt-get clean all && \
         exit_code=0 && break || exit_code=$? && echo "apt-get error: retry $iter in 10s" && sleep 10; \
     done; \
@@ -142,6 +134,14 @@ COPY --from=home {{ $beatHome }}/NOTICE.txt /licenses
 
 {{- if contains .image_name "-cloud" }}
 COPY --from=home /opt /opt
+{{- end }}
+
+{{- if .linux_capabilities }}
+# Since the beat is stored at the other end of a symlink we must follow the symlink first
+# For security reasons setcap does not support symlinks. This is smart in the general case
+# but in our specific case since we're building a trusted image from trusted binaries this is
+# fine. Thus, we use readlink to follow the link and setcap on the actual binary
+RUN readlink -f {{ $beatBinary }} | xargs setcap {{ .linux_capabilities }}
 {{- end }}
 
 {{- if eq .user "root" }}
