@@ -872,6 +872,7 @@ func (b *Beat) checkElasticsearchVersion() {
 			return err
 		}
 		if esVersion.LessThan(beatVersion) {
+			logp.Err("Elasticsearch instance is too old. ES=%v Beat=%s", esVersion, b.Info.Version)
 			return elasticsearch.ErrTooOld
 		}
 		return nil
