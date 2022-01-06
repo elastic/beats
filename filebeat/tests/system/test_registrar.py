@@ -199,7 +199,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             registry_home=registry_home,
-            registry_file_permissions=0644,
+            registry_file_permissions=0o644,
         )
         os.mkdir(self.working_dir + "/log/")
         testfile_path = self.working_dir + "/log/test.log"
@@ -255,7 +255,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             registry_home="a/b/c/registry_x",
-            registry_file_permissions=0644
+            registry_file_permissions=0o644
         )
 
         filebeat = self.start_beat()
