@@ -22,10 +22,9 @@ FROM {{ .from }}
 
 {{- if contains .from "ubi-minimal" }}
 RUN microdnf -y update && \
-    microdnf install shadow-utils && \
+    microdnf install findutils shadow-utils && \
     microdnf clean all
 {{- else }}
-
 RUN for iter in {1..10}; do \
         apt-get update -y && \
         DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes ca-certificates curl libcap2-bin xz-utils && \
