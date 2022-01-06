@@ -50,11 +50,17 @@ log_group_name is given.
 ==== `log_group_name_prefix`
 The prefix for a group of log group names. Note: `region_name` is required when
 log_group_name_prefix is given. `log_group_name` and `log_group_name_prefix`
-cannot be given at the same time.
+cannot be given at the same time. The number of workers that will process the
+log groups under this prefix is set through the `number_of_workers` config.
 
 [float]
 ==== `region_name`
 Region that the specified log group or log group prefix belongs to.
+
+[float]
+==== `number_of_workers`
+Number of workers that will process the log groups with the given `log_group_name_prefix`.
+Default value is 1.
 
 [float]
 ==== `log_streams`

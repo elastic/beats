@@ -38,7 +38,7 @@ func defaultConfig() config {
 		ScanFrequency:   10 * time.Second,
 		APITimeout:      120 * time.Second,
 		APISleep:        200 * time.Millisecond, // FilterLogEvents has a limit of 5 transactions per second (TPS)/account/Region: 1s / 5 = 200 ms
-		NumberOfWorkers: 5,
+		NumberOfWorkers: 1,
 	}
 }
 
