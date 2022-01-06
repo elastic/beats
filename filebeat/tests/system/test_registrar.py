@@ -216,7 +216,7 @@ class Test(BaseTest):
             max_timeout=1)
         filebeat.check_kill_and_wait()
 
-        self.assertEqual(self.file_permissions(registry_file), "0644")
+        self.assertEqual(self.file_permissions(os.path.join(registry_path, "log.json")), "0644")
 
     def test_registry_file_update_permissions(self):
         """
@@ -273,7 +273,7 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-        self.assertEqual(self.file_permissions(registry_file), "0644")
+        self.assertEqual(self.file_permissions(os.path.join(registry_path, "log.json")), "0644")
 
     @unittest.skipIf(platform.system() == 'Darwin' or os.name == 'nt',
                      'Flaky test: https://github.com/elastic/beats/issues/26378')
