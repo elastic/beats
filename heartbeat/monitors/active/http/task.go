@@ -113,11 +113,11 @@ func createPingFactory(
 	timeout := config.Transport.Timeout
 
 	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
-		request, err := reqFactory()
+		req, err := reqFactory()
 		if err != nil {
 			return fmt.Errorf("could not create http request: %w", err)
 		}
-		isTLS := request.URL.Scheme == "https"
+		isTLS := req.URL.Scheme == "https"
 
 		addr := net.JoinHostPort(ip.String(), strconv.Itoa(int(port)))
 		d := &dialchain.DialerChain{
@@ -168,11 +168,6 @@ func createPingFactory(
 			CheckRedirect: checkRedirect,
 			Timeout:       timeout,
 			Transport:     httpcommon.HeaderRoundTripper(transport, map[string]string{"User-Agent": userAgent}),
-		}
-
-		req, err := reqFactory()
-		if err != nil {
-			return fmt.Errorf("could not create http request: %w", err)
 		}
 
 		_, end, err := execPing(event, client, req, body, timeout, validator, config.Response)
