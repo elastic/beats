@@ -454,8 +454,8 @@
         },
         "related": {
           "ip": [
-            "172.20.4.199",
-            "172.20.4.1"
+            "172.20.4.1",
+            "172.20.4.199"
           ]
         },
         "source": {
@@ -610,8 +610,8 @@
         },
         "related": {
           "ip": [
-            "172.20.4.30",
-            "10.10.8.34"
+            "10.10.8.34",
+            "172.20.4.30"
           ]
         },
         "source": {
@@ -766,8 +766,8 @@
         },
         "related": {
           "ip": [
-            "172.20.4.30",
-            "10.10.8.105"
+            "10.10.8.105",
+            "172.20.4.30"
           ]
         },
         "source": {
@@ -1078,8 +1078,8 @@
         },
         "related": {
           "ip": [
-            "172.20.5.191",
-            "10.10.8.220"
+            "10.10.8.220",
+            "172.20.5.191"
           ]
         },
         "source": {
@@ -2190,6 +2190,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:401",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -2204,7 +2206,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "b7SlZfUSuVA",
           "locality": "internal"
         },
         "netflow": {
@@ -2233,7 +2235,7 @@
         },
         "network": {
           "bytes": 555,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:jPPsu6xuLKidwts3HEFDcMotUV4=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 3,
@@ -2242,8 +2244,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:401"
+          ]
+        },
         "source": {
           "bytes": 555,
+          "ip": "fe80::ff:fe00:401",
+          "locality": "internal",
           "packets": 3,
           "port": 5678
         }
@@ -2256,6 +2265,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:401",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -2270,7 +2281,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "b7SlZfUSuVA",
           "locality": "internal"
         },
         "netflow": {
@@ -2299,7 +2310,7 @@
         },
         "network": {
           "bytes": 370,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:jPPsu6xuLKidwts3HEFDcMotUV4=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 2,
@@ -2308,8 +2319,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:401"
+          ]
+        },
         "source": {
           "bytes": 370,
+          "ip": "fe80::ff:fe00:401",
+          "locality": "internal",
           "packets": 2,
           "port": 5678
         }
@@ -2322,6 +2340,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:501",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -2336,7 +2356,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "VSgWWLDT0B0",
           "locality": "internal"
         },
         "netflow": {
@@ -2365,7 +2385,7 @@
         },
         "network": {
           "bytes": 495,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:5591MHyJIXcwUkG4sl3Rs9ro+Ng=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 3,
@@ -2374,8 +2394,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:501"
+          ]
+        },
         "source": {
           "bytes": 495,
+          "ip": "fe80::ff:fe00:501",
+          "locality": "internal",
           "packets": 3,
           "port": 5678
         }
@@ -2388,6 +2415,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:501",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -2402,7 +2431,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "VSgWWLDT0B0",
           "locality": "internal"
         },
         "netflow": {
@@ -2431,7 +2460,7 @@
         },
         "network": {
           "bytes": 330,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:5591MHyJIXcwUkG4sl3Rs9ro+Ng=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 2,
@@ -2440,8 +2469,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:501"
+          ]
+        },
         "source": {
           "bytes": 330,
+          "ip": "fe80::ff:fe00:501",
+          "locality": "internal",
           "packets": 2,
           "port": 5678
         }
@@ -2454,6 +2490,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:601",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -2468,7 +2506,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "LZgYFJ0tL2g",
           "locality": "internal"
         },
         "netflow": {
@@ -2497,7 +2535,7 @@
         },
         "network": {
           "bytes": 555,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:0uFiK83G7mZT66yRsishu3GrI+Y=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 3,
@@ -2506,8 +2544,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:601"
+          ]
+        },
         "source": {
           "bytes": 555,
+          "ip": "fe80::ff:fe00:601",
+          "locality": "internal",
           "packets": 3,
           "port": 5678
         }
@@ -2520,6 +2565,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:601",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -2534,7 +2581,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "LZgYFJ0tL2g",
           "locality": "internal"
         },
         "netflow": {
@@ -2563,7 +2610,7 @@
         },
         "network": {
           "bytes": 370,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:0uFiK83G7mZT66yRsishu3GrI+Y=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 2,
@@ -2572,8 +2619,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:601"
+          ]
+        },
         "source": {
           "bytes": 370,
+          "ip": "fe80::ff:fe00:601",
+          "locality": "internal",
           "packets": 2,
           "port": 5678
         }
@@ -2586,6 +2640,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:701",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -2600,7 +2656,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "dmeH14jqz_U",
           "locality": "internal"
         },
         "netflow": {
@@ -2629,7 +2685,7 @@
         },
         "network": {
           "bytes": 555,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:GHzTYB/S+swKAM+TWkXhIHekjME=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 3,
@@ -2638,8 +2694,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:701"
+          ]
+        },
         "source": {
           "bytes": 555,
+          "ip": "fe80::ff:fe00:701",
+          "locality": "internal",
           "packets": 3,
           "port": 5678
         }
@@ -2652,6 +2715,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:701",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -2666,7 +2731,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "dmeH14jqz_U",
           "locality": "internal"
         },
         "netflow": {
@@ -2695,7 +2760,7 @@
         },
         "network": {
           "bytes": 370,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:GHzTYB/S+swKAM+TWkXhIHekjME=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 2,
@@ -2704,8 +2769,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:701"
+          ]
+        },
         "source": {
           "bytes": 370,
+          "ip": "fe80::ff:fe00:701",
+          "locality": "internal",
           "packets": 2,
           "port": 5678
         }
@@ -2718,6 +2790,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:801",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -2732,7 +2806,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "Il9O6oJGqRk",
           "locality": "internal"
         },
         "netflow": {
@@ -2761,7 +2835,7 @@
         },
         "network": {
           "bytes": 555,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:Y0L0KaggvOgNiQSbjBDXSANtIRo=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 3,
@@ -2770,8 +2844,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:801"
+          ]
+        },
         "source": {
           "bytes": 555,
+          "ip": "fe80::ff:fe00:801",
+          "locality": "internal",
           "packets": 3,
           "port": 5678
         }
@@ -2784,6 +2865,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:801",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -2798,7 +2881,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "Il9O6oJGqRk",
           "locality": "internal"
         },
         "netflow": {
@@ -2827,7 +2910,7 @@
         },
         "network": {
           "bytes": 370,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:Y0L0KaggvOgNiQSbjBDXSANtIRo=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 2,
@@ -2836,8 +2919,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:801"
+          ]
+        },
         "source": {
           "bytes": 370,
+          "ip": "fe80::ff:fe00:801",
+          "locality": "internal",
           "packets": 2,
           "port": 5678
         }
@@ -2850,6 +2940,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:901",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -2864,7 +2956,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "fA2V7HT45yo",
           "locality": "internal"
         },
         "netflow": {
@@ -2893,7 +2985,7 @@
         },
         "network": {
           "bytes": 555,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:ckujBEtohW0WnvxDVLoLAfkwHeE=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 3,
@@ -2902,8 +2994,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:901"
+          ]
+        },
         "source": {
           "bytes": 555,
+          "ip": "fe80::ff:fe00:901",
+          "locality": "internal",
           "packets": 3,
           "port": 5678
         }
@@ -2916,6 +3015,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:901",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -2930,7 +3031,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "fA2V7HT45yo",
           "locality": "internal"
         },
         "netflow": {
@@ -2959,7 +3060,7 @@
         },
         "network": {
           "bytes": 370,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:ckujBEtohW0WnvxDVLoLAfkwHeE=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 2,
@@ -2968,8 +3069,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:901"
+          ]
+        },
         "source": {
           "bytes": 370,
+          "ip": "fe80::ff:fe00:901",
+          "locality": "internal",
           "packets": 2,
           "port": 5678
         }
@@ -2982,6 +3090,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:1001",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -2996,7 +3106,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "r9myTc0ZAtE",
           "locality": "internal"
         },
         "netflow": {
@@ -3025,7 +3135,7 @@
         },
         "network": {
           "bytes": 555,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:3MYYQzFTLjghJ6R8FULtQ6M3TY4=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 3,
@@ -3034,8 +3144,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:1001"
+          ]
+        },
         "source": {
           "bytes": 555,
+          "ip": "fe80::ff:fe00:1001",
+          "locality": "internal",
           "packets": 3,
           "port": 5678
         }
@@ -3048,6 +3165,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:1001",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -3062,7 +3181,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "r9myTc0ZAtE",
           "locality": "internal"
         },
         "netflow": {
@@ -3091,7 +3210,7 @@
         },
         "network": {
           "bytes": 370,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:3MYYQzFTLjghJ6R8FULtQ6M3TY4=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 2,
@@ -3100,8 +3219,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:1001"
+          ]
+        },
         "source": {
           "bytes": 370,
+          "ip": "fe80::ff:fe00:1001",
+          "locality": "internal",
           "packets": 2,
           "port": 5678
         }
@@ -3114,6 +3240,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:1101",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -3128,7 +3256,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "we4v-M4gTEo",
           "locality": "internal"
         },
         "netflow": {
@@ -3157,7 +3285,7 @@
         },
         "network": {
           "bytes": 555,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:RCaNdj14AFbHfSM4MQquuPjYpgs=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 3,
@@ -3166,8 +3294,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:1101"
+          ]
+        },
         "source": {
           "bytes": 555,
+          "ip": "fe80::ff:fe00:1101",
+          "locality": "internal",
           "packets": 3,
           "port": 5678
         }
@@ -3180,6 +3315,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:1101",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -3194,7 +3331,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "we4v-M4gTEo",
           "locality": "internal"
         },
         "netflow": {
@@ -3223,7 +3360,7 @@
         },
         "network": {
           "bytes": 370,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:RCaNdj14AFbHfSM4MQquuPjYpgs=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 2,
@@ -3232,8 +3369,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:1101"
+          ]
+        },
         "source": {
           "bytes": 370,
+          "ip": "fe80::ff:fe00:1101",
+          "locality": "internal",
           "packets": 2,
           "port": 5678
         }
@@ -3246,6 +3390,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:1201",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -3260,7 +3406,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "N9KUKy-eIwc",
           "locality": "internal"
         },
         "netflow": {
@@ -3289,7 +3435,7 @@
         },
         "network": {
           "bytes": 555,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:AL2CtUGKb1BgJM4KclloxlRQdRc=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 3,
@@ -3298,8 +3444,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:1201"
+          ]
+        },
         "source": {
           "bytes": 555,
+          "ip": "fe80::ff:fe00:1201",
+          "locality": "internal",
           "packets": 3,
           "port": 5678
         }
@@ -3312,6 +3465,8 @@
       "Meta": null,
       "Fields": {
         "destination": {
+          "ip": "fe80::ff:fe00:1201",
+          "locality": "internal",
           "port": 5678
         },
         "event": {
@@ -3326,7 +3481,7 @@
           ]
         },
         "flow": {
-          "id": "RlrAo_U1Y14",
+          "id": "N9KUKy-eIwc",
           "locality": "internal"
         },
         "netflow": {
@@ -3355,7 +3510,7 @@
         },
         "network": {
           "bytes": 370,
-          "community_id": "1:I4DlCbWgyxRiNPVj5ntu1L7Z0hw=",
+          "community_id": "1:AL2CtUGKb1BgJM4KclloxlRQdRc=",
           "direction": "unknown",
           "iana_number": 17,
           "packets": 2,
@@ -3364,8 +3519,15 @@
         "observer": {
           "ip": "192.0.2.1"
         },
+        "related": {
+          "ip": [
+            "fe80::ff:fe00:1201"
+          ]
+        },
         "source": {
           "bytes": 370,
+          "ip": "fe80::ff:fe00:1201",
+          "locality": "internal",
           "packets": 2,
           "port": 5678
         }

@@ -16,7 +16,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws/transformer"
@@ -45,7 +45,7 @@ func APIGatewayProxyDetails() feature.Details {
 }
 
 // Run starts the lambda function and wait for web triggers.
-func (a *APIGatewayProxy) Run(_ context.Context, client core.Client, telemetry telemetry.T) error {
+func (a *APIGatewayProxy) Run(_ context.Context, client pipeline.ISyncClient, telemetry telemetry.T) error {
 	telemetry.AddTriggeredFunction()
 
 	lambda.Start(a.createHandler(client))
@@ -53,7 +53,7 @@ func (a *APIGatewayProxy) Run(_ context.Context, client core.Client, telemetry t
 }
 
 func (a *APIGatewayProxy) createHandler(
-	client core.Client,
+	client pipeline.ISyncClient,
 ) func(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	return func(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 		a.log.Debugf("The handler receives a new event from the gateway (requestID: %s)", request.RequestContext.RequestID)
