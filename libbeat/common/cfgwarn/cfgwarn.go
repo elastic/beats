@@ -33,7 +33,8 @@ func Beta(format string, v ...interface{}) {
 }
 
 // Deprecate logs a deprecation message.
-// The version string contains the version when the future will be removed
+// The version string contains the version when the future will be removed.
+// If version is empty, the message  will not mention the removal of the feature.
 func Deprecate(version string, format string, v ...interface{}) {
 	var postfix string
 	if version != "" {
