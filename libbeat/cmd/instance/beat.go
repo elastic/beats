@@ -34,6 +34,7 @@ import (
 	"runtime/debug"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -128,7 +129,11 @@ type beatConfig struct {
 	Migration *common.Config `config:"migration.6_to_7"`
 }
 
-var debugf = logp.MakeDebug("beat")
+var (
+	warnAboutOldES sync.Once
+
+	debugf = logp.MakeDebug("beat")
+)
 
 func init() {
 	initRand()
@@ -325,6 +330,8 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	logSystemInfo(b.Info)
 	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
+
+	b.warnAboutElasticsearchVersion()
 
 	err = b.registerESIndexManagement()
 	if err != nil {
@@ -853,6 +860,31 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	}
 
 	return nil
+}
+
+// checkElasticsearchVersion registers a global callback to make sure ES instance we are connecting
+// to is at least on the same version as the Beat.
+// If the check is disabled or the output is not Elasticsearch, nothing happens.
+func (b *Beat) warnAboutElasticsearchVersion() {
+	if b.Config.Output.Name() != "elasticsearch" {
+		return
+	}
+
+	elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
+		warnAboutOldES.Do(func() {
+			esVersion := conn.GetVersion()
+			beatVersion, err := common.NewVersion(b.Info.Version)
+			if err != nil {
+				logp.Debug("beat", "Failed to determine Beat version to compare it with ES version: %+v", err)
+				return
+			}
+
+			if esVersion.LessThan(beatVersion) {
+				logp.Warn("Connecting to older version of Elasticsearch. From 8.1, it is going to be disabled by default.")
+			}
+		})
+		return nil
+	})
 }
 
 // registerESIndexManagement registers the loading of the template and ILM
