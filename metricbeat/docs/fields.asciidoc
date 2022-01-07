@@ -40508,6 +40508,25 @@ Kibana module
 
 
 
+*`kibana_rule.timestamp`*::
++
+--
+type: alias
+
+alias to: @timestamp
+
+--
+
+*`kibana_rule.rule.id`*::
++
+--
+type: alias
+
+alias to: kibana.rule.id
+
+--
+
+
 *`kibana_stats.timestamp`*::
 +
 --
@@ -40666,6 +40685,63 @@ alias to: service.id
 +
 --
 type: keyword
+
+--
+
+[float]
+=== rule
+
+rule
+
+
+
+
+*`kibana.rule.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.rule.name`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.rule.id`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.rule.lastExecutionDuration`*::
++
+--
+type: long
+
+--
+
+*`kibana.rule.averageDrift`*::
++
+--
+type: long
+
+--
+
+*`kibana.rule.lastExecutionTimeout`*::
++
+--
+type: date
+
+--
+
+*`kibana.rule.totalExecutions`*::
++
+--
+type: long
 
 --
 
@@ -41180,6 +41256,28 @@ type: long
 Total number of connections.
 
 
+type: long
+
+--
+
+[float]
+=== task_manager
+
+task_manager
+
+
+
+
+*`kibana.task_manager.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.task_manager.pending`*::
++
+--
 type: long
 
 --

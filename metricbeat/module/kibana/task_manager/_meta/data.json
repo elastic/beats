@@ -7,12 +7,12 @@
     "metricset":{
         "host":"localhost",
         "module":"kibana",
-        "name":"metrics",
+        "name":"task_manager",
         "rtt":44269
     },
     "kibana":{
-        "metrics":{
-            "example": "metrics"
+        "task_manager":{
+            "example": "task_manager"
         }
     },
     "type":"metricsets"

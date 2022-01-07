@@ -34,10 +34,11 @@ const (
 	ModuleName = "kibana"
 
 	// API Paths
-	StatusPath   = "api/status"
-	StatsPath    = "api/stats"
-	MetricsPath    = "api/metrics"
-	SettingsPath = "api/settings"
+	StatusPath      = "api/status"
+	StatsPath       = "api/stats"
+	RulePath        = "api/monitoring_collection/rules"
+	TaskManagerPath = "api/monitoring_collection/task_manager"
+	SettingsPath    = "api/settings"
 )
 
 var (
@@ -54,8 +55,9 @@ var (
 	// SettingsAPIAvailableVersion is the version of Kibana since when the settings API is available
 	SettingsAPIAvailableVersion = v6_5_0
 
-	// SettingsAPIAvailableVersion is the version of Kibana since when the settings API is available
-	MetricsAPIAvailableVersion = v8_1_0
+	// Version of Kibana since when the rules and task manager APIs are available
+	RulesAPIAvailableVersion       = v8_1_0
+	TaskManagerAPIAvailableVersion = v8_1_0
 )
 
 func init() {
@@ -67,7 +69,7 @@ func init() {
 
 // NewModule creates a new module.
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	return elastic.NewModule(&base, []string{"stats"}, logp.NewLogger(ModuleName))
+	return elastic.NewModule(&base, []string{"stats", "rule", "task_manager"}, logp.NewLogger(ModuleName))
 }
 
 // GetVersion returns the version of the Kibana instance
@@ -101,9 +103,14 @@ func IsSettingsAPIAvailable(currentKibanaVersion *common.Version) bool {
 	return elastic.IsFeatureAvailable(currentKibanaVersion, SettingsAPIAvailableVersion)
 }
 
-// IsMetricsAPIAvailable returns whether the stats API is available in the given version of Kibana
-func IsMetricsAPIAvailable(currentKibanaVersion *common.Version) bool {
-	return elastic.IsFeatureAvailable(currentKibanaVersion, MetricsAPIAvailableVersion)
+// IsRulesAPIAvailable returns whether the rules API is available in the given version of Kibana
+func IsRulesAPIAvailable(currentKibanaVersion *common.Version) bool {
+	return elastic.IsFeatureAvailable(currentKibanaVersion, RulesAPIAvailableVersion)
+}
+
+// IsTaskManagerAPIAvailable returns whether the rules API is available in the given version of Kibana
+func IsTaskManagerAPIAvailable(currentKibanaVersion *common.Version) bool {
+	return elastic.IsFeatureAvailable(currentKibanaVersion, TaskManagerAPIAvailableVersion)
 }
 
 // IsUsageExcludable returns whether the stats API supports the exclude_usage parameter in the

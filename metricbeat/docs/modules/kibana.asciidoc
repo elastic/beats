@@ -57,15 +57,23 @@ It also supports the options described in <<module-http-config-options>>.
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-kibana-rule,rule>>
+
 * <<metricbeat-metricset-kibana-settings,settings>>
 
 * <<metricbeat-metricset-kibana-stats,stats>>
 
 * <<metricbeat-metricset-kibana-status,status>>
 
+* <<metricbeat-metricset-kibana-task_manager,task_manager>>
+
+include::kibana/rule.asciidoc[]
+
 include::kibana/settings.asciidoc[]
 
 include::kibana/stats.asciidoc[]
 
 include::kibana/status.asciidoc[]
+
+include::kibana/task_manager.asciidoc[]
 

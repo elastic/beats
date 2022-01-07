@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package metrics
+package rule
 
 import (
 	"fmt"
@@ -31,7 +31,7 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet(kibana.ModuleName, "metrics", New,
+	mb.Registry.MustAddMetricSet(kibana.ModuleName, "rule", New,
 		mb.WithHostParser(hostParser),
 	)
 }
@@ -39,15 +39,14 @@ func init() {
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: "http",
-		DefaultPath:   kibana.MetricsPath,
+		DefaultPath:   kibana.RulePath,
 	}.Build()
 )
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*kibana.MetricSet
-	metricsHTTP         *helper.HTTP
-	isUsageExcludable bool
+	ruleHTTP *helper.HTTP
 }
 
 // New create a new instance of the MetricSet
@@ -71,30 +70,30 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 	}
 
 	if err = m.fetchMetrics(r); err != nil {
-		return errors.Wrap(err, "error trying to get metrics data from Kibana")
+		return errors.Wrap(err, "error trying to get rule data from Kibana")
 	}
 
 	return
 }
 
 func (m *MetricSet) init() error {
-	metricsHTTP, err := helper.NewHTTP(m.BaseMetricSet)
+	ruleHTTP, err := helper.NewHTTP(m.BaseMetricSet)
 	if err != nil {
 		return err
 	}
 
-	kibanaVersion, err := kibana.GetVersion(metricsHTTP, kibana.MetricsPath)
+	kibanaVersion, err := kibana.GetVersion(ruleHTTP, kibana.RulePath)
 	if err != nil {
 		return err
 	}
 
-	isMetricsAPIAvailable := kibana.IsMetricsAPIAvailable(kibanaVersion)
+	isMetricsAPIAvailable := kibana.IsRulesAPIAvailable(kibanaVersion)
 	if !isMetricsAPIAvailable {
-		const errorMsg = "the %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
-		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.MetricsAPIAvailableVersion, kibanaVersion)
+		const errorMsg = "the %v rule is only supported with Kibana >= %v. You are currently running Kibana %v"
+		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.RulesAPIAvailableVersion, kibanaVersion)
 	}
 
-	m.metricsHTTP = metricsHTTP
+	m.ruleHTTP = ruleHTTP
 
 	return nil
 }
@@ -103,7 +102,7 @@ func (m *MetricSet) fetchMetrics(r mb.ReporterV2) error {
 	var content []byte
 	var err error
 
-	content, err = m.metricsHTTP.FetchContent()
+	content, err = m.ruleHTTP.FetchContent()
 	if err != nil {
 		return err
 	}
