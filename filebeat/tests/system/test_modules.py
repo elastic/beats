@@ -124,6 +124,9 @@ class Test(BaseTest):
                 module=module, fileset=fileset, test_file=test_file),
             "-M", "*.*.input.close_eof=true",
         ]
+        # allow connecting older versions of Elasticsearch
+        if os.getenv("TESTING_ALLOW_OLDER"):
+            cmd.extend(["-E", "output.elasticsearch.allow_older_versions=true"])
 
         # Based on the convention that if a name contains -json the json format is needed. Currently used for LS.
         if "-json" in test_file:
