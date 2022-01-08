@@ -41282,6 +41282,35 @@ type: long
 
 --
 
+
+*`kibana.task_manager.drift.p50`*::
++
+--
+type: long
+
+--
+
+*`kibana.task_manager.drift.p90`*::
++
+--
+type: long
+
+--
+
+*`kibana.task_manager.drift.p95`*::
++
+--
+type: long
+
+--
+
+*`kibana.task_manager.drift.p99`*::
++
+--
+type: long
+
+--
+
 [[exported-fields-kubernetes-processor]]
 == Kubernetes fields
 

@@ -34,6 +34,12 @@ var (
 	schema = s.Schema{
 		"task_manager": c.Dict("task_manager", s.Schema{
 			"pending": c.Int("pending"),
+			"drift": c.Dict("drift", s.Schema{
+				"p50": c.Float("p50"),
+				"p90": c.Float("p90"),
+				"p95": c.Float("p95"),
+				"p99": c.Float("p99"),
+			}),
 		}),
 		"kibana": c.Dict("kibana", s.Schema{
 			"uuid":  c.Str("uuid"),

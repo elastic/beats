@@ -11,3 +11,15 @@
           type: keyword
     - name: pending
       type: long
+    - name: drift
+      type: group
+      fields:
+        - name: p50
+          type: long
+        - name: p90
+          type: long
+        - name: p95
+          type: long
+        - name: p99
+          type: long
+
