@@ -41,7 +41,7 @@ var functionAlternatives = map[string][]string{
 	"SYS_EXECVE":        syscallAlternatives("execve"),
 	"SYS_GETTIMEOFDAY":  syscallAlternatives("gettimeofday"),
 	"SYS_UNAME":         syscallAlternatives("newuname"),
-	"DO_FORK":           {"_do_fork", "do_fork"},
+	"DO_FORK":           {"_do_fork", "do_fork", "kernel_clone"},
 }
 
 func syscallAlternatives(syscall string) []string {
