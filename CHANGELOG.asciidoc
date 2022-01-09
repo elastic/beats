@@ -3,6 +3,119 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.16.3]]
+=== Beats version 7.16.3
+https://github.com/elastic/beats/compare/v7.16.2...v7.16.3[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fields of type `match_only_text` (i.e. `message`) and `wildcard` were missing from the template's default_field list. {issue}29633[29633] {pull}29634[29634]
+
+*Auditbeat*
+
+*Filebeat*
+
+
+*Heartbeat*
+
+- Fix broken monitors with newer versions of image relying on dup3. {pull}28938[pull]
+- Fix race condition in http monitors using `mode:all` that can cause crashes. {pull}29697[pull]
+
+*Metricbeat*
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+*Packetbeat*
+
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+*Journalbeat*
+
+
+
+
+
+
+
+
+
 [[release-notes-7.16.2]]
 === Beats version 7.16.2
 https://github.com/elastic/beats/compare/v7.16.1...v7.16.2[View commits]
