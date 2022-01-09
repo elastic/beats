@@ -116,6 +116,7 @@ require (
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/jonboulle/clockwork v0.2.2
 	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
+	github.com/kortschak/toutoumomoma v0.0.0-20220212064956-c13235c1f719
 	github.com/lib/pq v1.10.3
 	github.com/magefile/mage v1.13.0
 	github.com/mattn/go-colorable v0.1.12
@@ -155,14 +156,14 @@ require (
 	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
-	golang.org/x/mod v0.5.1
+	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
 	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b
 	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094
 	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde
 	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261
 	golang.org/x/text v0.3.7
 	golang.org/x/time v0.0.0-20220609170525-579cf78fd858
-	golang.org/x/tools v0.1.9
+	golang.org/x/tools v0.1.11-0.20220509190205-b87ceec0dd4d
 	google.golang.org/api v0.94.0
 	google.golang.org/genproto v0.0.0-20220829175752-36a9c930ecbf
 	google.golang.org/grpc v1.49.0
@@ -197,7 +198,6 @@ require (
 	github.com/elastic/elastic-agent-system-metrics v0.4.4
 	github.com/elastic/go-elasticsearch/v8 v8.2.0
 	github.com/googleapis/gax-go/v2 v2.5.1
-	github.com/kortschak/toutoumomoma v0.0.0-20220212064956-c13235c1f719
 	github.com/pierrec/lz4/v4 v4.1.15
 	github.com/shirou/gopsutil/v3 v3.21.12
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.0.0
@@ -205,7 +205,6 @@ require (
 	go.elastic.co/apm/v2 v2.0.0
 	go.mongodb.org/mongo-driver v1.5.1
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
-	mvdan.cc/garble v0.7.1
 )
 
 require (
@@ -332,7 +331,7 @@ require (
 	k8s.io/kube-openapi v0.0.0-20211115234752-e816edb12b65 // indirect
 	k8s.io/utils v0.0.0-20211116205334-6203023598ed // indirect
 	kernel.org/pub/linux/libs/security/libcap/psx v1.2.57 // indirect
-	mvdan.cc/garble v0.4.0 // indirect
+	mvdan.cc/garble v0.7.1 // indirect
 	sigs.k8s.io/json v0.0.0-20211020170558-c049b76a60c6 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.1 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
