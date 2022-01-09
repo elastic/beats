@@ -3,7 +3,7 @@
 version: '2.3'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
     healthcheck:
       test: ["CMD-SHELL", "curl -s http://localhost:9200/_cat/health?h=status | grep -q green"]
       retries: 300
@@ -21,7 +21,7 @@ services:
     - "action.destructive_requires_name=false"
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:7.16.1
+    image: docker.elastic.co/logstash/logstash:7.16.2
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
       retries: 600
@@ -31,7 +31,7 @@ services:
       - ./docker/logstash/pki:/etc/pki:ro
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.16.1
+    image: docker.elastic.co/kibana/kibana:7.16.2
     healthcheck:
       test: ["CMD-SHELL", "curl -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
       retries: 600
