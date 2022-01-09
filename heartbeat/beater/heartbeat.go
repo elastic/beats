@@ -37,7 +37,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 
 	_ "github.com/elastic/beats/v7/heartbeat/security"
-	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 )
 
 // Heartbeat represents the root datastructure of this beat.
