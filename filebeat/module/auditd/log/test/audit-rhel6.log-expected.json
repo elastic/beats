@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2017-03-14T19:20:30.178Z",
         "auditd.log.op": "PAM:session_close",
         "auditd.log.record_type": "USER_END",
         "auditd.log.sequence": 19600327,
@@ -32,7 +31,6 @@
         "user.name": "root"
     },
     {
-        "@timestamp": "2017-03-14T19:20:30.178Z",
         "auditd.log.op": "PAM:setcred",
         "auditd.log.record_type": "CRED_DISP",
         "auditd.log.sequence": 19600328,
@@ -64,7 +62,6 @@
         "user.name": "root"
     },
     {
-        "@timestamp": "2017-03-14T19:20:56.192Z",
         "auditd.log.record_type": "USER_CMD",
         "auditd.log.sequence": 19600329,
         "auditd.log.ses": "11988",
@@ -86,8 +83,8 @@
         "input.type": "log",
         "log.offset": 373,
         "process.args": [
-            "-p",
             "/usr/lib64/nagios/plugins/check_asterisk_sip_peers",
+            "-p",
             "202"
         ],
         "process.args_count": 3,
@@ -98,7 +95,6 @@
         "user.id": "497"
     },
     {
-        "@timestamp": "2017-03-14T19:20:56.193Z",
         "auditd.log.op": "PAM:setcred",
         "auditd.log.record_type": "CRED_ACQ",
         "auditd.log.sequence": 19600330,
@@ -130,7 +126,6 @@
         "user.name": "root"
     },
     {
-        "@timestamp": "2017-03-14T19:20:56.193Z",
         "auditd.log.op": "PAM:session_open",
         "auditd.log.record_type": "USER_START",
         "auditd.log.sequence": 19600331,
@@ -162,7 +157,6 @@
         "user.name": "root"
     },
     {
-        "@timestamp": "2017-03-14T19:23:02.529Z",
         "auditd.log.dst_prefixlen": 22,
         "auditd.log.op": "SPD-add",
         "auditd.log.sequence": 19600354,
@@ -184,7 +178,6 @@
         "user.audit.id": "4294967295"
     },
     {
-        "@timestamp": "2017-03-14T19:23:02.529Z",
         "auditd.log.a0": "9",
         "auditd.log.a1": "7f564ee6d2a0",
         "auditd.log.a2": "b8",
@@ -228,7 +221,6 @@
         "user.saved.id": "0"
     },
     {
-        "@timestamp": "2017-03-16T04:02:40.072Z",
         "auditd.log.new_auid": "700",
         "auditd.log.new_ses": "12286",
         "auditd.log.old_auid": "700",
@@ -258,7 +250,6 @@
         "user.id": "700"
     },
     {
-        "@timestamp": "2017-03-16T04:02:40.070Z",
         "auditd.log.direction": "both",
         "auditd.log.kind": "session",
         "auditd.log.laddr": "107.170.139.210",
@@ -305,7 +296,6 @@
         "user.saved.id": "74"
     },
     {
-        "@timestamp": "2017-03-16T04:02:40.072Z",
         "auditd.log.op": "success",
         "auditd.log.record_type": "USER_AUTH",
         "auditd.log.sequence": 19623789,
@@ -349,7 +339,6 @@
         "user.terminal": "ssh"
     },
     {
-        "@timestamp": "2017-03-16T04:02:57.804Z",
         "auditd.log.op": "PAM:authentication",
         "auditd.log.record_type": "USER_AUTH",
         "auditd.log.sequence": 19623807,
@@ -382,7 +371,6 @@
         "user.terminal": "pts/0"
     },
     {
-        "@timestamp": "2017-03-16T04:02:57.805Z",
         "auditd.log.op": "PAM:accounting",
         "auditd.log.record_type": "USER_ACCT",
         "auditd.log.sequence": 19623808,

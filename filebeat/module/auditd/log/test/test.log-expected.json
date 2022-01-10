@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2017-01-31T20:17:14.891Z",
         "auditd.log.dst_prefixlen": 16,
         "auditd.log.op": "SPD-delete",
         "auditd.log.sequence": 18877201,
@@ -22,7 +21,6 @@
         "user.audit.id": "4294967295"
     },
     {
-        "@timestamp": "2017-01-31T20:17:14.891Z",
         "auditd.log.a0": "9",
         "auditd.log.a1": "7f564b2672a0",
         "auditd.log.a2": "b8",
@@ -66,7 +64,6 @@
         "user.saved.id": "0"
     },
     {
-        "@timestamp": "2017-03-14T19:20:56.192Z",
         "auditd.log.record_type": "USER_CMD",
         "auditd.log.sequence": 19600329,
         "auditd.log.ses": "11988",
@@ -88,8 +85,8 @@
         "input.type": "log",
         "log.offset": 536,
         "process.args": [
-            "-p",
             "/usr/lib64/nagios/plugins/check_asterisk_sip_peers",
+            "-p",
             "202"
         ],
         "process.args_count": 3,
@@ -100,7 +97,6 @@
         "user.id": "497"
     },
     {
-        "@timestamp": "2016-12-07T02:17:21.515Z",
         "auditd.log.cipher": "chacha20-poly1305@openssh.com",
         "auditd.log.direction": "from-server",
         "auditd.log.ksize": 512,
@@ -150,7 +146,6 @@
         "user.saved.id": "74"
     },
     {
-        "@timestamp": "2017-04-11T15:21:03.550Z",
         "auditd.log.data": "eh^?^?echo test^Mvim /etc/pam.d/password-auth-ac^Mman pam_tty_audit^Mman pam.d^Mvim /etc^Asudo ^E/pamd.sy^?^?^?^?^?.^?m.d/sy^I-a^Ia^?-a^I^Mman pam^Mt^?grep sys^?^?^?/var/lo^Ig/me^Is^I | grep pam_tty^Mgrep pam_tty /var/log/mes^I^M^[[A^Asudo ^Msudo su^M",
         "auditd.log.major": "136",
         "auditd.log.minor": "0",
@@ -174,7 +169,6 @@
         "user.id": "1000"
     },
     {
-        "@timestamp": "2016-01-03T00:37:51.394Z",
         "auditd.log.proctitle": "bash",
         "auditd.log.sequence": 194438,
         "event.action": "proctitle",
@@ -188,7 +182,6 @@
         "service.type": "auditd"
     },
     {
-        "@timestamp": "2016-01-03T00:37:51.394Z",
         "auditd.log.proctitle": "sshd: burn [priv]",
         "auditd.log.sequence": 194440,
         "event.action": "proctitle",
@@ -202,7 +195,6 @@
         "service.type": "auditd"
     },
     {
-        "@timestamp": "2019-11-15T19:01:24.309Z",
         "auditd.log.gpg_res": "1",
         "auditd.log.key_enforce": "0",
         "auditd.log.record_type": "SOFTWARE_UPDATE",
@@ -237,7 +229,6 @@
         "user.id": "0"
     },
     {
-        "@timestamp": "2019-11-15T19:00:56.144Z",
         "auditd.log.record_type": "SYSTEM_BOOT",
         "auditd.log.sequence": 5,
         "auditd.log.ses": "4294967295",
@@ -263,7 +254,6 @@
         "user.id": "0"
     },
     {
-        "@timestamp": "2019-11-15T19:01:57.054Z",
         "auditd.log.record_type": "SYSTEM_SHUTDOWN",
         "auditd.log.sequence": 1163,
         "auditd.log.ses": "4294967295",
@@ -289,8 +279,6 @@
         "user.id": "0"
     },
     {
-        "@timestamp": "2020-02-10T21:59:44.206Z",
-        "auditd.log.a0": "top",
         "auditd.log.sequence": 579393,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -300,11 +288,14 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2688,
+        "process.args": [
+            "top"
+        ],
         "process.args_count": 1,
+        "process.executable": "top",
         "service.type": "auditd"
     },
     {
-        "@timestamp": "2020-02-10T21:59:44.206Z",
         "auditd.log.a0": "0x1fd05c0",
         "auditd.log.a1": "0x1fd2730",
         "auditd.log.a2": "0x1fd4640",
@@ -347,7 +338,6 @@
         "user.saved.id": "vagrant"
     },
     {
-        "@timestamp": "2020-02-10T21:59:44.206Z",
         "auditd.log.name": "mymodule",
         "auditd.log.record_type": "KERN_MODULE",
         "auditd.log.sequence": 579397,
@@ -370,7 +360,6 @@
         "service.type": "auditd"
     },
     {
-        "@timestamp": "2017-12-17T10:44:41.075Z",
         "auditd.log.op": "create",
         "auditd.log.reason": "api",
         "auditd.log.record_type": "VIRT_CONTROL",
@@ -398,7 +387,6 @@
         "user.name": "root"
     },
     {
-        "@timestamp": "2016-12-16T15:45:43.572Z",
         "auditd.log.img-ctx": "system_u:object_r:svirt_image_t:s0:c444,c977",
         "auditd.log.model": "selinux",
         "auditd.log.record_type": "VIRT_MACHINE_ID",
