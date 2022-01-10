@@ -25,6 +25,7 @@ remove_timestamp = {
     "f5.bigipafm",
     "fortinet.clientendpoint",
     "haproxy.log",
+    "ibmmq.errorlog",
     "icinga.startup",
     "imperva.securesphere",
     "infoblox.nios",
