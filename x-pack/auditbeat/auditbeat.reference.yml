@@ -516,7 +516,7 @@ output.elasticsearch:
   # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
 
-  # auditbeat expects Elasticseach to be the same version or newer than the Beat.
+  # auditbeat expects Elasticsearch to be the same version or newer than the Beat.
   # Lift the version restriction by setting allow_older_versions to true.
   #allow_older_versions: false
 

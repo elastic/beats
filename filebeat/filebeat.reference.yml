@@ -1404,7 +1404,7 @@ output.elasticsearch:
   # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
 
-  # filebeat expects Elasticseach to be the same version or newer than the Beat.
+  # filebeat expects Elasticsearch to be the same version or newer than the Beat.
   # Lift the version restriction by setting allow_older_versions to true.
   #allow_older_versions: false
 
