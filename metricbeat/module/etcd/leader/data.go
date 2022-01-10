@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 type Counts struct {
@@ -46,12 +47,26 @@ type Leader struct {
 	Leader    string                 `json:"leader"`
 }
 
-func eventMapping(content []byte) common.MapStr {
+func eventsMapping(r mb.ReporterV2, content []byte) {
 	var data Leader
 	json.Unmarshal(content, &data)
-	event := common.MapStr{
-		"followers": data.Followers,
-		"leader":    data.Leader,
+
+	for id, follower := range data.Followers {
+		event := mb.Event{
+			MetricSetFields: common.MapStr{
+				"follower": common.MapStr{
+					"id": id,
+					"latency": common.MapStr{
+						"ms": follower.Latency.Current,
+					},
+					"success_operations": follower.Counts.Success,
+					"failed_operations":  follower.Counts.Fail,
+					"leader":             data.Leader,
+				},
+			},
+			ModuleFields: common.MapStr{"api_version": apiVersion},
+		}
+
+		r.Event(event)
 	}
-	return event
 }
