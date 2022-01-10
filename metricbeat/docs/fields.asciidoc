@@ -7535,6 +7535,13 @@ type: keyword
 
 --
 
+*`beat.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
+
 [float]
 === state
 
@@ -8701,6 +8708,13 @@ type: short
 --
 
 *`beat.stats.libbeat.config.stops`*::
++
+--
+type: short
+
+--
+
+*`beat.stats.libbeat.config.reloads`*::
 +
 --
 type: short
@@ -40648,6 +40662,13 @@ alias to: service.id
 --
 
 
+*`kibana.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
+
 [float]
 === settings
 
@@ -41959,6 +41980,18 @@ format: bytes
 
 --
 
+*`kubernetes.container.memory.workingset.limit.pct`*::
++
+--
+Working set memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited)
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`kubernetes.container.memory.pagefaults`*::
 +
 --
@@ -43020,6 +43053,18 @@ Total working set memory
 type: double
 
 format: bytes
+
+--
+
+*`kubernetes.pod.memory.working_set.limit.pct`*::
++
+--
+Working set memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited)
+
+
+type: scaled_float
+
+format: percent
 
 --
 
@@ -46279,6 +46324,13 @@ alias to: logstash.node.state.pipeline.hash
 
 --
 
+
+*`logstash.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
 
 [float]
 === node

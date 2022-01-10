@@ -15,15 +15,26 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package system
+package sysinit
 
 import (
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/helper"
+	"os"
+	"path/filepath"
+
+	"github.com/elastic/gosigar"
 )
 
-func initModule(config string) {
-	if err := helper.CheckAndEnableSeDebugPrivilege(); err != nil {
-		logp.Warn("%v", err)
-	}
+func InitModule(config string) {
+	configureHostFS(config)
+}
+
+func configureHostFS(config string) {
+	dir := config
+	// Set environment variables for gopsutil.
+	os.Setenv("HOST_PROC", filepath.Join(dir, "/proc"))
+	os.Setenv("HOST_SYS", filepath.Join(dir, "/sys"))
+	os.Setenv("HOST_ETC", filepath.Join(dir, "/etc"))
+
+	// Set proc location for gosigar.
+	gosigar.Procd = filepath.Join(dir, "/proc")
 }

@@ -15,41 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package pipeline
+package sysinit
 
-import "sync"
+import (
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/helper"
+)
 
-type sema struct {
-	// simulate cancellable counting semaphore using counter + mutex + cond
-	mutex      sync.Mutex
-	cond       sync.Cond
-	count, max int
-}
-
-func newSema(max int) *sema {
-	s := &sema{max: max}
-	s.cond.L = &s.mutex
-	return s
-}
-
-func (s *sema) inc() {
-	s.mutex.Lock()
-	for s.count == s.max {
-		s.cond.Wait()
+func InitModule(config string) {
+	if err := helper.CheckAndEnableSeDebugPrivilege(); err != nil {
+		logp.Warn("%v", err)
 	}
-	s.mutex.Unlock()
-}
-
-func (s *sema) release(n int) {
-	s.mutex.Lock()
-	old := s.count
-	s.count -= n
-	if old == s.max {
-		if n == 1 {
-			s.cond.Signal()
-		} else {
-			s.cond.Broadcast()
-		}
-	}
-	s.mutex.Unlock()
 }

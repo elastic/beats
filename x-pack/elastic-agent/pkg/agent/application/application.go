@@ -43,7 +43,6 @@ type upgraderControl interface {
 // New creates a new Agent and bootstrap the required subsystem.
 func New(
 	log *logger.Logger,
-	pathConfigFile string,
 	reexec reexecManager,
 	statusCtrl status.Controller,
 	uc upgraderControl,
@@ -53,6 +52,7 @@ func New(
 	// Load configuration from disk to understand in which mode of operation
 	// we must start the elastic-agent, the mode of operation cannot be changed without restarting the
 	// elastic-agent.
+	pathConfigFile := paths.ConfigFile()
 	rawConfig, err := config.LoadFile(pathConfigFile)
 	if err != nil {
 		return nil, err
@@ -77,7 +77,6 @@ func createApplication(
 ) (Application, error) {
 	log.Info("Detecting execution mode")
 	ctx := context.Background()
-
 	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
 		return nil, err

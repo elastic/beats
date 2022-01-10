@@ -160,12 +160,13 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 	}
 	defer control.Stop()
 
-	app, err := application.New(logger, pathConfigFile, rex, statusCtrl, control, agentInfo, tracer)
+	app, err := application.New(logger, rex, statusCtrl, control, agentInfo, tracer)
 	if err != nil {
 		return err
 	}
 
 	control.SetRouteFn(app.Routes)
+	control.SetMonitoringCfg(cfg.Settings.MonitoringConfig)
 
 	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS(), cfg.Settings.MonitoringConfig, app, tracer)
 	if err != nil {
@@ -338,7 +339,7 @@ func setupMetrics(
 	}
 	s.Start()
 
-	if cfg.Pprof {
+	if cfg.Pprof != nil && cfg.Pprof.Enabled {
 		s.AttachPprof()
 	}
 

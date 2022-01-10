@@ -38,7 +38,6 @@ func TestConfig(t *testing.T) {
 			SQSWaitTime:         20 * time.Second,
 			BucketListInterval:  120 * time.Second,
 			BucketListPrefix:    "",
-			FIPSEnabled:         false,
 			PathStyle:           false,
 			MaxNumberOfMessages: 5,
 			ReaderConfig: readerConfig{
