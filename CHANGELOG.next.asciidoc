@@ -41,6 +41,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - With the default configuration the cloud modules (aws, azure, googlecloud, o365, okta)
 - With the default configuration the cef and panw modules will no longer send the `host`
 - Add `while_pattern` type to multiline reader. {pull}19662[19662]
+- auditd dataset: Use process.args to store program arguments instead of auditd.log.aNNN fields. {pull}29601[29601]
 
 *Heartbeat*
 - Only add monitor.status to browser events when summary. {pull}29460[29460]
@@ -91,6 +92,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
 - system/socket: Fix bugs leading to wrong process being attributed to flows. {pull}29166[29166] {issue}17165[17165]
 - system/socket: Fix process name and arg truncation for long names, paths and args lists. {issue}24667[24667] {pull}29410[29410]
+- system/socket: Fix startup errors on newer 5.x kernels due to missing _do_fork function. {issue}29607[29607] {pull}29744[29744]
 
 *Filebeat*
 
@@ -102,6 +104,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Heartbeat*
 
 - Fix broken monitors with newer versions of image relying on dup3. {pull}28938[pull]
+- Fix race condition in http monitors using `mode:all` that can cause crashes. {pull}29697[pull]
 
 *Metricbeat*
 
@@ -110,6 +113,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Enhance filter check in kubernetes event metricset. {pull}29470[29470]
 - Fix gcp metrics metricset apply aligner to all metric_types {pull}29514[29513]
 - Extract correct index property in kibana.stats metricset {pull}29622[29622]
+- Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {pull}29711[29711]
 
 *Packetbeat*
 
