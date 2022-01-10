@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2016-12-07T02:20:31.371Z",
         "auditd.log.sequence": 479,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -23,6 +24,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:20:31.372Z",
         "auditd.log.sequence": 481,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -42,6 +44,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:20:32.471Z",
         "auditd.log.sequence": 485,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -71,6 +74,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:20:53.941Z",
         "auditd.log.sequence": 486,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -90,6 +94,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:20:54.135Z",
         "auditd.log.sequence": 493,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -109,6 +114,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:20:54.258Z",
         "auditd.log.sequence": 507,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -126,6 +132,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:20:54.261Z",
         "auditd.log.sequence": 508,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -144,6 +151,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:20:54.264Z",
         "auditd.log.sequence": 509,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -161,6 +169,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:20:54.265Z",
         "auditd.log.sequence": 510,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -179,6 +188,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:20:54.266Z",
         "auditd.log.sequence": 511,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -197,6 +207,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:20:54.268Z",
         "auditd.log.sequence": 512,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -216,6 +227,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:20:54.269Z",
         "auditd.log.sequence": 513,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -236,6 +248,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:20:54.270Z",
         "auditd.log.sequence": 514,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -254,6 +267,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:20:54.271Z",
         "auditd.log.sequence": 515,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -272,6 +286,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:20:54.273Z",
         "auditd.log.sequence": 516,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -291,6 +306,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:20:54.274Z",
         "auditd.log.sequence": 517,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -311,6 +327,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:20:54.276Z",
         "auditd.log.sequence": 518,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -329,6 +346,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:21:07.546Z",
         "auditd.log.sequence": 519,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -347,6 +365,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:21:07.553Z",
         "auditd.log.sequence": 520,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -365,6 +384,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:21:07.557Z",
         "auditd.log.sequence": 521,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -383,6 +403,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:21:07.561Z",
         "auditd.log.sequence": 522,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -401,6 +422,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:21:18.176Z",
         "auditd.log.sequence": 525,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -419,6 +441,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:21:32.487Z",
         "auditd.log.sequence": 528,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -448,6 +471,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:21:48.360Z",
         "auditd.log.sequence": 529,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -468,6 +492,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:21:48.371Z",
         "auditd.log.sequence": 533,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -487,6 +512,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:21:48.376Z",
         "auditd.log.sequence": 534,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -505,6 +531,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:21:48.378Z",
         "auditd.log.sequence": 538,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -528,6 +555,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:21:48.379Z",
         "auditd.log.sequence": 540,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -547,6 +575,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:21:57.921Z",
         "auditd.log.sequence": 542,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -565,6 +594,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:22:14.297Z",
         "auditd.log.sequence": 543,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -583,6 +613,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:22:14.304Z",
         "auditd.log.sequence": 547,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -600,6 +631,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:22:14.330Z",
         "auditd.log.sequence": 552,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -617,6 +649,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:22:14.334Z",
         "auditd.log.sequence": 553,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -636,6 +669,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:22:14.335Z",
         "auditd.log.sequence": 554,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -656,6 +690,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:22:14.336Z",
         "auditd.log.sequence": 555,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -674,6 +709,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:22:14.337Z",
         "auditd.log.sequence": 556,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -692,6 +728,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:22:14.338Z",
         "auditd.log.sequence": 557,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -711,6 +748,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:22:14.339Z",
         "auditd.log.sequence": 558,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -731,6 +769,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:22:14.341Z",
         "auditd.log.sequence": 559,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -749,6 +788,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:22:16.705Z",
         "auditd.log.sequence": 560,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -767,6 +807,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:22:32.504Z",
         "auditd.log.sequence": 563,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -796,6 +837,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:22:36.580Z",
         "auditd.log.sequence": 564,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -814,6 +856,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:22:36.585Z",
         "auditd.log.sequence": 565,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -832,6 +875,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:22:36.590Z",
         "auditd.log.sequence": 566,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -850,6 +894,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:22:36.593Z",
         "auditd.log.sequence": 567,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -868,6 +913,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:23:32.521Z",
         "auditd.log.sequence": 570,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -897,6 +943,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:24:05.611Z",
         "auditd.log.sequence": 571,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -915,6 +962,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:24:05.615Z",
         "auditd.log.sequence": 572,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -933,6 +981,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:24:05.619Z",
         "auditd.log.sequence": 573,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -951,6 +1000,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:24:05.622Z",
         "auditd.log.sequence": 574,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -969,6 +1019,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:24:32.536Z",
         "auditd.log.sequence": 577,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -998,6 +1049,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:25:32.552Z",
         "auditd.log.sequence": 580,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1027,6 +1079,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:25:34.641Z",
         "auditd.log.sequence": 581,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1045,6 +1098,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:25:34.645Z",
         "auditd.log.sequence": 582,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1063,6 +1117,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:25:34.648Z",
         "auditd.log.sequence": 583,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1081,6 +1136,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:25:34.652Z",
         "auditd.log.sequence": 584,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1099,6 +1155,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:26:32.568Z",
         "auditd.log.sequence": 587,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1128,6 +1185,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:27:03.670Z",
         "auditd.log.sequence": 588,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1146,6 +1204,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:27:03.674Z",
         "auditd.log.sequence": 589,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1164,6 +1223,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:27:03.678Z",
         "auditd.log.sequence": 590,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1182,6 +1242,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:27:03.681Z",
         "auditd.log.sequence": 591,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1200,6 +1261,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:27:32.585Z",
         "auditd.log.sequence": 594,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1229,6 +1291,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:28:28.279Z",
         "auditd.log.sequence": 597,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1247,6 +1310,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:28:32.602Z",
         "auditd.log.sequence": 600,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1276,6 +1340,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:28:32.699Z",
         "auditd.log.sequence": 601,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1294,6 +1359,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:28:32.703Z",
         "auditd.log.sequence": 602,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1312,6 +1378,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:28:32.707Z",
         "auditd.log.sequence": 603,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1330,6 +1397,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:28:32.710Z",
         "auditd.log.sequence": 604,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1348,6 +1416,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:29:32.619Z",
         "auditd.log.sequence": 607,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1377,6 +1446,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:30:01.729Z",
         "auditd.log.sequence": 608,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1395,6 +1465,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:30:01.733Z",
         "auditd.log.sequence": 609,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1413,6 +1484,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:30:01.737Z",
         "auditd.log.sequence": 610,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1431,6 +1503,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:30:01.740Z",
         "auditd.log.sequence": 611,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1449,6 +1522,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:30:32.635Z",
         "auditd.log.sequence": 614,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1478,6 +1552,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:31:29.545Z",
         "auditd.log.sequence": 615,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1496,6 +1571,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:31:30.759Z",
         "auditd.log.sequence": 618,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1514,6 +1590,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:31:30.765Z",
         "auditd.log.sequence": 619,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1532,6 +1609,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:31:30.769Z",
         "auditd.log.sequence": 620,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1550,6 +1628,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:31:30.772Z",
         "auditd.log.sequence": 621,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1568,6 +1647,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:31:32.652Z",
         "auditd.log.sequence": 624,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1597,6 +1677,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:32:32.668Z",
         "auditd.log.sequence": 627,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1626,6 +1707,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:32:59.791Z",
         "auditd.log.sequence": 628,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1644,6 +1726,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:32:59.795Z",
         "auditd.log.sequence": 629,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1662,6 +1745,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:32:59.799Z",
         "auditd.log.sequence": 630,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1680,6 +1764,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:32:59.802Z",
         "auditd.log.sequence": 631,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1698,6 +1783,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:33:32.684Z",
         "auditd.log.sequence": 634,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1727,6 +1813,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:34:28.821Z",
         "auditd.log.sequence": 635,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1745,6 +1832,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:34:28.825Z",
         "auditd.log.sequence": 636,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1763,6 +1851,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:34:28.829Z",
         "auditd.log.sequence": 637,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1781,6 +1870,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:34:28.832Z",
         "auditd.log.sequence": 638,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -1799,6 +1889,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:34:29.999Z",
         "auditd.log.sequence": 639,
         "event.action": "execve",
         "event.dataset": "auditd.log",
