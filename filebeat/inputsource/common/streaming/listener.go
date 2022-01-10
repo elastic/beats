@@ -179,13 +179,13 @@ func (l *Listener) handleConnection(conn net.Conn) {
 	if remoteAddr := conn.RemoteAddr().String(); remoteAddr != "" {
 		log = log.With("remote_address", remoteAddr)
 	}
-	defer l.log.Recover("Panic in connection handler")
+	defer log.Recover("Panic in connection handler")
 
 	// Ensure accepted connection is closed on return and at shutdown.
-	connCtx := ctxtool.WrapCancel(l.ctx, func() {
+	connCtx, cancel := ctxtool.WithFunc(l.ctx, func() {
 		conn.Close()
 	})
-	defer connCtx.Cancel()
+	defer cancel()
 
 	// Track number of clients.
 	l.clientsCount.Inc()
@@ -204,7 +204,7 @@ func (l *Listener) handleConnection(conn net.Conn) {
 
 // Stop stops accepting new incoming connections and closes all active clients.
 func (l *Listener) Stop() {
-	l.log.Debug("Stopping socket listener. Waiting for all connections to close.")
+	l.log.Debugw("Stopping socket listener. Waiting for active connections to close.", "active_clients", l.clientsCount.Load())
 	l.ctx.Cancel()
 	l.wg.Wait()
 	l.log.Info("Socket listener stopped")

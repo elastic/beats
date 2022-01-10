@@ -173,7 +173,10 @@ class Test(BaseTest):
 
             filebeat = self.start_beat()
 
-            self.wait_until(lambda: self.log_contains("Start accepting connections"))
+            if socket_type == "stream":
+                self.wait_until(lambda: self.log_contains("Start accepting connections"))
+            else:
+                self.wait_until(lambda: self.log_contains("Started listening"))
 
             sock = send_over_socket(path,
                                     "<13>Oct 11 22:14:15 wopr.mymachine.co postfix/smtpd[2000]:"
@@ -233,7 +236,10 @@ class Test(BaseTest):
 
             filebeat = self.start_beat()
 
-            self.wait_until(lambda: self.log_contains("Start accepting connections"))
+            if socket_type == "stream":
+                self.wait_until(lambda: self.log_contains("Start accepting connections"))
+            else:
+                self.wait_until(lambda: self.log_contains("Started listening"))
 
             sock = send_over_socket(path, "invalid\n")
 
