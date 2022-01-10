@@ -25,7 +25,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -102,10 +101,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	if res.StatusCode == http.StatusOK {
-		reporter.Event(mb.Event{
-			MetricSetFields: eventMapping(content),
-			ModuleFields:    common.MapStr{"api_version": apiVersion},
-		})
+		eventsMapping(reporter, content)
 		return nil
 	}
 
