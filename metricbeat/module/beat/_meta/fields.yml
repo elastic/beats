@@ -305,19 +305,19 @@
           fields:
             - name: host
               type: alias
-              path: beat.stats.beat.host
+              path: beat.stats.info.host
             - name: name
               type: alias
-              path: beat.stats.beat.name
+              path: beat.stats.info.name
             - name: type
               type: alias
-              path: beat.stats.beat.type
+              path: beat.stats.info.type
             - name: uuid
               type: alias
-              path: beat.stats.beat.uuid
+              path: beat.stats.info.uuid
             - name: version
               type: alias
-              path: beat.stats.beat.version
+              path: beat.stats.info.version
         - name: metrics
           type: group
           fields:
@@ -634,3 +634,5 @@
           type: keyword
           description: >
             Beat type.
+        - name: elasticsearch.cluster.id
+          type: keyword

@@ -51,7 +51,6 @@ type Template struct {
 	esVersion       common.Version
 	config          TemplateConfig
 	migration       bool
-	templateType    IndexTemplateType
 	order           int
 	priority        int
 }
@@ -71,13 +70,17 @@ func New(
 	}
 
 	name := config.Name
+	if config.JSON.Enabled {
+		name = config.JSON.Name
+	}
+
 	if name == "" {
 		name = fmt.Sprintf("%s-%s", beatName, bV.String())
 	}
 
 	pattern := config.Pattern
 	if pattern == "" {
-		pattern = name + "-*"
+		pattern = name + "*"
 	}
 
 	event := &beat.Event{
@@ -132,8 +135,6 @@ func New(
 		beatName:        beatName,
 		config:          config,
 		migration:       migration,
-		templateType:    config.Type,
-		order:           config.Order,
 		priority:        config.Priority,
 	}, nil
 }
@@ -156,12 +157,13 @@ func (t *Template) load(fields mapping.Fields) (common.MapStr, error) {
 
 	// Start processing at the root
 	properties := common.MapStr{}
+	analyzers := common.MapStr{}
 	processor := Processor{EsVersion: t.esVersion, ElasticLicensed: t.elasticLicensed, Migration: t.migration}
-	if err := processor.Process(fields, nil, properties); err != nil {
+	if err := processor.Process(fields, nil, properties, analyzers); err != nil {
 		return nil, err
 	}
 
-	output := t.Generate(properties, processor.dynamicTemplates)
+	output := t.Generate(properties, analyzers, processor.dynamicTemplates)
 
 	return output, nil
 }
@@ -187,54 +189,23 @@ func (t *Template) LoadBytes(data []byte) (common.MapStr, error) {
 }
 
 // LoadMinimal loads the template only with the given configuration
-func (t *Template) LoadMinimal() (common.MapStr, error) {
-	m := common.MapStr{}
-	switch t.templateType {
-	case IndexTemplateLegacy:
-		m = t.loadMinimalLegacy()
-	case IndexTemplateComponent:
-		m = t.loadMinimalComponent()
-	case IndexTemplateIndex:
-		m = t.loadMinimalIndex()
-	default:
-		return nil, fmt.Errorf("unknown template type %v", t.templateType)
-	}
-
+func (t *Template) LoadMinimal() common.MapStr {
+	templ := common.MapStr{}
 	if t.config.Settings.Source != nil {
-		m["mappings"] = buildMappings(
-			t.beatVersion, t.esVersion, t.beatName,
+		templ["mappings"] = buildMappings(
+			t.beatVersion, t.beatName,
 			nil, nil,
 			common.MapStr(t.config.Settings.Source))
 	}
-
-	return m, nil
-}
-
-func (t *Template) loadMinimalLegacy() common.MapStr {
-	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
-	return common.MapStr{
-		keyPattern: patterns,
-		"order":    t.order,
-		"settings": common.MapStr{
-			"index": t.config.Settings.Index,
-		},
+	templ["settings"] = common.MapStr{
+		"index": t.config.Settings.Index,
 	}
-}
-
-func (t *Template) loadMinimalComponent() common.MapStr {
 	return common.MapStr{
-		"template": common.MapStr{
-			"settings": common.MapStr{
-				"index": t.config.Settings.Index,
-			},
-		},
+		"template":       templ,
+		"data_stream":    struct{}{},
+		"priority":       t.priority,
+		"index_patterns": []string{t.GetPattern()},
 	}
-}
-
-func (t *Template) loadMinimalIndex() common.MapStr {
-	m := t.loadMinimalComponent()
-	m["priority"] = t.priority
-	return m
 }
 
 // GetName returns the name of the template
@@ -249,42 +220,20 @@ func (t *Template) GetPattern() string {
 
 // Generate generates the full template
 // The default values are taken from the default variable.
-func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
-	switch t.templateType {
-	case IndexTemplateLegacy:
-		return t.generateLegacy(properties, dynamicTemplates)
-	case IndexTemplateComponent:
-		return t.generateComponent(properties, dynamicTemplates)
-	case IndexTemplateIndex:
-		return t.generateIndex(properties, dynamicTemplates)
-	}
-	return nil
+func (t *Template) Generate(properties, analyzers common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
+	tmpl := t.generateComponent(properties, analyzers, dynamicTemplates)
+	tmpl["data_stream"] = struct{}{}
+	tmpl["priority"] = t.priority
+	tmpl["index_patterns"] = []string{t.GetPattern()}
+	return tmpl
+
 }
 
-func (t *Template) generateLegacy(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
-	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
-	return common.MapStr{
-		keyPattern: patterns,
-		"order":    t.order,
-		"mappings": buildMappings(
-			t.beatVersion, t.esVersion, t.beatName,
-			properties,
-			append(dynamicTemplates, buildDynTmpl(t.esVersion)),
-			common.MapStr(t.config.Settings.Source)),
-		"settings": common.MapStr{
-			"index": buildIdxSettings(
-				t.esVersion,
-				t.config.Settings.Index,
-			),
-		},
-	}
-}
-
-func (t *Template) generateComponent(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
-	return common.MapStr{
+func (t *Template) generateComponent(properties, analyzers common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
+	m := common.MapStr{
 		"template": common.MapStr{
 			"mappings": buildMappings(
-				t.beatVersion, t.esVersion, t.beatName,
+				t.beatVersion, t.beatName,
 				properties,
 				append(dynamicTemplates, buildDynTmpl(t.esVersion)),
 				common.MapStr(t.config.Settings.Source)),
@@ -296,25 +245,14 @@ func (t *Template) generateComponent(properties common.MapStr, dynamicTemplates 
 			},
 		},
 	}
-}
-
-func (t *Template) generateIndex(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
-	tmpl := t.generateComponent(properties, dynamicTemplates)
-	tmpl["priority"] = t.priority
-	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
-	tmpl[keyPattern] = patterns
-	return tmpl
-}
-
-func buildPatternSettings(ver common.Version, pattern string) (string, interface{}) {
-	if ver.Major < 6 {
-		return "template", pattern
+	if len(analyzers) != 0 {
+		m.Put("template.settings.analysis.analyzer", analyzers)
 	}
-	return "index_patterns", []string{pattern}
+	return m
 }
 
 func buildMappings(
-	beatVersion, esVersion common.Version,
+	beatVersion common.Version,
 	beatName string,
 	properties common.MapStr,
 	dynTmpls []common.MapStr,
@@ -334,41 +272,16 @@ func buildMappings(
 		mapping["_source"] = source
 	}
 
-	major := esVersion.Major
-	switch {
-	case major == 2:
-		mapping.Put("_all.norms.enabled", false)
-		mapping = common.MapStr{
-			"_default_": mapping,
-		}
-	case major < 6:
-		mapping = common.MapStr{
-			"_default_": mapping,
-		}
-	case major == 6:
-		mapping = common.MapStr{
-			"doc": mapping,
-		}
-	case major >= 7:
-		// keep typeless structure
-	}
-
 	return mapping
 }
 
 func buildDynTmpl(ver common.Version) common.MapStr {
-	strMapping := common.MapStr{
-		"ignore_above": 1024,
-		"type":         "keyword",
-	}
-	if ver.Major == 2 {
-		strMapping["type"] = "string"
-		strMapping["index"] = "not_analyzed"
-	}
-
 	return common.MapStr{
 		"strings_as_keyword": common.MapStr{
-			"mapping":            strMapping,
+			"mapping": common.MapStr{
+				"ignore_above": 1024,
+				"type":         "keyword",
+			},
 			"match_mapping_type": "string",
 		},
 	}
@@ -384,25 +297,14 @@ func buildIdxSettings(ver common.Version, userSettings common.MapStr) common.Map
 		},
 	}
 
-	// number_of_routing shards is only supported for ES version >= 6.1
-	// If ES >= 7.0 we can exclude this setting as well.
-	version61, _ := common.NewVersion("6.1.0")
-	if !ver.LessThan(version61) && ver.Major < 7 {
-		indexSettings.Put("number_of_routing_shards", defaultNumberOfRoutingShards)
-	}
+	// copy defaultFields, as defaultFields is shared global slice.
+	fields := make([]string, len(defaultFields))
+	copy(fields, defaultFields)
+	fields = append(fields, "fields.*")
 
-	if ver.Major >= 7 {
-		// copy defaultFields, as defaultFields is shared global slice.
-		fields := make([]string, len(defaultFields))
-		copy(fields, defaultFields)
-		fields = append(fields, "fields.*")
+	indexSettings.Put("query.default_field", fields)
 
-		indexSettings.Put("query.default_field", fields)
-	}
-
-	if ver.Major >= 6 {
-		indexSettings.Put("max_docvalue_fields_search", defaultMaxDocvalueFieldsSearch)
-	}
+	indexSettings.Put("max_docvalue_fields_search", defaultMaxDocvalueFieldsSearch)
 
 	indexSettings.DeepUpdate(userSettings)
 	return indexSettings

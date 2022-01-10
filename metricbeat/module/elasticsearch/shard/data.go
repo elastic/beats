@@ -57,7 +57,7 @@ type stateStruct struct {
 	} `json:"routing_table"`
 }
 
-func eventsMapping(r mb.ReporterV2, content []byte) error {
+func eventsMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	stateData := &stateStruct{}
 	err := json.Unmarshal(content, stateData)
 	if err != nil {
@@ -73,6 +73,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 				}
 
 				event.ModuleFields.Put("cluster.state.id", stateData.StateID)
+				event.ModuleFields.Put("cluster.stats.state.state_uuid", stateData.StateID)
 				event.ModuleFields.Put("cluster.id", stateData.ClusterID)
 				event.ModuleFields.Put("cluster.name", stateData.ClusterName)
 
@@ -117,6 +118,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 						errs = append(errs, errors.Wrap(err, "failure getting source node information"))
 						continue
 					}
+					event.ModuleFields.Put("node.name", sourceNode["name"])
 					event.MetricSetFields.Put("source_node", sourceNode)
 				}
 
@@ -130,6 +132,13 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 				relocatingNode := fields["relocating_node"]
 				event.MetricSetFields.Put("relocating_node.name", relocatingNode)
 				event.MetricSetFields.Put("relocating_node.id", relocatingNode)
+
+				// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+				// When using Agent, the index name is overwritten anyways.
+				if isXpack {
+					index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+					event.Index = index
+				}
 
 				r.Event(event)
 			}

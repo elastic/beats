@@ -5,9 +5,7 @@
 			"labels": {
 				"k8s_app": "kube-state-metrics"
 			},
-			"namespace": {
-				"name": "kube-system"
-			}
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
 			"cluster_ip": "10.101.63.187",
@@ -34,9 +32,7 @@
 				"kubernetes_io_cluster_service": "true",
 				"kubernetes_io_name": "KubeDNS"
 			},
-			"namespace": {
-				"name": "kube-system"
-			}
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
 			"cluster_ip": "10.96.0.10",
@@ -59,17 +55,14 @@
 		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
-				"component": "apiserver",
-				"provider": "kubernetes"
+				"app": "nginx"
 			},
-			"namespace": {
-				"name": "default"
-			}
+			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"cluster_ip": "10.96.0.1",
-			"created": "2020-01-07T16:11:02.000Z",
-			"name": "kubernetes",
+			"cluster_ip": "None",
+			"created": "2020-01-08T18:15:25.000Z",
+			"name": "nginx",
 			"type": "ClusterIP"
 		},
 		"Index": "",
@@ -87,16 +80,15 @@
 		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
-				"app": "nginx"
+				"component": "apiserver",
+				"provider": "kubernetes"
 			},
-			"namespace": {
-				"name": "default"
-			}
+			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"cluster_ip": "None",
-			"created": "2020-01-08T18:15:25.000Z",
-			"name": "nginx",
+			"cluster_ip": "10.96.0.1",
+			"created": "2020-01-07T16:11:02.000Z",
+			"name": "kubernetes",
 			"type": "ClusterIP"
 		},
 		"Index": "",

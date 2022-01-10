@@ -28,6 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 var exampleUnits = []dbus.UnitStatus{

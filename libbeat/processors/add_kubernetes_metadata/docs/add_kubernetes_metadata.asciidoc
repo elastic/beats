@@ -138,6 +138,17 @@ Example:
 -------------------------------------------------------------------------------------
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
 client. It defaults to `KUBECONFIG` environment variable if present.
+`kube_client_options`:: (Optional) Additional options can be configured for Kubernetes
+client. Currently client QPS and burst are supported, if not set Kubernetes client's
+https://pkg.go.dev/k8s.io/client-go/rest#pkg-constants[default QPS and burst] will be used.
+Example:
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+      kube_client_options:
+        qps: 5
+        burst: 10
+-------------------------------------------------------------------------------------
+
 `cleanup_timeout`:: (Optional) Specify the time of inactivity before stopping the
 running configuration for a container. This is `60s` by default.
 `sync_period`:: (Optional) Specify the timeout for listing historical resources.

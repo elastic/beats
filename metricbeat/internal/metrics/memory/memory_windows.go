@@ -20,12 +20,13 @@ package memory
 import (
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/go-windows"
 )
 
 // get is the windows implementation of get for memory metrics
-func get(_ string) (Memory, error) {
+func get(_ resolve.Resolver) (Memory, error) {
 
 	memData := Memory{}
 

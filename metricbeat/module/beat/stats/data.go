@@ -20,6 +20,8 @@ package stats
 import (
 	"encoding/json"
 
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -86,10 +88,11 @@ var (
 					"total":     c.Int("total"),
 				}),
 			}),
-			"config": c.Dict("config.module", s.Schema{
-				"running": c.Int("running"),
-				"starts":  c.Int("starts"),
-				"stops":   c.Int("stops"),
+			"config": c.Dict("config", s.Schema{
+				"running": c.Int("module.running"),
+				"starts":  c.Int("module.starts"),
+				"stops":   c.Int("module.stops"),
+				"reloads": c.Int("reloads"),
 			}),
 		}),
 		"state": c.Dict("metricbeat.beat.state", s.Schema{
@@ -108,7 +111,7 @@ var (
 	}
 )
 
-func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
+func eventMapping(r mb.ReporterV2, info beat.Info, clusterUUID string, content []byte, isXpack bool) error {
 	event := mb.Event{
 		RootFields:      common.MapStr{},
 		ModuleFields:    common.MapStr{},
@@ -116,9 +119,12 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
 	}
 	event.RootFields.Put("service.name", beat.ModuleName)
 
-	event.ModuleFields = common.MapStr{}
 	event.ModuleFields.Put("id", info.UUID)
 	event.ModuleFields.Put("type", info.Beat)
+
+	if clusterUUID != "" {
+		event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
+	}
 
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
@@ -134,6 +140,13 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
 		"uuid":    info.UUID,
 		"version": info.Version,
 	})
+
+	// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+	// When using Agent, the index name is overwritten anyways.
+	if isXpack {
+		index := elastic.MakeXPackMonitoringIndexName(elastic.Beats)
+		event.Index = index
+	}
 
 	r.Event(event)
 	return nil

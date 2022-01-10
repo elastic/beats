@@ -25,6 +25,7 @@ import (
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/packetbeat/beater"
 
@@ -35,15 +36,12 @@ import (
 const (
 	// Name of this beat.
 	Name = "packetbeat"
-
-	// ecsVersion specifies the version of ECS that Packetbeat is implementing.
-	ecsVersion = "1.12.0"
 )
 
 // withECSVersion is a modifier that adds ecs.version to events.
 var withECSVersion = processing.WithFields(common.MapStr{
 	"ecs": common.MapStr{
-		"version": ecsVersion,
+		"version": ecs.Version,
 	},
 })
 
@@ -52,7 +50,7 @@ var RootCmd *cmd.BeatsRootCmd
 
 // PacketbeatSettings contains the default settings for packetbeat
 func PacketbeatSettings() instance.Settings {
-	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
+	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("I"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("t"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("O"))

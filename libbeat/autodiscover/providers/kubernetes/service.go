@@ -56,7 +56,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface,
 		return nil, err
 	}
 
-	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Service{}, kubernetes.WatchOptions{
+	watcher, err := kubernetes.NewNamedWatcher("service", client, &kubernetes.Service{}, kubernetes.WatchOptions{
 		SyncTimeout:  config.SyncPeriod,
 		Namespace:    config.Namespace,
 		HonorReSyncs: true,
@@ -70,7 +70,7 @@ func NewServiceEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface,
 	var namespaceWatcher kubernetes.Watcher
 
 	metaConf := metadata.GetDefaultResourceMetadataConfig()
-	namespaceWatcher, err = kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+	namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
 		Namespace:   config.Namespace,
 	}, nil)
@@ -140,8 +140,7 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 		}
 
 		// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
-		rawNsAnn, err := kubeMeta.GetValue("namespace.annotations")
-		if err == nil {
+		if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
 			nsAnn, _ := rawNsAnn.(common.MapStr)
 			if len(nsAnn) != 0 {
 				annotations.DeepUpdateNoOverwrite(nsAnn)
@@ -215,7 +214,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 				for k, v := range namespace.GetAnnotations() {
 					safemapstr.Put(nsAnns, k, v)
 				}
-				kubemeta.Put("namespace.annotations", nsAnns)
+				kubemeta["namespace_annotations"] = nsAnns
 			}
 		}
 	}

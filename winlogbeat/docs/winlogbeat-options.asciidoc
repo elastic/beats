@@ -47,6 +47,23 @@ backslashes. Forward slashes are easier to work with in YAML because there is no
 need to escape them.
 
 [float]
+==== `registry_flush`
+
+The timeout value that controls when registry entries are written to disk
+(flushed). When an unwritten update exceeds this value, it triggers a write
+to disk. When flush is set to 0s, the registry is written to disk after each
+batch of events has been published successfully.
+
+The default value is 5s.
+
+Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`.
+
+[source,yaml]
+--------------------------------------------------------------------------------
+winlogbeat.registry_flush: 5s
+--------------------------------------------------------------------------------
+
+[float]
 ==== `shutdown_timeout`
 
 The amount of time to wait for all events to be published when shutting down.
@@ -70,7 +87,6 @@ winlogbeat.shutdown_timeout: 30s
 A list of entries (called 'dictionaries' in YAML) that specify which event logs
 to monitor. Each entry in the list defines an event log to monitor as well as
 any information to be associated with the event log (filter, tags, and so on).
-The `name` field is the only required field for each event log.
 
 [source,yaml]
 --------------------------------------------------------------------------------
@@ -96,9 +112,9 @@ reading additional event log records.
 ==== `event_logs.name`
 
 The name of the event log to monitor. Each dictionary under `event_logs` must
-have a `name` field. You can get a list of available event logs by running
-`Get-EventLog *` in PowerShell.  Here is a sample of the output from the
-command:
+have a `name` field, except for those which use a custom XML query. You can
+get a list of available event logs by running `Get-EventLog *` in PowerShell.
+Here is a sample of the output from the command:
 
 [source,sh]
 --------------------------------------------------------------------------------
@@ -154,6 +170,28 @@ of how to read from an .evtx file in the <<reading-from-evtx,FAQ>>.
 --------------------------------------------------------------------------------
 winlogbeat.event_logs:
   - name: 'C:\backup\sysmon-2019.08.evtx'
+--------------------------------------------------------------------------------
+
+The name key must not be used with custom XML queries.
+
+[float]
+==== `event_logs.id`
+
+A unique identifier for the event log. This key is required when using a custom
+XML query.
+
+It is used to uniquely identify the event log reader in the registry file. This is
+useful if multiple event logs are being set up to watch the same channel or file. If an
+ID is not given, the `event_logs.name` value will be used.
+
+This value must be unique.
+
+[source,yaml]
+--------------------------------------------------------------------------------
+winlogbeat.event_logs:
+  - name: Application
+    id: application-logs
+    ignore_older: 168h
 --------------------------------------------------------------------------------
 
 [float]
@@ -319,6 +357,35 @@ Microsoft-Windows-Eventlog
 --------------------------------------------------------------------------------
 
 [float]
+==== `event_logs.xml_query`
+
+Provide a custom XML query. This option is mutually exclusive with the `name`, `event_id`,
+`ignore_older`, `level`, and `provider` options. These options should be included in
+the XML query directly. Furthermore, an `id` must be provided. Custom XML queries
+provide more flexibility and advanced options than the simpler query options in {beatname_uc}.
+*{vista_and_newer}*
+
+Here is a configuration which will collect DHCP server events from multiple channels:
+
+[source,yaml]
+--------------------------------------------------------------------------------
+winlogbeat.event_logs:
+  - id: dhcp-server-logs
+    xml_query: >
+      <QueryList>
+        <Query Id="0" Path="DhcpAdminEvents">
+          <Select Path="DhcpAdminEvents">*</Select>
+          <Select Path="Microsoft-Windows-Dhcp-Server/FilterNotifications">*</Select>
+          <Select Path="Microsoft-Windows-Dhcp-Server/Operational">*</Select>
+        </Query>
+      </QueryList>
+--------------------------------------------------------------------------------
+
+XML queries may also be created in Windows Event Viewer using custom views. The query
+can be created using a graphical interface and the corresponding XML can be
+retrieved from the XML tab.
+
+[float]
 ==== `event_logs.include_xml`
 
 Boolean option that controls if the raw XML representation of an event is
@@ -447,3 +514,12 @@ There are a few notable differences in the events:
   `winlog.event_data`.
 * Setting `include_xml: true` has no effect.
 
+
+[float]
+==== `overwrite_pipelines`
+
+By default Ingest pipelines are not updated if a pipeline with the same ID
+already exists. If this option is enabled Winlogbeat overwrites pipelines
+every time a new Elasticsearch connection is established.
+
+The default value is `false`.

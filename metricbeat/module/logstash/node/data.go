@@ -81,7 +81,7 @@ func commonFieldsMapping(event *mb.Event, fields common.MapStr) error {
 	return nil
 }
 
-func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.PipelineState, overrideClusterUUID string) error {
+func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.PipelineState, overrideClusterUUID string, isXpack bool) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -122,9 +122,17 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 
 			if clusterUUID != "" {
 				event.ModuleFields.Put("cluster.id", clusterUUID)
+				event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
 			}
 
 			event.ID = pipeline.EphemeralID
+
+			// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+			// When using Agent, the index name is overwritten anyways.
+			if isXpack {
+				index := elastic.MakeXPackMonitoringIndexName(elastic.Logstash)
+				event.Index = index
+			}
 
 			r.Event(event)
 		}

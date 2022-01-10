@@ -135,10 +135,21 @@ class Test(metricbeat.BaseTest):
             }
         }])
         proc = self.start_beat()
-        self.wait_log_contains('"dataset": "elasticsearch.cluster.stats"')
+        self.wait_log_contains('\\"dataset\\": \\"elasticsearch.cluster.stats\\"')
 
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
+
+        docs = self.read_output_json()
+        for doc in docs:
+            t = doc["metricset"]["name"]
+            if t != "cluster_stats":
+                continue
+            license = doc["elasticsearch"]["cluster"]["stats"]["license"]
+            issue_date = license["issue_date_in_millis"]
+            self.assertIsNot(type(issue_date), float)
+
+            self.assertNotIn("expiry_date_in_millis", license)
 
     def create_ml_job(self):
         # Check if an ml job already exists

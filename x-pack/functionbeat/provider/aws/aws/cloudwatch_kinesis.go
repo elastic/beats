@@ -15,7 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws/transformer"
@@ -70,14 +70,14 @@ func CloudwatchKinesisDetails() feature.Details {
 }
 
 // Run starts the lambda function and wait for web triggers.
-func (c *CloudwatchKinesis) Run(_ context.Context, client core.Client, t telemetry.T) error {
+func (c *CloudwatchKinesis) Run(_ context.Context, client pipeline.ISyncClient, t telemetry.T) error {
 	t.AddTriggeredFunction()
 
 	lambdarunner.Start(c.createHandler(client))
 	return nil
 }
 
-func (c *CloudwatchKinesis) createHandler(client core.Client) func(request events.KinesisEvent) error {
+func (c *CloudwatchKinesis) createHandler(client pipeline.ISyncClient) func(request events.KinesisEvent) error {
 	return func(request events.KinesisEvent) error {
 		c.log.Debugf("The handler receives %d events", len(request.Records))
 

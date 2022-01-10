@@ -1,7 +1,6 @@
 - name: sophos.xg
   type: group
   release: beta
-  default_field: false
   description: >
     Module for parsing sophosxg syslog.
   fields:
@@ -944,3 +943,8 @@
       type: keyword
       description: >
         The related XSS caught by the WAF
+
+    - name: ether_type
+      type: keyword
+      description: >
+        The ethernet frame type

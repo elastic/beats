@@ -24,8 +24,8 @@ journal.
 ----
 
 You may wish to have separate inputs for each service. You can use
-`include_matches` to specify a list of filter expressions that are applied as a
-logical OR.  A good way to list the journald fields that are available for
+`include_matches` to specify filtering expressions.
+A good way to list the https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html[journald fields] that are available for
 filtering messages is to run `journalctl -o json` to output logs and metadata as
 JSON. This example collects logs from the `vault.service` systemd unit.
 
@@ -34,7 +34,7 @@ JSON. This example collects logs from the `vault.service` systemd unit.
 {beatname_lc}.inputs:
 - type: journald
   id: service-vault
-  include_matches:
+  include_matches.match:
     - _SYSTEMD_UNIT=vault.service
 ----
 
@@ -48,7 +48,7 @@ possible.
 {beatname_lc}.inputs:
 - type: journald
   id: iptables
-  include_matches:
+  include_matches.match:
     - _TRANSPORT=kernel
   processors:
     - drop_event:
@@ -134,12 +134,62 @@ If you have old log files and want to skip lines, start {beatname_uc} with
 {beatname_uc}.
 
 [float]
+[id="{beatname_lc}-input-{type}-units"]
+==== `units`
+
+Iterate only the entries of the units specified in this option. The iterated entries include
+messages from the units, messages about the units by authorized daemons and coredumps. However,
+it does not match systemd user units.
+
+[float]
+[id="{beatname_lc}-input-{type}-syslog-identifiers"]
+==== `syslog_identifiers`
+
+Read only the entries with the selected syslog identifiers.
+
+[float]
+[id="{beatname_lc}-input-{type}-transports"]
+==== `transports`
+
+Collect the messages using the specified transports. Example: syslog.
+
+Valid transports:
+
+* audit: messages from the kernel audit subsystem
+* driver: internally generated messages
+* syslog: messages received via the local syslog socket with the syslog protocol
+* journal: messages received via the native journal protocol
+* stdout: messages from a service's standard output or error output
+* kernel: messages from the kernel
+
+[float]
 [id="{beatname_lc}-input-{type}-include-matches"]
 ==== `include_matches`
 
-A list of filter expressions used to match fields. The format of the expression
+A collection of filter expressions used to match fields. The format of the expression
 is `field=value`. {beatname_uc} fetches all events that exactly match the
 expressions. Pattern matching is not supported.
+
+If you configured a filter expression, only entries with this field set will be iterated by the journald reader of Filebeat.
+If the filter expressions apply to different fields, only entries with all fields set will be iterated.
+If they apply to the same fields, only entries where the field takes one of the specified values will be iterated.
+
+`match`: List of filter expressions to match fields.
+`or`: The filter expressions listed under `or` are connected with a disjunction (or).
+`and`: The filter expressions listed under `and` are connected with a conjunction (and).
+
+Please note that these expressions are limited. You can build complex filtering, but full logical
+expressions are not supported.
+
+The following include matches configuration reads all `systemd` syslog entries:
+
+["source","yaml",subs="attributes"]
+----
+include_matches.and:
+- match:
+  - "journald.process.name=systemd"
+  - "systemd.transport=syslog"
+----
 
 To reference fields, use one of the following:
 

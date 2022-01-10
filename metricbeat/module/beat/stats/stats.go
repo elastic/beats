@@ -18,6 +18,8 @@
 package stats
 
 import (
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/beat"
@@ -66,5 +68,36 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	return eventMapping(r, *info, content)
+	clusterUUID, err := m.getClusterUUID()
+	if err != nil {
+		return err
+	}
+
+	return eventMapping(r, *info, clusterUUID, content, m.XPackEnabled)
+}
+
+func (m *MetricSet) getClusterUUID() (string, error) {
+	state, err := beat.GetState(m.MetricSet)
+	if err != nil {
+		return "", errors.Wrap(err, "could not get state information")
+	}
+
+	clusterUUID := state.Monitoring.ClusterUUID
+	if clusterUUID != "" {
+		return clusterUUID, nil
+	}
+
+	if state.Output.Name != "elasticsearch" {
+		return "", nil
+	}
+
+	clusterUUID = state.Outputs.Elasticsearch.ClusterUUID
+	if clusterUUID == "" {
+		// Output is ES but cluster UUID could not be determined. No point sending monitoring
+		// data with empty cluster UUID since it will not be associated with the correct ES
+		// production cluster. Log error instead.
+		return "", beat.ErrClusterUUID
+	}
+
+	return clusterUUID, nil
 }

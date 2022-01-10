@@ -43,7 +43,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := struct {
 		ActiveOnly bool `config:"index_recovery.active_only"`
 	}{
-		ActiveOnly: true,
+		ActiveOnly: false,
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
@@ -81,5 +81,5 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	return eventsMapping(r, *info, content)
+	return eventsMapping(r, *info, content, m.XPackEnabled)
 }

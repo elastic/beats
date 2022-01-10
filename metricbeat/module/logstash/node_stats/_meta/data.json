@@ -6,6 +6,14 @@
         "module": "logstash"
     },
     "logstash": {
+        "cluster": {
+           "id": "VUwnkX_lTzCFP9VUoXT1IQ"
+        },
+        "elasticsearch": {
+            "cluster": {
+               "id": "VUwnkX_lTzCFP9VUoXT1IQ"
+            }
+        },
         "node": {
             "stats": {
                 "events": {
@@ -19,20 +27,20 @@
                         "collectors": {
                             "old": {
                                 "collection_count": 3,
-                                "collection_time_in_millis": 449
+                                "collection_time_in_millis": 738
                             },
                             "young": {
-                                "collection_count": 7,
-                                "collection_time_in_millis": 231
+                                "collection_count": 9,
+                                "collection_time_in_millis": 422
                             }
                         }
                     },
                     "mem": {
                         "heap_max_in_bytes": 1037959168,
-                        "heap_used_in_bytes": 371211952,
-                        "heap_used_percent": 35
+                        "heap_used_in_bytes": 309034360,
+                        "heap_used_percent": 29
                     },
-                    "uptime_in_millis": 33546
+                    "uptime_in_millis": 551958
                 },
                 "reloads": {
                     "failures": 0,
@@ -42,41 +50,34 @@
                     "events_count": 0
                 },
                 "process": {
-                    "open_file_descriptors": 103,
-                    "max_file_descriptors": 524288,
+                    "open_file_descriptors": 171,
+                    "max_file_descriptors": 1024,
                     "cpu": {
-                        "percent": 1
+                        "percent": 0
                     }
                 },
                 "os": {
                     "cpu": {
                         "percent": 0,
                         "load_average": {
-                            "15m": 1.7,
-                            "1m": 2.52,
-                            "5m": 1.8
+                            "15m": 1.69,
+                            "1m": 1.51,
+                            "5m": 1.69
                         }
                     },
                     "cgroup": {
-                        "cpuacct": {
-                            "control_group": "/user.slice",
-                            "usage_nanos": 24041075965919
-                        },
+                        "cpuacct": null,
                         "cpu": {
-                            "stat": {
-                                "number_of_elapsed_periods": 0,
-                                "number_of_times_throttled": 0,
-                                "time_throttled_nanos": 0
-                            },
-                            "control_group": "/user.slice"
+                            "stat": null,
+                            "control_group": ""
                         }
                     }
                 },
                 "pipelines": [
                     {
                         "id": "main",
-                        "hash": "6984380a58d40b7ebe6ba7ba8fc3134b95ffadfcef9ff328f0864ae002943792",
-                        "ephemeral_id": "eb977feb-0052-4651-a995-39e545213723",
+                        "hash": "5022893e09c573cc517eef12da3df428d41a45370e168b19031f5b6b0da3db22",
+                        "ephemeral_id": "0a6062d1-85e8-4e9b-b943-d80573912692",
                         "events": {
                             "duration_in_millis": 0,
                             "filtered": 0,
@@ -94,24 +95,39 @@
                             "queue_size_in_bytes": 0,
                             "type": "memory"
                         },
-                        "vertices": null
+                        "vertices": [
+                            {
+                                "events_out": 0,
+                                "id": "293e8492626c637c237bf394279270356589b77d285ea009a555e19977779693",
+                                "pipeline_ephemeral_id": "0a6062d1-85e8-4e9b-b943-d80573912692",
+                                "queue_push_duration_in_millis": 0
+                            },
+                            {
+                                "cluster_uuid": "VUwnkX_lTzCFP9VUoXT1IQ",
+                                "duration_in_millis": 6011,
+                                "events_in": 0,
+                                "events_out": 0,
+                                "id": "942f820402532e034dc5b27a680547732f49dc4b5e48df0475d280eb31382e0d",
+                                "pipeline_ephemeral_id": "0a6062d1-85e8-4e9b-b943-d80573912692"
+                            }
+                        ]
                     }
                 ],
                 "logstash": {
-                    "uuid": "2fc9524f-a36b-4611-82e4-5246d3ac4714",
-                    "ephemeral_id": "10311adf-a5ba-4920-ada2-8dadc54618fe",
-                    "name": "anonymous",
-                    "host": "anonymous",
-                    "version": "7.8.1",
+                    "uuid": "9a1f83e1-52b9-4625-a98a-6aa336f41719",
+                    "ephemeral_id": "cead1f28-1e2d-4ef3-9f0b-93c10447e6e7",
+                    "name": "7dc1b688baf4",
+                    "host": "7dc1b688baf4",
+                    "version": "7.12.0",
                     "snapshot": false,
                     "status": "green",
-                    "http_address": "127.0.0.1:9600",
+                    "http_address": "0.0.0.0:9600",
                     "pipeline": {
                         "batch_size": 125,
                         "workers": 12
                     }
                 },
-                "timestamp": "2020-12-09T16:16:17.796Z"
+                "timestamp": "2021-11-03T16:22:10.651Z"
             }
         }
     },
@@ -120,11 +136,11 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:33437",
-        "hostname": "anonymous",
+        "address": "172.20.0.3:9600",
+        "hostname": "7dc1b688baf4",
         "id": "",
         "name": "logstash",
         "type": "logstash",
-        "version": "7.8.1"
+        "version": "7.12.0"
     }
 }

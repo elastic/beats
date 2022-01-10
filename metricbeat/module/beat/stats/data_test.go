@@ -42,12 +42,14 @@ func TestEventMapping(t *testing.T) {
 		Beat: "helloworld",
 	}
 
+	clusterUUID := "foo"
+
 	for _, f := range files {
 		input, err := ioutil.ReadFile(f)
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, info, input)
+		err = eventMapping(reporter, info, clusterUUID, input, true)
 
 		require.NoError(t, err, f)
 		require.True(t, len(reporter.GetEvents()) >= 1, f)

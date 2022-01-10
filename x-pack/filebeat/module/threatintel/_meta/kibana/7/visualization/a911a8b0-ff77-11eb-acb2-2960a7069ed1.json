@@ -27,7 +27,7 @@
                     "enabled": true,
                     "id": "2",
                     "params": {
-                        "field": "threatintel.indicator.marking.tlp",
+                        "field": "threat.indicator.marking.tlp",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

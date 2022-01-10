@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2017-04-21T05:28:40.441Z",
         "auditd.log.a0": "3",
         "auditd.log.a1": "7ffd0dc80040",
         "auditd.log.a2": "7ffd0dc7ffd0",
@@ -31,8 +30,8 @@
         "process.executable": "/usr/sbin/sshd",
         "process.exit_code": 5,
         "process.name": "sshd",
+        "process.parent.pid": 1,
         "process.pid": 1663,
-        "process.ppid": 1,
         "service.type": "auditd",
         "user.audit.id": "4294967295",
         "user.effective.group.id": "0",
@@ -45,7 +44,6 @@
         "user.saved.id": "0"
     },
     {
-        "@timestamp": "2017-04-21T05:28:40.441Z",
         "auditd.log.saddr": "0200E31C4853E6640000000000000000",
         "auditd.log.sequence": 8832,
         "event.action": "sockaddr",
@@ -59,7 +57,6 @@
         "service.type": "auditd"
     },
     {
-        "@timestamp": "2017-04-21T05:28:40.441Z",
         "auditd.log.proctitle": "(sshd)",
         "auditd.log.sequence": 8832,
         "event.action": "proctitle",
@@ -73,7 +70,6 @@
         "service.type": "auditd"
     },
     {
-        "@timestamp": "2017-04-21T05:38:27.096Z",
         "auditd.log.a0": "5",
         "auditd.log.a1": "7ffc12ac3ab0",
         "auditd.log.a2": "10",
@@ -104,8 +100,8 @@
         "process.executable": "/usr/bin/python3.5",
         "process.exit_code": -115,
         "process.name": "google_ip_forwa",
+        "process.parent.pid": 1,
         "process.pid": 1648,
-        "process.ppid": 1,
         "service.type": "auditd",
         "user.audit.id": "4294967295",
         "user.effective.group.id": "0",
@@ -118,7 +114,6 @@
         "user.saved.id": "0"
     },
     {
-        "@timestamp": "2017-04-21T05:38:27.096Z",
         "auditd.log.saddr": "02000050A9FEA9FE0000000000000000",
         "auditd.log.sequence": 9004,
         "event.action": "sockaddr",
@@ -132,7 +127,6 @@
         "service.type": "auditd"
     },
     {
-        "@timestamp": "2017-04-21T05:38:27.096Z",
         "auditd.log.proctitle": "(g_daemon)",
         "auditd.log.sequence": 9004,
         "event.action": "proctitle",

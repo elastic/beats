@@ -19,18 +19,14 @@ package logp
 
 import (
 	"time"
-
-	"github.com/elastic/beats/v7/libbeat/common/file"
 )
 
 // Config contains the configuration options for the logger. To create a Config
 // from a common.Config use logp/config.Build.
 type Config struct {
-	Beat       string   `config:",ignore"`        // Name of the Beat (for default file name).
-	JSON       bool     `config:"json"`           // Write logs as JSON.
-	Level      Level    `config:"level"`          // Logging level (error, warning, info, debug).
-	Selectors  []string `config:"selectors"`      // Selectors for debug level logging.
-	ECSEnabled bool     `config:"ecs" yaml:"ecs"` // Adds minimal ECS information using ECS conformant keys to every log line
+	Beat      string   `config:",ignore"`   // Name of the Beat (for default file name).
+	Level     Level    `config:"level"`     // Logging level (error, warning, info, debug).
+	Selectors []string `config:"selectors"` // Selectors for debug level logging.
 
 	toObserver  bool
 	toIODiscard bool
@@ -49,15 +45,14 @@ type Config struct {
 
 // FileConfig contains the configuration options for the file output.
 type FileConfig struct {
-	Path            string          `config:"path" yaml:"path"`
-	Name            string          `config:"name" yaml:"name"`
-	Suffix          file.SuffixType `config:"suffix" yaml:"suffix"`
-	MaxSize         uint            `config:"rotateeverybytes" yaml:"rotateeverybytes" validate:"min=1"`
-	MaxBackups      uint            `config:"keepfiles" yaml:"keepfiles" validate:"max=1024"`
-	Permissions     uint32          `config:"permissions"`
-	Interval        time.Duration   `config:"interval"`
-	RotateOnStartup bool            `config:"rotateonstartup"`
-	RedirectStderr  bool            `config:"redirect_stderr" yaml:"redirect_stderr"`
+	Path            string        `config:"path" yaml:"path"`
+	Name            string        `config:"name" yaml:"name"`
+	MaxSize         uint          `config:"rotateeverybytes" yaml:"rotateeverybytes" validate:"min=1"`
+	MaxBackups      uint          `config:"keepfiles" yaml:"keepfiles" validate:"max=1024"`
+	Permissions     uint32        `config:"permissions"`
+	Interval        time.Duration `config:"interval"`
+	RotateOnStartup bool          `config:"rotateonstartup"`
+	RedirectStderr  bool          `config:"redirect_stderr" yaml:"redirect_stderr"`
 }
 
 // MetricsConfig contains configuration used by the monitor to output metrics into the logstream.
@@ -78,7 +73,6 @@ func DefaultConfig(environment Environment) Config {
 	return Config{
 		Level: defaultLevel,
 		Files: FileConfig{
-			Suffix:          file.SuffixCount,
 			MaxSize:         10 * 1024 * 1024,
 			MaxBackups:      7,
 			Permissions:     0600,

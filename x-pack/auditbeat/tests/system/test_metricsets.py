@@ -48,6 +48,7 @@ class Test(AuditbeatXPackTest):
     @unittest.skipIf(sys.platform == "win32", "Not implemented for Windows")
     @unittest.skipIf(sys.platform.startswith('linux') and not (os.path.isdir("/var/lib/dpkg") or os.path.isdir("/var/lib/rpm")),
                      "Only implemented for dpkg and rpm")
+    @unittest.skipIf(sys.platform.startswith('darwin'), "See https://github.com/elastic/beats/issues/21308")
     def test_metricset_package(self):
         """
         package metricset collects information about installed packages on a system.
@@ -63,7 +64,7 @@ class Test(AuditbeatXPackTest):
         process metricset collects information about processes running on a system.
         """
 
-        fields = ["process.entity_id", "process.pid", "process.ppid", "process.name", "process.executable",
+        fields = ["process.entity_id", "process.pid", "process.parent.pid", "process.name", "process.executable",
                   "process.args", "process.start", "process.working_directory", "user.id", "user.group.id"]
 
         # Windows does not have effective and saved IDs, and user.name is not always filled for system processes.
