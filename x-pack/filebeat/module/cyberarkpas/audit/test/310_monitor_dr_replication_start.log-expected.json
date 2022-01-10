@@ -38,7 +38,7 @@
         ]
     },
     {
-        "@timestamp": "2021-03-08T02:48:07.000-02:00",
+        "@timestamp": "2022-03-08T02:48:07.000-02:00",
         "cyberarkpas.audit.action": "Monitor DR Replication start",
         "cyberarkpas.audit.desc": "Monitor DR Replication start",
         "cyberarkpas.audit.issuer": "Batch",
