@@ -136,21 +136,6 @@ var fileParserFor = map[string]string{
 	"file.pe.go_imports_names_entropy":     "executable_object",
 	"file.pe.go_imports_names_var_entropy": "executable_object",
 	"file.pe.go_stripped":                  "executable_object",
-
-	"file.plan9.sections":                     "executable_object",
-	"file.plan9.sections.name":                "executable_object",
-	"file.plan9.sections.virtual_size":        "executable_object",
-	"file.plan9.sections.entropy":             "executable_object",
-	"file.plan9.sections.var_entropy":         "executable_object",
-	"file.plan9.import_hash":                  "executable_object",
-	"file.plan9.imports":                      "executable_object",
-	"file.plan9.imports_names_entropy":        "executable_object",
-	"file.plan9.imports_names_var_entropy":    "executable_object",
-	"file.plan9.go_import_hash":               "executable_object",
-	"file.plan9.go_imports":                   "executable_object",
-	"file.plan9.go_imports_names_entropy":     "executable_object",
-	"file.plan9.go_imports_names_var_entropy": "executable_object",
-	"file.plan9.go_stripped":                  "executable_object",
 }
 
 // fileParsers contains the set of file parsers that can be executed. Fields used

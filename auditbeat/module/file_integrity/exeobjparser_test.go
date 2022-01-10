@@ -31,7 +31,7 @@ import (
 
 func TestExeObjParser(t *testing.T) {
 	for _, format := range []string{
-		"elf", "macho", "plan9", "pe",
+		"elf", "macho", "pe",
 	} {
 		for _, builder := range []string{
 			"go",
@@ -197,19 +197,6 @@ func (o objSection) String() string {
 }
 
 var want = map[string]common.MapStr{
-	"garble_plan9": {
-		"plan9": common.MapStr{
-			"go_import_hash": "d41d8cd98f00b204e9800998ecf8427e",
-			"go_stripped":    true,
-			"sections": []objSection{
-				{Name: strPtr("text"), Size: uint64Ptr(0xfcd30), Entropy: float64Ptr(5.86), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("data"), Size: uint64Ptr(0x16d80), Entropy: float64Ptr(4.65), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("syms"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("spsz"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("pcsz"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0), VarEntropy: float64Ptr(0.0001)},
-			},
-		},
-	},
 	"go_pe": {
 		"pe": common.MapStr{
 			"imphash":                      "c7269d59926fa4252270f407e4dab043",
@@ -565,25 +552,6 @@ var want = map[string]common.MapStr{
 			"go_imports_names_entropy":     4.527763863520965,
 			"go_imports_names_var_entropy": 0.004284997488747353,
 			"go_stripped":                  true,
-		},
-	},
-	"go_plan9": {
-		"plan9": common.MapStr{
-			"go_import_hash": "10bddcb4cee42080f76c88d9ff964491",
-			"go_imports": []string{
-				"github.com/elastic/beats/v7/auditbeat/module/file_integrity/testdata/b.Used",
-				"github.com/elastic/beats/v7/auditbeat/module/file_integrity/testdata/b.hash",
-			},
-			"go_imports_names_entropy":     4.156563879566413,
-			"go_imports_names_var_entropy": 0.0073028693197579415,
-			"go_stripped":                  false,
-			"sections": []objSection{
-				{Name: strPtr("text"), Size: uint64Ptr(0x110c88), Entropy: float64Ptr(5.87), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("data"), Size: uint64Ptr(0x17000), Entropy: float64Ptr(4.64), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("syms"), Size: uint64Ptr(0xe9fa), Entropy: float64Ptr(5.09), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("spsz"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("pcsz"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0), VarEntropy: float64Ptr(0.0001)},
-			},
 		},
 	},
 }

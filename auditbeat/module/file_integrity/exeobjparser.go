@@ -33,7 +33,7 @@ import (
 //
 // The fields populated by exeObjParser are:
 //
-//  {elf,macho,pe,plan9}:
+//  {elf,macho,pe}:
 //    sections:
 //      - name
 //        virtual_size
@@ -148,15 +148,14 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 		}
 	}
 
-	if typ != "plan9" && // Plan9 is purely statically linked.
-		wantFields(fields,
-			"file.pe.imphash",
-			"file.macho.symhash",
-			"file."+typ+".import_hash",
-			"file."+typ+".imports",
-			"file."+typ+".imports_names_entropy",
-			"file."+typ+".imports_names_var_entropy",
-		) {
+	if wantFields(fields,
+		"file.pe.imphash",
+		"file.macho.symhash",
+		"file."+typ+".import_hash",
+		"file."+typ+".imports",
+		"file."+typ+".imports_names_entropy",
+		"file."+typ+".imports_names_var_entropy",
+	) {
 		h, symbols, err := f.ImportHash()
 		if err != nil {
 			return err

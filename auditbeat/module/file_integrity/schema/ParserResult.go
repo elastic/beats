@@ -89,21 +89,8 @@ func (rcv *ParserResult) Macho(obj *ExecutableObject) *ExecutableObject {
 	return nil
 }
 
-func (rcv *ParserResult) Plan9(obj *ExecutableObject) *ExecutableObject {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
-	if o != 0 {
-		x := rcv._tab.Indirect(o + rcv._tab.Pos)
-		if obj == nil {
-			obj = new(ExecutableObject)
-		}
-		obj.Init(rcv._tab.Bytes, x)
-		return obj
-	}
-	return nil
-}
-
 func ParserResultStart(builder *flatbuffers.Builder) {
-	builder.StartObject(4)
+	builder.StartObject(3)
 }
 func ParserResultAddPe(builder *flatbuffers.Builder, pe flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(pe), 0)
@@ -113,9 +100,6 @@ func ParserResultAddElf(builder *flatbuffers.Builder, elf flatbuffers.UOffsetT) 
 }
 func ParserResultAddMacho(builder *flatbuffers.Builder, macho flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(2, flatbuffers.UOffsetT(macho), 0)
-}
-func ParserResultAddPlan9(builder *flatbuffers.Builder, plan9 flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(3, flatbuffers.UOffsetT(plan9), 0)
 }
 func ParserResultEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

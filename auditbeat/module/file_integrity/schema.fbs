@@ -92,7 +92,6 @@ table ParserResult {
   pe:ExecutableObject;
   elf:ExecutableObject;
   macho:ExecutableObject;
-  plan9:ExecutableObject;
 }
 
 table Event {
