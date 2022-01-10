@@ -3,7 +3,7 @@ description: Winlogbeat Routing Pipeline
 processors:
   - pipeline:
       name: '{< IngestPipeline "security" >}'
-      if: ctx?.winlog?.channel == 'Security'
+      if: ctx?.winlog?.channel == 'Security' && ['Microsoft-Windows-Eventlog', 'Microsoft-Windows-Security-Auditing'].contains(ctx?.winlog?.provider_name)
   - pipeline:
       name: '{< IngestPipeline "sysmon" >}'
       if: ctx?.winlog?.channel == 'Microsoft-Windows-Sysmon/Operational'
