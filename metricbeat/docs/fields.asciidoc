@@ -33597,13 +33597,36 @@ Contains etcd leader statistics.
 
 
 [float]
-=== followers.counts
+=== follower
 
-The number of failed and successful Raft RPC requests.
+Contains follower statistics.
 
 
 
-*`etcd.leader.followers.counts.followers.counts.success`*::
+*`etcd.leader.follower.id`*::
++
+--
+ID of follower
+
+type: keyword
+
+--
+
+[float]
+=== latency
+
+latency to each peer in the cluster
+
+
+
+*`etcd.leader.follower.latency.ms`*::
++
+--
+type: scaled_float
+
+--
+
+*`etcd.leader.follower.success_operations`*::
 +
 --
 successful Raft RPC requests
@@ -33612,7 +33635,7 @@ type: integer
 
 --
 
-*`etcd.leader.followers.counts.followers.counts.fail`*::
+*`etcd.leader.follower.failed_operations`*::
 +
 --
 failed Raft RPC requests
@@ -33621,49 +33644,7 @@ type: integer
 
 --
 
-[float]
-=== followers.latency
-
-latency to each peer in the cluster
-
-
-
-*`etcd.leader.followers.latency.followers.latency.average`*::
-+
---
-type: scaled_float
-
---
-
-*`etcd.leader.followers.latency.followers.latency.current`*::
-+
---
-type: scaled_float
-
---
-
-*`etcd.leader.followers.latency.followers.latency.maximum`*::
-+
---
-type: scaled_float
-
---
-
-*`etcd.leader.followers.latency.followers.latency.minimum`*::
-+
---
-type: integer
-
---
-
-*`etcd.leader.followers.latency.follower.latency.standardDeviation`*::
-+
---
-type: scaled_float
-
---
-
-*`etcd.leader.leader`*::
+*`etcd.leader.follower.leader`*::
 +
 --
 ID of actual leader
