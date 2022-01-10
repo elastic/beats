@@ -31,15 +31,6 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
-func TestEventMapping(t *testing.T) {
-	content, err := ioutil.ReadFile("../_meta/test/leaderstats.json")
-	assert.NoError(t, err)
-
-	event := eventMapping(content)
-
-	assert.Equal(t, event["leader"], string("924e2e83e93f2560"))
-}
-
 func TestFetchEventContent(t *testing.T) {
 
 	const (
@@ -60,7 +51,7 @@ func TestFetchEventContent(t *testing.T) {
 			name:              "Leader member stats",
 			mockedFetchFile:   "/leaderstats.json",
 			httpCode:          http.StatusOK,
-			expectedNumEvents: 1,
+			expectedNumEvents: 0,
 		},
 		{
 			name:              "Follower member",
