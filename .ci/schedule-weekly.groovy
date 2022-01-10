@@ -45,7 +45,7 @@ def runBuilds(Map args = [:]) {
   branches.each { branch ->
     build(quietPeriod: quietPeriod, job: "Beats/beats/${branch}", parameters: [booleanParam(name: 'awsCloudTests', value: true)], wait: false, propagate: false)
     // Increate the quiet period for the next iteration
-    quietPeriod += quietPeriodFactor
+    quietPeriod += args.quietPeriodFactor
   }
 }
 
