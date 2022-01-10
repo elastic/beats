@@ -21,3 +21,9 @@
       type: date
     - name: totalExecutions
       type: long
+    - name: lastErrorDate
+      type: date
+    - name: lastErrorMessage
+      type: text
+    - name: lastErrorReason
+      type: text

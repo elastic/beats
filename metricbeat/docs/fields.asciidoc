@@ -40745,6 +40745,27 @@ type: long
 
 --
 
+*`kibana.rule.lastErrorDate`*::
++
+--
+type: date
+
+--
+
+*`kibana.rule.lastErrorMessage`*::
++
+--
+type: text
+
+--
+
+*`kibana.rule.lastErrorReason`*::
++
+--
+type: text
+
+--
+
 [float]
 === settings
 

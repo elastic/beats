@@ -45,6 +45,9 @@ var (
 		"averageDuration":       c.Int("averageDuration", s.Optional),
 		"lastExecutionTimeout":  c.Int("lastExecutionTimeout", s.Optional),
 		"totalExecutions":       c.Int("totalExecutions", s.Optional),
+		"lastErrorDate":         c.Int("lastErrorDate", s.Optional),
+		"lastErrorMessage":      c.Str("lastErrorMessage", s.Optional),
+		"lastErrorReason":       c.Str("lastErrorReason", s.Optional),
 	}
 
 	kibanaSchema = s.Schema{
