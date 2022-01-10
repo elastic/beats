@@ -1,6 +1,5 @@
 [
     {
-        "@timestamp": "2008-11-16T22:21:13.147Z",
         "auditd.log.dev": "dm-0",
         "auditd.log.ino": "284133",
         "auditd.log.path": "/var/www/html/file1",
@@ -21,7 +20,6 @@
         "service.type": "auditd"
     },
     {
-        "@timestamp": "2018-04-25T13:28:53.080Z",
         "auditd.log.apparmor": "DENIED",
         "auditd.log.denied_mask": "trace",
         "auditd.log.operation": "ptrace",
@@ -45,7 +43,6 @@
         "service.type": "auditd"
     },
     {
-        "@timestamp": "2018-04-25T13:28:53.080Z",
         "auditd.log.record_type": "AVC",
         "auditd.log.sequence": 61207,
         "auditd.log.seresult": "1",

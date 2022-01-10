@@ -52,7 +52,7 @@ var (
 
 		"uuid":  c.Str("kibana.uuid"),
 		"name":  c.Str("kibana.name"),
-		"index": c.Str("kibana.name"),
+		"index": c.Str("kibana.index"),
 		"host": s.Object{
 			"name": c.Str("kibana.host"),
 		},
@@ -123,7 +123,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		event.Error = elastic.MakeErrorForMissingField("cluster_uuid", elastic.Kibana)
 		return event.Error
 	}
-	event.RootFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
+	event.ModuleFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
 
 	// Set service ID
 	uuid, err := dataFields.GetValue("uuid")

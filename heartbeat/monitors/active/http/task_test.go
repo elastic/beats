@@ -106,7 +106,7 @@ func TestSplitHostnamePort(t *testing.T) {
 			request := &http.Request{
 				URL: url,
 			}
-			host, port, err := splitHostnamePort(request)
+			host, port, err := splitHostnamePort(request.URL.String())
 
 			if err != nil {
 				if test.expectedError == nil {
