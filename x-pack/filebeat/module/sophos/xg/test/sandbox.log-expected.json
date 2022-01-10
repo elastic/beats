@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2017-01-31T14:52:11.000-02:00",
         "event.action": "Allowed",
         "event.category": [
             "network"
@@ -45,6 +46,7 @@
         ]
     },
     {
+        "@timestamp": "2017-01-31T14:52:11.000-02:00",
         "client.ip": "10.198.47.112",
         "event.action": "Denied",
         "event.category": [
@@ -106,6 +108,7 @@
         ]
     },
     {
+        "@timestamp": "2017-01-31T15:28:25.000-02:00",
         "event.action": "Allowed",
         "event.category": [
             "network"
@@ -151,6 +154,7 @@
         ]
     },
     {
+        "@timestamp": "2017-01-31T15:28:25.000-02:00",
         "client.ip": "10.198.47.112",
         "event.action": "Pending",
         "event.category": [
@@ -211,6 +215,7 @@
         ]
     },
     {
+        "@timestamp": "2017-01-31T15:28:25.000-02:00",
         "client.ip": "10.198.47.112",
         "event.action": "Denied",
         "event.category": [
@@ -272,6 +277,7 @@
         ]
     },
     {
+        "@timestamp": "2020-05-18T14:38:36.000-02:00",
         "client.ip": "172.16.34.24",
         "event.action": "Denied",
         "event.category": [
