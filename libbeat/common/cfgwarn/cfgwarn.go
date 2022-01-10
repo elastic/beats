@@ -33,9 +33,13 @@ func Beta(format string, v ...interface{}) {
 }
 
 // Deprecate logs a deprecation message.
-// The version string contains the version when the future will be removed
+// The version string contains the version when the future will be removed.
+// If version is empty, the message  will not mention the removal of the feature.
 func Deprecate(version string, format string, v ...interface{}) {
-	postfix := fmt.Sprintf(" Will be removed in version: %s", version)
+	var postfix string
+	if version != "" {
+		postfix = fmt.Sprintf(" Will be removed in version: %s", version)
+	}
 	logp.NewLogger(selector, zap.AddCallerSkip(1)).Warnf("DEPRECATED: "+format+postfix, v...)
 }
 
