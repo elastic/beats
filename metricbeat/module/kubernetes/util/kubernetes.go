@@ -306,6 +306,12 @@ func getResourceMetadataWatchers(config *kubernetesConfig, resource kubernetes.R
 	return watcher, nodeWatcher, namespaceWatcher
 }
 
+func GetDefaultDisabledMetaConfig() *kubernetesConfig {
+	return &kubernetesConfig{
+		AddMetadata: false,
+	}
+}
+
 func validatedConfig(base mb.BaseMetricSet) *kubernetesConfig {
 	config := kubernetesConfig{
 		AddMetadata:         true,

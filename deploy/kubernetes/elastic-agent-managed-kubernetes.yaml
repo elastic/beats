@@ -165,7 +165,8 @@ rules:
   - apiGroups: [ "batch" ]
     resources:
       - jobs
-      - cronjobs
+      # Uncomment if need metadata for cronjob objects in versions >= v1.21
+      #- cronjobs
     verbs: [ "get", "list", "watch" ]
   # required for apiserver
   - nonResourceURLs:

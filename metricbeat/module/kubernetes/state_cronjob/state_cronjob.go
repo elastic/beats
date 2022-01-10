@@ -59,11 +59,15 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("must be child of kubernetes module")
 	}
 
-	return &CronJobMetricSet{
+	config := util.GetDefaultDisabledMetaConfig()
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, fmt.Errorf("error loading config of kubernetes module")
+	}
+
+	ms := CronJobMetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		mod:           mod,
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.CronJob{}, false),
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 				"kube_cronjob_info":                           p.InfoMetric(),
@@ -81,7 +85,12 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				"concurrency_policy": p.KeyLabel("concurrency"),
 			},
 		},
-	}, nil
+	}
+	if config.AddMetadata {
+		ms.enricher = util.NewResourceMetadataEnricher(
+			base, &kubernetes.CronJob{}, false)
+	}
+	return &ms, nil
 }
 
 // Fetch prometheus metrics and treats those prefixed by mb.ModuleDataKey as
@@ -89,7 +98,9 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 //
 // Copied from other kube state metrics.
 func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) {
-	m.enricher.Start()
+	if m.enricher != nil {
+		m.enricher.Start()
+	}
 
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
@@ -104,7 +115,9 @@ func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) {
 		return
 	}
 
-	m.enricher.Enrich(events)
+	if m.enricher != nil {
+		m.enricher.Enrich(events)
+	}
 	for _, event := range events {
 		e, err := util.CreateEvent(event, "kubernetes.cronjob")
 		if err != nil {
@@ -122,6 +135,8 @@ func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) {
 
 // Close stops this metricset
 func (m *CronJobMetricSet) Close() error {
-	m.enricher.Stop()
+	if m.enricher != nil {
+		m.enricher.Stop()
+	}
 	return nil
 }
