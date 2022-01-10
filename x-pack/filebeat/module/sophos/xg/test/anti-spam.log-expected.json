@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2020-05-18T14:38:48.000-02:00",
         "client.bytes": 0,
         "client.port": 0,
         "destination.bytes": 0,
@@ -62,6 +63,7 @@
         ]
     },
     {
+        "@timestamp": "2020-05-18T14:38:49.000-02:00",
         "client.bytes": 0,
         "client.ip": "89.160.20.156",
         "client.port": 52742,
@@ -140,6 +142,7 @@
         ]
     },
     {
+        "@timestamp": "2020-05-18T14:38:50.000-02:00",
         "client.bytes": 0,
         "client.ip": "67.43.156.12",
         "client.port": 51789,
@@ -216,6 +219,7 @@
         ]
     },
     {
+        "@timestamp": "2020-05-18T14:38:51.000-02:00",
         "client.bytes": 0,
         "client.ip": "67.43.156.14",
         "client.port": 55002,
@@ -292,6 +296,7 @@
         ]
     },
     {
+        "@timestamp": "2017-01-31T18:34:41.000-02:00",
         "client.bytes": 0,
         "client.ip": "10.198.47.71",
         "client.port": 22420,
@@ -362,6 +367,7 @@
         ]
     },
     {
+        "@timestamp": "2018-06-06T11:10:11.000-02:00",
         "client.bytes": 0,
         "client.ip": "10.198.16.121",
         "client.port": 58043,
@@ -432,6 +438,7 @@
         ]
     },
     {
+        "@timestamp": "2018-06-06T12:50:07.000-02:00",
         "client.bytes": 0,
         "client.ip": "10.198.16.121",
         "client.port": 60134,
@@ -502,6 +509,7 @@
         ]
     },
     {
+        "@timestamp": "2018-06-06T12:51:34.000-02:00",
         "client.bytes": 0,
         "client.ip": "10.198.16.121",
         "client.port": 60298,
@@ -570,6 +578,7 @@
         ]
     },
     {
+        "@timestamp": "2018-06-06T12:53:39.000-02:00",
         "client.bytes": 0,
         "client.ip": "10.198.16.121",
         "client.port": 60392,
@@ -635,6 +644,7 @@
         ]
     },
     {
+        "@timestamp": "2018-06-06T12:56:53.000-02:00",
         "client.bytes": 0,
         "client.ip": "10.198.16.121",
         "client.port": 60608,
@@ -704,6 +714,7 @@
         ]
     },
     {
+        "@timestamp": "2017-01-31T18:31:11.000-02:00",
         "client.bytes": 0,
         "client.ip": "10.198.47.71",
         "client.port": 22333,
