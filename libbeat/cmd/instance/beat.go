@@ -879,7 +879,7 @@ func (b *Beat) warnAboutElasticsearchVersion() {
 			}
 
 			if esVersion.LessThan(beatVersion) {
-				logp.Warn("Connecting to older version of Elasticsearch. From 8.1, it is going to be disabled by default.")
+				logp.Warn("Connecting to older version of Elasticsearch. From 8.1, connecting to older versions will be disabled by default.")
 			}
 		})
 		return nil
