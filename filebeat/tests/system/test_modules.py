@@ -25,6 +25,7 @@ remove_timestamp = {
     "f5.bigipafm",
     "fortinet.clientendpoint",
     "haproxy.log",
+    "ibmmq.errorlog",
     "icinga.startup",
     "imperva.securesphere",
     "infoblox.nios",
@@ -299,7 +300,7 @@ def clean_keys(obj):
         host_keys.append("host.name")
 
     # The create timestamps area always new
-    time_keys = ["event.created", "event.ingested", "@timestamp"]
+    time_keys = ["event.created", "event.ingested"]
     # source path and agent.version can be different for each run
     other_keys = ["log.file.path", "agent.version"]
     # ECS versions change for any ECS release, large or small

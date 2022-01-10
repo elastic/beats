@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2020-07-06T16:38:34.588Z",
         "auditd.log.format": "raw",
         "auditd.log.kernel": "3.10.0-1062.9.1.el7.x86_64",
         "auditd.log.node": "localhost.localdomain",
@@ -32,6 +33,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2020-07-06T16:38:34.707Z",
         "auditd.log.audit_backlog_limit": "8192",
         "auditd.log.node": "localhost.localdomain",
         "auditd.log.old": "64",
@@ -61,6 +63,7 @@
         "user.audit.id": "4294967295"
     },
     {
+        "@timestamp": "2020-07-06T16:38:34.707Z",
         "auditd.log.audit_failure": "1",
         "auditd.log.node": "localhost.localdomain",
         "auditd.log.old": "1",
@@ -90,6 +93,7 @@
         "user.audit.id": "4294967295"
     },
     {
+        "@timestamp": "2020-07-06T16:38:34.709Z",
         "auditd.log.node": "localhost.localdomain",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 6,
@@ -121,6 +125,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2020-07-06T16:38:34.725Z",
         "auditd.log.node": "localhost.localdomain",
         "auditd.log.record_type": "SYSTEM_BOOT",
         "auditd.log.sequence": 7,
@@ -147,6 +152,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2020-07-06T16:38:34.739Z",
         "auditd.log.node": "localhost.localdomain",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 8,
@@ -178,6 +184,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2020-07-06T16:38:34.807Z",
         "auditd.log.node": "localhost.localdomain",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 9,
@@ -209,6 +216,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2020-07-06T16:38:34.843Z",
         "auditd.log.node": "localhost.localdomain",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 10,
@@ -240,6 +248,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2020-07-06T16:38:34.850Z",
         "auditd.log.node": "localhost.localdomain",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 11,
@@ -271,6 +280,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2020-07-06T16:38:34.857Z",
         "auditd.log.node": "localhost.localdomain",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 12,

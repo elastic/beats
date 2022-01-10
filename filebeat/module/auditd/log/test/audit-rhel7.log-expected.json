@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2016-12-07T02:16:23.819Z",
         "auditd.log.format": "raw",
         "auditd.log.kernel": "3.10.0-327.36.3.el7.x86_64",
         "auditd.log.record_type": "DAEMON_START",
@@ -28,6 +29,7 @@
         "user.audit.id": "4294967295"
     },
     {
+        "@timestamp": "2016-12-07T02:16:23.864Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 6,
         "auditd.log.ses": "4294967295",
@@ -58,6 +60,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:23.876Z",
         "auditd.log.record_type": "SYSTEM_BOOT",
         "auditd.log.sequence": 7,
         "auditd.log.ses": "4294967295",
@@ -83,6 +86,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:23.879Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 8,
         "auditd.log.ses": "4294967295",
@@ -113,6 +117,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.075Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 9,
         "auditd.log.ses": "4294967295",
@@ -143,6 +148,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.088Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 10,
         "auditd.log.ses": "4294967295",
@@ -173,6 +179,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.163Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 11,
         "auditd.log.ses": "4294967295",
@@ -203,6 +210,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.212Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 12,
         "auditd.log.ses": "4294967295",
@@ -233,6 +241,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.521Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 13,
         "auditd.log.ses": "4294967295",
@@ -263,6 +272,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.521Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 14,
         "auditd.log.ses": "4294967295",
@@ -293,6 +303,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.526Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 15,
         "auditd.log.ses": "4294967295",
@@ -323,6 +334,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.534Z",
         "auditd.log.record_type": "SERVICE_STOP",
         "auditd.log.sequence": 16,
         "auditd.log.ses": "4294967295",
@@ -353,6 +365,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.827Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -377,6 +390,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.827Z",
         "auditd.log.a0": "0",
         "auditd.log.a1": "41a15c",
         "auditd.log.a2": "0",
@@ -420,6 +434,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.858Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -444,6 +459,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.858Z",
         "auditd.log.a0": "0",
         "auditd.log.a1": "41a15c",
         "auditd.log.a2": "0",
@@ -487,6 +503,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.870Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -511,6 +528,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.870Z",
         "auditd.log.a0": "0",
         "auditd.log.a1": "41a15c",
         "auditd.log.a2": "0",
@@ -554,6 +572,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.877Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -578,6 +597,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.877Z",
         "auditd.log.a0": "0",
         "auditd.log.a1": "41a15c",
         "auditd.log.a2": "0",
@@ -621,6 +641,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.931Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -645,6 +666,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.931Z",
         "auditd.log.a0": "3",
         "auditd.log.a1": "41a15c",
         "auditd.log.a2": "0",
@@ -688,6 +710,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.939Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 22,
         "auditd.log.ses": "4294967295",
@@ -718,6 +741,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.945Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 23,
         "auditd.log.ses": "4294967295",
@@ -748,6 +772,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.953Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 24,
         "auditd.log.ses": "4294967295",
@@ -778,6 +803,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.954Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 25,
         "auditd.log.ses": "4294967295",
@@ -808,6 +834,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.960Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 26,
         "auditd.log.ses": "4294967295",
@@ -838,6 +865,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.982Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "10",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -862,6 +890,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:24.982Z",
         "auditd.log.a0": "0",
         "auditd.log.a1": "41a15c",
         "auditd.log.a2": "0",
@@ -905,6 +934,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.012Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 28,
         "auditd.log.ses": "4294967295",
@@ -935,6 +965,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.031Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 29,
         "auditd.log.ses": "4294967295",
@@ -965,6 +996,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.043Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 30,
         "auditd.log.ses": "4294967295",
@@ -995,6 +1027,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.044Z",
         "auditd.log.record_type": "SERVICE_STOP",
         "auditd.log.sequence": 31,
         "auditd.log.ses": "4294967295",
@@ -1025,6 +1058,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.069Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "10",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -1049,6 +1083,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.069Z",
         "auditd.log.a0": "0",
         "auditd.log.a1": "41a15c",
         "auditd.log.a2": "0",
@@ -1092,6 +1127,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.104Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 33,
         "auditd.log.ses": "4294967295",
@@ -1122,6 +1158,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.099Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "10",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -1146,6 +1183,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.099Z",
         "auditd.log.a0": "0",
         "auditd.log.a1": "41a15c",
         "auditd.log.a2": "0",
@@ -1189,6 +1227,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.128Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "10",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -1213,6 +1252,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.128Z",
         "auditd.log.a0": "0",
         "auditd.log.a1": "41a15c",
         "auditd.log.a2": "0",
@@ -1256,6 +1296,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.164Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 36,
         "auditd.log.ses": "4294967295",
@@ -1286,6 +1327,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.166Z",
         "auditd.log.record_type": "SERVICE_STOP",
         "auditd.log.sequence": 37,
         "auditd.log.ses": "4294967295",
@@ -1316,6 +1358,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.167Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 38,
         "auditd.log.ses": "4294967295",
@@ -1346,6 +1389,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.168Z",
         "auditd.log.record_type": "SERVICE_STOP",
         "auditd.log.sequence": 39,
         "auditd.log.ses": "4294967295",
@@ -1376,6 +1420,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.170Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 40,
         "auditd.log.ses": "4294967295",
@@ -1406,6 +1451,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.170Z",
         "auditd.log.record_type": "SERVICE_STOP",
         "auditd.log.sequence": 41,
         "auditd.log.ses": "4294967295",
@@ -1436,6 +1482,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.180Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 42,
         "auditd.log.ses": "4294967295",
@@ -1466,6 +1513,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.187Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 43,
         "auditd.log.ses": "4294967295",
@@ -1496,6 +1544,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.191Z",
         "auditd.log.entries": 0,
         "auditd.log.family": "10",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -1520,6 +1569,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.191Z",
         "auditd.log.a0": "1",
         "auditd.log.a1": "41a15c",
         "auditd.log.a2": "0",
@@ -1563,6 +1613,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.511Z",
         "auditd.log.record_type": "SERVICE_START",
         "auditd.log.sequence": 45,
         "auditd.log.ses": "4294967295",
@@ -1593,6 +1644,7 @@
         "user.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.528Z",
         "auditd.log.entries": 5,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -1617,6 +1669,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.528Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "0",
         "auditd.log.a2": "40",
@@ -1660,6 +1713,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.532Z",
         "auditd.log.entries": 5,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -1684,6 +1738,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.532Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "0",
         "auditd.log.a2": "40",
@@ -1727,6 +1782,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.534Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -1751,6 +1807,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.534Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "0",
         "auditd.log.a2": "40",
@@ -1794,6 +1851,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.537Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -1818,6 +1876,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.537Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "0",
         "auditd.log.a2": "40",
@@ -1861,6 +1920,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.538Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -1885,6 +1945,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.538Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "0",
         "auditd.log.a2": "40",
@@ -1928,6 +1989,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.542Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -1952,6 +2014,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.542Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "0",
         "auditd.log.a2": "40",
@@ -1995,6 +2058,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.543Z",
         "auditd.log.entries": 3,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -2019,6 +2083,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.543Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "0",
         "auditd.log.a2": "40",
@@ -2062,6 +2127,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.546Z",
         "auditd.log.entries": 3,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -2086,6 +2152,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.546Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "0",
         "auditd.log.a2": "40",
@@ -2129,6 +2196,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.548Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -2153,6 +2221,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.548Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "0",
         "auditd.log.a2": "40",
@@ -2196,6 +2265,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.552Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -2220,6 +2290,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.552Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "0",
         "auditd.log.a2": "40",
@@ -2263,6 +2334,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.553Z",
         "auditd.log.entries": 5,
         "auditd.log.family": "10",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -2287,6 +2359,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.553Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "29",
         "auditd.log.a2": "40",
@@ -2330,6 +2403,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.556Z",
         "auditd.log.entries": 5,
         "auditd.log.family": "10",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -2354,6 +2428,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.556Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "29",
         "auditd.log.a2": "40",
@@ -2397,6 +2472,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.557Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "10",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -2421,6 +2497,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.557Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "29",
         "auditd.log.a2": "40",
@@ -2464,6 +2541,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.560Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "10",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -2488,6 +2566,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.560Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "29",
         "auditd.log.a2": "40",
@@ -2531,6 +2610,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.562Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "10",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -2555,6 +2635,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.562Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "29",
         "auditd.log.a2": "40",
@@ -2598,6 +2679,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.566Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "10",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -2622,6 +2704,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.566Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "29",
         "auditd.log.a2": "40",
@@ -2665,6 +2748,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.569Z",
         "auditd.log.entries": 3,
         "auditd.log.family": "10",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -2689,6 +2773,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.569Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "29",
         "auditd.log.a2": "40",
@@ -2732,6 +2817,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.573Z",
         "auditd.log.entries": 3,
         "auditd.log.family": "10",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -2756,6 +2842,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.573Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "29",
         "auditd.log.a2": "40",
@@ -2799,6 +2886,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.575Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "10",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -2823,6 +2911,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.575Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "29",
         "auditd.log.a2": "40",
@@ -2866,6 +2955,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.578Z",
         "auditd.log.entries": 4,
         "auditd.log.family": "10",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -2890,6 +2980,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.578Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "29",
         "auditd.log.a2": "40",
@@ -2933,6 +3024,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.580Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -2957,6 +3049,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.580Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "0",
         "auditd.log.a2": "40",
@@ -3000,6 +3093,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.582Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -3024,6 +3118,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.582Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "0",
         "auditd.log.a2": "40",
@@ -3067,6 +3162,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.583Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -3091,6 +3187,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.583Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "0",
         "auditd.log.a2": "40",
@@ -3134,6 +3231,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.585Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
@@ -3158,6 +3256,7 @@
         "service.type": "auditd"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.585Z",
         "auditd.log.a0": "4",
         "auditd.log.a1": "0",
         "auditd.log.a2": "40",
@@ -3201,6 +3300,7 @@
         "user.saved.id": "0"
     },
     {
+        "@timestamp": "2016-12-07T02:16:25.587Z",
         "auditd.log.entries": 6,
         "auditd.log.family": "2",
         "auditd.log.record_type": "NETFILTER_CFG",
