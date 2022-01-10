@@ -38,14 +38,17 @@ import (
 //      - name
 //        virtual_size
 //        entropy
+//        var_entropy
 //    import_hash
 //    imphash
 //    symhash
 //    imports
 //    imports_names_entropy
+//    imports_names_var_entropy
 //    go_import_hash
 //    go_imports
 //    go_imports_names_entropy
+//    go_imports_names_var_entropy
 //    go_stripped
 type exeObjParser map[string]bool
 
@@ -89,22 +92,25 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 		"file."+typ+".sections.name",
 		"file."+typ+".sections.virtual_size",
 		"file."+typ+".sections.entropy",
+		"file."+typ+".sections.var_entropy",
 	) {
 		sections, err := f.Sections()
 		if err != nil {
 			return err
 		}
 		var (
-			name    *string
-			size    *uint64
-			entropy *float64
+			name       *string
+			size       *uint64
+			entropy    *float64
+			varEntropy *float64
 
-			wantName, wantSize, wantEntropy bool
+			wantName, wantSize, wantEntropy, wantVariance bool
 		)
 		if !all {
 			wantName = wantFields(fields, "file."+typ+".sections.name")
 			wantSize = wantFields(fields, "file."+typ+".sections.virtual_size")
 			wantEntropy = wantFields(fields, "file."+typ+".sections.entropy")
+			wantVariance = wantFields(fields, "file."+typ+".sections.var_entropy")
 		}
 		if len(sections) != 0 {
 			// TODO: Replace this []section with a []common.MapStr if additional
@@ -116,6 +122,7 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 					name = &s.Name
 					size = &s.Size
 					entropy = &s.Entropy
+					varEntropy = &s.VarEntropy
 				} else {
 					if wantName {
 						name = &s.Name
@@ -126,11 +133,15 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 					if wantEntropy {
 						entropy = &s.Entropy
 					}
+					if wantVariance {
+						varEntropy = &s.VarEntropy
+					}
 				}
 				stats[i] = objSection{
-					Name:    name,
-					Size:    size,
-					Entropy: entropy,
+					Name:       name,
+					Size:       size,
+					Entropy:    entropy,
+					VarEntropy: varEntropy,
 				}
 			}
 			details.Put("sections", stats)
@@ -144,6 +155,7 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 			"file."+typ+".import_hash",
 			"file."+typ+".imports",
 			"file."+typ+".imports_names_entropy",
+			"file."+typ+".imports_names_var_entropy",
 		) {
 		h, symbols, err := f.ImportHash()
 		if err != nil {
@@ -167,8 +179,16 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 			if wantFields(fields, "file."+typ+".imports") {
 				details.Put("imports", symbols)
 			}
-			if wantFields(fields, "file."+typ+".imports_names_entropy") {
-				details.Put("imports_names_entropy", toutoumomoma.NameEntropy(symbols))
+			wantEntropy := wantFields(fields, "file."+typ+".imports_names_entropy")
+			wantVariance := wantFields(fields, "file."+typ+".imports_names_var_entropy")
+			if wantEntropy || wantVariance {
+				entropy, varEntropy := toutoumomoma.NameEntropy(symbols)
+				if wantEntropy {
+					details.Put("imports_names_entropy", entropy)
+				}
+				if wantVariance {
+					details.Put("imports_names_var_entropy", varEntropy)
+				}
 			}
 		}
 	}
@@ -177,6 +197,7 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 		"file."+typ+".go_import_hash",
 		"file."+typ+".go_imports",
 		"file."+typ+".go_imports_names_entropy",
+		"file."+typ+".go_imports_names_var_entropy",
 	) {
 		h, symbols, err := f.GoSymbolHash(false)
 		if err != nil {
@@ -192,8 +213,16 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 			if wantFields(fields, "file."+typ+".go_imports") {
 				details.Put("go_imports", symbols)
 			}
-			if wantFields(fields, "file."+typ+".go_imports_names_entropy") {
-				details.Put("go_imports_names_entropy", toutoumomoma.NameEntropy(symbols))
+			wantEntropy := wantFields(fields, "file."+typ+".go_imports_names_entropy")
+			wantVariance := wantFields(fields, "file."+typ+".go_imports_names_variance")
+			if wantEntropy || wantVariance {
+				entropy, varEntropy := toutoumomoma.NameEntropy(symbols)
+				if wantEntropy {
+					details.Put("go_imports_names_entropy", entropy)
+				}
+				if wantVariance {
+					details.Put("go_imports_names_var_entropy", varEntropy)
+				}
 			}
 		}
 	}
@@ -210,7 +239,8 @@ func (fields exeObjParser) Parse(dst common.MapStr, path string) error {
 }
 
 type objSection struct {
-	Name    *string  `json:"name,omitempty"`
-	Size    *uint64  `json:"virtual_size,omitempty"`
-	Entropy *float64 `json:"entropy,omitempty"`
+	Name       *string  `json:"name,omitempty"`
+	Size       *uint64  `json:"virtual_size,omitempty"`
+	Entropy    *float64 `json:"entropy,omitempty"`
+	VarEntropy *float64 `json:"var_entropy,omitempty"`
 }

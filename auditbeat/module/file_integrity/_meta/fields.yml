@@ -25,6 +25,13 @@
         ignore_above: 1024
         description: Shannon entropy calculation from the list of Go imports.
         default_field: false
+      - name: go_imports_names_var_entropy
+        level: extended
+        type: long
+        format: number
+        ignore_above: 1024
+        description: Variance for Shannon entropy calculation from the list of Go imports.
+        default_field: false
       - name: go_import_hash
         level: extended
         type: keyword
@@ -47,6 +54,13 @@
         ignore_above: 1024
         description: Shannon entropy calculation from the list of imported element names and types.
         default_field: false
+      - name: imports_names_var_entropy
+        level: extended
+        type: long
+        format: number
+        ignore_above: 1024
+        description: Variance for Shannon entropy calculation from the list of imported element names and types.
+        default_field: false
       - name: import_hash
         level: extended
         type: keyword
@@ -55,6 +69,13 @@
           fingerprint binaries even after recompilation or other code-level
           transformations have occurred, which would change more traditional hash values.'
         example: d41d8cd98f00b204e9800998ecf8427e
+        default_field: false
+      - name: sections.var_entropy
+        level: extended
+        type: long
+        format: number
+        ignore_above: 1024
+        description: Variance for Shannon entropy calculation from the section.
         default_field: false
     - name: macho
       title: Mach-O Header
@@ -74,6 +95,13 @@
         format: number
         ignore_above: 1024
         description: Shannon entropy calculation from the list of Go imports.
+        default_field: false
+      - name: go_imports_names_var_entropy
+        level: extended
+        type: long
+        format: number
+        ignore_above: 1024
+        description: Variance for Shannon entropy calculation from the list of Go imports.
         default_field: false
       - name: go_import_hash
         level: extended
@@ -103,6 +131,13 @@
         ignore_above: 1024
         description: Shannon entropy calculation from the list of imported element names and types.
         default_field: false
+      - name: imports_names_var_entropy
+        level: extended
+        type: long
+        format: number
+        ignore_above: 1024
+        description: Variance for Shannon entropy calculation from the list of imported element names and types.
+        default_field: false
       - name: import_hash
         level: extended
         type: keyword
@@ -118,7 +153,7 @@
         level: extended
         type: nested
         ignore_above: 1024
-        description: 'An array containing an object for each section of the ELF file.
+        description: 'An array containing an object for each section of the Mach-O file.
 
           The keys that should be present in these objects are defined by sub-fields
           underneath `macho.sections.*`.'
@@ -129,6 +164,13 @@
         format: number
         ignore_above: 1024
         description: Shannon entropy calculation from the section.
+        default_field: false
+      - name: sections.var_entropy
+        level: extended
+        type: long
+        format: number
+        ignore_above: 1024
+        description: Variance for Shannon entropy calculation from the section.
         default_field: false
       - name: sections.name
         level: extended
@@ -171,6 +213,13 @@
         ignore_above: 1024
         description: Shannon entropy calculation from the list of Go imports.
         default_field: false
+      - name: go_imports_names_var_entropy
+        level: extended
+        type: long
+        format: number
+        ignore_above: 1024
+        description: Variance for Shannon entropy calculation from the list of Go imports.
+        default_field: false
       - name: go_import_hash
         level: extended
         type: keyword
@@ -199,6 +248,13 @@
         ignore_above: 1024
         description: Shannon entropy calculation from the list of imported element names and types.
         default_field: false
+      - name: imports_names_var_entropy
+        level: extended
+        type: long
+        format: number
+        ignore_above: 1024
+        description: Variance for Shannon entropy calculation from the list of imported element names and types.
+        default_field: false
       - name: import_hash
         level: extended
         type: keyword
@@ -223,6 +279,13 @@
         format: number
         ignore_above: 1024
         description: Shannon entropy calculation from the section.
+        default_field: false
+      - name: sections.var_entropy
+        level: extended
+        type: long
+        format: number
+        ignore_above: 1024
+        description: Variance for Shannon entropy calculation from the section.
         default_field: false
       - name: sections.name
         level: extended
@@ -256,6 +319,13 @@
         ignore_above: 1024
         description: Shannon entropy calculation from the list of Go imports.
         default_field: false
+      - name: go_imports_names_var_entropy
+        level: extended
+        type: long
+        format: number
+        ignore_above: 1024
+        description: Variance for Shannon entropy calculation from the list of Go imports.
+        default_field: false
       - name: go_import_hash
         level: extended
         type: keyword
@@ -286,6 +356,13 @@
         format: number
         ignore_above: 1024
         description: Shannon entropy calculation from the section.
+        default_field: false
+      - name: sections.var_entropy
+        level: extended
+        type: long
+        format: number
+        ignore_above: 1024
+        description: Variance for Shannon entropy calculation from the section.
         default_field: false
       - name: sections.name
         level: extended

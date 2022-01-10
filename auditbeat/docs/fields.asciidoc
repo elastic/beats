@@ -18013,6 +18013,17 @@ format: number
 
 --
 
+*`file.elf.go_imports_names_var_entropy`*::
++
+--
+Variance for Shannon entropy calculation from the list of Go imports.
+
+type: long
+
+format: number
+
+--
+
 *`file.elf.go_import_hash`*::
 +
 --
@@ -18044,6 +18055,17 @@ format: number
 
 --
 
+*`file.elf.imports_names_var_entropy`*::
++
+--
+Variance for Shannon entropy calculation from the list of imported element names and types.
+
+type: long
+
+format: number
+
+--
+
 *`file.elf.import_hash`*::
 +
 --
@@ -18052,6 +18074,17 @@ A hash of the imports in an ELF file. An import hash can be used to fingerprint 
 type: keyword
 
 example: d41d8cd98f00b204e9800998ecf8427e
+
+--
+
+*`file.elf.sections.var_entropy`*::
++
+--
+Variance for Shannon entropy calculation from the section.
+
+type: long
+
+format: number
 
 --
 
@@ -18074,6 +18107,17 @@ type: flattened
 +
 --
 Shannon entropy calculation from the list of Go imports.
+
+type: long
+
+format: number
+
+--
+
+*`file.macho.go_imports_names_var_entropy`*::
++
+--
+Variance for Shannon entropy calculation from the list of Go imports.
 
 type: long
 
@@ -18121,6 +18165,17 @@ format: number
 
 --
 
+*`file.macho.imports_names_var_entropy`*::
++
+--
+Variance for Shannon entropy calculation from the list of imported element names and types.
+
+type: long
+
+format: number
+
+--
+
 *`file.macho.import_hash`*::
 +
 --
@@ -18136,7 +18191,7 @@ example: d3ccf195b62a9279c3c19af1080497ec
 *`file.macho.sections`*::
 +
 --
-An array containing an object for each section of the ELF file.
+An array containing an object for each section of the Mach-O file.
 The keys that should be present in these objects are defined by sub-fields underneath `macho.sections.*`.
 
 type: nested
@@ -18147,6 +18202,17 @@ type: nested
 +
 --
 Shannon entropy calculation from the section.
+
+type: long
+
+format: number
+
+--
+
+*`file.macho.sections.var_entropy`*::
++
+--
+Variance for Shannon entropy calculation from the section.
 
 type: long
 
@@ -18211,6 +18277,17 @@ format: number
 
 --
 
+*`file.pe.go_imports_names_var_entropy`*::
++
+--
+Variance for Shannon entropy calculation from the list of Go imports.
+
+type: long
+
+format: number
+
+--
+
 *`file.pe.go_import_hash`*::
 +
 --
@@ -18251,6 +18328,17 @@ format: number
 
 --
 
+*`file.pe.imports_names_var_entropy`*::
++
+--
+Variance for Shannon entropy calculation from the list of imported element names and types.
+
+type: long
+
+format: number
+
+--
+
 *`file.pe.import_hash`*::
 +
 --
@@ -18275,6 +18363,17 @@ type: nested
 +
 --
 Shannon entropy calculation from the section.
+
+type: long
+
+format: number
+
+--
+
+*`file.pe.sections.var_entropy`*::
++
+--
+Variance for Shannon entropy calculation from the section.
 
 type: long
 
@@ -18328,6 +18427,17 @@ format: number
 
 --
 
+*`file.plan9.go_imports_names_var_entropy`*::
++
+--
+Variance for Shannon entropy calculation from the list of Go imports.
+
+type: long
+
+format: number
+
+--
+
 *`file.plan9.go_import_hash`*::
 +
 --
@@ -18362,6 +18472,17 @@ type: nested
 +
 --
 Shannon entropy calculation from the section.
+
+type: long
+
+format: number
+
+--
+
+*`file.plan9.sections.var_entropy`*::
++
+--
+Variance for Shannon entropy calculation from the section.
 
 type: long
 
