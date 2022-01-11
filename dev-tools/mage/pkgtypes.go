@@ -129,7 +129,7 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 		DMG: map[string]string{
 			"386":   "x86",
 			"amd64": "x86_64",
-			"arm64": "arm64", // TODO(AndersonQ): will we publish DMG as well?
+			"arm64": "arm64",
 		},
 	},
 	"linux": map[PackageType]map[string]string{
