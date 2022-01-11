@@ -10,8 +10,7 @@ Additional shared options are defined in <<monitor-options>>.
 
 Browser based monitors can only be run in our {beatname_uc} docker image,
 or via the `elastic-agent-complete` docker image. 
-See the {observability-guide}/synthetics-quickstart.html[synthetics quick start guide].
-for more information.
+For more information, see {observability-guide}/synthetics-quickstart.html[Synthetic monitoring using Docker].
 
 Example configuration:
 
