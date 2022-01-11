@@ -3,7 +3,6 @@
 
 - module: containerd
   metricsets: ["cpu", "memory", "blkio"]
-  enabled: false
   period: 10s
   # containerd metrics endpoint is configured in /etc/containerd/config.toml
   # Metrics endpoint does not listen by default

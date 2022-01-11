@@ -5,7 +5,7 @@ include::{libbeat-dir}/shared/integration-link.asciidoc[]
 Containerd module collects cpu, memory and blkio statistics about
 running containers controlled by containerd runtime.
 
-The current metricsets are: `cpu`, `blkio` and `memory`. They are not enabled by default.
+The current metricsets are: `cpu`, `blkio` and `memory` and are enabled by default.
 
 [float]
 === Prerequisites
