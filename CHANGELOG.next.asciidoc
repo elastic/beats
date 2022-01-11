@@ -57,6 +57,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated config option perfmon.counters from windows/perfmon metricset. {pull}28282[28282]
 - Remove deprecated fields in Redis module. {issue}11835[11835] {pull}28246[28246]
 - system/process metricset: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
+- Remove overriding of index pattern on the Kubernetes overview dashboard. {pull}29676[29676]
 
 *Packetbeat*
 
@@ -166,6 +167,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `add_resource_metadata` configuration to Kubernetes module. {pull}29133[29133]
 - Add `container.id` and `container.runtime` ECS fields in container metricset. {pull}29560[29560]
 - Add `memory.workingset.limit.pct` field in Kubernetes container/pod metricset. {pull}29547[29547]
+- Add k8s metadata in state_cronjob metricset. {pull}29572[29572]
 - Add `elasticsearch.cluster.id` field to Beat and Kibana modules. {pull}29577[29577]
 - Add `elasticsearch.cluster.id` field to Logstash module. {pull}29625[29625]
 
