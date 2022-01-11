@@ -51,34 +51,14 @@ type awsCloudWatchInput struct {
 	outlet   channel.Outleter // Output of received aws-cloudwatch logs.
 	inputCtx context.Context
 
-	workerWg     sync.WaitGroup     // Waits on aws-cloudwatch worker goroutine.
-	workerCtx    context.Context    // Worker goroutine context. It's cancelled when the input stops or the worker exits.
-	workerCancel context.CancelFunc // Used to signal that the worker should stop.
-	stopOnce     sync.Once
-	close        chan struct{}
+	stopOnce sync.Once
+	close    chan struct{}
 
 	startTime   int64
 	endTime     int64
 	prevEndTime int64 // track previous endTime for each iteration.
 	workerSem   *awscommon.Sem
 }
-
-// channelContext implements context.Context by wrapping a channel
-type channelContext struct {
-	done <-chan struct{}
-}
-
-func (c *channelContext) Deadline() (time.Time, bool) { return time.Time{}, false }
-func (c *channelContext) Done() <-chan struct{}       { return c.done }
-func (c *channelContext) Err() error {
-	select {
-	case <-c.done:
-		return context.Canceled
-	default:
-		return nil
-	}
-}
-func (c *channelContext) Value(key interface{}) interface{} { return nil }
 
 // NewInput creates a new aws-cloudwatch input
 func NewInput(cfg *common.Config, connector channel.Connector, ctx input.Context) (input.Input, error) {
@@ -126,20 +106,18 @@ func NewInput(cfg *common.Config, connector channel.Connector, ctx input.Context
 
 	// If the input ever needs to be made restartable, then context would need
 	// to be recreated with each restart.
-	workerCtx, workerCancel := context.WithCancel(inputCtx)
+	// workerCtx, workerCancel := context.WithCancel(inputCtx)
 
 	in := &awsCloudWatchInput{
-		config:       config,
-		awsConfig:    awsConfig,
-		logger:       logger,
-		close:        closeChannel,
-		inputCtx:     inputCtx,
-		workerCtx:    workerCtx,
-		workerCancel: workerCancel,
-		startTime:    int64(0),
-		endTime:      int64(0),
-		prevEndTime:  int64(0),
-		workerSem:    awscommon.NewSem(config.NumberOfWorkers),
+		config:      config,
+		awsConfig:   awsConfig,
+		logger:      logger,
+		close:       closeChannel,
+		inputCtx:    inputCtx,
+		startTime:   int64(0),
+		endTime:     int64(0),
+		prevEndTime: int64(0),
+		workerSem:   awscommon.NewSem(config.NumberOfWorkers),
 	}
 
 	// Build outlet for events.
@@ -170,6 +148,8 @@ func (in *awsCloudWatchInput) Run() {
 	// listing, sequentially processes every object and then does another listing
 	logGroupCount := 0
 	start := true
+	workerWg := new(sync.WaitGroup)
+
 	for in.inputCtx.Err() == nil {
 		if logGroupCount == 0 {
 			currentTime := time.Now()
@@ -204,13 +184,12 @@ func (in *awsCloudWatchInput) Run() {
 			}
 
 			lg := logGroupNames[logGroupCount]
-			in.workerWg.Add(1)
+			workerWg.Add(1)
 			go func(logGroup string, startTime int64, endTime int64) {
 				defer func() {
 					in.logger.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", logGroup)
-					in.workerWg.Done()
+					workerWg.Done()
 					in.workerSem.Release(1)
-					in.workerCancel()
 				}()
 				in.logger.Infof("aws-cloudwatch input worker for log group: '%v' has started", logGroup)
 				in.run(svc, logGroup, startTime, endTime)
@@ -219,20 +198,18 @@ func (in *awsCloudWatchInput) Run() {
 		}
 	}
 	// Wait for all workers to finish.
-	in.workerWg.Wait()
+	workerWg.Wait()
 }
 
-func (in *awsCloudWatchInput) run(svc cloudwatchlogsiface.ClientAPI, logGroup string, startTime int64, endTime int64) error {
+func (in *awsCloudWatchInput) run(svc cloudwatchlogsiface.ClientAPI, logGroup string, startTime int64, endTime int64) {
 	err := in.getLogEventsFromCloudWatch(svc, logGroup, startTime, endTime)
 	if err != nil {
 		var err *awssdk.RequestCanceledError
 		if errors.As(err, &err) {
-			return err
+			in.logger.Error("getLogEventsFromCloudWatch failed with RequestCanceledError: ", err)
 		}
 		in.logger.Error("getLogEventsFromCloudWatch failed: ", err)
-		return err
 	}
-	return nil
 }
 
 func parseARN(logGroupARN string) (string, string, error) {
@@ -408,5 +385,4 @@ func (in *awsCloudWatchInput) Stop() {
 // Wait is an alias for Stop.
 func (in *awsCloudWatchInput) Wait() {
 	in.Stop()
-	in.workerWg.Wait()
 }
