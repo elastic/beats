@@ -76,6 +76,9 @@ type Service = v1.Service
 // Job data
 type Job = batchv1.Job
 
+// CronJob data
+type CronJob = batchv1.CronJob
+
 const (
 	// PodPending phase
 	PodPending = v1.PodPending
