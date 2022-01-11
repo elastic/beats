@@ -47,6 +47,7 @@ remove_timestamp = {
     "threatintel.anomalithreatstream",
     "threatintel.malwarebazaar",
     "threatintel.recordedfuture",
+    "threatintel.recordedfuture2",
     "snyk.vulnerabilities",
     "snyk.audit",
     "awsfargate.log",
