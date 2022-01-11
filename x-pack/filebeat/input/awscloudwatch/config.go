@@ -26,7 +26,7 @@ type config struct {
 	APISleep                  time.Duration       `config:"api_sleep" validate:"min=0,nonzero"`
 	Latency                   time.Duration       `config:"latency"`
 	NumberOfWorkers           int                 `config:"number_of_workers"`
-	AwsConfig                 awscommon.ConfigAWS `config:",inline"`
+	AWSConfig                 awscommon.ConfigAWS `config:",inline"`
 }
 
 func defaultConfig() config {

@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package awss3
+package aws
 
 import (
 	"context"
@@ -45,7 +45,7 @@ func TestEventACKHandler(t *testing.T) {
 	acker.Add()
 
 	// Create an ACK handler and simulate one ACKed event.
-	ackHandler := newEventACKHandler()
+	ackHandler := NewEventACKHandler()
 	ackHandler.AddEvent(beat.Event{Private: acker}, true)
 	ackHandler.ACKEvents(1)
 
