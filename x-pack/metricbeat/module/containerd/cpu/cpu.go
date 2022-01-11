@@ -156,6 +156,7 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 			}
 
 			// Calculate cpu kernel usage percentage
+			// If event does not contain usage.kernel.ns skip the calculation (event has only system.total)
 			cpuUsageKernel, err := event.GetValue("usage.kernel.ns")
 			if err == nil {
 				cpuUsageKernelPct := calcUsagePct(timestampDelta, cpuUsageKernel.(float64),
