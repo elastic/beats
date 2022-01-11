@@ -61,12 +61,6 @@ type indexSelector struct {
 	beatInfo beat.Info
 }
 
-type ilmIndexSelector struct {
-	index    outil.Selector
-	st       *indexState
-	beatInfo beat.Info
-}
-
 type componentType uint8
 
 //go:generate stringer -linecomment -type componentType
@@ -292,15 +286,6 @@ func (m *indexManager) setupWithILM() (bool, error) {
 	return withILM, nil
 }
 
-func (s *ilmIndexSelector) Select(evt *beat.Event) (string, error) {
-	if idx := getEventCustomIndex(evt, s.beatInfo); idx != "" {
-		return idx, nil
-	}
-
-	idx, err := s.index.Select(evt)
-	return idx, err
-}
-
 func (s indexSelector) Select(evt *beat.Event) (string, error) {
 	if idx := getEventCustomIndex(evt, s.beatInfo); idx != "" {
 		return idx, nil
@@ -314,9 +299,7 @@ func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 	}
 
 	if idx, err := events.GetMetaStringValue(*evt, events.FieldMetaIndex); err == nil {
-		ts := evt.Timestamp.UTC()
-		return fmt.Sprintf("%s-%d.%02d.%02d",
-			strings.ToLower(idx), ts.Year(), ts.Month(), ts.Day())
+		return strings.ToLower(idx)
 	}
 
 	// This is functionally identical to Meta["alias"], returning the overriding
