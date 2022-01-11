@@ -199,11 +199,6 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 		}
 	}
 
-	err = ensureServiceToken(streams, &cfg)
-	if err != nil {
-		return err
-	}
-
 	// start apm-server legacy process when in cloud mode
 	var wg sync.WaitGroup
 	var apmProc *process.Info
@@ -287,6 +282,19 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		}
 	}
 	if cfg.Fleet.Enroll {
+		if cfg.FleetServer.Enable {
+			if client == nil {
+				client, err = kibanaClient(cfg.Kibana, cfg.Kibana.Headers)
+				if err != nil {
+					return err
+				}
+			}
+			err = ensureServiceToken(streams, client, &cfg)
+			if err != nil {
+				return err
+			}
+		}
+
 		var policy *kibanaPolicy
 		token := cfg.Fleet.EnrollmentToken
 		if token == "" && !cfg.FleetServer.Enable {
@@ -309,7 +317,10 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		if policy != nil {
 			policyID = policy.ID
 		}
-		logInfo(streams, "Policy selected for enrollment: ", policyID)
+		if policyID != "" {
+			logInfo(streams, "Policy selected for enrollment: ", policyID)
+		}
+
 		cmdArgs, err := buildEnrollArgs(cfg, token, policyID)
 		if err != nil {
 			return err
@@ -339,7 +350,7 @@ type TokenResp struct {
 // ensureServiceToken will ensure that the cfg specified has the service_token attributes filled.
 //
 // If no token is specified it will use the elasticsearch username/password to request a new token from Kibana
-func ensureServiceToken(streams *cli.IOStreams, cfg *setupConfig) error {
+func ensureServiceToken(streams *cli.IOStreams, client *kibana.Client, cfg *setupConfig) error {
 	// There's already a service token
 	if cfg.Kibana.Fleet.ServiceToken != "" || cfg.FleetServer.Elasticsearch.ServiceToken != "" {
 		return nil
@@ -349,11 +360,6 @@ func ensureServiceToken(streams *cli.IOStreams, cfg *setupConfig) error {
 	}
 
 	logInfo(streams, "Requesting service_token from Kibana.")
-	client, err := kibanaClient(cfg.Kibana, cfg.Kibana.Headers)
-	if err != nil {
-		return err
-	}
-
 	code, r, err := client.Connection.Request("POST", "/api/fleet/service-tokens", nil, nil, nil)
 	if err != nil {
 		return fmt.Errorf("request to get security token from Kibana failed: %w", err)
