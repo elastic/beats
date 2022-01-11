@@ -8,8 +8,9 @@ beta[] The options described here configure {beatname_uc} to run the synthetic
 monitoring test suites via Synthetic Agent on the Chromium browser.
 Additional shared options are defined in <<monitor-options>>. 
 
-Please note that browser based monitors can only be run in our {beatname_uc} docker image,
-or via the `elastic-agent-complete` docker image. See the {observability-guide}/synthetics-quickstart.html[synthetics quick start guide].
+Browser based monitors can only be run in our {beatname_uc} docker image,
+or via the `elastic-agent-complete` docker image. 
+See the {observability-guide}/synthetics-quickstart.html[synthetics quick start guide].
 for more information.
 
 Example configuration:
