@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2020-05-18T14:38:46.000-02:00",
         "client.bytes": 1419,
         "client.ip": "216.160.83.61",
         "destination.bytes": 401,
@@ -74,6 +75,7 @@
         "user_agent.original": "Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.4954; Pro)"
     },
     {
+        "@timestamp": "2020-05-18T14:38:47.000-02:00",
         "client.bytes": 1774,
         "client.ip": "216.160.83.61",
         "destination.bytes": 200,
@@ -149,6 +151,7 @@
         "user_agent.original": "Microsoft Office/16.0 (Windows NT 6.2; Microsoft Outlook 16.0.4954; Pro)"
     },
     {
+        "@timestamp": "2020-05-19T17:20:29.000-02:00",
         "client.bytes": 510,
         "client.ip": "10.198.235.254",
         "destination.bytes": 403,
@@ -220,6 +223,7 @@
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0"
     },
     {
+        "@timestamp": "2020-05-19T18:03:30.000-02:00",
         "client.bytes": 715,
         "client.ip": "10.198.235.254",
         "destination.bytes": 403,
@@ -295,6 +299,7 @@
         "user_agent.original": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0"
     },
     {
+        "@timestamp": "2020-05-20T18:03:31.000-02:00",
         "client.bytes": 295,
         "client.ip": "89.160.20.112",
         "destination.bytes": 403,

@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2019-10-10T10:21:36.000-02:00",
         "cisco.asa.mapped_source_ip": "10.0.55.66",
         "cisco.asa.message_id": "302021",
         "destination.domain": "target.destination.hostname.local",
@@ -47,6 +48,7 @@
         ]
     },
     {
+        "@timestamp": "2011-06-04T21:59:52.000-02:00",
         "cisco.asa.icmp_code": 0,
         "cisco.asa.icmp_type": 8,
         "cisco.asa.mapped_source_ip": "192.0.2.134",
