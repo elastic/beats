@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2021-01-14T13:06:17.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -54,6 +55,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T13:06:17.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -116,6 +118,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T13:06:17.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -178,6 +181,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T13:06:17.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -244,6 +248,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T13:06:17.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -310,6 +315,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T13:06:17.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -362,6 +368,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T12:57:46.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -416,6 +423,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T12:57:46.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -468,6 +476,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T12:57:45.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -534,6 +543,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T12:32:14.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -592,6 +602,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T12:32:14.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -650,6 +661,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T12:27:42.000Z",
         "cisco.amp.cloud_ioc.description": "Qakbot is a worm that spreads through network shares and removable drives. It downloads additional files, steals information, and opens a back door on the compromised computer. The worm also contains rootkit functionality to allow it to hide its presence. A command or file path similar to one used by Qakbot for spreading across the network or persistence was seen.",
         "cisco.amp.cloud_ioc.short_description": "W32.Qakbot.ioc",
         "cisco.amp.computer.active": true,
@@ -708,6 +720,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T12:27:23.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -761,6 +774,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T12:19:10.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -804,6 +818,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T12:11:04.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -864,6 +879,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T12:02:58.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -936,6 +952,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T12:02:58.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -988,6 +1005,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T11:58:57.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1042,6 +1060,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T11:58:57.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1110,6 +1129,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T11:58:54.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1182,6 +1202,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T11:58:54.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1234,6 +1255,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T11:49:08.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1277,6 +1299,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T11:41:12.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1332,6 +1355,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T11:41:12.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1387,6 +1411,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T11:28:46.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1439,6 +1464,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T11:28:45.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1501,6 +1527,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T11:26:38.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1555,6 +1582,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T11:26:38.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1617,6 +1645,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T11:26:37.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1671,6 +1700,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T11:26:37.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1725,6 +1755,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T11:26:37.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1779,6 +1810,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T11:26:37.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1841,6 +1873,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T11:26:37.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1893,6 +1926,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T11:26:37.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1945,6 +1979,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T11:26:36.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2007,6 +2042,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T11:26:36.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2073,6 +2109,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T11:26:36.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2125,6 +2162,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T11:26:35.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2191,6 +2229,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T11:26:35.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2257,6 +2296,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T11:26:35.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2323,6 +2363,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T11:26:35.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2395,6 +2436,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T10:59:33.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2465,6 +2507,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T10:59:30.000Z",
         "cisco.amp.cloud_ioc.description": "Shadow copies are snapshots of part of the filesystem, used for backups and restore points. Ransomware may delete these to prevent the user from restoring files that it has encrypted or destroyed. Aside from ransomware, shadow copy deletion may also be used by other types of malware to remove forensic evidence of malicious activity.",
         "cisco.amp.cloud_ioc.short_description": "W32.PossibleRansomwareShadowCopyDeletion.ioc",
         "cisco.amp.computer.active": true,
@@ -2523,6 +2566,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:55:07.000Z",
         "cisco.amp.cloud_ioc.description": "PowerShell is a Windows utility that allows access to many Microsoft APIs within a shell environment. In this case, a shell was launched with an encoded command or to use Base64 to decode or encode an existing file or command. Malware authors may use this technique to bypass antivirus tools.",
         "cisco.amp.cloud_ioc.short_description": "W32.PowershellEncodedBuffer.ioc",
         "cisco.amp.computer.active": true,
@@ -2581,6 +2625,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:47:17.000Z",
         "cisco.amp.cloud_ioc.description": "PowerShell is a Windows utility that allows access to many Microsoft APIs within a shell environment. In this case, a script attempted to download a file or script to the local system and then execute it. Malware authors may use this to download items, rename them, execute and delete them with a single command.",
         "cisco.amp.cloud_ioc.short_description": "W32.PowershellDownloadedExecutable.ioc",
         "cisco.amp.computer.active": true,
@@ -2639,6 +2684,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:47:17.000Z",
         "cisco.amp.cloud_ioc.description": "Microsoft Word launched PowerShell. This is indicative of multiple dropper variants that make use of Visual Basic Application macros to perform nefarious activities, such as downloading and executing malicious executables.",
         "cisco.amp.cloud_ioc.short_description": "W32.WinWord.Powershell",
         "cisco.amp.computer.active": true,
@@ -2697,6 +2743,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:33:46.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2751,6 +2798,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:33:46.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",

@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2021-01-14T10:33:46.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -62,6 +63,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:15:29.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -105,6 +107,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:06:39.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -177,6 +180,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T10:06:39.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -229,6 +233,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:05:52.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -283,6 +288,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:05:52.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -355,6 +361,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T10:05:52.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -423,6 +430,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T10:05:52.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -475,6 +483,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:05:50.000Z",
         "cisco.amp.cloud_ioc.description": "The Windows Scripting Host (WScript.exe) was used to execute a file with a fake benign extension prior to a scripting extension. This is indicative of an attempt to conceal the malicious intent of the file and to trick the user into opening it.",
         "cisco.amp.cloud_ioc.short_description": "W32.WScriptExecuteFakeExtension.ioc",
         "cisco.amp.computer.active": true,
@@ -533,6 +542,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:05:50.000Z",
         "cisco.amp.cloud_ioc.description": "Bitsadmin is a command-line tool that can be used to create, download or upload jobs and monitor their progress. However, it can also be used to maintain persistence and evade checks for usual persistence mechanisms. An attacker with Administrator's rights can use the setnotifycmdline option to create a persistent job and then specify a /Resume option at a later time to execute the job. This mechanism allows the malware to survive reboots since the job is run repeatedly after a system restart. Moreover, Bitsadmin by default downloads files unless the destination server is running IIS with the required server component and /UPLOAD is specified in the command-line. While this is not by itself malicious, the command-line needs to be reviewed to ascertain the origin and intent.",
         "cisco.amp.cloud_ioc.short_description": "W32.Bitsadmin.ioc",
         "cisco.amp.computer.active": true,
@@ -591,6 +601,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:05:50.000Z",
         "cisco.amp.cloud_ioc.description": "Windows Script Host (wscript.exe) was used to execute a JavaScript file inside a zip archive. This attack vector is increasingly being used by ransomware. This may not be necessarily malicious but it needs further investigation to determine if the executed JavaScript is indeed malicious.",
         "cisco.amp.cloud_ioc.short_description": "W32.WScriptLaunchedZippedJS.ioc",
         "cisco.amp.computer.active": true,
@@ -649,6 +660,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:04:56.000Z",
         "cisco.amp.cloud_ioc.description": "Shadow copies are snapshots of part of the filesystem, used for backups and restore points. Ransomware may delete these to prevent the user from restoring files that it has encrypted or destroyed. Aside from ransomware, shadow copy deletion may also be used by other types of malware to remove forensic evidence of malicious activity.",
         "cisco.amp.cloud_ioc.short_description": "W32.PossibleRansomwareShadowCopyDeletion.ioc",
         "cisco.amp.computer.active": true,
@@ -707,6 +719,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:04:49.000Z",
         "cisco.amp.cloud_ioc.description": "The BCDEdit command displays and modifies information about the boot options for Windows Vista and later Windows operating systems. In this case, it was used to disable automatic start up of recovery mode at boot susequent to a failure. Malware, such as ransomware, may use this to prevent the user from booting Windows into a safe mode or recovering a previous setting.",
         "cisco.amp.cloud_ioc.short_description": "W32.BCDEditDisableRecovery.ioc",
         "cisco.amp.computer.active": true,
@@ -765,6 +778,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:03:40.000Z",
         "cisco.amp.cloud_ioc.description": "A file containing a benign extension prior to the .exe extension was executed. This is indicative of suspicious behaviour in an attempt to conceal the malicious intent of the file.",
         "cisco.amp.cloud_ioc.short_description": "W32.FakeExtensionExec.RET",
         "cisco.amp.computer.active": true,
@@ -824,6 +838,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:01:51.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -875,6 +890,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T10:01:50.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -942,6 +958,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2021-01-14T09:56:55.000Z",
         "cisco.amp.cloud_ioc.description": "The psexec utility was executed as admin.",
         "cisco.amp.cloud_ioc.short_description": "W32.PsexecAsAdmin.ioc",
         "cisco.amp.computer.active": true,
@@ -1000,6 +1017,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T07:56:40.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1060,6 +1078,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T05:49:06.000Z",
         "cisco.amp.cloud_ioc.description": "PowerShell is a Windows utility that allows access to many Microsoft APIs within a shell environment. In this case, a shell was launched with an encoded command or to use Base64 to decode or encode an existing file or command. Malware authors may use this technique to bypass antivirus tools.",
         "cisco.amp.cloud_ioc.short_description": "W32.PowershellEncodedBuffer.ioc",
         "cisco.amp.computer.active": true,
@@ -1118,6 +1137,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T00:37:44.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1171,6 +1191,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T00:27:10.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1231,6 +1252,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-14T00:02:08.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1274,6 +1296,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-13T15:36:52.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1328,6 +1351,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-13T15:36:52.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1380,6 +1404,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-13T15:36:52.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1438,6 +1463,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-13T15:36:52.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1500,6 +1526,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-13T10:37:33.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1651,6 +1678,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-13T10:23:35.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1694,6 +1722,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-13T10:13:13.000Z",
         "cisco.amp.cloud_ioc.description": "PowerShell is a Windows utility that allows access to many Microsoft APIs within a shell environment. In this case, a script attempted to download a file or script to the local system and then execute it. Malware authors may use this to download items, rename them, execute and delete them with a single command.",
         "cisco.amp.cloud_ioc.short_description": "W32.PowershellDownloadedExecutable.ioc",
         "cisco.amp.computer.active": true,
@@ -1752,6 +1781,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-13T10:13:08.000Z",
         "cisco.amp.cloud_ioc.description": "Microsoft Word launched PowerShell. This is indicative of multiple dropper variants that make use of Visual Basic Application macros to perform nefarious activities, such as downloading and executing malicious executables.",
         "cisco.amp.cloud_ioc.short_description": "W32.WinWord.Powershell",
         "cisco.amp.computer.active": true,
@@ -1810,6 +1840,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-13T10:00:07.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1862,6 +1893,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-12T10:24:47.000Z",
         "cisco.amp.cloud_ioc.description": "PowerShell is a Windows utility that allows access to many Microsoft APIs within a shell environment. In this case, a script attempted to download a file or script to the local system and then execute it. Malware authors may use this to download items, rename them, execute and delete them with a single command.",
         "cisco.amp.cloud_ioc.short_description": "W32.PowershellDownloadedExecutable.ioc",
         "cisco.amp.computer.active": true,
@@ -1920,6 +1952,7 @@
         ]
     },
     {
+        "@timestamp": "2021-01-12T10:15:22.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -1963,6 +1996,7 @@
         ]
     },
     {
+        "@timestamp": "2020-12-25T05:49:09.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2035,6 +2069,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2020-12-25T05:49:09.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2087,6 +2122,7 @@
         ]
     },
     {
+        "@timestamp": "2020-12-25T05:30:44.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2159,6 +2195,7 @@
         "user.name": "user@testdomain.com"
     },
     {
+        "@timestamp": "2020-12-25T05:30:44.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2211,6 +2248,7 @@
         ]
     },
     {
+        "@timestamp": "2020-12-25T05:30:41.000Z",
         "cisco.amp.cloud_ioc.description": "PowerShell is a Windows utility that allows access to many Microsoft APIs within a shell environment. In this case, a script attempted to download a file or script to the local system and then execute it. Malware authors may use this to download items, rename them, execute and delete them with a single command.",
         "cisco.amp.cloud_ioc.short_description": "W32.PowershellDownloadedExecutable.ioc",
         "cisco.amp.computer.active": true,
@@ -2269,6 +2307,7 @@
         ]
     },
     {
+        "@timestamp": "2020-12-25T05:30:41.000Z",
         "cisco.amp.cloud_ioc.description": "Microsoft Word launched PowerShell. This is indicative of multiple dropper variants that make use of Visual Basic Application macros to perform nefarious activities, such as downloading and executing malicious executables.",
         "cisco.amp.cloud_ioc.short_description": "W32.WinWord.Powershell",
         "cisco.amp.computer.active": true,
@@ -2327,6 +2366,7 @@
         ]
     },
     {
+        "@timestamp": "2020-12-25T05:02:27.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2400,6 +2440,7 @@
         ]
     },
     {
+        "@timestamp": "2020-12-25T05:02:26.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2473,6 +2514,7 @@
         ]
     },
     {
+        "@timestamp": "2020-12-25T04:32:53.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2576,6 +2618,7 @@
         ]
     },
     {
+        "@timestamp": "2020-12-25T04:22:45.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2619,6 +2662,7 @@
         ]
     },
     {
+        "@timestamp": "2020-12-25T04:07:21.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
@@ -2668,6 +2712,7 @@
         ]
     },
     {
+        "@timestamp": "2020-12-25T04:06:40.000Z",
         "cisco.amp.computer.active": true,
         "cisco.amp.computer.connector_guid": "test_connector_guid",
         "cisco.amp.computer.external_ip": "175.16.199.1",
