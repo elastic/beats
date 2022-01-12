@@ -13,13 +13,14 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"reflect"
 	"strings"
 	"time"
+
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/pkg/errors"
@@ -103,8 +104,8 @@ type s3ObjectProcessor struct {
 	log          *logp.Logger
 	ctx          context.Context
 	acker        *awscommon.EventACKTracker // ACKer tied to the SQS message (multiple S3 readers share an ACKer when the S3 notification event contains more than one S3 object).
-	readerConfig *readerConfig    // Config about how to process the object.
-	s3Obj        s3EventV2        // S3 object information.
+	readerConfig *readerConfig              // Config about how to process the object.
+	s3Obj        s3EventV2                  // S3 object information.
 	s3ObjHash    string
 	s3RequestURL string
 

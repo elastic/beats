@@ -192,7 +192,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 			event.S3.Bucket.ARN = p.bucket
 			event.S3.Object.Key = filename
 
-			acker := newEventACKTracker(ctx)
+			acker := awscommon.NewEventACKTracker(ctx)
 
 			s3Processor := p.s3ObjectHandler.Create(ctx, p.log, acker, event)
 			if s3Processor == nil {
