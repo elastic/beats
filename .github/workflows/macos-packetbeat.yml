@@ -1,10 +1,11 @@
 name: packetbeat
 
 on:
-  pull_request:
-    paths:
-      - 'packetbeat/**'
-      - '.github/workflows/macos-packetbeat.yml'
+  push:
+    branches:
+      - master
+      - 7.1*
+      - 8.*
 
 env:
   BEAT_MODULE: 'packetbeat'

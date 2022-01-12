@@ -1,10 +1,11 @@
 name: metricbeat
 
 on:
-  pull_request:
-    paths:
-      - 'metricbeat/**'
-      - '.github/workflows/macos-metricbeat.yml'
+  push:
+    branches:
+      - master
+      - 7.1*
+      - 8.*
 
 env:
   BEAT_MODULE: 'metricbeat'

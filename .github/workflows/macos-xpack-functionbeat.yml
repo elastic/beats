@@ -1,10 +1,11 @@
 name: x-pack-functionbeat
 
 on:
-  pull_request:
-    paths:
-      - 'x-pack/functionbeat/**'
-      - '.github/workflows/macos-xpack-functionbeat.yml'
+  push:
+    branches:
+      - master
+      - 7.1*
+      - 8.*
 
 env:
   BEAT_MODULE: 'x-pack/functionbeat'
