@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2020-04-17T14:08:08.000-02:00",
         "cisco.ftd.connection_id": "110577675",
         "cisco.ftd.destination_interface": "Inside",
         "cisco.ftd.message_id": "302016",
@@ -63,6 +64,7 @@
         ]
     },
     {
+        "@timestamp": "2020-04-17T14:00:31.000-02:00",
         "cisco.ftd.destination_interface": "Outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "Inside_access_in",
@@ -114,6 +116,7 @@
         ]
     },
     {
+        "@timestamp": "2013-04-15T09:36:50.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "acl_dmz",
@@ -162,6 +165,7 @@
         ]
     },
     {
+        "@timestamp": "2020-04-17T14:16:20.000-02:00",
         "cisco.ftd.destination_interface": "Outside",
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "Inside_access_in",
@@ -220,6 +224,7 @@
         ]
     },
     {
+        "@timestamp": "2020-04-17T14:15:07.000-02:00",
         "cisco.ftd.message_id": "106017",
         "destination.address": "10.123.123.123",
         "destination.ip": "10.123.123.123",

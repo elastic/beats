@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2020-07-23T18:03:46.000Z",
         "cisco.umbrella.datacenter": "ams1.edc",
         "cisco.umbrella.identity_types": "CDFW Tunnel Device",
         "cisco.umbrella.origin_id": "[211039844]",
@@ -36,6 +37,7 @@
         "source.user.name": "Passive Monitor"
     },
     {
+        "@timestamp": "2020-07-23T18:03:46.000Z",
         "cisco.umbrella.datacenter": "ams1.edc",
         "cisco.umbrella.identity_types": "CDFW Tunnel Device",
         "cisco.umbrella.origin_id": "[211039844]",

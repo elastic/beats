@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2016-01-29T06:09:59.000Z",
         "destination.ip": "10.193.124.51",
         "destination.port": 5293,
         "event.action": "deny",
@@ -44,6 +45,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2016-02-12T13:12:33.000Z",
         "destination.mac": "01:00:5e:0f:87:e3",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -79,6 +81,7 @@
         ]
     },
     {
+        "@timestamp": "2016-02-26T20:15:08.000Z",
         "event.action": "ceroinBC flows src=10.179.60.216 dst=10.69.53.104 protocol=udp pattern: 0 reprehe",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -108,6 +111,7 @@
         ]
     },
     {
+        "@timestamp": "2016-03-12T03:17:42.000Z",
         "destination.ip": "10.112.46.169",
         "event.action": "radip flows block",
         "event.code": "flows",
@@ -145,6 +149,7 @@
         ]
     },
     {
+        "@timestamp": "2016-03-26T10:20:16.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -173,6 +178,7 @@
         ]
     },
     {
+        "@timestamp": "2016-04-09T17:22:51.000Z",
         "destination.ip": "10.108.180.105",
         "destination.mac": "01:00:5e:40:9b:83",
         "destination.port": 5098,
@@ -209,6 +215,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2016-04-24T00:25:25.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -237,6 +244,7 @@
         ]
     },
     {
+        "@timestamp": "2016-05-08T07:27:59.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -261,6 +269,7 @@
         ]
     },
     {
+        "@timestamp": "2016-05-22T14:30:33.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -289,6 +298,7 @@
         ]
     },
     {
+        "@timestamp": "2016-06-05T21:33:08.000Z",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
         "event.dataset": "cisco.meraki",
@@ -319,6 +329,7 @@
         ]
     },
     {
+        "@timestamp": "2016-06-20T04:35:42.000Z",
         "destination.ip": "10.134.0.141",
         "destination.port": 2703,
         "event.action": "accept",
@@ -363,6 +374,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2016-07-04T11:38:16.000Z",
         "destination.ip": "10.74.237.180",
         "event.action": "security_event",
         "event.code": "security_event",
@@ -397,6 +409,7 @@
         ]
     },
     {
+        "@timestamp": "2016-07-18T18:40:50.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -425,6 +438,7 @@
         ]
     },
     {
+        "@timestamp": "2016-08-02T01:43:25.000Z",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
         "event.dataset": "cisco.meraki",
@@ -455,6 +469,7 @@
         ]
     },
     {
+        "@timestamp": "2016-08-16T08:45:59.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -483,6 +498,7 @@
         ]
     },
     {
+        "@timestamp": "2016-08-30T15:48:33.000Z",
         "destination.mac": "01:00:5e:46:17:35",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -518,6 +534,7 @@
         ]
     },
     {
+        "@timestamp": "2016-09-13T22:51:07.000Z",
         "destination.ip": "10.187.77.245",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
@@ -549,6 +566,7 @@
         ]
     },
     {
+        "@timestamp": "2016-09-28T05:53:42.000Z",
         "destination.ip": "10.186.58.115",
         "destination.mac": "01:00:5e:8f:16:6d",
         "destination.port": 7238,
@@ -585,6 +603,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2016-10-12T12:56:16.000Z",
         "destination.mac": "01:00:5e:87:e1:a0",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -620,6 +639,7 @@
         ]
     },
     {
+        "@timestamp": "2016-10-26T19:58:50.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -648,6 +668,7 @@
         ]
     },
     {
+        "@timestamp": "2016-11-10T03:01:24.000Z",
         "destination.ip": "10.63.194.87",
         "destination.mac": "01:00:5e:e3:b1:24",
         "event.action": "texp",
@@ -692,6 +713,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2016-11-24T10:03:59.000Z",
         "destination.ip": "10.163.154.210",
         "destination.mac": "01:00:5e:9e:7b:a4",
         "event.action": "rau",
@@ -736,6 +758,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2016-12-08T17:06:33.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -764,6 +787,7 @@
         ]
     },
     {
+        "@timestamp": "2016-12-23T00:09:07.000Z",
         "event.action": "ese flows allow src=10.145.248.111 dst=10.57.6.252 mac=01:00:5e:94:6a:cf protocol=udp",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -793,6 +817,7 @@
         ]
     },
     {
+        "@timestamp": "2017-01-06T07:11:41.000Z",
         "destination.ip": "10.12.182.70",
         "event.action": "security_event",
         "event.code": "security_event",
@@ -827,6 +852,7 @@
         ]
     },
     {
+        "@timestamp": "2017-01-20T14:14:16.000Z",
         "event.action": "cancel",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -856,6 +882,7 @@
         ]
     },
     {
+        "@timestamp": "2017-02-03T21:16:50.000Z",
         "destination.ip": "10.135.217.12",
         "event.action": "cteturad flows deny",
         "event.code": "flows",
@@ -893,6 +920,7 @@
         ]
     },
     {
+        "@timestamp": "2017-02-18T04:19:24.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -917,6 +945,7 @@
         ]
     },
     {
+        "@timestamp": "2017-03-04T11:21:59.000Z",
         "destination.ip": "10.66.89.5",
         "event.action": "iscinge flows",
         "event.code": "flows",
@@ -954,6 +983,7 @@
         ]
     },
     {
+        "@timestamp": "2017-03-18T18:24:33.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -977,6 +1007,7 @@
         ]
     },
     {
+        "@timestamp": "2017-04-02T01:27:07.000Z",
         "destination.ip": "10.173.136.186",
         "destination.mac": "01:00:5e:c1:53:b1",
         "event.action": "security_event",
@@ -1011,6 +1042,7 @@
         ]
     },
     {
+        "@timestamp": "2017-04-16T08:29:41.000Z",
         "destination.ip": "10.54.37.86",
         "destination.mac": "01:00:5e:1f:c6:29",
         "event.action": "ids-alerts",
@@ -1044,6 +1076,7 @@
         ]
     },
     {
+        "@timestamp": "2017-04-30T15:32:16.000Z",
         "destination.ip": "10.163.93.20",
         "event.action": "veli flows block",
         "event.code": "flows",
@@ -1081,6 +1114,7 @@
         ]
     },
     {
+        "@timestamp": "2017-05-14T22:34:50.000Z",
         "destination.ip": "10.183.44.198",
         "destination.mac": "01:00:5e:35:71:1e",
         "destination.port": 1702,
@@ -1117,6 +1151,7 @@
         ]
     },
     {
+        "@timestamp": "2017-05-29T05:37:24.000Z",
         "destination.mac": "01:00:5e:06:12:98",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -1152,6 +1187,7 @@
         ]
     },
     {
+        "@timestamp": "2017-06-12T12:39:58.000Z",
         "destination.ip": "10.98.194.212",
         "destination.mac": "01:00:5e:bb:60:a6",
         "event.action": "utaliqu",
@@ -1196,6 +1232,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2017-06-26T19:42:33.000Z",
         "destination.ip": "10.197.13.39",
         "destination.port": 5912,
         "event.code": "events",
@@ -1231,6 +1268,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2017-07-11T02:45:07.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1255,6 +1293,7 @@
         ]
     },
     {
+        "@timestamp": "2017-07-25T09:47:41.000Z",
         "destination.ip": "10.150.245.88",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
@@ -1286,6 +1325,7 @@
         ]
     },
     {
+        "@timestamp": "2017-08-08T16:50:15.000Z",
         "destination.ip": "10.180.195.43",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
@@ -1319,6 +1359,7 @@
         ]
     },
     {
+        "@timestamp": "2017-08-22T23:52:50.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1343,6 +1384,7 @@
         ]
     },
     {
+        "@timestamp": "2017-09-06T06:55:24.000Z",
         "destination.ip": "10.147.15.213",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
@@ -1374,6 +1416,7 @@
         ]
     },
     {
+        "@timestamp": "2017-09-20T13:57:58.000Z",
         "destination.ip": "10.111.157.56",
         "event.action": "obeata flows block",
         "event.code": "flows",
@@ -1411,6 +1454,7 @@
         ]
     },
     {
+        "@timestamp": "2017-10-04T21:00:32.000Z",
         "destination.ip": "10.193.219.34",
         "destination.mac": "01:00:5e:58:2d:1c",
         "event.action": "inBC",
@@ -1455,6 +1499,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2017-10-19T04:03:07.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1483,6 +1528,7 @@
         ]
     },
     {
+        "@timestamp": "2017-11-02T11:05:41.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1511,6 +1557,7 @@
         ]
     },
     {
+        "@timestamp": "2017-11-16T18:08:15.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1534,6 +1581,7 @@
         ]
     },
     {
+        "@timestamp": "2017-12-01T01:10:49.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1557,6 +1605,7 @@
         ]
     },
     {
+        "@timestamp": "2017-12-15T08:13:24.000Z",
         "destination.ip": "10.124.63.4",
         "destination.mac": "01:00:5e:01:60:e0",
         "event.action": "security_event",
@@ -1591,6 +1640,7 @@
         ]
     },
     {
+        "@timestamp": "2017-12-29T15:15:58.000Z",
         "destination.ip": "10.249.7.146",
         "destination.port": 2010,
         "event.code": "events",
@@ -1626,6 +1676,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2018-01-12T22:18:32.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1649,6 +1700,7 @@
         ]
     },
     {
+        "@timestamp": "2018-01-27T05:21:06.000Z",
         "destination.ip": "10.81.234.34",
         "destination.mac": "01:00:5e:c9:b7:22",
         "event.action": "security_event",
@@ -1683,6 +1735,7 @@
         ]
     },
     {
+        "@timestamp": "2018-02-10T12:23:41.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1706,6 +1759,7 @@
         ]
     },
     {
+        "@timestamp": "2018-02-24T19:26:15.000Z",
         "destination.mac": "01:00:5e:7c:01:ab",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -1746,6 +1800,7 @@
         ]
     },
     {
+        "@timestamp": "2018-03-11T02:28:49.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -1774,6 +1829,7 @@
         ]
     },
     {
+        "@timestamp": "2018-03-25T09:31:24.000Z",
         "destination.ip": "10.39.172.93",
         "event.action": "pteurs flows deny",
         "event.code": "flows",
@@ -1811,6 +1867,7 @@
         ]
     },
     {
+        "@timestamp": "2018-04-08T16:33:58.000Z",
         "destination.mac": "01:00:5e:7e:cd:15",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -1846,6 +1903,7 @@
         ]
     },
     {
+        "@timestamp": "2018-04-22T23:36:32.000Z",
         "destination.ip": "10.122.204.151",
         "destination.port": 3903,
         "event.action": "deny",
@@ -1890,6 +1948,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2018-05-07T06:39:06.000Z",
         "event.action": "luptatem flows accept",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -1919,6 +1978,7 @@
         ]
     },
     {
+        "@timestamp": "2018-05-21T13:41:41.000Z",
         "destination.ip": "10.120.4.9",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
@@ -1950,6 +2010,7 @@
         ]
     },
     {
+        "@timestamp": "2018-06-04T20:44:15.000Z",
         "destination.ip": "10.165.173.162",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
@@ -1981,6 +2042,7 @@
         ]
     },
     {
+        "@timestamp": "2018-06-19T03:46:49.000Z",
         "destination.mac": "01:00:5e:f2:d3:12",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -2021,6 +2083,7 @@
         ]
     },
     {
+        "@timestamp": "2018-07-03T10:49:23.000Z",
         "destination.ip": "10.54.44.231",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
@@ -2054,6 +2117,7 @@
         ]
     },
     {
+        "@timestamp": "2018-07-17T17:51:58.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2082,6 +2146,7 @@
         ]
     },
     {
+        "@timestamp": "2018-08-01T00:54:32.000Z",
         "event.action": "orem flows src=10.71.22.225 dst=10.4.76.100 protocol=ggp pattern: allow serrorsi",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -2111,6 +2176,7 @@
         ]
     },
     {
+        "@timestamp": "2018-08-15T07:57:06.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2139,6 +2205,7 @@
         ]
     },
     {
+        "@timestamp": "2018-08-29T14:59:40.000Z",
         "destination.ip": "10.103.49.129",
         "destination.mac": "01:00:5e:59:bf:36",
         "event.action": "olor",
@@ -2183,6 +2250,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2018-09-12T22:02:15.000Z",
         "destination.ip": "10.132.176.96",
         "destination.mac": "01:00:5e:e6:a6:a2",
         "event.action": "rvelill",
@@ -2227,6 +2295,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2018-09-27T05:04:49.000Z",
         "destination.mac": "01:00:5e:69:92:4a",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
@@ -2267,6 +2336,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-11T12:07:23.000Z",
         "destination.ip": "10.123.62.215",
         "destination.mac": "01:00:5e:1f:7f:1d",
         "event.code": "flows",
@@ -2301,6 +2371,7 @@
         ]
     },
     {
+        "@timestamp": "2018-10-25T19:09:57.000Z",
         "event.action": "cancel src=10.239.105.121 dst=10.70.7.23 mac=01:00:5e:8e:82:f0 protocol=ipv6",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -2330,6 +2401,7 @@
         ]
     },
     {
+        "@timestamp": "2018-11-09T02:12:32.000Z",
         "destination.ip": "10.16.230.121",
         "destination.mac": "01:00:5e:99:a6:b4",
         "event.action": "nonpro",
@@ -2374,6 +2446,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2018-11-23T09:15:06.000Z",
         "destination.ip": "10.34.62.190",
         "destination.mac": "01:00:5e:6a:c8:f8",
         "destination.port": 1641,
@@ -2410,6 +2483,7 @@
         ]
     },
     {
+        "@timestamp": "2018-12-07T16:17:40.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2434,6 +2508,7 @@
         ]
     },
     {
+        "@timestamp": "2018-12-21T23:20:14.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2458,6 +2533,7 @@
         ]
     },
     {
+        "@timestamp": "2019-01-05T06:22:49.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2482,6 +2558,7 @@
         ]
     },
     {
+        "@timestamp": "2019-01-19T13:25:23.000Z",
         "destination.ip": "10.121.9.5",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
@@ -2513,6 +2590,7 @@
         ]
     },
     {
+        "@timestamp": "2019-02-02T20:27:57.000Z",
         "destination.ip": "10.41.124.15",
         "destination.port": 333,
         "event.code": "events",
@@ -2548,6 +2626,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2019-02-17T03:30:32.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2572,6 +2651,7 @@
         ]
     },
     {
+        "@timestamp": "2019-03-03T10:33:06.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2600,6 +2680,7 @@
         ]
     },
     {
+        "@timestamp": "2019-03-17T17:35:40.000Z",
         "destination.ip": "10.103.91.159",
         "destination.port": 7116,
         "event.action": "ids-alerts",
@@ -2635,6 +2716,7 @@
         ]
     },
     {
+        "@timestamp": "2019-04-01T00:38:14.000Z",
         "destination.ip": "10.65.0.157",
         "destination.mac": "01:00:5e:49:c4:17",
         "event.action": "Deny",
@@ -2673,6 +2755,7 @@
         ]
     },
     {
+        "@timestamp": "2019-04-15T07:40:49.000Z",
         "event.action": "cancel",
         "event.code": "flows",
         "event.dataset": "cisco.meraki",
@@ -2702,6 +2785,7 @@
         ]
     },
     {
+        "@timestamp": "2019-04-29T14:43:23.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2730,6 +2814,7 @@
         ]
     },
     {
+        "@timestamp": "2019-05-13T21:45:57.000Z",
         "destination.ip": "10.140.242.86",
         "event.action": "ids-alerts",
         "event.code": "ids-alerts",
@@ -2761,6 +2846,7 @@
         ]
     },
     {
+        "@timestamp": "2019-05-28T04:48:31.000Z",
         "destination.ip": "10.51.121.223",
         "destination.port": 24,
         "event.action": "security_event",
@@ -2797,6 +2883,7 @@
         ]
     },
     {
+        "@timestamp": "2019-06-11T11:51:06.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2825,6 +2912,7 @@
         ]
     },
     {
+        "@timestamp": "2019-06-25T18:53:40.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -2849,6 +2937,7 @@
         ]
     },
     {
+        "@timestamp": "2019-07-10T01:56:14.000Z",
         "destination.ip": "10.113.152.241",
         "event.action": "uira flows deny",
         "event.code": "flows",
@@ -2886,6 +2975,7 @@
         ]
     },
     {
+        "@timestamp": "2019-07-24T08:58:48.000Z",
         "destination.ip": "10.254.96.130",
         "destination.mac": "01:00:5e:10:8b:c3",
         "event.action": "ionu",
@@ -2930,6 +3020,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2019-08-07T16:01:23.000Z",
         "destination.ip": "10.200.98.243",
         "destination.mac": "01:00:5e:95:ae:d0",
         "event.action": "ntium",
@@ -2974,6 +3065,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2019-08-21T23:03:57.000Z",
         "destination.ip": "10.247.205.185",
         "destination.mac": "01:00:5e:6f:21:c8",
         "destination.port": 7676,
@@ -3010,6 +3102,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2019-09-05T06:06:31.000Z",
         "destination.ip": "10.147.165.30",
         "destination.mac": "01:00:5e:0a:88:bb",
         "destination.port": 7662,
@@ -3045,6 +3138,7 @@
         ]
     },
     {
+        "@timestamp": "2019-09-19T13:09:05.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -3068,6 +3162,7 @@
         ]
     },
     {
+        "@timestamp": "2019-10-03T20:11:40.000Z",
         "destination.ip": "10.162.202.14",
         "destination.mac": "01:00:5e:dd:cb:5b",
         "event.action": "ids-alerts",
@@ -3101,6 +3196,7 @@
         ]
     },
     {
+        "@timestamp": "2019-10-18T03:14:14.000Z",
         "destination.ip": "10.227.135.142",
         "destination.port": 6598,
         "event.code": "events",
@@ -3136,6 +3232,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2019-11-01T10:16:48.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -3164,6 +3261,7 @@
         ]
     },
     {
+        "@timestamp": "2019-11-15T17:19:22.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",
@@ -3188,6 +3286,7 @@
         ]
     },
     {
+        "@timestamp": "2019-11-30T00:21:57.000Z",
         "destination.ip": "10.75.122.111",
         "destination.mac": "01:00:5e:92:d8:95",
         "event.action": "modoco",
@@ -3232,6 +3331,7 @@
         "url.scheme": "https"
     },
     {
+        "@timestamp": "2019-12-14T07:24:31.000Z",
         "event.code": "events",
         "event.dataset": "cisco.meraki",
         "event.module": "cisco",

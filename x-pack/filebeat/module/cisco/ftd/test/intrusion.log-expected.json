@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2019-08-16T07:54:00.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430001",
         "cisco.ftd.rule_name": [
@@ -87,6 +88,7 @@
         "user.name": "No Authentication Required"
     },
     {
+        "@timestamp": "2019-08-16T07:57:02.000-02:00",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430001",
         "cisco.ftd.rule_name": [
@@ -174,6 +176,7 @@
         "user.name": "No Authentication Required"
     },
     {
+        "@timestamp": "2019-08-16T08:04:44.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "430001",
         "cisco.ftd.rule_name": [
@@ -257,6 +260,7 @@
         "user.name": "No Authentication Required"
     },
     {
+        "@timestamp": "2019-08-16T08:09:47.000-02:00",
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "430001",
         "cisco.ftd.rule_name": [
