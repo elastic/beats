@@ -269,6 +269,12 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		return run(streams, logToStderr)
 	}
 
+	if cfg.Kibana.Fleet.Setup || cfg.Fleet.Enroll {
+		err = ensureServiceToken(streams, &cfg)
+		if err != nil {
+			return err
+		}
+	}
 	if cfg.Kibana.Fleet.Setup {
 		client, err = kibanaClient(cfg.Kibana, cfg.Kibana.Headers)
 		if err != nil {
@@ -282,19 +288,6 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		}
 	}
 	if cfg.Fleet.Enroll {
-		if cfg.FleetServer.Enable {
-			if client == nil {
-				client, err = kibanaClient(cfg.Kibana, cfg.Kibana.Headers)
-				if err != nil {
-					return err
-				}
-			}
-			err = ensureServiceToken(streams, client, &cfg)
-			if err != nil {
-				return err
-			}
-		}
-
 		var policy *kibanaPolicy
 		token := cfg.Fleet.EnrollmentToken
 		if token == "" && !cfg.FleetServer.Enable {
@@ -350,7 +343,7 @@ type TokenResp struct {
 // ensureServiceToken will ensure that the cfg specified has the service_token attributes filled.
 //
 // If no token is specified it will use the elasticsearch username/password to request a new token from Kibana
-func ensureServiceToken(streams *cli.IOStreams, client *kibana.Client, cfg *setupConfig) error {
+func ensureServiceToken(streams *cli.IOStreams, cfg *setupConfig) error {
 	// There's already a service token
 	if cfg.Kibana.Fleet.ServiceToken != "" || cfg.FleetServer.Elasticsearch.ServiceToken != "" {
 		return nil
@@ -360,6 +353,13 @@ func ensureServiceToken(streams *cli.IOStreams, client *kibana.Client, cfg *setu
 	}
 
 	logInfo(streams, "Requesting service_token from Kibana.")
+
+	// Client is not passed in to this function because this function will use username/password and then
+	// all the following clients will use the created service token.
+	client, err := kibanaClient(cfg.Kibana, cfg.Kibana.Headers)
+	if err != nil {
+		return err
+	}
 	code, r, err := client.Connection.Request("POST", "/api/fleet/service-tokens", nil, nil, nil)
 	if err != nil {
 		return fmt.Errorf("request to get security token from Kibana failed: %w", err)
