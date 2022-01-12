@@ -66,11 +66,12 @@ var DefaultCleanupTimeout time.Duration = 0
 
 func defaultConfig() *Config {
 	return &Config{
-		SyncPeriod:     10 * time.Minute,
-		Resource:       "pod",
-		CleanupTimeout: DefaultCleanupTimeout,
-		Prefix:         "co.elastic",
-		Unique:         false,
+		SyncPeriod:          10 * time.Minute,
+		Resource:            "pod",
+		CleanupTimeout:      DefaultCleanupTimeout,
+		Prefix:              "co.elastic",
+		Unique:              false,
+		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
 	}
 }
 

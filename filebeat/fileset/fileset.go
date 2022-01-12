@@ -237,13 +237,13 @@ func (fs *Fileset) turnOffElasticsearchVars(vars map[string]interface{}, esVersi
 func resolveVariable(vars map[string]interface{}, value interface{}) (interface{}, error) {
 	switch v := value.(type) {
 	case string:
-		return applyTemplate(vars, v, false)
+		return ApplyTemplate(vars, v, false)
 	case []interface{}:
 		transformed := []interface{}{}
 		for _, val := range v {
 			s, ok := val.(string)
 			if ok {
-				transf, err := applyTemplate(vars, s, false)
+				transf, err := ApplyTemplate(vars, s, false)
 				if err != nil {
 					return nil, fmt.Errorf("array: %v", err)
 				}
@@ -257,10 +257,10 @@ func resolveVariable(vars map[string]interface{}, value interface{}) (interface{
 	return value, nil
 }
 
-// applyTemplate applies a Golang text/template. If specialDelims is set to true,
+// ApplyTemplate applies a Golang text/template. If specialDelims is set to true,
 // the delimiters are set to `{<` and `>}` instead of `{{` and `}}`. These are easier to use
 // in pipeline definitions.
-func applyTemplate(vars map[string]interface{}, templateString string, specialDelims bool) (string, error) {
+func ApplyTemplate(vars map[string]interface{}, templateString string, specialDelims bool) (string, error) {
 	tpl := template.New("text").Option("missingkey=error")
 	if specialDelims {
 		tpl = tpl.Delims("{<", ">}")
@@ -307,7 +307,7 @@ func getTemplateFunctions(vars map[string]interface{}) (template.FuncMap, error)
 			return buf.String(), err
 		},
 		"IngestPipeline": func(shortID string) string {
-			return formatPipelineID(
+			return FormatPipelineID(
 				builtinVars["prefix"].(string),
 				builtinVars["module"].(string),
 				builtinVars["fileset"].(string),
@@ -343,7 +343,7 @@ func (fs *Fileset) getBuiltinVars(info beat.Info) (map[string]interface{}, error
 }
 
 func (fs *Fileset) getInputConfig() (*common.Config, error) {
-	path, err := applyTemplate(fs.vars, fs.manifest.Input, false)
+	path, err := ApplyTemplate(fs.vars, fs.manifest.Input, false)
 	if err != nil {
 		return nil, fmt.Errorf("Error expanding vars on the input path: %v", err)
 	}
@@ -352,7 +352,7 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 		return nil, fmt.Errorf("Error reading input file %s: %v", path, err)
 	}
 
-	yaml, err := applyTemplate(fs.vars, string(contents), false)
+	yaml, err := ApplyTemplate(fs.vars, string(contents), false)
 	if err != nil {
 		return nil, fmt.Errorf("Error interpreting the template of the input: %v", err)
 	}
@@ -409,12 +409,12 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 func (fs *Fileset) getPipelineIDs(info beat.Info) ([]string, error) {
 	var pipelineIDs []string
 	for _, ingestPipeline := range fs.manifest.IngestPipeline {
-		path, err := applyTemplate(fs.vars, ingestPipeline, false)
+		path, err := ApplyTemplate(fs.vars, ingestPipeline, false)
 		if err != nil {
 			return nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
 		}
 
-		pipelineIDs = append(pipelineIDs, formatPipelineID(info.IndexPrefix, fs.mcfg.Module, fs.name, path, info.Version))
+		pipelineIDs = append(pipelineIDs, FormatPipelineID(info.IndexPrefix, fs.mcfg.Module, fs.name, path, info.Version))
 	}
 
 	return pipelineIDs, nil
@@ -428,7 +428,7 @@ func (fs *Fileset) GetPipelines(esVersion common.Version) (pipelines []pipeline,
 	}
 
 	for idx, ingestPipeline := range fs.manifest.IngestPipeline {
-		path, err := applyTemplate(fs.vars, ingestPipeline, false)
+		path, err := ApplyTemplate(fs.vars, ingestPipeline, false)
 		if err != nil {
 			return nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
 		}
@@ -438,7 +438,7 @@ func (fs *Fileset) GetPipelines(esVersion common.Version) (pipelines []pipeline,
 			return nil, fmt.Errorf("Error reading pipeline file %s: %v", path, err)
 		}
 
-		encodedString, err := applyTemplate(vars, string(strContents), true)
+		encodedString, err := ApplyTemplate(vars, string(strContents), true)
 		if err != nil {
 			return nil, fmt.Errorf("Error interpreting the template of the ingest pipeline: %v", err)
 		}
@@ -453,7 +453,7 @@ func (fs *Fileset) GetPipelines(esVersion common.Version) (pipelines []pipeline,
 			if err = yaml.Unmarshal([]byte(encodedString), &content); err != nil {
 				return nil, fmt.Errorf("Error YAML decoding the pipeline file: %s: %v", path, err)
 			}
-			newContent, err := fixYAMLMaps(content)
+			newContent, err := FixYAMLMaps(content)
 			if err != nil {
 				return nil, fmt.Errorf("Failed to sanitize the YAML pipeline file: %s: %v", path, err)
 			}
@@ -474,11 +474,11 @@ func (fs *Fileset) GetPipelines(esVersion common.Version) (pipelines []pipeline,
 	return pipelines, nil
 }
 
-// This function recursively converts maps with interface{} keys, as returned by
+// FixYAMLMaps recursively converts maps with interface{} keys, as returned by
 // yaml.Unmarshal, to maps of string keys, as expected by the json encoder
 // that will be used when delivering the pipeline to Elasticsearch.
 // Will return an error when something other than a string is used as a key.
-func fixYAMLMaps(elem interface{}) (_ interface{}, err error) {
+func FixYAMLMaps(elem interface{}) (_ interface{}, err error) {
 	switch v := elem.(type) {
 	case map[interface{}]interface{}:
 		result := make(map[string]interface{}, len(v))
@@ -487,20 +487,20 @@ func fixYAMLMaps(elem interface{}) (_ interface{}, err error) {
 			if !ok {
 				return nil, fmt.Errorf("key '%v' is not string but %T", key, key)
 			}
-			if result[keyS], err = fixYAMLMaps(value); err != nil {
+			if result[keyS], err = FixYAMLMaps(value); err != nil {
 				return nil, err
 			}
 		}
 		return result, nil
 	case map[string]interface{}:
 		for key, value := range v {
-			if v[key], err = fixYAMLMaps(value); err != nil {
+			if v[key], err = FixYAMLMaps(value); err != nil {
 				return nil, err
 			}
 		}
 	case []interface{}:
 		for idx, value := range v {
-			if v[idx], err = fixYAMLMaps(value); err != nil {
+			if v[idx], err = FixYAMLMaps(value); err != nil {
 				return nil, err
 			}
 		}
@@ -508,8 +508,11 @@ func fixYAMLMaps(elem interface{}) (_ interface{}, err error) {
 	return elem, nil
 }
 
-// formatPipelineID generates the ID to be used for the pipeline ID in Elasticsearch
-func formatPipelineID(prefix, module, fileset, path, version string) string {
+// FormatPipelineID generates the ID to be used for the pipeline ID in Elasticsearch
+func FormatPipelineID(prefix, module, fileset, path, version string) string {
+	if module == "" && fileset == "" {
+		return fmt.Sprintf("%s-%s-%s", prefix, version, removeExt(filepath.Base(path)))
+	}
 	return fmt.Sprintf("%s-%s-%s-%s-%s", prefix, version, module, fileset, removeExt(filepath.Base(path)))
 }
 

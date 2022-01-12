@@ -20,6 +20,7 @@ package monitors
 import (
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -153,12 +154,10 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	reg, built, closed := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
 
-	sched := scheduler.New(1, monitoring.NewRegistry())
-	err := sched.Start()
-	require.NoError(t, err)
+	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
 	defer sched.Stop()
 
-	f := NewFactory(binfo, sched, reg)
+	f := NewFactory(binfo, sched.Add, reg, false)
 	makeTestMon := func() (*Monitor, error) {
 		mIface, err := f.Create(pipelineConnector, serverMonConf)
 		if mIface == nil {
@@ -169,7 +168,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	}
 
 	// Ensure that an error is returned on a bad config
-	_, m0Err := newMonitor(badConf, reg, pipelineConnector, sched, nil)
+	_, m0Err := newMonitor(badConf, reg, pipelineConnector, sched.Add, nil, false)
 	require.Error(t, m0Err)
 
 	// Would fail if the previous newMonitor didn't free the monitor.id

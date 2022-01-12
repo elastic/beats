@@ -21,7 +21,7 @@ function dockerPullCommonImages() {
   docker.elastic.co/observability-ci/database-enterprise:12.2.0.1
   docker.elastic.co/beats-dev/fpm:1.11.0
   golang:1.14.12-stretch
-  centos:7
+  ubuntu:20.04
   "
   for image in ${DOCKER_IMAGES} ; do
     (retry 2 docker pull ${image}) || echo "Error pulling ${image} Docker image. Continuing."

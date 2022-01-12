@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2020-04-01T13:21:06.725Z",
+        "@timestamp": "2020-04-01T09:21:06.725Z",
         "elasticsearch.audit.action": "indices:data/read/mget[shard]",
         "elasticsearch.audit.indices": [
             ".logstash",

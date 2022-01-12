@@ -29,16 +29,22 @@ type processCacheEntry struct {
 }
 
 type processCache struct {
-	cache      map[int]processCacheEntry
 	provider   processMetadataProvider
 	expiration time.Duration
-	rwMutex    sync.RWMutex
+
+	cap    int // cap is the maximum number of elements the cache will hold.
+	effort int // effort is the number of entries to examine during expired element eviction.
+
+	rwMutex sync.RWMutex // rwMutex protects the cache map.
+	cache   map[int]processCacheEntry
 }
 
-func newProcessCache(expiration time.Duration, provider processMetadataProvider) processCache {
+func newProcessCache(expiration time.Duration, cap, effort int, provider processMetadataProvider) processCache {
 	return processCache{
 		cache:      make(map[int]processCacheEntry),
 		expiration: expiration,
+		cap:        cap,
+		effort:     effort,
 		provider:   provider,
 	}
 }
@@ -58,6 +64,12 @@ func (pc *processCache) GetProcessMetadata(pid int) (*processMetadata, error) {
 	if !valid {
 		pc.rwMutex.Lock()
 		defer pc.rwMutex.Unlock()
+
+		pc.tryEvictExpired()
+		if len(pc.cache) >= pc.cap {
+			pc.evictRandomEntry()
+		}
+
 		// Make sure someone else didn't generate this entry while we were
 		// waiting for the write lock
 		if entry, valid = pc.getEntryUnlocked(pid); !valid {
@@ -67,4 +79,28 @@ func (pc *processCache) GetProcessMetadata(pid int) (*processMetadata, error) {
 		}
 	}
 	return entry.metadata, entry.err
+}
+
+// tryEvictExpired implements a random sampling expired element cache
+// eviction policy.
+func (pc *processCache) tryEvictExpired() {
+	now := time.Now()
+	n := 0
+	for pid, entry := range pc.cache {
+		if n >= pc.effort {
+			return
+		}
+		if now.After(entry.expiration) {
+			delete(pc.cache, pid)
+		}
+		n++
+	}
+}
+
+// evictRandomEntry implements a random cache eviction policy.
+func (pc *processCache) evictRandomEntry() {
+	for pid := range pc.cache {
+		delete(pc.cache, pid)
+		return
+	}
 }

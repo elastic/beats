@@ -23,8 +23,6 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -53,44 +51,14 @@ func ReplaceIndexInIndexPattern(index string, content common.MapStr) (err error)
 		return nil
 	}
 
-	list, ok := content["objects"]
-	if !ok {
-		return errors.New("empty index pattern")
+	// This uses Put instead of DeepUpdate to avoid modifying types for
+	// inner objects. (DeepUpdate will replace maps with MapStr).
+	content.Put("id", index)
+	// Only overwrite title if it exists.
+	if _, err := content.GetValue("attributes.title"); err == nil {
+		content.Put("attributes.title", index)
 	}
 
-	updateObject := func(obj common.MapStr) {
-		// This uses Put instead of DeepUpdate to avoid modifying types for
-		// inner objects. (DeepUpdate will replace maps with MapStr).
-		obj.Put("id", index)
-		// Only overwrite title if it exists.
-		if _, err := obj.GetValue("attributes.title"); err == nil {
-			obj.Put("attributes.title", index)
-		}
-	}
-
-	switch v := list.(type) {
-	case []interface{}:
-		for _, objIf := range v {
-			switch obj := objIf.(type) {
-			case common.MapStr:
-				updateObject(obj)
-			case map[string]interface{}:
-				updateObject(obj)
-			default:
-				return errors.Errorf("index pattern object has unexpected type %T", v)
-			}
-		}
-	case []map[string]interface{}:
-		for _, obj := range v {
-			updateObject(obj)
-		}
-	case []common.MapStr:
-		for _, obj := range v {
-			updateObject(obj)
-		}
-	default:
-		return errors.Errorf("index pattern objects have unexpected type %T", v)
-	}
 	return nil
 }
 
