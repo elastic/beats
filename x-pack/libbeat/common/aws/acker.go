@@ -18,7 +18,7 @@ import (
 // more S3 objects.
 type EventACKTracker struct {
 	sync.Mutex
-	pendingACKs int64
+	PendingACKs int64
 	ctx         context.Context
 	cancel      context.CancelFunc
 }
@@ -31,7 +31,7 @@ func NewEventACKTracker(ctx context.Context) *EventACKTracker {
 // Add increments the number of pending ACKs.
 func (a *EventACKTracker) Add() {
 	a.Lock()
-	a.pendingACKs++
+	a.PendingACKs++
 	a.Unlock()
 }
 
@@ -40,12 +40,12 @@ func (a *EventACKTracker) ACK() {
 	a.Lock()
 	defer a.Unlock()
 
-	if a.pendingACKs <= 0 {
+	if a.PendingACKs <= 0 {
 		panic("misuse detected: negative ACK counter")
 	}
 
-	a.pendingACKs--
-	if a.pendingACKs == 0 {
+	a.PendingACKs--
+	if a.PendingACKs == 0 {
 		a.cancel()
 	}
 }
@@ -59,7 +59,7 @@ func (a *EventACKTracker) Wait() {
 	// If there were never any pending ACKs then cancel the context. (This can
 	// happen when a document contains no events or cannot be read due to an error).
 	a.Lock()
-	if a.pendingACKs == 0 {
+	if a.PendingACKs == 0 {
 		a.cancel()
 	}
 	a.Unlock()

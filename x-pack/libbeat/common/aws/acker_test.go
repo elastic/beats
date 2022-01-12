@@ -17,11 +17,11 @@ func TestEventACKTracker(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
-	acker := newEventACKTracker(ctx)
+	acker := NewEventACKTracker(ctx)
 	acker.Add()
 	acker.ACK()
 
-	assert.EqualValues(t, 0, acker.pendingACKs)
+	assert.EqualValues(t, 0, acker.PendingACKs)
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
 
@@ -29,10 +29,10 @@ func TestEventACKTrackerNoACKs(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
-	acker := newEventACKTracker(ctx)
+	acker := NewEventACKTracker(ctx)
 	acker.Wait()
 
-	assert.EqualValues(t, 0, acker.pendingACKs)
+	assert.EqualValues(t, 0, acker.PendingACKs)
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
 
@@ -41,7 +41,7 @@ func TestEventACKHandler(t *testing.T) {
 	t.Cleanup(cancel)
 
 	// Create acker. Add one pending ACK.
-	acker := newEventACKTracker(ctx)
+	acker := NewEventACKTracker(ctx)
 	acker.Add()
 
 	// Create an ACK handler and simulate one ACKed event.
@@ -49,7 +49,7 @@ func TestEventACKHandler(t *testing.T) {
 	ackHandler.AddEvent(beat.Event{Private: acker}, true)
 	ackHandler.ACKEvents(1)
 
-	assert.EqualValues(t, 0, acker.pendingACKs)
+	assert.EqualValues(t, 0, acker.PendingACKs)
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
 
@@ -58,12 +58,12 @@ func TestEventACKHandlerWait(t *testing.T) {
 	t.Cleanup(cancel)
 
 	// Create acker. Add one pending ACK.
-	acker := newEventACKTracker(ctx)
+	acker := NewEventACKTracker(ctx)
 	acker.Add()
 	acker.ACK()
 	acker.Wait()
 	acker.Add()
 
-	assert.EqualValues(t, 1, acker.pendingACKs)
+	assert.EqualValues(t, 1, acker.PendingACKs)
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
