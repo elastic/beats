@@ -88,7 +88,7 @@ func (tq *TimerQueue) Start() {
 				if tq.th.Len() > 0 {
 					nr := tq.th[0].runAt
 					tq.nextRunAt = &nr
-					tq.timer = time.NewTimer(time.Until(nr))
+					tq.timer.Reset(time.Until(nr))
 				} else {
 					tq.timer.Stop()
 					tq.nextRunAt = nil
@@ -107,18 +107,7 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 		if tq.nextRunAt != nil && !tq.timer.Stop() {
 			<-tq.timer.C
 		}
-		// Originally the line below this comment was
-		//
-		//  tq.timer.Reset(time.Until(tt.runAt))
-		//
-		// however this broke in go1.16rc1, specifically on the commit b4b014465216790e01aa66f9120d03230e4aff46
-		//, specifically on this line:
-		// https://github.com/golang/go/commit/b4b014465216790e01aa66f9120d03230e4aff46#diff-73699b6edfe5dbb3f6824e66bb3566bce9405e9a8c810cac55c8199459f0ac19R652
-		// where some nice new optimizations don't actually work reliably
-		// This can be worked around by instantiating a new timer rather than resetting the timer.
-		// since that internally calls deltimer in runtime/timer.go rather than modtimer,
-		// I suspect that the problem is in modtimer's setting of &pp.timerModifiedEarliest
-		tq.timer = time.NewTimer(time.Until(tt.runAt))
+		tq.timer.Reset(time.Until(tt.runAt))
 		tq.nextRunAt = &tt.runAt
 	}
 }
