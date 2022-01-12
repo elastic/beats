@@ -101,7 +101,8 @@ processors:
   - add_docker_metadata: ~{{ end }}
 
 {{- if .UseKubernetesMetadataProcessor }}
-  - add_kubernetes_metadata: ~
+  - add_kubernetes_metadata:
+        when.not.has_fields: ['elastic_agent']
 {{- else -}}
 {{ end }}
 {{else}}

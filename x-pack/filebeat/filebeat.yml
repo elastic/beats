@@ -162,7 +162,8 @@ processors:
       when.not.contains.tags: forwarded
   - add_cloud_metadata: ~
   - add_docker_metadata: ~
-  - add_kubernetes_metadata: ~
+  - add_kubernetes_metadata:
+      when.not.has_fields: ['elastic_agent']
 
 # ================================== Logging ===================================
 
