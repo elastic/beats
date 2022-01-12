@@ -16,7 +16,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: '1.17.2'
+        go-version: '1.17.5'
     - name: Install dependencies
       run:  go get -u github.com/magefile/mage
     - uses: actions/checkout@v2
