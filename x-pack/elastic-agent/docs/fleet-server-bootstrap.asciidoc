@@ -4,17 +4,17 @@
 Elastic Agent with Fleet Server has a bootstrap process that it uses to get
 Fleet Server up and running under Elastic Agent.
 
-Upon `install` or `enroll` with Elastic Agent will bootstrap a Fleet Server
-when the `--fleet-server-es` command-line option is provided. In this mode
+Elastic Agent will bootstrap a Fleet Server when the `--fleet-server-es`
+command-line option is provided to an `install` or `enroll` command. In this mode
 Elastic Agent will only communicate with its local Fleet Server and expose
 the Fleet Server over the `:8221` port.
 
-`:8221` is only bound to the localhost of the machine/container and cannot
-be accessed remotely. The `:8220` port is also bound but is bound on `0.0.0.0`
-to allow remote connections from external Elastic Agents that wish to enroll
-and communication. The `:8221` port is reserved for communication between the
-Elastic Agent and the Fleet Server on the host. This ensures that the local
-Elastic Agent has priority in check-ins with the Fleet Server.
+The `:8221` port is reserved for communication between the Elastic Agent and the
+Fleet Server on the host. It is bound to the localhost of the machine/container
+and cannot be accessed remotely. This ensures that the local Elastic Agent has
+priority in check-ins with the Fleet Server. The `:8220` port is bound on
+`0.0.0.0` to allow remote connections from external Elastic Agents that wish to
+enroll and communicate.
 
 [float]
 [[fleet-server-operating-modes]]
@@ -42,16 +42,16 @@ communicate in clear-text.
 
 When deploying Elastic Agent in a production environment using enterprise generated
 certificates will ensure that Elastic Agent running locally and remote Elastic Agent
-will be able to connect over a verified TLS based connection. Passing in the certificates
-use `--fleet-server-cert`, `--fleet-server-cert-ca`, and `--certificate-authorities`.
+will be able to connect over a verified TLS based connection. Certificates are specified
+with `--fleet-server-cert`, `--fleet-server-cert-ca`, and `--certificate-authorities`.
 
 [float]
 [[fleet-server-bootstrap-process]]
 === How Does It Bootstrap
 
-Bootstrapping happens inside of the `enroll` command. Even when the `install` command
-or the `container` command (used by Docker container) is used they both still call
-the `enroll` command to perform the bootstrapping process.
+Bootstrapping is ran during the `enroll` command. The `install` command
+or the `container` command (used by Docker container) will call the `enroll`
+command to perform the bootstrapping process.
 
 ==== Install Command
 
