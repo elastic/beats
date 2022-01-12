@@ -57,7 +57,6 @@
                                 "type": "sum"
                             }
                         ],
-                        "override_index_pattern": 1,
                         "point_size": 1,
                         "seperate_axis": 0,
                         "series_interval": "10s",

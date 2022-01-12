@@ -30,13 +30,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.abuseurl.larted"
+                            "field": "abusech.url.larted"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                            "key": "threatintel.abuseurl.larted",
+                            "key": "abusech.url.larted",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -73,7 +73,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "Hosting Provider Notified",
-                        "field": "threatintel.abuseurl.larted",
+                        "field": "abusech.url.larted",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

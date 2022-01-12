@@ -13,9 +13,11 @@
 # accompanying options. The YAML data type of event_logs is a list of
 # dictionaries.
 #
-# The supported keys are name (required), tags, fields, fields_under_root,
-# forwarded, ignore_older, level, event_id, provider, and include_xml. Please
-# visit the documentation for the complete details of each option.
+# The supported keys are name, id, xml_query, tags, fields, fields_under_root,
+# forwarded, ignore_older, level, event_id, provider, and include_xml.
+# The xml_query key requires an id and must not be used with the name,
+# ignore_older, level, event_id, or provider keys. Please visit the
+# documentation for the complete details of each option.
 # https://go.es.io/WinlogbeatConfig
 
 winlogbeat.event_logs:

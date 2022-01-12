@@ -11,11 +11,13 @@ var:
   - name: client_id
   - name: client_secret
   - name: host
-    default: "https://www.threatq.com/"
+    default: "https://www.threatq.com"
   - name: proxy_url
   - name: http_client_timeout
   - name: tags
     default: [threatintel-threatq, forwarded]
+  - name: preserve_original_event
+    default: false
 
 ingest_pipeline:
   - ingest/pipeline.yml

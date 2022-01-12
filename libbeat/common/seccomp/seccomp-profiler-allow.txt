@@ -9,7 +9,7 @@ access
 open
 stat
 
-# cgo tsg/gopacket
+# cgo google/gopacket
 poll
 fcntl64
 

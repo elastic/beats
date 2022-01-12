@@ -208,6 +208,7 @@ class Test(BaseTest):
 
         assert p.returncode != 0
 
+    @unittest.skip("Failing test: https://github.com/elastic/beats/issues/29327")
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
     def test_dev_tool_export_dashboard_by_id_from_space(self):

@@ -56,58 +56,6 @@ func eventually(t *testing.T, predicate func() (bool, error), timeout time.Durat
 	t.Fatal("predicate is not true after", timeout)
 }
 
-// Test that a write is triggered when the maximum number of updates is reached.
-func TestWriteMaxUpdates(t *testing.T) {
-	dir, err := ioutil.TempDir("", "wlb-checkpoint-test")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		err := os.RemoveAll(dir)
-		if err != nil {
-			t.Fatal(err)
-		}
-	}()
-
-	file := filepath.Join(dir, "some", "new", "dir", ".winlogbeat.yml")
-	if !assert.False(t, fileExists(file), "%s should not exist", file) {
-		return
-	}
-
-	cp, err := NewCheckpoint(file, 2, time.Hour)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer cp.Shutdown()
-
-	// Send update - it's not written to disk but it's in memory.
-	cp.Persist("App", 1, time.Now(), "")
-	found := false
-	eventually(t, func() (bool, error) {
-		_, found = cp.States()["App"]
-		return found, nil
-	}, time.Second*15)
-	assert.True(t, found)
-
-	ps, err := cp.read()
-	if err != nil {
-		t.Fatal("read failed", err)
-	}
-	assert.Len(t, ps.States, 0)
-
-	// Send update - it is written to disk.
-	cp.Persist("App", 2, time.Now(), "")
-	eventually(t, func() (bool, error) {
-		ps, err = cp.read()
-		return ps != nil && len(ps.States) > 0, err
-	}, time.Second*15)
-
-	if assert.Len(t, ps.States, 1, "state not written, could be a flush timing issue, retry") {
-		assert.Equal(t, "App", ps.States[0].Name)
-		assert.Equal(t, uint64(2), ps.States[0].RecordNumber)
-	}
-}
-
 // Test that a write is triggered when the maximum time period since the last
 // write is reached.
 func TestWriteTimedFlush(t *testing.T) {
@@ -127,7 +75,7 @@ func TestWriteTimedFlush(t *testing.T) {
 		return
 	}
 
-	cp, err := NewCheckpoint(file, 100, time.Second)
+	cp, err := NewCheckpoint(file, time.Second)
 	if err != nil {
 		t.Fatal(err)
 	}

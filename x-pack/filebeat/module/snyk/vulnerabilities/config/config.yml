@@ -90,13 +90,6 @@ processors:
   - fingerprint:
       fields: ["json.issue.id"]
       target_field: "@metadata._id"
-  - script:
-      lang: javascript
-      id: my_filter
-      source: >
-        function process(event) {
-            event.Put("@metadata.op_type", "index");
-        }
   - add_fields:
       target: ''
       fields:

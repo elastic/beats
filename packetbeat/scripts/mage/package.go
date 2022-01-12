@@ -28,7 +28,7 @@ import (
 func CustomizePackaging() {
 	var (
 		configYml = devtools.PackageFile{
-			Mode:   0600,
+			Mode:   0o600,
 			Source: "{{.PackageDir}}/{{.BeatName}}.yml",
 			Config: true,
 			Dep: func(spec devtools.PackageSpec) error {
@@ -39,7 +39,7 @@ func CustomizePackaging() {
 			},
 		}
 		referenceConfigYml = devtools.PackageFile{
-			Mode:   0644,
+			Mode:   0o644,
 			Source: "{{.PackageDir}}/{{.BeatName}}.reference.yml",
 			Dep: func(spec devtools.PackageSpec) error {
 				c := ConfigFileParams()

@@ -2,12 +2,10 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			}
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
-			"name": "kube-dns",
+			"name": "kube-state-metrics",
 			"paused": false,
 			"replicas": {
 				"available": 1,
@@ -30,9 +28,7 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			}
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
 			"name": "kubernetes-dashboard",
@@ -58,12 +54,10 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": {
-				"name": "kube-system"
-			}
+			"namespace": "kube-system"
 		},
 		"MetricSetFields": {
-			"name": "kube-state-metrics",
+			"name": "kube-dns",
 			"paused": false,
 			"replicas": {
 				"available": 1,
