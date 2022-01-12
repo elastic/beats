@@ -470,7 +470,7 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional data stream name. The default is "auditbeat"
+  # Optional data stream or index name. The default is "auditbeat-%{[agent.version]}".
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
   #index: "auditbeat-%{[agent.version]}"
 
