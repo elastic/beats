@@ -1,13 +1,8 @@
 FROM golang:1.17.5
 
 RUN \
-<<<<<<< HEAD
-    apt-get update \
-      && apt-get install -y --no-install-recommends \
-=======
     apt update \
       && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --no-install-recommends \
->>>>>>> febc7ddbfa (Change docker image from CentOS 7 to Ubuntu 20.04 (#29681))
          netcat \
          python3 \
          python3-dev \
