@@ -196,8 +196,9 @@ func runCmd(
 		if err != nil {
 			str := fmt.Sprintf("command exited with status %d: %s", cmd.ProcessState.ExitCode(), err)
 			mpx.writeSynthEvent(&SynthEvent{
-				Type:  "cmd/status",
-				Error: &SynthError{Name: "cmdexit", Message: str},
+				Type:                 "cmd/status",
+				Error:                &SynthError{Name: "cmdexit", Message: str},
+				TimestampEpochMicros: float64(time.Now().UnixMicro()),
 			})
 			logp.Warn("Error executing command '%s' (%d): %s", loggableCmd.String(), cmd.ProcessState.ExitCode(), err)
 		}
@@ -243,7 +244,7 @@ func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *S
 		logp.Info("%s: %s", typ, text)
 		return &SynthEvent{
 			Type:                 typ,
-			TimestampEpochMicros: float64(time.Now().UnixNano() / int64(time.Millisecond)),
+			TimestampEpochMicros: float64(time.Now().UnixMicro()),
 			Payload: map[string]interface{}{
 				"message": text,
 			},
