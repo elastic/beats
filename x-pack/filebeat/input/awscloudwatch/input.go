@@ -11,25 +11,21 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-
-	"github.com/elastic/beats/v7/filebeat/beater"
-	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/go-concert/unison"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/go-concert/unison"
 )
 
 const (
@@ -68,67 +64,6 @@ type cloudwatchInput struct {
 	config    config
 	awsConfig awssdk.Config
 	store     beater.StateStore
-}
-
-type cloudwatchPoller struct {
-	numberOfWorkers      int
-	apiSleep             time.Duration
-	region               string
-	logStreams           []string
-	logStreamPrefix      string
-	startTime            int64
-	endTime              int64
-	prevEndTime          int64
-	workerSem            *awscommon.Sem
-	log                  *logp.Logger
-	metrics              *inputMetrics
-	store                *statestore.Store
-	workersListingMap    *sync.Map
-	workersProcessingMap *sync.Map
-}
-
-type logProcessor struct {
-	log       *logp.Logger
-	metrics   *inputMetrics
-	publisher beat.Client
-	ack       *awscommon.EventACKTracker
-}
-
-func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Client, ctx context.Context) *logProcessor {
-	if metrics == nil {
-		metrics = newInputMetrics(monitoring.NewRegistry(), "")
-	}
-	return &logProcessor{
-		log:       log,
-		metrics:   metrics,
-		publisher: publisher,
-		ack:       awscommon.NewEventACKTracker(ctx),
-	}
-}
-
-func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
-	store *statestore.Store,
-	awsRegion string, apiSleep time.Duration,
-	numberOfWorkers int, logStreams []string, logStreamPrefix string) *cloudwatchPoller {
-	if metrics == nil {
-		metrics = newInputMetrics(monitoring.NewRegistry(), "")
-	}
-
-	return &cloudwatchPoller{
-		numberOfWorkers:      numberOfWorkers,
-		apiSleep:             apiSleep,
-		region:               awsRegion,
-		logStreams:           logStreams,
-		logStreamPrefix:      logStreamPrefix,
-		startTime:            int64(0),
-		endTime:              int64(0),
-		workerSem:            awscommon.NewSem(numberOfWorkers),
-		log:                  log,
-		metrics:              metrics,
-		store:                store,
-		workersListingMap:    new(sync.Map),
-		workersProcessingMap: new(sync.Map),
-	}
 }
 
 func newInput(config config, store beater.StateStore) (*cloudwatchInput, error) {
@@ -271,17 +206,6 @@ func (in *cloudwatchInput) Receive(svc cloudwatchlogsiface.ClientAPI, cwPoller *
 	return ctx.Err()
 }
 
-func (p *cloudwatchPoller) run(svc cloudwatchlogsiface.ClientAPI, logGroup string, startTime int64, endTime int64, logProcessor *logProcessor) {
-	err := p.getLogEventsFromCloudWatch(svc, logGroup, startTime, endTime, logProcessor)
-	if err != nil {
-		var err *awssdk.RequestCanceledError
-		if errors.As(err, &err) {
-			p.log.Error("getLogEventsFromCloudWatch failed with RequestCanceledError: ", err)
-		}
-		p.log.Error("getLogEventsFromCloudWatch failed: ", err)
-	}
-}
-
 func parseARN(logGroupARN string) (string, string, error) {
 	arnParsed, err := arn.Parse(logGroupARN)
 	if err != nil {
@@ -325,57 +249,6 @@ func getLogGroupNames(svc cloudwatchlogsiface.ClientAPI, logGroupNamePrefix stri
 	return logGroupNames, nil
 }
 
-// getLogEventsFromCloudWatch uses FilterLogEvents API to collect logs from CloudWatch
-func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc cloudwatchlogsiface.ClientAPI, logGroup string, startTime int64, endTime int64, logProcessor *logProcessor) error {
-	// construct FilterLogEventsInput
-	filterLogEventsInput := p.constructFilterLogEventsInput(startTime, endTime, logGroup)
-
-	// make API request
-	req := svc.FilterLogEventsRequest(filterLogEventsInput)
-	paginator := cloudwatchlogs.NewFilterLogEventsPaginator(req)
-	for paginator.Next(context.TODO()) {
-		page := paginator.CurrentPage()
-		p.metrics.apiCallsTotal.Inc()
-
-		logEvents := page.Events
-		p.metrics.logEventsReceivedTotal.Add(uint64(len(logEvents)))
-		p.log.Debugf("Processing #%v events", len(logEvents))
-		err := logProcessor.processLogEvents(logEvents, logGroup, p.region)
-		if err != nil {
-			err = errors.Wrap(err, "processLogEvents failed")
-			p.log.Error(err)
-		}
-	}
-
-	if err := paginator.Err(); err != nil {
-		return errors.Wrap(err, "error FilterLogEvents with Paginator")
-	}
-
-	// This sleep is to avoid hitting the FilterLogEvents API limit(5 transactions per second (TPS)/account/Region).
-	p.log.Debugf("sleeping for %v before making FilterLogEvents API call again", p.apiSleep)
-	time.Sleep(p.apiSleep)
-	p.log.Debug("done sleeping")
-	return nil
-}
-
-func (p *cloudwatchPoller) constructFilterLogEventsInput(startTime int64, endTime int64, logGroup string) *cloudwatchlogs.FilterLogEventsInput {
-	filterLogEventsInput := &cloudwatchlogs.FilterLogEventsInput{
-		LogGroupName: awssdk.String(logGroup),
-		StartTime:    awssdk.Int64(startTime),
-		EndTime:      awssdk.Int64(endTime),
-		Limit:        awssdk.Int64(100),
-	}
-
-	if len(p.logStreams) > 0 {
-		filterLogEventsInput.LogStreamNames = p.logStreams
-	}
-
-	if p.logStreamPrefix != "" {
-		filterLogEventsInput.LogStreamNamePrefix = awssdk.String(p.logStreamPrefix)
-	}
-	return filterLogEventsInput
-}
-
 func getStartPosition(startPosition string, currentTime time.Time, endTime int64, scanFrequency time.Duration, latency time.Duration) (int64, int64) {
 	if latency != 0 {
 		// add latency if config is not 0
@@ -395,45 +268,4 @@ func getStartPosition(startPosition string, currentTime time.Time, endTime int64
 		return currentTime.Add(-scanFrequency).UnixNano() / int64(time.Millisecond), currentTime.UnixNano() / int64(time.Millisecond)
 	}
 	return 0, 0
-}
-
-func (p *logProcessor) processLogEvents(logEvents []cloudwatchlogs.FilteredLogEvent, logGroup string, regionName string) error {
-	for _, logEvent := range logEvents {
-		event := createEvent(logEvent, logGroup, regionName)
-		p.publish(p.ack, &event)
-	}
-	return nil
-}
-
-func createEvent(logEvent cloudwatchlogs.FilteredLogEvent, logGroup string, regionName string) beat.Event {
-	event := beat.Event{
-		Timestamp: time.Unix(*logEvent.Timestamp/1000, 0).UTC(),
-		Fields: common.MapStr{
-			"message":       *logEvent.Message,
-			"log.file.path": logGroup + "/" + *logEvent.LogStreamName,
-			"event": common.MapStr{
-				"id":       *logEvent.EventId,
-				"ingested": time.Now(),
-			},
-			"awscloudwatch": common.MapStr{
-				"log_group":      logGroup,
-				"log_stream":     *logEvent.LogStreamName,
-				"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
-			},
-			"cloud": common.MapStr{
-				"provider": "aws",
-				"region":   regionName,
-			},
-		},
-	}
-	event.SetID(*logEvent.EventId)
-
-	return event
-}
-
-func (p *logProcessor) publish(ack *awscommon.EventACKTracker, event *beat.Event) {
-	ack.Add()
-	event.Private = ack
-	p.metrics.cloudwatchEventsCreatedTotal.Inc()
-	p.publisher.Publish(*event)
 }
