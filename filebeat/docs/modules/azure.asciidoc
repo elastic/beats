@@ -31,7 +31,7 @@ Will retrieve azure platform logs. Platform logs provide detailed diagnostic and
 Will retrieve azure Active Directory sign-in logs. The sign-ins report provides information about the usage of managed applications and user sign-in activities. To learn more, refer to the https://docs.microsoft.com/en-us/azure/active-directory/reports-monitoring/concept-sign-ins[Azure sign-in logs] documentation.
 
 `auditlogs` ::
-Will retrieve azure Active Directory audit logs. The audit logs provide traceability through logs for all changes done by various features within Azure AD. Examples of audit logs include changes made to any resources within Azure AD like adding or removing users, apps, groups, roles and policies. To learn more, refer to the https://docs.microsoft.com/en-us/azure/active-directory/reports-monitoring/concept-audit-logs[Azureaudit logs] documentation.
+Will retrieve azure Active Directory audit logs. The audit logs provide traceability through logs for all changes done by various features within Azure AD. Examples of audit logs include changes made to any resources within Azure AD like adding or removing users, apps, groups, roles and policies. To learn more, refer to the https://docs.microsoft.com/en-us/azure/active-directory/reports-monitoring/concept-audit-logs[Azure audit logs] documentation.
 
 [float]
 === Module configuration
