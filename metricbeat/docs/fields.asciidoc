@@ -7535,6 +7535,13 @@ type: keyword
 
 --
 
+*`beat.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
+
 [float]
 === state
 
@@ -8701,6 +8708,13 @@ type: short
 --
 
 *`beat.stats.libbeat.config.stops`*::
++
+--
+type: short
+
+--
+
+*`beat.stats.libbeat.config.reloads`*::
 +
 --
 type: short
@@ -12861,9 +12875,12 @@ format: bytes
 *`client.domain`*::
 +
 --
-Client domain.
+The domain name of the client system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -13872,9 +13889,12 @@ format: bytes
 *`destination.domain`*::
 +
 --
-Destination domain.
+The domain name of the destination system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -20368,9 +20388,12 @@ format: bytes
 *`server.domain`*::
 +
 --
-Server domain.
+The domain name of the server system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -21111,9 +21134,12 @@ format: bytes
 *`source.domain`*::
 +
 --
-Source domain.
+The domain name of the source system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -40648,6 +40674,13 @@ alias to: service.id
 --
 
 
+*`kibana.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
+
 [float]
 === settings
 
@@ -41959,6 +41992,18 @@ format: bytes
 
 --
 
+*`kubernetes.container.memory.workingset.limit.pct`*::
++
+--
+Working set memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited)
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`kubernetes.container.memory.pagefaults`*::
 +
 --
@@ -43020,6 +43065,18 @@ Total working set memory
 type: double
 
 format: bytes
+
+--
+
+*`kubernetes.pod.memory.working_set.limit.pct`*::
++
+--
+Working set memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited)
+
+
+type: scaled_float
+
+format: percent
 
 --
 
@@ -46279,6 +46336,13 @@ alias to: logstash.node.state.pipeline.hash
 
 --
 
+
+*`logstash.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
 
 [float]
 === node

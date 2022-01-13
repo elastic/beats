@@ -187,6 +187,15 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 	} else {
 		for _, p := range procs {
 			if i, err := p.Info(); err == nil {
+				if len(i.Name) == 16 && len(i.Args) != 0 {
+					// github.com/prometheus/procfs uses /proc/<pid>/stat for
+					// the process name which is truncated to 16 bytes, so get
+					// the name from the cmdline data if it might be truncated.
+					// The guard for length of i.Args is for cases where there
+					// is no command line reported by proc fs; this should never
+					// happen, but does.
+					i.Name = filepath.Base(i.Args[0])
+				}
 				process := &process{
 					name:        i.Name,
 					pid:         uint32(i.PID),

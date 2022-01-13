@@ -61,14 +61,14 @@ type kubernetesConfig struct {
 
 type enricher struct {
 	sync.RWMutex
-	metadata           map[string]common.MapStr
-	index              func(common.MapStr) string
-	watcher            kubernetes.Watcher
-	watcherStarted     bool
-	watcherStartedLock sync.Mutex
-	namespaceWatcher   kubernetes.Watcher
-	nodeWatcher        kubernetes.Watcher
-	isPod              bool
+	metadata            map[string]common.MapStr
+	index               func(common.MapStr) string
+	watcher             kubernetes.Watcher
+	watchersStarted     bool
+	watchersStartedLock sync.Mutex
+	namespaceWatcher    kubernetes.Watcher
+	nodeWatcher         kubernetes.Watcher
+	isPod               bool
 }
 
 const selector = "kubernetes"
@@ -134,6 +134,8 @@ func NewResourceMetadataEnricher(
 				m[id] = metaGen.Generate("deployment", r)
 			case *kubernetes.Job:
 				m[id] = metaGen.Generate("job", r)
+			case *kubernetes.CronJob:
+				m[id] = metaGen.Generate("cronjob", r)
 			case *kubernetes.Service:
 				m[id] = serviceMetaGen.Generate(r)
 			case *kubernetes.StatefulSet:
@@ -198,6 +200,14 @@ func NewContainerMetadataEnricher(
 			pod := r.(*kubernetes.Pod)
 			meta := metaGen.Generate(pod)
 
+			statuses := make(map[string]*kubernetes.PodContainerStatus)
+			mapStatuses := func(s []kubernetes.PodContainerStatus) {
+				for i := range s {
+					statuses[s[i].Name] = &s[i]
+				}
+			}
+			mapStatuses(pod.Status.ContainerStatuses)
+			mapStatuses(pod.Status.InitContainerStatuses)
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				cuid := ContainerUID(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 
@@ -213,6 +223,15 @@ func NewContainerMetadataEnricher(
 					}
 				}
 
+				if s, ok := statuses[container.Name]; ok {
+					// Extracting id and runtime ECS fields from ContainerID
+					// which is in the form of <container.runtime>://<container.id>
+					split := strings.Index(s.ContainerID, "://")
+					if split != -1 {
+						meta.Put("container.id", s.ContainerID[split+3:])
+						meta.Put("container.runtime", s.ContainerID[:split])
+					}
+				}
 				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				m[id] = meta
 			}
@@ -287,6 +306,12 @@ func getResourceMetadataWatchers(config *kubernetesConfig, resource kubernetes.R
 	return watcher, nodeWatcher, namespaceWatcher
 }
 
+func GetDefaultDisabledMetaConfig() *kubernetesConfig {
+	return &kubernetesConfig{
+		AddMetadata: false,
+	}
+}
+
 func validatedConfig(base mb.BaseMetricSet) *kubernetesConfig {
 	config := kubernetesConfig{
 		AddMetadata:         true,
@@ -356,42 +381,44 @@ func buildMetadataEnricher(
 }
 
 func (m *enricher) Start() {
-	m.watcherStartedLock.Lock()
-	defer m.watcherStartedLock.Unlock()
-	if m.nodeWatcher != nil {
-		if err := m.nodeWatcher.Start(); err != nil {
-			logp.Warn("Error starting node watcher: %s", err)
+	m.watchersStartedLock.Lock()
+	defer m.watchersStartedLock.Unlock()
+	if !m.watchersStarted {
+		if m.nodeWatcher != nil {
+			if err := m.nodeWatcher.Start(); err != nil {
+				logp.Warn("Error starting node watcher: %s", err)
+			}
 		}
-	}
 
-	if m.namespaceWatcher != nil {
-		if err := m.namespaceWatcher.Start(); err != nil {
-			logp.Warn("Error starting namespace watcher: %s", err)
+		if m.namespaceWatcher != nil {
+			if err := m.namespaceWatcher.Start(); err != nil {
+				logp.Warn("Error starting namespace watcher: %s", err)
+			}
 		}
-	}
 
-	if !m.watcherStarted {
 		err := m.watcher.Start()
 		if err != nil {
 			logp.Warn("Error starting Kubernetes watcher: %s", err)
 		}
-		m.watcherStarted = true
+		m.watchersStarted = true
 	}
 }
 
 func (m *enricher) Stop() {
-	m.watcherStartedLock.Lock()
-	defer m.watcherStartedLock.Unlock()
-	if m.watcherStarted {
+	m.watchersStartedLock.Lock()
+	defer m.watchersStartedLock.Unlock()
+	if m.watchersStarted {
 		m.watcher.Stop()
-		m.watcherStarted = false
-	}
-	if m.namespaceWatcher != nil {
-		m.namespaceWatcher.Stop()
-	}
 
-	if m.nodeWatcher != nil {
-		m.nodeWatcher.Stop()
+		if m.namespaceWatcher != nil {
+			m.namespaceWatcher.Stop()
+		}
+
+		if m.nodeWatcher != nil {
+			m.nodeWatcher.Stop()
+		}
+
+		m.watchersStarted = false
 	}
 }
 
