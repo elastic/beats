@@ -43,6 +43,7 @@ type elasticsearchConfig struct {
 	MaxRetries         int                     `config:"max_retries"`
 	Backoff            Backoff                 `config:"backoff"`
 	NonIndexablePolicy *common.ConfigNamespace `config:"non_indexable_policy"`
+	AllowOlderVersion  bool                    `config:"allow_older_versions"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
