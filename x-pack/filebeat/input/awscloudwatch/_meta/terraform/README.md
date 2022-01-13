@@ -14,7 +14,11 @@ You must have the appropriate AWS environment variables for authentication set
 before running Terraform or the integration tests. The AWS key must be
 authorized to create and destroy AWS CloudWatch log groups.
 
-1. Execute terraform in this directory to create the resources. This will also
+1. Initialize a working directory containing Terraform configuration files.
+
+   `terraform init`
+
+2. Execute terraform in this directory to create the resources. This will also
    write the `outputs.yml`. You can use `export TF_VAR_aws_region=NNNNN` in order
    to match the AWS region of the profile you are using.
 

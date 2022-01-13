@@ -11,6 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+
 	"github.com/elastic/beats/v7/filebeat/beater"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -79,6 +81,7 @@ type cloudwatchPoller struct {
 	prevEndTime          int64
 	workerSem            *awscommon.Sem
 	log                  *logp.Logger
+	metrics              *inputMetrics
 	store                *statestore.Store
 	workersListingMap    *sync.Map
 	workersProcessingMap *sync.Map
@@ -86,22 +89,31 @@ type cloudwatchPoller struct {
 
 type logProcessor struct {
 	log       *logp.Logger
+	metrics   *inputMetrics
 	publisher beat.Client
 	ack       *awscommon.EventACKTracker
 }
 
-func newLogProcessor(log *logp.Logger, publisher beat.Client, ctx context.Context) *logProcessor {
+func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Client, ctx context.Context) *logProcessor {
+	if metrics == nil {
+		metrics = newInputMetrics(monitoring.NewRegistry(), "")
+	}
 	return &logProcessor{
 		log:       log,
+		metrics:   metrics,
 		publisher: publisher,
 		ack:       awscommon.NewEventACKTracker(ctx),
 	}
 }
 
-func newCloudwatchPoller(log *logp.Logger,
+func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
 	store *statestore.Store,
 	awsRegion string, apiSleep time.Duration,
 	numberOfWorkers int, logStreams []string, logStreamPrefix string) *cloudwatchPoller {
+	if metrics == nil {
+		metrics = newInputMetrics(monitoring.NewRegistry(), "")
+	}
+
 	return &cloudwatchPoller{
 		numberOfWorkers:      numberOfWorkers,
 		apiSleep:             apiSleep,
@@ -112,6 +124,7 @@ func newCloudwatchPoller(log *logp.Logger,
 		endTime:              int64(0),
 		workerSem:            awscommon.NewSem(numberOfWorkers),
 		log:                  log,
+		metrics:              metrics,
 		store:                store,
 		workersListingMap:    new(sync.Map),
 		workersProcessingMap: new(sync.Map),
@@ -195,16 +208,20 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		return fmt.Errorf("failed to get log group names: %w", err)
 	}
 
-	log := inputContext.Logger.With("aws-cloudwatch")
+	log := inputContext.Logger
+	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
+	metrics := newInputMetrics(metricRegistry, inputContext.ID)
 	cwPoller := newCloudwatchPoller(
 		log.Named("cloudwatch_poller"),
+		metrics,
 		persistentStore,
 		in.awsConfig.Region,
 		in.config.APISleep,
 		in.config.NumberOfWorkers,
 		in.config.LogStreams,
 		in.config.LogStreamPrefix)
-	logProcessor := newLogProcessor(log.Named("log_processor"), client, ctx)
+	logProcessor := newLogProcessor(log.Named("log_processor"), metrics, client, ctx)
+	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupNames)))
 	return in.Receive(svc, cwPoller, ctx, logProcessor, logGroupNames)
 }
 
@@ -318,8 +335,10 @@ func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc cloudwatchlogsiface.Cl
 	paginator := cloudwatchlogs.NewFilterLogEventsPaginator(req)
 	for paginator.Next(context.TODO()) {
 		page := paginator.CurrentPage()
+		p.metrics.apiCallsTotal.Inc()
 
 		logEvents := page.Events
+		p.metrics.logEventsReceivedTotal.Add(uint64(len(logEvents)))
 		p.log.Debugf("Processing #%v events", len(logEvents))
 		err := logProcessor.processLogEvents(logEvents, logGroup, p.region)
 		if err != nil {
@@ -344,6 +363,7 @@ func (p *cloudwatchPoller) constructFilterLogEventsInput(startTime int64, endTim
 		LogGroupName: awssdk.String(logGroup),
 		StartTime:    awssdk.Int64(startTime),
 		EndTime:      awssdk.Int64(endTime),
+		Limit:        awssdk.Int64(100),
 	}
 
 	if len(p.logStreams) > 0 {
@@ -414,5 +434,6 @@ func createEvent(logEvent cloudwatchlogs.FilteredLogEvent, logGroup string, regi
 func (p *logProcessor) publish(ack *awscommon.EventACKTracker, event *beat.Event) {
 	ack.Add()
 	event.Private = ack
+	p.metrics.cloudwatchEventsCreatedTotal.Inc()
 	p.publisher.Publish(*event)
 }
