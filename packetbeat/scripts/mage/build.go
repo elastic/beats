@@ -17,11 +17,37 @@
 
 package mage
 
-import devtools "github.com/elastic/beats/v7/dev-tools/mage"
+import (
+	"errors"
+	"os"
+	"strings"
+
+	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+)
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	// Run all builds serially to try to address failures that might be caused
-	// by concurrent builds. See https://github.com/elastic/beats/issues/24304.
-	return devtools.CrossBuild(devtools.Serially())
+	return devtools.CrossBuild(
+		// Run all builds serially to try to address failures that might be caused
+		// by concurrent builds. See https://github.com/elastic/beats/issues/24304.
+		devtools.Serially(),
+
+		devtools.ImageSelector(func(platform string) (string, error) {
+			image, err := devtools.CrossBuildImage(platform)
+			if err != nil {
+				return "", err
+			}
+			if os.ExpandEnv("CI") != "true" {
+				return image, nil
+			}
+			if platform == "windows/amd64" || platform == "windows/386" {
+				npcapVersion := os.ExpandEnv("NPCAP_VERSION")
+				if npcapVersion == "" {
+					return "", errors.New("NPCAP_VERSION not set correctly")
+				}
+				image = strings.ReplaceAll(image, "main", "npcap-"+npcapVersion)
+			}
+			return image, nil
+		}),
+	)
 }
