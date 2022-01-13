@@ -20,15 +20,15 @@ enroll and communicate.
 [[fleet-server-operating-modes]]
 === Operating Modes
 
-Elastic Agent can bootstrap the Fleet Server into three different modes. In either
-mode the Fleet Server operates the same, but how it exposes itself over the `:8220`
-port is different.
+Elastic Agent can bootstrap the Fleet Server into three different modes. The mode
+determines how Fleet Server exposes itself over the `:8220` port, but does not change
+any other behaviour.
 
 ==== Self-signed Certificate
 
 With the standard `--fleet-server-es` and `--fleet-server-service-token` options the
-Elastic Agent will generate a self-generated CA and certificate for communication with
-the Fleet Server that it starts under the Elastic Agent. These certificates are generated
+Elastic Agent will generate a CA and certificate for communication with
+the Fleet Server that it starts. These certificates are generated
 by Elastic Agent and passed to the Fleet Server, with Elastic Agent using the host's
 hostname in the communication URL for valid TLS verification.
 
