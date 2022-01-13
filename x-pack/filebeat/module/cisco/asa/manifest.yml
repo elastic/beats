@@ -11,7 +11,8 @@ var:
   - name: syslog_port
     default: 9001
   - name: input
-    default: syslog
+    default: udp
+  - name: ssl
   - name: log_level
     default: 7
     # if ES < 6.1.0, this flag switches to false automatically when evaluating the

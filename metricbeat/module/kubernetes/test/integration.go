@@ -49,6 +49,18 @@ func GetKubeStateMetricsConfig(t *testing.T, metricSetName string) map[string]in
 	}
 }
 
+// GetKubeStateMetricsConfigWithMetaDisabled function returns configuration for talking to kube-state-metrics.
+func GetKubeStateMetricsConfigWithMetaDisabled(t *testing.T, metricSetName string) map[string]interface{} {
+	t.Helper()
+	return map[string]interface{}{
+		"module":       "kubernetes",
+		"metricsets":   []string{metricSetName},
+		"host":         "${NODE_NAME}",
+		"hosts":        []string{"kube-state-metrics:8080"},
+		"add_metadata": false,
+	}
+}
+
 // GetKubeletConfig function returns configuration for talking to Kubelet API.
 func GetKubeletConfig(t *testing.T, metricSetName string) map[string]interface{} {
 	t.Helper()
@@ -79,10 +91,12 @@ func GetKubeProxyConfig(t *testing.T, metricSetName string) map[string]interface
 func GetSchedulerConfig(t *testing.T, metricSetName string) map[string]interface{} {
 	t.Helper()
 	return map[string]interface{}{
-		"module":     "kubernetes",
-		"metricsets": []string{metricSetName},
-		"host":       "${NODE_NAME}",
-		"hosts":      []string{"localhost:10251"},
+		"module":                "kubernetes",
+		"metricsets":            []string{metricSetName},
+		"host":                  "${NODE_NAME}",
+		"hosts":                 []string{"https://0.0.0.0:10259"},
+		"bearer_token_file":     "/var/run/secrets/kubernetes.io/serviceaccount/token",
+		"ssl.verification_mode": "none",
 	}
 }
 
@@ -90,9 +104,11 @@ func GetSchedulerConfig(t *testing.T, metricSetName string) map[string]interface
 func GetControllerManagerConfig(t *testing.T, metricSetName string) map[string]interface{} {
 	t.Helper()
 	return map[string]interface{}{
-		"module":     "kubernetes",
-		"metricsets": []string{metricSetName},
-		"host":       "${NODE_NAME}",
-		"hosts":      []string{"localhost:10252"},
+		"module":                "kubernetes",
+		"metricsets":            []string{metricSetName},
+		"host":                  "${NODE_NAME}",
+		"hosts":                 []string{"https://0.0.0.0:10257"},
+		"bearer_token_file":     "/var/run/secrets/kubernetes.io/serviceaccount/token",
+		"ssl.verification_mode": "none",
 	}
 }

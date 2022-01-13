@@ -3,6 +3,11 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.0.0-rc1]]
+=== Beats version 8.0.0-rc1
+
+Changes will be described in a later RC / GA.
+
 [[release-notes-8.0.0-beta1]]
 === Beats version 8.0.0-beta1
 
@@ -17,6 +22,37 @@ Changes will be described in a later alpha / beta.
 === Beats version 8.0.0-alpha1
 
 Changes will be described in a later alpha / beta.
+[[release-notes-7.16.3]]
+=== Beats version 7.16.3
+https://github.com/elastic/beats/compare/v7.16.2...v7.16.3[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fields of type `match_only_text` (i.e. `message`) and `wildcard` were missing from the template's `default_field` list. {issue}29633[29633] {pull}29634[29634]
+
+[[release-notes-7.16.2]]
+=== Beats version 7.16.2
+https://github.com/elastic/beats/compare/v7.16.1...v7.16.2[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Resolve issue with @timestamp for `defender_atp`. {pull}28272[28272]
+- Fix handling of escaped newlines in the `decode_cef` processor. {issue}16995[16995] {pull}29268[29268]
+
+==== Added
+
+*Filebeat*
+
+- Update Cisco module to enable TCP input. {issue}26118[26118] {issue}28821[28821] {pull}26159[26159]
+
+*Winlogbeat*
+
+- Add configuration option for registry file flush timeout {issue}29001[29001] {pull}29053[29053]
+
 [[release-notes-7.16.1]]
 === Beats version 7.16.1
 https://github.com/elastic/beats/compare/v7.16.0...v7.16.1[View commits]

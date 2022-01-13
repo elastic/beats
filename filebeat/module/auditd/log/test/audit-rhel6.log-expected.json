@@ -86,8 +86,8 @@
         "input.type": "log",
         "log.offset": 373,
         "process.args": [
-            "-p",
             "/usr/lib64/nagios/plugins/check_asterisk_sip_peers",
+            "-p",
             "202"
         ],
         "process.args_count": 3,
