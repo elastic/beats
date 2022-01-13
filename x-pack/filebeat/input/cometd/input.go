@@ -5,13 +5,10 @@
 package cometd
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
-	"net/http"
+	"os"
 	"sync"
 	"time"
 
@@ -24,24 +21,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
+
+	bay "github.com/kush-elastic/bayeux"
 )
 
 const (
-	cometdVersion     = "38.0"
-	inputName         = "cometd"
-	subscribe_channel = "/meta/subscribe"
-	connetion_type    = "long-polling"
-	connect_channel   = "/meta/connect"
-	// Replay accepts the following values
-	// -2: replay all events from past 24 hrs
-	// -1: start at current
-	// >= 0: start from this event number
-	Replay = -1
-)
-
-var (
-	st = status{[]string{}, "", false}
-	wg sync.WaitGroup
+	inputName = "cometd"
 )
 
 // Run starts the input worker then returns. Only the first invocation
@@ -63,41 +48,33 @@ func (in *cometdInput) Run() {
 }
 
 func (in *cometdInput) run() error {
-	ctx, cancel := context.WithCancel(in.workerCtx)
-	defer cancel()
-	b := bayeux{}
-	creds, err := in.config.Auth.OAuth2.client()
-	if err != nil {
-		return fmt.Errorf("error while getting Salesforce credentials: %v", err)
-	}
-	in.out, err = b.TopicToChannel(ctx, creds, in.config.ChannelName, in.log, in.out)
-	if err != nil {
-		return fmt.Errorf("failed to subscribe to channel: %v", err)
-	}
+
+	b := bay.Bayeux{}
+	creds := bay.GetSalesforceCredentials()
+	in.out = b.Channel(in.out, "-1", creds, in.config.ChannelName)
 
 	var event Event
 	for e := range in.out {
 		if !e.Successful {
 			// To handle the last response where the object received was empty
-			if e.Data.Object == nil {
+			if e.Data.Payload == nil {
 				return nil
 			}
 
 			// Convert json.RawMessage response to []byte
-			msg, err := json.Marshal(e.Data.Object)
+			msg, err := json.Marshal(e.Data.Payload)
 			if err != nil {
 				return fmt.Errorf("JSON error: %v", err)
 			}
 
 			// Extract event IDs from json.RawMessage
-			err = json.Unmarshal(e.Data.Object, &event)
+			err = json.Unmarshal(e.Data.Payload, &event)
 			if err != nil {
 				return fmt.Errorf("error while parsing JSON: %v", err)
 			}
 			if ok := in.outlet.OnEvent(makeEvent(event.EventId, string(msg))); !ok {
 				in.log.Debug("OnEvent returned false. Stopping input worker.")
 				close(in.out)
-				cancel()
 				return fmt.Errorf("error ingesting data to elasticsearch")
 			}
 		}
@@ -124,6 +101,11 @@ func NewInput(
 	if err = cfg.Unpack(&conf); err != nil {
 		return nil, err
 	}
+
+	os.Setenv("SALESFORCE_CONSUMER_KEY", conf.Auth.OAuth2.ClientID)
+	os.Setenv("SALESFORCE_CONSUMER_SECRET", conf.Auth.OAuth2.ClientSecret)
+	os.Setenv("SALESFORCE_USER", conf.Auth.OAuth2.User)
+	os.Setenv("SALESFORCE_PASSWORD", conf.Auth.OAuth2.Password)
 
 	logger := logp.NewLogger("cometd").With(
 		"pubsub_channel", conf.ChannelName)
@@ -153,7 +135,7 @@ func NewInput(
 	}
 
 	// Creating a new channel for cometd input
-	in.out = make(chan triggerEvent)
+	in.out = make(chan bay.TriggerEvent)
 
 	// Build outlet for events.
 	in.outlet, err = connector.Connect(cfg)
@@ -191,60 +173,7 @@ type cometdInput struct {
 	ackedCount *atomic.Uint32                   // Total number of successfully ACKed messages.
 	Transport  httpcommon.HTTPTransportSettings `config:",inline"`
 	Retry      retryConfig                      `config:"retry"`
-	out        chan triggerEvent
-}
-
-// triggerEvent describes an event received from Bayeaux Endpoint
-type triggerEvent struct {
-	Channel  string `json:"channel"`
-	ClientID string `json:"clientId"`
-	Data     struct {
-		Event struct {
-			CreatedDate time.Time `json:"createdDate"`
-			ReplayID    int       `json:"replayId"`
-			Type        string    `json:"type"`
-		} `json:"event"`
-		Object json.RawMessage `json:"payload"`
-	} `json:"data,omitempty"`
-	Successful bool `json:"successful,omitempty"`
-}
-
-// status is the state of success and subscribed channels
-type status struct {
-	channels  []string
-	clientID  string
-	connected bool
-}
-
-type bayeuxHandshake []struct {
-	ClientID string `json:"clientId"`
-	Channel  string `json:"channel"`
-	Ext      struct {
-		Replay bool `json:"replay"`
-	} `json:"ext"`
-	MinimumVersion           string   `json:"minimumVersion"`
-	Successful               bool     `json:"successful"`
-	SupportedConnectionTypes []string `json:"supportedConnectionTypes"`
-	Version                  string   `json:"version"`
-}
-
-type subscription struct {
-	ClientID     string `json:"clientId"`
-	Channel      string `json:"channel"`
-	Subscription string `json:"subscription"`
-	Successful   bool   `json:"successful"`
-}
-
-type clientIDAndCookies struct {
-	clientID string
-	cookies  []*http.Cookie
-}
-
-// bayeux struct allow for centralized storage of creds, ids, and cookies
-type bayeux struct {
-	creds  credentials
-	id     clientIDAndCookies
-	client *http.Client
+	out        chan bay.TriggerEvent
 }
 
 type retryConfig struct {
@@ -255,148 +184,6 @@ type retryConfig struct {
 
 type Event struct {
 	EventId string `json:"EventIdentifier"`
-}
-
-func (c credentials) bayeuxUrl() string {
-	return c.InstanceURL + "/cometd/" + cometdVersion
-}
-
-// Call is the base function for making bayeux requests
-func (b *bayeux) call(body string, route string) (*http.Response, error) {
-	var jsonStr = []byte(body)
-	req, err := http.NewRequest("POST", route, bytes.NewBuffer(jsonStr))
-	if err != nil {
-		return nil, fmt.Errorf("bad Call request: %v", err)
-	}
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", b.creds.AccessToken))
-	// Passing back cookies is required though undocumented in Salesforce API
-	// SF Reference: https://developer.salesforce.com/docs/atlas.en-us.api_streaming.meta/api_streaming/intro_client_specs.htm
-	for _, cookie := range b.id.cookies {
-		req.AddCookie(cookie)
-	}
-
-	resp, err := b.client.Do(req)
-	if err == io.EOF {
-		return nil, fmt.Errorf("bad bayeuxCall io.EOF: %v", err)
-	} else if err != nil {
-		return nil, fmt.Errorf("unknown error: %v", err)
-	}
-	return resp, nil
-}
-
-func (b *bayeux) getClientID() error {
-	handshake := `{"channel": "/meta/handshake", "supportedConnectionTypes": ["long-polling"], "version": "1.0"}`
-	// Stub out clientIDAndCookies for first bayeuxCall
-	resp, err := b.call(handshake, b.creds.bayeuxUrl())
-	if err != nil {
-		return fmt.Errorf("cannot get client id: %v", err)
-	}
-	defer resp.Body.Close()
-
-	decoder := json.NewDecoder(resp.Body)
-	var h bayeuxHandshake
-	if err := decoder.Decode(&h); err == io.EOF {
-		return fmt.Errorf("reached end of response: %v", err)
-	} else if err != nil {
-		return fmt.Errorf("error while reading response: %v", err)
-	}
-	creds := clientIDAndCookies{h[0].ClientID, resp.Cookies()}
-	b.id = creds
-	return nil
-}
-
-func (b *bayeux) subscribe(topic string, Replay int, log *logp.Logger) (subscription, error) {
-	handshake := fmt.Sprintf(`{
-								"channel": "%s",
-								"subscription": "%s",
-								"clientId": "%s",
-								"ext": {
-									"replay": {"%s": "%d"}
-									}
-								}`, subscribe_channel, topic, b.id.clientID, topic, Replay)
-	resp, err := b.call(handshake, b.creds.bayeuxUrl())
-	if err != nil {
-		return subscription{}, fmt.Errorf("error while subscribing: %v", err)
-	}
-
-	defer resp.Body.Close()
-
-	// Read the content
-	var content []byte
-	if resp.Body != nil {
-		content, err = ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return subscription{}, fmt.Errorf("error while reading content: %v", err)
-		}
-	}
-	// Restore the io.ReadCloser to its original state
-	resp.Body = ioutil.NopCloser(bytes.NewBuffer(content))
-
-	if resp.StatusCode > 299 {
-		return subscription{}, fmt.Errorf("received non 2XX response: HTTP_CODE %v", resp.StatusCode)
-	}
-	decoder := json.NewDecoder(resp.Body)
-	var h []subscription
-	if err := decoder.Decode(&h); err == io.EOF {
-		return subscription{}, fmt.Errorf("reached end of response: %v", err)
-	} else if err != nil {
-		return subscription{}, fmt.Errorf("error while reading response: %v", err)
-	}
-	sub := h[0]
-	st.connected = sub.Successful
-	st.clientID = sub.ClientID
-	st.channels = append(st.channels, topic)
-	log.Infof("Established connection(s): %+v", st)
-	return sub, nil
-}
-
-func (b *bayeux) connect(out chan triggerEvent, log *logp.Logger) (chan triggerEvent, error) {
-	go func() {
-		for {
-			postBody := fmt.Sprintf(`{"channel": "%s", "connectionType": "%s", "clientId": "%s"} `, connect_channel, connetion_type, b.id.clientID)
-			resp, err := b.call(postBody, b.creds.bayeuxUrl())
-			if err != nil {
-				log.Warnf("Cannot connect to bayeux %s, trying again...", err)
-			} else {
-				// Read the content
-				var b []byte
-				if resp.Body != nil {
-					b, err = ioutil.ReadAll(resp.Body)
-				}
-				if err != nil {
-					return
-				}
-				// Restore the io.ReadCloser to its original state
-				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
-				var x []triggerEvent
-				decoder := json.NewDecoder(resp.Body)
-				if err := decoder.Decode(&x); err != nil && err != io.EOF {
-					return
-				}
-				for _, e := range x {
-					out <- e
-				}
-			}
-		}
-	}()
-	return out, nil
-}
-
-func (b *bayeux) TopicToChannel(ctx context.Context, creds credentials, topic string, log *logp.Logger, out chan triggerEvent) (chan triggerEvent, error) {
-	b.creds = creds
-	b.client = &http.Client{}
-	err := b.getClientID()
-	if err != nil {
-		return make(chan triggerEvent), fmt.Errorf("error while getting client ID: %v", err)
-	}
-	b.subscribe(topic, Replay, log)
-	c, err := b.connect(out, log)
-	if err != nil {
-		return make(chan triggerEvent), fmt.Errorf("error while creating a connection: %v", err)
-	}
-	wg.Add(1)
-	return c, nil
 }
 
 func makeEvent(id string, body string) beat.Event {
