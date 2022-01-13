@@ -44,7 +44,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - With the default configuration the cef and panw modules will no longer send the `host`
 - Add `while_pattern` type to multiline reader. {pull}19662[19662]
 - auditd dataset: Use process.args to store program arguments instead of auditd.log.aNNN fields. {pull}29601[29601]
-- Remove deprecated old awscloudwatch input name.
+- Remove deprecated old awscloudwatch input name. {pull}29844[29844]
 
 *Heartbeat*
 - Only add monitor.status to browser events when summary. {pull}29460[29460]
