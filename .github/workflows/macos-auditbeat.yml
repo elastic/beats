@@ -1,6 +1,9 @@
 name: auditbeat
 
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/macos-auditbeat.yml'
   push:
     branches:
       - master
