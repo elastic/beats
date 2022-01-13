@@ -1,6 +1,9 @@
 name: metricbeat
 
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/macos-metricbeat.yml'
   push:
     branches:
       - master

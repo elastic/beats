@@ -1,6 +1,9 @@
 name: packetbeat
 
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/macos-packetbeat.yml'
   push:
     branches:
       - master

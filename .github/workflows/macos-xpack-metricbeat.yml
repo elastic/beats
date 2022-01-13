@@ -1,6 +1,9 @@
 name: x-pack-metricbeat
 
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/macos-xpack-metricbeat.yml'
   push:
     branches:
       - master

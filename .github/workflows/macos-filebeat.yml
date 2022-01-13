@@ -1,6 +1,9 @@
 name: filebeat
 
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/macos-filebeat.yml'
   push:
     branches:
       - master

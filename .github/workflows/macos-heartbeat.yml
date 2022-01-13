@@ -1,6 +1,9 @@
 name: heartbeat
 
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/macos-heartbeat.yml'
   push:
     branches:
       - master

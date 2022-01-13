@@ -1,6 +1,9 @@
 name: x-pack-filebeat
 
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/macos-xpack-filebeat.yml'
   push:
     branches:
       - master
