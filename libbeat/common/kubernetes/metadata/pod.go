@@ -93,7 +93,7 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	}
 
 	if p.node != nil {
-		meta := p.node.GenerateFromName(po.Spec.NodeName, WithLabels("node"))
+		meta := p.node.GenerateFromName(po.Spec.NodeName, WithMetadata("node"))
 		if meta != nil {
 			out.Put("node", meta["node"])
 		} else {

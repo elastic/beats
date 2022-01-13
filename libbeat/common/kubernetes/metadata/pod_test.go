@@ -673,7 +673,172 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 		namespaces.Add(test.namespace)
 		nsMeta := NewNamespaceMetadataGenerator(config, namespaces, client)
 
+<<<<<<< HEAD
 		metagen := NewPodMetadataGenerator(config, pods, client, nodeMeta, nsMeta)
+=======
+		metagen := NewPodMetadataGenerator(config, pods, client, nodeMeta, nsMeta, addResourceMetadata)
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.output, metagen.Generate(test.input))
+		})
+	}
+}
+
+func TestPod_GenerateWithNodeNamespaceWithAddResourceConfig(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
+	namespace := "default"
+	name := "obj"
+	boolean := true
+
+	tests := []struct {
+		input     kubernetes.Resource
+		node      kubernetes.Resource
+		namespace kubernetes.Resource
+		output    common.MapStr
+		name      string
+	}{
+		{
+			name: "test simple object",
+			input: &v1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      name,
+					UID:       types.UID(uid),
+					Namespace: namespace,
+					Labels: map[string]string{
+						"app.kubernetes.io/component": "exporter",
+					},
+					Annotations: map[string]string{
+						"app": "production",
+					},
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							APIVersion: "apps",
+							Kind:       "ReplicaSet",
+							Name:       "nginx-rs",
+							UID:        "005f3b90-4b9d-12f8-acf0-31020a8409087",
+							Controller: &boolean,
+						},
+					},
+				},
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Pod",
+					APIVersion: "v1",
+				},
+
+				Spec: v1.PodSpec{
+					NodeName: "testnode",
+				},
+				Status: v1.PodStatus{PodIP: "127.0.0.5"},
+			},
+			node: &v1.Node{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "testnode",
+					UID:  types.UID(uid),
+					Labels: map[string]string{
+						"nodekey":  "nodevalue",
+						"nodekey2": "nodevalue2",
+					},
+					Annotations: map[string]string{
+						"node.annotation": "node.value",
+					},
+				},
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Node",
+					APIVersion: "v1",
+				},
+				Status: v1.NodeStatus{
+					Addresses: []v1.NodeAddress{{Type: v1.NodeHostName, Address: "node1"}},
+				},
+			},
+			namespace: &v1.Namespace{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: namespace,
+					UID:  types.UID(uid),
+					Labels: map[string]string{
+						"app.kubernetes.io/name": "kube-state-metrics",
+						"nskey2":                 "nsvalue2",
+					},
+					Annotations: map[string]string{
+						"ns.annotation": "ns.value",
+					},
+				},
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Namespace",
+					APIVersion: "v1",
+				},
+			},
+			output: common.MapStr{"kubernetes": common.MapStr{
+				"pod": common.MapStr{
+					"name": "obj",
+					"uid":  uid,
+					"ip":   "127.0.0.5",
+				},
+				"namespace":     "default",
+				"namespace_uid": uid,
+				"namespace_labels": common.MapStr{
+					"app_kubernetes_io/name": "kube-state-metrics",
+				},
+				"namespace_annotations": common.MapStr{
+					"ns_annotation": "ns.value",
+				},
+				"node": common.MapStr{
+					"name": "testnode",
+					"uid":  uid,
+					"labels": common.MapStr{
+						"nodekey2": "nodevalue2",
+					},
+					"hostname": "node1",
+					"annotations": common.MapStr{
+						"node_annotation": "node.value",
+					},
+				},
+				"labels": common.MapStr{
+					"app_kubernetes_io/component": "exporter",
+				},
+				"annotations": common.MapStr{
+					"app": "production",
+				},
+				"replicaset": common.MapStr{
+					"name": "nginx-rs",
+				},
+			}},
+		},
+	}
+
+	for _, test := range tests {
+		config, err := common.NewConfigFrom(map[string]interface{}{
+			"include_annotations": []string{"app"},
+		})
+
+		assert.NoError(t, err)
+
+		namespaceConfig, _ := common.NewConfigFrom(map[string]interface{}{
+			"include_labels":      []string{"app.kubernetes.io/name"},
+			"include_annotations": []string{"ns.annotation"},
+		})
+		nodeConfig, _ := common.NewConfigFrom(map[string]interface{}{
+			"include_labels":      []string{"nodekey2"},
+			"include_annotations": []string{"node.annotation"},
+		})
+		metaConfig := AddResourceMetadataConfig{
+			Namespace:  namespaceConfig,
+			Node:       nodeConfig,
+			Deployment: false,
+		}
+
+		pods := cache.NewStore(cache.MetaNamespaceKeyFunc)
+		pods.Add(test.input)
+
+		nodes := cache.NewStore(cache.MetaNamespaceKeyFunc)
+		nodes.Add(test.node)
+		nodeMeta := NewNodeMetadataGenerator(nodeConfig, nodes, client)
+
+		namespaces := cache.NewStore(cache.MetaNamespaceKeyFunc)
+		namespaces.Add(test.namespace)
+		nsMeta := NewNamespaceMetadataGenerator(namespaceConfig, namespaces, client)
+
+		metagen := NewPodMetadataGenerator(config, pods, client, nodeMeta, nsMeta, &metaConfig)
+>>>>>>> 2917392a01 (Fix annotation enrichment (#29605))
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
 		})
