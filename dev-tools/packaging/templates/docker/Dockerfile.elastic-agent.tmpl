@@ -152,7 +152,7 @@ COPY --from=home {{ $beatHome }}/NOTICE.txt /licenses
 RUN readlink -f {{ $beatBinary }} | xargs setcap {{ .linux_capabilities }}
 {{- end }}
 
-{{- if eq .user "root" }}
+{{- if ne .user "root" }}
 RUN groupadd --gid 1000 {{ .BeatName }}
 RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
 {{- if (and (contains .image_name "-complete") (not (contains .from "ubi-minimal")))  }}
