@@ -30,6 +30,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - `include_matches` option of `journald` input no longer accepts a list of string. {pull}29294[29294]
 - Add job.name in pods controlled by Jobs {pull}28954[28954]
 - Change Docker base image from CentOS 7 to Ubuntu 20.04 {pull}29681[29681]
+- Enrich kubernetes metadata with node annotations. {pull}29605[29605]
 
 *Auditbeat*
 
@@ -46,6 +47,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 - Only add monitor.status to browser events when summary. {pull}29460[29460]
+- Also add summary to journeys for which the synthetics runner crashes. {pull}29606[29606]
 
 *Metricbeat*
 
@@ -124,6 +126,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+- Add provider names to Security pipeline conditional check in routing pipeline. {issue}27288[27288] {pull}29781[29781]
 
 *Functionbeat*
 
@@ -145,6 +148,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add FIPS configuration option for all AWS API calls. {pull}28899[28899]
 - Add `default_region` config to AWS common module. {pull}29415[29415]
 - Add support for latest k8s versions v1.23 and v1.22 {pull}29575[29575]
+- Only connect to Elasticsearch instances with the same version or newer. {pull}29683[29683]
 
 *Auditbeat*
 
