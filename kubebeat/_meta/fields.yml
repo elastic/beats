@@ -1,0 +1,9 @@
+- key: kubebeat
+  title: kubebeat
+  description:
+  fields:
+    - name: counter
+      type: long
+      required: true
+      description: >
+        PLEASE UPDATE DOCUMENTATION

@@ -1,0 +1,9 @@
+/.idea
+/build
+
+.DS_Store
+/kubebeat
+/kubebeat.test
+*.pyc
+*local.yaml
+*local.yml

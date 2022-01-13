@@ -1,0 +1,35 @@
+# Todo delete before merge to elastic/beats
+name: automerge
+on:
+  pull_request:
+    types:
+      - labeled
+      - unlabeled
+      - synchronize
+      - opened
+      - edited
+      - ready_for_review
+      - reopened
+      - unlocked
+  schedule:
+    - cron: '*/5 * * * *'
+  pull_request_review:
+    types:
+      - submitted
+  check_suite:
+    types:
+      - completed
+  status: { }
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: automerge
+        uses: "pascalgn/automerge-action@v0.14.2"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          MERGE_LABELS: _______NOT_USING_THIS_AUTOMERGE_FEATURE_TO_MERGE_______
+          MERGE_COMMIT_MESSAGE: pull-request-title
+          UPDATE_LABELS: autoupdate
+          UPDATE_METHOD: merge
+          UPDATE_RETRIES: 3

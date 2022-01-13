@@ -1,0 +1,54 @@
+# Todo delete before merge to elastic/beats
+create-kind-cluster:
+  kind create cluster --config deploy/k8s/kind/kind-config.yaml
+
+Install-kind:
+  brew install kind
+
+cp-manifests-local:
+  scripts/bash/locals.sh
+
+setup-env: Install-kind cp-manifests-local create-kind-cluster
+
+manifest-local:
+  cp kubebeat-ds-local.yaml
+
+load-kubebeat-image:
+  kind load docker-image kubebeat:latest --name kind-mono
+
+load-agent-image:
+  kind load docker-image docker.elastic.co/beats/elastic-agent:8.1.0-SNAPSHOT --name kind-mono
+
+build-kubebeat:
+  GOOS=linux go build -v && docker build -t kubebeat .
+
+deploy-kubebeat:
+  kubectl delete -f deploy/k8s/kubebeat-ds-local.yaml -n kube-system & kubectl apply -f deploy/k8s/kubebeat-ds-local.yaml -n kube-system
+
+build-deploy-kubebeat: build-kubebeat-debug load-kubebeat-image deploy-kubebeat-debug
+
+build-kubebeat-debug:
+  GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -gcflags "all=-N -l" && docker build -f Dockerfile.debug -t kubebeat .
+
+deploy-kubebeat-debug:
+  kubectl delete -f deploy/k8s/kubebeat-ds-debug-local.yaml -n kube-system & kubectl apply -f deploy/k8s/kubebeat-ds-debug-local.yaml -n kube-system
+
+build-deploy-kubebeat-debug: build-kubebeat-debug load-kubebeat-image deploy-kubebeat-debug
+
+package-agent:
+  cd ../x-pack/elastic-agent & DEV=true SNAPSHOT=true PLATFORMS=linux/amd64 TYPES=docker mage -v package
+
+deploy-agent:
+  kubectl delete -f deploy/k8s/agent-kubebeat-fleet-managed-ds-local.yaml -n kube-system & kubectl apply -f deploy/k8s//agent-kubebeat-fleet-managed-ds-local.yaml -n kube-system
+
+build-deploy-agent: package-agent load-agent-image deploy-agent
+
+build-kibana-docker:
+  node scripts/build --docker-images --skip-docker-ubi --skip-docker-centos -v
+
+elastic-stack-up:
+  elastic-package stack up --version=8.1.0-SNAPSHOT
+
+elastic-stack-down:
+  elastic-package stack down
+
