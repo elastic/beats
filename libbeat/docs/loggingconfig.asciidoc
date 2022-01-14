@@ -231,6 +231,8 @@ The permissions mask to apply when rotating log files. The default value is
 expressed in octal notation. In Go, numbers in octal notation must start with
 '0'.
 
+This option is not supported on Windows.
+
 Examples:
 
 * 0640: give read and write access to the file owner, and read access to members of the group associated with the file.
