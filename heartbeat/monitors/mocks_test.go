@@ -219,7 +219,18 @@ func mockBadPluginConf(t *testing.T, id string, schedule string) *common.Config 
 	return conf
 }
 
-func mockInvalidPluginConfigWithStdFields(t *testing.T, id string, name string, schedule string) *common.Config {
+func mockInvalidPluginConf(t *testing.T) *common.Config {
+	confMap := map[string]interface{}{
+		"hoeutnheou": "oueanthoue",
+	}
+
+	conf, err := common.NewConfigFrom(confMap)
+	require.NoError(t, err)
+
+	return conf
+}
+
+func mockInvalidPluginConfWithStdFields(t *testing.T, id string, name string, schedule string) *common.Config {
 	confMap := map[string]interface{}{
 		"type":     "test",
 		"id":       id,

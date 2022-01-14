@@ -47,7 +47,7 @@ func TestMonitorBasic(t *testing.T) {
 func TestMonitorCfgError(t *testing.T) {
 	testMonitorConfig(
 		t,
-		mockInvalidPluginConfigWithStdFields(t, "invalidTestId", "invalidTestName", "@every 10s"),
+		mockInvalidPluginConfWithStdFields(t, "invalidTestId", "invalidTestName", "@every 10s"),
 		lookslike.Compose(
 			baseMockEventMonitorValidator("invalidTestId", "invalidTestName", "down"),
 			lookslike.MustCompile(common.MapStr{
@@ -104,4 +104,24 @@ func testMonitorConfig(t *testing.T, conf *common.Config, eventValidator validat
 
 	assert.Equal(t, 1, closed.Load())
 	assert.Equal(t, true, pcClient.closed)
+}
+
+func TestCheckInvalidConfig(t *testing.T) {
+	serverMonConf := mockInvalidPluginConf(t)
+	reg, built, closed := mockPluginsReg()
+	pipelineConnector := &MockPipelineConnector{}
+
+	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
+	defer sched.Stop()
+
+	m, err := newMonitor(serverMonConf, reg, pipelineConnector, sched.Add, nil, false)
+	require.Error(t, err)
+	// This could change if we decide the contract for newMonitor should always return a monitor
+	require.Nil(t, m, "For this test to work we need a nil value for the monitor.")
+
+	// These counters are both zero since this fails at config parse time
+	require.Equal(t, 0, built.Load())
+	require.Equal(t, 0, closed.Load())
+
+	require.Error(t, checkMonitorConfig(serverMonConf, reg))
 }
