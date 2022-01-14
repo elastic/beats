@@ -57,19 +57,27 @@ func GetDataInstallDir(osarch OSArch) string {
 	return filepath.Join(DataInstallDir, osarch.OS, osarch.Arch)
 }
 
-func OsquerydFilename() string {
-	if runtime.GOOS == "windows" {
+func OsquerydFilenameForOS(os string) string {
+	if os == "windows" {
 		return osqueryDName + ".exe"
 	}
 	return osqueryDName
+}
+
+func OsquerydFilename() string {
+	return OsquerydFilenameForOS(runtime.GOOS)
 }
 
 func OsquerydDarwinApp() string {
 	return osqueryDarwinApp
 }
 
+func OsquerydPathForOS(os, dir string) string {
+	return filepath.Join(dir, OsquerydFilenameForOS(os))
+}
+
 func OsquerydPath(dir string) string {
-	return filepath.Join(dir, OsquerydFilename())
+	return OsquerydPathForOS(runtime.GOOS, dir)
 }
 
 func OsquerydDarwinDistroPath() string {
@@ -87,7 +95,7 @@ func OsquerydDistroFilename() string {
 func OsquerydDistroPlatformFilename(platform string) string {
 	switch platform {
 	case "windows":
-		return osqueryName + "-" + osqueryVersion + osqueryMSIExt
+		return OsquerydFilenameForOS(platform)
 	case "darwin":
 		return osqueryName + "-" + osqueryVersion + osqueryPkgExt
 	}

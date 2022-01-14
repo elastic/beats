@@ -29,6 +29,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove Journalbeat. Use `journald` input of Filebeat instead. {pull}29131[29131]
 - `include_matches` option of `journald` input no longer accepts a list of string. {pull}29294[29294]
 - Add job.name in pods controlled by Jobs {pull}28954[28954]
+- Change Docker base image from CentOS 7 to Ubuntu 20.04 {pull}29681[29681]
+- Enrich kubernetes metadata with node annotations. {pull}29605[29605]
 
 *Auditbeat*
 
@@ -42,9 +44,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - With the default configuration the cef and panw modules will no longer send the `host`
 - Add `while_pattern` type to multiline reader. {pull}19662[19662]
 - auditd dataset: Use process.args to store program arguments instead of auditd.log.aNNN fields. {pull}29601[29601]
+- Remove deprecated old awscloudwatch input name. {pull}29844[29844]
 
 *Heartbeat*
 - Only add monitor.status to browser events when summary. {pull}29460[29460]
+- Also add summary to journeys for which the synthetics runner crashes. {pull}29606[29606]
 
 *Metricbeat*
 
@@ -57,6 +61,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated config option perfmon.counters from windows/perfmon metricset. {pull}28282[28282]
 - Remove deprecated fields in Redis module. {issue}11835[11835] {pull}28246[28246]
 - system/process metricset: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
+- Remove overriding of index pattern on the Kubernetes overview dashboard. {pull}29676[29676]
 
 *Packetbeat*
 
@@ -83,7 +88,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Fields of type `match_only_text` (i.e. `message`) and `wildcard` were missing from the template's default_field list. {issue}29633[29633] {pull}29634[29634]
 
 *Auditbeat*
 
@@ -93,6 +97,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/socket: Fix bugs leading to wrong process being attributed to flows. {pull}29166[29166] {issue}17165[17165]
 - system/socket: Fix process name and arg truncation for long names, paths and args lists. {issue}24667[24667] {pull}29410[29410]
 - system/socket: Fix startup errors on newer 5.x kernels due to missing _do_fork function. {issue}29607[29607] {pull}29744[29744]
+- libbeat/processors/add_process_metadata: Fix memory leak in process cache. {issue}24890[24890] {pull}29717[29717]
 
 *Filebeat*
 
@@ -100,10 +105,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handling of IPv6 addresses in netflow flow events. {issue}19210[19210] {pull}29383[29383]
 - Fix `sophos` KV splitting and syslog header handling {issue}24237[24237] {pull}29331[29331]
 - Undo deletion of endpoint config from cloudtrail fileset in {pull}29415[29415]. {pull}29450[29450]
+- ibmmq: Fixed `@timestamp` not being populated with correct values. {pull}29773[29773]
 
 *Heartbeat*
 
-- Fix broken monitors with newer versions of image relying on dup3. {pull}28938[pull]
 - Fix race condition in http monitors using `mode:all` that can cause crashes. {pull}29697[pull]
 
 *Metricbeat*
@@ -122,6 +127,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+- Add provider names to Security pipeline conditional check in routing pipeline. {issue}27288[27288] {pull}29781[29781]
 
 *Functionbeat*
 
@@ -143,6 +149,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add FIPS configuration option for all AWS API calls. {pull}28899[28899]
 - Add `default_region` config to AWS common module. {pull}29415[29415]
 - Add support for latest k8s versions v1.23 and v1.22 {pull}29575[29575]
+- Only connect to Elasticsearch instances with the same version or newer. {pull}29683[29683]
 
 *Auditbeat*
 
@@ -168,6 +175,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `add_resource_metadata` configuration to Kubernetes module. {pull}29133[29133]
 - Add `container.id` and `container.runtime` ECS fields in container metricset. {pull}29560[29560]
 - Add `memory.workingset.limit.pct` field in Kubernetes container/pod metricset. {pull}29547[29547]
+- Add k8s metadata in state_cronjob metricset. {pull}29572[29572]
 - Add `elasticsearch.cluster.id` field to Beat and Kibana modules. {pull}29577[29577]
 - Add `elasticsearch.cluster.id` field to Logstash module. {pull}29625[29625]
 

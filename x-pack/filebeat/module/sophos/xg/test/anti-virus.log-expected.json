@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2020-05-18T14:38:33.000-02:00",
         "client.bytes": 550,
         "client.ip": "172.16.34.24",
         "client.port": 57695,
@@ -73,6 +74,7 @@
         "user_agent.original": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36"
     },
     {
+        "@timestamp": "2020-05-18T14:38:34.000-02:00",
         "client.bytes": 541,
         "client.ip": "172.16.34.24",
         "client.port": 57835,
@@ -146,6 +148,7 @@
         "user_agent.original": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36"
     },
     {
+        "@timestamp": "2020-05-18T14:38:35.000-02:00",
         "client.bytes": 0,
         "client.ip": "1.128.3.4",
         "client.port": 56336,
@@ -221,6 +224,7 @@
         "url.domain": "farasamed.com"
     },
     {
+        "@timestamp": "2020-05-18T14:38:36.000-02:00",
         "client.bytes": 0,
         "client.ip": "216.160.83.61",
         "client.port": 54693,
@@ -303,6 +307,7 @@
         "url.domain": "divella.it"
     },
     {
+        "@timestamp": "2018-06-06T10:51:29.000-02:00",
         "client.bytes": 0,
         "client.ip": "10.198.16.121",
         "client.port": 56653,
@@ -376,6 +381,7 @@
         "url.domain": "postman.local"
     },
     {
+        "@timestamp": "2018-06-06T10:58:29.000-02:00",
         "client.bytes": 0,
         "client.ip": "10.198.16.121",
         "client.port": 56632,
@@ -449,6 +455,7 @@
         "url.domain": "postman.local"
     },
     {
+        "@timestamp": "2018-06-21T19:50:23.000-02:00",
         "client.bytes": 0,
         "client.ip": "10.146.13.49",
         "client.port": 39910,
@@ -520,6 +527,7 @@
         ]
     },
     {
+        "@timestamp": "2018-06-21T19:50:48.000-02:00",
         "client.bytes": 0,
         "client.ip": "10.146.13.49",
         "client.port": 39936,

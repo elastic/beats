@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2021-01-17T17:12:33.686Z",
         "auditd.log.hostname": "ubuntu-bionic",
         "auditd.log.id": "1004",
         "auditd.log.op": "adding group to /etc/group",
@@ -37,6 +38,7 @@
         "user.terminal": "pts/2"
     },
     {
+        "@timestamp": "2021-01-17T17:12:33.710Z",
         "auditd.log.hostname": "ubuntu-bionic",
         "auditd.log.id": "1004",
         "auditd.log.op": "adding group to /etc/gshadow",
@@ -74,6 +76,7 @@
         "user.terminal": "pts/2"
     },
     {
+        "@timestamp": "2021-01-17T17:12:33.710Z",
         "auditd.log.hostname": "ubuntu-bionic",
         "auditd.log.id": "1004",
         "auditd.log.record_type": "ADD_GROUP",
@@ -110,6 +113,7 @@
         "user.terminal": "pts/2"
     },
     {
+        "@timestamp": "2021-01-17T17:12:33.730Z",
         "auditd.log.hostname": "ubuntu-bionic",
         "auditd.log.id": "1004",
         "auditd.log.op": "adding user",
@@ -147,6 +151,7 @@
         "user.terminal": "pts/2"
     },
     {
+        "@timestamp": "2021-01-17T17:12:33.814Z",
         "auditd.log.hostname": "localhost",
         "auditd.log.record_type": "USER_ACCT",
         "auditd.log.reset": "0",
@@ -183,6 +188,7 @@
         "user.terminal": "/dev/pts/2"
     },
     {
+        "@timestamp": "2021-01-17T17:12:38.174Z",
         "auditd.log.hostname": "ubuntu-bionic",
         "auditd.log.op": "PAM:chauthtok",
         "auditd.log.record_type": "USER_CHAUTHTOK",
@@ -220,6 +226,7 @@
         "user.terminal": "pts/2"
     },
     {
+        "@timestamp": "2021-01-17T17:12:38.178Z",
         "auditd.log.hostname": "ubuntu-bionic",
         "auditd.log.op": "PAM:authentication",
         "auditd.log.record_type": "USER_AUTH",
@@ -255,6 +262,7 @@
         "user.terminal": "pts/2"
     },
     {
+        "@timestamp": "2021-01-17T17:12:38.178Z",
         "auditd.log.hostname": "ubuntu-bionic",
         "auditd.log.op": "PAM:accounting",
         "auditd.log.record_type": "USER_ACCT",

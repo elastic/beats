@@ -181,6 +181,9 @@ class Test(BaseTest):
                 module=module, fileset=fileset, test_file=test_file),
             "-M", "*.*.input.close_eof=true",
         ]
+        # allow connecting older versions of Elasticsearch
+        if os.getenv("TESTING_FILEBEAT_ALLOW_OLDER"):
+            cmd.extend(["-E", "output.elasticsearch.allow_older_versions=true"])
 
         # Based on the convention that if a name contains -json the json format is needed. Currently used for LS.
         if "-json" in test_file:
@@ -299,7 +302,7 @@ def clean_keys(obj):
         host_keys.append("host.name")
 
     # The create timestamps area always new
-    time_keys = ["event.created", "event.ingested", "@timestamp"]
+    time_keys = ["event.created", "event.ingested"]
     # source path and agent.version can be different for each run
     other_keys = ["log.file.path", "agent.version"]
     # ECS versions change for any ECS release, large or small
