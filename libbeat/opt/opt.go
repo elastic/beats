@@ -54,6 +54,25 @@ func (opt String) Exists() bool {
 	return opt.exists
 }
 
+// StringOrEmpty returns the string, or ""
+func (opt String) StringOrEmpty() string {
+	if opt.exists {
+		return opt.value
+	}
+	return ""
+}
+
+// Fold implements the folder interface for OptUint
+func (in *String) Fold(v structform.ExtVisitor) error {
+	if in.exists {
+		value := in.value
+		v.OnString(value)
+	} else {
+		v.OnNil()
+	}
+	return nil
+}
+
 // Int
 
 // Int is a wrapper for "optional" types, with the bool value indicating
@@ -97,6 +116,17 @@ func (opt Int) ValueOr(i int) int {
 		return opt.value
 	}
 	return i
+}
+
+// Fold implements the folder interface for OptUint
+func (in *Int) Fold(v structform.ExtVisitor) error {
+	if in.exists {
+		value := in.value
+		v.OnInt(value)
+	} else {
+		v.OnNil()
+	}
+	return nil
 }
 
 // Uint

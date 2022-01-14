@@ -15,8 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !integration && (darwin || freebsd || linux || windows)
-// +build !integration
+//go:build darwin || freebsd || linux || windows
 // +build darwin freebsd linux windows
 
 package process
@@ -25,7 +24,6 @@ import (
 	"os"
 	"runtime"
 	"sort"
-	"strings"
 	"testing"
 	"time"
 
@@ -33,27 +31,36 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/gosigar"
+	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
+	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 // numCPU is the number of CPUs of the host
 var numCPU = runtime.NumCPU()
 
-func TestPidFetch(t *testing.T) {
+func TestGetOne(t *testing.T) {
 	logp.DevelopmentSetup()
-	matcherFunc := func(name string) bool {
-		if strings.Contains(name, "node") {
-			return true
-		}
-		return false
-
+	testConfig := Stats{
+		Procs:        []string{".*"},
+		CPUTicks:     true,
+		CacheCmdLine: true,
+		IncludeTop: IncludeTopConfig{
+			Enabled:  true,
+			ByCPU:    4,
+			ByMemory: 4,
+		},
+		EnableCgroups: false,
+		CgroupOpts: cgroup.ReaderOptions{
+			RootfsMountpoint:  "/",
+			IgnoreRootCgroups: true,
+		},
 	}
+	err := testConfig.Init()
+	assert.NoError(t, err, "Init")
 
-	procList, err := FetchPids("/proc", matcherFunc)
-	assert.NoError(t, err, "error in FetchPids")
-	t.Logf("Process list is: %d", len(procList))
-	t.Logf("First Process: %#v", procList[0])
-
+	procData, err := testConfig.GetOne(709832)
+	assert.NoError(t, err, "GetOne")
+	t.Logf("Proc: %s", procData.StringToPrint())
 }
 
 func TestPids(t *testing.T) {
@@ -67,31 +74,27 @@ func TestPids(t *testing.T) {
 }
 
 func TestGetProcess(t *testing.T) {
-	process, err := newProcess(os.Getpid(), "", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err = process.getDetails(nil); err != nil {
-		t.Fatal(err)
-	}
+	process, err := FetchPid("/", os.Getpid(), func(in ProcState) (ProcState, error) {
+		return in, nil
+	})
+	assert.NoError(t, err, "FetchPid")
 
-	assert.True(t, (process.Pid > 0))
-	assert.True(t, (process.Ppid >= 0))
-	assert.True(t, (process.Pgid >= 0))
+	assert.True(t, (process.Pid.ValueOr(0) > 0))
+	assert.True(t, (process.Ppid.ValueOr(0) >= 0))
+	assert.True(t, (process.Pgid.ValueOr(0) >= 0))
 	assert.True(t, (len(process.Name) > 0))
 	assert.True(t, (len(process.Username) > 0))
 	assert.NotEqual(t, "unknown", process.State)
 
 	// Memory Checks
-	assert.True(t, (process.Mem.Size >= 0))
-	assert.True(t, (process.Mem.Resident >= 0))
-	assert.True(t, (process.Mem.Share >= 0))
+	assert.True(t, (process.Memory.Size.ValueOr(0) >= 0))
+	assert.True(t, (process.Memory.Rss.Bytes.ValueOr(0) >= 0))
+	assert.True(t, (process.Memory.Share.ValueOr(0) >= 0))
 
 	// CPU Checks
-	assert.True(t, (process.CPU.StartTime > 0))
-	assert.True(t, (process.CPU.Total >= 0))
-	assert.True(t, (process.CPU.User >= 0))
-	assert.True(t, (process.CPU.Sys >= 0))
+	assert.True(t, (process.CPU.Total.Value.ValueOr(0) >= 0))
+	assert.True(t, (process.CPU.User.Ticks.ValueOr(0) >= 0))
+	assert.True(t, (process.CPU.System.Ticks.ValueOr(0) >= 0))
 
 	assert.True(t, (process.SampleTime.Unix() <= time.Now().Unix()))
 
@@ -146,36 +149,40 @@ func TestMatchProcs(t *testing.T) {
 func TestProcMemPercentage(t *testing.T) {
 	procStats := Stats{}
 
-	p := Process{
-		Pid: 3456,
-		Mem: gosigar.ProcMem{
-			Resident: 1416,
-			Size:     145164088,
+	p := ProcState{
+		Pid: opt.IntWith(3456),
+		Memory: ProcMemInfo{
+			Rss:  MemBytePct{Bytes: opt.UintWith(1416)},
+			Size: opt.UintWith(145164088),
 		},
 	}
 
 	procStats.ProcsMap = make(ProcsMap)
-	procStats.ProcsMap[p.Pid] = &p
+	procStats.ProcsMap[p.Pid.ValueOr(0)] = p
 
 	rssPercent := GetProcMemPercentage(&p, 10000)
 	assert.Equal(t, rssPercent, 0.1416)
 }
 
 func TestProcCpuPercentage(t *testing.T) {
-	p1 := &Process{
-		CPU: gosigar.ProcTime{
-			User:  11345,
-			Sys:   37,
-			Total: 11382,
+	p1 := ProcState{
+		CPU: ProcCPUInfo{
+			User:   CPUTicks{Ticks: opt.UintWith(11345)},
+			System: CPUTicks{Ticks: opt.UintWith(37)},
+			Total: CPUTotal{
+				Ticks: opt.UintWith(11382),
+			},
 		},
 		SampleTime: time.Now(),
 	}
 
-	p2 := &Process{
-		CPU: gosigar.ProcTime{
-			User:  14794,
-			Sys:   47,
-			Total: 14841,
+	p2 := ProcState{
+		CPU: ProcCPUInfo{
+			User:   CPUTicks{Ticks: opt.UintWith(14794)},
+			System: CPUTicks{Ticks: opt.UintWith(47)},
+			Total: CPUTotal{
+				Ticks: opt.UintWith(14841),
+			},
 		},
 		SampleTime: p1.SampleTime.Add(time.Second),
 	}
@@ -206,75 +213,146 @@ func BenchmarkGetProcess(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		pid := pids[i%nPids]
 
-		var cmdline string
-		var env common.MapStr
-		if p := procs[pid]; p != nil {
-			cmdline = p.CmdLine
-			env = p.Env
-		}
-
-		process, err := newProcess(pid, cmdline, env)
+		process, err := FetchPid("/proc", pid, func(in ProcState) (ProcState, error) { return in, nil })
 		if err != nil {
 			continue
 		}
-		err = process.getDetails(nil)
-		assert.NoError(b, err)
 
 		procs[pid] = process
 	}
 }
 
 func TestIncludeTopProcesses(t *testing.T) {
-	processes := []Process{
+	processes := []ProcState{
 		{
-			Pid:         1,
-			cpuTotalPct: 10,
-			Mem:         gosigar.ProcMem{Resident: 3000},
+			Pid: opt.IntWith(1),
+			CPU: ProcCPUInfo{
+				Total: CPUTotal{
+					Pct: opt.FloatWith(10),
+				},
+			},
+			Memory: ProcMemInfo{
+				Rss: MemBytePct{
+					Bytes: opt.UintWith(3000),
+				},
+			},
 		},
 		{
-			Pid:         2,
-			cpuTotalPct: 5,
-			Mem:         gosigar.ProcMem{Resident: 4000},
+			Pid: opt.IntWith(2),
+			CPU: ProcCPUInfo{
+				Total: CPUTotal{
+					Pct: opt.FloatWith(5),
+				},
+			},
+			Memory: ProcMemInfo{
+				Rss: MemBytePct{
+					Bytes: opt.UintWith(4000),
+				},
+			},
 		},
 		{
-			Pid:         3,
-			cpuTotalPct: 7,
-			Mem:         gosigar.ProcMem{Resident: 2000},
+			Pid: opt.IntWith(3),
+			CPU: ProcCPUInfo{
+				Total: CPUTotal{
+					Pct: opt.FloatWith(7),
+				},
+			},
+			Memory: ProcMemInfo{
+				Rss: MemBytePct{
+					Bytes: opt.UintWith(2000),
+				},
+			},
 		},
 		{
-			Pid:         4,
-			cpuTotalPct: 5,
-			Mem:         gosigar.ProcMem{Resident: 8000},
+			Pid: opt.IntWith(4),
+			CPU: ProcCPUInfo{
+				Total: CPUTotal{
+					Pct: opt.FloatWith(5),
+				},
+			},
+			Memory: ProcMemInfo{
+				Rss: MemBytePct{
+					Bytes: opt.UintWith(8000),
+				},
+			},
 		},
 		{
-			Pid:         5,
-			cpuTotalPct: 12,
-			Mem:         gosigar.ProcMem{Resident: 9000},
+			Pid: opt.IntWith(5),
+			CPU: ProcCPUInfo{
+				Total: CPUTotal{
+					Pct: opt.FloatWith(12),
+				},
+			},
+			Memory: ProcMemInfo{
+				Rss: MemBytePct{
+					Bytes: opt.UintWith(9000),
+				},
+			},
 		},
 		{
-			Pid:         6,
-			cpuTotalPct: 5,
-			Mem:         gosigar.ProcMem{Resident: 7000},
+			Pid: opt.IntWith(6),
+			CPU: ProcCPUInfo{
+				Total: CPUTotal{
+					Pct: opt.FloatWith(5),
+				},
+			},
+			Memory: ProcMemInfo{
+				Rss: MemBytePct{
+					Bytes: opt.UintWith(7000),
+				},
+			},
 		},
 		{
-			Pid:         7,
-			cpuTotalPct: 80,
-			Mem:         gosigar.ProcMem{Resident: 11000},
+			Pid: opt.IntWith(7),
+			CPU: ProcCPUInfo{
+				Total: CPUTotal{
+					Pct: opt.FloatWith(80),
+				},
+			},
+			Memory: ProcMemInfo{
+				Rss: MemBytePct{
+					Bytes: opt.UintWith(11000),
+				},
+			},
 		},
 		{
-			Pid:         8,
-			cpuTotalPct: 50,
-			Mem:         gosigar.ProcMem{Resident: 13000},
+			Pid: opt.IntWith(8),
+			CPU: ProcCPUInfo{
+				Total: CPUTotal{
+					Pct: opt.FloatWith(50),
+				},
+			},
+			Memory: ProcMemInfo{
+				Rss: MemBytePct{
+					Bytes: opt.UintWith(13000),
+				},
+			},
 		},
 		{
-			Pid:         9,
-			cpuTotalPct: 15,
-			Mem:         gosigar.ProcMem{Resident: 1000},
+			Pid: opt.IntWith(9),
+			CPU: ProcCPUInfo{
+				Total: CPUTotal{
+					Pct: opt.FloatWith(15),
+				},
+			},
+			Memory: ProcMemInfo{
+				Rss: MemBytePct{
+					Bytes: opt.UintWith(1000),
+				},
+			},
 		},
 		{
-			Pid:         10,
-			cpuTotalPct: 60,
-			Mem:         gosigar.ProcMem{Resident: 500},
+			Pid: opt.IntWith(10),
+			CPU: ProcCPUInfo{
+				Total: CPUTotal{
+					Pct: opt.FloatWith(60),
+				},
+			},
+			Memory: ProcMemInfo{
+				Rss: MemBytePct{
+					Bytes: opt.UintWith(500),
+				},
+			},
 		},
 	}
 
@@ -356,7 +434,7 @@ func TestIncludeTopProcesses(t *testing.T) {
 
 		resPids := []int{}
 		for _, p := range res {
-			resPids = append(resPids, p.Pid)
+			resPids = append(resPids, p.Pid.ValueOr(0))
 		}
 		sort.Ints(test.ExpectedPids)
 		sort.Ints(resPids)

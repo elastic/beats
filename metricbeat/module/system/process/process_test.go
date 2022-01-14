@@ -21,45 +21,30 @@
 package process
 
 import (
-	"runtime"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
 func TestFetch(t *testing.T) {
+	logp.DevelopmentSetup()
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
-
 	assert.Empty(t, errs)
-	if !assert.NotEmpty(t, events) {
-		t.FailNow()
-	}
+	assert.NotEmpty(t, events)
 
-	// We have root cgroups disabled
-	// This will pick a "populated" event to print
-	if runtime.GOOS == "linux" {
-		for _, evt := range events {
-			field := evt.BeatEvent("system", "process").Fields["system"].(common.MapStr)["process"].(common.MapStr)["cgroup"].(common.MapStr)["cpu"]
-			if field == nil {
-				continue
-			}
-			if field.(map[string]interface{})["path"].(string) == "/" {
-				continue
-			}
-			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-				evt.BeatEvent("system", "process").Fields.StringToPrint())
-			return
-		}
-	} else {
-		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-			events[0].BeatEvent("system", "process").Fields.StringToPrint())
-	}
+	time.Sleep(3 * time.Second)
 
+	events, errs = mbtest.ReportingFetchV2Error(f)
+	assert.Empty(t, errs)
+	assert.NotEmpty(t, events)
+
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("system", "process").Fields.StringToPrint())
 }
 
 func TestData(t *testing.T) {
@@ -77,8 +62,11 @@ func TestData(t *testing.T) {
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "system",
-		"metricsets": []string{"process"},
-		//"processes":  []string{".*metricbeat.*"}, // in case we want a prettier looking example for data.json
+		"module":                        "system",
+		"metricsets":                    []string{"process"},
+		"processes":                     []string{".*node.*"}, // in case we want a prettier looking example for data.json
+		"process.cgroups.enabled":       false,
+		"process.include_cpu_ticks":     true,
+		"process.cmdline.cache.enabled": true,
 	}
 }

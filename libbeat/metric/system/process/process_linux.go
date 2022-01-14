@@ -23,6 +23,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/user"
 	"path"
 	"path/filepath"
 	"strconv"
@@ -54,8 +55,27 @@ func GetSelfPid() (int, error) {
 	return strconv.Atoi(pid)
 }
 
+func FetchPid(hostfs string, pid int, postprocess func(state ProcState) (ProcState, error)) (ProcState, error) {
+	status, err := GetInfoForPid(hostfs, pid)
+	if err != nil {
+		return ProcState{}, errors.Wrapf(err, "error fetching PID %d", pid)
+	}
+
+	status, err = FillPidMetrics(hostfs, pid, status)
+	if err != nil {
+		return status, errors.Wrapf(err, "Error fetching data for PID %d", pid)
+
+	}
+	status, err = postprocess(status)
+	if err != nil {
+		return status, errors.Wrapf(err, "Error in postprocess of PID %d", pid)
+	}
+
+	return status, nil
+}
+
 // FetchPids is the linux implementation of FetchPids
-func FetchPids(hostfs string, filter func(name string) bool) ([]ProcState, error) {
+func FetchPids(hostfs string, filter func(name string) bool, preprocess ProcCallback, postprocess ProcCallback) (ProcsMap, error) {
 	dir, err := os.Open(hostfs)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error reading from procfs %s", hostfs)
@@ -69,7 +89,7 @@ func FetchPids(hostfs string, filter func(name string) bool) ([]ProcState, error
 		return nil, errors.Wrap(err, "error reading directory names")
 	}
 
-	list := make([]ProcState, 0)
+	procMap := make(ProcsMap, 0)
 
 	// Iterate over the directory, fetch just enough info so we can filter based on user input.
 	logger := logp.L()
@@ -90,6 +110,11 @@ func FetchPids(hostfs string, filter func(name string) bool) ([]ProcState, error
 			logger.Debugf("Skipping over PID=%d, due to: %d", pid, err)
 			continue
 		}
+		status, err = preprocess(status)
+		if err != nil {
+			logger.Debugf("Skipping over PID=%d, due to preprocessing error: %d", pid, err)
+			continue
+		}
 		// Filter based on user-supplied func
 		if !filter(status.Name) {
 			logger.Debugf("Process name does not matches the provided regex; PID=%d; name=%s", pid, status.Name)
@@ -99,13 +124,17 @@ func FetchPids(hostfs string, filter func(name string) bool) ([]ProcState, error
 		//If we've passed the filter, continue to fill out the rest of the metrics
 		status, err = FillPidMetrics(hostfs, pid, status)
 		if err != nil {
-			logger.Debugf("Skipping over PID=%d, due to: %d", pid, err)
+			logger.Debugf("Skipping over PID=%d, due to: %s", pid, err)
 			continue
 		}
-		list = append(list, status)
+		status, err = postprocess(status)
+		if err != nil {
+			logger.Debugf("Error in postprocess of PID %d: %s", pid, err)
+		}
+		procMap[pid] = status
 	}
 
-	return list, nil
+	return procMap, nil
 }
 
 func FillPidMetrics(hostfs string, pid int, state ProcState) (ProcState, error) {
@@ -123,9 +152,12 @@ func FillPidMetrics(hostfs string, pid int, state ProcState) (ProcState, error) 
 	}
 
 	// CLI args
-	state.Args, err = getArgs(hostfs, pid)
-	if err != nil {
-		return state, errors.Wrapf(err, "error getting CLI args for pid %d", pid)
+	if len(state.Args) == 0 {
+		state.Args, err = getArgs(hostfs, pid)
+		if err != nil {
+			return state, errors.Wrapf(err, "error getting CLI args for pid %d", pid)
+		}
+		state.Cmdline = strings.Join(state.Args, " ")
 	}
 
 	// FD metrics
@@ -134,9 +166,21 @@ func FillPidMetrics(hostfs string, pid int, state ProcState) (ProcState, error) 
 		return state, errors.Wrapf(err, "error getting FD metrics for pid %d", pid)
 	}
 
-	// env vars
-	state.Env, err = getEnvData(hostfs, pid)
+	if state.Env == nil {
+		// env vars
+		state.Env, err = getEnvData(hostfs, pid)
+	}
 
+	state.Exe, state.Cwd, err = getProcStringData(hostfs, pid)
+	if err != nil {
+		return state, errors.Wrapf(err, "error getting metadata for pid %d", pid)
+	}
+
+	//username
+	state.Username, err = getUser(hostfs, pid)
+	if err != nil {
+		return state, errors.Wrapf(err, "error creating username for pid %d", pid)
+	}
 	return state, nil
 }
 
@@ -189,8 +233,23 @@ func GetInfoForPid(hostfs string, pid int) (ProcState, error) {
 	state.State = getProcState(procState[0])
 	state.Ppid = opt.IntWith(ppid)
 	state.Pgid = opt.IntWith(pgid)
+	state.Pid = opt.IntWith(pid)
 
 	return state, nil
+}
+
+func getProcStringData(hostfs string, pid int) (string, string, error) {
+	exe, err := os.Readlink(filepath.Join(hostfs, strconv.Itoa(pid), "exe"))
+	if err != nil {
+		return "", "", errors.Wrapf(err, "error fetching exe from pid %d", pid)
+	}
+
+	cwd, err := os.Readlink(filepath.Join(hostfs, strconv.Itoa(pid), "cwd"))
+	if err != nil {
+		return "", "", errors.Wrapf(err, "error fetching cwd for pid %d", pid)
+	}
+
+	return string(exe), string(cwd), nil
 }
 
 func dirIsPid(name string) bool {
@@ -198,6 +257,27 @@ func dirIsPid(name string) bool {
 		return false
 	}
 	return true
+}
+
+func getUser(hostfs string, pid int) (string, error) {
+	status, err := getProcStatus(hostfs, pid)
+	if err != nil {
+		return "", errors.Wrapf(err, "error fetching user ID for pid %d", pid)
+	}
+	uidValues, ok := status["Uid"]
+	if !ok {
+		return "", fmt.Errorf("Uid not found in proc status")
+	}
+	uidStrings := strings.Fields(uidValues)
+	var userFinal string
+	user, err := user.LookupId(uidStrings[0])
+	if err == nil {
+		userFinal = user.Username
+	} else {
+		userFinal = uidStrings[0]
+	}
+
+	return userFinal, nil
 }
 
 func getEnvData(hostfs string, pid int) (common.MapStr, error) {
@@ -296,7 +376,6 @@ func getCPUTime(hostfs string, pid int) (ProcCPUInfo, error) {
 	startTime *= 1000
 
 	state.StartTime = unixTimeMsToTime(startTime)
-
 	return state, nil
 }
 
@@ -390,4 +469,21 @@ func getLinuxBootTime(hostfs string) (uint64, error) {
 	}
 
 	return 0, errors.Wrapf(err, "no boot time find in file %s", path)
+}
+
+func getProcStatus(hostfs string, pid int) (map[string]string, error) {
+	status := make(map[string]string, 42)
+	path := filepath.Join(hostfs, strconv.Itoa(pid), "status")
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error opening file %s", path)
+	}
+	for _, line := range strings.Split(string(data), "\n") {
+		fields := strings.SplitN(line, ":", 2)
+		if len(fields) == 2 {
+			status[fields[0]] = strings.TrimSpace(fields[1])
+		}
+	}
+
+	return status, err
 }

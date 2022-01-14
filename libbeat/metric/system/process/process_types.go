@@ -1,6 +1,8 @@
 package process
 
 import (
+	"time"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/opt"
@@ -28,15 +30,15 @@ type ProcState struct {
 	Name     string  `struct:"name,omitempty"`
 	State    string  `struct:"state,omitempty"`
 	Username string  `struct:"username,omitempty"`
-	pid      opt.Int `struct:"pid,omitempty"`
+	Pid      opt.Int `struct:"pid,omitempty"`
 	Ppid     opt.Int `struct:"ppid,omitempty"`
 	Pgid     opt.Int `struct:"pgid,omitempty"`
 
 	// Extended Process Data
 	Args    []string      `struct:"args,omitempty"`
-	Cmdline opt.String    `struct:"cmdline,omitempty"`
-	Cwd     opt.String    `struct:"cwd,omitempty"`
-	Exe     opt.String    `struct:"exe,omitempty"`
+	Cmdline string        `struct:"cmdline,omitempty"`
+	Cwd     string        `struct:"cwd,omitempty"`
+	Exe     string        `struct:"exe,omitempty"`
 	Env     common.MapStr `struct:"env,omitempty"`
 
 	// Resource Metrics
@@ -46,11 +48,14 @@ type ProcState struct {
 
 	// cgroups
 	Cgroup cgroup.CGStats `struct:"cgroups,omitempty"`
+
+	// meta
+	SampleTime time.Time `struct:"-,omitempty"`
 }
 
 type ProcCPUInfo struct {
-	StartTime common.Time `struct:"start_time,omitempty"`
-	Total     CPUTotal    `struct:"total,omitempty"`
+	StartTime string   `struct:"start_time,omitempty"`
+	Total     CPUTotal `struct:"total,omitempty"`
 	// Optional Tick values
 	User   CPUTicks `struct:"user,omitempty"`
 	System CPUTicks `struct:"system,omitempty"`
@@ -86,4 +91,11 @@ type ProcFDInfo struct {
 type ProcLimits struct {
 	Soft opt.Uint `struct:"soft,omitempty"`
 	Hard opt.Uint `struct:"hard,omitempty"`
+}
+
+// Implementations
+
+// IsZero returns true if the underlying value nil
+func (t CPUTicks) IsZero() bool {
+	return t.Ticks.IsZero()
 }
