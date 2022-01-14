@@ -95,3 +95,25 @@ func TestCheckInvalidConfig(t *testing.T) {
 
 	require.Error(t, checkMonitorConfig(serverMonConf, reg))
 }
+
+// So long as the standard fields are present the monitor will 'run', but report an error each time,
+// even if the plugin factory fails to create a job.
+func TestInvalidConfigWithStdFields(t *testing.T) {
+	serverMonConf := mockInvalidPluginConf(t)
+	reg, built, closed := mockPluginsReg()
+	pipelineConnector := &MockPipelineConnector{}
+
+	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, false)
+	defer sched.Stop()
+
+	m, err := newMonitor(serverMonConf, reg, pipelineConnector, sched.Add, nil, false)
+	require.NoError(t, err)
+	// This could change if we decide the contract for newMonitor should always return a monitor
+	require.Nil(t, m, "For this test to work we need a nil value for the monitor.")
+
+	// These counters are both zero since this fails at config parse time
+	require.Equal(t, 0, built.Load())
+	require.Equal(t, 0, closed.Load())
+
+	require.Error(t, checkMonitorConfig(serverMonConf, reg))
+}
