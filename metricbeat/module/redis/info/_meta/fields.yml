@@ -569,3 +569,11 @@
           type: float
           description: >
             The average CPU consumed per command execution.
+        - name: "*.rejected_calls"
+          type: long
+          description: >
+            The number of rejected calls (on redis 6.2-rc2).
+        - name: "*.failed_calls"
+          type: long
+          description: >
+            The number of failed calls (on redis 6.2-rc2).

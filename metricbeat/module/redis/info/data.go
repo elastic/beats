@@ -240,9 +240,11 @@ func buildCommandstatsSchema(key string, schema s.Schema) {
 	// Build schema for each command
 	command := strings.Split(key, "_")[1]
 	schema[command] = s.Object{
-		"calls":         c.Int("cmdstat_" + command + "_calls"),
-		"usec":          c.Int("cmdstat_" + command + "_usec"),
-		"usec_per_call": c.Float("cmdstat_" + command + "_usec_per_call"),
+		"calls":          c.Int("cmdstat_" + command + "_calls"),
+		"usec":           c.Int("cmdstat_" + command + "_usec"),
+		"usec_per_call":  c.Float("cmdstat_" + command + "_usec_per_call"),
+		"rejected_calls": c.Int("cmdstat_" + command + "_rejected_calls"),
+		"failed_calls":   c.Int("cmdstat_" + command + "_failed_calls"),
 	}
 }
 

@@ -28,21 +28,21 @@
             },
             "commandstats": {
                 "info": {
-                    "calls": 19,
-                    "usec": 2058,
-                    "usec_per_call": 108.32
+                    "calls": 3,
+                    "usec": 241,
+                    "usec_per_call": 80.33
                 },
                 "slowlog": {
-                    "calls": 19,
-                    "usec": 171,
-                    "usec_per_call": 9
+                    "calls": 3,
+                    "usec": 22,
+                    "usec_per_call": 7.33
                 }
             },
             "cpu": {
                 "used": {
-                    "sys": 198.04,
+                    "sys": 0.85,
                     "sys_children": 0,
-                    "user": 26.7,
+                    "user": 0.14,
                     "user_children": 0
                 }
             },
@@ -54,7 +54,7 @@
                     "rss": {}
                 },
                 "fragmentation": {
-                    "ratio": 2.78
+                    "ratio": 2.74
                 },
                 "max": {
                     "policy": "noeviction",
@@ -63,8 +63,8 @@
                 "used": {
                     "lua": 37888,
                     "peak": 843312,
-                    "rss": 2338816,
-                    "value": 842288
+                    "rss": 2310144,
+                    "value": 843312
                 }
             },
             "persistence": {
@@ -107,7 +107,7 @@
                     "copy_on_write": {},
                     "last_save": {
                         "changes_since": 0,
-                        "time": 1639711601
+                        "time": 1642155583
                     }
                 }
             },
@@ -134,21 +134,21 @@
                 "git_dirty": "0",
                 "git_sha1": "00000000",
                 "hz": 10,
-                "lru_clock": 12363944,
+                "lru_clock": 14765805,
                 "mode": "standalone",
                 "multiplexing_api": "epoll",
-                "run_id": "a2b83e50ce54d2b3d5efe96035c25996e7a1ff07",
+                "run_id": "567ea825bae461f81d687f671c6cfaef5c1e45c7",
                 "tcp_port": 6379,
-                "uptime": 42295
+                "uptime": 174
             },
             "slowlog": {
                 "count": 0
             },
             "stats": {
                 "active_defrag": {},
-                "commands_processed": 38,
+                "commands_processed": 6,
                 "connections": {
-                    "received": 19678,
+                    "received": 164,
                     "rejected": 0
                 },
                 "instantaneous": {
@@ -168,10 +168,10 @@
                 "migrate_cached_sockets": 0,
                 "net": {
                     "input": {
-                        "bytes": 954
+                        "bytes": 170
                     },
                     "output": {
-                        "bytes": 42601
+                        "bytes": 6593
                     }
                 },
                 "pubsub": {
@@ -189,7 +189,7 @@
         }
     },
     "service": {
-        "address": "localhost:65457",
+        "address": "localhost:63118",
         "type": "redis",
         "version": "3.2.12"
     }

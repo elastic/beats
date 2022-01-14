@@ -56649,6 +56649,26 @@ type: float
 
 --
 
+*`redis.info.commandstats.*.rejected_calls`*::
++
+--
+The number of rejected calls (on redis 6.2-rc2).
+
+
+type: long
+
+--
+
+*`redis.info.commandstats.*.failed_calls`*::
++
+--
+The number of failed calls (on redis 6.2-rc2).
+
+
+type: long
+
+--
+
 [float]
 === key
 
