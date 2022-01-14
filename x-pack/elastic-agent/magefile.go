@@ -494,7 +494,7 @@ func (Demo) Enroll() error {
 	return runAgent(env)
 }
 
-// Enroll runs agent which does not enroll before running.
+// NoEnroll runs agent which does not enroll before running.
 func (Demo) NoEnroll() error {
 	env := map[string]string{
 		"FLEET_ENROLL": "0",
