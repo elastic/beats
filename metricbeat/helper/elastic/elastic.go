@@ -44,6 +44,9 @@ const (
 
 	// Beats product
 	Beats
+
+	// Enterprise Search product
+	EnterpriseSearch
 )
 
 func (p Product) xPackMonitoringIndexString() string {
@@ -52,6 +55,7 @@ func (p Product) xPackMonitoringIndexString() string {
 		"kibana",
 		"logstash",
 		"beats",
+		"ent-search",
 	}
 
 	if int(p) < 0 || int(p) > len(indexProductNames) {
@@ -67,6 +71,7 @@ func (p Product) String() string {
 		"kibana",
 		"logstash",
 		"beats",
+		"enterprisesearch",
 	}
 
 	if int(p) < 0 || int(p) > len(productNames) {

@@ -24,7 +24,7 @@ services:
       - 3002:3002
 
   elasticsearch:
-    image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-7.15.0}-1
+    image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-8.0.0-SNAPSHOT}-1
     build:
       args:
         ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-7.15.0}

@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -155,7 +156,7 @@ var (
 	}
 )
 
-func eventMapping(report mb.ReporterV2, input []byte) error {
+func eventMapping(report mb.ReporterV2, input []byte, isXpack bool) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(input, &data)
 	if err != nil {
@@ -183,6 +184,13 @@ func eventMapping(report mb.ReporterV2, input []byte) error {
 		}
 	} else {
 		errs = append(errs, errors.New("queues is not a map"))
+	}
+
+	// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+	// When using Agent, the index name is overwritten anyways.
+	if isXpack {
+		index := elastic.MakeXPackMonitoringIndexName(elastic.EnterpriseSearch)
+		event.Index = index
 	}
 
 	event.MetricSetFields, err = schema.Apply(data)
