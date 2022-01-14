@@ -13,7 +13,7 @@
 # of individual yaml files.
 heartbeat.config.monitors:
   # Directory + glob pattern to search for configuration files
-  path: ${path.config}/monitors.diee/*.yml
+  path: ${path.config}/monitors.d/*.yml
   # If enabled, heartbeat will periodically check the config.monitors path for changes
   reload.enabled: false
   # How often to check for changes
@@ -21,11 +21,6 @@ heartbeat.config.monitors:
 
 # Configure monitors inline
 heartbeat.monitors:
-- type: icmp
-  enabled: true
-  id: ouehroeu
-  hosts: "2600::"
-  schedule: '@every 10s'
 - type: http
   # Set enabled to true (or delete the following line) to enable this example monitor
   enabled: false
@@ -101,11 +96,11 @@ setup.kibana:
 # ================================== Outputs ===================================
 
 # Configure what output to use when sending the data collected by the beat.
-output.console: ~
+
 # ---------------------------- Elasticsearch Output ----------------------------
-#output.elasticsearch:
+output.elasticsearch:
   # Array of hosts to connect to.
-  #hosts: ["localhost:9200"]
+  hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
