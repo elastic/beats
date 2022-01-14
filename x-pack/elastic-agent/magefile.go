@@ -294,12 +294,7 @@ func (Format) License() error {
 	)
 }
 
-// # use docker to merge the binaries
-// docker run --rm -v "$(pwd)/build/golang-crossbuild:/app" -it --entrypoint bash docker.elastic.co/beats-dev/golang-crossbuild:1.17.5-darwin-arm64-debian10
-//
-// # within the docker container
-// lipo -create -output elastic-agent-darwin-universal elastic-agent-darwin-amd64 elastic-agent-darwin-arm64
-func Merge() error {
+func BuildDarwinUniversal() error {
 	return sh.Run("lipo",
 		"-create",
 		"-output", "./build/golang-crossbuild/elastic-agent-darwin-universal",
@@ -329,7 +324,6 @@ func Package() {
 
 	var requiredPackages []string
 	for _, p := range platformPackages {
-		// TODO(AndersonQ): Should it fail or log a warning if p.platform isn't on platformPackages?
 		if _, enabled := devtools.Platforms.Get(p.platform); enabled {
 			requiredPackages = append(requiredPackages, p.packages)
 		}
@@ -611,7 +605,6 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		defer os.RemoveAll(dropPath)
 		defer os.Unsetenv(agentDropPath)
 
-		// packedBeats := []string{"filebeat"}
 		packedBeats := []string{"filebeat", "heartbeat", "metricbeat", "osquerybeat"}
 
 		for _, b := range packedBeats {
@@ -642,15 +635,13 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 			}
 		}
 	}
-	// panic("a wee stop")
 
 	// package agent
 	packagingFn()
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
-	// mg.SerialDeps(devtools.Package, TestPackages)
-	mg.SerialDeps(devtools.Package)
+	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
 func selectedPackageTypes() string {

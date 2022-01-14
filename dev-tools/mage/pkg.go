@@ -18,7 +18,6 @@
 package mage
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -44,40 +43,10 @@ func Package() error {
 			"UseCommunityBeatPackaging, UseElasticBeatPackaging or USeElasticBeatWithoutXPackPackaging first.")
 	}
 
-	// let's see if we have both darwin/amd64 and darwin/arm64
-	var darwinAMD64, darwinARM64 bool
-	for _, p := range Platforms {
-		if p.Name == "darwin/amd64" {
-			darwinAMD64 = true
-		}
-		if p.Name == "darwin/arm64" {
-			darwinARM64 = true
-		}
-	}
-	darwinUniversal := darwinAMD64 && darwinARM64
-	if darwinUniversal {
-		Platforms = append(Platforms, BuildPlatform{
-			Name:  "darwin/universal",
-			Flags: 7,
-		})
-	}
-	log.Println("==========================================================")
-	log.Println("Package: darwinUniversal =", darwinUniversal)
+	platforms := updateWithDarwinUniversal(Platforms)
 
-	for _, p := range Platforms {
-		if darwinUniversal {
-			bs, _ := json.MarshalIndent(p, "", "  ")
-			log.Println(string(bs))
-		}
-	}
-
-	// panic("==========")
-	log.Println("==========================================================")
-
-	// WIP: in order to pack the universal binary, both the arm and amd must be present.
-	// Thus, it can only run if both binaries were build.
 	var tasks []interface{}
-	for _, target := range Platforms {
+	for _, target := range platforms {
 		for _, pkg := range Packages {
 			if pkg.OS != target.GOOS() || pkg.Arch != "" && pkg.Arch != target.Arch() {
 				continue
@@ -148,6 +117,30 @@ func Package() error {
 
 	Parallel(tasks...)
 	return nil
+}
+
+// updateWithDarwinUniversal checks if darwin/amd64 and darwin/arm64, are listed
+// if so, the universal binary was built, then we need to package it as well.
+func updateWithDarwinUniversal(platforms BuildPlatformList) BuildPlatformList {
+	var darwinAMD64, darwinARM64 bool
+	for _, p := range platforms {
+		if p.Name == "darwin/amd64" {
+			darwinAMD64 = true
+		}
+		if p.Name == "darwin/arm64" {
+			darwinARM64 = true
+		}
+	}
+
+	if darwinAMD64 && darwinARM64 {
+		platforms = append(platforms,
+			BuildPlatform{
+				Name:  "darwin/universal",
+				Flags: CGOSupported | CrossBuildSupported | Default,
+			})
+	}
+
+	return platforms
 }
 
 func isPackageTypeSelected(pkgType PackageType) bool {

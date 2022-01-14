@@ -128,9 +128,10 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 			"universal": "universal",
 		},
 		DMG: map[string]string{
-			"386":   "x86",
-			"amd64": "x86_64",
-			"arm64": "arm64",
+			"386":       "x86",
+			"amd64":     "x86_64",
+			"arm64":     "arm64",
+			"universal": "universal",
 		},
 	},
 	"linux": map[PackageType]map[string]string{
@@ -267,9 +268,7 @@ func (typ PackageType) AddFileExtension(file string) string {
 
 // PackagingDir returns the path that should be used for building and packaging.
 // The path returned guarantees that packaging operations can run in isolation.
-func (typ PackageType) PackagingDir(
-	home string, target BuildPlatform, spec PackageSpec) (string, error) {
-
+func (typ PackageType) PackagingDir(home string, target BuildPlatform, spec PackageSpec) (string, error) {
 	root := home
 	if typ == Docker {
 		imageName, err := spec.ImageName()

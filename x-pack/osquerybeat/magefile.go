@@ -40,7 +40,7 @@ func init() {
 	devtools.BeatLicense = "Elastic License"
 }
 
-func Merge() error {
+func BuildDarwinUniversal() error {
 	beatsArgs := map[string]string{
 		devtools.DefaultBuildArgs().Name: "",
 		"osquery-extension":              "ext/osquery-extension/",

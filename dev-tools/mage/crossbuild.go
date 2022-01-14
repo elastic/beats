@@ -183,7 +183,6 @@ func CrossBuild(options ...CrossBuildOption) error {
 		builder := GolangCrossBuilder{buildPlatform.Name, params.Target, params.InDir, params.ImageSelector}
 		if params.Serial {
 			if err := builder.Build(); err != nil {
-				// TODO(AndersonQ): find out what is the correct way to print functions.
 				return errors.Wrapf(err, "failed cross-building target=%v for platform=%v",
 					params.Target,
 					buildPlatform.Name)
@@ -196,8 +195,17 @@ func CrossBuild(options ...CrossBuildOption) error {
 	// Each build runs in parallel.
 	Parallel(deps...)
 
-	// here: build the universal2 binary
-	// let's see if we have both darwin/amd64 and darwin/arm64
+	// It needs to run after all the builds, as it needs the darwin binaries.
+	if err := buildDarwinUniversal(params); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// buildDarwinUniversal checks if darwin/amd64 and darwin/arm64 were build,
+// if so, it generates a darwin/universal binary that is the merge fo them two.
+func buildDarwinUniversal(params crossBuildParams) error {
 	var darwinAMD64, darwinARM64 bool
 	for _, p := range Platforms {
 		if p.Name == "darwin/amd64" {
@@ -207,19 +215,19 @@ func CrossBuild(options ...CrossBuildOption) error {
 			darwinARM64 = true
 		}
 	}
-	darwinUniversal := darwinAMD64 && darwinARM64
-	if darwinUniversal {
-		universal2 = true
+
+	if darwinAMD64 && darwinARM64 {
 		builder := GolangCrossBuilder{
+			// the docker image for darwin/arm64 is the one capable of merging the binaries.
 			Platform:      "darwin/arm64",
-			Target:        "merge",
+			Target:        "buildDarwinUniversal",
 			InDir:         params.InDir,
 			ImageSelector: params.ImageSelector}
 		if err := builder.Build(); err != nil {
 			return errors.Wrapf(err,
-				"failed cross-building target=%v for platform=%v",
-				params.Target,
-				"darwin/universal")
+				"failed merging darwin/amd64 and darwin/arm64 into darwin/universal target=%v for platform=%v",
+				builder.Target,
+				builder.Platform)
 		}
 	}
 
@@ -295,8 +303,6 @@ type GolangCrossBuilder struct {
 	ImageSelector ImageSelectorFunc
 }
 
-var universal2 bool
-
 // Build executes the build inside of Docker.
 func (b GolangCrossBuilder) Build() error {
 	fmt.Printf(">> %v: Building for %v\n", b.Target, b.Platform)
@@ -359,11 +365,6 @@ func (b GolangCrossBuilder) Build() error {
 		"--build-cmd", buildCmd+" "+b.Target,
 		"-p", b.Platform,
 	)
-
-	if universal2 {
-		log.Println(args)
-		// panic("stop")
-	}
 
 	return dockerRun(args...)
 }

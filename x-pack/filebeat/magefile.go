@@ -39,7 +39,7 @@ func init() {
 	devtools.BeatLicense = "Elastic License"
 }
 
-func Merge() error {
+func BuildDarwinUniversal() error {
 	return sh.Run("lipo",
 		"-create",
 		"-output", "./build/golang-crossbuild/filebeat-darwin-universal",
@@ -93,8 +93,6 @@ func Package() {
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
-	// TODO: perhaps we can build the universal here
-	// mg.Deps(Merge)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
