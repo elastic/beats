@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
@@ -94,6 +95,15 @@ func TestPackages() error {
 
 		// To be increased or removed when more light modules are added
 		devtools.MinModules(1),
+	)
+}
+
+func BuildDarwinUniversal() error {
+	return sh.Run("lipo",
+		"-create",
+		"-output", "./build/golang-crossbuild/metricbeat-darwin-universal",
+		"./build/golang-crossbuild/metricbeat-darwin-arm64",
+		"./build/golang-crossbuild/metricbeat-darwin-amd64",
 	)
 }
 
