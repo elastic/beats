@@ -44,9 +44,8 @@ This option is not supported on Windows.
 
 Examples:
 
-    0644: give read and write access to the file owner, and read access to all others.
-    0600: give read and write access to the file owner, and no access to all others.
-    0664: give read and write access to the file owner and members of the group associated with the file, as well as read access to all other users.
+* 0640: give read and write access to the file owner, and read access to members of the group associated with the file.
+* 0600: give read and write access to the file owner, and no access to all others.
 
 [source,yaml]
 -------------------------------------------------------------------------------------

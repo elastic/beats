@@ -199,7 +199,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             registry_home=registry_home,
-            registry_file_permissions=0o644,
+            registry_file_permissions=0o640,
         )
         os.mkdir(self.working_dir + "/log/")
         testfile_path = self.working_dir + "/log/test.log"
@@ -216,7 +216,7 @@ class Test(BaseTest):
             max_timeout=1)
         filebeat.check_kill_and_wait()
 
-        self.assertEqual(self.file_permissions(os.path.join(registry_path, "log.json")), "0o644")
+        self.assertEqual(self.file_permissions(os.path.join(registry_path, "log.json")), "0o640")
 
     def test_registry_file_update_permissions(self):
         """
@@ -255,7 +255,7 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             registry_home="a/b/c/registry_x",
-            registry_file_permissions=0o644
+            registry_file_permissions=0o640
         )
 
         filebeat = self.start_beat()
@@ -273,7 +273,7 @@ class Test(BaseTest):
 
         filebeat.check_kill_and_wait()
 
-        self.assertEqual(self.file_permissions(os.path.join(registry_path, "log.json")), "0o644")
+        self.assertEqual(self.file_permissions(os.path.join(registry_path, "log.json")), "0o640")
 
     @unittest.skipIf(platform.system() == 'Darwin' or os.name == 'nt',
                      'Flaky test: https://github.com/elastic/beats/issues/26378')
