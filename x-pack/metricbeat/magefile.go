@@ -40,8 +40,8 @@ func init() {
 	devtools.BeatLicense = "Elastic License"
 }
 
-func Merge() {
-	sh.RunV("lipo",
+func Merge() error {
+	return sh.Run("lipo",
 		"-create",
 		"-output", "./build/golang-crossbuild/metricbeat-darwin-universal",
 		"./build/golang-crossbuild/metricbeat-darwin-arm64",

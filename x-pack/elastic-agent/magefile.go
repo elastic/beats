@@ -299,8 +299,8 @@ func (Format) License() error {
 //
 // # within the docker container
 // lipo -create -output elastic-agent-darwin-universal elastic-agent-darwin-amd64 elastic-agent-darwin-arm64
-func Merge() {
-	sh.RunV("lipo",
+func Merge() error {
+	return sh.Run("lipo",
 		"-create",
 		"-output", "./build/golang-crossbuild/elastic-agent-darwin-universal",
 		"./build/golang-crossbuild/elastic-agent-darwin-arm64",

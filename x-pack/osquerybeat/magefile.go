@@ -40,13 +40,30 @@ func init() {
 	devtools.BeatLicense = "Elastic License"
 }
 
-func Merge() {
-	sh.RunV("lipo",
-		"-create",
-		"-output", "./build/golang-crossbuild/osquery-extension-darwin-universal",
-		"./build/golang-crossbuild/osquery-extension-darwin-arm64",
-		"./build/golang-crossbuild/osquery-extension-darwin-amd64",
-	)
+func Merge() error {
+	beatsArgs := map[string]string{
+		devtools.DefaultBuildArgs().Name: "",
+		"osquery-extension":              "ext/osquery-extension/",
+	}
+	lipo := sh.RunCmd("lipo", "-create", "-output")
+
+	for name, path := range beatsArgs {
+		lipoTmplArgs := []string{
+			"%sbuild/golang-crossbuild/%s-darwin-universal",
+			"%sbuild/golang-crossbuild/%s-darwin-arm64",
+			"%sbuild/golang-crossbuild/%s-darwin-amd64"}
+
+		var lipoArgs []string
+		for _, arg := range lipoTmplArgs {
+			lipoArgs = append(lipoArgs, fmt.Sprintf(arg, path, name))
+		}
+
+		if err := lipo(lipoArgs...); err != nil {
+			return fmt.Errorf("could not merge %s: %w", name, err)
+		}
+	}
+
+	return nil
 }
 
 func Check() error {
