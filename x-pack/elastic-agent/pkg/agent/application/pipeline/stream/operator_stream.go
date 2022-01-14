@@ -49,7 +49,6 @@ func (b *operatorStream) Specs() map[string]program.Spec {
 }
 
 func (b *operatorStream) Execute(ctx context.Context, cfg configrequest.Request) (err error) {
-	// TODO: double check `route` as name
 	span, ctx := apm.StartSpan(ctx, "route", "app.internal")
 	defer func() {
 		if err != nil {

@@ -175,7 +175,6 @@ func (f *fleetGateway) worker() {
 			}
 
 			var errMsg string
-			// TODO: Is there a purpose in using f.bgContext?
 			if err := f.dispatcher.Dispatch(context.Background(), f.acker, actions...); err != nil {
 				errMsg = fmt.Sprintf("failed to dispatch actions, error: %s", err)
 				f.log.Error(errMsg)

@@ -165,10 +165,8 @@ func (o *Operator) HandleConfig(ctx context.Context, cfg configrequest.Request) 
 	// TODO: double check `route` as name
 	span, ctx := apm.StartSpan(ctx, "route", "app.internal")
 	defer func() {
-		if err != nil {
+		if err = filterContextCancelled(err); err != nil {
 			apm.CaptureError(ctx, err).Send()
-			// TODO: do we want to report `context.Canceled`?
-			err = filterContextCancelled(err)
 		}
 		span.End()
 	}()
