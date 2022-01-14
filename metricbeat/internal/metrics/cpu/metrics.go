@@ -21,6 +21,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
@@ -69,12 +70,12 @@ calculate CPU percentages, as we average usage across a time period.
 // Monitor is used to monitor the overall CPU usage of the system over time.
 type Monitor struct {
 	lastSample CPUMetrics
-	Hostfs     string
+	Hostfs     resolve.Resolver
 }
 
 // New returns a new CPU metrics monitor
 // Hostfs is only relevant on linux and freebsd.
-func New(hostfs string) *Monitor {
+func New(hostfs resolve.Resolver) *Monitor {
 	return &Monitor{Hostfs: hostfs}
 }
 

@@ -29,6 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 func TestData(t *testing.T) {

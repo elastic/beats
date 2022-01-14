@@ -26,19 +26,13 @@ import (
 )
 
 const (
-	inputName    = "aws-cloudwatch"
-	oldInputName = "awscloudwatch"
+	inputName = "aws-cloudwatch"
 )
 
 func init() {
 	err := input.Register(inputName, NewInput)
 	if err != nil {
 		panic(errors.Wrapf(err, "failed to register %v input", inputName))
-	}
-
-	err = input.Register(oldInputName, NewInput)
-	if err != nil {
-		panic(errors.Wrapf(err, "failed to register %v input", oldInputName))
 	}
 }
 
@@ -88,10 +82,6 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 	}
 	logger.Debug("aws-cloudwatch input config = ", config)
 
-	if config.Type == oldInputName {
-		logger.Warnf("%s input name is deprecated, please use %s instead", oldInputName, inputName)
-	}
-
 	if config.LogGroupARN != "" {
 		logGroupName, regionName, err := parseARN(config.LogGroupARN)
 		if err != nil {
@@ -131,7 +121,8 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 // Run runs the input
 func (in *awsCloudWatchInput) Run() {
 	// Please see https://docs.aws.amazon.com/general/latest/gr/cwl_region.html for more info on Amazon CloudWatch Logs endpoints.
-	cwConfig := awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, "logs", in.config.RegionName, in.awsConfig)
+	logsServiceName := awscommon.CreateServiceName("logs", in.config.AwsConfig.FIPSEnabled, in.config.RegionName)
+	cwConfig := awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, logsServiceName, in.config.RegionName, in.awsConfig)
 	svc := cloudwatchlogs.New(cwConfig)
 
 	var logGroupNames []string

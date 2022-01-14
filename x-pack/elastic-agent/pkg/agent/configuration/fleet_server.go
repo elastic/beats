@@ -13,12 +13,13 @@ import (
 
 // FleetServerConfig is the configuration written so Elastic Agent can run Fleet Server.
 type FleetServerConfig struct {
-	Bootstrap bool                     `config:"bootstrap" yaml:"bootstrap,omitempty"`
-	Policy    *FleetServerPolicyConfig `config:"policy" yaml:"policy,omitempty"`
-	Output    FleetServerOutputConfig  `config:"output" yaml:"output,omitempty"`
-	Host      string                   `config:"host" yaml:"host,omitempty"`
-	Port      uint16                   `config:"port" yaml:"port,omitempty"`
-	TLS       *tlscommon.Config        `config:"ssl" yaml:"ssl,omitempty"`
+	Bootstrap    bool                     `config:"bootstrap" yaml:"bootstrap,omitempty"`
+	Policy       *FleetServerPolicyConfig `config:"policy" yaml:"policy,omitempty"`
+	Output       FleetServerOutputConfig  `config:"output" yaml:"output,omitempty"`
+	Host         string                   `config:"host" yaml:"host,omitempty"`
+	Port         uint16                   `config:"port" yaml:"port,omitempty"`
+	InternalPort uint16                   `config:"internal_port" yaml:"internal_port,omitempty"`
+	TLS          *tlscommon.Config        `config:"ssl" yaml:"ssl,omitempty"`
 }
 
 // FleetServerPolicyConfig is the configuration for the policy Fleet Server should run on.
@@ -36,8 +37,6 @@ type Elasticsearch struct {
 	Protocol     string            `config:"protocol" yaml:"protocol"`
 	Hosts        []string          `config:"hosts" yaml:"hosts"`
 	Path         string            `config:"path" yaml:"path,omitempty"`
-	Username     string            `config:"username" yaml:"username,omitempty"`
-	Password     string            `config:"password" yaml:"password,omitempty"`
 	ServiceToken string            `config:"service_token" yaml:"service_token,omitempty"`
 	TLS          *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty"`
 	Headers      map[string]string `config:"headers" yaml:"headers,omitempty"`
@@ -69,18 +68,9 @@ func ElasticsearchFromConnStr(conn string, serviceToken string, insecure bool) (
 			VerificationMode: tlscommon.VerifyNone,
 		}
 	}
-	if serviceToken != "" {
-		cfg.ServiceToken = serviceToken
-		return cfg, nil
+	if serviceToken == "" {
+		return Elasticsearch{}, errors.New("invalid connection string: must include a service token")
 	}
-	if u.User == nil || u.User.Username() == "" {
-		return Elasticsearch{}, errors.New("invalid connection string: must include a username unless a service token is provided")
-	}
-	password, ok := u.User.Password()
-	if !ok {
-		return Elasticsearch{}, errors.New("invalid connection string: must include a password unless a service token is provided")
-	}
-	cfg.Username = u.User.Username()
-	cfg.Password = password
+	cfg.ServiceToken = serviceToken
 	return cfg, nil
 }

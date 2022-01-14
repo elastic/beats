@@ -94,6 +94,11 @@
               format: bytes
               description: >
                 Total working set memory
+            - name: limit.pct
+              type: scaled_float
+              format: percent
+              description: >
+                Working set memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited)
         - name: rss
           type: group
           fields:

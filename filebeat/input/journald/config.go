@@ -24,8 +24,9 @@ import (
 	"errors"
 	"time"
 
-	"github.com/elastic/beats/v7/journalbeat/pkg/journalfield"
-	"github.com/elastic/beats/v7/journalbeat/pkg/journalread"
+	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
+	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalread"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 )
 
 // Config stores the options of a journald input.
@@ -47,10 +48,22 @@ type config struct {
 	CursorSeekFallback journalread.SeekMode `config:"cursor_seek_fallback"`
 
 	// Matches store the key value pairs to match entries.
-	Matches []journalfield.Matcher `config:"include_matches"`
+	Matches journalfield.IncludeMatches `config:"include_matches"`
+
+	// Units stores the units to monitor.
+	Units []string `config:"units"`
+
+	// Transports stores the list of transports to include in the messages.
+	Transports []string `config:"transports"`
+
+	// Identifiers stores the syslog identifiers to watch.
+	Identifiers []string `config:"syslog_identifiers"`
 
 	// SaveRemoteHostname defines if the original source of the entry needs to be saved.
 	SaveRemoteHostname bool `config:"save_remote_hostname"`
+
+	// Parsers configuration
+	Parsers parser.Config `config:",inline"`
 }
 
 var errInvalidSeekFallback = errors.New("invalid setting for cursor_seek_fallback")

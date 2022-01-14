@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 func TestFetch(t *testing.T) {

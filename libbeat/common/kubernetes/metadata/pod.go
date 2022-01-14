@@ -29,12 +29,12 @@ import (
 )
 
 type pod struct {
-	store         cache.Store
-	client        k8s.Interface
-	node          MetaGen
-	namespace     MetaGen
-	resource      *Resource
-	addDeployment bool
+	store               cache.Store
+	client              k8s.Interface
+	node                MetaGen
+	namespace           MetaGen
+	resource            *Resource
+	addResourceMetadata *AddResourceMetadataConfig
 }
 
 // NewPodMetadataGenerator creates a metagen for pod resources
@@ -44,14 +44,15 @@ func NewPodMetadataGenerator(
 	client k8s.Interface,
 	node MetaGen,
 	namespace MetaGen,
-	addDeploymentMeta bool) MetaGen {
+	addResourceMetadata *AddResourceMetadataConfig) MetaGen {
+
 	return &pod{
-		resource:      NewResourceMetadataGenerator(cfg, client),
-		store:         pods,
-		node:          node,
-		namespace:     namespace,
-		client:        client,
-		addDeployment: addDeploymentMeta,
+		resource:            NewResourceMetadataGenerator(cfg, client),
+		store:               pods,
+		node:                node,
+		namespace:           namespace,
+		client:              client,
+		addResourceMetadata: addResourceMetadata,
 	}
 }
 
@@ -87,7 +88,8 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	out := p.resource.GenerateK8s("pod", obj, opts...)
 
 	// check if Pod is handled by a ReplicaSet which is controlled by a Deployment
-	if p.addDeployment {
+	// TODO: same happens with CronJob vs Job. The hierarcy there is CronJob->Job->Pod
+	if p.addResourceMetadata.Deployment {
 		rsName, _ := out.GetValue("replicaset.name")
 		if rsName, ok := rsName.(string); ok {
 			dep := p.getRSDeployment(rsName, po.GetNamespace())
@@ -98,7 +100,7 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	}
 
 	if p.node != nil {
-		meta := p.node.GenerateFromName(po.Spec.NodeName, WithLabels("node"))
+		meta := p.node.GenerateFromName(po.Spec.NodeName, WithMetadata("node"))
 		if meta != nil {
 			out.Put("node", meta["node"])
 		} else {

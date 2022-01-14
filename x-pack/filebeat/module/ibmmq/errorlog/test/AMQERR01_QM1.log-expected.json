@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2018-07-13T07:06:00.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -32,6 +33,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:00.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -64,6 +66,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:00.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -96,6 +99,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:01.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -128,6 +132,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:01.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -160,6 +165,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:01.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -192,6 +198,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:01.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -224,6 +231,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:01.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -256,6 +264,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:01.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -288,6 +297,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:01.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -320,6 +330,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:01.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -352,6 +363,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:01.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -384,6 +396,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:01.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -416,6 +429,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:01.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -448,6 +462,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:01.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -480,6 +495,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:02.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -512,6 +528,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:03.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -544,6 +561,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:03.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -576,6 +594,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:03.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -608,6 +627,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:03.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -640,6 +660,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:03.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -672,6 +693,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:03.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -704,6 +726,7 @@
         "user.name": "felix"
     },
     {
+        "@timestamp": "2018-07-13T07:06:03.000Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",

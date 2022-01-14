@@ -3,8 +3,8 @@
 
 {es} uses {ref}/index-templates.html[index templates] to define:
 
-* Settings that control the behavior of your indices. The settings include the
-lifecycle policy used to manage indices as they grow and age.
+* Settings that control the behavior of your data stream and backing indices.
+The settings include the lifecycle policy used to manage backing indices as they grow and age.
 * Mappings that determine how fields are analyzed. Each mapping sets the
 {ref}/mapping-types.html[{es} datatype] to use for a specific data field.
 
@@ -43,6 +43,8 @@ setup.template.fields: "path/to/fields.yml"
 
 If the template already exists, it’s not overwritten unless you configure
 {beatname_uc} to do so.
+
+You can load templates for both data streams and indices.
 
 [float]
 [[overwrite-template]]
@@ -224,7 +226,7 @@ PS > Invoke-RestMethod -Method Delete "http://localhost:9200/{beatname_lc}-*"
 ----------------------------------------------------------------------
 endif::win_os[]
 
-This command deletes all indices that match the pattern +{beat_default_index_prefix}-*+.
+This command deletes all indices that match the pattern +{beat_default_index_prefix}+.
 Before running this command, make sure you want to delete all indices that match
 the pattern.
 

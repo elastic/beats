@@ -1954,20 +1954,6 @@
   alias: true
   beat: heartbeat
 
-# Journalbeat
-- from: host.name
-  to: host.hostname
-  alias: false
-  beat: journalbeat
-  comment: This field should not be renamed as it would cause issue some Beats and Journalbeat does not have dashboards
-  # This field should not be renamed as it would cause issue some Beats and Journalbeat does not have dashboards
-  rename: false
-
-- from: read_timestamp
-  to: event.created
-  alias: true
-  beat: journalbeat
-
 ## Winlogbeat
 
 # Alias to ECS fields

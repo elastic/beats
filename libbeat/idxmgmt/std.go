@@ -61,13 +61,6 @@ type indexSelector struct {
 	beatInfo beat.Info
 }
 
-type ilmIndexSelector struct {
-	index    outil.Selector
-	alias    outil.Selector
-	st       *indexState
-	beatInfo beat.Info
-}
-
 type componentType uint8
 
 //go:generate stringer -linecomment -type componentType
@@ -112,7 +105,7 @@ func newIndexSupport(
 		return nil, err
 	}
 
-	tmplCfg, err := unpackTemplateConfig(tmplConfig)
+	tmplCfg, err := unpackTemplateConfig(info, tmplConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +116,7 @@ func newIndexSupport(
 		info:         info,
 		templateCfg:  tmplCfg,
 		migration:    migration,
-		defaultIndex: fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", info.IndexPrefix, info.Version),
+		defaultIndex: fmt.Sprintf("%v-%v", info.IndexPrefix, info.Version),
 	}, nil
 }
 
@@ -155,8 +148,6 @@ func (s *indexSupport) Manager(
 
 func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector, error) {
 	var err error
-	log := s.log
-
 	// we construct our own configuration object based on the available settings
 	// in cfg and defaultIndex. The configuration object provided must not be
 	// modified.
@@ -175,12 +166,6 @@ func (s *indexSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector,
 		if err != nil {
 			return nil, err
 		}
-	}
-
-	if s.ilm.Enabled() {
-		alias := s.ilm.Alias().Name
-		log.Infof("Set %v to '%s' as ILM is enabled.", cfg.PathOf("index"), alias)
-		indexName = alias
 	}
 
 	// no index name configuration found yet -> define default index name based on
@@ -213,19 +198,18 @@ func (m *indexManager) VerifySetup(loadTemplate, loadILM LoadMode) (bool, string
 		m.support.templateCfg.Overwrite, loadTemplate)
 
 	if ilmComponent.load && !templateComponent.load {
-		return false, "Loading ILM policy and write alias without loading template " +
-			"is not recommended. Check your configuration."
+		return false, "Loading ILM policy without loading template is not recommended. Check your configuration."
 	}
 
 	if templateComponent.load && !ilmComponent.load && ilmComponent.enabled {
 		return false, "Loading template with ILM settings whithout loading ILM " +
-			"policy and alias can lead to issues and is not recommended. " +
+			"policy can lead to issues and is not recommended. " +
 			"Check your configuration."
 	}
 
 	var warn string
 	if !ilmComponent.load {
-		warn += "ILM policy and write alias loading not enabled.\n"
+		warn += "ILM policy loading not enabled.\n"
 	} else if !ilmComponent.overwrite {
 		warn += "Overwriting ILM policy is disabled. Set `setup.ilm.overwrite: true` for enabling.\n"
 	}
@@ -243,7 +227,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 	if err != nil {
 		return err
 	}
-	if withILM && loadILM.Enabled() {
+	if withILM {
 		log.Info("Auto ILM enable success.")
 	}
 
@@ -269,7 +253,7 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		tmplCfg.Overwrite, tmplCfg.Enabled = templateComponent.overwrite, templateComponent.enabled
 
 		if ilmComponent.enabled {
-			tmplCfg, err = applyILMSettings(log, tmplCfg, m.support.ilm.Policy(), m.support.ilm.Alias())
+			tmplCfg, err = applyILMSettings(log, tmplCfg, m.support.ilm.Policy())
 			if err != nil {
 				return err
 			}
@@ -281,13 +265,6 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		}
 
 		log.Info("Loaded index template.")
-	}
-
-	if ilmComponent.load {
-		err := m.ilm.EnsureAlias()
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -309,20 +286,6 @@ func (m *indexManager) setupWithILM() (bool, error) {
 	return withILM, nil
 }
 
-func (s *ilmIndexSelector) Select(evt *beat.Event) (string, error) {
-	if idx := getEventCustomIndex(evt, s.beatInfo); idx != "" {
-		return idx, nil
-	}
-
-	if s.st.withILM.Load() {
-		idx, err := s.alias.Select(evt)
-		return idx, err
-	}
-
-	idx, err := s.index.Select(evt)
-	return idx, err
-}
-
 func (s indexSelector) Select(evt *beat.Event) (string, error) {
 	if idx := getEventCustomIndex(evt, s.beatInfo); idx != "" {
 		return idx, nil
@@ -335,14 +298,8 @@ func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 		return ""
 	}
 
-	if alias, err := events.GetMetaStringValue(*evt, events.FieldMetaAlias); err == nil {
-		return strings.ToLower(alias)
-	}
-
 	if idx, err := events.GetMetaStringValue(*evt, events.FieldMetaIndex); err == nil {
-		ts := evt.Timestamp.UTC()
-		return fmt.Sprintf("%s-%d.%02d.%02d",
-			strings.ToLower(idx), ts.Year(), ts.Month(), ts.Day())
+		return strings.ToLower(idx)
 	}
 
 	// This is functionally identical to Meta["alias"], returning the overriding
@@ -356,8 +313,9 @@ func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 	return ""
 }
 
-func unpackTemplateConfig(cfg *common.Config) (config template.TemplateConfig, err error) {
-	config = template.DefaultConfig()
+func unpackTemplateConfig(info beat.Info, cfg *common.Config) (config template.TemplateConfig, err error) {
+	config = template.DefaultConfig(info)
+
 	if cfg != nil {
 		err = cfg.Unpack(&config)
 	}
@@ -368,31 +326,14 @@ func applyILMSettings(
 	log *logp.Logger,
 	tmpl template.TemplateConfig,
 	policy ilm.Policy,
-	alias ilm.Alias,
 ) (template.TemplateConfig, error) {
 	if !tmpl.Enabled {
 		return tmpl, nil
 	}
 
-	if alias.Name == "" {
-		return tmpl, errors.New("no ilm rollover alias configured")
-	}
-
 	if policy.Name == "" {
 		return tmpl, errors.New("no ilm policy name configured")
 	}
-
-	tmpl.Name = alias.Name
-	if log != nil {
-		log.Infof("Set setup.template.name to '%s' as ILM is enabled.", alias)
-	}
-
-	tmpl.Pattern = fmt.Sprintf("%s-*", alias.Name)
-	if log != nil {
-		log.Infof("Set setup.template.pattern to '%s' as ILM is enabled.", tmpl.Pattern)
-	}
-
-	// rollover_alias and lifecycle.name can't be configured and will be overwritten
 
 	// init/copy index settings
 	idxSettings := tmpl.Settings.Index
@@ -421,11 +362,6 @@ func applyILMSettings(
 	}
 	idxSettings["lifecycle"] = lifecycle
 
-	// add rollover_alias and name to index.lifecycle settings
-	if _, exists := lifecycle["rollover_alias"]; !exists {
-		log.Infof("Set settings.index.lifecycle.rollover_alias in template to %s as ILM is enabled.", alias)
-		lifecycle["rollover_alias"] = alias.Name
-	}
 	if _, exists := lifecycle["name"]; !exists {
 		log.Infof("Set settings.index.lifecycle.name in template to %s as ILM is enabled.", policy)
 		lifecycle["name"] = policy.Name

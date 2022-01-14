@@ -30,14 +30,12 @@ type amqpConfig struct {
 	HideConnectionInformation bool `config:"hide_connection_information"`
 }
 
-var (
-	defaultConfig = amqpConfig{
-		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionExpiration,
-		},
-		ParseHeaders:              true,
-		ParseArguments:            true,
-		MaxBodyLength:             1000,
-		HideConnectionInformation: true,
-	}
-)
+var defaultConfig = amqpConfig{
+	ProtocolCommon: config.ProtocolCommon{
+		TransactionTimeout: protos.DefaultTransactionExpiration,
+	},
+	ParseHeaders:              true,
+	ParseArguments:            true,
+	MaxBodyLength:             1000,
+	HideConnectionInformation: true,
+}

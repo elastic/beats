@@ -72,11 +72,16 @@ func WithFields(key string, value interface{}) FieldOptions {
 	}
 }
 
-// WithLabels FieldOption allows adding labels under sub-resource(kind)
+// WithMetadata FieldOption allows adding labels and annotations under sub-resource(kind)
 // example if kind=namespace namespace.labels key will be added
-func WithLabels(kind string) FieldOptions {
+func WithMetadata(kind string) FieldOptions {
 	return func(meta common.MapStr) {
-		safemapstr.Put(meta, strings.ToLower(kind)+".labels", meta["labels"])
+		if meta["labels"] != nil {
+			safemapstr.Put(meta, strings.ToLower(kind)+".labels", meta["labels"])
+		}
+		if meta["annotations"] != nil {
+			safemapstr.Put(meta, strings.ToLower(kind)+".annotations", meta["annotations"])
+		}
 	}
 }
 
@@ -96,8 +101,7 @@ func GetPodMetaGen(
 	if namespaceWatcher != nil && metaConf.Namespace.Enabled() {
 		namespaceMetaGen = NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), namespaceWatcher.Client())
 	}
-	metaGen := NewPodMetadataGenerator(cfg, podWatcher.Store(), podWatcher.Client(), nodeMetaGen, namespaceMetaGen, metaConf.Deployment)
-
+	metaGen := NewPodMetadataGenerator(cfg, podWatcher.Store(), podWatcher.Client(), nodeMetaGen, namespaceMetaGen, metaConf)
 	return metaGen
 }
 
