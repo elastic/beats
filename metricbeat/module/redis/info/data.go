@@ -255,7 +255,7 @@ func eventMapping(r mb.ReporterV2, info map[string]string) {
 	commandstatsSchema := s.Schema{}
 	for key, val := range info {
 		source[key] = val
-		if strings.Contains(key, "_calls") {
+		if strings.HasPrefix(key, "cmdstat_") {
 			buildCommandstatsSchema(key, commandstatsSchema)
 		}
 	}
