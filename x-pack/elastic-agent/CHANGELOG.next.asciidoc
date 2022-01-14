@@ -158,3 +158,5 @@
 - Add --fleet-server-es-ca-trusted-fingerprint flag to allow agent/fleet-server to work with elasticsearch clusters using self signed certs. {pull}29128[29128]
 - Discover changes in Kubernetes nodes metadata as soon as they happen. {pull}23139[23139]
 - Add results of inspect output command into archive produced by diagnostics collect. {pull}29902[29902]
+- Agent can be built for `darwin/arm64`. When it's built for both `darwin/arm64`
+and `darwin/adm64` a universal binary is also built and packaged. {pull}29585[29585]
