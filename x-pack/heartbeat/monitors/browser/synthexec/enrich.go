@@ -112,6 +112,14 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	}
 
 	switch se.Type {
+	case "cmd/status":
+		// If a command failed _after_ the journey was complete, as it happens
+		// when an `afterAll` hook fails, for example, we don't wan't to include
+		// a summary in the cmd/status event.
+		if !je.journeyComplete {
+			je.end = event.Timestamp
+			return je.createSummary(event)
+		}
 	case "journey/end":
 		je.journeyComplete = true
 		return je.createSummary(event)
@@ -155,23 +163,24 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		down = 0
 	}
 
+	eventext.MergeEventFields(event, common.MapStr{
+		"url": je.urlFields,
+		"synthetics": common.MapStr{
+			"type":    "heartbeat/summary",
+			"journey": je.journey,
+		},
+		"monitor": common.MapStr{
+			"duration": common.MapStr{
+				"us": int64(je.end.Sub(je.start) / time.Microsecond),
+			},
+		},
+		"summary": common.MapStr{
+			"up":   up,
+			"down": down,
+		},
+	})
+
 	if je.journeyComplete {
-		eventext.MergeEventFields(event, common.MapStr{
-			"url": je.urlFields,
-			"synthetics": common.MapStr{
-				"type":    "heartbeat/summary",
-				"journey": je.journey,
-			},
-			"monitor": common.MapStr{
-				"duration": common.MapStr{
-					"us": int64(je.end.Sub(je.start) / time.Microsecond),
-				},
-			},
-			"summary": common.MapStr{
-				"up":   up,
-				"down": down,
-			},
-		})
 		return je.firstError
 	}
 
