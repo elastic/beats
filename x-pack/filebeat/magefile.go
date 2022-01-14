@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	filebeat "github.com/elastic/beats/v7/filebeat/scripts/mage"
@@ -36,6 +37,15 @@ func init() {
 
 	devtools.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
 	devtools.BeatLicense = "Elastic License"
+}
+
+func Merge() {
+	sh.RunV("lipo",
+		"-create",
+		"-output", "./build/golang-crossbuild/filebeat-darwin-universal",
+		"./build/golang-crossbuild/filebeat-darwin-arm64",
+		"./build/golang-crossbuild/filebeat-darwin-amd64",
+	)
 }
 
 // Build builds the Beat binary.
@@ -83,6 +93,8 @@ func Package() {
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	// TODO: perhaps we can build the universal here
+	// mg.Deps(Merge)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 

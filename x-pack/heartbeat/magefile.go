@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	heartbeat "github.com/elastic/beats/v7/heartbeat/scripts/mage"
@@ -34,6 +35,15 @@ func init() {
 	common.RegisterCheckDeps(Update)
 
 	devtools.BeatLicense = "Elastic License"
+}
+
+func Merge() {
+	sh.RunV("lipo",
+		"-create",
+		"-output", "./build/golang-crossbuild/heartbeat-darwin-universal",
+		"./build/golang-crossbuild/heartbeat-darwin-arm64",
+		"./build/golang-crossbuild/heartbeat-darwin-amd64",
+	)
 }
 
 // Package packages the Beat for distribution.

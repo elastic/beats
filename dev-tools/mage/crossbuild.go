@@ -184,8 +184,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 		if params.Serial {
 			if err := builder.Build(); err != nil {
 				// TODO(AndersonQ): find out what is the correct way to print functions.
-				return errors.Wrapf(err, "failed cross-building target=%v for platform=%v %v",
-					params.ImageSelector,
+				return errors.Wrapf(err, "failed cross-building target=%v for platform=%v",
 					params.Target,
 					buildPlatform.Name)
 			}
@@ -196,6 +195,34 @@ func CrossBuild(options ...CrossBuildOption) error {
 
 	// Each build runs in parallel.
 	Parallel(deps...)
+
+	// here: build the universal2 binary
+	// let's see if we have both darwin/amd64 and darwin/arm64
+	var darwinAMD64, darwinARM64 bool
+	for _, p := range Platforms {
+		if p.Name == "darwin/amd64" {
+			darwinAMD64 = true
+		}
+		if p.Name == "darwin/arm64" {
+			darwinARM64 = true
+		}
+	}
+	darwinUniversal := darwinAMD64 && darwinARM64
+	if darwinUniversal {
+		universal2 = true
+		builder := GolangCrossBuilder{
+			Platform:      "darwin/arm64",
+			Target:        "merge",
+			InDir:         params.InDir,
+			ImageSelector: params.ImageSelector}
+		if err := builder.Build(); err != nil {
+			return errors.Wrapf(err,
+				"failed cross-building target=%v for platform=%v",
+				params.Target,
+				"darwin/universal")
+		}
+	}
+
 	return nil
 }
 
@@ -224,6 +251,8 @@ func CrossBuildImage(platform string) (string, error) {
 	case platform == "darwin/amd64":
 		tagSuffix = "darwin-debian10"
 	case platform == "darwin/arm64":
+		tagSuffix = "darwin-arm64-debian10"
+	case platform == "darwin/universal":
 		tagSuffix = "darwin-arm64-debian10"
 	case platform == "linux/arm64":
 		tagSuffix = "arm"
@@ -266,6 +295,8 @@ type GolangCrossBuilder struct {
 	ImageSelector ImageSelectorFunc
 }
 
+var universal2 bool
+
 // Build executes the build inside of Docker.
 func (b GolangCrossBuilder) Build() error {
 	fmt.Printf(">> %v: Building for %v\n", b.Target, b.Platform)
@@ -284,7 +315,8 @@ func (b GolangCrossBuilder) Build() error {
 	workDir := filepath.ToSlash(filepath.Join(mountPoint, cwd))
 
 	builderArch := runtime.GOARCH
-	buildCmd, err := filepath.Rel(workDir, filepath.Join(mountPoint, repoInfo.SubDir, "build/mage-linux-"+builderArch))
+	buildCmd, err := filepath.Rel(workDir,
+		filepath.Join(mountPoint, repoInfo.SubDir, "build/mage-linux-"+builderArch))
 	if err != nil {
 		return errors.Wrap(err, "failed to determine mage-linux-"+builderArch+" relative path")
 	}
@@ -327,6 +359,11 @@ func (b GolangCrossBuilder) Build() error {
 		"--build-cmd", buildCmd+" "+b.Target,
 		"-p", b.Platform,
 	)
+
+	if universal2 {
+		log.Println(args)
+		// panic("stop")
+	}
 
 	return dockerRun(args...)
 }
