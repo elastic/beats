@@ -1,3 +1,0 @@
-[submodule "kubebeat/bundle/csp-security-policies"]
-	path = kubebeat/bundle/csp-security-policies
-	url = https://github.com/elastic/csp-security-policies.git
