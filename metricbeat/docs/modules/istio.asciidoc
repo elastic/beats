@@ -18,7 +18,7 @@ Istio https://istio.io/v1.4/docs/tasks/observability/metrics/querying-metrics/#a
 
 When using Istio `1.5+`, the `istiod` and `proxy` metricsets should be used. The `istiod` collects metrics directly from Istio Daemon Prometheus Exporter while `proxy` collects from the Prometheus Exporter of each of the proxy sidecars.
 
-The default metricsets are `mesh`, `mixer`, `pilot`, `galley`, `citadel`. If using Istio `1.6+`, you should specify the metricsets `istiod` and `proxy`.
+The default metricsets are `mesh`, `mixer`, `pilot`, `galley`, `citadel`. If using Istio `1.5+`, you should specify the metricsets `istiod` and `proxy`.
 
 [float]
 === Compatibility
