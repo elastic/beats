@@ -11,11 +11,19 @@ class Test(XPackTest):
 
     # -------------------------------------------------------------------------
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
-    def test_health(self):
-        """Tests the Health API and the associated metricset"""
+    def test_health_xpack_disabled(self, xpackEnabled):
+        """Tests the Health API and the associated metricset with XPack disabled"""
+        test_health(xpackEnabled=False)
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
+    def test_health_xpack_enabled(self, xpackEnabled):
+        """Tests the Health API and the associated metricset with XPack enabled"""
+        test_health(xpackEnabled=True)
+
+    def test_health(self, xpackEnabled):
 
         # Setup the environment
-        self.setup_environment(metricset="health")
+        self.setup_environment(metricset="health", xpackEnabled=xpackEnabled)
 
         # Get a single event for testing
         evt = self.get_event()
@@ -25,14 +33,23 @@ class Test(XPackTest):
 
         health = evt["enterprisesearch"]["health"]
         self.assertIn("jvm", health)
+        self.assertEqual(evt["index"].startsWith(".monitoring-"), xpackEnabled)
 
     # -------------------------------------------------------------------------
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
-    def test_stats(self):
-        """Tests the Stats API and the associated metricset"""
+    def test_stats_xpack_disabled(self):
+        """Tests the Stats API and the associated metricset with XPack disabled"""
+        test_stats(xpackEnabled=False)
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
+    def test_stats_xpack_enabled(self):
+        """Tests the Stats API and the associated metricset with XPack enabled"""
+        test_stats(xpackEnabled=True)
+
+    def test_stats(self, xpackEnabled):
 
         # Setup the environment
-        self.setup_environment(metricset="stats")
+        self.setup_environment(metricset="stats", xpackEnabled=xpackEnabled)
 
         # Get a single event for testing
         evt = self.get_event()
@@ -42,9 +59,10 @@ class Test(XPackTest):
 
         stats = evt["enterprisesearch"]["stats"]
         self.assertIn("http", stats)
+        self.assertEqual(evt["index"].startsWith(".monitoring-"), xpackEnabled)
 
     # -------------------------------------------------------------------------
-    def setup_environment(self, metricset):
+    def setup_environment(self, metricset, xpackEnabled):
         """Sets up the testing environment and starts all components needed"""
 
         self.render_config_template(modules=[{
@@ -53,7 +71,8 @@ class Test(XPackTest):
             "hosts": [self.compose_host(service="enterprise_search")],
             "username": self.get_username(),
             "password": self.get_password(),
-            "period": "5s"
+            "period": "5s",
+            "xpack.enabled": xpackEnabled
         }])
 
         proc = self.start_beat(home=self.beat_path)
