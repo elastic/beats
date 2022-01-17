@@ -91,6 +91,7 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 		return err
 	}
 
+	// TODO: remove before review
 	cfg.Settings.LoggingConfig.Level = logp.DebugLevel
 	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig, true)
 	if err != nil {
