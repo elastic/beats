@@ -508,7 +508,7 @@ func runAgent(env map[string]string) error {
 		return err
 	}
 
-	// docker does not exist for this commit, build it
+	// docker does not exists for this commit, build it
 	if !strings.Contains(dockerImageOut, tag) {
 		// produce docker package
 		packageAgent([]string{
