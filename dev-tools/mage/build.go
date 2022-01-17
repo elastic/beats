@@ -51,6 +51,7 @@ func DefaultBuildArgs() BuildArgs {
 		Name:    BeatName,
 		CGO:     build.Default.CgoEnabled,
 		LDFlags: []string{
+			// TODO: comment in before final review/merge
 			// "-s", // Strip all debug symbols from binary (does not affect Go stack traces).
 		},
 		Vars: map[string]string{
@@ -66,6 +67,7 @@ func DefaultBuildArgs() BuildArgs {
 	if positionIndependendCodeSupported() {
 		args.ExtraFlags = append(args.ExtraFlags, "-buildmode", "pie")
 	}
+	// TODO: remove before final review/merge
 	args.ExtraFlags = append(args.ExtraFlags, `-gcflags`, `"all=-N -l"`)
 	return args
 }
