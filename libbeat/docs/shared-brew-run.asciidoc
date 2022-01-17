@@ -8,6 +8,8 @@ run:
 brew services start elastic/tap/{beatname_lc}-full
 -----
 
+The launchd service is configured with `Umask=0027` which means the most permissive mask allowed for files created by {beatname_uc} is `0640`. All configured file permissions higher than `0640` will be ignored. Please edit the service file manually in case you need to change that.
+
 ifndef::requires-sudo[]
 To run {beatname_uc} in the foreground instead of running it as a background
 service, run:
