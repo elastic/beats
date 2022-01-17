@@ -310,12 +310,17 @@ func (client *Client) createEventBulkMeta(version common.Version, event *beat.Ev
 	id, _ := events.GetMetaStringValue(*event, events.FieldMetaID)
 	opType := events.GetOpType(*event)
 
+	alias := client.index.IsAlias()
+	if version.Major < 7 {
+		alias = false
+	}
+
 	meta := eslegclient.BulkMeta{
 		Index:        index,
 		DocType:      eventType,
 		Pipeline:     pipeline,
 		ID:           id,
-		RequireAlias: client.index.IsAlias(),
+		RequireAlias: alias,
 	}
 
 	if opType == events.OpTypeDelete {
