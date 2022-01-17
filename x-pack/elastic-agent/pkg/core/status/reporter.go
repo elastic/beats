@@ -279,7 +279,7 @@ func (r *reporter) Update(s state.Status, message string, payload map[string]int
 	}
 }
 
-// Unregister unregisters status from reporter. Reporter will no longer be taken into consideration
+// Unregister unregister status from reporter. Reporter will no longer be taken into consideration
 // for overall status computation.
 func (r *reporter) Unregister() {
 	r.mx.Lock()

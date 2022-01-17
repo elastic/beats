@@ -60,7 +60,7 @@ func Logging(beatName string, cfg *common.Config) error {
 	return logp.Configure(config)
 }
 
-// LoggingWithOutputs builds a logp.Config based on the given common.Config and the specified
+// Logging builds a logp.Config based on the given common.Config and the specified
 // CLI flags along with the given outputs.
 func LoggingWithOutputs(beatName string, cfg *common.Config, outputs ...zapcore.Core) error {
 	config := logp.DefaultConfig(environment)

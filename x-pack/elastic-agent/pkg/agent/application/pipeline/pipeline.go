@@ -29,7 +29,7 @@ var DefaultRK = "default"
 // RoutingKey is used for routing as pipeline id.
 type RoutingKey = string
 
-// Router is an interface routing programs to the corresponding stream.
+// Router is an interace routes programs to correspongind stream
 type Router interface {
 	Routes() *sorted.Set
 	Route(id string, grpProg map[RoutingKey][]program.Program) error

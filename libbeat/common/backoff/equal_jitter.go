@@ -47,11 +47,11 @@ func NewEqualJitterBackoff(done <-chan struct{}, init, max time.Duration) Backof
 
 // Reset resets the duration of the backoff.
 func (b *EqualJitterBackoff) Reset() {
-	// Allow sleeping at least the init period on the first wait.
+	// Allow to sleep at least the init period on the first wait.
 	b.duration = b.init * 2
 }
 
-// Wait blocks until either the timer is completed or channel is done.
+// Wait block until either the timer is completed or channel is done.
 func (b *EqualJitterBackoff) Wait() bool {
 	// Make sure we have always some minimal back off and jitter.
 	temp := int64(b.duration / 2)
