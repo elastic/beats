@@ -8,8 +8,6 @@ For versions after `1.5`, `istiod` and `proxy` metricsets can be used.
 
 `istiod` collects metrics directly from Istio Daemon while `proxy` collects from each of the proxy sidecars.
 
-The default metricsets are `mesh`, `mixer`, `pilot`, `galley`, `citadel`.
-
 [float]
 === Compatibility
 
