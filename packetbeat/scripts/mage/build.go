@@ -24,10 +24,10 @@ import (
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
 
-// npcapVersion specifies the version of the OEM Npcap installer to bundle with
+// NpcapVersion specifies the version of the OEM Npcap installer to bundle with
 // the packetbeat executable. It is used to specify which npcap builder crossbuild
 // image to use.
-const npcapVersion = "1.60"
+const NpcapVersion = "1.60"
 
 // CrossBuild cross-builds the beat for all target platforms.
 //
@@ -50,7 +50,7 @@ func CrossBuild() error {
 				return image, nil
 			}
 			if platform == "windows/amd64" || platform == "windows/386" {
-				image = strings.ReplaceAll(image, "main", "npcap-"+npcapVersion)
+				image = strings.ReplaceAll(image, "main", "npcap-"+NpcapVersion)
 			}
 			return image, nil
 		}),

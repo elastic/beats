@@ -9,10 +9,12 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"time"
 
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	packetbeat "github.com/elastic/beats/v7/packetbeat/scripts/mage"
@@ -57,6 +59,14 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
+	if devtools.Platform.GOOS == "windows" && (devtools.Platform.GOARCH == "amd64" || devtools.Platform.GOARCH == "386") {
+		const installer = "npcap-" + packetbeat.NpcapVersion + "-oem.exe"
+		log.Println("golangCrossBuild: copying OEM Npcap installer for Windows build:", installer)
+		err := sh.Copy("./npcap/installer/"+installer, "/installer/"+installer)
+		if err != nil {
+			return fmt.Errorf("failed to copy Npcap installer into source tree: %w", err)
+		}
+	}
 	return packetbeat.GolangCrossBuild()
 }
 

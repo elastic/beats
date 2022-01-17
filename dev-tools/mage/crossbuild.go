@@ -321,8 +321,11 @@ func (b GolangCrossBuilder) Build() error {
 		"-v", repoInfo.RootDir+":"+mountPoint,
 		"-w", workDir,
 		image,
+
+		// Arguments for docker crossbuild entrypoint. For details see
+		// https://github.com/elastic/golang-crossbuild/blob/main/go1.17/base/rootfs/entrypoint.go.
 		"--build-cmd", buildCmd+" "+b.Target,
-		"-p", b.Platform,
+		"--platforms", b.Platform,
 	)
 
 	return dockerRun(args...)
