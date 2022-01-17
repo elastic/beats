@@ -174,6 +174,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Preliminary AIX support {pull}27954[27954]
 - Add option to skip older k8s events {pull}29396[29396]
 - Add `add_resource_metadata` configuration to Kubernetes module. {pull}29133[29133]
+- Add `containerd` module with `cpu`, `memory`, `blkio` metricsets. {pull}29247[29247]
 - Add `container.id` and `container.runtime` ECS fields in container metricset. {pull}29560[29560]
 - Add `memory.workingset.limit.pct` field in Kubernetes container/pod metricset. {pull}29547[29547]
 - Add k8s metadata in state_cronjob metricset. {pull}29572[29572]
