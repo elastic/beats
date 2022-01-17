@@ -13,12 +13,12 @@ class Test(XPackTest):
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
     def test_health_xpack_disabled(self, xpackEnabled):
         """Tests the Health API and the associated metricset with XPack disabled"""
-        test_health(xpackEnabled=False)
+        self.test_health(xpackEnabled=False)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
     def test_health_xpack_enabled(self, xpackEnabled):
         """Tests the Health API and the associated metricset with XPack enabled"""
-        test_health(xpackEnabled=True)
+        self.test_health(xpackEnabled=True)
 
     def test_health(self, xpackEnabled):
 
@@ -39,12 +39,12 @@ class Test(XPackTest):
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
     def test_stats_xpack_disabled(self):
         """Tests the Stats API and the associated metricset with XPack disabled"""
-        test_stats(xpackEnabled=False)
+        self.test_stats(xpackEnabled=False)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
     def test_stats_xpack_enabled(self):
         """Tests the Stats API and the associated metricset with XPack enabled"""
-        test_stats(xpackEnabled=True)
+        self.test_stats(xpackEnabled=True)
 
     def test_stats(self, xpackEnabled):
 
