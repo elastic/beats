@@ -1,4 +1,5 @@
 - module: enterprisesearch
+  xpack.enabled: true
   metricsets: ["health", "stats"]
   enabled: true
   period: 10s
