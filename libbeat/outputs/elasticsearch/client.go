@@ -310,17 +310,15 @@ func (client *Client) createEventBulkMeta(version common.Version, event *beat.Ev
 	id, _ := events.GetMetaStringValue(*event, events.FieldMetaID)
 	opType := events.GetOpType(*event)
 
-	alias := client.index.IsAlias()
-	if version.Major < 7 {
-		alias = false
+	meta := eslegclient.BulkMeta{
+		Index:    index,
+		DocType:  eventType,
+		Pipeline: pipeline,
+		ID:       id,
 	}
 
-	meta := eslegclient.BulkMeta{
-		Index:        index,
-		DocType:      eventType,
-		Pipeline:     pipeline,
-		ID:           id,
-		RequireAlias: alias,
+	if isRequireAliasSupported(version) {
+		meta.RequireAlias = client.index.IsAlias()
 	}
 
 	if opType == events.OpTypeDelete {
@@ -337,6 +335,10 @@ func (client *Client) createEventBulkMeta(version common.Version, event *beat.Ev
 		return eslegclient.BulkCreateAction{Create: meta}, nil
 	}
 	return eslegclient.BulkIndexAction{Index: meta}, nil
+}
+
+func isRequireAliasSupported(version common.Version) bool {
+	return !version.LessThan(common.MustNewVersion("7.9.0"))
 }
 
 func (client *Client) getPipeline(event *beat.Event) (string, error) {
