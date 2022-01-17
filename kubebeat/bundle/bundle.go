@@ -1,16 +1,12 @@
 package bundle
 
 import (
-	"embed"
-	"io/fs"
-	"os"
-	"strings"
+	"log"
+	"net/http"
+	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	csppolicies "github.com/elastic/csp-security-policies/bundle"
 )
-
-//go:embed csp-security-policies
-var EmbeddedPolicy embed.FS
 
 var Config = `{
         "services": {
@@ -28,23 +24,32 @@ var Config = `{
         }
     }`
 
-func CreateCISPolicy(fileSystem embed.FS) map[string]string {
-	policies := make(map[string]string)
+func CreateServer() (*http.Server, error) {
+	policies, err := csppolicies.CISKubernetes()
+	if err != nil {
+		return nil, err
+	}
 
-	fs.WalkDir(fileSystem, ".", func(filepath string, info os.DirEntry, err error) error {
-		if err != nil {
-			logp.Err("Failed to create CIS policy- %+v", err)
-			return nil
+	bundleServer := csppolicies.NewServer()
+	err = bundleServer.HostBundle("bundle.tar.gz", policies)
+	if err != nil {
+		return nil, err
+	}
+
+	srv := &http.Server{
+		Addr: "0.0.0.0:8080",
+		// Good practice to set timeouts to avoid Slowloris attacks.
+		WriteTimeout: time.Second * 15,
+		ReadTimeout:  time.Second * 15,
+		IdleTimeout:  time.Second * 60,
+		Handler:      bundleServer, // Pass our instance of gorilla/mux in.
+	}
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Println(err)
 		}
-		if info.IsDir() == false && strings.HasSuffix(info.Name(), ".rego") && !strings.HasSuffix(info.Name(), "test.rego") {
+	}()
 
-			data, err := fs.ReadFile(fileSystem, filepath)
-			if err == nil {
-				policies[filepath] = string(data)
-			}
-		}
-		return nil
-	})
-
-	return policies
+	return srv, nil
 }

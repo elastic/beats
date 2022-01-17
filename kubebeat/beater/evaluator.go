@@ -4,29 +4,27 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/elastic/beats/v7/kubebeat/bundle"
 	"github.com/open-policy-agent/opa/sdk"
-	sdktest "github.com/open-policy-agent/opa/sdk/test"
 )
 
 type evaluator struct {
-	bundleServer *sdktest.Server
+	bundleServer *http.Server
 	opa          *sdk.OPA
 }
 
 func NewEvaluator() (*evaluator, error) {
-	policies := bundle.CreateCISPolicy(bundle.EmbeddedPolicy)
-	// create a mock HTTP bundle bundleServer
-	bundleServer, err := sdktest.NewServer(sdktest.MockBundle("/bundles/bundle.tar.gz", policies))
+	server, err := bundle.CreateServer()
 	if err != nil {
-		return nil, fmt.Errorf("fail to init bundle server: %s", err.Error())
+		return nil, err
 	}
 
 	// provide the OPA configuration which specifies
 	// fetching policy bundles from the mock bundleServer
 	// and logging decisions locally to the console
-	config := []byte(fmt.Sprintf(bundle.Config, bundleServer.URL()))
+	config := []byte(fmt.Sprintf(bundle.Config, server.Addr))
 
 	// create an instance of the OPA object
 	opa, err := sdk.New(context.Background(), sdk.Options{
@@ -38,7 +36,7 @@ func NewEvaluator() (*evaluator, error) {
 
 	return &evaluator{
 		opa:          opa,
-		bundleServer: bundleServer,
+		bundleServer: server,
 	}, nil
 }
 
@@ -56,6 +54,7 @@ func (e *evaluator) Decision(input interface{}) (interface{}, error) {
 }
 
 func (e *evaluator) Stop() {
-	e.opa.Stop(context.Background())
-	e.bundleServer.Stop()
+	stopCtx := context.Background()
+	e.opa.Stop(stopCtx)
+	e.bundleServer.Shutdown(stopCtx)
 }

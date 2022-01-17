@@ -219,7 +219,8 @@ require (
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
-	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
+	github.com/elastic/csp-security-policies v0.0.1-go-lib // indirect
+	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fearful-symmetry/gomsr v0.0.1 // indirect
 	github.com/go-logr/logr v0.4.0 // indirect
 	github.com/gobuffalo/here v0.6.0 // indirect
