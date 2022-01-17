@@ -153,10 +153,7 @@ func (a *Application) Stop() {
 		// signal stop through GRPC, wait and kill is performed later in gracefulKill
 		if err := srvState.Stop(a.processConfig.StopTimeout); err != nil {
 			err := fmt.Errorf("failed to stop after %s: %w", a.processConfig.StopTimeout, err)
-			a.setState(
-				state.Failed,
-				err.Error(),
-				nil)
+			a.setState(state.Failed, err.Error(), nil)
 
 			a.logger.Error(err)
 		}
