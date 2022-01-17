@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/elastic/beats/v7/kubebeat/bundle"
+	"github.com/elastic/beats/v7/kubebeat/beater/bundle"
 	"github.com/open-policy-agent/opa/sdk"
 )
 
