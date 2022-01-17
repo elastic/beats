@@ -14,7 +14,6 @@ import (
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -289,9 +288,6 @@ func (a *Application) gracefulKill(proc *process.Info) {
 		return
 	}
 
-	alog := logp.NewLogger("anderson")
-	alog.Infof("[gracefulKill][%s] invoked", a.Name())
-
 	// send stop signal to request stop
 	if err := proc.Stop(); err != nil {
 		a.logger.Error(fmt.Errorf("failed to stop %s: %w", a.Name(), err))
@@ -305,7 +301,6 @@ func (a *Application) gracefulKill(proc *process.Info) {
 
 		if _, err := proc.Process.Wait(); err != nil {
 			// process is not a child - some OSs requires process to be child
-			alog.Infof("[gracefulKill][externalProcess][%s] closing it", a.Name())
 			a.externalProcess(proc.Process)
 		}
 		close(doneChan)
@@ -320,7 +315,6 @@ func (a *Application) gracefulKill(proc *process.Info) {
 	select {
 	case <-doneChan:
 	case <-t.C:
-		alog.Infof("[gracefulKill][%s] killing it", a.Name())
 		a.logger.Infof("gracefulKill timed out after %d, killing %s",
 			procExitTimeout, a.Name())
 		_ = proc.Process.Kill()
