@@ -164,11 +164,11 @@ The multiline message is stored under the key `msg`.
   ...
   parsers:
     - ndjson:
-      keys_under_root: true
-      message_key: msg
+        keys_under_root: true
+        message_key: msg
     - multiline:
-      type: counter
-      lines_count: 3
+        type: counter
+        lines_count: 3
 ----
 
 See the available parser settings in detail below.
@@ -197,9 +197,9 @@ Example configuration:
 [source,yaml]
 ----
 - ndjson:
-  keys_under_root: true
-  add_error_key: true
-  message_key: log
+    keys_under_root: true
+    add_error_key: true
+    message_key: log
 ----
 
 *`keys_under_root`*:: By default, the decoded JSON is placed under a "json" key
@@ -256,5 +256,5 @@ all containers under the default Kubernetes logs path:
     - "/var/log/containers/*.log"
   parsers:
     - container:
-      stream: stdout
+        stream: stdout
 ----
