@@ -6,6 +6,7 @@ import subprocess
 import sys
 import time
 import unittest
+import re
 from beat.beat import INTEGRATION_TESTS
 from elasticsearch import Elasticsearch
 from heartbeat import BaseTest
@@ -44,8 +45,11 @@ class Test(BaseTest):
         # we should run pings on those machines and make sure they work.
         self.wait_until(lambda: has_started_message() or has_failed_message(), 30)
 
+        self.wait_until(lambda: self.output_has(lines=1))
+        output = self.read_output()
+        monitor_status = output[0]["monitor.status"]
         if has_failed_message():
-            proc.check_kill_and_wait(1)
+            assert monitor_status == "down"
+            self.assertRegex(output[0]["error.message"], ".*Insufficient privileges to perform ICMP ping.*")
         else:
-            # Check that documents are moving through
-            self.wait_until(lambda: self.output_has(lines=1))
+            assert monitor_status == "up"
