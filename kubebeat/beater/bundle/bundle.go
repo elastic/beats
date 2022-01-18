@@ -37,12 +37,11 @@ func CreateServer() (*http.Server, error) {
 	}
 
 	srv := &http.Server{
-		Addr: "0.0.0.0:8080",
-		// Good practice to set timeouts to avoid Slowloris attacks.
+		Addr:         "0.0.0.0:8080",
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
-		Handler:      bundleServer, // Pass our instance of gorilla/mux in.
+		Handler:      bundleServer,
 	}
 
 	go func() {
