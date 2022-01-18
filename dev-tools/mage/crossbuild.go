@@ -183,7 +183,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 		builder := GolangCrossBuilder{buildPlatform.Name, params.Target, params.InDir, params.ImageSelector}
 		if params.Serial {
 			if err := builder.Build(); err != nil {
-				return errors.Wrapf(err, "failed cross-building target=%v for platform=%v %v", params.ImageSelector,
+				return errors.Wrapf(err, "failed cross-building target=%s for platform=%s",
 					params.Target, buildPlatform.Name)
 			}
 		} else {

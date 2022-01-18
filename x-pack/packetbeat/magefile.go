@@ -9,7 +9,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -61,7 +60,6 @@ func Build() error {
 func GolangCrossBuild() error {
 	if devtools.Platform.GOOS == "windows" && (devtools.Platform.GOARCH == "amd64" || devtools.Platform.GOARCH == "386") {
 		const installer = "npcap-" + packetbeat.NpcapVersion + "-oem.exe"
-		log.Println("golangCrossBuild: copying OEM Npcap installer for Windows build:", installer)
 		err := sh.Copy("./npcap/installer/"+installer, "/installer/"+installer)
 		if err != nil {
 			return fmt.Errorf("failed to copy Npcap installer into source tree: %w", err)
