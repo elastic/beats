@@ -219,11 +219,13 @@ func (o *Operator) Shutdown() {
 	}
 
 	wg := sync.WaitGroup{}
+	wg.Add(len(o.apps))
+
 	started := time.Now()
+
+	o.appsLock.Lock()
+	defer o.appsLock.Unlock()
 	for _, a := range o.apps {
-		// shutdown apps concurrently.
-		// TODO(Anderson): it's fine, right?
-		wg.Add(1)
 		go func(a Application) {
 			a.Shutdown()
 			wg.Done()
