@@ -88,7 +88,7 @@ include::{libbeat-dir}/tab-widgets/enable-modules-widget.asciidoc[]
 --
 
 . In the module config under `modules.d`, enable the desired datasets and
-change the module settings to match your environment.
+change the module settings to match your environment. **Datasets are disabled by default.**
 +
 For example, log locations are set based on the OS. If your logs aren't in
 default locations, set the `paths` variable:
