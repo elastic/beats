@@ -338,7 +338,7 @@ func (client *Client) createEventBulkMeta(version common.Version, event *beat.Ev
 }
 
 func isRequireAliasSupported(version common.Version) bool {
-	return !version.LessThan(common.MustNewVersion("7.9.0"))
+	return !version.LessThan(common.MustNewVersion("7.10.0"))
 }
 
 func (client *Client) getPipeline(event *beat.Event) (string, error) {
