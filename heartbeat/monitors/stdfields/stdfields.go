@@ -18,9 +18,8 @@
 package stdfields
 
 import (
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -46,7 +45,7 @@ func ConfigToStdMonitorFields(config *common.Config) (StdMonitorFields, error) {
 	mpi := StdMonitorFields{Enabled: true}
 
 	if err := config.Unpack(&mpi); err != nil {
-		return mpi, errors.Wrap(err, "error unpacking monitor plugin config")
+		return mpi, fmt.Errorf("error unpacking monitor plugin config: %w", err)
 	}
 
 	// Use `service_name` if `service.name` is unspecified

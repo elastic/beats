@@ -1,0 +1,38 @@
+{
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "container": {
+        "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
+    },
+    "containerd": {
+        "namespace": "k8s.io",
+        "cpu": {
+            "usage": {
+                "user": {
+                    "ns": 22526620000000,
+                    "pct": 0.2496932948025663
+                },
+                "total": {
+                    "pct": 0.24969398913655017,
+                    "ns": 22554111128186
+                },
+                "kernel": {
+                    "ns": 16740000000,
+                    "pct": 0
+                }
+            }
+        }
+    },
+    "event": {
+        "dataset": "containerd.cpu",
+        "duration": 115000,
+        "module": "containerd"
+    },
+    "metricset": {
+        "name": "cpu",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "containerd"
+    }
+}

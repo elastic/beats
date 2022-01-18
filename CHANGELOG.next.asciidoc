@@ -110,6 +110,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Heartbeat*
 
 - Fix race condition in http monitors using `mode:all` that can cause crashes. {pull}29697[pull]
+- Fix broken ICMP availability check that prevented heartbeat from starting in rare cases. {pull}29413[pull]
 
 *Metricbeat*
 
@@ -150,6 +151,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `default_region` config to AWS common module. {pull}29415[29415]
 - Add support for latest k8s versions v1.23 and v1.22 {pull}29575[29575]
 - Only connect to Elasticsearch instances with the same version or newer. {pull}29683[29683]
+- Move umask from code to service files. {pull}29708[29708]
 
 *Auditbeat*
 
@@ -167,12 +169,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
+- More errors are now visible in ES with new logic failing monitors later to ease debugging. {pull}29413[pull]
+
 
 *Metricbeat*
 
 - Preliminary AIX support {pull}27954[27954]
 - Add option to skip older k8s events {pull}29396[29396]
 - Add `add_resource_metadata` configuration to Kubernetes module. {pull}29133[29133]
+- Add `containerd` module with `cpu`, `memory`, `blkio` metricsets. {pull}29247[29247]
 - Add `container.id` and `container.runtime` ECS fields in container metricset. {pull}29560[29560]
 - Add `memory.workingset.limit.pct` field in Kubernetes container/pod metricset. {pull}29547[29547]
 - Add k8s metadata in state_cronjob metricset. {pull}29572[29572]
@@ -214,9 +219,3 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
-
-
-
-
-
-
