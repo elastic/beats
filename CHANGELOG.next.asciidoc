@@ -110,6 +110,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Heartbeat*
 
 - Fix race condition in http monitors using `mode:all` that can cause crashes. {pull}29697[pull]
+- Fix broken ICMP availability check that prevented heartbeat from starting in rare cases. {pull}29413[pull]
 
 *Metricbeat*
 
@@ -167,6 +168,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new `userAgent` and `beatInfo` template functions for httpjson input {pull}29528[29528]
 
 *Heartbeat*
+
+- More errors are now visible in ES with new logic failing monitors later to ease debugging. {pull}29413[pull]
 
 
 *Metricbeat*
