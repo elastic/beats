@@ -48,9 +48,8 @@ class Test(BaseTest):
         self.wait_until(lambda: self.output_has(lines=1))
         output = self.read_output()
         monitor_status = output[0]["monitor.status"]
-        monitor_error = output[0]["error.message"]
         if has_failed_message():
             assert monitor_status == "down"
-            self.assertRegex(monitor_error, ".*Insufficient privileges to perform ICMP ping.*")
+            self.assertRegex(output[0]["error.message"], ".*Insufficient privileges to perform ICMP ping.*")
         else:
             assert monitor_status == "up"
