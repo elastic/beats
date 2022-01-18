@@ -423,6 +423,21 @@ func TestBulkEncodeEvents(t *testing.T) {
 			ilmConfig: common.NewConfig(),
 			events:    []common.MapStr{{"message": "test"}},
 		},
+		"require_alias not supported": {
+			version:   "7.9.0",
+			docType:   "",
+			config:    common.MapStr{},
+			ilmConfig: common.NewConfig(),
+			events:    []common.MapStr{{"message": "test"}},
+		},
+		"require_alias is supported": {
+			version:   "7.10.0",
+			docType:   "",
+			config:    common.MapStr{},
+			ilmConfig: common.NewConfig(),
+			isAlias:   true,
+			events:    []common.MapStr{{"message": "test"}},
+		},
 		"latest with ILM": {
 			version:   version.GetDefaultVersion(),
 			docType:   "",
