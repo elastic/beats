@@ -48,12 +48,8 @@ type BuildArgs struct {
 // DefaultBuildArgs returns the default BuildArgs for use in builds.
 func DefaultBuildArgs() BuildArgs {
 	args := BuildArgs{
-		Name:    BeatName,
-		CGO:     build.Default.CgoEnabled,
-		LDFlags: []string{
-			// TODO: comment in before final review/merge
-			// "-s", // Strip all debug symbols from binary (does not affect Go stack traces).
-		},
+		Name: BeatName,
+		CGO:  build.Default.CgoEnabled,
 		Vars: map[string]string{
 			elasticBeatsModulePath + "/libbeat/version.buildTime": "{{ date }}",
 			elasticBeatsModulePath + "/libbeat/version.commit":    "{{ commit }}",
@@ -67,8 +63,15 @@ func DefaultBuildArgs() BuildArgs {
 	if positionIndependendCodeSupported() {
 		args.ExtraFlags = append(args.ExtraFlags, "-buildmode", "pie")
 	}
-	// TODO: remove before final review/merge
-	args.ExtraFlags = append(args.ExtraFlags, `-gcflags`, `"all=-N -l"`)
+
+	if DevBuild {
+		// Disable optimizations (-N) and inlining (-l) for debugging.
+		args.ExtraFlags = append(args.ExtraFlags, `-gcflags`, `"all=-N -l"`)
+	} else {
+		// Strip all debug symbols from binary (does not affect Go stack traces).
+		args.LDFlags = append(args.LDFlags, "-s")
+	}
+
 	return args
 }
 
