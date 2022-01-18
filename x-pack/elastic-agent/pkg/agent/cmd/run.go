@@ -18,7 +18,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/service"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
@@ -91,8 +90,6 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 		return err
 	}
 
-	// TODO: remove before review
-	cfg.Settings.LoggingConfig.Level = logp.DebugLevel
 	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig, true)
 	if err != nil {
 		return err
