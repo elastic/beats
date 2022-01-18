@@ -369,3 +369,5 @@ func (bt *osquerybeat) unregisterActionHandler(b *beat.Beat, ah *actionHandler) 
 		b.Manager.UnregisterAction(ah)
 	}
 }
+
+// ToDo Copy regsiterAction Handler to kubebeat
