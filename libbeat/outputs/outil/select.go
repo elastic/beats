@@ -87,6 +87,8 @@ func (s Selector) Select(evt *beat.Event) (string, error) {
 	return s.sel.sel(evt)
 }
 
+func (s Selector) IsAlias() bool { return false }
+
 // IsEmpty checks if the selector is not configured and will always return an empty string.
 func (s Selector) IsEmpty() bool {
 	return s.sel == nilSelector || s.sel == nil
