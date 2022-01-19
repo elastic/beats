@@ -166,23 +166,23 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 
 		k.matchers = matchers
 		nd := &kubernetes.DiscoverKubernetesNodeParams{
-			ConfigHost:  config.Host,
+			ConfigHost:  config.Node,
 			Client:      client,
 			IsInCluster: kubernetes.IsInCluster(config.KubeConfig),
 			HostUtils:   &kubernetes.DefaultDiscoveryUtils{},
 		}
 		if config.Scope == "node" {
-			config.Host, err = kubernetes.DiscoverKubernetesNode(k.log, nd)
+			config.Node, err = kubernetes.DiscoverKubernetesNode(k.log, nd)
 			if err != nil {
 				k.log.Errorf("Couldn't discover Kubernetes node: %w", err)
 				return
 			}
-			k.log.Debugf("Initializing a new Kubernetes watcher using host: %s", config.Host)
+			k.log.Debugf("Initializing a new Kubernetes watcher using host: %s", config.Node)
 		}
 
 		watcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_pod", client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
-			Node:        config.Host,
+			Node:        config.Node,
 			Namespace:   config.Namespace,
 		}, nil)
 		if err != nil {
@@ -194,7 +194,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 
 		options := kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
-			Node:        config.Host,
+			Node:        config.Node,
 		}
 		if config.Namespace != "" {
 			options.Namespace = config.Namespace
