@@ -319,15 +319,26 @@ func (ms *MetricSet) enrichProcess(process *Process) {
 	}
 
 	if process.Info.Exe != "" {
+		sharedMntNS, err := isNsSharedWith(process.Info.PID, "mnt")
+		if err != nil {
+			if process.Error == nil {
+				process.Error = errors.Wrapf(err, "failed to get namespaces for %v PID %v", process.Info.Exe,
+					process.Info.PID)
+			}
+			return
+		}
+		if !sharedMntNS {
+			return
+		}
 		hashes, err := ms.hasher.HashFile(process.Info.Exe)
 		if err != nil {
 			if process.Error == nil {
 				process.Error = errors.Wrapf(err, "failed to hash executable %v for PID %v", process.Info.Exe,
 					process.Info.PID)
 			}
-		} else {
-			process.Hashes = hashes
+			return
 		}
+		process.Hashes = hashes
 	}
 }
 
