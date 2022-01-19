@@ -420,7 +420,8 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 	}
 
 	info := beat.Info{Beat: "libbeat"}
-	im, _ := idxmgmt.DefaultSupport(nil, info, nil)
+	// ILM must be disabled otherwise custom index settings are ignored.
+	im, _ := idxmgmt.DefaultSupport(nil, info, disabledILMConfig())
 	output, err := makeES(im, info, stats, config)
 	if err != nil {
 		t.Fatal(err)
@@ -436,6 +437,10 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 	client.Connect()
 
 	return client, client
+}
+
+func disabledILMConfig() *common.Config {
+	return common.MustNewConfigFrom(map[string]interface{}{"setup": map[string]interface{}{"ilm": map[string]interface{}{"enabled": false}}})
 }
 
 // setupRoleMapping sets up role mapping for the Kerberos user beats@ELASTIC
