@@ -164,7 +164,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
 - Add support for filtering in journald input with `unit`, `kernel`, `identifiers` and `include_matches`. {pull}29294[29294]
 - Add new `userAgent` and `beatInfo` template functions for httpjson input {pull}29528[29528]
-- Add extraction of `host.name` to Microsoft 365 Defender ingest pipeline {issue}29859[29859] {pull}29863[29863]
+- Add extraction of `related.hosts` to Microsoft 365 Defender ingest pipeline {issue}29859[29859] {pull}29863[29863]
 
 *Heartbeat*
 
