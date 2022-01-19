@@ -7,3 +7,4 @@
 *.pyc
 *local.yaml
 *local.yml
+tmpBundles/

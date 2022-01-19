@@ -42,12 +42,6 @@ The interesting files are:
 cd kubebeat & just setup-env
 ```
 
-5. Clone the git submodule of the CIS rules:
-
-```zsh
-git submodule update --init
-```
-
 ## Running Kubebeat (without the agent)
 
 Build & deploy kubebeat:
@@ -216,19 +210,15 @@ This will fetch and create all images required for the build process. The whole 
 
 **1.Build Elastic-Agent Docker**
 
-1. initialise git submodule for rego rules:
-```
-$ git submodule update --init
-```
-2. Access the Elastic-Agent dir
+1. Access the Elastic-Agent dir
 ```
 $ cd x-pack/elastic-agent
 ```
-3. Build & deploy the elastic-agent docker( You might need to increase docker engine resources on your docker-engine)
+2. Build & deploy the elastic-agent docker( You might need to increase docker engine resources on your docker-engine)
 ```
 $ just build-deploy-agent # It takes a while on the first execution.
 ```
-4. Once command is finished, Verify the agent is running on your machine
+3. Once command is finished, Verify the agent is running on your machine
 
 ```zsh
 $ kubectl get po --selector="app=elastic-agent" --all-namespaces -o wide
