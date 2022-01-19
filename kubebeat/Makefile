@@ -19,6 +19,9 @@ CHECK_HEADERS_DISABLED=true
 copy-vendor:
 	mage vendorUpdate
 
+delete-pod:
+	kubectl delete pod kubebeat-demo
+
 build-docker:
 	GOOS=linux go build && docker build -t kubebeat .
 
@@ -30,6 +33,9 @@ docker-image-load-kind: build-docker
 
 deploy-kubebeat:
 	kubectl apply -f deploy/k8s/kubebeat-ds.yaml -n kube-system
+
+deploy-pod: delete-pod build-docker docker-image-load-minikube
+	kubectl apply -f pod.yml
 
 build-deploy-docker: build-docker docker-image-load-kind deploy-kubebeat
 
