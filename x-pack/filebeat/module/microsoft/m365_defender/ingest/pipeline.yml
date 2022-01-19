@@ -236,24 +236,6 @@ processors:
     ignore_failure: true
     if: ctx?.url?.full != null
 
-  ######################
-  ## ECS Host Mapping ##
-  ######################
-- foreach:
-    field: json.alerts.devices
-    ignore_missing: true
-    processor:
-      append:
-        field: host.hostname
-        value: "{{ _ingest._value.deviceDnsName }}"
-        allow_duplicates: false
-        ignore_failure: true
-
-- set:
-    field: host.name
-    copy_from: host.hostname
-    if: ctx?.host?.hostname != null
-
 ######################
 ## ECS User Mapping ##
 ######################
@@ -290,12 +272,12 @@ processors:
     value: '{{file.hash.sha256}}'
     if: ctx?.file?.hash?.sha256 != null
 - foreach:
-    field: host.hostname
+    field: json.alerts.devices
     ignore_missing: true
     processor:
       append:
           field: related.hosts
-          value: '{{ _ingest._value }}'
+          value: '{{ _ingest._value.deviceDnsName }}'
           allow_duplicates: false
           ignore_failure: true
 
