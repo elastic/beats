@@ -119,6 +119,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix gcp metrics metricset apply aligner to all metric_types {pull}29514[29513]
 - Extract correct index property in kibana.stats metricset {pull}29622[29622]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {pull}29711[29711]
+- Fixed GCP GKE Overview dashboard {pull}29913[29913]
 
 *Packetbeat*
 
