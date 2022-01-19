@@ -30,9 +30,6 @@ response.split:
     split:
       target: body.alerts.entities
       keep_parent: true
-      split:
-        target: body.alerts.devices
-        keep_parent: true
 
 cursor:
   lastUpdateTime:
