@@ -45,3 +45,27 @@ func TestIsStatsAPIAvailable(t *testing.T) {
 		require.Equal(t, test.expected, actual)
 	}
 }
+
+func TestIsUsageExcludable(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected bool
+	}{
+		{"6.3.1", false},
+		{"6.4.0", false},
+		{"6.5.0", false},
+		{"6.7.2", true},
+		{"6.8.16", true},
+		{"7.0.0-alpha1", false},
+		{"7.0.0", false},
+		{"7.0.1", true},
+		{"7.0.2", true},
+		{"7.5.0", true},
+		{"7.16.2", true},
+	}
+
+	for _, test := range tests {
+		actual := kibana.IsUsageExcludable(common.MustNewVersion(test.input))
+		require.Equal(t, test.expected, actual)
+	}
+}

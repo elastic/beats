@@ -47,8 +47,7 @@ var (
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*kibana.MetricSet
-	statsHTTP         *helper.HTTP
-	isUsageExcludable bool
+	statsHTTP *helper.HTTP
 }
 
 // New create a new instance of the MetricSet
@@ -95,8 +94,13 @@ func (m *MetricSet) init() error {
 		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.StatsAPIAvailableVersion, kibanaVersion)
 	}
 
+	// Add exclude_usage=true if the Kibana Version supports it
+	if kibana.IsUsageExcludable(kibanaVersion) {
+		origURI := statsHTTP.GetURI()
+		statsHTTP.SetURI(origURI + "&exclude_usage=true")
+	}
+
 	m.statsHTTP = statsHTTP
-	m.isUsageExcludable = kibana.IsUsageExcludable(kibanaVersion)
 
 	return nil
 }
@@ -104,14 +108,6 @@ func (m *MetricSet) init() error {
 func (m *MetricSet) fetchStats(r mb.ReporterV2) error {
 	var content []byte
 	var err error
-
-	// Add exclude_usage=true if the Kibana Version supports it
-	if m.isUsageExcludable {
-		origURI := m.statsHTTP.GetURI()
-		defer m.statsHTTP.SetURI(origURI)
-
-		m.statsHTTP.SetURI(origURI + "&exclude_usage=true")
-	}
 
 	content, err = m.statsHTTP.FetchContent()
 	if err != nil {
