@@ -23,14 +23,6 @@
         "file.hash.sha256": "fd46705c4f67a8ef16e76259ca6d6253241e51a1f8952223145f92aa1907d356",
         "file.name": "amsistream-1D89ECED25A52AB98B76FF619B7BA07A",
         "fileset.name": "m365_defender",
-        "host.hostname": [
-            "TestServer4",
-            "TestServer5"
-        ],
-        "host.name": [
-            "TestServer4",
-            "TestServer5"
-        ],
         "input.type": "log",
         "log.offset": 0,
         "message": "'Mountsi' malware was detected",
@@ -122,12 +114,6 @@
         "file.hash.sha256": "fd46705c4f67a8ef16e76259ca6d6253241e51a1f8952223145f92aa1907d356",
         "file.name": "amsistream-B103C1A335BDB049E617D1AC4A41FCDC",
         "fileset.name": "m365_defender",
-        "host.hostname": [
-            "TestServer4"
-        ],
-        "host.name": [
-            "TestServer4"
-        ],
         "input.type": "log",
         "log.offset": 2381,
         "message": "'Mountsi' malware was detected",
@@ -207,12 +193,6 @@
         "file.name": "SB.xsl",
         "file.path": "C:\\Windows\\Temp\\sb-sim-temp-ikyxqi\\sb_10554_bs_h4qpk5",
         "fileset.name": "m365_defender",
-        "host.hostname": [
-            "testserver4"
-        ],
-        "host.name": [
-            "testserver4"
-        ],
         "input.type": "log",
         "log.offset": 4452,
         "message": "'Exeselrun' malware was detected",
@@ -290,12 +270,6 @@
         "file.name": "SB.xsl",
         "file.path": "C:\\Windows\\Temp\\sb-sim-temp-ikyxqi\\sb_10554_bs_h4qpk5",
         "fileset.name": "m365_defender",
-        "host.hostname": [
-            "TestServer4"
-        ],
-        "host.name": [
-            "TestServer4"
-        ],
         "input.type": "log",
         "log.offset": 6559,
         "message": "An active 'Exeselrun' malware was detected",
@@ -367,12 +341,6 @@
             "end"
         ],
         "fileset.name": "m365_defender",
-        "host.hostname": [
-            "testserver4"
-        ],
-        "host.name": [
-            "testserver4"
-        ],
         "input.type": "log",
         "log.offset": 8686,
         "message": "Suspicious 'AccessibilityEscalation' behavior was detected",
@@ -446,12 +414,6 @@
             "end"
         ],
         "fileset.name": "m365_defender",
-        "host.hostname": [
-            "testserver4"
-        ],
-        "host.name": [
-            "testserver4"
-        ],
         "input.type": "log",
         "log.offset": 10852,
         "message": "Suspicious 'AccessibilityEscalation' behavior was detected",
@@ -523,12 +485,6 @@
             "end"
         ],
         "fileset.name": "m365_defender",
-        "host.hostname": [
-            "testserver4"
-        ],
-        "host.name": [
-            "testserver4"
-        ],
         "input.type": "log",
         "log.offset": 12908,
         "message": "Suspicious 'AccessibilityEscalation' behavior was detected",
