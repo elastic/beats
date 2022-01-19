@@ -108,7 +108,7 @@ func runPublishJob(job jobs.Job, client *WrappedClient) []scheduler.TaskFunc {
 
 	conts, err := job(event)
 	if err != nil {
-		logp.Err("Job %v failed with: ", err)
+		logp.Err("Job failed with: %s", err)
 	}
 
 	hasContinuations := len(conts) > 0
