@@ -1358,10 +1358,9 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional index name. The default is "filebeat" plus date
-  # and generates [filebeat-]YYYY.MM.DD keys.
+  # Optional data stream or index name. The default is "filebeat-%{[agent.version]}".
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+  #index: "filebeat-%{[agent.version]}"
 
   # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -2170,10 +2169,8 @@ setup.template.settings:
 
 # ====================== Index Lifecycle Management (ILM) ======================
 
-# Configure index lifecycle management (ILM). These settings create a write
-# alias and add additional settings to the index template. When ILM is enabled,
-# output.elasticsearch.index is ignored, and the write alias is used to set the
-# index name.
+# Configure index lifecycle management (ILM) to manage the backing indices
+# of your data streams.
 
 # Enable ILM support. Valid values are true, false.
 #setup.ilm.enabled: true

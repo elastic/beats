@@ -22563,12 +22563,12 @@ For t_cl_generator.cc
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/apoydence/eachers
+Dependency : github.com/poy/eachers
 Version: v0.0.0-20181020210610-23942921fe77
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/apoydence/eachers@v0.0.0-20181020210610-23942921fe77/LICENSE.md:
+Contents of probable licence file $GOMODCACHE/github.com/poy/eachers@v0.0.0-20181020210610-23942921fe77/LICENSE.md:
 
 The MIT License (MIT)
 

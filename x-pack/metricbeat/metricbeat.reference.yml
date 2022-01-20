@@ -427,6 +427,19 @@ metricbeat.modules:
   hosts: ["localhost:8500"]
 
 
+#------------------------------ Containerd Module ------------------------------
+- module: containerd
+  metricsets: ["cpu", "memory", "blkio"]
+  period: 10s
+  # containerd metrics endpoint is configured in /etc/containerd/config.toml
+  # Metrics endpoint does not listen by default
+  # https://github.com/containerd/containerd/blob/main/docs/man/containerd-config.toml.5.md
+  hosts: ["localhost:1338"]
+  # if set to true, cpu and memory usage percentages will be calculated. Default is true
+  calcpct.cpu: true
+  calcpct.memory: true
+
+
 #------------------------------- Coredns Module -------------------------------
 - module: coredns
   metricsets: ["stats"]
@@ -696,49 +709,49 @@ metricbeat.modules:
  # application_pool.name: []
 
 #-------------------------------- Istio Module --------------------------------
-# Istio mesh. To collect all Mixer-generated metrics
+# Istio mesh. To collect all Mixer-generated metrics. For versions of Istio prior to 1.5.
 - module: istio
   metricsets: ["mesh"]
   period: 10s
   # use istio-telemetry.istio-system:42422, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ["localhost:42422"]
 
-# Istio mixer. To monitor Mixer itself.
+# Istio mixer. To monitor Mixer itself. For versions of Istio prior to 1.5.
 - module: istio
   metricsets: ["mixer"]
   period: 10s
   # use istio-telemetry.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ["localhost:15014"]
 
-# Istio galley. To collect all Galley-generated metrics
+# Istio galley. To collect all Galley-generated metrics. For versions of Istio prior to 1.5.
 - module: istio
   metricsets: ["galley"]
   period: 10s
   # use istio-galley.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ["localhost:15014"]
 
-# Istio pilot. To collect all Pilot-generated metrics.
+# Istio pilot. To collect all Pilot-generated metrics. For versions of Istio prior to 1.5.
 - module: istio
   metricsets: ["pilot"]
   period: 10s
   # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ["localhost:15014"]
 
-# Istio citadel. To collect all Citadel-generated metrics.
+# Istio citadel. To collect all Citadel-generated metrics. For versions of Istio prior to 1.5.
 - module: istio
   metricsets: ["citadel"]
   period: 10s
   # use istio-pilot.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ["localhost:15014"]
 
-# Istio istiod to monitor the Istio Daemon for versions after 1.5 of Istio.
+# Istio istiod to monitor the Istio Daemon for versions of Istio after 1.5.
 - module: istio
   metricsets: ['istiod']
   period: 10s
   # use istiod.istio-system:15014, when deploying Metricbeat in a kubernetes cluster as Pod or Daemonset
   hosts: ['localhost:15014']
 
-# Istio proxy to monitor Envoy sidecars for versions after 1.5 of Istio.
+# Istio proxy to monitor Envoy sidecars for versions of Istio after 1.5.
 - module: istio
   metricsets: ['proxy']
   period: 10s
@@ -1798,10 +1811,9 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional index name. The default is "metricbeat" plus date
-  # and generates [metricbeat-]YYYY.MM.DD keys.
+  # Optional data stream or index name. The default is "metricbeat-%{[agent.version]}".
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "metricbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+  #index: "metricbeat-%{[agent.version]}"
 
   # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -2610,10 +2622,8 @@ setup.template.settings:
 
 # ====================== Index Lifecycle Management (ILM) ======================
 
-# Configure index lifecycle management (ILM). These settings create a write
-# alias and add additional settings to the index template. When ILM is enabled,
-# output.elasticsearch.index is ignored, and the write alias is used to set the
-# index name.
+# Configure index lifecycle management (ILM) to manage the backing indices
+# of your data streams.
 
 # Enable ILM support. Valid values are true, false.
 #setup.ilm.enabled: true

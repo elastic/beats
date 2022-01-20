@@ -3,8 +3,8 @@
 
 {es} uses {ref}/index-templates.html[index templates] to define:
 
-* Settings that control the behavior of your indices. The settings include the
-lifecycle policy used to manage indices as they grow and age.
+* Settings that control the behavior of your data stream and backing indices.
+The settings include the lifecycle policy used to manage backing indices as they grow and age.
 * Mappings that determine how fields are analyzed. Each mapping sets the
 {ref}/mapping-types.html[{es} datatype] to use for a specific data field.
 
@@ -43,6 +43,8 @@ setup.template.fields: "path/to/fields.yml"
 
 If the template already exists, it’s not overwritten unless you configure
 {beatname_uc} to do so.
+
+You can load templates for both data streams and indices.
 
 [float]
 [[overwrite-template]]
@@ -290,7 +292,7 @@ ifdef::deb_os,rpm_os[]
 
 ["source","sh",subs="attributes"]
 ----
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{version} -d@{beatname_lc}.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/{beatname_lc}-{version} -d@{beatname_lc}.template.json
 ----
 endif::deb_os,rpm_os[]
 
@@ -299,7 +301,7 @@ ifdef::mac_os[]
 
 ["source","sh",subs="attributes"]
 ----
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{version} -d@{beatname_lc}.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/{beatname_lc}-{version} -d@{beatname_lc}.template.json
 ----
 endif::mac_os[]
 
@@ -308,7 +310,7 @@ ifdef::linux_os[]
 
 ["source","sh",subs="attributes"]
 ----
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_template/{beatname_lc}-{version} -d@{beatname_lc}.template.json
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/{beatname_lc}-{version} -d@{beatname_lc}.template.json
 ----
 endif::linux_os[]
 
@@ -319,6 +321,6 @@ endif::win_only[]
 
 ["source","sh",subs="attributes"]
 ----
-PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile {beatname_lc}.template.json -Uri http://localhost:9200/_template/{beatname_lc}-{version}
+PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile {beatname_lc}.template.json -Uri http://localhost:9200/_index_template/{beatname_lc}-{version}
 ----
 endif::win_os[]
