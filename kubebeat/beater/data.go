@@ -18,25 +18,37 @@ type Data struct {
 	interval time.Duration
 	output   chan map[string][]interface{}
 
-	ctx      context.Context
-	cancel   context.CancelFunc
-	state    map[string][]interface{}
-	fetchers map[string]Fetcher
-	wg       *sync.WaitGroup
+	ctx             context.Context
+	cancel          context.CancelFunc
+	state           map[string][]interface{}
+	fetcherRegistry map[string]registeredFetcher
+	leaseInfo       *LeaseInfo
+	wg              *sync.WaitGroup
+}
+
+type registeredFetcher struct {
+	f          Fetcher
+	leaderOnly bool
 }
 
 // NewData returns a new Data instance with the given interval.
-func NewData(ctx context.Context, interval time.Duration) *Data {
+func NewData(ctx context.Context, interval time.Duration) (*Data, error) {
 	ctx, cancel := context.WithCancel(ctx)
 
-	return &Data{
-		interval: interval,
-		output:   make(chan map[string][]interface{}),
-		ctx:      ctx,
-		cancel:   cancel,
-		state:    make(map[string][]interface{}),
-		fetchers: make(map[string]Fetcher),
+	li, err := NewLeaseInfo(ctx)
+	if err != nil {
+		return nil, err
 	}
+
+	return &Data{
+		interval:        interval,
+		output:          make(chan map[string][]interface{}),
+		ctx:             ctx,
+		cancel:          cancel,
+		state:           make(map[string][]interface{}),
+		fetcherRegistry: make(map[string]registeredFetcher),
+		leaseInfo:       li,
+	}, nil
 }
 
 // Output returns the output channel.
@@ -45,13 +57,28 @@ func (d *Data) Output() <-chan map[string][]interface{} {
 }
 
 // RegisterFetcher registers a Fetcher implementation.
-func (d *Data) RegisterFetcher(key string, f Fetcher) error {
-	if _, ok := d.fetchers[key]; ok {
+// If leaderOnly is true, then this given Fetcher will only be invoked when
+// the current instance is an elected leader.
+func (d *Data) RegisterFetcher(key string, f Fetcher, leaderOnly bool) error {
+	if _, ok := d.fetcherRegistry[key]; ok {
 		return fmt.Errorf("fetcher key collision: %q is already registered", key)
 	}
 
-	d.fetchers[key] = f
+	d.fetcherRegistry[key] = registeredFetcher{
+		f:          f,
+		leaderOnly: leaderOnly,
+	}
+
 	return nil
+}
+
+func (d *Data) IsLeader() bool {
+	l, err := d.leaseInfo.IsLeader()
+	if err != nil {
+		logp.L().Errorf("could not read leader value, using default value %v: %v", l, err)
+	}
+
+	return l
 }
 
 // Run updates the cache using Fetcher implementations.
@@ -61,12 +88,12 @@ func (d *Data) Run() error {
 	var wg sync.WaitGroup
 	d.wg = &wg
 
-	for key, fetcher := range d.fetchers {
+	for key, rfetcher := range d.fetcherRegistry {
 		wg.Add(1)
-		go func(k string, f Fetcher) {
+		go func(k string, rf registeredFetcher) {
 			defer wg.Done()
-			d.fetchWorker(updates, k, f)
-		}(key, fetcher)
+			d.fetchWorker(updates, k, rf)
+		}(key, rfetcher)
 	}
 
 	wg.Add(1)
@@ -84,21 +111,27 @@ type update struct {
 	val []interface{}
 }
 
-func (d *Data) fetchWorker(updates chan update, k string, f Fetcher) {
+func (d *Data) fetchWorker(updates chan update, k string, rf registeredFetcher) {
 	for {
+		// Go to sleep in each iteration.
+		time.Sleep(d.interval)
+
 		select {
 		case <-d.ctx.Done():
 			return
 		default:
-			val, err := f.Fetch()
+			if rf.leaderOnly {
+				if !d.IsLeader() {
+					continue
+				}
+			}
+
+			val, err := rf.f.Fetch()
 			if err != nil {
 				logp.L().Errorf("error running fetcher for key %q: %v", k, err)
 			}
 
 			updates <- update{k, val}
-
-			// Go to sleep after fetching.
-			time.Sleep(d.interval)
 		}
 	}
 }
@@ -132,8 +165,8 @@ func (d *Data) fetchManager(updates chan update) {
 func (d *Data) Stop() {
 	d.cancel()
 
-	for key, fetcher := range d.fetchers {
-		fetcher.Stop()
+	for key, rfetcher := range d.fetcherRegistry {
+		rfetcher.f.Stop()
 		logp.L().Infof("Fetcher for key %q stopped", key)
 	}
 
@@ -161,6 +194,8 @@ func init() {
 	gob.Register([]interface{}{})
 	gob.Register(Process{})
 	gob.Register(FileSystemResourceData{})
+
+	gob.Register(KubeAPIResource{})
 	gob.Register(kubernetes.Pod{})
 	gob.Register(kubernetes.Secret{})
 	gob.Register(kubernetes.Role{})
