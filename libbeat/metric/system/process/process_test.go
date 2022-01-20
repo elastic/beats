@@ -43,7 +43,7 @@ func TestGetOne(t *testing.T) {
 	logp.DevelopmentSetup()
 	testConfig := Stats{
 		Procs:        []string{".*"},
-		Hostfs:       resolve.NewTestResolver("/proc"),
+		Hostfs:       resolve.NewTestResolver("/"),
 		CPUTicks:     true,
 		CacheCmdLine: true,
 		IncludeTop: IncludeTopConfig{
@@ -60,9 +60,9 @@ func TestGetOne(t *testing.T) {
 	err := testConfig.Init()
 	assert.NoError(t, err, "Init")
 
-	procData, err := testConfig.GetOne(709832)
-	assert.NoError(t, err, "GetOne")
-	t.Logf("Proc: %s", procData.StringToPrint())
+	procData, err := testConfig.GetSelf()
+	assert.NoError(t, err, "GetSelf")
+	t.Logf("Proc: %#v", procData)
 }
 
 func TestGetProcess(t *testing.T) {

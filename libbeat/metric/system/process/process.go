@@ -184,6 +184,7 @@ func (procStats *Stats) GetSelf() (ProcState, error) {
 // The second return value will only be false if an event has been filtered out
 func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	// Fetch proc state so we can get the name for filtering based on user's filter.
+
 	status, err := GetInfoForPid(procStats.Hostfs, pid)
 	if err != nil {
 		return status, true, errors.Wrap(err, "GetInfoForPid")
