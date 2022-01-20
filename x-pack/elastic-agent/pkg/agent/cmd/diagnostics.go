@@ -366,24 +366,24 @@ func gatherConfig() (AgentConfig, error) {
 	// Gather vars to render process config
 	isStandalone, err := isStandalone(renderedCFG)
 	if err != nil {
-		return cfg, err
+		return AgentConfig{}, err
 	}
 
 	agentInfo, err := info.NewAgentInfo(false)
 	if err != nil {
-		return cfg, err
+		return AgentConfig{}, err
 	}
 
 	log, err := newErrorLogger()
 	if err != nil {
-		return cfg, err
+		return AgentConfig{}, err
 	}
 
-	// get process config - uses same approach as inspect output command
-	// does not contact server process to request configs
+	// Get process config - uses same approach as inspect output command.
+	// Does not contact server process to request configs.
 	pMap, err := getProgramsFromConfig(log, agentInfo, renderedCFG, isStandalone)
 	if err != nil {
-		return cfg, err
+		return AgentConfig{}, err
 	}
 	cfg.AppConfig = make(map[string]interface{}, 0)
 	for rk, programs := range pMap {
