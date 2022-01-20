@@ -139,12 +139,12 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 	status.CPU.System.Ticks = opt.UintWith(uint64(info.ptinfo.pti_total_system) / uint64(time.Millisecond))
 	status.CPU.Total.Ticks = opt.UintWith(opt.SumOptUint(status.CPU.User.Ticks, status.CPU.System.Ticks))
 
-	status.CPU.StartTime = common.Time(uint64(info.pbsd.pbi_start_tvsec)*1000) + (uint64(info.pbsd.pbi_start_tvusec) / 1000).String()
+	status.CPU.StartTime = unixTimeMsToTime((uint64(info.pbsd.pbi_start_tvsec) * 1000) + (uint64(info.pbsd.pbi_start_tvusec) / 1000)).String()
 
 	return status, nil
 }
 
-func FillPidMetrics(pid int, state ProcState) (ProcState, error) {
+func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState) (ProcState, error) {
 
 	return state, nil
 }

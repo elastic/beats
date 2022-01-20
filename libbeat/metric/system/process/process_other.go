@@ -20,9 +20,12 @@
 
 package process
 
-import "os"
+import (
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"os"
+)
 
 // GetSelfPid returns the PID for this process
-func GetSelfPid() (int, error) {
+func GetSelfPid(_ resolve.Resolver) (int, error) {
 	return os.Getpid(), nil
 }
