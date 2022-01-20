@@ -60,6 +60,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix in rename processor to ingest metrics for `write.iops` to proper field instead of `write_iops` in rds metricset. {pull}28960[28960]
 - Enhance filter check in kubernetes event metricset. {pull}29470[29470]
 - Fix gcp metrics metricset apply aligner to all metric_types {pull}29514[29513]
+- Fixed GCP GKE Overview dashboard {pull}29913[29913]
 
 *Packetbeat*
 
