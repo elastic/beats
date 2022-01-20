@@ -1,12 +1,13 @@
 This is the Istio module.
-This module is compatible with versions before `1.5` of Istio where microservices architecture is used. If using
-versions prior to `1.5` then `mesh`, `mixer`, `pilot`, `galley`, `citadel` metricsets should be used where the Istio
-module collects metrics from the
+When using versions prior to `1.5` then the `mesh`, `mixer`, `pilot`, `galley`, `citadel` metricsets should be used.
+
+In such case, the Istio module collects metrics from the pre v1.5
 Istio https://istio.io/v1.4/docs/tasks/observability/metrics/querying-metrics/#about-the-prometheus-add-on[prometheus exporters endpoints].
 
-For versions after `1.5`, `istiod` and `proxy` metricsets can be used.
+For versions after `1.5`, the `istiod` and `proxy` metricsets should be used.
+In such case, the `istiod` endpoint collects metrics directly from the Istio Daemon while the `proxy` endpoint collects from each of the proxy sidecars.
+The metrics exposed by Istio after version `1.5` are documented on https://istio.io/latest/docs/reference/config/metrics/[Istio Documentation > Reference > Configuration > Istio Standard Metrics].
 
-`istiod` collects metrics directly from Istio Daemon while `proxy` collects from each of the proxy sidecars.
 
 [float]
 === Compatibility
@@ -19,7 +20,7 @@ The Istio module is tested with Istio `1.7` for `istiod` and `proxy`.
 
 The Istio module includes predefined dashboards:
 
-1. overview information about Istio Daemon.
+1. Overview information about Istio Daemon.
 
 2. Traffic information collected from istio-proxies.
 

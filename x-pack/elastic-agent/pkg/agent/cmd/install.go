@@ -11,7 +11,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	c "github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
@@ -73,7 +72,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 	if status == install.Broken {
 		if !force {
 			fmt.Fprintf(streams.Out, "Elastic Agent is installed but currently broken: %s\n", reason)
-			confirm, err := c.Confirm(fmt.Sprintf("Continuing will re-install Elastic Agent over the current installation at %s. Do you want to continue?", paths.InstallPath), true)
+			confirm, err := cli.Confirm(fmt.Sprintf("Continuing will re-install Elastic Agent over the current installation at %s. Do you want to continue?", paths.InstallPath), true)
 			if err != nil {
 				return fmt.Errorf("problem reading prompt response")
 			}
@@ -83,7 +82,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 		}
 	} else {
 		if !force {
-			confirm, err := c.Confirm(fmt.Sprintf("Elastic Agent will be installed at %s and will run as a service. Do you want to continue?", paths.InstallPath), true)
+			confirm, err := cli.Confirm(fmt.Sprintf("Elastic Agent will be installed at %s and will run as a service. Do you want to continue?", paths.InstallPath), true)
 			if err != nil {
 				return fmt.Errorf("problem reading prompt response")
 			}
@@ -106,7 +105,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 		askEnroll = false
 	}
 	if askEnroll {
-		confirm, err := c.Confirm("Do you want to enroll this Agent into Fleet?", true)
+		confirm, err := cli.Confirm("Do you want to enroll this Agent into Fleet?", true)
 		if err != nil {
 			return fmt.Errorf("problem reading prompt response")
 		}
@@ -122,7 +121,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 
 	if enroll && fleetServer == "" {
 		if url == "" {
-			url, err = c.ReadInput("URL you want to enroll this Agent into:")
+			url, err = cli.ReadInput("URL you want to enroll this Agent into:")
 			if err != nil {
 				return fmt.Errorf("problem reading prompt response")
 			}
@@ -132,7 +131,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 			}
 		}
 		if token == "" {
-			token, err = c.ReadInput("Fleet enrollment token:")
+			token, err = cli.ReadInput("Fleet enrollment token:")
 			if err != nil {
 				return fmt.Errorf("problem reading prompt response")
 			}

@@ -149,7 +149,7 @@ func TestPreProcessors(t *testing.T) {
 }
 
 func TestDuplicateMonitorIDs(t *testing.T) {
-	serverMonConf := mockPluginConf(t, "custom", "@every 1ms", "http://example.net")
+	serverMonConf := mockPluginConf(t, "custom", "custom", "@every 1ms", "http://example.net")
 	badConf := mockBadPluginConf(t, "custom", "@every 1ms")
 	reg, built, closed := mockPluginsReg()
 	pipelineConnector := &MockPipelineConnector{}
@@ -190,8 +190,9 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	m1.Stop()
 	m2.Stop()
 
-	// 3 are counted as built, even the bad config
-	require.Equal(t, 3, built.Load())
+	// Two are counted as built. The bad config is missing a stdfield so it
+	// doesn't complete construction
+	require.Equal(t, 2, built.Load())
 	// Only 2 closes, because the bad config isn't closed
 	require.Equal(t, 2, closed.Load())
 }
