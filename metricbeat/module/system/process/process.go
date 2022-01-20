@@ -21,6 +21,7 @@
 package process
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 
@@ -60,7 +61,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	sys := base.Module().(resolve.Resolver)
-
+	fmt.Printf("sys: %#v\n", sys.ResolveHostFS(""))
 	enableCgroups := false
 	if runtime.GOOS == "linux" {
 		if config.Cgroups == nil || *config.Cgroups {
@@ -73,6 +74,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		stats: &process.Stats{
 			Procs:         config.Procs,
+			Hostfs:        sys,
 			EnvWhitelist:  config.EnvWhitelist,
 			CPUTicks:      config.IncludeCPUTicks || (config.CPUTicks != nil && *config.CPUTicks),
 			CacheCmdLine:  config.CacheCmdLine,

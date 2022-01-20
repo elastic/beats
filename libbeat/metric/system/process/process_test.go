@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
@@ -42,6 +43,7 @@ func TestGetOne(t *testing.T) {
 	logp.DevelopmentSetup()
 	testConfig := Stats{
 		Procs:        []string{".*"},
+		Hostfs:       resolve.NewTestResolver("/proc"),
 		CPUTicks:     true,
 		CacheCmdLine: true,
 		IncludeTop: IncludeTopConfig{
@@ -51,7 +53,7 @@ func TestGetOne(t *testing.T) {
 		},
 		EnableCgroups: false,
 		CgroupOpts: cgroup.ReaderOptions{
-			RootfsMountpoint:  "/",
+			RootfsMountpoint:  resolve.NewTestResolver("/"),
 			IgnoreRootCgroups: true,
 		},
 	}
@@ -63,20 +65,10 @@ func TestGetOne(t *testing.T) {
 	t.Logf("Proc: %s", procData.StringToPrint())
 }
 
-func TestPids(t *testing.T) {
-	pids, err := Pids()
-
-	assert.NotNil(t, pids)
-	assert.NoError(t, err)
-
-	// Assuming at least 2 processes are running
-	assert.True(t, (len(pids) > 1))
-}
-
 func TestGetProcess(t *testing.T) {
-	process, err := FetchPid("/", os.Getpid(), func(in ProcState) (ProcState, error) {
-		return in, nil
-	})
+	stat, err := initTestResolver()
+	assert.NoError(t, err, "Init()")
+	process, err := stat.GetSelf()
 	assert.NoError(t, err, "FetchPid")
 
 	assert.True(t, (process.Pid.ValueOr(0) > 0))
@@ -111,7 +103,7 @@ func TestGetProcess(t *testing.T) {
 
 // See https://github.com/elastic/beats/issues/6620
 func TestGetSelfPid(t *testing.T) {
-	pid, err := GetSelfPid()
+	pid, err := GetSelfPid(resolve.NewTestResolver("/"))
 	assert.NoError(t, err)
 	assert.Equal(t, os.Getpid(), pid)
 }
@@ -202,18 +194,16 @@ func TestProcCpuPercentage(t *testing.T) {
 // BenchmarkGetProcess runs a benchmark of the GetProcess method with caching
 // of the command line and environment variables.
 func BenchmarkGetProcess(b *testing.B) {
-	pids, err := Pids()
+	stat, err := initTestResolver()
 	if err != nil {
-		b.Fatal(err)
+		b.Fatalf("Failed init: %s", err)
 	}
-	nPids := len(pids)
-	procs := make(ProcsMap, nPids)
-
+	procs := make(map[int]common.MapStr, 1)
+	pid := os.Getpid()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		pid := pids[i%nPids]
 
-		process, err := FetchPid("/proc", pid, func(in ProcState) (ProcState, error) { return in, nil })
+		process, err := stat.GetOne(pid)
 		if err != nil {
 			continue
 		}
@@ -440,4 +430,26 @@ func TestIncludeTopProcesses(t *testing.T) {
 		sort.Ints(resPids)
 		assert.Equal(t, resPids, test.ExpectedPids, test.Name)
 	}
+}
+
+func initTestResolver() (Stats, error) {
+	logp.DevelopmentSetup()
+	testConfig := Stats{
+		Procs:        []string{".*"},
+		Hostfs:       resolve.NewTestResolver("/proc"),
+		CPUTicks:     true,
+		CacheCmdLine: true,
+		IncludeTop: IncludeTopConfig{
+			Enabled:  true,
+			ByCPU:    4,
+			ByMemory: 4,
+		},
+		EnableCgroups: false,
+		CgroupOpts: cgroup.ReaderOptions{
+			RootfsMountpoint:  resolve.NewTestResolver("/"),
+			IgnoreRootCgroups: true,
+		},
+	}
+	err := testConfig.Init()
+	return testConfig, err
 }

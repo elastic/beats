@@ -15,6 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build freebsd || linux
+// +build freebsd linux
+
 package process
 
 import (
@@ -24,17 +27,16 @@ import (
 	"io/ioutil"
 	"os"
 	"os/user"
-	"path"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
-	"github.com/elastic/gosigar"
-	"github.com/pkg/errors"
 )
 
 // Indulging in one non-const global variable for the sake of storing boot time
@@ -45,8 +47,8 @@ var bootTime uint64 = 0
 const ticks = 100
 
 // GetSelfPid returns the PID for this process
-func GetSelfPid() (int, error) {
-	pid, err := os.Readlink(path.Join(gosigar.Procd, "self"))
+func GetSelfPid(hostfs resolve.Resolver) (int, error) {
+	pid, err := os.Readlink(hostfs.Join("proc", "self"))
 
 	if err != nil {
 		return 0, err
@@ -55,30 +57,11 @@ func GetSelfPid() (int, error) {
 	return strconv.Atoi(pid)
 }
 
-func FetchPid(hostfs string, pid int, postprocess func(state ProcState) (ProcState, error)) (ProcState, error) {
-	status, err := GetInfoForPid(hostfs, pid)
-	if err != nil {
-		return ProcState{}, errors.Wrapf(err, "error fetching PID %d", pid)
-	}
-
-	status, err = FillPidMetrics(hostfs, pid, status)
-	if err != nil {
-		return status, errors.Wrapf(err, "Error fetching data for PID %d", pid)
-
-	}
-	status, err = postprocess(status)
-	if err != nil {
-		return status, errors.Wrapf(err, "Error in postprocess of PID %d", pid)
-	}
-
-	return status, nil
-}
-
 // FetchPids is the linux implementation of FetchPids
-func FetchPids(hostfs string, filter func(name string) bool, preprocess ProcCallback, postprocess ProcCallback) (ProcsMap, error) {
-	dir, err := os.Open(hostfs)
+func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
+	dir, err := os.Open(procStats.Hostfs.ResolveHostFS("proc"))
 	if err != nil {
-		return nil, errors.Wrapf(err, "error reading from procfs %s", hostfs)
+		return nil, nil, errors.Wrapf(err, "error reading from procfs %s", procStats.Hostfs)
 	}
 	defer dir.Close()
 
@@ -86,10 +69,11 @@ func FetchPids(hostfs string, filter func(name string) bool, preprocess ProcCall
 
 	names, err := dir.Readdirnames(readAllDirnames)
 	if err != nil {
-		return nil, errors.Wrap(err, "error reading directory names")
+		return nil, nil, errors.Wrap(err, "error reading directory names")
 	}
 
 	procMap := make(ProcsMap, 0)
+	var plist []ProcState
 
 	// Iterate over the directory, fetch just enough info so we can filter based on user input.
 	logger := logp.L()
@@ -104,40 +88,24 @@ func FetchPids(hostfs string, filter func(name string) bool, preprocess ProcCall
 			logger.Debugf("Error converting PID name %s", name)
 			continue
 		}
-		// Fetch proc state so we can get the name for filtering based on user's filter.
-		status, err := GetInfoForPid(hostfs, pid)
-		if err != nil {
-			logger.Debugf("Skipping over PID=%d, due to: %d", pid, err)
-			continue
-		}
-		status, err = preprocess(status)
-		if err != nil {
-			logger.Debugf("Skipping over PID=%d, due to preprocessing error: %d", pid, err)
-			continue
-		}
-		// Filter based on user-supplied func
-		if !filter(status.Name) {
-			logger.Debugf("Process name does not matches the provided regex; PID=%d; name=%s", pid, status.Name)
-			continue
-		}
 
-		//If we've passed the filter, continue to fill out the rest of the metrics
-		status, err = FillPidMetrics(hostfs, pid, status)
+		status, saved, err := procStats.pidFill(pid, true)
 		if err != nil {
-			logger.Debugf("Skipping over PID=%d, due to: %s", pid, err)
+			procStats.logger.Debugf("Error fetching PID info for %d, skipping: %s", pid, err)
 			continue
 		}
-		status, err = postprocess(status)
-		if err != nil {
-			logger.Debugf("Error in postprocess of PID %d: %s", pid, err)
+		if !saved {
+			procStats.logger.Debugf("Process name does not matches the provided regex; PID=%d; name=%s", pid, status.Name)
+			continue
 		}
 		procMap[pid] = status
+		plist = append(plist, status)
 	}
 
-	return procMap, nil
+	return procMap, plist, nil
 }
 
-func FillPidMetrics(hostfs string, pid int, state ProcState) (ProcState, error) {
+func FillPidMetrics(hostfs resolve.Resolver, pid int, state ProcState) (ProcState, error) {
 	// Memory Data
 	var err error
 	state.Memory, err = getMemData(hostfs, pid)
@@ -185,8 +153,8 @@ func FillPidMetrics(hostfs string, pid int, state ProcState) (ProcState, error) 
 }
 
 // GetInfoForPid fetches the basic hostinfo from /proc/[PID]/stat
-func GetInfoForPid(hostfs string, pid int) (ProcState, error) {
-	path := filepath.Join(hostfs, strconv.Itoa(pid), "stat")
+func GetInfoForPid(hostfs resolve.Resolver, pid int) (ProcState, error) {
+	path := hostfs.Join("proc", strconv.Itoa(pid), "stat")
 	data, err := ioutil.ReadFile(path)
 	// Transform the error into a more sensible error in cases where the directory doesn't exist, i.e the process is gone
 	if err != nil {
@@ -238,13 +206,13 @@ func GetInfoForPid(hostfs string, pid int) (ProcState, error) {
 	return state, nil
 }
 
-func getProcStringData(hostfs string, pid int) (string, string, error) {
-	exe, err := os.Readlink(filepath.Join(hostfs, strconv.Itoa(pid), "exe"))
+func getProcStringData(hostfs resolve.Resolver, pid int) (string, string, error) {
+	exe, err := os.Readlink(hostfs.Join("proc", strconv.Itoa(pid), "exe"))
 	if err != nil {
 		return "", "", errors.Wrapf(err, "error fetching exe from pid %d", pid)
 	}
 
-	cwd, err := os.Readlink(filepath.Join(hostfs, strconv.Itoa(pid), "cwd"))
+	cwd, err := os.Readlink(hostfs.Join("proc", strconv.Itoa(pid), "cwd"))
 	if err != nil {
 		return "", "", errors.Wrapf(err, "error fetching cwd for pid %d", pid)
 	}
@@ -259,7 +227,7 @@ func dirIsPid(name string) bool {
 	return true
 }
 
-func getUser(hostfs string, pid int) (string, error) {
+func getUser(hostfs resolve.Resolver, pid int) (string, error) {
 	status, err := getProcStatus(hostfs, pid)
 	if err != nil {
 		return "", errors.Wrapf(err, "error fetching user ID for pid %d", pid)
@@ -280,8 +248,8 @@ func getUser(hostfs string, pid int) (string, error) {
 	return userFinal, nil
 }
 
-func getEnvData(hostfs string, pid int) (common.MapStr, error) {
-	path := filepath.Join(hostfs, strconv.Itoa(pid), "environ")
+func getEnvData(hostfs resolve.Resolver, pid int) (common.MapStr, error) {
+	path := hostfs.Join("proc", strconv.Itoa(pid), "environ")
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error opening file %s", path)
@@ -305,10 +273,10 @@ func getEnvData(hostfs string, pid int) (common.MapStr, error) {
 	return env, nil
 }
 
-func getMemData(hostfs string, pid int) (ProcMemInfo, error) {
+func getMemData(hostfs resolve.Resolver, pid int) (ProcMemInfo, error) {
 	// Memory data
 	state := ProcMemInfo{}
-	path := filepath.Join(hostfs, strconv.Itoa(pid), "statm")
+	path := hostfs.Join("proc", strconv.Itoa(pid), "statm")
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		return state, errors.Wrapf(err, "error opening file %s", path)
@@ -334,10 +302,10 @@ func getMemData(hostfs string, pid int) (ProcMemInfo, error) {
 	return state, nil
 }
 
-func getCPUTime(hostfs string, pid int) (ProcCPUInfo, error) {
+func getCPUTime(hostfs resolve.Resolver, pid int) (ProcCPUInfo, error) {
 	state := ProcCPUInfo{}
 
-	pathCPU := filepath.Join(hostfs, strconv.Itoa(pid), "stat")
+	pathCPU := hostfs.Join("proc", strconv.Itoa(pid), "stat")
 	data, err := ioutil.ReadFile(pathCPU)
 	if err != nil {
 		return state, errors.Wrapf(err, "error opening file %s", pathCPU)
@@ -379,8 +347,8 @@ func getCPUTime(hostfs string, pid int) (ProcCPUInfo, error) {
 	return state, nil
 }
 
-func getArgs(hostfs string, pid int) ([]string, error) {
-	path := filepath.Join(hostfs, strconv.Itoa(pid), "cmdline")
+func getArgs(hostfs resolve.Resolver, pid int) ([]string, error) {
+	path := hostfs.Join("proc", strconv.Itoa(pid), "cmdline")
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error opening file %s", path)
@@ -401,10 +369,10 @@ func getArgs(hostfs string, pid int) ([]string, error) {
 	return args, nil
 }
 
-func getFDStats(hostfs string, pid int) (ProcFDInfo, error) {
+func getFDStats(hostfs resolve.Resolver, pid int) (ProcFDInfo, error) {
 	state := ProcFDInfo{}
 
-	path := filepath.Join(hostfs, strconv.Itoa(pid), "limits")
+	path := hostfs.Join("proc", strconv.Itoa(pid), "limits")
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		return state, errors.Wrapf(err, "error opening file %s", path)
@@ -433,7 +401,7 @@ func getFDStats(hostfs string, pid int) (ProcFDInfo, error) {
 		}
 	}
 
-	pathFD := filepath.Join(hostfs, strconv.Itoa(pid), "fd")
+	pathFD := hostfs.Join("proc", strconv.Itoa(pid), "fd")
 	fds, err := ioutil.ReadDir(pathFD)
 	if err != nil {
 		return state, errors.Wrapf(err, "error reading FD directory for pid %d", pid)
@@ -443,12 +411,12 @@ func getFDStats(hostfs string, pid int) (ProcFDInfo, error) {
 }
 
 // getLinuxBootTime fetches the static unix time for when the system was booted.
-func getLinuxBootTime(hostfs string) (uint64, error) {
+func getLinuxBootTime(hostfs resolve.Resolver) (uint64, error) {
 	if bootTime != 0 {
 		return bootTime, nil
 	}
 
-	path := filepath.Join(hostfs, "stat")
+	path := hostfs.Join("proc", "stat")
 	// grab system boot time
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -471,9 +439,9 @@ func getLinuxBootTime(hostfs string) (uint64, error) {
 	return 0, errors.Wrapf(err, "no boot time find in file %s", path)
 }
 
-func getProcStatus(hostfs string, pid int) (map[string]string, error) {
+func getProcStatus(hostfs resolve.Resolver, pid int) (map[string]string, error) {
 	status := make(map[string]string, 42)
-	path := filepath.Join(hostfs, strconv.Itoa(pid), "status")
+	path := hostfs.Join("proc", strconv.Itoa(pid), "status")
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error opening file %s", path)
