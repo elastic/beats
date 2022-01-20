@@ -61,13 +61,9 @@ output:
   {% if elasticsearch.ssl_ca_sha256 %}
     ssl.ca_sha256: {{ elasticsearch.ssl_ca_sha256 }}
   {% endif %}
-  # merge conflict
-    {% for k, v in elasticsearch.items() -%}
-    {{ k }}: {{ v }}
-    {% endfor -%}
-    # older versions have to be allowed because mockbeat is on v9.9.9
-    allow_older_versions: true
-    # merge conflict
+
+  # older versions have to be allowed because mockbeat is on v9.9.9
+  allow_older_versions: true
   {%- endif %}
 
 
