@@ -9,10 +9,10 @@ import (
 	"testing"
 )
 
-func TestJsonNorm(t *testing.T) {
+func TestGetMapValue(t *testing.T) {
 	type args struct {
-		key    string
-		mapStr interface{}
+		key  string
+		data interface{}
 	}
 	tests := []struct {
 		name    string
@@ -21,10 +21,10 @@ func TestJsonNorm(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "will return string value from interface",
+			name: "will return map from input data",
 			args: args{
 				key: "a",
-				mapStr: map[string]interface{}{
+				data: map[string]interface{}{
 					"a": "a_value",
 				},
 			},
@@ -32,10 +32,10 @@ func TestJsonNorm(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "will return interface value from interface",
+			name: "will return map from input data",
 			args: args{
 				key: "a",
-				mapStr: map[string]interface{}{
+				data: map[string]interface{}{
 					"a": map[string]interface{}{
 						"b": "b_value",
 					},
@@ -47,10 +47,10 @@ func TestJsonNorm(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "can not pass wrong key in key parameter",
+			name: "returns an error if the key is not found",
 			args: args{
 				key: "b",
-				mapStr: map[string]interface{}{
+				data: map[string]interface{}{
 					"a": map[string]interface{}{
 						"b": "b_value",
 					},
@@ -59,10 +59,10 @@ func TestJsonNorm(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "can not pass mapStr other then type map[string]interface{} in key parameter",
+			name: "returns an error if data is not type map[string]interface{}",
 			args: args{
 				key: "a",
-				mapStr: []interface{}{
+				data: []interface{}{
 					map[string]interface{}{
 						"a": "a_value_1",
 					},
@@ -76,22 +76,22 @@ func TestJsonNorm(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := jsonNorm(tt.args.key, tt.args.mapStr)
+			got, err := getMapValue(tt.args.key, tt.args.data)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("jsonNorm() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("getMapValue() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("jsonNorm() = %v, want %v", got, tt.want)
+				t.Errorf("getMapValue() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestJsonArr(t *testing.T) {
+func TestGetArrayValue(t *testing.T) {
 	type args struct {
-		key            string
-		arrayInterface []interface{}
+		key   string
+		array []interface{}
 	}
 	tests := []struct {
 		name    string
@@ -100,10 +100,10 @@ func TestJsonArr(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "will return array of interface values from interface",
+			name: "will return array of maps from input JSON",
 			args: args{
 				key: "a",
-				arrayInterface: []interface{}{
+				array: []interface{}{
 					map[string]interface{}{
 						"a": "a_value_1",
 					},
@@ -119,10 +119,10 @@ func TestJsonArr(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "will return array of embedded interface values from interface",
+			name: "will return array of maps from input JSON",
 			args: args{
 				key: "a",
-				arrayInterface: []interface{}{
+				array: []interface{}{
 					map[string]interface{}{
 						"a": map[string]interface{}{
 							"b": "b_value",
@@ -146,10 +146,10 @@ func TestJsonArr(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "can not collect values from non-existing key",
+			name: "returns an error if the key is not found",
 			args: args{
 				key: "b",
-				arrayInterface: []interface{}{
+				array: []interface{}{
 					map[string]interface{}{
 						"a": "a_value_1",
 					},
@@ -163,13 +163,13 @@ func TestJsonArr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := jsonArr(tt.args.key, tt.args.arrayInterface)
+			got, err := getArrayValue(tt.args.key, tt.args.array)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("jsonArr() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("getArrayValue() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("jsonArr() = %v, want %v", got, tt.want)
+				t.Errorf("getArrayValue() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -187,7 +187,7 @@ func TestParse(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "will return string value from string json",
+			name: "will return a array of string from JSON",
 			args: args{
 				rawJSON: `{"a": "a_value"}`,
 				key:     "a",
@@ -196,7 +196,7 @@ func TestParse(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "will return string value from string embedded json",
+			name: "will return a array of string from JSON",
 			args: args{
 				rawJSON: `{"a": {"b": "b_value"}}`,
 				key:     "a.b",
@@ -205,7 +205,7 @@ func TestParse(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "will return string value from string embedded Array json",
+			name: "will return a array of string from JSON",
 			args: args{
 				rawJSON: `{"a": [{"b": "b_value_1"},{"b": "b_value_2"},{"b": "b_value_3"}]}`,
 				key:     "a.#.b",
@@ -214,7 +214,7 @@ func TestParse(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "will return string value from string Array json",
+			name: "will return a array of string from JSON",
 			args: args{
 				rawJSON: `[{"b": "b_value_1"},{"b": "b_value_2"},{"b": "b_value_3"}]`,
 				key:     "#.b",
@@ -223,7 +223,7 @@ func TestParse(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "will return string value from string embedded Array json",
+			name: "will return a array of string from JSON",
 			args: args{
 				rawJSON: `{"a":[{"b":{"c":"c_value_1"}},{"b":{"c":"c_value_2"}},{"b":{"c":"c_value_3"}}]}`,
 				key:     "a.#.b.c",
@@ -232,7 +232,7 @@ func TestParse(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "can not extract value using unstructured key",
+			name: "returns an error if the key is not found",
 			args: args{
 				rawJSON: `{"a":[{"b":{"c":"c_value_1"}},{"b":{"c":"c_value_2"}},{"b":{"c":"c_value_3"}}]}`,
 				key:     "a.b.c",
@@ -240,7 +240,7 @@ func TestParse(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "can not extract value using unstructured key",
+			name: "returns an error if the key is not found",
 			args: args{
 				rawJSON: `{"a":[{"b":{"c":"c_value_1"}},{"b":{"c":"c_value_2"}},{"b":{"c":"c_value_3"}}]}`,
 				key:     "a.b.#.c",
@@ -262,7 +262,7 @@ func TestParse(t *testing.T) {
 	}
 }
 
-func Test_parseInterface(t *testing.T) {
+func TestParseInterface(t *testing.T) {
 	type args struct {
 		data interface{}
 		key  string
@@ -274,7 +274,7 @@ func Test_parseInterface(t *testing.T) {
 		wantErr    bool
 	}{
 		{
-			name: "will return string value from string json",
+			name: "will return array of string from input data",
 			args: args{
 				data: map[string]interface{}{
 					"a": "a_value",
@@ -285,7 +285,7 @@ func Test_parseInterface(t *testing.T) {
 			wantErr:    false,
 		},
 		{
-			name: "will return string value from string embedded json",
+			name: "will return array of string from input data",
 			args: args{
 				data: map[string]interface{}{
 					"a": map[string]interface{}{
@@ -298,7 +298,7 @@ func Test_parseInterface(t *testing.T) {
 			wantErr:    false,
 		},
 		{
-			name: "will return string value from string embedded Array json",
+			name: "will return array of string from input data",
 			args: args{
 				data: map[string]interface{}{
 					"a": []interface{}{
@@ -319,7 +319,7 @@ func Test_parseInterface(t *testing.T) {
 			wantErr:    false,
 		},
 		{
-			name: "will return string value from string Array json",
+			name: "will return array of string from input data",
 			args: args{
 				data: []interface{}{
 					map[string]interface{}{
@@ -338,7 +338,7 @@ func Test_parseInterface(t *testing.T) {
 			wantErr:    false,
 		},
 		{
-			name: "will return string value from string embedded Array json",
+			name: "will return array of string from input data",
 			args: args{
 				data: map[string]interface{}{
 					"a": []interface{}{
@@ -365,7 +365,7 @@ func Test_parseInterface(t *testing.T) {
 			wantErr:    false,
 		},
 		{
-			name: "can not extract value using unstructured key",
+			name: "returns an error if the key is not found",
 			args: args{
 				data: map[string]interface{}{
 					"a": []interface{}{
@@ -391,7 +391,7 @@ func Test_parseInterface(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "can not extract value using unstructured key",
+			name: "returns an error if the key is not found",
 			args: args{
 				data: map[string]interface{}{
 					"a": []interface{}{

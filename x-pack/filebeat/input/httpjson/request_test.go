@@ -8,8 +8,6 @@ import (
 	"context"
 	"fmt"
 	"net/http/httptest"
-	"net/url"
-	"reflect"
 	"testing"
 	"time"
 
@@ -134,42 +132,4 @@ func TestCtxAfterDoRequest(t *testing.T) {
 		},
 		lastResp,
 	)
-}
-
-func Test_generateNewUrl(t *testing.T) {
-	type args struct {
-		replacement string
-		oldUrl      string
-		ids         string
-	}
-	newurl, _ := url.Parse("http://some_url/id_10001/some_url")
-	tests := []struct {
-		name    string
-		args    args
-		want    url.URL
-		wantErr bool
-	}{
-		{
-			name: "will return old url with new id",
-			args: args{
-				replacement: "records.#.id",
-				oldUrl:      "http://some_url/records.#.id/some_url",
-				ids:         "id_10001",
-			},
-			want:    *newurl,
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := generateNewUrl(tt.args.replacement, tt.args.oldUrl, tt.args.ids)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("generateNewUrl() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("generateNewUrl() = %v, want %v", got, tt.want)
-			}
-		})
-	}
 }

@@ -89,7 +89,7 @@ type requestFactory struct {
 	password   string
 	log        *logp.Logger
 	encoder    encoderFunc
-	replace    string
+	replace    *regexp.Regexp
 	split      *split
 }
 
@@ -112,6 +112,7 @@ func newRequestFactory(config config, log *logp.Logger) []*requestFactory {
 	}
 	rfs = append(rfs, rf)
 	for _, ch := range config.Chain {
+		reg, _ := regexp.Compile(ch.Step.Replace)
 		// chain calls requestFactory object
 		split, _ := newSplitResponse(ch.Step.Response.Split, log)
 		rf := &requestFactory{
@@ -121,7 +122,7 @@ func newRequestFactory(config config, log *logp.Logger) []*requestFactory {
 			transforms: ts,
 			log:        log,
 			encoder:    registeredEncoders[config.Request.EncodeAs],
-			replace:    ch.Step.Replace,
+			replace:    reg,
 			split:      split,
 		}
 		rfs = append(rfs, rf)
@@ -198,12 +199,8 @@ func (rf *requestFactory) collectResponse(stdCtx context.Context, trCtx *transfo
 }
 
 // generateNewUrl returns new url value using replacement from oldUrl with ids
-func generateNewUrl(replacement, oldUrl, ids string) (url.URL, error) {
-	reg, err := regexp.Compile(replacement)
-	if err != nil {
-		return url.URL{}, fmt.Errorf("failed to create regex on provided value: %w", err)
-	}
-	newUrl, err := url.Parse(reg.ReplaceAllString(oldUrl, ids))
+func generateNewUrl(replacement *regexp.Regexp, oldUrl, ids string) (url.URL, error) {
+	newUrl, err := url.Parse(replacement.ReplaceAllString(oldUrl, ids))
 	if err != nil {
 		return url.URL{}, fmt.Errorf("failed to replace value in url: %w", err)
 	}
@@ -287,8 +284,9 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 					return err
 				}
 				r.responseProcessor.split = split
-				continue
 			} else {
+				// The if comdition (i == rfSize-1) ensures this branch never runs to the last element
+				// of r.requestFactories, therefore r.requestFactories[i+1] will never be out of bounds.
 				ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[i+1].replace)
 				if err != nil {
 					return err
@@ -304,20 +302,21 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		}
 	}
 
-	defer httpResp.Body.Close()
 	r.log.Infof("request finished: %d events published", n)
 
 	return nil
 }
 
 // getIdsFromResponses returns ids from responses
-func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, replace string) ([]string, error) {
+func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, replace *regexp.Regexp) ([]string, error) {
 	var b []byte
 	var ids []string
 	var err error
 	// collect ids from all responses
 	for _, resp := range intermediateResps {
+		resp := resp
 		if resp.Body != nil {
+			defer resp.Body.Close()
 			b, err = io.ReadAll(resp.Body)
 			if err != nil {
 				return nil, fmt.Errorf("error while reading response body: %w", err)
@@ -325,7 +324,7 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 		}
 
 		// get replace values from collected json
-		ids, err = parse(string(b), replace)
+		ids, err = parse(string(b), replace.String())
 		if err != nil {
 			return nil, fmt.Errorf("error while getting keys: %w", err)
 		}

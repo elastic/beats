@@ -4,6 +4,8 @@
 
 package httpjson
 
+// chainConfig for chain request
+// each step will be considered as seperate request call
 type chainConfig struct {
 	Step stepConfig `config:"step" validate:"required"`
 }
