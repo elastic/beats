@@ -195,10 +195,9 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 		options := kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
 			Node:        config.Node,
+			Namespace:   config.Namespace,
 		}
-		if config.Namespace != "" {
-			options.Namespace = config.Namespace
-		}
+
 		nodeWatcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_node", client, &kubernetes.Node{}, options, nil)
 		if err != nil {
 			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
