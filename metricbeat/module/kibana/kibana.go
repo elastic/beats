@@ -34,11 +34,10 @@ const (
 	ModuleName = "kibana"
 
 	// API Paths
-	StatusPath      = "api/status"
-	StatsPath       = "api/stats"
-	RulePath        = "api/monitoring_collection/rules"
-	TaskManagerPath = "api/monitoring_collection/task_manager"
-	SettingsPath    = "api/settings"
+	StatusPath   = "api/status"
+	StatsPath    = "api/stats"
+	RulesPath    = "api/monitoring_collection/rules"
+	SettingsPath = "api/settings"
 )
 
 var (
@@ -69,7 +68,7 @@ func init() {
 
 // NewModule creates a new module.
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	return elastic.NewModule(&base, []string{"stats", "rule", "task_manager"}, logp.NewLogger(ModuleName))
+	return elastic.NewModule(&base, []string{"stats", "rules"}, logp.NewLogger(ModuleName))
 }
 
 // GetVersion returns the version of the Kibana instance

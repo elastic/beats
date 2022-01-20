@@ -157,11 +157,10 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kafka-partition,partition>>   
 |<<metricbeat-metricset-kafka-producer,producer>> beta[]  
 |<<metricbeat-module-kibana,Kibana>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.5+| .5+|  |<<metricbeat-metricset-kibana-rule,rule>>   
+.4+| .4+|  |<<metricbeat-metricset-kibana-rules,rules>> beta[]  
 |<<metricbeat-metricset-kibana-settings,settings>>   
 |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
-|<<metricbeat-metricset-kibana-task_manager,task_manager>> beta[]  
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .23+| .23+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
 |<<metricbeat-metricset-kubernetes-container,container>>   

@@ -1,1 +1,0 @@
-This is the rule metricset of the module kibana.

@@ -6,15 +6,6 @@
   release: ga
   settings: ["ssl", "http"]
   fields:
-    - name: kibana_rule
-      type: group
-      fields:
-        - name: timestamp
-          type: alias
-          path: "@timestamp"
-        - name: rule.id
-          type: alias
-          path: kibana.rule.id
     - name: kibana_stats
       type: group
       fields:

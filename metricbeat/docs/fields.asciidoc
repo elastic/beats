@@ -40508,25 +40508,6 @@ Kibana module
 
 
 
-*`kibana_rule.timestamp`*::
-+
---
-type: alias
-
-alias to: @timestamp
-
---
-
-*`kibana_rule.rule.id`*::
-+
---
-type: alias
-
-alias to: kibana.rule.id
-
---
-
-
 *`kibana_stats.timestamp`*::
 +
 --
@@ -40689,80 +40670,54 @@ type: keyword
 --
 
 [float]
-=== rule
+=== rules
 
-rule
-
-
+Kibana rule metrics.
 
 
-*`kibana.rule.kibana.status`*::
+
+
+*`kibana.rules.kibana.status`*::
 +
 --
 type: keyword
 
 --
 
-*`kibana.rule.name`*::
-+
---
-type: keyword
 
---
-
-*`kibana.rule.id`*::
-+
---
-type: keyword
-
---
-
-*`kibana.rule.lastExecutionDuration`*::
+*`kibana.rules.overdue.count`*::
 +
 --
 type: long
 
 --
 
-*`kibana.rule.averageDrift`*::
+
+*`kibana.rules.overdue.duration.p50`*::
++
+--
+type: float
+
+--
+
+*`kibana.rules.overdue.duration.p99`*::
++
+--
+type: float
+
+--
+
+*`kibana.rules.failures`*::
 +
 --
 type: long
 
 --
 
-*`kibana.rule.lastExecutionTimeout`*::
-+
---
-type: date
-
---
-
-*`kibana.rule.totalExecutions`*::
+*`kibana.rules.executions`*::
 +
 --
 type: long
-
---
-
-*`kibana.rule.lastErrorDate`*::
-+
---
-type: date
-
---
-
-*`kibana.rule.lastErrorMessage`*::
-+
---
-type: text
-
---
-
-*`kibana.rule.lastErrorReason`*::
-+
---
-type: text
 
 --
 
@@ -41277,57 +41232,6 @@ type: long
 Total number of connections.
 
 
-type: long
-
---
-
-[float]
-=== task_manager
-
-task_manager
-
-
-
-
-*`kibana.task_manager.kibana.status`*::
-+
---
-type: keyword
-
---
-
-*`kibana.task_manager.pending`*::
-+
---
-type: long
-
---
-
-
-*`kibana.task_manager.drift.p50`*::
-+
---
-type: long
-
---
-
-*`kibana.task_manager.drift.p90`*::
-+
---
-type: long
-
---
-
-*`kibana.task_manager.drift.p95`*::
-+
---
-type: long
-
---
-
-*`kibana.task_manager.drift.p99`*::
-+
---
 type: long
 
 --

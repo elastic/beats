@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package rule
+package rules
 
 import (
 	"fmt"
@@ -31,7 +31,7 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet(kibana.ModuleName, "rule", New,
+	mb.Registry.MustAddMetricSet(kibana.ModuleName, "rules", New,
 		mb.WithHostParser(hostParser),
 	)
 }
@@ -39,14 +39,14 @@ func init() {
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: "http",
-		DefaultPath:   kibana.RulePath,
+		DefaultPath:   kibana.RulesPath,
 	}.Build()
 )
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
 	*kibana.MetricSet
-	ruleHTTP *helper.HTTP
+	rulesHTTP *helper.HTTP
 }
 
 // New create a new instance of the MetricSet
@@ -77,23 +77,23 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 }
 
 func (m *MetricSet) init() error {
-	ruleHTTP, err := helper.NewHTTP(m.BaseMetricSet)
+	rulesHTTP, err := helper.NewHTTP(m.BaseMetricSet)
 	if err != nil {
 		return err
 	}
 
-	kibanaVersion, err := kibana.GetVersion(ruleHTTP, kibana.RulePath)
+	kibanaVersion, err := kibana.GetVersion(rulesHTTP, kibana.RulesPath)
 	if err != nil {
 		return err
 	}
 
 	isMetricsAPIAvailable := kibana.IsRulesAPIAvailable(kibanaVersion)
 	if !isMetricsAPIAvailable {
-		const errorMsg = "the %v rule is only supported with Kibana >= %v. You are currently running Kibana %v"
+		const errorMsg = "the %v rules is only supported with Kibana >= %v. You are currently running Kibana %v"
 		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.RulesAPIAvailableVersion, kibanaVersion)
 	}
 
-	m.ruleHTTP = ruleHTTP
+	m.rulesHTTP = rulesHTTP
 
 	return nil
 }
@@ -102,7 +102,7 @@ func (m *MetricSet) fetchMetrics(r mb.ReporterV2) error {
 	var content []byte
 	var err error
 
-	content, err = m.ruleHTTP.FetchContent()
+	content, err = m.rulesHTTP.FetchContent()
 	if err != nil {
 		return err
 	}

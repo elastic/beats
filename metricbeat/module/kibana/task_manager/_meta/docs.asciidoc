@@ -1,1 +1,0 @@
-This is the task_manager metricset of the module kibana.

@@ -1,0 +1,27 @@
+- name: rules
+  type: group
+  description: >
+    Kibana rule metrics.
+  release: beta
+  fields:
+    - name: kibana
+      type: group
+      fields:
+        - name: status
+          type: keyword
+    - name: overdue
+      type: group
+      fields:
+        - name: count
+          type: long
+        - name: duration
+          type: group
+          fields:
+            - name: p50
+              type: float
+            - name: p99
+              type: float
+    - name: failures
+      type: long
+    - name: executions
+      type: long
