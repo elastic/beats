@@ -8,7 +8,6 @@ For versions after `1.5`, the `istiod` and `proxy` metricsets should be used.
 In such case, the `istiod` endpoint collects metrics directly from the Istio Daemon while the `proxy` endpoint collects from each of the proxy sidecars.
 The metrics exposed by Istio after version `1.5` are documented on https://istio.io/latest/docs/reference/config/metrics/[Istio Documentation > Reference > Configuration > Istio Standard Metrics].
 
-The default metricsets of the module are `mesh`, `mixer`, `pilot`, `galley`, `citadel`. When using Istio versions after `1.5`, the default metricsets must be overwritten specifying the `istiod` and/or `proxy` metricsets.
 
 [float]
 === Compatibility
