@@ -54,4 +54,4 @@ services:
       retries: 1200
       interval: 5s
       start_period: 60s
-    command: /usr/local/bin/kibana-docker --xpack.security.enabled=true --elasticsearch.username=myelastic --elasticsearch.password=changeme
+    command: /usr/local/bin/kibana-docker
