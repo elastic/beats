@@ -5,15 +5,15 @@ import (
 )
 
 const (
-	procfsdir        = "/hostfs"
-	ProcessInputType = "process"
+	procfsdir   = "/hostfs"
+	ProcessType = "process"
 )
 
 type Process struct {
-	InputType string        `json:"type"`
-	PID       string        `json:"pid"`
-	Cmd       string        `json:"command"`
-	Stat      proc.ProcStat `json:"stat"`
+	Type string        `json:"type"`
+	PID  string        `json:"pid"`
+	Cmd  string        `json:"command"`
+	Stat proc.ProcStat `json:"stat"`
 }
 
 type ProcessesFetcher struct {
@@ -47,7 +47,7 @@ func (f *ProcessesFetcher) Fetch() ([]interface{}, error) {
 			return ret, nil
 		}
 
-		ret = append(ret, Process{ProcessInputType, p, cmd, stat})
+		ret = append(ret, Process{ProcessType, p, cmd, stat})
 	}
 
 	return ret, nil

@@ -2,16 +2,19 @@ package beater
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/logp"
+
 	"k8s.io/apimachinery/pkg/runtime"
 	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 )
 
 const (
+	KubeAPIType         = "kube-api"
 	kubeSystemNamespace = "kube-system"
 	allNamespaces       = "" // The Kube API treats this as "all namespaces"
 )
@@ -22,7 +25,7 @@ var (
 	vanillaClusterResources = []requiredResource{
 		{
 			&kubernetes.Pod{},
-			kubeSystemNamespace,
+			allNamespaces,
 		},
 		{
 
@@ -56,11 +59,19 @@ var (
 		// 	allNamespaces,
 		// },
 	}
+
+	watcherlock sync.Once
 )
 
 type requiredResource struct {
 	resource  kubernetes.Resource
 	namespace string
+}
+
+// KubeAPIResource is a single resource from the Kube API.
+type KubeAPIResource struct {
+	Type     string      `json:"type"`
+	Resource interface{} `json:"resource"`
 }
 
 type KubeFetcher struct {
@@ -74,10 +85,6 @@ func NewKubeFetcher(kubeconfig string, interval time.Duration) (Fetcher, error) 
 		kubeconfig: kubeconfig,
 		interval:   interval,
 		watchers:   make([]kubernetes.Watcher, 0),
-	}
-
-	if err := f.initWatchers(); err != nil {
-		return nil, err
 	}
 
 	return f, nil
@@ -131,6 +138,16 @@ func (f *KubeFetcher) initWatchers() error {
 }
 
 func (f *KubeFetcher) Fetch() ([]interface{}, error) {
+	var err error
+	watcherlock.Do(func() {
+		err = f.initWatchers()
+	})
+	if err != nil {
+		// Reset watcherlock if the watchers could not be initiated.
+		watcherlock = sync.Once{}
+		return nil, fmt.Errorf("could not initate Kubernetes watchers: %w", err)
+	}
+
 	ret := make([]interface{}, 0)
 
 	for _, w := range f.watchers {
@@ -145,9 +162,9 @@ func (f *KubeFetcher) Fetch() ([]interface{}, error) {
 			}
 
 			addTypeInformationToObject(o) // See https://github.com/kubernetes/kubernetes/issues/3030
-		}
 
-		ret = append(ret, resources...)
+			ret = append(ret, KubeAPIResource{KubeAPIType, o})
+		}
 	}
 
 	return ret, nil

@@ -1,10 +1,10 @@
 package beater
 
 import (
-	libevents "github.com/elastic/beats/v7/libbeat/beat/events"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	libevents "github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/gofrs/uuid"
