@@ -2,13 +2,13 @@
 create-kind-cluster:
   kind create cluster --config deploy/k8s/kind/kind-config.yaml
 
-Install-kind:
+install-kind:
   brew install kind
 
 cp-manifests-local:
   scripts/bash/locals.sh
 
-setup-env: Install-kind cp-manifests-local create-kind-cluster
+setup-env: install-kind cp-manifests-local create-kind-cluster
 
 manifest-local:
   cp kubebeat-ds-local.yaml
@@ -25,7 +25,7 @@ build-kubebeat:
 deploy-kubebeat:
   kubectl delete -f deploy/k8s/kubebeat-ds-local.yaml -n kube-system & kubectl apply -f deploy/k8s/kubebeat-ds-local.yaml -n kube-system
 
-build-deploy-kubebeat: build-kubebeat-debug load-kubebeat-image deploy-kubebeat-debug
+build-deploy-kubebeat: build-kubebeat load-kubebeat-image deploy-kubebeat
 
 build-kubebeat-debug:
   GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -gcflags "all=-N -l" && docker build -f Dockerfile.debug -t kubebeat .

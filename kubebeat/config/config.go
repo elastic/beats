@@ -8,7 +8,8 @@ import "time"
 // Todo add consts as configurable vars from integration package - add datastream struct
 const DefaultNamespace = "default"
 
-const datastreamPrefix = "logs-k8s_cis.result-"
+const ResultsDatastreamIndexPrefix = "logs-k8s_cis.result"
+const MetadataDatastreamIndexPrefix = ".logs-k8s_cis.metadata"
 
 type Config struct {
 	KubeConfig string        `config:"kube_config"`
@@ -32,13 +33,12 @@ var DefaultConfig = Config{
 		"/hostfs/var/lib/etcd/**",
 		"/hostfs/etc/kubernetes/pki/**",
 	},
-
 }
 
-// function to generate the datastream value
-func Datastream(namespace string) string {
+// Datastream function to generate the datastream value
+func Datastream(namespace string, indexPrefix string) string {
 	if namespace == "" {
 		namespace = DefaultNamespace
 	}
-	return datastreamPrefix + namespace
+	return indexPrefix + "-" + namespace
 }

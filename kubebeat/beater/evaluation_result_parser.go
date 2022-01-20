@@ -12,15 +12,14 @@ import (
 )
 
 type evaluationResultParser struct {
+	index string
 }
 
-func NewEvaluationResultParser() (*evaluationResultParser, error) {
-
-	return &evaluationResultParser{}, nil
+func NewEvaluationResultParser(index string) (*evaluationResultParser, error) {
+	return &evaluationResultParser{index: index}, nil
 }
 
-func (parser *evaluationResultParser) ParseResult(index, result interface{}, uuid uuid.UUID, timestamp time.Time) ([]beat.Event, error) {
-
+func (parser *evaluationResultParser) ParseResult(result interface{}, cycleId uuid.UUID) ([]beat.Event, error) {
 	events := make([]beat.Event, 0)
 	var opaResultMap = result.(map[string]interface{})
 	var opaResult RuleResult
@@ -30,21 +29,19 @@ func (parser *evaluationResultParser) ParseResult(index, result interface{}, uui
 		return nil, err
 	}
 
+	timestamp := time.Now()
 	for _, finding := range opaResult.Findings {
 		event := beat.Event{
 			Timestamp: timestamp,
 			Fields: common.MapStr{
-				"run_id":   uuid,
+				"cycle_id": cycleId,
 				"result":   finding.Result,
 				"resource": opaResult.Resource,
 				"rule":     finding.Rule,
 			},
 		}
 		// Insert datastream as index to event struct
-	if index != "" {
-
-		event.Meta = common.MapStr{libevents.FieldMetaIndex: index}
-	}
+		event.Meta = common.MapStr{libevents.FieldMetaIndex: parser.index}
 
 		events = append(events, event)
 	}
