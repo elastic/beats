@@ -308,7 +308,7 @@ func Package() {
 	}{
 		{"darwin/amd64", "darwin-x86_64.tar.gz"},
 		{"linux/amd64", "linux-x86_64.tar.gz"},
-		{"linux/arm64", "linux-arm64.tar.gz"},
+		{"linux/arm64", "linux-aarch64.tar.gz"},
 		{"windows/amd64", "windows-x86_64.zip"},
 	}
 
