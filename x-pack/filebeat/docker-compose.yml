@@ -28,4 +28,8 @@ services:
     extends:
       file: ${ES_BEATS}/testing/environments/${STACK_ENVIRONMENT}.yml
       service: elasticsearch
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+      retries: 300
+      interval: 1s
 
