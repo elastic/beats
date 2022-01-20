@@ -218,13 +218,14 @@ func (o *Operator) Shutdown() {
 		o.logger.Debugf("pipeline installer '%s' done", o.pipelineID)
 	}
 
+	o.appsLock.Lock()
+	defer o.appsLock.Unlock()
+
 	wg := sync.WaitGroup{}
 	wg.Add(len(o.apps))
 
 	started := time.Now()
 
-	o.appsLock.Lock()
-	defer o.appsLock.Unlock()
 	for _, a := range o.apps {
 		go func(a Application) {
 			a.Shutdown()
