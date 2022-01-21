@@ -53,6 +53,8 @@ type client struct {
 
 	producer sarama.AsyncProducer
 
+	recordHeaders []sarama.RecordHeader
+
 	wg sync.WaitGroup
 }
 
@@ -76,7 +78,8 @@ func newKafkaClient(
 	index string,
 	key *fmtstr.EventFormatString,
 	topic outil.Selector,
-	writer codec.Codec,
+	headers map[string]string,
+    writer codec.Codec,
 	cfg *sarama.Config,
 ) (*client, error) {
 	c := &client{
@@ -90,6 +93,20 @@ func newKafkaClient(
 		config:   *cfg,
 		done:     make(chan struct{}),
 	}
+
+	if len(headers) != 0 {
+		recordHeaders := make([]sarama.RecordHeader, 0)
+		for k, v := range headers {
+			recordHeader := sarama.RecordHeader{
+				Key:   []byte(k),
+				Value: []byte(v),
+			}
+
+			recordHeaders = append(recordHeaders, recordHeader)
+		}
+		c.recordHeaders = recordHeaders
+	}
+	
 	return c, nil
 }
 
