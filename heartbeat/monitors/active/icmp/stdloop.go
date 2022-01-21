@@ -346,7 +346,7 @@ func (l *stdICMPLoop) sendEchoRequest(addr *net.IPAddr) (*requestContext, error)
 	l.requests[id] = ctx
 	l.mutex.Unlock()
 
-	payloadBuf := make([]byte, 0, 8)
+	payloadBuf := make([]byte, 48, 48)
 	payload := bytes.NewBuffer(payloadBuf)
 	ts := time.Now()
 	binary.Write(payload, binary.BigEndian, ts.UnixNano())
