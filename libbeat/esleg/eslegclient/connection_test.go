@@ -71,18 +71,21 @@ func TestHeaders(t *testing.T) {
 		expected map[string][]string
 	}{
 		{input: map[string]string{
-			"Accept":       "application/vnd.elasticsearch+json;compatible-with=7",
-			"Content-Type": "application/vnd.elasticsearch+json;compatible-with=7",
-			"X-My-Header":  "true"},
+			"Accept":            "application/vnd.elasticsearch+json;compatible-with=7",
+			"Content-Type":      "application/vnd.elasticsearch+json;compatible-with=7",
+			ProductOriginHeader: "elastic-product",
+			"X-My-Header":       "true"},
 			expected: map[string][]string{
-				"Accept":       {"application/vnd.elasticsearch+json;compatible-with=7"},
-				"Content-Type": {"application/vnd.elasticsearch+json;compatible-with=7"},
-				"X-My-Header":  {"true"}}},
+				"Accept":            {"application/vnd.elasticsearch+json;compatible-with=7"},
+				"Content-Type":      {"application/vnd.elasticsearch+json;compatible-with=7"},
+				ProductOriginHeader: {"elastic-product"},
+				"X-My-Header":       {"true"}}},
 		{input: map[string]string{
 			"X-My-Header": "true"},
 			expected: map[string][]string{
-				"Accept":      {"application/json"},
-				"X-My-Header": {"true"}}},
+				"Accept":            {"application/json"},
+				ProductOriginHeader: {BeatsProductOrigin},
+				"X-My-Header":       {"true"}}},
 	} {
 		conn, err := NewConnection(ConnectionSettings{
 			Headers: td.input,

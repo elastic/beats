@@ -39,6 +39,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
 
+const (
+	// Identifies the request as originating from an Elastic product. Has the side effect of
+	// suppressing Elasticsearch API deprecation warnings in Kibana when set.
+	ProductOriginHeader = "X-Elastic-Product-Origin"
+	BeatsProductOrigin  = "beats"
+)
+
 type esHTTPClient interface {
 	Do(req *http.Request) (resp *http.Response, err error)
 	CloseIdleConnections()
@@ -84,7 +91,9 @@ type ConnectionSettings struct {
 func NewConnection(s ConnectionSettings) (*Connection, error) {
 	logger := logp.NewLogger("esclientleg")
 
-	s = settingsWithDefaults(s)
+	if s.IdleConnTimeout == 0 {
+		s.IdleConnTimeout = 1 * time.Minute
+	}
 
 	u, err := url.Parse(s.URL)
 	if err != nil {
@@ -116,6 +125,14 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		s.Beatname = "Libbeat"
 	}
 	userAgent := useragent.UserAgent(s.Beatname)
+
+	// Default the product origin header to beats if it wasn't already set.
+	if _, ok := s.Headers[ProductOriginHeader]; !ok {
+		if s.Headers == nil {
+			s.Headers = make(map[string]string)
+		}
+		s.Headers[ProductOriginHeader] = BeatsProductOrigin
+	}
 
 	httpClient, err := s.Transport.Client(
 		httpcommon.WithLogger(logger),
@@ -153,15 +170,6 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 	}
 
 	return &conn, nil
-}
-
-func settingsWithDefaults(s ConnectionSettings) ConnectionSettings {
-	settings := s
-	if settings.IdleConnTimeout == 0 {
-		settings.IdleConnTimeout = 1 * time.Minute
-	}
-
-	return settings
 }
 
 // NewClients returns a list of Elasticsearch clients based on the given
