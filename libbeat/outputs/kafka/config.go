@@ -62,6 +62,7 @@ type kafkaConfig struct {
 	BulkMaxSize        int                       `config:"bulk_max_size"`
 	BulkFlushFrequency time.Duration             `config:"bulk_flush_frequency"`
 	MaxRetries         int                       `config:"max_retries"         validate:"min=-1,nonzero"`
+	Headers            map[string]string         `config:"headers"`
 	Backoff            backoffConfig             `config:"backoff"`
 	ClientID           string                    `config:"client_id"`
 	ChanBufferSize     int                       `config:"channel_buffer_size" validate:"min=1"`
@@ -114,6 +115,7 @@ func defaultConfig() kafkaConfig {
 		CompressionLevel: 4,
 		Version:          kafka.Version("1.0.0"),
 		MaxRetries:       3,
+		Headers:          nil,
 		Backoff: backoffConfig{
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
