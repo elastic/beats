@@ -84,6 +84,14 @@ func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error
 							vm = client.GetVMForMetaData(&resource, groupDimValues)
 							addCloudVMMetadata(&event, vm, resource.Subscription)
 						}
+						if client.Config.DefaultResourceType == "" {
+							event.ModuleFields.Put("metrics", metricList)
+						} else {
+							for key, metric := range metricList {
+								event.MetricSetFields.Put(key, metric)
+							}
+						}
+						report.Event(event)
 					}
 				}
 			} else {
@@ -92,15 +100,15 @@ func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error
 					vm = client.GetVMForMetaData(&resource, groupTimeValues)
 					addCloudVMMetadata(&event, vm, resource.Subscription)
 				}
-			}
-			if client.Config.DefaultResourceType == "" {
-				event.ModuleFields.Put("metrics", metricList)
-			} else {
-				for key, metric := range metricList {
-					event.MetricSetFields.Put(key, metric)
+				if client.Config.DefaultResourceType == "" {
+					event.ModuleFields.Put("metrics", metricList)
+				} else {
+					for key, metric := range metricList {
+						event.MetricSetFields.Put(key, metric)
+					}
 				}
+				report.Event(event)
 			}
-			report.Event(event)
 		}
 	}
 	return nil
