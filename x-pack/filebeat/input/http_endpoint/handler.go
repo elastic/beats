@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/libbeat/common/split"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -37,7 +38,7 @@ type httpHandler struct {
 	responseBody          string
 	includeHeaders        []string
 	preserveOriginalEvent bool
-	split                 *splitConfig
+	split                 *split.SplitConfig
 }
 
 // Triggers if middleware validation returns successful
@@ -62,24 +63,24 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 
 	for _, obj := range objs {
 		if h.split != nil {
-			split, err := newSplit(h.split, h.log)
+			split, err := split.NewSplit(h.split, h.log)
 			if err != nil {
 				return
 			}
 			// We want to be able to identify which split is the root of the chain.
-			split.isRoot = true
+			split.IsRoot = true
 			data, _ := json.Marshal(obj)
-			eventsCh, err := split.startSplit(data)
+			eventsCh, err := split.StartSplit(data)
 			if err != nil {
 				return
 			}
 			for maybeMsg := range eventsCh {
-				if maybeMsg.failed() {
+				if maybeMsg.Failed() {
 					h.log.Errorf("error processing response: %v", maybeMsg)
 					continue
 				}
 				// MAKE EVENT
-				h.publishEvent(maybeMsg.msg, headers)
+				h.publishEvent(maybeMsg.Msg, headers)
 			}
 			continue
 		}

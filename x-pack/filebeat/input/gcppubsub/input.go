@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/common/split"
 	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -173,25 +174,25 @@ func (in *pubsubInput) run() error {
 		arrayOffset := int64(0)
 		for _, item := range messages {
 			if in.config.Split != nil {
-				split, err := newSplit(in.config.Split, in.log)
+				split, err := split.NewSplit(in.config.Split, in.log)
 				if err != nil {
 					return
 				}
 				// We want to be able to identify which split is the root of the chain.
-				split.isRoot = true
+				split.IsRoot = true
 
-				eventsCh, err := split.startSplit([]byte(item))
+				eventsCh, err := split.StartSplit([]byte(item))
 				if err != nil {
 					return
 				}
 				for maybeMsg := range eventsCh {
-					if maybeMsg.failed() {
+					if maybeMsg.Failed() {
 						in.log.Errorf("error processing response: %v", maybeMsg)
 						continue
 					}
 
 					// data, _ := json.Marshal(maybeMsg.msg)
-					event := makeSplitEvent(topicID, msg, maybeMsg.msg, arrayOffset)
+					event := makeSplitEvent(topicID, msg, maybeMsg.Msg, arrayOffset)
 					if ok := in.outlet.OnEvent(event); !ok {
 						msg.Nack()
 						in.log.Debug("OnEvent returned false. Stopping input worker.")

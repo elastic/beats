@@ -13,6 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/common/split"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
@@ -127,7 +128,7 @@ type readerConfig struct {
 	LineTerminator           readfile.LineTerminator `config:"line_terminator"`
 	MaxBytes                 cfgtype.ByteSize        `config:"max_bytes"`
 	Parsers                  parser.Config           `config:",inline"`
-	Split                    *splitConfig            `config:"split"`
+	Split                    *split.SplitConfig      `config:"split"`
 }
 
 func (rc *readerConfig) Validate() error {

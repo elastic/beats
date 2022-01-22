@@ -26,6 +26,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/split"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
@@ -222,24 +223,24 @@ OUTER:
 		messages := p.parseMultipleMessages(item)
 		for _, item := range messages {
 			if p.readerConfig.Split != nil {
-				split, err := newSplit(p.readerConfig.Split, p.log)
+				split, err := split.NewSplit(p.readerConfig.Split, p.log)
 				if err != nil {
 					return nil
 				}
 				// We want to be able to identify which split is the root of the chain.
-				split.isRoot = true
+				split.IsRoot = true
 				arrayOffset := int64(0)
-				eventsCh, err := split.startSplit([]byte(item))
+				eventsCh, err := split.StartSplit([]byte(item))
 				if err != nil {
 					return err
 				}
 				for maybeMsg := range eventsCh {
-					if maybeMsg.failed() {
+					if maybeMsg.Failed() {
 						p.log.Errorf("error processing response: %v", maybeMsg)
 						continue
 					}
 
-					data, _ := json.Marshal(maybeMsg.msg)
+					data, _ := json.Marshal(maybeMsg.Msg)
 					evt := p.createEvent(string(data), offset+arrayOffset)
 					p.publish(p.acker, &evt)
 					arrayOffset++
@@ -262,7 +263,7 @@ OUTER:
 
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
 func (s *s3ObjectProcessor) parseMultipleMessages(bMessage []byte) []string {
-	var mapObject common.MapStr
+	var mapObject mapstr.M
 	var messages []string
 	// check if the message is a "records" object containing a list of events
 	err := json.Unmarshal(bMessage, &mapObject)
@@ -275,7 +276,7 @@ func (s *s3ObjectProcessor) parseMultipleMessages(bMessage []byte) []string {
 	} else {
 		s.log.Debugf("deserializing message into object returning error: %s", err)
 		// in some cases the message is an array
-		var arrayObject []common.MapStr
+		var arrayObject []mapstr.M
 		err = json.Unmarshal(bMessage, &arrayObject)
 		if err != nil {
 			// return entire message

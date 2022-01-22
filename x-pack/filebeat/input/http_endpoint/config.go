@@ -10,6 +10,7 @@ import (
 	"net/textproto"
 
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/split"
 )
 
 // Config contains information about httpjson configuration
@@ -33,7 +34,7 @@ type config struct {
 	HMACPrefix            string                  `config:"hmac.prefix"`
 	IncludeHeaders        []string                `config:"include_headers"`
 	PreserveOriginalEvent bool                    `config:"preserve_original_event"`
-	Split                 *splitConfig            `config:"split"`
+	Split                 *split.SplitConfig      `config:"split"`
 }
 
 func defaultConfig() config {

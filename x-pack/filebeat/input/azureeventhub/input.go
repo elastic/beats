@@ -20,6 +20,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/split"
+
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -187,19 +189,19 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 		azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
 		azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
 		if a.config.Split != nil {
-			split, err := newSplit(a.config.Split, a.log)
+			split, err := split.NewSplit(a.config.Split, a.log)
 			if err != nil {
 				return false
 			}
 			// We want to be able to identify which split is the root of the chain.
-			split.isRoot = true
+			split.IsRoot = true
 
-			eventsCh, err := split.startSplit([]byte(item))
+			eventsCh, err := split.StartSplit([]byte(item))
 			if err != nil {
 				return false
 			}
 			for maybeMsg := range eventsCh {
-				if maybeMsg.failed() {
+				if maybeMsg.Failed() {
 					a.log.Errorf("error processing response: %v", maybeMsg)
 					continue
 				}

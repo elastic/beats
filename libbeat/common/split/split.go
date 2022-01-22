@@ -20,10 +20,10 @@ var (
 	errExpectedSplitString = errors.New("split was expecting field to be a string")
 )
 
-type splitConfig struct {
+type SplitConfig struct {
 	Target string `config:"target" validation:"required"`
 	// Type   string `config:"type"`
-	Split      *splitConfig `config:"split"`
+	Split      *SplitConfig `config:"split"`
 	KeepParent bool         `config:"keep_parent"`
 	// KeyField   string `config:"key_field"`
 	// DelimiterString  string       `config:"delimiter"`
@@ -41,24 +41,24 @@ type split struct {
 	keepParent       bool
 	ignoreEmptyValue bool
 	// keyField         string
-	isRoot bool
+	IsRoot bool
 	// delimiter        string
 }
 type maybeMsg struct {
 	err error
-	msg common.MapStr
+	Msg common.MapStr
 }
 
-func (e maybeMsg) failed() bool { return e.err != nil }
+func (e maybeMsg) Failed() bool { return e.err != nil }
 
 func (e maybeMsg) Error() string { return e.err.Error() }
 
 // newSplit returns a new split based on the provided config and
 // logging to the provided logger.
-func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
+func NewSplit(c *SplitConfig, log *logp.Logger) (*split, error) {
 	var s *split
 	if c.Split != nil {
-		s, _ = newSplit(c.Split, log)
+		s, _ = NewSplit(c.Split, log)
 		// if err != nil {
 		// 	return nil, err
 		// }
@@ -76,7 +76,7 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 	}, nil
 }
 
-func (s *split) startSplit(raw json.RawMessage) (<-chan maybeMsg, error) {
+func (s *split) StartSplit(raw json.RawMessage) (<-chan maybeMsg, error) {
 	ch := make(chan maybeMsg)
 	var jsonObject common.MapStr
 	if err := json.Unmarshal(raw, &jsonObject); err != nil {
@@ -133,10 +133,10 @@ func (s *split) split(root common.MapStr, ch chan<- maybeMsg) error {
 			}
 			return nil
 		}
-		if s.isRoot {
+		if s.IsRoot {
 			return errEmptyRootField
 		}
-		ch <- maybeMsg{msg: root}
+		ch <- maybeMsg{Msg: root}
 		return errEmptyField
 	}
 
@@ -152,10 +152,10 @@ func (s *split) split(root common.MapStr, ch chan<- maybeMsg) error {
 			}
 			return nil
 		}
-		if s.isRoot {
+		if s.IsRoot {
 			return errEmptyRootField
 		}
-		ch <- maybeMsg{msg: root}
+		ch <- maybeMsg{Msg: root}
 		return errEmptyField
 	}
 
@@ -194,7 +194,7 @@ func (s *split) sendMessage(root common.MapStr, v interface{}, ch chan<- maybeMs
 		return s.child.split(clone, ch)
 	}
 	// data, _ := json.Marshal(clone)
-	ch <- maybeMsg{msg: clone}
+	ch <- maybeMsg{Msg: clone}
 
 	return nil
 }
