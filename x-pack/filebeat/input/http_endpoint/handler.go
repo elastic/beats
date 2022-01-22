@@ -37,6 +37,7 @@ type httpHandler struct {
 	responseBody          string
 	includeHeaders        []string
 	preserveOriginalEvent bool
+	split                 *splitConfig
 }
 
 // Triggers if middleware validation returns successful
@@ -60,10 +61,29 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, obj := range objs {
-		if err = h.publishEvent(obj, headers); err != nil {
-			sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
-			return
+		if h.split != nil {
+			split, err := newSplit(h.split, h.log)
+			if err != nil {
+				return
+			}
+			// We want to be able to identify which split is the root of the chain.
+			split.isRoot = true
+			data, _ := json.Marshal(obj)
+			eventsCh, err := split.startSplit(data)
+			if err != nil {
+				return
+			}
+			for maybeMsg := range eventsCh {
+				if maybeMsg.failed() {
+					h.log.Errorf("error processing response: %v", maybeMsg)
+					continue
+				}
+				// MAKE EVENT
+				h.publishEvent(maybeMsg.msg, headers)
+			}
+			continue
 		}
+		h.publishEvent(obj, headers)
 	}
 
 	h.sendResponse(w, h.responseCode, h.responseBody)

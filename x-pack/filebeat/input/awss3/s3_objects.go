@@ -205,6 +205,7 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 	dec := json.NewDecoder(r)
 	dec.UseNumber()
 
+OUTER:
 	for dec.More() && p.ctx.Err() == nil {
 		offset := dec.InputOffset()
 
@@ -212,38 +213,43 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 		if err := dec.Decode(&item); err != nil {
 			return fmt.Errorf("failed to decode json: %w", err)
 		}
-
 		if p.readerConfig.ExpandEventListFromField != "" {
 			if err := p.splitEventList(p.readerConfig.ExpandEventListFromField, item, offset, p.s3ObjHash); err != nil {
 				return err
 			}
 			continue
 		}
-
-		if p.readerConfig.Split != nil {
-			split, err := newSplit(p.readerConfig.Split, p.log)
-			if err != nil {
-				return nil
-			}
-			// We want to be able to identify which split is the root of the chain.
-			split.isRoot = true
-			arrayOffset := int64(0)
-			eventsCh, err := split.startSplit(item)
-			if err != nil {
-				return err
-			}
-			for maybeMsg := range eventsCh {
-				if maybeMsg.failed() {
-					p.log.Errorf("error processing response: %v", maybeMsg)
-					continue
+		messages := p.parseMultipleMessages(item)
+		for _, item := range messages {
+			if p.readerConfig.Split != nil {
+				split, err := newSplit(p.readerConfig.Split, p.log)
+				if err != nil {
+					return nil
 				}
+				// We want to be able to identify which split is the root of the chain.
+				split.isRoot = true
+				arrayOffset := int64(0)
+				eventsCh, err := split.startSplit([]byte(item))
+				if err != nil {
+					return err
+				}
+				for maybeMsg := range eventsCh {
+					if maybeMsg.failed() {
+						p.log.Errorf("error processing response: %v", maybeMsg)
+						continue
+					}
 
-				data, _ := json.Marshal(maybeMsg.msg)
-				evt := p.createEvent(string(data), offset+arrayOffset)
+					data, _ := json.Marshal(maybeMsg.msg)
+					evt := p.createEvent(string(data), offset+arrayOffset)
+					p.publish(p.acker, &evt)
+					arrayOffset++
+				}
+			} else {
+				// data, _ := json.Marshal(item)
+				evt := p.createEvent(string(item), offset)
 				p.publish(p.acker, &evt)
-				arrayOffset++
 			}
-			continue
+			continue OUTER
 		}
 
 		data, _ := item.MarshalJSON()
@@ -252,6 +258,40 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 	}
 
 	return nil
+}
+
+// parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
+func (s *s3ObjectProcessor) parseMultipleMessages(bMessage []byte) []string {
+	var mapObject common.MapStr
+	var messages []string
+	// check if the message is a "records" object containing a list of events
+	err := json.Unmarshal(bMessage, &mapObject)
+	if err == nil {
+		js, err := json.Marshal(mapObject)
+		if err != nil {
+			s.log.Errorw(fmt.Sprintf("serializing message %s", js), "error", err)
+		}
+		messages = append(messages, string(js))
+	} else {
+		s.log.Debugf("deserializing message into object returning error: %s", err)
+		// in some cases the message is an array
+		var arrayObject []common.MapStr
+		err = json.Unmarshal(bMessage, &arrayObject)
+		if err != nil {
+			// return entire message
+			s.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
+			messages = append(messages, string(bMessage))
+		}
+		s.log.Debugf("deserializing multiple messages to an array")
+		for _, ms := range arrayObject {
+			js, err := json.Marshal(ms)
+			if err != nil {
+				s.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
+			}
+			messages = append(messages, string(js))
+		}
+	}
+	return messages
 }
 
 func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offset int64, objHash string) error {

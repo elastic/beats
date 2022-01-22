@@ -169,27 +169,40 @@ func (in *pubsubInput) run() error {
 	// Start receiving messages.
 	topicID := makeTopicID(in.ProjectID, in.Topic)
 	return sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-		if in.config.Split != nil {
-			split, err := newSplit(in.config.Split, in.log)
-			if err != nil {
-				return
-			}
-			// We want to be able to identify which split is the root of the chain.
-			split.isRoot = true
-
-			eventsCh, err := split.startSplit(msg.Data)
-			if err != nil {
-				return
-			}
-			arrayOffset := int64(0)
-			for maybeMsg := range eventsCh {
-				if maybeMsg.failed() {
-					in.log.Errorf("error processing response: %v", maybeMsg)
-					continue
+		messages := in.parseMultipleMessages(msg.Data)
+		arrayOffset := int64(0)
+		for _, item := range messages {
+			if in.config.Split != nil {
+				split, err := newSplit(in.config.Split, in.log)
+				if err != nil {
+					return
 				}
+				// We want to be able to identify which split is the root of the chain.
+				split.isRoot = true
 
-				// data, _ := json.Marshal(maybeMsg.msg)
-				event := makeSplitEvent(topicID, msg, maybeMsg.msg, arrayOffset)
+				eventsCh, err := split.startSplit([]byte(item))
+				if err != nil {
+					return
+				}
+				for maybeMsg := range eventsCh {
+					if maybeMsg.failed() {
+						in.log.Errorf("error processing response: %v", maybeMsg)
+						continue
+					}
+
+					// data, _ := json.Marshal(maybeMsg.msg)
+					event := makeSplitEvent(topicID, msg, maybeMsg.msg, arrayOffset)
+					if ok := in.outlet.OnEvent(event); !ok {
+						msg.Nack()
+						in.log.Debug("OnEvent returned false. Stopping input worker.")
+						cancel()
+					}
+					arrayOffset++
+				}
+			} else {
+				var object common.MapStr
+				err = json.Unmarshal([]byte(item), &object)
+				event := makeSplitEvent(topicID, msg, object, arrayOffset)
 				if ok := in.outlet.OnEvent(event); !ok {
 					msg.Nack()
 					in.log.Debug("OnEvent returned false. Stopping input worker.")
@@ -197,24 +210,51 @@ func (in *pubsubInput) run() error {
 				}
 				arrayOffset++
 			}
-		} else {
-			event := makeEvent(topicID, msg)
-			if ok := in.outlet.OnEvent(event); !ok {
-				msg.Nack()
-				in.log.Debug("OnEvent returned false. Stopping input worker.")
-				cancel()
-			}
 		}
 	})
 }
 
-// Stop stops the pubsub input and waits for it to fully stop.
+// parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
+func (in *pubsubInput) parseMultipleMessages(bMessage []byte) []string {
+	var mapObject common.MapStr
+	var messages []string
+	// check if the message is a "records" object containing a list of events
+	err := json.Unmarshal(bMessage, &mapObject)
+	if err == nil {
+		js, err := json.Marshal(mapObject)
+		if err != nil {
+			in.log.Errorw(fmt.Sprintf("serializing message %s", js), "error", err)
+		}
+		messages = append(messages, string(js))
+	} else {
+		in.log.Debugf("deserializing message into object returning error: %s", err)
+		// in some cases the message is an array
+		var arrayObject []common.MapStr
+		err = json.Unmarshal(bMessage, &arrayObject)
+		if err != nil {
+			// return entire message
+			in.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
+			messages = append(messages, string(bMessage))
+		}
+		in.log.Debugf("deserializing multiple messages to an array")
+		for _, ms := range arrayObject {
+			js, err := json.Marshal(ms)
+			if err != nil {
+				in.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
+			}
+			messages = append(messages, string(js))
+		}
+	}
+	return messages
+}
+
+// Stop stops the pubsub input and waits for it to fully stoin.
 func (in *pubsubInput) Stop() {
 	in.workerCancel()
 	in.workerWg.Wait()
 }
 
-// Wait is an alias for Stop.
+// Wait is an alias for Stoin.
 func (in *pubsubInput) Wait() {
 	in.Stop()
 }

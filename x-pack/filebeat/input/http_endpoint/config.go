@@ -33,6 +33,7 @@ type config struct {
 	HMACPrefix            string                  `config:"hmac.prefix"`
 	IncludeHeaders        []string                `config:"include_headers"`
 	PreserveOriginalEvent bool                    `config:"preserve_original_event"`
+	Split                 *splitConfig            `config:"split"`
 }
 
 func defaultConfig() config {

@@ -128,6 +128,7 @@ func newHandler(c config, pub stateless.Publisher, log *logp.Logger) http.Handle
 		responseBody:          c.ResponseBody,
 		includeHeaders:        canonicalizeHeaders(c.IncludeHeaders),
 		preserveOriginalEvent: c.PreserveOriginalEvent,
+		split:                 c.Split,
 	}
 
 	return newAPIValidationHandler(http.HandlerFunc(handler.apiResponse), validator, log)
