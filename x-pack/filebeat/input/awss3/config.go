@@ -127,6 +127,7 @@ type readerConfig struct {
 	LineTerminator           readfile.LineTerminator `config:"line_terminator"`
 	MaxBytes                 cfgtype.ByteSize        `config:"max_bytes"`
 	Parsers                  parser.Config           `config:",inline"`
+	Split                    *splitConfig            `config:"split"`
 }
 
 func (rc *readerConfig) Validate() error {
@@ -140,6 +141,10 @@ func (rc *readerConfig) Validate() error {
 
 	if rc.ExpandEventListFromField != "" && rc.ContentType != "" && rc.ContentType != "application/json" {
 		return fmt.Errorf("content_type must be `application/json` when expand_event_list_from_field is used")
+	}
+
+	if rc.Split != nil && rc.ContentType != "" && rc.ContentType != "application/json" {
+		return fmt.Errorf("content_type must be `application/json` when split is used")
 	}
 
 	_, found := encoding.FindEncoding(rc.Encoding)

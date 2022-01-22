@@ -39,7 +39,8 @@ type config struct {
 	CredentialsJSON common.JSONBlob `config:"credentials_json"`
 
 	// Overrides the default Pub/Sub service address and disables TLS. For testing.
-	AlternativeHost string `config:"alternative_host"`
+	AlternativeHost string       `config:"alternative_host"`
+	Split           *splitConfig `config:"split"`
 }
 
 func (c *config) Validate() error {

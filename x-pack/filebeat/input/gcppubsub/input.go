@@ -8,6 +8,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"sync"
 	"time"
@@ -168,10 +169,41 @@ func (in *pubsubInput) run() error {
 	// Start receiving messages.
 	topicID := makeTopicID(in.ProjectID, in.Topic)
 	return sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-		if ok := in.outlet.OnEvent(makeEvent(topicID, msg)); !ok {
-			msg.Nack()
-			in.log.Debug("OnEvent returned false. Stopping input worker.")
-			cancel()
+		if in.config.Split != nil {
+			split, err := newSplit(in.config.Split, in.log)
+			if err != nil {
+				return
+			}
+			// We want to be able to identify which split is the root of the chain.
+			split.isRoot = true
+
+			eventsCh, err := split.startSplit(msg.Data)
+			if err != nil {
+				return
+			}
+			arrayOffset := int64(0)
+			for maybeMsg := range eventsCh {
+				if maybeMsg.failed() {
+					in.log.Errorf("error processing response: %v", maybeMsg)
+					continue
+				}
+
+				// data, _ := json.Marshal(maybeMsg.msg)
+				event := makeSplitEvent(topicID, msg, maybeMsg.msg, arrayOffset)
+				if ok := in.outlet.OnEvent(event); !ok {
+					msg.Nack()
+					in.log.Debug("OnEvent returned false. Stopping input worker.")
+					cancel()
+				}
+				arrayOffset++
+			}
+		} else {
+			event := makeEvent(topicID, msg)
+			if ok := in.outlet.OnEvent(event); !ok {
+				msg.Nack()
+				in.log.Debug("OnEvent returned false. Stopping input worker.")
+				cancel()
+			}
 		}
 	})
 }
@@ -196,6 +228,29 @@ func makeTopicID(project, topic string) string {
 	h.Write([]byte(topic))
 	prefix := hex.EncodeToString(h.Sum(nil))
 	return prefix[:10]
+}
+
+func makeSplitEvent(topicID string, msg *pubsub.Message, data common.MapStr, offset int64) beat.Event {
+	id := fmt.Sprintf("%s-%s-%012d", topicID, msg.ID, offset)
+	message, _ := json.Marshal(data)
+	event := beat.Event{
+		Timestamp: msg.PublishTime.UTC(),
+		Fields: common.MapStr{
+			"event": common.MapStr{
+				"id":      id,
+				"created": time.Now().UTC(),
+			},
+			"message": string(message),
+		},
+		Private: msg,
+	}
+	event.SetID(id)
+
+	if len(msg.Attributes) > 0 {
+		event.PutValue("labels", msg.Attributes)
+	}
+
+	return event
 }
 
 func makeEvent(topicID string, msg *pubsub.Message) beat.Event {

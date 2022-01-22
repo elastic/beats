@@ -220,6 +220,32 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 			continue
 		}
 
+		if p.readerConfig.Split != nil {
+			split, err := newSplit(p.readerConfig.Split, p.log)
+			if err != nil {
+				return nil
+			}
+			// We want to be able to identify which split is the root of the chain.
+			split.isRoot = true
+			arrayOffset := int64(0)
+			eventsCh, err := split.startSplit(item)
+			if err != nil {
+				return err
+			}
+			for maybeMsg := range eventsCh {
+				if maybeMsg.failed() {
+					p.log.Errorf("error processing response: %v", maybeMsg)
+					continue
+				}
+
+				data, _ := json.Marshal(maybeMsg.msg)
+				evt := p.createEvent(string(data), offset+arrayOffset)
+				p.publish(p.acker, &evt)
+				arrayOffset++
+			}
+			continue
+		}
+
 		data, _ := item.MarshalJSON()
 		evt := p.createEvent(string(data), offset)
 		p.publish(p.acker, &evt)
