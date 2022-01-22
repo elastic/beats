@@ -183,11 +183,11 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 		"eventhub":       a.config.EventHubName,
 		"consumer_group": a.config.ConsumerGroup,
 	}
+	azure.Put("offset", event.SystemProperties.Offset)
+	azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
+	azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
 	messages := a.parseMultipleMessages(event.Data)
 	for _, item := range messages {
-		azure.Put("offset", event.SystemProperties.Offset)
-		azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
-		azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
 		if a.config.Split != nil {
 			split, err := split.NewSplit(a.config.Split, a.log)
 			if err != nil {
@@ -205,10 +205,11 @@ func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bo
 					a.log.Errorf("error processing response: %v", maybeMsg)
 					continue
 				}
+				jsonString, _ := json.Marshal(maybeMsg.Msg)
 				ok := a.outlet.OnEvent(beat.Event{
 					Timestamp: timestamp,
 					Fields: mapstr.M{
-						"message": maybeMsg.msg,
+						"message": jsonString,
 						"azure":   azure,
 					},
 					Private: event.Data,
@@ -245,25 +246,24 @@ func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 		if err != nil {
 			a.log.Errorw(fmt.Sprintf("serializing message %s", js), "error", err)
 		}
-		messages = append(messages, string(js))
-	} else {
-		a.log.Debugf("deserializing message into object returning error: %s", err)
-		// in some cases the message is an array
-		var arrayObject []mapstr.M
-		err = json.Unmarshal(bMessage, &arrayObject)
+		return append(messages, string(js))
+	}
+	a.log.Debugf("deserializing message into object returning error: %s", err)
+	// in some cases the message is an array
+	var arrayObject []mapstr.M
+	err = json.Unmarshal(bMessage, &arrayObject)
+	if err != nil {
+		// return entire message
+		a.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
+		return append(messages, string(bMessage))
+	}
+	a.log.Debugf("deserializing multiple messages to an array")
+	for _, ms := range arrayObject {
+		js, err := json.Marshal(ms)
 		if err != nil {
-			// return entire message
-			a.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
-			messages = append(messages, string(bMessage))
+			a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
 		}
-		a.log.Debugf("deserializing multiple messages to an array")
-		for _, ms := range arrayObject {
-			js, err := json.Marshal(ms)
-			if err != nil {
-				a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-			}
-			messages = append(messages, string(js))
-		}
+		messages = append(messages, string(js))
 	}
 	return messages
 }

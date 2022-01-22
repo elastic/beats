@@ -206,7 +206,6 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 	dec := json.NewDecoder(r)
 	dec.UseNumber()
 
-OUTER:
 	for dec.More() && p.ctx.Err() == nil {
 		offset := dec.InputOffset()
 
@@ -246,18 +245,11 @@ OUTER:
 					arrayOffset++
 				}
 			} else {
-				// data, _ := json.Marshal(item)
-				evt := p.createEvent(string(item), offset)
+				evt := p.createEvent(item, offset)
 				p.publish(p.acker, &evt)
 			}
-			continue OUTER
 		}
-
-		data, _ := item.MarshalJSON()
-		evt := p.createEvent(string(data), offset)
-		p.publish(p.acker, &evt)
 	}
-
 	return nil
 }
 
@@ -272,25 +264,24 @@ func (s *s3ObjectProcessor) parseMultipleMessages(bMessage []byte) []string {
 		if err != nil {
 			s.log.Errorw(fmt.Sprintf("serializing message %s", js), "error", err)
 		}
-		messages = append(messages, string(js))
-	} else {
-		s.log.Debugf("deserializing message into object returning error: %s", err)
-		// in some cases the message is an array
-		var arrayObject []mapstr.M
-		err = json.Unmarshal(bMessage, &arrayObject)
+		return append(messages, string(js))
+	}
+	s.log.Debugf("deserializing message into object returning error: %s", err)
+	// in some cases the message is an array
+	var arrayObject []mapstr.M
+	err = json.Unmarshal(bMessage, &arrayObject)
+	if err != nil {
+		// return entire message
+		s.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
+		return append(messages, string(bMessage))
+	}
+	s.log.Debugf("deserializing multiple messages to an array")
+	for _, ms := range arrayObject {
+		js, err := json.Marshal(ms)
 		if err != nil {
-			// return entire message
-			s.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
-			messages = append(messages, string(bMessage))
+			s.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
 		}
-		s.log.Debugf("deserializing multiple messages to an array")
-		for _, ms := range arrayObject {
-			js, err := json.Marshal(ms)
-			if err != nil {
-				s.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-			}
-			messages = append(messages, string(js))
-		}
+		messages = append(messages, string(js))
 	}
 	return messages
 }

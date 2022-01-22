@@ -191,8 +191,8 @@ func (in *pubsubInput) run() error {
 						continue
 					}
 
-					// data, _ := json.Marshal(maybeMsg.msg)
-					event := makeSplitEvent(topicID, msg, maybeMsg.Msg, arrayOffset)
+					message, _ := json.Marshal(maybeMsg.Msg)
+					event := makeSplitEvent(topicID, msg, string(message), arrayOffset)
 					if ok := in.outlet.OnEvent(event); !ok {
 						msg.Nack()
 						in.log.Debug("OnEvent returned false. Stopping input worker.")
@@ -201,9 +201,7 @@ func (in *pubsubInput) run() error {
 					arrayOffset++
 				}
 			} else {
-				var object common.MapStr
-				err = json.Unmarshal([]byte(item), &object)
-				event := makeSplitEvent(topicID, msg, object, arrayOffset)
+				event := makeSplitEvent(topicID, msg, item, arrayOffset)
 				if ok := in.outlet.OnEvent(event); !ok {
 					msg.Nack()
 					in.log.Debug("OnEvent returned false. Stopping input worker.")
@@ -217,7 +215,7 @@ func (in *pubsubInput) run() error {
 
 // parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
 func (in *pubsubInput) parseMultipleMessages(bMessage []byte) []string {
-	var mapObject common.MapStr
+	var mapObject mapstr.M
 	var messages []string
 	// check if the message is a "records" object containing a list of events
 	err := json.Unmarshal(bMessage, &mapObject)
@@ -226,25 +224,24 @@ func (in *pubsubInput) parseMultipleMessages(bMessage []byte) []string {
 		if err != nil {
 			in.log.Errorw(fmt.Sprintf("serializing message %s", js), "error", err)
 		}
-		messages = append(messages, string(js))
-	} else {
-		in.log.Debugf("deserializing message into object returning error: %s", err)
-		// in some cases the message is an array
-		var arrayObject []common.MapStr
-		err = json.Unmarshal(bMessage, &arrayObject)
+		return append(messages, string(js))
+	}
+	in.log.Debugf("deserializing message into object returning error: %s", err)
+	// in some cases the message is an array
+	var arrayObject []mapstr.M
+	err = json.Unmarshal(bMessage, &arrayObject)
+	if err != nil {
+		// return entire message
+		in.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
+		return append(messages, string(bMessage))
+	}
+	in.log.Debugf("deserializing multiple messages to an array")
+	for _, ms := range arrayObject {
+		js, err := json.Marshal(ms)
 		if err != nil {
-			// return entire message
-			in.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
-			messages = append(messages, string(bMessage))
+			in.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
 		}
-		in.log.Debugf("deserializing multiple messages to an array")
-		for _, ms := range arrayObject {
-			js, err := json.Marshal(ms)
-			if err != nil {
-				in.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-			}
-			messages = append(messages, string(js))
-		}
+		messages = append(messages, string(js))
 	}
 	return messages
 }
@@ -271,32 +268,8 @@ func makeTopicID(project, topic string) string {
 	return prefix[:10]
 }
 
-func makeSplitEvent(topicID string, msg *pubsub.Message, data common.MapStr, offset int64) beat.Event {
+func makeSplitEvent(topicID string, msg *pubsub.Message, message string, offset int64) beat.Event {
 	id := fmt.Sprintf("%s-%s-%012d", topicID, msg.ID, offset)
-	message, _ := json.Marshal(data)
-	event := beat.Event{
-		Timestamp: msg.PublishTime.UTC(),
-		Fields: common.MapStr{
-			"event": common.MapStr{
-				"id":      id,
-				"created": time.Now().UTC(),
-			},
-			"message": string(message),
-		},
-		Private: msg,
-	}
-	event.SetID(id)
-
-	if len(msg.Attributes) > 0 {
-		event.PutValue("labels", msg.Attributes)
-	}
-
-	return event
-}
-
-func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
-	id := topicID + "-" + msg.ID
-
 	event := beat.Event{
 		Timestamp: msg.PublishTime.UTC(),
 		Fields: mapstr.M{
@@ -304,7 +277,7 @@ func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
 				"id":      id,
 				"created": time.Now().UTC(),
 			},
-			"message": string(msg.Data),
+			"message": message,
 		},
 		Private: msg,
 	}
@@ -316,6 +289,29 @@ func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
 
 	return event
 }
+
+// func makeEvent(topicID string, msg *pubsub.Message) beat.Event {
+// 	id := topicID + "-" + msg.ID
+
+// event := beat.Event{
+// 	Timestamp: msg.PublishTime.UTC(),
+// 	Fields: mapstr.M{
+// 		"event": mapstr.M{
+// 			"id":      id,
+// 			"created": time.Now().UTC(),
+// 		},
+// 		"message": string(msg.Data),
+// 	},
+// 	Private: msg,
+// }
+// event.SetID(id)
+
+// 	if len(msg.Attributes) > 0 {
+// 		event.PutValue("labels", msg.Attributes)
+// 	}
+
+// 	return event
+// }
 
 func (in *pubsubInput) getOrCreateSubscription(ctx context.Context, client *pubsub.Client) (*pubsub.Subscription, error) {
 	sub := client.Subscription(in.Subscription.Name)
