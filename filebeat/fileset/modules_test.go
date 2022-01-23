@@ -85,37 +85,40 @@ func TestNewModuleRegistry(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
-	expectedModules := map[string][]string{
-		"auditd": {"log"},
-		"nginx":  {"access", "error"},
-		"mysql":  {"slowlog", "error"},
-		"system": {"syslog", "auth"},
+	expectedModules := []map[string][]string{
+		{"nginx": {"access", "error"}},
+		{"mysql": {"slowlog", "error"}},
+		{"system": {"syslog", "auth"}},
+		{"auditd": {"log"}},
 	}
-
 	assert.Equal(t, len(expectedModules), len(reg.registry))
-	for name, filesets := range reg.registry {
-		expectedFilesets, exists := expectedModules[name]
-		assert.True(t, exists)
+	for i, modules := range reg.registry {
+		for name, filesets := range modules {
+			expectedFilesets, exists := expectedModules[i][name]
+			assert.True(t, exists)
 
-		assert.Equal(t, len(expectedFilesets), len(filesets))
-		for _, fileset := range expectedFilesets {
-			fs := filesets[fileset]
-			assert.NotNil(t, fs)
+			assert.Equal(t, len(expectedFilesets), len(filesets))
+			for _, fileset := range expectedFilesets {
+				fs := filesets[fileset]
+				assert.NotNil(t, fs)
+			}
 		}
 	}
 
-	for module, filesets := range reg.registry {
-		for name, fileset := range filesets {
-			cfg, err := fileset.getInputConfig()
-			require.NoError(t, err, fmt.Sprintf("module: %s, fileset: %s", module, name))
+	for _, modules := range reg.registry {
+		for module, filesets := range modules {
+			for name, fileset := range filesets {
+				cfg, err := fileset.getInputConfig()
+				require.NoError(t, err, fmt.Sprintf("module: %s, fileset: %s", module, name))
 
-			moduleName, err := cfg.String("_module_name", -1)
-			require.NoError(t, err)
-			assert.Equal(t, module, moduleName)
+				moduleName, err := cfg.String("_module_name", -1)
+				require.NoError(t, err)
+				assert.Equal(t, module, moduleName)
 
-			filesetName, err := cfg.String("_fileset_name", -1)
-			require.NoError(t, err)
-			assert.Equal(t, name, filesetName)
+				filesetName, err := cfg.String("_fileset_name", -1)
+				require.NoError(t, err)
+				assert.Equal(t, name, filesetName)
+			}
 		}
 	}
 }
@@ -150,12 +153,12 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
-	nginxAccess := reg.registry["nginx"]["access"]
+	nginxAccess := reg.registry[0]["nginx"]["access"]
 	if assert.NotNil(t, nginxAccess) {
 		assert.Equal(t, []interface{}{"/hello/test"}, nginxAccess.vars["paths"])
 	}
 
-	assert.NotContains(t, reg.registry["nginx"], "error")
+	assert.NotContains(t, reg.registry[0]["nginx"], "error")
 }
 
 func TestMovedModule(t *testing.T) {

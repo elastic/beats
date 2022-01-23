@@ -179,8 +179,10 @@ func (p *inputsRunner) Start() {
 	}
 
 	// Loop through and add modules, only 1 normally
-	for m := range p.moduleRegistry.registry {
-		moduleList.Add(m)
+	for _, modules := range p.moduleRegistry.registry {
+		for m := range modules {
+			moduleList.Add(m)
+		}
 	}
 }
 
@@ -194,8 +196,10 @@ func (p *inputsRunner) Stop() {
 	}
 
 	// Loop through and remove modules, only 1 normally
-	for m := range p.moduleRegistry.registry {
-		moduleList.Remove(m)
+	for _, modules := range p.moduleRegistry.registry {
+		for m := range modules {
+			moduleList.Remove(m)
+		}
 	}
 }
 

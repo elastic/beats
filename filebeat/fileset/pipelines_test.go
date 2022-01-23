@@ -79,9 +79,11 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 				pipelineIDs: []string{"filebeat-7.0.0-mod-fls-pipeline-plain", "filebeat-7.0.0-mod-fls-pipeline-json"},
 			}
 			testRegistry := ModuleRegistry{
-				registry: map[string]map[string]*Fileset{
-					"mod": map[string]*Fileset{
-						"fls": testFileset,
+				registry: []map[string]map[string]*Fileset{
+					{
+						"mod": map[string]*Fileset{
+							"fls": testFileset,
+						},
 					},
 				},
 				log: logp.NewLogger(logName),
