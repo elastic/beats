@@ -1,0 +1,69 @@
+- name: dns
+  type: group
+  description: >
+    Fields for Google Cloud DNS logs.
+  fields:
+  - name: auth_answer
+    type: boolean
+    description: >
+      Authoritative answer.
+  - name: destination_ip
+    type: ip
+    description: >
+      Destination IP address, only applicable for forwarding cases.
+  - name: egress_error
+    type: keyword
+    description: >
+      Egress proxy error.
+  - name: protocol
+    type: keyword
+    description: >
+      Protocol TCP or UDP.
+  - name: query_name
+    type: keyword
+    description: >
+      DNS query name.
+  - name: query_type
+    type: keyword
+    description: >
+      DNS query type.
+  - name: rdata
+    type: keyword
+    description: >
+      DNS answer in presentation format, truncated to 260 bytes.
+  - name: response_code
+    type: keyword
+    description: >
+      Response code.
+  - name: server_latency
+    type: integer
+    description: >
+      Server latency.
+  - name: source_ip
+    type: ip
+    description: >
+      Source IP address of the query.
+  - name: source_network
+    type: keyword
+    description: >
+      Source network of the query.
+  - name: vm_instance_id
+    type: keyword
+    description: >
+      Compute Engine VM instance ID, only applicable to queries initiated by 
+      Compute Engine VMs.
+  - name: vm_instance_name
+    type: keyword
+    description: >
+      Compute Engine VM instance name, only applicable to queries initiated by 
+      Compute Engine VMs.
+  - name: vm_project_id
+    type: keyword
+    description: >
+      Google Cloud project ID, only applicable to queries initiated by Compute 
+      Engine VMs.
+  - name: vm_zone_name
+    type: keyword
+    description: >
+      Google Cloud VM zone, only applicable to queries initiated by Compute 
+      Engine VMs.

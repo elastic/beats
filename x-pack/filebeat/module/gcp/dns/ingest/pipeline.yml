@@ -1,0 +1,17 @@
+description: Pipeline for Google Cloud DNS logs
+
+processors:
+  - set:
+      field: event.ingested
+      value: '{{_ingest.timestamp}}'
+  - registered_domain:
+      field: dns.question.name
+      target_field: dns.question
+  - remove:
+      field: dns.question.domain
+      ignore_missing: true
+
+on_failure:
+  - set:
+      field: error.message
+      value: '{{ _ingest.on_failure_message }}'

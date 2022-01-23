@@ -71,3 +71,21 @@
     # Credentials file for the service account with authorization to read from
     # the subscription.
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+
+  dns:
+    enabled: false
+
+    # Google Cloud project ID.
+    var.project_id: my-gcp-project-id
+
+    # Google Pub/Sub topic containing dns logs. Stackdriver must be
+    # configured to use this topic as a sink for dns logs.
+    var.topic: gcp-dns
+
+    # Google Pub/Sub subscription for the topic. Filebeat will create this
+    # subscription if it does not exist.
+    var.subscription_name: filebeat-gcp-dns
+
+    # Credentials file for the service account with authorization to read from
+    # the subscription.
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json

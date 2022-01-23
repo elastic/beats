@@ -1,0 +1,307 @@
+[
+    {
+        "@timestamp": "2022-01-23T09:16:05.341Z",
+        "cloud.availability_zone": "europe-west2-a",
+        "cloud.instance.id": "8340998530665147",
+        "cloud.instance.name": "instance",
+        "cloud.project.id": "project",
+        "cloud.region": "europe-west2",
+        "dns.answers": [
+            {
+                "class": "IN",
+                "data": "34.107.161.234",
+                "name": "elastic.co",
+                "ttl": "300",
+                "type": "A"
+            }
+        ],
+        "dns.question.name": "elastic.co",
+        "dns.question.type": "A",
+        "dns.resolved_ip": [
+            "34.107.161.234"
+        ],
+        "dns.response_code": "NOERROR",
+        "event.dataset": "gcp.dns",
+        "event.id": "vwroyze8pg7y",
+        "event.kind": "event",
+        "event.module": "gcp",
+        "event.outcome": "success",
+        "fileset.name": "dns",
+        "gcp.dns.auth_answer": true,
+        "gcp.dns.protocol": "UDP",
+        "gcp.dns.query_name": "elastic.co.",
+        "gcp.dns.query_type": "A",
+        "gcp.dns.rdata": "elastic.co.\t300\tIN\ta\t34.107.161.234",
+        "gcp.dns.response_code": "NOERROR",
+        "gcp.dns.server_latency": 14,
+        "gcp.dns.source_ip": "10.154.0.3",
+        "gcp.dns.source_network": "default",
+        "gcp.dns.vm_instance_id": "8340998530665147",
+        "gcp.dns.vm_instance_name": "694119234537.instance",
+        "gcp.dns.vm_project_id": "project",
+        "gcp.dns.vm_zone_name": "europe-west2-a",
+        "input.type": "gcp-pubsub",
+        "log.logger": "projects/project/logs/dns.googleapis.com%2Fdns_queries",
+        "network.transport": "UDP",
+        "service.type": "gcp",
+        "source.address": "10.154.0.3",
+        "source.ip": "10.154.0.3",
+        "tags": [
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2022-01-23T09:16:08.581Z",
+        "cloud.availability_zone": "europe-west2-a",
+        "cloud.instance.id": "8340998530665147",
+        "cloud.instance.name": "instance",
+        "cloud.project.id": "project",
+        "cloud.region": "europe-west2",
+        "dns.answers": [
+            {
+                "class": "IN",
+                "data": "2600:1901:0:1f6d::",
+                "name": "elastic.co",
+                "ttl": "300",
+                "type": "AAAA"
+            }
+        ],
+        "dns.question.name": "elastic.co",
+        "dns.question.type": "AAAA",
+        "dns.resolved_ip": [
+            "2600:1901:0:1f6d::"
+        ],
+        "dns.response_code": "NOERROR",
+        "event.dataset": "gcp.dns",
+        "event.id": "ivmbnpe95vee",
+        "event.kind": "event",
+        "event.module": "gcp",
+        "event.outcome": "success",
+        "fileset.name": "dns",
+        "gcp.dns.auth_answer": true,
+        "gcp.dns.protocol": "UDP",
+        "gcp.dns.query_name": "elastic.co.",
+        "gcp.dns.query_type": "AAAA",
+        "gcp.dns.rdata": "elastic.co.\t300\tIN\taaaa\t2600:1901:0:1f6d::",
+        "gcp.dns.response_code": "NOERROR",
+        "gcp.dns.server_latency": 7,
+        "gcp.dns.source_ip": "10.154.0.3",
+        "gcp.dns.source_network": "default",
+        "gcp.dns.vm_instance_id": "8340998530665147",
+        "gcp.dns.vm_instance_name": "694119234537.instance",
+        "gcp.dns.vm_project_id": "project",
+        "gcp.dns.vm_zone_name": "europe-west2-a",
+        "input.type": "gcp-pubsub",
+        "log.logger": "projects/project/logs/dns.googleapis.com%2Fdns_queries",
+        "network.transport": "UDP",
+        "service.type": "gcp",
+        "source.address": "10.154.0.3",
+        "source.ip": "10.154.0.3",
+        "tags": [
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2022-01-23T09:16:11.834Z",
+        "cloud.availability_zone": "europe-west2-a",
+        "cloud.instance.id": "8340998530665147",
+        "cloud.instance.name": "instance",
+        "cloud.project.id": "project",
+        "cloud.region": "europe-west2",
+        "dns.answers": [
+            {
+                "class": "IN",
+                "data": "1 aspmx.l.google.com",
+                "name": "elastic.co",
+                "ttl": "300",
+                "type": "MX"
+            },
+            {
+                "class": "IN",
+                "data": "10 alt3.aspmx.l.google.com",
+                "name": "elastic.co",
+                "ttl": "300",
+                "type": "MX"
+            },
+            {
+                "class": "IN",
+                "data": "10 alt4.aspmx.l.google.com",
+                "name": "elastic.co",
+                "ttl": "300",
+                "type": "MX"
+            },
+            {
+                "class": "IN",
+                "data": "5 alt1.aspmx.l.google.com",
+                "name": "elastic.co",
+                "ttl": "300",
+                "type": "MX"
+            },
+            {
+                "class": "IN",
+                "data": "5 alt2.aspmx.l.google.com",
+                "name": "elastic.co",
+                "ttl": "300",
+                "type": "MX"
+            }
+        ],
+        "dns.question.name": "elastic.co",
+        "dns.question.type": "MX",
+        "dns.resolved_ip": [],
+        "dns.response_code": "NOERROR",
+        "event.dataset": "gcp.dns",
+        "event.id": "3c0hhve794jt",
+        "event.kind": "event",
+        "event.module": "gcp",
+        "event.outcome": "success",
+        "fileset.name": "dns",
+        "gcp.dns.auth_answer": true,
+        "gcp.dns.protocol": "UDP",
+        "gcp.dns.query_name": "elastic.co.",
+        "gcp.dns.query_type": "MX",
+        "gcp.dns.rdata": "elastic.co.\t300\tIN\tmx\t1 aspmx.l.google.com.\nelastic.co.\t300\tIN\tmx\t10 alt3.aspmx.l.google.com.\nelastic.co.\t300\tIN\tmx\t10 alt4.aspmx.l.google.com.\nelastic.co.\t300\tIN\tmx\t5 alt1.aspmx.l.google.com.\nelastic.co.\t300\tIN\tmx\t5 alt2.aspmx.l.google.com.",
+        "gcp.dns.response_code": "NOERROR",
+        "gcp.dns.server_latency": 8,
+        "gcp.dns.source_ip": "10.154.0.3",
+        "gcp.dns.source_network": "default",
+        "gcp.dns.vm_instance_id": "8340998530665147",
+        "gcp.dns.vm_instance_name": "694119234537.instance",
+        "gcp.dns.vm_project_id": "project",
+        "gcp.dns.vm_zone_name": "europe-west2-a",
+        "input.type": "gcp-pubsub",
+        "log.logger": "projects/project/logs/dns.googleapis.com%2Fdns_queries",
+        "network.transport": "UDP",
+        "service.type": "gcp",
+        "source.address": "10.154.0.3",
+        "source.ip": "10.154.0.3",
+        "tags": [
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2022-01-23T09:16:14.334Z",
+        "cloud.availability_zone": "europe-west2-a",
+        "cloud.instance.id": "8340998530665147",
+        "cloud.instance.name": "instance",
+        "cloud.project.id": "project",
+        "cloud.region": "europe-west2",
+        "dns.answers": [
+            {
+                "class": "IN",
+                "data": "ns-1168.awsdns-18.org",
+                "name": "elastic.co",
+                "ttl": "21600",
+                "type": "NS"
+            },
+            {
+                "class": "IN",
+                "data": "ns-1737.awsdns-25.co.uk",
+                "name": "elastic.co",
+                "ttl": "21600",
+                "type": "NS"
+            },
+            {
+                "class": "IN",
+                "data": "ns-339.awsdns-42.com",
+                "name": "elastic.co",
+                "ttl": "21600",
+                "type": "NS"
+            },
+            {
+                "class": "IN",
+                "data": "ns-785.awsdns-34.net",
+                "name": "elastic.co",
+                "ttl": "21600",
+                "type": "NS"
+            }
+        ],
+        "dns.question.name": "elastic.co",
+        "dns.question.type": "NS",
+        "dns.resolved_ip": [],
+        "dns.response_code": "NOERROR",
+        "event.dataset": "gcp.dns",
+        "event.id": "1de2pp0e8q6k",
+        "event.kind": "event",
+        "event.module": "gcp",
+        "event.outcome": "success",
+        "fileset.name": "dns",
+        "gcp.dns.auth_answer": true,
+        "gcp.dns.protocol": "UDP",
+        "gcp.dns.query_name": "elastic.co.",
+        "gcp.dns.query_type": "NS",
+        "gcp.dns.rdata": "elastic.co.\t21600\tIN\tns\tns-1168.awsdns-18.org.\nelastic.co.\t21600\tIN\tns\tns-1737.awsdns-25.co.uk.\nelastic.co.\t21600\tIN\tns\tns-339.awsdns-42.com.\nelastic.co.\t21600\tIN\tns\tns-785.awsdns-34.net.",
+        "gcp.dns.response_code": "NOERROR",
+        "gcp.dns.server_latency": 9,
+        "gcp.dns.source_ip": "10.154.0.3",
+        "gcp.dns.source_network": "default",
+        "gcp.dns.vm_instance_id": "8340998530665147",
+        "gcp.dns.vm_instance_name": "694119234537.instance",
+        "gcp.dns.vm_project_id": "project",
+        "gcp.dns.vm_zone_name": "europe-west2-a",
+        "input.type": "gcp-pubsub",
+        "log.logger": "projects/project/logs/dns.googleapis.com%2Fdns_queries",
+        "network.transport": "UDP",
+        "service.type": "gcp",
+        "source.address": "10.154.0.3",
+        "source.ip": "10.154.0.3",
+        "tags": [
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2022-01-23T09:16:17.088Z",
+        "cloud.availability_zone": "europe-west2-a",
+        "cloud.instance.id": "8340998530665147",
+        "cloud.instance.name": "instance",
+        "cloud.project.id": "project",
+        "cloud.region": "europe-west2",
+        "dns.answers": [
+            {
+                "class": "IN",
+                "data": "\"adobe-idp-site-verification=f0ae487a2bd7cc4eb1fc64162e1a85c5b39002bc5fe0d7d7373ece0fdb3fd494\"",
+                "name": "elastic.co",
+                "ttl": "300",
+                "type": "TXT"
+            },
+            {
+                "class": "IN",
+                "data": "\"atlassian-domain-verification=eFQHgCgWimOfFj3Ol7kfJg9RGDmaS8X6V2M6YZRgnEY6/iKi0SUYWRlOvBOmgV7H\"",
+                "name": "elastic.co",
+                "ttl": "300",
+                "type": "TXT"
+            }
+        ],
+        "dns.question.name": "elastic.co",
+        "dns.question.type": "TXT",
+        "dns.resolved_ip": [],
+        "dns.response_code": "NOERROR",
+        "event.dataset": "gcp.dns",
+        "event.id": "1oht95te9dnf",
+        "event.kind": "event",
+        "event.module": "gcp",
+        "event.outcome": "success",
+        "fileset.name": "dns",
+        "gcp.dns.auth_answer": true,
+        "gcp.dns.protocol": "UDP",
+        "gcp.dns.query_name": "elastic.co.",
+        "gcp.dns.query_type": "TXT",
+        "gcp.dns.rdata": "elastic.co.\t300\tIN\ttxt\t\"adobe-idp-site-verification=f0ae487a2bd7cc4eb1fc64162e1a85c5b39002bc5fe0d7d7373ece0fdb3fd494\"\nelastic.co.\t300\tIN\ttxt\t\"atlassian-domain-verification=eFQHgCgWimOfFj3Ol7kfJg9RGDmaS8X6V2M6YZRgnEY6/iKi0SUYWRlOvBOmgV7H\"\nelastic.co.\t300\tIN\ttxt...",
+        "gcp.dns.response_code": "NOERROR",
+        "gcp.dns.server_latency": 12,
+        "gcp.dns.source_ip": "10.154.0.3",
+        "gcp.dns.source_network": "default",
+        "gcp.dns.vm_instance_id": "8340998530665147",
+        "gcp.dns.vm_instance_name": "694119234537.instance",
+        "gcp.dns.vm_project_id": "project",
+        "gcp.dns.vm_zone_name": "europe-west2-a",
+        "input.type": "gcp-pubsub",
+        "log.logger": "projects/project/logs/dns.googleapis.com%2Fdns_queries",
+        "network.transport": "UDP",
+        "service.type": "gcp",
+        "source.address": "10.154.0.3",
+        "source.ip": "10.154.0.3",
+        "tags": [
+            "forwarded"
+        ]
+    }
+]

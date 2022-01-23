@@ -7,8 +7,8 @@
 
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
-This is a module for Google Cloud logs. It supports reading audit, VPC flow,
-and firewall logs that have been exported from Stackdriver to a
+This is a module for Google Cloud logs. It supports reading audit, VPC flow, 
+DNS, and firewall logs that have been exported from Stackdriver to a
 Google Pub/Sub topic sink.
 
 include::../include/what-happens.asciidoc[]
@@ -82,6 +82,51 @@ Example config:
     var.project_id: my-gcp-project-id
     var.topic: gcp-vpc-flowlogs
     var.subscription_name: filebeat-gcp-vpc-flowlogs-sub
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+    var.keep_original_message: false
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.project_id`*::
+
+Google Cloud project ID.
+
+*`var.topic`*::
+
+Google Cloud Pub/Sub topic name.
+
+*`var.subscription_name`*::
+
+Google Cloud Pub/Sub topic subscription name. If the subscription does not
+exist it will be created.
+
+*`var.credentials_file`*::
+
+Path to a JSON file containing the credentials and key used to subscribe.
+
+*`var.keep_original_message`*::
+
+Flag to control whether the original message is stored in the `log.original`
+field. Defaults to `false`, meaning the original message is not saved.
+
+:fileset_ex!:
+
+:fileset_ex: dns
+
+[float]
+==== `dns` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+- module: gcp
+  dns:
+    enabled: true
+    var.project_id: my-gcp-project-id
+    var.topic: gcp-dns
+    var.subscription_name: filebeat-gcp-dns
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
     var.keep_original_message: false
 ----
