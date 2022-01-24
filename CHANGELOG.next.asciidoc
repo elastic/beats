@@ -53,6 +53,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - aws-s3: Stop trying to increase SQS message visibility after ReceiptHandleIsInvalid errors. {pull}29480[29480]
+- Fix handling of IPv6 addresses in netflow flow events. {issue}19210[19210] {pull}29383[29383]
+- Fix `sophos` KV splitting and syslog header handling {issue}24237[24237] {pull}29331[29331]
+- Undo deletion of endpoint config from cloudtrail fileset in {pull}29415[29415]. {pull}29450[29450]
+- Make Cisco ASA and FTD modules conform to the ECS definition for event.outcome and event.type. {issue}29581[29581] {pull}29698[29698]
+- ibmmq: Fixed `@timestamp` not being populated with correct values. {pull}29773[29773]
+- aws-s3: Improve gzip detection to avoid false negatives. {issue}29968[29968]
 
 *Heartbeat*
 
