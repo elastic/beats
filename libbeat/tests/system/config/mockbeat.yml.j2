@@ -62,8 +62,8 @@ output:
     ssl.ca_sha256: {{ elasticsearch.ssl_ca_sha256 }}
   {% endif %}
 
-  # older versions have to be allowed because mockbeat is on v9.9.9
-  allow_older_versions: true
+    # older versions have to be allowed because mockbeat is on v9.9.9
+    allow_older_versions: true
   {%- endif %}
 
 
