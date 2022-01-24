@@ -42,6 +42,8 @@ output:
     {% for k, v in elasticsearch.items() -%}
     {{ k }}: {{ v }}
     {% endfor -%}
+    # older versions have to be allowed because mockbeat is on v9.9.9
+    allow_older_versions: true
   {%- endif %}
 
   # Redis as output

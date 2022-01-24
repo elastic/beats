@@ -685,15 +685,22 @@ filebeat.modules:
   asa:
     enabled: false
 
-    # Set which input to use between syslog (default) or file.
-    #var.input: syslog
+    # Set which input to use between udp (default), tcp or file.
+    #var.input: udp
 
-    # The interface to listen to UDP based syslog traffic. Defaults to
+    # The interface to listen to udp or tcp syslog traffic. Defaults to
     # localhost. Set to 0.0.0.0 to bind to all available interfaces.
     #var.syslog_host: localhost
 
-    # The UDP port to listen for syslog traffic. Defaults to 9001.
+    # The port to listen for udp or tcp syslog traffic. Defaults to 9001.
     #var.syslog_port: 9001
+
+    # With tcp input, set the optional tls configuration:
+    #var.ssl:
+    #  enabled: true
+    #  certificate: /path/to/cert.pem
+    #  key: /path/to/privatekey.pem
+    #  key_passphrase: 'password for my key'
 
     # Set the log level from 1 (alerts only) to 7 (include all messages).
     # Messages with a log level higher than the specified will be dropped.
@@ -711,15 +718,22 @@ filebeat.modules:
   ftd:
     enabled: false
 
-    # Set which input to use between syslog (default) or file.
-    #var.input: syslog
+    # Set which input to use between udp (default), tcp or file.
+    #var.input: udp
 
-    # The interface to listen to UDP based syslog traffic. Defaults to
+    # The interface to listen to tcp or udp syslog traffic. Defaults to
     # localhost. Set to 0.0.0.0 to bind to all available interfaces.
     #var.syslog_host: localhost
 
-    # The UDP port to listen for syslog traffic. Defaults to 9003.
+    # The UDP port to listen for tcp or udp syslog traffic. Defaults to 9003.
     #var.syslog_port: 9003
+
+    # With tcp input, set the optional tls configuration:
+    #var.ssl:
+    #  enabled: true
+    #  certificate: /path/to/cert.pem
+    #  key: /path/to/privatekey.pem
+    #  key_passphrase: 'password for my key'
 
     # Set the log level from 1 (alerts only) to 7 (include all messages).
     # Messages with a log level higher than the specified will be dropped.
@@ -740,12 +754,15 @@ filebeat.modules:
     # Set which input to use between syslog (default) or file.
     #var.input: syslog
 
-    # The interface to listen to UDP based syslog traffic. Defaults to
+    # The interface to listen to syslog traffic. Defaults to
     # localhost. Set to 0.0.0.0 to bind to all available interfaces.
     #var.syslog_host: localhost
 
-    # The UDP port to listen for syslog traffic. Defaults to 9002.
+    # The port to listen on for syslog traffic. Defaults to 9002.
     #var.syslog_port: 9002
+
+    # Set which protocol to use between udp (default) or tcp.
+    #var.syslog_protocol: udp
 
     # Set custom paths for the log files when using file input. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -3021,10 +3038,21 @@ filebeat.inputs:
   #id: service-foo
 
   # You may wish to have separate inputs for each service. You can use
-  # include_matches to specify a list of filter expressions that are
+  # include_matches.or to specify a list of filter expressions that are
   # applied as a logical OR. You may specify filter
-  #include_matches:
-    #- _SYSTEMD_UNIT=foo.service
+  #include_matches.or:
+    #- equals:
+      #- _SYSTEMD_UNIT=foo.service
+
+  # List of syslog identifiers
+  #syslog_identifiers: ["audit"]
+
+  # Collect events from the service and messages about the service,
+  # including coredumps.
+  #units: ["docker.service"]
+
+  # The list of transports (_TRANSPORT field of journald entries)
+  #transports: ["audit"]
 
   # Parsers are also supported, here is an example of the multiline
   # parser.
@@ -3560,10 +3588,9 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional index name. The default is "filebeat" plus date
-  # and generates [filebeat-]YYYY.MM.DD keys.
+  # Optional data stream or index name. The default is "filebeat-%{[agent.version]}".
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+  #index: "filebeat-%{[agent.version]}"
 
   # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -3605,6 +3632,10 @@ output.elasticsearch:
 
   # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
+
+  # filebeat expects Elasticsearch to be the same version or newer than the Beat.
+  # Lift the version restriction by setting allow_older_versions to true.
+  #allow_older_versions: false
 
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
@@ -4203,7 +4234,7 @@ output.elasticsearch:
   #path: "/tmp/filebeat"
 
   # Name of the generated files. The default is `filebeat` and it generates
-  # files: `filebeat`, `filebeat.1`, `filebeat.2`, etc.
+  # files: `filebeat-{datetime}.ndjson`, `filebeat-{datetime}-1.ndjson`, etc.
   #filename: filebeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
@@ -4221,6 +4252,7 @@ output.elasticsearch:
   
   # Configure automatic file rotation on every startup. The default is true.
   #rotate_on_startup: true
+
 # ------------------------------- Console Output -------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.
@@ -4367,10 +4399,8 @@ setup.template.settings:
 
 # ====================== Index Lifecycle Management (ILM) ======================
 
-# Configure index lifecycle management (ILM). These settings create a write
-# alias and add additional settings to the index template. When ILM is enabled,
-# output.elasticsearch.index is ignored, and the write alias is used to set the
-# index name.
+# Configure index lifecycle management (ILM) to manage the backing indices
+# of your data streams.
 
 # Enable ILM support. Valid values are true, false.
 #setup.ilm.enabled: true

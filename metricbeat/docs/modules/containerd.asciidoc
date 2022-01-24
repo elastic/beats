@@ -1,0 +1,91 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+:modulename: containerd
+
+[[metricbeat-module-containerd]]
+[role="xpack"]
+== Containerd module
+
+beta[]
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
+Containerd module collects cpu, memory and blkio statistics about
+running containers controlled by containerd runtime.
+
+The current metricsets are: `cpu`, `blkio` and `memory` and are enabled by default.
+
+[float]
+=== Prerequisites
+`Containerd` daemon has to be configured to provide metrics before enabling containerd module.
+
+In the configuration file located in `/etc/containerd/config.toml` metrics endpoint needs to
+be set and containerd daemon needs to be restarted.
+
+```
+[metrics]
+    address = "127.0.0.1:1338"
+```
+
+[float]
+=== Compatibility
+
+The Containerd module is tested with the following versions of Containerd:
+v1.5.2
+
+[float]
+=== Module-specific configuration notes
+
+For cpu metricset if `calcpct.cpu` setting is set to true, cpu usage percentages will be calculated
+and more specifically fields `containerd.cpu.usage.total.pct`, `containerd.cpu.usage.kernel.pct`, `containerd.cpu.usage.user.pct`.
+Default value is true.
+
+For memory metricset if `calcpct.memory` setting is set to true, memory usage percentages will be calculated
+and more specifically fields `containerd.memory.usage.pct` and  `containerd.memory.workingset.pct`.
+Default value is true.
+
+
+
+[float]
+=== Example configuration
+
+The Containerd module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: containerd
+  metricsets: ["cpu", "memory", "blkio"]
+  period: 10s
+  # containerd metrics endpoint is configured in /etc/containerd/config.toml
+  # Metrics endpoint does not listen by default
+  # https://github.com/containerd/containerd/blob/main/docs/man/containerd-config.toml.5.md
+  hosts: ["localhost:1338"]
+  # if set to true, cpu and memory usage percentages will be calculated. Default is true
+  calcpct.cpu: true
+  calcpct.memory: true
+
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-containerd-blkio,blkio>>
+
+* <<metricbeat-metricset-containerd-cpu,cpu>>
+
+* <<metricbeat-metricset-containerd-memory,memory>>
+
+include::containerd/blkio.asciidoc[]
+
+include::containerd/cpu.asciidoc[]
+
+include::containerd/memory.asciidoc[]
+

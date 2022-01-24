@@ -47,6 +47,7 @@ const (
 type winEventLogExp struct {
 	config      winEventLogConfig
 	query       string
+	id          string                   // Identifier of this event log.
 	channelName string                   // Name of the channel from which to read.
 	file        bool                     // Reading from file rather than channel.
 	maxRead     int                      // Maximum number returned in one Read.
@@ -59,7 +60,7 @@ type winEventLogExp struct {
 
 // Name returns the name of the event log (i.e. Application, Security, etc.).
 func (l *winEventLogExp) Name() string {
-	return l.channelName
+	return l.id
 }
 
 func (l *winEventLogExp) Open(state checkpoint.EventLogState) error {
@@ -205,11 +206,11 @@ func (l *winEventLogExp) processHandle(h win.EvtHandle) (*Record, error) {
 	}
 
 	if l.file {
-		r.File = l.channelName
+		r.File = l.id
 	}
 
 	r.Offset = checkpoint.EventLogState{
-		Name:         l.channelName,
+		Name:         l.id,
 		RecordNumber: r.RecordID,
 		Timestamp:    r.TimeCreated.SystemTime,
 	}
@@ -241,6 +242,11 @@ func (l *winEventLogExp) Close() error {
 // newWinEventLogExp creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
 func newWinEventLogExp(options *common.Config) (EventLog, error) {
+	var xmlQuery string
+	var err error
+	var isFile bool
+	var log *logp.Logger
+
 	cfgwarn.Experimental("The %s event log reader is experimental.", winEventLogExpAPIName)
 
 	c := winEventLogConfig{BatchReadSize: 512}
@@ -248,29 +254,38 @@ func newWinEventLogExp(options *common.Config) (EventLog, error) {
 		return nil, err
 	}
 
-	queryLog := c.Name
-	isFile := false
-	if info, err := os.Stat(c.Name); err == nil && info.Mode().IsRegular() {
-		path, err := filepath.Abs(c.Name)
+	id := c.ID
+	if id == "" {
+		id = c.Name
+	}
+
+	if c.XMLQuery != "" {
+		xmlQuery = c.XMLQuery
+		log = logp.NewLogger("wineventlog").With("id", id)
+	} else {
+		queryLog := c.Name
+		if info, err := os.Stat(c.Name); err == nil && info.Mode().IsRegular() {
+			path, err := filepath.Abs(c.Name)
+			if err != nil {
+				return nil, err
+			}
+			isFile = true
+			queryLog = "file://" + path
+		}
+
+		xmlQuery, err = win.Query{
+			Log:         queryLog,
+			IgnoreOlder: c.SimpleQuery.IgnoreOlder,
+			Level:       c.SimpleQuery.Level,
+			EventID:     c.SimpleQuery.EventID,
+			Provider:    c.SimpleQuery.Provider,
+		}.Build()
 		if err != nil {
 			return nil, err
 		}
-		isFile = true
-		queryLog = "file://" + path
-	}
 
-	query, err := win.Query{
-		Log:         queryLog,
-		IgnoreOlder: c.SimpleQuery.IgnoreOlder,
-		Level:       c.SimpleQuery.Level,
-		EventID:     c.SimpleQuery.EventID,
-		Provider:    c.SimpleQuery.Provider,
-	}.Build()
-	if err != nil {
-		return nil, err
+		log = logp.NewLogger("wineventlog").With("id", id).With("channel", c.Name)
 	}
-
-	log := logp.NewLogger("wineventlog").With("channel", c.Name)
 
 	renderer, err := win.NewRenderer(win.NilHandle, log)
 	if err != nil {
@@ -279,7 +294,8 @@ func newWinEventLogExp(options *common.Config) (EventLog, error) {
 
 	l := &winEventLogExp{
 		config:      c,
-		query:       query,
+		query:       xmlQuery,
+		id:          id,
 		channelName: c.Name,
 		file:        isFile,
 		maxRead:     c.BatchReadSize,

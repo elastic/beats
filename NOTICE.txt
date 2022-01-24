@@ -1,5 +1,5 @@
 Elastic Beats
-Copyright 2014-2021 Elasticsearch BV
+Copyright 2014-2022 Elasticsearch BV
 
 This product includes software developed by The Apache Software 
 Foundation (http://www.apache.org/).
@@ -22563,12 +22563,12 @@ For t_cl_generator.cc
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/apoydence/eachers
+Dependency : github.com/poy/eachers
 Version: v0.0.0-20181020210610-23942921fe77
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/apoydence/eachers@v0.0.0-20181020210610-23942921fe77/LICENSE.md:
+Contents of probable licence file $GOMODCACHE/github.com/poy/eachers@v0.0.0-20181020210610-23942921fe77/LICENSE.md:
 
 The MIT License (MIT)
 
@@ -22745,11 +22745,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/containerd/containerd
-Version: v1.5.7
+Version: v1.5.9
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/containerd/containerd@v1.5.7/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/containerd/containerd@v1.5.9/LICENSE:
 
 
                                  Apache License
@@ -32571,11 +32571,11 @@ Contents of probable licence file $GOMODCACHE/github.com/opencontainers/go-diges
 
 --------------------------------------------------------------------------------
 Dependency : github.com/opencontainers/image-spec
-Version: v1.0.2-0.20190823105129-775207bd45b6
+Version: v1.0.2
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/opencontainers/image-spec@v1.0.2-0.20190823105129-775207bd45b6/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/opencontainers/image-spec@v1.0.2/LICENSE:
 
 
                                  Apache License

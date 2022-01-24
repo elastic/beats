@@ -20,12 +20,7 @@ pipeline {
   stages {
     stage('Weekly beats builds') {
       steps {
-        runBuild(quietPeriod: 0, job: 'Beats/beats/master')
-        // This should be `current_8` bump.getCurrentMinorReleaseFor8
-        runBuild(quietPeriod: 1000, job: 'Beats/beats/8.0')
-        // This should be `current_7` bump.getCurrentMinorReleaseFor7 or
-        // `next_minor_7`  bump.getNextMinorReleaseFor7
-        runBuild(quietPeriod: 2000, job: 'Beats/beats/7.16')
+        runBuilds(quietPeriodFactor: 1000, branches: ['master', '8.<minor>', '7.<minor>', '7.<next-minor>'])
       }
     }
   }
@@ -36,7 +31,37 @@ pipeline {
   }
 }
 
-def runBuild(Map args = [:]) {
-  def jobName = args.job
-  build(quietPeriod: args.quietPeriod, job: jobName, parameters: [booleanParam(name: 'awsCloudTests', value: true)], wait: false, propagate: false)
+def runBuilds(Map args = [:]) {
+  def branches = []
+  // Expand macros and filter duplicated matches.
+  args.branches.each { branch ->
+    def branchName = getBranchName(branch)
+    if (!branches.contains(branchName)) {
+      branches << branchName
+    }
+  }
+
+  def quietPeriod = 0
+  branches.each { branch ->
+    build(quietPeriod: quietPeriod, job: "Beats/beats/${branch}", parameters: [booleanParam(name: 'awsCloudTests', value: true)], wait: false, propagate: false)
+    // Increate the quiet period for the next iteration
+    quietPeriod += args.quietPeriodFactor
+  }
+}
+
+def getBranchName(branch) {
+  // special macro to look for the latest minor version
+  if (branch.contains('8.<minor>')) {
+   return bumpUtils.getMajorMinor(bumpUtils.getCurrentMinorReleaseFor8())
+  }
+  if (branch.contains('8.<next-minor>')) {
+    return bumpUtils.getMajorMinor(bumpUtils.getNextMinorReleaseFor8())
+  }
+  if (branch.contains('7.<minor>')) {
+    return bumpUtils.getMajorMinor(bumpUtils.getCurrentMinorReleaseFor7())
+  }
+  if (branch.contains('7.<next-minor>')) {
+    return bumpUtils.getMajorMinor(bumpUtils.getNextMinorReleaseFor7())
+  }
+  return branch
 }

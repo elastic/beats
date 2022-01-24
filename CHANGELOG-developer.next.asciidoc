@@ -68,6 +68,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Remove `event.dataset` (ECS) annotion from `libbeat.logp`. {issue}27404[27404]
 - Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
 - Avoid panicking in `add_fields` processor when input event.Fields is a nil map. {pull}28219[28219]
+- Drop event batch when get HTTP status 413 from Elasticsearch to avoid infinite loop {issue}14350[14350] {pull}29368[29368]
 
 ==== Added
 

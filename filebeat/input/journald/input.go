@@ -43,7 +43,10 @@ type journald struct {
 	MaxBackoff         time.Duration
 	Seek               journalread.SeekMode
 	CursorSeekFallback journalread.SeekMode
-	Matches            []journalfield.Matcher
+	Matches            journalfield.IncludeMatches
+	Units              []string
+	Transports         []string
+	Identifiers        []string
 	SaveRemoteHostname bool
 	Parsers            parser.Config
 }
@@ -105,6 +108,9 @@ func configure(cfg *common.Config) ([]cursor.Source, cursor.Input, error) {
 		Seek:               config.Seek,
 		CursorSeekFallback: config.CursorSeekFallback,
 		Matches:            config.Matches,
+		Units:              config.Units,
+		Transports:         config.Transports,
+		Identifiers:        config.Identifiers,
 		SaveRemoteHostname: config.SaveRemoteHostname,
 		Parsers:            config.Parsers,
 	}, nil
@@ -156,7 +162,8 @@ func (inp *journald) Run(
 
 func (inp *journald) open(log *logp.Logger, canceler input.Canceler, src cursor.Source) (*journalread.Reader, error) {
 	backoff := backoff.NewExpBackoff(canceler.Done(), inp.Backoff, inp.MaxBackoff)
-	reader, err := journalread.Open(log, src.Name(), backoff, withFilters(inp.Matches))
+	reader, err := journalread.Open(log, src.Name(), backoff,
+		withFilters(inp.Matches), withUnits(inp.Units), withTransports(inp.Transports), withSyslogIdentifiers(inp.Identifiers))
 	if err != nil {
 		return nil, sderr.Wrap(err, "failed to create reader for %{path} journal", src.Name())
 	}
@@ -184,9 +191,27 @@ func initCheckpoint(log *logp.Logger, c cursor.Cursor) checkpoint {
 	return cp
 }
 
-func withFilters(filters []journalfield.Matcher) func(*sdjournal.Journal) error {
+func withFilters(filters journalfield.IncludeMatches) func(*sdjournal.Journal) error {
 	return func(j *sdjournal.Journal) error {
-		return journalfield.ApplyMatchersOr(j, filters)
+		return journalfield.ApplyIncludeMatches(j, filters)
+	}
+}
+
+func withUnits(units []string) func(*sdjournal.Journal) error {
+	return func(j *sdjournal.Journal) error {
+		return journalfield.ApplyUnitMatchers(j, units)
+	}
+}
+
+func withTransports(transports []string) func(*sdjournal.Journal) error {
+	return func(j *sdjournal.Journal) error {
+		return journalfield.ApplyTransportMatcher(j, transports)
+	}
+}
+
+func withSyslogIdentifiers(identifiers []string) func(*sdjournal.Journal) error {
+	return func(j *sdjournal.Journal) error {
+		return journalfield.ApplySyslogIdentifierMatcher(j, identifiers)
 	}
 }
 

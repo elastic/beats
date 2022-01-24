@@ -21,12 +21,19 @@
 # batch of events has been published successfully. The default value is 5s.
 #winlogbeat.registry_flush: 5s
 
+# By default Ingest pipelines are not updated if a pipeline with the same ID
+# already exists. If this option is enabled Winlogbeat overwrites pipelines
+# every time a new Elasticsearch connection is established.
+#winlogbeat.overwrite_pipelines: false
+
 {{end -}}
 # event_logs specifies a list of event logs to monitor as well as any
 # accompanying options. The YAML data type of event_logs is a list of
 # dictionaries.
 #
-# The supported keys are name (required), tags, fields, fields_under_root,
-# forwarded, ignore_older, level, event_id, provider, and include_xml. Please
-# visit the documentation for the complete details of each option.
+# The supported keys are name, id, xml_query, tags, fields, fields_under_root,
+# forwarded, ignore_older, level, event_id, provider, and include_xml.
+# The xml_query key requires an id and must not be used with the name,
+# ignore_older, level, event_id, or provider keys. Please visit the
+# documentation for the complete details of each option.
 # https://go.es.io/WinlogbeatConfig
