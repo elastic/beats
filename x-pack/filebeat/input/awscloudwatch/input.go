@@ -26,19 +26,13 @@ import (
 )
 
 const (
-	inputName    = "aws-cloudwatch"
-	oldInputName = "awscloudwatch"
+	inputName = "aws-cloudwatch"
 )
 
 func init() {
 	err := input.Register(inputName, NewInput)
 	if err != nil {
 		panic(errors.Wrapf(err, "failed to register %v input", inputName))
-	}
-
-	err = input.Register(oldInputName, NewInput)
-	if err != nil {
-		panic(errors.Wrapf(err, "failed to register %v input", oldInputName))
 	}
 }
 
@@ -87,10 +81,6 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 		return nil, errors.Wrap(err, "failed unpacking config")
 	}
 	logger.Debug("aws-cloudwatch input config = ", config)
-
-	if config.Type == oldInputName {
-		logger.Warnf("%s input name is deprecated, please use %s instead", oldInputName, inputName)
-	}
 
 	if config.LogGroupARN != "" {
 		logGroupName, regionName, err := parseARN(config.LogGroupARN)
