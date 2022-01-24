@@ -33,6 +33,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"os/user"
 	"strconv"
 	"syscall"
@@ -42,13 +43,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/pkg/errors"
 )
 
-func FetchPid(hostfs resolve.Resolver, pid int, postprocess func(state ProcState) (ProcState, error)) (ProcState, error) {
-
-	return ProcState{}, nil
-}
-
+// FetchPids returns a map and array of pids
 func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 	n := C.proc_listpids(C.PROC_ALL_PIDS, 0, nil, 0)
 	if n <= 0 {
@@ -89,9 +87,10 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 		plist = append(plist, status)
 	}
 
-	return procMap, nil
+	return procMap, plist, nil
 }
 
+// GetInfoForPid returns basic info for the process
 func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 	info := C.struct_proc_taskallinfo{}
 
@@ -120,7 +119,7 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 	}
 
 	status.Ppid = opt.IntWith(int(info.pbsd.pbi_ppid))
-
+	status.Pid = opt.IntWith(pid)
 	status.Pgid = opt.IntWith(int(info.pbsd.pbi_pgid))
 
 	// Get process username. Fallback to UID if username is not available.
@@ -135,23 +134,101 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 	// grab memory info + process time while we have it from struct_proc_taskallinfo
 	status.Memory.Size = opt.UintWith(uint64(info.ptinfo.pti_virtual_size))
 	status.Memory.Rss.Bytes = opt.UintWith(uint64(info.ptinfo.pti_resident_size))
+
 	status.CPU.User.Ticks = opt.UintWith(uint64(info.ptinfo.pti_total_user) / uint64(time.Millisecond))
 	status.CPU.System.Ticks = opt.UintWith(uint64(info.ptinfo.pti_total_system) / uint64(time.Millisecond))
 	status.CPU.Total.Ticks = opt.UintWith(opt.SumOptUint(status.CPU.User.Ticks, status.CPU.System.Ticks))
-
-	status.CPU.StartTime = unixTimeMsToTime((uint64(info.pbsd.pbi_start_tvsec) * 1000) + (uint64(info.pbsd.pbi_start_tvusec) / 1000)).String()
+	status.CPU.StartTime = unixTimeMsToTime((uint64(info.pbsd.pbi_start_tvsec) * 1000) + (uint64(info.pbsd.pbi_start_tvusec) / 1000))
 
 	return status, nil
 }
 
+// FillPidMetrics is the darwin implementation
 func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState) (ProcState, error) {
+
+	args, exe, env, err := getProcArgs(pid)
+	if err != nil {
+		return state, errors.Wrap(err, "error fetching string data from process")
+	}
+
+	state.Args = args
+	state.Exe = exe
+	state.Env = env
 
 	return state, nil
 }
 
-func getArgs(_ int) ([]string, error) {
+func getProcArgs(pid int) ([]string, string, common.MapStr, error) {
 
-	return nil, nil
+	exeName := ""
+
+	mib := []C.int{C.CTL_KERN, C.KERN_PROCARGS2, C.int(pid)}
+	argmax := uintptr(C.ARG_MAX)
+	buf := make([]byte, argmax)
+	err := sysctl(mib, &buf[0], &argmax, nil, 0)
+	if err != nil {
+		return nil, "", nil, errors.Wrap(err, "error in sysctl")
+	}
+
+	bbuf := bytes.NewBuffer(buf)
+	bbuf.Truncate(int(argmax))
+
+	var argc int32                                // raw buffer
+	binary.Read(bbuf, binary.LittleEndian, &argc) // read length
+
+	path, err := bbuf.ReadBytes(0)
+	if err != nil {
+		return nil, "", nil, errors.Wrap(err, "Error reading the executable name")
+	}
+
+	exeName = stripNullByte(path)
+
+	// skip trailing nul bytes
+	for {
+		c, err := bbuf.ReadByte()
+		if err != nil {
+			return nil, "", nil, errors.Wrap(err, "Error skipping nul values in KERN_PROCARGS2 buffer")
+		}
+		if c != 0 {
+			bbuf.UnreadByte()
+			break
+		}
+	}
+
+	// read CLI args
+	var argv []string
+	for i := 0; i < int(argc); i++ {
+		arg, err := bbuf.ReadBytes(0)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, exeName, nil, errors.Wrap(err, "Error reading args from KERN_PROCARGS2")
+		}
+		argv = append(argv, stripNullByte(arg))
+	}
+
+	delim := []byte{61} // "=" for key value pairs
+
+	envVars := common.MapStr{}
+	for {
+		line, err := bbuf.ReadBytes(0)
+		if err == io.EOF || line[0] == 0 {
+			break
+		}
+		if err != nil {
+			return argv, exeName, nil, errors.Wrap(err, "Error reading args from KERN_PROCARGS2 buffer")
+		}
+		pair := bytes.SplitN(stripNullByteRaw(line), delim, 2)
+
+		if len(pair) != 2 {
+			return argv, exeName, nil, errors.Wrap(err, "Error reading process information from KERN_PROCARGS2")
+		}
+
+		envVars[string(pair[0])] = string(pair[1])
+	}
+
+	return argv, exeName, envVars, nil
 }
 
 func taskInfo(pid int, info *C.struct_proc_taskallinfo) error {
@@ -164,4 +241,26 @@ func taskInfo(pid int, info *C.struct_proc_taskallinfo) error {
 	}
 
 	return nil
+}
+
+func sysctl(mib []C.int, old *byte, oldlen *uintptr,
+	new *byte, newlen uintptr) (err error) {
+	var p0 unsafe.Pointer
+	p0 = unsafe.Pointer(&mib[0])
+	_, _, e1 := syscall.Syscall6(syscall.SYS___SYSCTL, uintptr(p0),
+		uintptr(len(mib)),
+		uintptr(unsafe.Pointer(old)), uintptr(unsafe.Pointer(oldlen)),
+		uintptr(unsafe.Pointer(new)), uintptr(newlen))
+	if e1 != 0 {
+		err = e1
+	}
+	return
+}
+
+func stripNullByte(buf []byte) string {
+	return string(buf[0 : len(buf)-1])
+}
+
+func stripNullByteRaw(buf []byte) []byte {
+	return buf[0 : len(buf)-1]
 }

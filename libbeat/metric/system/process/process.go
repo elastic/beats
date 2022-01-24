@@ -123,6 +123,7 @@ func (procStats *Stats) Init() error {
 	return nil
 }
 
+// Get fetches the configured processes and returns a formatted map
 func (procStats *Stats) Get() ([]common.MapStr, error) {
 	//If the user hasn't configured any kind of process glob, return
 	if len(procStats.Procs) == 0 {
@@ -189,17 +190,18 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	if err != nil {
 		return status, true, errors.Wrap(err, "GetInfoForPid")
 	}
-	status = procStats.cacheCmdLine(pid, status)
+	status = procStats.cacheCmdLine(status)
 	// Filter based on user-supplied func
-	if !procStats.matchProcess(status.Name) {
-		return status, false, nil
-	}
-	//If we've passed the filter, continue to fill out the rest of the metrics
 	if filter {
-		status, err = FillPidMetrics(procStats.Hostfs, pid, status)
-		if err != nil {
-			return status, true, errors.Wrap(err, "FillPidMetrics")
+		if !procStats.matchProcess(status.Name) {
+			return status, false, nil
 		}
+	}
+
+	//If we've passed the filter, continue to fill out the rest of the metrics
+	status, err = FillPidMetrics(procStats.Hostfs, pid, status)
+	if err != nil {
+		return status, true, errors.Wrap(err, "FillPidMetrics")
 	}
 
 	//postprocess with cgroups and percentages
@@ -208,11 +210,10 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 		cgStats, err := procStats.cgroups.GetStatsForPid(status.Pid.ValueOr(0))
 		if err != nil {
 			return status, true, errors.Wrap(err, "cgroups.GetStatsForPid")
-		} else {
-			status.Cgroup = cgStats
-			if ok {
-				status.Cgroup.FillPercentages(last.Cgroup, status.SampleTime, last.SampleTime)
-			}
+		}
+		status.Cgroup = cgStats
+		if ok {
+			status.Cgroup.FillPercentages(last.Cgroup, status.SampleTime, last.SampleTime)
 		}
 	} // end cgroups processor
 	status.SampleTime = time.Now()
@@ -226,7 +227,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	return status, true, nil
 }
 
-func (procStats *Stats) cacheCmdLine(pid int, in ProcState) ProcState {
+func (procStats *Stats) cacheCmdLine(in ProcState) ProcState {
 	if previousProc, ok := procStats.ProcsMap[in.Pid.ValueOr(0)]; ok {
 		if procStats.CacheCmdLine {
 			cmdline := previousProc.Cmdline

@@ -65,7 +65,7 @@ func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":                        "system",
 		"metricsets":                    []string{"process"},
-		"processes":                     []string{".*node.*"}, // in case we want a prettier looking example for data.json
+		"processes":                     []string{".*"}, // in case we want a prettier looking example for data.json
 		"process.cgroups.enabled":       false,
 		"process.include_cpu_ticks":     true,
 		"process.cmdline.cache.enabled": true,

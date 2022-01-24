@@ -60,9 +60,9 @@ func TestGetOne(t *testing.T) {
 	err := testConfig.Init()
 	assert.NoError(t, err, "Init")
 
-	procData, err := testConfig.GetSelf()
-	assert.NoError(t, err, "GetSelf")
-	t.Logf("Proc: %#v", procData)
+	procData, err := testConfig.GetOne(os.Getpid())
+	assert.NoError(t, err, "GetOne")
+	t.Logf("Proc: %s", procData.StringToPrint())
 }
 
 func TestGetProcess(t *testing.T) {

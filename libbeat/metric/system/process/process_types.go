@@ -25,23 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
-type RunState byte
-
-const (
-	// RunStateSleep corresponds to a sleep state
-	RunStateSleep = 'S'
-	// RunStateRun corresponds to a running state
-	RunStateRun = 'R'
-	// RunStateStop corresponds to a stopped state
-	RunStateStop = 'T'
-	// RunStateZombie marks a zombie process
-	RunStateZombie = 'Z'
-	// RunStateIdle corresponds to an idle state
-	RunStateIdle = 'D'
-	// RunStateUnknown corresponds to a process in an unknown state
-	RunStateUnknown = '?'
-)
-
+// ProcState is the main struct for process information and metrics.
 type ProcState struct {
 	// Basic Process data
 	Name     string  `struct:"name,omitempty"`
@@ -70,6 +54,7 @@ type ProcState struct {
 	SampleTime time.Time `struct:"-,omitempty"`
 }
 
+// ProcCPUInfo is the main struct for CPU metrics
 type ProcCPUInfo struct {
 	StartTime string   `struct:"start_time,omitempty"`
 	Total     CPUTotal `struct:"total,omitempty"`
@@ -78,10 +63,12 @@ type ProcCPUInfo struct {
 	System CPUTicks `struct:"system,omitempty"`
 }
 
+// CPUTicks is a formatting wrapper for `tick` metric values
 type CPUTicks struct {
 	Ticks opt.Uint `struct:"ticks,omitempty"`
 }
 
+// CPUTotal is the struct for cpu.total metrics
 type CPUTotal struct {
 	Value opt.Float  `struct:"value,omitempty"`
 	Ticks opt.Uint   `struct:"ticks,omitempty"`
@@ -89,22 +76,26 @@ type CPUTotal struct {
 	Norm  opt.PctOpt `struct:"norm,omitempty"`
 }
 
+// ProcMemInfo is the struct for cpu.memory metrics
 type ProcMemInfo struct {
 	Size  opt.Uint   `struct:"size,omitempty"`
 	Share opt.Uint   `struct:"share,omitempty"`
 	Rss   MemBytePct `struct:"rss,omitempty"`
 }
 
+// MemBytePct is the formatting struct for wrapping pct/byte metrics
 type MemBytePct struct {
 	Bytes opt.Uint  `struct:"bytes,omitempty"`
 	Pct   opt.Float `struct:"pct,omitempty"`
 }
 
+// ProcFDInfo is the struct for process.fd metrics
 type ProcFDInfo struct {
 	Open  opt.Uint   `struct:"open,omitempty"`
 	Limit ProcLimits `struct:"limit,omitempty"`
 }
 
+// ProcLimits wraps the fd.limit metrics
 type ProcLimits struct {
 	Soft opt.Uint `struct:"soft,omitempty"`
 	Hard opt.Uint `struct:"hard,omitempty"`
@@ -115,4 +106,9 @@ type ProcLimits struct {
 // IsZero returns true if the underlying value nil
 func (t CPUTicks) IsZero() bool {
 	return t.Ticks.IsZero()
+}
+
+// IsZero returns true if the underlying value nil
+func (t ProcFDInfo) IsZero() bool {
+	return t.Open.IsZero() && t.Limit.Hard.IsZero() && t.Limit.Soft.IsZero()
 }
