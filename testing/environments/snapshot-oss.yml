@@ -3,7 +3,7 @@
 version: '2.3'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.24-98b58fc7-SNAPSHOT
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.8.24-249d8e5f-SNAPSHOT
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9200"]
       retries: 300
@@ -15,7 +15,7 @@ services:
     - "http.host=0.0.0.0"
 
   logstash:
-    image: docker.elastic.co/logstash/logstash-oss:6.8.24-98b58fc7-SNAPSHOT
+    image: docker.elastic.co/logstash/logstash-oss:6.8.24-249d8e5f-SNAPSHOT
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
       retries: 600
@@ -25,7 +25,7 @@ services:
     - ./docker/logstash/pki:/etc/pki:ro
 
   kibana:
-    image: docker.elastic.co/kibana/kibana-oss:6.8.24-98b58fc7-SNAPSHOT
+    image: docker.elastic.co/kibana/kibana-oss:6.8.24-249d8e5f-SNAPSHOT
     healthcheck:
       test: ["CMD-SHELL", 'python -c ''import urllib, json; response = urllib.urlopen("http://localhost:5601/api/status"); data = json.loads(response.read()); exit(1) if data["status"]["overall"]["state"] != "green" else exit(0);''']
       retries: 600
