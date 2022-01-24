@@ -40670,6 +40670,58 @@ type: keyword
 --
 
 [float]
+=== actions
+
+Kibana actions metrics.
+
+
+
+
+*`kibana.actions.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+
+*`kibana.actions.overdue.count`*::
++
+--
+type: long
+
+--
+
+
+*`kibana.actions.overdue.duration.p50`*::
++
+--
+type: float
+
+--
+
+*`kibana.actions.overdue.duration.p99`*::
++
+--
+type: float
+
+--
+
+*`kibana.actions.failures`*::
++
+--
+type: long
+
+--
+
+*`kibana.actions.executions`*::
++
+--
+type: long
+
+--
+
+[float]
 === rules
 
 Kibana rule metrics.

@@ -37,6 +37,7 @@ const (
 	StatusPath   = "api/status"
 	StatsPath    = "api/stats"
 	RulesPath    = "api/monitoring_collection/rules"
+	ActionsPath  = "api/monitoring_collection/actions"
 	SettingsPath = "api/settings"
 )
 
@@ -55,8 +56,8 @@ var (
 	SettingsAPIAvailableVersion = v6_5_0
 
 	// Version of Kibana since when the rules and task manager APIs are available
-	RulesAPIAvailableVersion       = v8_1_0
-	TaskManagerAPIAvailableVersion = v8_1_0
+	RulesAPIAvailableVersion   = v8_1_0
+	ActionsAPIAvailableVersion = v8_1_0
 )
 
 func init() {
@@ -68,7 +69,7 @@ func init() {
 
 // NewModule creates a new module.
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	return elastic.NewModule(&base, []string{"stats", "rules"}, logp.NewLogger(ModuleName))
+	return elastic.NewModule(&base, []string{"stats", "rules", "actions"}, logp.NewLogger(ModuleName))
 }
 
 // GetVersion returns the version of the Kibana instance
@@ -107,9 +108,9 @@ func IsRulesAPIAvailable(currentKibanaVersion *common.Version) bool {
 	return elastic.IsFeatureAvailable(currentKibanaVersion, RulesAPIAvailableVersion)
 }
 
-// IsTaskManagerAPIAvailable returns whether the rules API is available in the given version of Kibana
-func IsTaskManagerAPIAvailable(currentKibanaVersion *common.Version) bool {
-	return elastic.IsFeatureAvailable(currentKibanaVersion, TaskManagerAPIAvailableVersion)
+// IsActionsAPIAvailable returns whether the rules API is available in the given version of Kibana
+func IsActionsAPIAvailable(currentKibanaVersion *common.Version) bool {
+	return elastic.IsFeatureAvailable(currentKibanaVersion, ActionsAPIAvailableVersion)
 }
 
 // IsUsageExcludable returns whether the stats API supports the exclude_usage parameter in the
