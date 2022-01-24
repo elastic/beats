@@ -55,7 +55,7 @@ func DefaultConfig() *Config {
 	}
 }
 
-// OS return configured operating system or falls back to runtime.GOOS
+// OS returns the configured operating system or falls back to runtime.GOOS
 func (c *Config) OS() string {
 	if c.OperatingSystem != "" {
 		return c.OperatingSystem
@@ -73,7 +73,7 @@ func (c *Config) OS() string {
 	return c.OperatingSystem
 }
 
-// Arch return configured architecture or falls back to 32bit
+// Arch returns the configured architecture or falls back to 32bit
 func (c *Config) Arch() string {
 	if c.Architecture != "" {
 		return c.Architecture

@@ -28,7 +28,6 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
@@ -98,13 +97,11 @@ func TestPackages() error {
 	)
 }
 
-func BuildDarwinUniversal() error {
-	return sh.Run("lipo",
-		"-create",
-		"-output", "./build/golang-crossbuild/metricbeat-darwin-universal",
-		"./build/golang-crossbuild/metricbeat-darwin-arm64",
-		"./build/golang-crossbuild/metricbeat-darwin-amd64",
-	)
+// AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
+// universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
+// were built and only performs the merge.
+func AssembleDarwinUniversal() error {
+	return devtools.AssembleDarwinUniversal()
 }
 
 // Dashboards collects all the dashboards and generates index patterns.

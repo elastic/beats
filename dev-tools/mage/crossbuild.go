@@ -196,16 +196,16 @@ func CrossBuild(options ...CrossBuildOption) error {
 	Parallel(deps...)
 
 	// It needs to run after all the builds, as it needs the darwin binaries.
-	if err := buildDarwinUniversal(params); err != nil {
+	if err := assembleDarwinUniversal(params); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// buildDarwinUniversal checks if darwin/amd64 and darwin/arm64 were build,
+// assembleDarwinUniversal checks if darwin/amd64 and darwin/arm64 were build,
 // if so, it generates a darwin/universal binary that is the merge fo them two.
-func buildDarwinUniversal(params crossBuildParams) error {
+func assembleDarwinUniversal(params crossBuildParams) error {
 	var darwinAMD64, darwinARM64 bool
 	for _, p := range Platforms {
 		if p.Name == "darwin/amd64" {
@@ -220,7 +220,7 @@ func buildDarwinUniversal(params crossBuildParams) error {
 		builder := GolangCrossBuilder{
 			// the docker image for darwin/arm64 is the one capable of merging the binaries.
 			Platform:      "darwin/arm64",
-			Target:        "buildDarwinUniversal",
+			Target:        "assembleDarwinUniversal",
 			InDir:         params.InDir,
 			ImageSelector: params.ImageSelector}
 		if err := builder.Build(); err != nil {
@@ -414,4 +414,22 @@ func chownPaths(uid, gid int, path string) error {
 		numFixed++
 		return nil
 	})
+}
+
+// AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
+// universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
+// were built and only performs the merge.
+func AssembleDarwinUniversal() error {
+	var lipoArgs []string
+	args := []string{
+		"build/golang-crossbuild/%s-darwin-universal",
+		"build/golang-crossbuild/%s-darwin-arm64",
+		"build/golang-crossbuild/%s-darwin-amd64"}
+
+	for _, arg := range args {
+		lipoArgs = append(lipoArgs, fmt.Sprintf(arg, BeatName))
+	}
+
+	lipo := sh.RunCmd("lipo", "-create", "-output")
+	return lipo(lipoArgs...)
 }

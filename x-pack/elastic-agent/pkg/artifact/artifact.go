@@ -20,6 +20,7 @@ var packageArchMap = map[string]string{
 	"windows-binary-64":  "windows-x86_64.zip",
 	"darwin-binary-32":   "darwin-x86_64.tar.gz",
 	"darwin-binary-64":   "darwin-x86_64.tar.gz",
+	"darwin-binary-arm64": "darwin-arm64.tar.gz",
 }
 
 // GetArtifactName constructs a path to a downloaded artifact

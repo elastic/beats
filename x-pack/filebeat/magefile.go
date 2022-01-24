@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	filebeat "github.com/elastic/beats/v7/filebeat/scripts/mage"
@@ -37,15 +36,6 @@ func init() {
 
 	devtools.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
 	devtools.BeatLicense = "Elastic License"
-}
-
-func BuildDarwinUniversal() error {
-	return sh.Run("lipo",
-		"-create",
-		"-output", "./build/golang-crossbuild/filebeat-darwin-universal",
-		"./build/golang-crossbuild/filebeat-darwin-arm64",
-		"./build/golang-crossbuild/filebeat-darwin-amd64",
-	)
 }
 
 // Build builds the Beat binary.
@@ -72,6 +62,13 @@ func BuildGoDaemon() error {
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
 func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
+}
+
+// AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
+// universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
+// were built and only performs the merge.
+func AssembleDarwinUniversal() error {
+	return devtools.AssembleDarwinUniversal()
 }
 
 // Package packages the Beat for distribution.

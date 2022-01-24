@@ -40,15 +40,6 @@ func init() {
 	devtools.BeatLicense = "Elastic License"
 }
 
-func BuildDarwinUniversal() error {
-	return sh.Run("lipo",
-		"-create",
-		"-output", "./build/golang-crossbuild/metricbeat-darwin-universal",
-		"./build/golang-crossbuild/metricbeat-darwin-arm64",
-		"./build/golang-crossbuild/metricbeat-darwin-amd64",
-	)
-}
-
 // Build builds the Beat binary.
 func Build() error {
 	args := devtools.DefaultBuildArgs()
@@ -141,6 +132,13 @@ func BuildSystemTestBinary() error {
 		log.Printf("BuildSystemTestGoBinary (go %v) took %v.", strings.Join(args, " "), time.Since(start))
 	}()
 	return sh.RunV("go", args...)
+}
+
+// AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
+// universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
+// were built and only performs the merge.
+func AssembleDarwinUniversal() error {
+	return devtools.AssembleDarwinUniversal()
 }
 
 // Package packages the Beat for distribution.
