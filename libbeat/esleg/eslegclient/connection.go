@@ -30,6 +30,7 @@ import (
 	"go.elastic.co/apm/module/apmelasticsearch"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
@@ -37,13 +38,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/testing"
-)
-
-const (
-	// Identifies the request as originating from an Elastic product. Has the side effect of
-	// suppressing Elasticsearch API deprecation warnings in Kibana when set.
-	ProductOriginHeader = "X-Elastic-Product-Origin"
-	BeatsProductOrigin  = "beats"
 )
 
 type esHTTPClient interface {
@@ -127,11 +121,11 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 	userAgent := useragent.UserAgent(s.Beatname)
 
 	// Default the product origin header to beats if it wasn't already set.
-	if _, ok := s.Headers[ProductOriginHeader]; !ok {
+	if _, ok := s.Headers[productorigin.Header]; !ok {
 		if s.Headers == nil {
 			s.Headers = make(map[string]string)
 		}
-		s.Headers[ProductOriginHeader] = BeatsProductOrigin
+		s.Headers[productorigin.Header] = productorigin.Beats
 	}
 
 	httpClient, err := s.Transport.Client(
