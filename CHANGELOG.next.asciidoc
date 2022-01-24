@@ -51,6 +51,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix broken macOS ICMP python e2e test. {pull}29900[29900]
 - Only add monitor.status to browser events when summary. {pull}29460[29460]
 - Also add summary to journeys for which the synthetics runner crashes. {pull}29606[29606]
+- Update size of ICMP packets to adhere to standard min size. {pull}29948[29948]
 
 *Metricbeat*
 
