@@ -15,7 +15,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"reflect"
 	"strings"
 	"time"
@@ -375,18 +374,13 @@ func s3ObjectHash(obj s3EventV2) string {
 // stream without consuming it. This makes it convenient for code executed after this function call
 // to consume the stream if it wants.
 func isStreamGzipped(r *bufio.Reader) (bool, error) {
-	// Why 512? See https://godoc.org/net/http#DetectContentType
-	buf, err := r.Peek(512)
+	buf, err := r.Peek(3)
 	if err != nil && err != io.EOF {
 		return false, err
 	}
 
-	switch http.DetectContentType(buf) {
-	case "application/x-gzip", "application/zip":
-		return true, nil
-	default:
-		return false, nil
-	}
+	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
+	return bytes.HasPrefix(buf, []byte{0x1F, 0x8B, 0x08}), nil
 }
 
 // s3Metadata returns a map containing the selected S3 object metadata keys.
