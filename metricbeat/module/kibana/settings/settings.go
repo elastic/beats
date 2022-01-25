@@ -15,15 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package status
+package settings
 
 import (
-<<<<<<< HEAD
 	"fmt"
 
-=======
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
->>>>>>> 5f3dd3e39d (Add the Elastic product origin header when talking to Elasticsearch or Kibana. (#29966))
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -33,58 +30,68 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet(kibana.ModuleName, "status", New,
+	mb.Registry.MustAddMetricSet(kibana.ModuleName, "settings", New,
 		mb.WithHostParser(hostParser),
-		mb.DefaultMetricSet(),
 	)
 }
 
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: "http",
-		PathConfigKey: "path",
-		DefaultPath:   "api/status",
+		DefaultPath:   kibana.SettingsPath,
+		QueryParams:   "extended=true", // make Kibana fetch the cluster_uuid
 	}.Build()
 )
 
 // MetricSet type defines all fields of the MetricSet
 type MetricSet struct {
-	*kibana.MetricSet
-	http *helper.HTTP
+	mb.BaseMetricSet
+	settingsHTTP *helper.HTTP
 }
 
 // New create a new instance of the MetricSet
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	ms, err := kibana.NewMetricSet(base)
-	if err != nil {
-		return nil, err
-	}
-
-	if ms.XPackEnabled {
-		return nil, fmt.Errorf("The %s metricset cannot be used with xpack.enabled: true", ms.FullyQualifiedName())
-	}
-
-	http, err := helper.NewHTTP(base)
-	if err != nil {
-		return nil, err
-	}
-
-	http.SetHeaderDefault(productorigin.Header, productorigin.Beats)
-
 	return &MetricSet{
-		ms,
-		http,
+		BaseMetricSet: base,
 	}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
-func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	content, err := m.http.FetchContent()
+func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
+	if err = m.init(); err != nil {
+		return
+	}
+
+	content, err := m.settingsHTTP.FetchContent()
+	if err != nil {
+		return
+	}
+
+	return eventMapping(r, content)
+}
+
+func (m *MetricSet) init() (err error) {
+	httpHelper, err := helper.NewHTTP(m.BaseMetricSet)
 	if err != nil {
 		return err
 	}
 
-	return eventMapping(r, content)
+	httpHelper.SetHeaderDefault(productorigin.Header, productorigin.Beats)
+
+	kibanaVersion, err := kibana.GetVersion(httpHelper, kibana.SettingsPath)
+	if err != nil {
+		return err
+	}
+
+	isSettingsAPIAvailable := kibana.IsSettingsAPIAvailable(kibanaVersion)
+	if !isSettingsAPIAvailable {
+		const errorMsg = "the %v metricset is only supported with Kibana >= %v. You are currently running Kibana %v"
+		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.SettingsAPIAvailableVersion, kibanaVersion)
+	}
+
+	m.settingsHTTP, err = helper.NewHTTP(m.BaseMetricSet)
+
+	return
 }

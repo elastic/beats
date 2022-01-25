@@ -22,6 +22,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -106,7 +107,13 @@ func (m *MetricSet) init() error {
 		return err
 	}
 
+<<<<<<< HEAD
 	kibanaVersion, err := kibana.GetVersion(statsHTTP, statsPath)
+=======
+	statsHTTP.SetHeaderDefault(productorigin.Header, productorigin.Beats)
+
+	kibanaVersion, err := kibana.GetVersion(statsHTTP, kibana.StatsPath)
+>>>>>>> 5f3dd3e39d (Add the Elastic product origin header when talking to Elasticsearch or Kibana. (#29966))
 	if err != nil {
 		return err
 	}
