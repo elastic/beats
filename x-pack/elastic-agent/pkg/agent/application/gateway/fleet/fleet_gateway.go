@@ -127,7 +127,8 @@ func newFleetGatewayWithScheduler(
 	stateStore stateStore,
 ) (gateway.FleetGateway, error) {
 
-	// Backoff implementation doesn't support the using context as the shutdown mechanism.
+	// Backoff implementation doesn't support the use of a context [cancellation]
+	// as the shutdown mechanism.
 	// So we keep a done channel that will be closed when the current context is shutdown.
 	done := make(chan struct{})
 
