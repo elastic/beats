@@ -26,5 +26,4 @@ const (
 	// Applicable values from https://github.com/elastic/kibana/blob/main/x-pack/plugins/upgrade_assistant/common/constants.ts#L50
 	Observability = "observability"
 	Beats         = "beats"
-	Fleet         = "fleet"
 )
