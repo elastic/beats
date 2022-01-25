@@ -29,15 +29,12 @@ import (
 // image to use.
 const NpcapVersion = "1.60"
 
-// BeatsCIHostPrefix is the prefix of hostnames used during beats builds.
-const BeatsCIHostPrefix = "beats-ci-immutable"
-
 // CrossBuild cross-builds the beat for all target platforms.
 //
 // On Windows platforms, if CrossBuild is invoked with the environment variables
-// NPCAP_LOCAL set to "true" or the builder hostname has the BeatsCIHostPrefix,
-// a private cross-build image is selected that provides the OEM Npcap installer
-// for the build. This behaviour requires access to the private image.
+// CI or NPCAP_LOCAL set to "true", a private cross-build image is selected that
+// provides the OEM Npcap installer for the build. This behaviour requires access
+// to the private image.
 func CrossBuild() error {
 	return devtools.CrossBuild(
 		// Run all builds serially to try to address failures that might be caused
@@ -49,11 +46,7 @@ func CrossBuild() error {
 			if err != nil {
 				return "", err
 			}
-			hostname, err := os.Hostname()
-			if err != nil {
-				return "", err
-			}
-			if !strings.HasPrefix(hostname, BeatsCIHostPrefix) && os.ExpandEnv("NPCAP_LOCAL") != "true" {
+			if os.ExpandEnv("CI") != "true" && os.ExpandEnv("NPCAP_LOCAL") != "true" {
 				return image, nil
 			}
 			if platform == "windows/amd64" || platform == "windows/386" {
