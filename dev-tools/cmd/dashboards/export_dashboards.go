@@ -66,7 +66,8 @@ func main() {
 		user = u.User.Username()
 		pass, _ = u.User.Password()
 	}
-
+	user = "beats"
+	pass = "testing"
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = kibanaTimeout
 
