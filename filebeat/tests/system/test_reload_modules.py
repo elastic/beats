@@ -6,7 +6,6 @@ import time
 
 from filebeat import BaseTest
 from beat.beat import INTEGRATION_TESTS
-from elasticsearch import Elasticsearch
 
 
 moduleConfigTemplate = """
@@ -27,7 +26,7 @@ class Test(BaseTest):
     def setUp(self):
         super(BaseTest, self).setUp()
         if INTEGRATION_TESTS:
-            self.es = Elasticsearch([self.get_elasticsearch_url()])
+            self.es = self.get_elasticsearch_instance()
 
         # Copy system module
         shutil.copytree(os.path.join(self.beat_path, "tests", "system", "module", "test"),
@@ -72,7 +71,7 @@ class Test(BaseTest):
             reload_path=self.working_dir + "/configs/*.yml",
             reload_type="modules",
             inputs=False,
-            elasticsearch={"host": self.get_elasticsearch_url()}
+            elasticsearch=self.get_elasticsearch_template_config(),
         )
 
         proc = self.start_beat()

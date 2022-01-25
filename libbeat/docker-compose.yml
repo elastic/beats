@@ -21,7 +21,9 @@ services:
       - KIBANA_PASS=testing
       - ES_HOST=elasticsearch
       - ES_PORT=9200
-      - ES_USER=beats
+      # ES_USER must be admin in order for the Go Integration tests to
+      # function because they require indices:data/read/search
+      - ES_USER=admin
       - ES_PASS=testing
       - ES_MONITORING_HOST=elasticsearch_monitoring
       - ES_MONITORING_PORT=9200
@@ -30,7 +32,7 @@ services:
       # - ES_KERBEROS_HOST=elasticsearch_kerberos.elastic
       - ES_PORT_SSL=9200
       - ES_SUPERUSER_USER=admin
-      - ES_SUPERUSER_PASS=changeme
+      - ES_SUPERUSER_PASS=testing
     volumes:
       - ${PWD}/..:/go/src/github.com/elastic/beats/
       # Used for docker integration tests:
@@ -61,19 +63,24 @@ services:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+      retries: 300
+      interval: 1s
 
   elasticsearch_monitoring:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
     healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+      test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+
   elasticsearchssl:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
     healthcheck:
-      test: ["CMD", "curl", "-u", "admin:changeme", "-f", "https://localhost:9200", "--insecure"]
+      test: ["CMD", "curl", "-u", "admin:testing", "-f", "https://localhost:9200", "--insecure"]
       retries: 1200
       interval: 5s
       start_period: 60s
@@ -94,9 +101,11 @@ services:
       - "xpack.security.authc.realms.file.file1.order=0"
     volumes:
       - ${ES_BEATS}/testing/environments/docker/elasticsearch/pki:/usr/share/elasticsearch/config/pki:ro
+      - ${ES_BEATS}/testing/environments/docker/elasticsearch/roles.yml:/usr/share/elasticsearch/config/roles.yml
+      - ${ES_BEATS}/testing/environments/docker/elasticsearch/users:/usr/share/elasticsearch/config/users
+      - ${ES_BEATS}/testing/environments/docker/elasticsearch/users_roles:/usr/share/elasticsearch/config/users_roles
     expose:
       - 9200
-    command: bash -c "bin/elasticsearch-users useradd admin -r superuser -p changeme | /usr/local/bin/docker-entrypoint.sh eswrapper"
 
   # This host name is static because of the certificate.
   logstash:
@@ -163,3 +172,6 @@ services:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: kibana
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
+      retries: 600
