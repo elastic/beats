@@ -21,8 +21,8 @@ IF NOT EXIST C:\Python38\python.exe (
 python --version
 where python
 
-where /q gcc
-IF ERRORLEVEL 1 (
+WHERE /q gcc
+IF %ERRORLEVEL% NEQ 0 (
     REM Install mingw 5.3.0
     choco install mingw -y -r --no-progress --version 5.3.0 || exit /b 1
 )
