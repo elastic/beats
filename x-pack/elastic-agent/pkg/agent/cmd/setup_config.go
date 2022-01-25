@@ -108,8 +108,8 @@ func defaultAccessConfig() (setupConfig, error) {
 			Fleet: kibanaFleetConfig{
 				Setup:        envBool("KIBANA_FLEET_SETUP"),
 				Host:         envWithDefault("http://kibana:5601", "KIBANA_FLEET_HOST", "KIBANA_HOST"),
-				Username:     envWithDefault("elastic", "KIBANA_FLEET_USERNAME", "ELASTICSEARCH_USERNAME"),
-				Password:     envWithDefault("changeme", "KIBANA_FLEET_PASSWORD", "ELASTICSEARCH_PASSWORD"),
+				Username:     envWithDefault("elastic", "KIBANA_FLEET_USERNAME", "KIBANA_USERNAME", "ELASTICSEARCH_USERNAME"),
+				Password:     envWithDefault("changeme", "KIBANA_FLEET_PASSWORD", "KIBANA_PASSWORD", "ELASTICSEARCH_PASSWORD"),
 				ServiceToken: envWithDefault("", "KIBANA_FLEET_SERVICE_TOKEN", "FLEET_SERVER_SERVICE_TOKEN"),
 				CA:           envWithDefault("", "KIBANA_FLEET_CA", "KIBANA_CA", "ELASTICSEARCH_CA"),
 			},

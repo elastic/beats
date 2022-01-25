@@ -80,12 +80,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny icmp src Inside:10.123.123.123 dst Outside:10.123.123.123 (type 11, code 0) by access-group \"Inside_access_in\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "ftd",
         "host.hostname": "SNL-ASA-VPN-A01",
@@ -133,12 +133,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src dmz:10.123.123.123/6316 dst outside:10.123.123.123/53 type 3, code 0, by access-group \"acl_dmz\" [0xe3afb522, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -183,12 +183,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny udp src Inside:10.123.123.123/57621(LOCAL\\Elastic) dst Outside:10.123.123.123/57621 by access-group \"Inside_access_in\" [0x0, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "ftd",
         "host.hostname": "SNL-ASA-VPN-A01",
@@ -237,12 +237,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106017: Deny IP due to Land Attack from 10.123.123.123 to 10.123.123.123",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "ftd",
         "host.hostname": "SNL-ASA-VPN-A01",
