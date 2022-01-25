@@ -43,10 +43,6 @@ services:
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.1.0-f5a18001-SNAPSHOT
-    healthcheck:
-      test: ["CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
-      retries: 600
-      interval: 10s
     environment:
     - "ELASTICSEARCH_USERNAME=kibana_system_user"
     - "ELASTICSEARCH_PASSWORD=testing"
