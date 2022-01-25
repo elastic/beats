@@ -44,7 +44,7 @@ const defaultCrossBuildTarget = "golangCrossBuild"
 var Platforms = BuildPlatforms.Defaults()
 
 // SelectedPackageTypes is the list of package types
-var SelectedPackageTypes []PackageType = []PackageType{TarGz}
+var SelectedPackageTypes = []PackageType{TarGz}
 
 func init() {
 	// Allow overriding via PLATFORMS.
@@ -414,22 +414,4 @@ func chownPaths(uid, gid int, path string) error {
 		numFixed++
 		return nil
 	})
-}
-
-// AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
-// universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
-// were built and only performs the merge.
-func AssembleDarwinUniversal() error {
-	var lipoArgs []string
-	args := []string{
-		"build/golang-crossbuild/%s-darwin-universal",
-		"build/golang-crossbuild/%s-darwin-arm64",
-		"build/golang-crossbuild/%s-darwin-amd64"}
-
-	for _, arg := range args {
-		lipoArgs = append(lipoArgs, fmt.Sprintf(arg, BeatName))
-	}
-
-	lipo := sh.RunCmd("lipo", "-create", "-output")
-	return lipo(lipoArgs...)
 }

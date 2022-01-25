@@ -20,6 +20,7 @@ import (
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
 	// mage:import
@@ -138,7 +139,7 @@ func BuildSystemTestBinary() error {
 // universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
 // were built and only performs the merge.
 func AssembleDarwinUniversal() error {
-	return devtools.AssembleDarwinUniversal()
+	return build.AssembleDarwinUniversal()
 }
 
 // Package packages the Beat for distribution.
