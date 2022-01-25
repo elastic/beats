@@ -185,6 +185,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 - Add support for custom XML queries {issue}1054[1054] {pull}29330[29330]
+- Add support for sysmon event ID 26; FileDeleteDetected. {issue}26280[26280] {pull}29957[29957]
 
 *Elastic Log Driver*
 
