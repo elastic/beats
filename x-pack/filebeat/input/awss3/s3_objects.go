@@ -19,6 +19,8 @@ import (
 	"strings"
 	"time"
 
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/pkg/errors"
 
@@ -73,7 +75,7 @@ func (f *s3ObjectProcessorFactory) findReaderConfig(key string) *readerConfig {
 
 // Create returns a new s3ObjectProcessor. It returns nil when no file selectors
 // match the S3 object key.
-func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger, ack *eventACKTracker, obj s3EventV2) s3ObjectHandler {
+func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger, ack *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler {
 	log = log.With(
 		"bucket_arn", obj.S3.Bucket.Name,
 		"object_key", obj.S3.Object.Key)
@@ -100,9 +102,9 @@ type s3ObjectProcessor struct {
 
 	log          *logp.Logger
 	ctx          context.Context
-	acker        *eventACKTracker // ACKer tied to the SQS message (multiple S3 readers share an ACKer when the S3 notification event contains more than one S3 object).
-	readerConfig *readerConfig    // Config about how to process the object.
-	s3Obj        s3EventV2        // S3 object information.
+	acker        *awscommon.EventACKTracker // ACKer tied to the SQS message (multiple S3 readers share an ACKer when the S3 notification event contains more than one S3 object).
+	readerConfig *readerConfig              // Config about how to process the object.
+	s3Obj        s3EventV2                  // S3 object information.
 	s3ObjHash    string
 	s3RequestURL string
 
@@ -313,7 +315,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	return nil
 }
 
-func (p *s3ObjectProcessor) publish(ack *eventACKTracker, event *beat.Event) {
+func (p *s3ObjectProcessor) publish(ack *awscommon.EventACKTracker, event *beat.Event) {
 	ack.Add()
 	event.Private = ack
 	p.metrics.s3EventsCreatedTotal.Inc()
