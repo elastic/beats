@@ -57,6 +57,9 @@ services:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: kibana
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
+      retries: 600
 
   mosquitto:
     build: ${ES_BEATS}/testing/environments/docker/mosquitto
