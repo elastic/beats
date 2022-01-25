@@ -166,6 +166,7 @@ func (in *cloudwatchInput) Receive(svc cloudwatchlogsiface.ClientAPI, cwPoller *
 	// listing, sequentially processes every object and then does another listing
 	start := true
 	workerWg := new(sync.WaitGroup)
+	lastLogGroupOffset := 0
 	for ctx.Err() == nil {
 		if start == false {
 			cwPoller.log.Debugf("sleeping for %v before checking new logs", in.config.ScanFrequency)
@@ -177,14 +178,36 @@ func (in *cloudwatchInput) Receive(svc cloudwatchlogsiface.ClientAPI, cwPoller *
 		currentTime := time.Now()
 		cwPoller.startTime, cwPoller.endTime = getStartPosition(in.config.StartPosition, currentTime, cwPoller.endTime, in.config.ScanFrequency, in.config.Latency)
 		cwPoller.log.Debugf("start_position = %s, startTime = %v, endTime = %v", in.config.StartPosition, time.Unix(cwPoller.startTime/1000, 0), time.Unix(cwPoller.endTime/1000, 0))
-		for _, lg := range logGroupNames {
-			// Determine how many workers are available.
-			availableWorkers, err := cwPoller.workerSem.AcquireContext(in.config.NumberOfWorkers, ctx)
-			if err != nil || availableWorkers == 0 {
-				continue
+		availableWorkers, err := cwPoller.workerSem.AcquireContext(in.config.NumberOfWorkers, ctx)
+		if err != nil {
+			break
+		}
+
+		if availableWorkers == 0 {
+			continue
+		}
+
+		workerWg.Add(availableWorkers)
+		logGroupNamesLength := len(logGroupNames)
+		runningGoroutines := 0
+
+		for i := lastLogGroupOffset; i < logGroupNamesLength; i++ {
+			if runningGoroutines >= availableWorkers {
+				break
 			}
 
-			workerWg.Add(1)
+			runningGoroutines++
+			lastLogGroupOffset = i + 1
+			if lastLogGroupOffset >= logGroupNamesLength {
+				// release unused workers
+				cwPoller.workerSem.Release(availableWorkers - runningGoroutines)
+				for j := 0; j < availableWorkers-runningGoroutines; j++ {
+					workerWg.Done()
+				}
+				lastLogGroupOffset = 0
+			}
+
+			lg := logGroupNames[i]
 			go func(logGroup string, startTime int64, endTime int64) {
 				defer func() {
 					cwPoller.log.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", logGroup)

@@ -87,6 +87,12 @@ func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc cloudwatchlogsiface.Cl
 
 		logEvents := page.Events
 		p.metrics.logEventsReceivedTotal.Add(uint64(len(logEvents)))
+
+		// This sleep is to avoid hitting the FilterLogEvents API limit(5 transactions per second (TPS)/account/Region).
+		p.log.Debugf("sleeping for %v before making FilterLogEvents API call again", p.apiSleep)
+		time.Sleep(p.apiSleep)
+		p.log.Debug("done sleeping")
+
 		p.log.Debugf("Processing #%v events", len(logEvents))
 		err := logProcessor.processLogEvents(logEvents, logGroup, p.region)
 		if err != nil {
@@ -98,11 +104,6 @@ func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc cloudwatchlogsiface.Cl
 	if err := paginator.Err(); err != nil {
 		return errors.Wrap(err, "error FilterLogEvents with Paginator")
 	}
-
-	// This sleep is to avoid hitting the FilterLogEvents API limit(5 transactions per second (TPS)/account/Region).
-	p.log.Debugf("sleeping for %v before making FilterLogEvents API call again", p.apiSleep)
-	time.Sleep(p.apiSleep)
-	p.log.Debug("done sleeping")
 	return nil
 }
 
