@@ -114,7 +114,7 @@ func newLocal(
 		return nil, errors.New(err, "failed to initialize composable controller")
 	}
 
-	discover := discoverer(pathConfigFile, cfg.Settings.Path)
+	discover := discoverer(pathConfigFile, cfg.Settings.Path, cfg.Settings.InputsConfig.Path)
 	emit, err := emitter.New(
 		localApplication.bgContext,
 		log,
@@ -132,13 +132,15 @@ func newLocal(
 		return nil, err
 	}
 
+	loader := config.NewLoader(log, cfg.Settings.InputsConfig.Path)
+
 	var cfgSource source
 	if !cfg.Settings.Reload.Enabled {
 		log.Debug("Reloading of configuration is off")
-		cfgSource = newOnce(log, discover, emit)
+		cfgSource = newOnce(log, discover, loader, emit)
 	} else {
 		log.Debugf("Reloading of configuration is on, frequency is set to %s", cfg.Settings.Reload.Period)
-		cfgSource = newPeriodic(log, cfg.Settings.Reload.Period, discover, emit)
+		cfgSource = newPeriodic(log, cfg.Settings.Reload.Period, discover, loader, emit)
 	}
 
 	localApplication.source = cfgSource

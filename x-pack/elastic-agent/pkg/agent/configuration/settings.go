@@ -23,8 +23,15 @@ type SettingsConfig struct {
 	LoggingConfig    *logger.Config                  `yaml:"logging,omitempty" config:"logging,omitempty" json:"logging,omitempty"`
 
 	// standalone config
-	Reload *ReloadConfig `config:"reload" yaml:"reload" json:"reload"`
-	Path   string        `config:"path" yaml:"path" json:"path"`
+	Reload       *ReloadConfig `config:"reload" yaml:"reload" json:"reload"`
+	Path         string        `config:"path" yaml:"path" json:"path"`
+	InputsConfig *InputsConfig `yaml:"config.inputs" config:"config.inputs" json:"config.inputs"`
+}
+
+// InputsConfig holds the paths configuration for external configuration
+// files for inputs.
+type InputsConfig struct {
+	Path string `config:"path" yaml:"path" json:"path"`
 }
 
 // DefaultSettingsConfig creates a config with pre-set default values.
