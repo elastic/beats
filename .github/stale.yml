@@ -14,7 +14,7 @@ onlyLabels: []
 exemptLabels: []
 
 # Set to true to ignore issues in a project (defaults to false)
-exemptProjects: true
+exemptProjects: false
 
 # Set to true to ignore issues in a milestone (defaults to false)
 exemptMilestones: true
@@ -47,7 +47,7 @@ limitPerRun: 30
 
 # Optionally, specify configuration settings that are specific to just 'issues' or 'pulls':
 pulls:
-  daysUntilStale: 30
+  daysUntilStale: 90
   daysUntilClose: 30
   markComment: >
     Hi!
