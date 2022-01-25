@@ -51,6 +51,8 @@ pipeline {
     stage('Checkout') {
       options { skipDefaultCheckout() }
       steps {
+        // For testing purposes, let's print the env variable CI
+        sh 'env | grep CI'
         pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
         deleteDir()
         // Here we do a checkout into a temporary directory in order to have the
@@ -378,6 +380,8 @@ def packagingLinux(Map args = [:]) {
   withEnv([
     "PLATFORMS=${PLATFORMS}"
   ]) {
+    // for testing purposes
+    echo "CI=${env.CI}"
     target(args)
   }
 }
@@ -997,6 +1001,7 @@ def dumpVariables(){
   BEAT_VERSION: ${env.BEAT_VERSION}
   BEATS: ${env.BEATS}
   BUILD_DIR: ${env.BUILD_DIR}
+  CI: ${env.CI}
   COMMIT_ID: ${env.COMMIT_ID}
   COVERAGE_DIR: ${env.COVERAGE_DIR}
   COVERAGE_TOOL: ${env.COVERAGE_TOOL}
