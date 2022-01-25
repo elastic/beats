@@ -30,13 +30,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.indicator.file.hash.sha1"
+                            "field": "threat.indicator.file.hash.sha1"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                            "key": "threatintel.indicator.file.hash.sha1",
+                            "key": "threat.indicator.file.hash.sha1",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -67,7 +67,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "MISP SHA1 Hash Indicator",
-                        "field": "threatintel.indicator.file.hash.sha1",
+                        "field": "threat.indicator.file.hash.sha1",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

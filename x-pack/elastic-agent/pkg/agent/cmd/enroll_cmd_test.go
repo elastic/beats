@@ -157,8 +157,6 @@ func TestEnroll(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
 			require.Equal(t, host, config.Client.Host)
-			require.Equal(t, "", config.Client.Username)
-			require.Equal(t, "", config.Client.Password)
 		},
 	))
 
@@ -217,8 +215,6 @@ func TestEnroll(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
 			require.Equal(t, host, config.Client.Host)
-			require.Equal(t, "", config.Client.Username)
-			require.Equal(t, "", config.Client.Password)
 		},
 	))
 
@@ -277,8 +273,6 @@ func TestEnroll(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, "my-access-api-key", config.AccessAPIKey)
 			require.Equal(t, host, config.Client.Host)
-			require.Equal(t, "", config.Client.Username)
-			require.Equal(t, "", config.Client.Password)
 		},
 	))
 

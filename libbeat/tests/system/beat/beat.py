@@ -16,6 +16,8 @@ from datetime import datetime, timedelta
 
 from .compose import ComposeMixin
 
+from elasticsearch import Elasticsearch
+
 
 BEAT_REQUIRED_FIELDS = ["@timestamp",
                         "agent.type", "agent.name", "agent.version"]
@@ -119,6 +121,7 @@ class Proc(object):
 
 
 class TestCase(unittest.TestCase, ComposeMixin):
+    today = datetime.now().strftime("%Y%m%d")
 
     @classmethod
     def setUpClass(self):
@@ -207,7 +210,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             config = self.beat_name + ".yml"
 
         if output is None:
-            output = self.beat_name + ".log"
+            output = self.beat_name + "-" + self.today + ".ndjson"
 
         args = [cmd, "-systemTest"]
         if os.getenv("TEST_COVERAGE") == "true":
@@ -264,7 +267,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
@@ -288,7 +291,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
@@ -368,7 +371,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         Returns the log as a string.
         """
         if logfile is None:
-            logfile = self.beat_name + ".log"
+            logfile = self.beat_name + "-" + self.today + ".ndjson"
 
         with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
             data = f.read()
@@ -380,7 +383,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         Returns the log lines as a list of strings
         """
         if logfile is None:
-            logfile = self.beat_name + ".log"
+            logfile = self.beat_name + "-" + self.today + ".ndjson"
 
         with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
             data = f.readlines()
@@ -417,8 +420,9 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if logfile is None:
-            logfile = self.beat_name + ".log"
+            logfile = self.beat_name + "-" + self.today + ".ndjson"
 
+        print("logfile", logfile, self.working_dir)
         try:
             with open(os.path.join(self.working_dir, logfile), "r", encoding="utf_8") as f:
                 for line in f:
@@ -430,7 +434,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                         line = line.lower()
                     if line.find(msg) >= 0:
                         counter = counter + 1
-        except IOError:
+        except IOError as e:
+            print(e)
             counter = -1
 
         return counter
@@ -442,7 +447,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         counts = {}
 
         if logfile is None:
-            logfile = self.beat_name + ".log"
+            logfile = self.beat_name + "-" + self.today + ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, logfile), "r", encoding="utf_8") as f:
@@ -462,7 +467,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
     def output_lines(self, output_file=None):
         """ Count number of lines in a file."""
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
@@ -477,7 +482,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as f:
@@ -492,7 +497,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as f:
@@ -656,7 +661,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
@@ -666,8 +671,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
     def get_elasticsearch_url(self):
         """
-        Returns an elasticsearch.Elasticsearch instance built from the
-        env variables like the integration tests.
+        Returns a string with the Elasticsearch URL
         """
         return "http://{host}:{port}".format(
             host=os.getenv("ES_HOST", "localhost"),
@@ -676,13 +680,45 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
     def get_elasticsearch_url_ssl(self):
         """
-        Returns an elasticsearch.Elasticsearch instance built from the
-        env variables like the integration tests.
+        Returns a string with the Elasticsearch URL
         """
         return "https://{host}:{port}".format(
             host=os.getenv("ES_HOST_SSL", "localhost"),
             port=os.getenv("ES_PORT_SSL", "9205"),
         )
+
+    def get_elasticsearch_template_config(self, security=True, user=None):
+        """
+        Returns a template suitable for a Beats config
+        """
+        template = {
+            "host": self.get_elasticsearch_url(),
+        }
+
+        if security:
+            template["user"] = user or os.getenv("ES_USER", "")
+            template["pass"] = os.getenv("ES_PASS", "")
+
+        return template
+
+    def get_elasticsearch_instance(self, security=True, ssl=False, url=None, user=None):
+        """
+        Returns an elasticsearch.Elasticsearch instance built from the
+        env variables like the integration tests.
+        """
+        if url is None:
+            if ssl:
+                url = self.get_elasticsearch_url_ssl()
+            else:
+                url = self.get_elasticsearch_url()
+
+        if security:
+            username = user or os.getenv("ES_USER", "")
+            password = os.getenv("ES_PASS", "")
+            es_instance = Elasticsearch([url], http_auth=(username, password))
+        else:
+            es_instance = Elasticsearch([url])
+        return es_instance
 
     def get_kibana_url(self):
         """
@@ -692,6 +728,20 @@ class TestCase(unittest.TestCase, ComposeMixin):
             host=os.getenv("KIBANA_HOST", "localhost"),
             port=os.getenv("KIBANA_PORT", "5601"),
         )
+
+    def get_kibana_template_config(self, security=True, user=None):
+        """
+        Returns a Kibana template suitable for a Beat
+        """
+        template = {
+            "host": self.get_kibana_url()
+        }
+
+        if security:
+            template["user"] = user or os.getenv("ES_USER", "")
+            template["pass"] = os.getenv("ES_PASS", "")
+
+        return template
 
     def assert_fields_are_documented(self, evt):
         """

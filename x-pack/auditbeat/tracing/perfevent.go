@@ -99,7 +99,8 @@ func NewPerfChannel(cfg ...PerfChannelConf) (channel *PerfChannel, err error) {
 		streams:     make(map[uint64]stream),
 		pid:         perf.AllThreads,
 		attr: perf.Attr{
-			Type: perf.TracepointEvent,
+			Type:    perf.TracepointEvent,
+			ClockID: unix.CLOCK_MONOTONIC,
 			SampleFormat: perf.SampleFormat{
 				Raw:      true,
 				StreamID: true,

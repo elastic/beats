@@ -52,8 +52,8 @@
         "process.executable": "/usr/libexec/strongswan/charon (deleted)",
         "process.exit_code": 184,
         "process.name": "charon",
+        "process.parent.pid": 1240,
         "process.pid": 1281,
-        "process.ppid": 1240,
         "service.type": "auditd",
         "user.audit.id": "4294967295",
         "user.effective.group.id": "0",
@@ -88,8 +88,8 @@
         "input.type": "log",
         "log.offset": 536,
         "process.args": [
-            "-p",
             "/usr/lib64/nagios/plugins/check_asterisk_sip_peers",
+            "-p",
             "202"
         ],
         "process.args_count": 3,
@@ -123,7 +123,7 @@
         "event.dataset": "auditd.log",
         "event.kind": "event",
         "event.module": "auditd",
-        "event.original": "type=CRYPTO_SESSION msg=audit(1481077041.515:406): pid=1298 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=start direction=from-server cipher=chacha20-poly1305@openssh.com ksize=512 mac= pfs=curve25519-sha256@libssh.org spid=1299 suid=74 rport=63927 laddr=10.142.0.2 lport=22  exe=\"/usr/sbin/sshd\" hostname=? addr=96.241.146.97 terminal=? res=success'",
+        "event.original": "type=CRYPTO_SESSION msg=audit(1481077041.515:406): pid=1298 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:sshd_t:s0-s0:c0.c1023 msg='op=start direction=from-server cipher=chacha20-poly1305@openssh.com ksize=512 mac= pfs=curve25519-sha256@libssh.org spid=1299 suid=74 rport=63927 laddr=10.142.0.2 lport=22  exe=\"/usr/sbin/sshd\" hostname=? addr=216.160.83.61 terminal=? res=success'",
         "event.outcome": "success",
         "event.type": [
             "info"
@@ -134,18 +134,17 @@
         "process.executable": "/usr/sbin/sshd",
         "process.pid": 1298,
         "service.type": "auditd",
-        "source.address": "96.241.146.97",
-        "source.as.number": 701,
-        "source.as.organization.name": "MCI Communications Services, Inc. d/b/a Verizon Business",
-        "source.geo.city_name": "Aldie",
+        "source.address": "216.160.83.61",
+        "source.as.number": 209,
+        "source.geo.city_name": "Milton",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
         "source.geo.country_name": "United States",
-        "source.geo.location.lat": 38.9637,
-        "source.geo.location.lon": -77.6099,
-        "source.geo.region_iso_code": "US-VA",
-        "source.geo.region_name": "Virginia",
-        "source.ip": "96.241.146.97",
+        "source.geo.location.lat": 47.2513,
+        "source.geo.location.lon": -122.3149,
+        "source.geo.region_iso_code": "US-WA",
+        "source.geo.region_name": "Washington",
+        "source.ip": "216.160.83.61",
         "user.audit.id": "4294967295",
         "user.id": "0",
         "user.saved.id": "74"
@@ -291,7 +290,6 @@
     },
     {
         "@timestamp": "2020-02-10T21:59:44.206Z",
-        "auditd.log.a0": "top",
         "auditd.log.sequence": 579393,
         "event.action": "execve",
         "event.dataset": "auditd.log",
@@ -301,7 +299,11 @@
         "fileset.name": "log",
         "input.type": "log",
         "log.offset": 2688,
+        "process.args": [
+            "top"
+        ],
         "process.args_count": 1,
+        "process.executable": "top",
         "service.type": "auditd"
     },
     {
@@ -334,8 +336,8 @@
         "process.executable": "/usr/bin/top",
         "process.exit_code": 0,
         "process.name": "top",
+        "process.parent.pid": 2563,
         "process.pid": 2614,
-        "process.ppid": 2563,
         "service.type": "auditd",
         "user.audit.id": "vagrant",
         "user.effective.group.id": "vagrant",

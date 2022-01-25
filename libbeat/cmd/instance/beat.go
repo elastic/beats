@@ -47,7 +47,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
@@ -105,6 +104,7 @@ type beatConfig struct {
 
 	// beat internal components configurations
 	HTTP            *common.Config         `config:"http"`
+	HTTPPprof       *common.Config         `config:"http.pprof"`
 	Path            paths.Path             `config:"path"`
 	Logging         *common.Config         `config:"logging"`
 	MetricLogging   *common.Config         `config:"logging.metrics"`
@@ -157,24 +157,15 @@ func initRand() {
 // instance.
 // XXX Move this as a *Beat method?
 func Run(settings Settings, bt beat.Creator) error {
-	err := setUmaskWithSettings(settings)
-	if err != nil && err != errNotImplemented {
-		return errw.Wrap(err, "could not set umask")
-	}
-
-	name := settings.Name
-	idxPrefix := settings.IndexPrefix
-	agentVersion := settings.Version
-	elasticLicensed := settings.ElasticLicensed
 
 	return handleError(func() error {
 		defer func() {
 			if r := recover(); r != nil {
-				logp.NewLogger(name).Fatalw("Failed due to panic.",
+				logp.NewLogger(settings.Name).Fatalw("Failed due to panic.",
 					"panic", r, zap.Stack("stack"))
 			}
 		}()
-		b, err := NewBeat(name, idxPrefix, agentVersion, elasticLicensed)
+		b, err := NewInitializedBeat(settings)
 		if err != nil {
 			return err
 		}
@@ -331,6 +322,8 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	logSystemInfo(b.Info)
 	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
 
+	b.checkElasticsearchVersion()
+
 	err = b.registerESIndexManagement()
 	if err != nil {
 		return nil, err
@@ -409,10 +402,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	defer logp.Sync()
 	defer logp.Info("%s stopped.", b.Info.Beat)
 
-	err := b.InitWithSettings(settings)
-	if err != nil {
-		return err
-	}
 	defer func() {
 		if err := b.processing.Close(); err != nil {
 			logp.Warn("Failed to close global processing: %v", err)
@@ -428,7 +417,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path.
 	bl := newLocker(b)
-	err = bl.lock()
+	err := bl.lock()
 	if err != nil {
 		return err
 	}
@@ -455,6 +444,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		}
 		s.Start()
 		defer s.Stop()
+		if b.Config.HTTPPprof.Enabled() {
+			s.AttachPprof()
+		}
 	}
 
 	if err = seccomp.LoadFilter(b.Config.Seccomp); err != nil {
@@ -861,6 +853,37 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	return nil
 }
 
+// checkElasticsearchVersion registers a global callback to make sure ES instance we are connecting
+// to is at least on the same version as the Beat.
+// If the check is disabled or the output is not Elasticsearch, nothing happens.
+func (b *Beat) checkElasticsearchVersion() {
+	if b.Config.Output.Name() != "elasticsearch" || b.isConnectionToOlderVersionAllowed() {
+		return
+	}
+
+	elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
+		esVersion := conn.GetVersion()
+		beatVersion, err := common.NewVersion(b.Info.Version)
+		if err != nil {
+			return err
+		}
+		if esVersion.LessThan(beatVersion) {
+			return fmt.Errorf("%v ES=%s, Beat=%s.", elasticsearch.ErrTooOld, esVersion.String(), b.Info.Version)
+		}
+		return nil
+	})
+}
+
+func (b *Beat) isConnectionToOlderVersionAllowed() bool {
+	config := struct {
+		AllowOlder bool `config:"allow_older_versions"`
+	}{false}
+
+	b.Config.Output.Config().Unpack(&config)
+
+	return config.AllowOlder
+}
+
 // registerESIndexManagement registers the loading of the template and ILM
 // policy as a callback with the elasticsearch output. It is important the
 // registration happens before the publisher is created.
@@ -1135,31 +1158,15 @@ func initPaths(cfg *common.Config) error {
 	// the paths field. After we will unpack the complete configuration and keystore reference
 	// will be correctly replaced.
 	partialConfig := struct {
-		Path   paths.Path `config:"path"`
-		Hostfs string     `config:"system.hostfs"`
+		Path paths.Path `config:"path"`
 	}{}
-
-	if paths.IsCLISet() {
-		cfgwarn.Deprecate("8.0.0", "This flag will be removed in the future and replaced by a config value.")
-	}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
 		return fmt.Errorf("error extracting default paths: %+v", err)
 	}
 
-	// Read the value for hostfs as `system.hostfs`
-	// In the config, there is no `path.hostfs`, as we're merely using the path struct to carry the hostfs variable.
-	partialConfig.Path.Hostfs = partialConfig.Hostfs
-
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
 		return fmt.Errorf("error setting default paths: %+v", err)
 	}
 	return nil
-}
-
-func setUmaskWithSettings(settings Settings) error {
-	if settings.Umask != nil {
-		return setUmask(*settings.Umask)
-	}
-	return setUmask(0027) // 0640 for files | 0750 for dirs
 }

@@ -28,7 +28,8 @@ You can spin up an ELK stack in two ways
 2. Locally on your kind cluster (EK tuple will suffice).
 ```bash
 # Deploy Elasticsearch and Kibana
-kubectl apply -f ../01_playground/ek_stack.yaml
+cd metricbeat/module/kubernetes/_meta/test/docs
+kubectl apply -f 01_playground/ek_stack.yaml
 
 # Expose Kibana with port forwarding. In your browser visit localhost:5601
 kubectl port-forward deployment/kibana 5601:5601
@@ -46,7 +47,7 @@ In case of Elastic Cloud deployment configure the variables ELASTIC_CLOUD_ID and
 
 Deploy metricbeat
 ```
-kubectl apply -f ../01_playground/metricbeat.yaml
+kubectl apply -f 01_playground/metricbeat.yaml
 ```
 
 ## Build and launch metricbeat process

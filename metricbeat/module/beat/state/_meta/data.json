@@ -1,32 +1,33 @@
 {
-    "@timestamp": "2021-03-30T18:16:03.880Z",
-    "@metadata": {
-        "beat": "metricbeat",
-        "type": "_doc",
-        "version": "8.0.0"
-    },
-    "agent": {
-        "version": "8.0.0",
-        "ephemeral_id": "ed46455e-9adf-4493-83ba-a145ad0371a9",
-        "id": "7a0a00bb-faa3-4b2b-9d92-4a0a17bcb8f3",
-        "name": "anonymous",
-        "type": "metricbeat"
-    },
-    "ecs": {
-        "version": "1.8.0"
-    },
-    "metricset": {
-        "name": "state",
-        "period": 10000
-    },
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
+        "elasticsearch": {
+            "cluster": {
+                "id": "foobar"
+            }
+        },
         "state": {
             "beat": {
-                "name": "anonymous",
-                "host": "anonymous",
+                "host": "2963d991095f",
+                "name": "2963d991095f",
                 "type": "metricbeat",
-                "uuid": "1be2b779-2479-44c4-9027-2e6fcc0cee93",
-                "version": "8.0.0"
+                "uuid": "c4c9bc08-e990-4529-8bf5-715c00fa6615",
+                "version": "7.12.0"
+            },
+            "cluster": {
+                "uuid": "foobar"
+            },
+            "host": {
+                "containerized": "containerized",
+                "os": {
+                    "kernel": "5.14.13-200.fc34.x86_64",
+                    "name": "CentOS Linux",
+                    "platform": "centos",
+                    "version": "7 (Core)"
+                }
+            },
+            "management": {
+                "enabled": false
             },
             "module": {
                 "count": 10
@@ -37,41 +38,29 @@
             "queue": {
                 "name": "mem"
             },
-            "host": {
-                "containerized": "containerized",
-                "os": {
-                    "platform": "antergos",
-                    "version": "",
-                    "kernel": "5.11.7-arch1-1",
-                    "name": "Antergos Linux"
-                }
-            },
-            "management": {
-                "enabled": false
-            },
             "service": {
-                "id": "1be2b779-2479-44c4-9027-2e6fcc0cee93",
+                "id": "c4c9bc08-e990-4529-8bf5-715c00fa6615",
                 "name": "metricbeat",
-                "version": "8.0.0"
-            },
-            "cluster": {
-                "uuid": "-6NL06F2Td6bMGdkyaJ0PA"
+                "version": "7.12.0"
             }
         }
     },
+    "event": {
+        "dataset": "beat.state",
+        "duration": 115000,
+        "module": "beat"
+    },
     "host": {
-        "name": "anonymous",
         "architecture": "x86_64",
-        "hostname": "anonymous",
-        "id": "54f70115bae545cbac2b150f254472a0"
+        "hostname": "2963d991095f",
+        "id": "44ccc339d95bd51386fcfc5d8f041927"
+    },
+    "metricset": {
+        "name": "state",
+        "period": 10000
     },
     "service": {
-        "address": "http://localhost:5066/state",
+        "address": "172.19.0.2:5066",
         "type": "beat"
-    },
-    "event": {
-        "module": "beat",
-        "duration": 4263542,
-        "dataset": "beat.state"
     }
 }

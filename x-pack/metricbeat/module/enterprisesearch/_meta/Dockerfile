@@ -9,4 +9,4 @@ COPY docker-entrypoint-dependencies.sh /usr/local/bin/
 ENTRYPOINT ["tini", "--", "/usr/local/bin/docker-entrypoint-dependencies.sh"]
 
 HEALTHCHECK --interval=1s --retries=300 --start-period=60s \
-  CMD curl --user elastic:changeme --fail --silent http://localhost:3002/api/as/v1/internal/health
+  CMD curl --user elastic:changeme --fail --silent http://localhost:3002/api/ent/v1/internal/health

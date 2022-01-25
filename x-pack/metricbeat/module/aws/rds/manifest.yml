@@ -159,7 +159,7 @@ processors:
         - from: "aws.rds.metrics.TransactionLogsGeneration.avg"
           to: "aws.rds.transaction_logs_generation"
         - from: "aws.rds.metrics.WriteIOPS.avg"
-          to: "aws.rds.write_iops"
+          to: "aws.rds.write.iops"
         - from: "aws.rds.metrics.Queries.avg"
           to: "aws.rds.queries"
         - from: "aws.rds.metrics.Deadlocks.avg"

@@ -1,0 +1,305 @@
+[
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "help": "When my_counter was last incremented",
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "my_counter_last_increment_timestamp_milliseconds": 123
+            },
+            "type":"gauge",
+            "unit":"milliseconds"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "up": 1
+            },
+            "type":"gauge"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "help": "Count total disk errors",
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics",
+                "type": "netapp"
+            },
+            "metrics": {
+                "disk_errors_total": 17
+            },
+            "type":"counter"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics",
+                "name": "open metrics collector",
+                "version": "6.3.9"
+            },
+            "metrics": {
+                "app_info": 1
+            },
+            "type":"info"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics",
+                "name": "metrics collector",
+                "version": "8.2.7"
+            },
+            "metrics": {
+                "collector_info": 1
+            },
+            "type":"info"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics",
+                "category": "shoes"
+            },
+            "metrics": {
+                "enable_category": 0
+            },
+            "type":"stateset"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics",
+                "category": "shirts"
+            },
+            "metrics": {
+                "enable_category": 1
+            },
+            "type":"stateset"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics",
+                "category": "shades"
+            },
+            "metrics": {
+                "enable_category": 0
+            },
+            "type":"stateset"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "connection_errors": 42
+            },
+            "type":"unknown"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "exemplar": {
+                "cnt_rulefires_deployment_total":0.67,
+                "labels": {
+                    "trace_id":"KOO5S4vxi0o"
+                }
+            },
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "cnt_rulefires_deployment_total": 66666
+            },
+            "type":"counter"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "exemplar": {
+                "labels": {
+                    "trace_id": "0d482-ac43e-d9320-debfe"
+                },
+                "process_cpu_seconds_total": 17,
+                "timestamp": 1622302012000
+            },
+            "help": "Total user and system CPU time spent in seconds. Exemplar with timestamp and labels.",
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics",
+                "entity": "controller",
+                "build": "8.2.7"
+            },
+            "metrics": {
+                "process_cpu_seconds_total": 11111
+            },
+            "type":"counter",
+            "unit":"seconds"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    }
+]

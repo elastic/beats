@@ -30,13 +30,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.indicator.ip"
+                            "field": "threat.indicator.ip"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                            "key": "threatintel.indicator.ip",
+                            "key": "threat.indicator.ip",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -67,7 +67,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "AlienVault OTX IP Indicator",
-                        "field": "threatintel.indicator.ip",
+                        "field": "threat.indicator.ip",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

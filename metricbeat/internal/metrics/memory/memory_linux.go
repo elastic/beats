@@ -20,11 +20,12 @@ package memory
 import (
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 // get is the linux implementation for fetching Memory data
-func get(rootfs string) (Memory, error) {
+func get(rootfs resolve.Resolver) (Memory, error) {
 	table, err := ParseMeminfo(rootfs)
 	if err != nil {
 		return Memory{}, errors.Wrap(err, "error fetching meminfo")

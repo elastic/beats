@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/id"
 )
 
 const (
@@ -59,19 +60,10 @@ func NewConfigFromURL(kURL string) (Config, error) {
 		return Config{}, errors.Wrap(err, "could not parse url")
 	}
 
-	var username, password string
-	if u.User != nil {
-		username = u.User.Username()
-		// _ is true when password is set.
-		password, _ = u.User.Password()
-	}
-
 	c := DefaultClientConfig()
 	c.Protocol = Protocol(u.Scheme)
 	c.Host = u.Host
 	c.Path = u.Path
-	c.Username = username
-	c.Password = password
 
 	return c, nil
 }
@@ -125,11 +117,6 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 			return nil, err
 		}
 
-		if cfg.IsBasicAuth() {
-			// Pass basic auth credentials to all the underlying calls.
-			transport = NewBasicAuthRoundTripper(transport, cfg.Username, cfg.Password)
-		}
-
 		if wrapper != nil {
 			transport, err = wrapper(transport)
 			if err != nil {
@@ -166,7 +153,13 @@ func (c *Client) Send(
 	headers http.Header,
 	body io.Reader,
 ) (*http.Response, error) {
-	c.log.Debugf("Request method: %s, path: %s", method, path)
+	// Generate a request ID for tracking
+	var reqID string
+	if u, err := id.Generate(); err == nil {
+		reqID = u.String()
+	}
+
+	c.log.Debugf("Request method: %s, path: %s, reqID: %s", method, path, reqID)
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	requester := c.nextRequester()
@@ -182,6 +175,11 @@ func (c *Client) Send(
 	req.Header.Add("Accept", "application/json")
 	// TODO: Make this header specific to fleet-server or remove it
 	req.Header.Set("kbn-xsrf", "1") // Without this Kibana will refuse to answer the request.
+
+	// If available, add the request id as an HTTP header
+	if reqID != "" {
+		req.Header.Add("X-Request-ID", reqID)
+	}
 
 	// copy headers.
 	for header, values := range headers {

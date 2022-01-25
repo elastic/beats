@@ -32,7 +32,7 @@ data:
         meta:
           package:
             name: kubernetes
-            version: 0.2.8
+            version: 1.9.0
         data_stream:
           namespace: default
         streams:
@@ -68,6 +68,15 @@ data:
               type: metrics
             metricsets:
               - state_cronjob
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - data_stream:
+              dataset: kubernetes.state_daemonset
+              type: metrics
+            metricsets:
+              - state_daemonset
             add_metadata: true
             hosts:
               - 'kube-state-metrics:8080'
@@ -214,20 +223,73 @@ data:
                   fields:
                     ecs.version: 1.12.0
       - name: container-log
-        type: logfile
+        type: filestream
         use_output: default
         meta:
           package:
-            name: log
-            version: 0.4.6
+            name: kubernetes
+            version: 1.9.0
         data_stream:
           namespace: default
         streams:
           - data_stream:
-              dataset: generic
-            symlinks: true
+              dataset: kubernetes.container_logs
+              type: logs
+            prospector.scanner.symlinks: true
+            parsers:
+              - container: ~
+              # - ndjson:
+              #     target: json
+              # - multiline:
+              #     type: pattern
+              #     pattern: '^\['
+              #     negate: true
+              #     match: after
             paths:
               - /var/log/containers/*${kubernetes.container.id}.log
+      - name: audit-log
+        type: filestream
+        use_output: default
+        meta:
+          package:
+            name: kubernetes
+            version: 1.9.0
+        data_stream:
+          namespace: default
+        streams:
+          - data_stream:
+              dataset: kubernetes.audit_logs
+              type: logs
+            exclude_files:
+            - .gz$
+            parsers:
+              - ndjson:
+                  add_error_key: true
+                  target: kubernetes_audit
+            paths:
+              - /var/log/kubernetes/kube-apiserver-audit.log
+            processors:
+            - rename:
+                fields:
+                - from: kubernetes_audit
+                  to: kubernetes.audit
+            - script:
+                id: dedot_annotations
+                lang: javascript
+                source: |
+                  function process(event) {
+                    var audit = event.Get("kubernetes.audit");
+                    for (var annotation in audit["annotations"]) {
+                      var annotation_dedoted = annotation.replace(/\./g,'_')
+                      event.Rename("kubernetes.audit.annotations."+annotation, "kubernetes.audit.annotations."+annotation_dedoted)
+                    }
+                    return event;
+                  } function test() {
+                    var event = process(new Event({ "kubernetes": { "audit": { "annotations": { "authorization.k8s.io/decision": "allow", "authorization.k8s.io/reason": "RBAC: allowed by ClusterRoleBinding \"system:kube-scheduler\" of ClusterRole \"system:kube-scheduler\" to User \"system:kube-scheduler\"" } } } }));
+                    if (event.Get("kubernetes.audit.annotations.authorization_k8s_io/decision") !== "allow") {
+                        throw "expected kubernetes.audit.annotations.authorization_k8s_io/decision === allow";
+                    }
+                  }
       - name: system-metrics
         type: system/metrics
         use_output: default
@@ -332,7 +394,7 @@ data:
         meta:
           package:
             name: kubernetes
-            version: 0.2.8
+            version: 1.9.0
         data_stream:
           namespace: default
         streams:
@@ -341,19 +403,23 @@ data:
               type: metrics
             metricsets:
               - controllermanager
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
             hosts:
-              - '${kubernetes.pod.ip}:10252'
+              - 'https://${kubernetes.pod.ip}:10257'
             period: 10s
-            condition: ${kubernetes.pod.labels.component} == 'kube-controller-manager'
+            ssl.verification_mode: none
+            condition: ${kubernetes.labels.component} == 'kube-controller-manager'
           - data_stream:
               dataset: kubernetes.scheduler
               type: metrics
             metricsets:
               - scheduler
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
             hosts:
-              - '${kubernetes.pod.ip}:10251'
+              - 'https://${kubernetes.pod.ip}:10259'
             period: 10s
-            condition: ${kubernetes.pod.labels.component} == 'kube-scheduler'
+            ssl.verification_mode: none
+            condition: ${kubernetes.labels.component} == 'kube-scheduler'
           - data_stream:
               dataset: kubernetes.proxy
               type: metrics
@@ -605,6 +671,8 @@ rules:
   - apiGroups: ["batch"]
     resources:
       - jobs
+      # Uncomment if need metadata for cronjob objects in versions >= v1.21
+      #- cronjobs
     verbs: ["get", "list", "watch"]
   - apiGroups:
       - ""

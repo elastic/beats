@@ -59,5 +59,16 @@ func TestAddLabels(t *testing.T) {
 				`{add_labels.labels: {l2: b, lc: b}}`,
 			),
 		},
+		"add array": {
+			event: common.MapStr{},
+			want: common.MapStr{
+				"labels": common.MapStr{
+					"array.0":       "foo",
+					"array.1":       "bar",
+					"array.2.hello": "world",
+				},
+			},
+			cfg: single(`{add_labels: {labels: {array: ["foo", "bar", {"hello": "world"}]}}}`),
+		},
 	})
 }

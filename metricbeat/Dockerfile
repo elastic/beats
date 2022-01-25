@@ -1,8 +1,8 @@
-FROM golang:1.17.2
+FROM golang:1.17.5
 
 RUN \
     apt update \
-      && apt install -qq -y --no-install-recommends \
+      && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --no-install-recommends \
          netcat \
          python3 \
          python3-dev \

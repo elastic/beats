@@ -189,6 +189,7 @@ type tcpAcceptResult struct {
 }
 
 func (e *tcpAcceptResult) asFlow() flow {
+	evTime := kernelTime(e.Meta.Timestamp)
 	f := flow{
 		sock:     e.Sock,
 		pid:      e.Meta.PID,
@@ -196,7 +197,8 @@ func (e *tcpAcceptResult) asFlow() flow {
 		proto:    protoTCP,
 		dir:      directionIngress,
 		complete: true,
-		lastSeen: kernelTime(e.Meta.Timestamp),
+		lastSeen: evTime,
+		created:  evTime,
 	}
 	if e.Af == unix.AF_INET {
 		f.local = newEndpointIPv4(e.LAddr, e.LPort, 0, 0)
@@ -217,7 +219,7 @@ func (e *tcpAcceptResult) String() string {
 // Update the state with the contents of this event.
 func (e *tcpAcceptResult) Update(s *state) error {
 	if e.Sock != 0 {
-		return s.UpdateFlow(e.asFlow())
+		return s.CreateSocket(e.asFlow())
 	}
 	return nil
 }
@@ -233,6 +235,7 @@ type tcpAcceptResult4 struct {
 }
 
 func (e *tcpAcceptResult4) asFlow() flow {
+	evTime := kernelTime(e.Meta.Timestamp)
 	f := flow{
 		sock:     e.Sock,
 		pid:      e.Meta.PID,
@@ -240,7 +243,8 @@ func (e *tcpAcceptResult4) asFlow() flow {
 		proto:    protoTCP,
 		dir:      directionIngress,
 		complete: true,
-		lastSeen: kernelTime(e.Meta.Timestamp),
+		lastSeen: evTime,
+		created:  evTime,
 	}
 	f.local = newEndpointIPv4(e.LAddr, e.LPort, 0, 0)
 	f.remote = newEndpointIPv4(e.RAddr, e.RPort, 0, 0)
@@ -256,7 +260,7 @@ func (e *tcpAcceptResult4) String() string {
 // Update the state with the contents of this event.
 func (e *tcpAcceptResult4) Update(s *state) error {
 	if e.Sock != 0 {
-		return s.UpdateFlow(e.asFlow())
+		return s.CreateSocket(e.asFlow())
 	}
 	return nil
 }
@@ -855,8 +859,10 @@ func (e *inetReleaseCall) Update(s *state) error {
 // kernels it needs to dump fixed-size arrays in 8-byte chunks. As the total
 // number of fetchargs available is limited, we have to dump only the first
 // 128 bytes of every argument.
-const maxProgArgLen = 128
-const maxProgArgs = 5
+const (
+	maxProgArgLen = 128
+	maxProgArgs   = 5
+)
 
 type execveCall struct {
 	Meta tracing.Metadata    `kprobe:"metadata"`
@@ -876,38 +882,78 @@ type execveCall struct {
 func (e *execveCall) getProcess() *process {
 	p := &process{
 		pid:     e.Meta.PID,
-		path:    readCString(e.Path[:]),
 		created: kernelTime(e.Meta.Timestamp),
 	}
-	p.name = filepath.Base(p.path)
-	var argc int
-	for argc = 0; argc <= maxProgArgs; argc++ {
-		if e.Ptrs[argc] == 0 {
-			break
+
+	if idx := bytes.IndexByte(e.Path[:], 0); idx >= 0 {
+		// Fast path if we already have the path.
+		p.path = string(e.Path[:idx])
+	} else {
+		// Attempt to get the path from the /prox/<pid>/exe symlink.
+		var err error
+		p.path, err = filepath.EvalSymlinks(fmt.Sprintf("/proc/%d/exe", e.Meta.PID))
+		if err != nil {
+			if pe, ok := err.(*os.PathError); ok && strings.Contains(pe.Path, "(deleted)") {
+				// Keep the deleted path from the PathError.
+				p.path = pe.Path
+			} else {
+				// Fallback to the truncated path.
+				p.path = string(e.Path[:]) + " ..."
+			}
 		}
 	}
-	p.args = make([]string, argc)
-	params := [maxProgArgs][]byte{
+
+	// Check for truncation of arg list or arguments.
+	params := [...][]byte{
 		e.Param0[:],
 		e.Param1[:],
 		e.Param2[:],
 		e.Param3[:],
 		e.Param4[:],
 	}
-	limit := argc
-	if limit > maxProgArgs {
-		limit = maxProgArgs
-		p.args[limit] = "..."
+	var (
+		argc         int
+		truncatedArg bool
+	)
+	for argc = 0; argc < len(e.Ptrs); argc++ {
+		if e.Ptrs[argc] == 0 {
+			break
+		}
+		if argc < len(params) && bytes.IndexByte(params[argc], 0) < 0 {
+			truncatedArg = true
+		}
 	}
-	for i := 0; i < limit; i++ {
-		p.args[i] = readCString(params[i])
+	if argc > maxProgArgs || truncatedArg {
+		// Attempt to get complete args list from /proc/<pid>/cmdline.
+		cmdline, err := os.ReadFile(fmt.Sprintf("/proc/%d/cmdline", e.Meta.PID))
+		if err == nil {
+			p.args = strings.Split(strings.TrimRight(string(cmdline), "\x00"), "\x00")
+		}
 	}
-	if p.hasCreds = e.creds != nil; p.hasCreds {
+
+	if p.args == nil {
+		// Fallback to arg list if unsuccessful or no truncation.
+		p.args = make([]string, argc)
+		if argc > maxProgArgs {
+			argc = maxProgArgs
+			p.args[argc] = "..."
+		}
+		for i, par := range params[:argc] {
+			p.args[i] = readCString(par)
+		}
+	}
+
+	// Get name from first argument.
+	p.name = filepath.Base(p.args[0])
+
+	if e.creds != nil {
+		p.hasCreds = true
 		p.uid = e.creds.UID
 		p.gid = e.creds.GID
 		p.euid = e.creds.EUID
 		p.egid = e.creds.EGID
 	}
+
 	return p
 }
 
@@ -946,6 +992,24 @@ func (e *execveRet) Update(s *state) error {
 		}
 	}
 	return nil
+}
+
+type forkRet struct {
+	Meta   tracing.Metadata `kprobe:"metadata"`
+	Retval int              `kprobe:"retval"`
+}
+
+// String returns a representation of the event.
+func (e *forkRet) String() string {
+	return fmt.Sprintf("%s <- fork %d", header(e.Meta), e.Retval)
+}
+
+// Update the state with the contents of this event.
+func (e *forkRet) Update(s *state) error {
+	if e.Retval <= 0 {
+		return nil
+	}
+	return s.ForkProcess(e.Meta.PID, uint32(e.Retval), kernelTime(e.Meta.Timestamp))
 }
 
 type doExit struct {

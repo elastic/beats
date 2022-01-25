@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
@@ -51,6 +52,8 @@ var (
 	harvesterSkipped = monitoring.NewInt(nil, "filebeat.harvester.skipped")
 
 	errHarvesterLimit = errors.New("harvester limit reached")
+
+	deprecatedNotificationOnce sync.Once
 )
 
 func init() {
@@ -82,6 +85,10 @@ func NewInput(
 	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
+	deprecatedNotificationOnce.Do(func() {
+		cfgwarn.Deprecate("", "Log input. Use Filestream input instead.")
+	})
+
 	cleanupNeeded := true
 	cleanupIfNeeded := func(f func() error) {
 		if cleanupNeeded {

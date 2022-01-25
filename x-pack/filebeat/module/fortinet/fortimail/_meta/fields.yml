@@ -1,13 +1,11 @@
 - name: network.interface.name
   overwrite: true
   type: keyword
-  default_field: false
   description: >
     Name of the network interface where the traffic has been observed.
 - name: rsa
   overwrite: true
   type: group
-  default_field: false
   fields:
   - name: internal
     overwrite: true

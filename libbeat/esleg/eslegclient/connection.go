@@ -30,6 +30,7 @@ import (
 	"go.elastic.co/apm/module/apmelasticsearch"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
@@ -84,7 +85,9 @@ type ConnectionSettings struct {
 func NewConnection(s ConnectionSettings) (*Connection, error) {
 	logger := logp.NewLogger("esclientleg")
 
-	s = settingsWithDefaults(s)
+	if s.IdleConnTimeout == 0 {
+		s.IdleConnTimeout = 1 * time.Minute
+	}
 
 	u, err := url.Parse(s.URL)
 	if err != nil {
@@ -116,6 +119,14 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		s.Beatname = "Libbeat"
 	}
 	userAgent := useragent.UserAgent(s.Beatname)
+
+	// Default the product origin header to beats if it wasn't already set.
+	if _, ok := s.Headers[productorigin.Header]; !ok {
+		if s.Headers == nil {
+			s.Headers = make(map[string]string)
+		}
+		s.Headers[productorigin.Header] = productorigin.Beats
+	}
 
 	httpClient, err := s.Transport.Client(
 		httpcommon.WithLogger(logger),
@@ -153,15 +164,6 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 	}
 
 	return &conn, nil
-}
-
-func settingsWithDefaults(s ConnectionSettings) ConnectionSettings {
-	settings := s
-	if settings.IdleConnTimeout == 0 {
-		settings.IdleConnTimeout = 1 * time.Minute
-	}
-
-	return settings
 }
 
 // NewClients returns a list of Elasticsearch clients based on the given
@@ -421,7 +423,11 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	}
 
 	for name, value := range conn.Headers {
-		req.Header.Add(name, value)
+		if name == "Content-Type" || name == "Accept" {
+			req.Header.Set(name, value)
+		} else {
+			req.Header.Add(name, value)
+		}
 	}
 
 	// The stlib will override the value in the header based on the configured `Host`

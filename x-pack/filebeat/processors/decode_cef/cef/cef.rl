@@ -18,7 +18,8 @@ import (
 // unpack unpacks a CEF message.
 func (e *Event) unpack(data string) error {
     cs, p, pe, eof := 0, 0, len(data), len(data)
-    mark := 0
+    mark, mark_slash := 0, 0
+    var escapes []int
 
     // Extension key.
     var extKey string
@@ -37,23 +38,34 @@ func (e *Event) unpack(data string) error {
         action mark {
             mark = p
         }
+        action mark_slash {
+            mark_slash = p
+        }
+        action mark_escape {
+            escapes = append(escapes, mark_slash, p)
+        }
         action version {
             e.Version, _ = strconv.Atoi(data[mark:p])
         }
         action device_vendor {
-            e.DeviceVendor = replaceHeaderEscapes(data[mark:p])
+            e.DeviceVendor = replaceEscapes(data[mark:p], mark, escapes)
+            escapes = escapes[:0]
         }
         action device_product {
-            e.DeviceProduct = replaceHeaderEscapes(data[mark:p])
+            e.DeviceProduct = replaceEscapes(data[mark:p], mark, escapes)
+            escapes = escapes[:0]
         }
         action device_version {
-            e.DeviceVersion = replaceHeaderEscapes(data[mark:p])
+            e.DeviceVersion = replaceEscapes(data[mark:p], mark, escapes)
+            escapes = escapes[:0]
         }
         action device_event_class_id {
-            e.DeviceEventClassID = replaceHeaderEscapes(data[mark:p])
+            e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, escapes)
+            escapes = escapes[:0]
         }
         action name {
-            e.Name = replaceHeaderEscapes(data[mark:p])
+            e.Name = replaceEscapes(data[mark:p], mark, escapes)
+            escapes = escapes[:0]
         }
         action severity {
             e.Severity = data[mark:p]
@@ -61,8 +73,8 @@ func (e *Event) unpack(data string) error {
         action extension_key {
             // A new extension key marks the end of the last extension value.
             if len(extKey) > 0 && extValueStart <= mark - 1 {
-                e.pushExtension(extKey, replaceExtensionEscapes(data[extValueStart:mark-1]))
-                extKey, extValueStart, extValueEnd = "", 0, 0
+                e.pushExtension(extKey, replaceEscapes(data[extValueStart:mark-1], extValueStart, escapes))
+                extKey, extValueStart, extValueEnd, escapes = "", 0, 0, escapes[:0]
             }
             extKey = data[mark:p]
         }
@@ -76,19 +88,19 @@ func (e *Event) unpack(data string) error {
         action extension_eof {
             // Reaching the EOF marks the end of the final extension value.
             if len(extKey) > 0 && extValueStart <= extValueEnd {
-                e.pushExtension(extKey, replaceExtensionEscapes(data[extValueStart:extValueEnd]))
-                extKey, extValueStart, extValueEnd = "", 0, 0
+                e.pushExtension(extKey, replaceEscapes(data[extValueStart:extValueEnd], extValueStart, escapes))
+                extKey, extValueStart, extValueEnd, escapes = "", 0, 0, escapes[:0]
             }
         }
         action extension_err {
             recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", extKey, p+1))
-            fhold; fgoto gobble_extension;
+            fhold; fnext gobble_extension;
         }
         action recover_next_extension {
             extKey, extValueStart, extValueEnd = "", 0, 0
             // Resume processing at p, the start of the next extension key.
             p = mark;
-            fgoto extensions;
+            fnext extensions;
         }
 
         # Define what header characters are allowed.
@@ -96,7 +108,8 @@ func (e *Event) unpack(data string) error {
         escape = "\\";
         escape_pipe = escape pipe;
         backslash = "\\\\";
-        device_chars = backslash | escape_pipe | (any -- pipe -- escape);
+        header_escapes = (backslash | escape_pipe) >mark_slash %mark_escape;
+        device_chars = header_escapes | (any -- pipe -- escape);
         severity_chars = ( alpha | digit | "-" );
 
         # Header fields.
@@ -119,12 +132,15 @@ func (e *Event) unpack(data string) error {
         # Define what extension characters are allowed.
         equal = "=";
         escape_equal = escape equal;
+        escape_newline = escape 'n';
+        escape_carriage_return = escape 'r';
+        extension_value_escapes = (escape_equal | backslash | escape_newline | escape_carriage_return) >mark_slash %mark_escape;
         # Only alnum is defined in the CEF spec. The other characters allow
         # non-conforming extension keys to be parsed.
         extension_key_start_chars = alnum | '_';
         extension_key_chars = extension_key_start_chars | '.' | ',' | '[' | ']';
         extension_key_pattern = extension_key_start_chars extension_key_chars*;
-        extension_value_chars_nospace = backslash | escape_equal | (any -- equal -- escape -- space);
+        extension_value_chars_nospace = extension_value_escapes | (any -- equal -- escape -- space);
 
         # Extension fields.
         extension_key = extension_key_pattern >mark %extension_key;

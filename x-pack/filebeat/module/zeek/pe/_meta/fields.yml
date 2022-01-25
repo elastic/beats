@@ -1,6 +1,5 @@
 - name: pe
   type: group
-  default_field: false
   description: >
     Fields exported by the Zeek pe log.
   fields:

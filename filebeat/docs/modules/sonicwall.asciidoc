@@ -33,7 +33,7 @@ NOTE: This was converted from RSA NetWitness log parser XML "sonicwall" device r
 
 *`var.input`*::
 
-The input from which messages are read. One of `file`, `tcp` or `udp`.
+The input from which messages are read. One of `file`, `tcp` or `udp`. Defaults to `udp`.
 
 *`var.syslog_host`*::
 

@@ -67,9 +67,7 @@
         "rsa.time.event_time": "2016-02-12T15:12:33.000Z",
         "rsa.web.fqdn": "sperna884.internal.domain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.165.201.71"
-        ],
+        "source.ip": "10.165.201.71",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -109,9 +107,7 @@
         "rsa.network.network_service": "alo",
         "rsa.time.event_time": "2016-02-26T22:15:08.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.212.18.145"
-        ],
+        "source.ip": "10.212.18.145",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -271,9 +267,7 @@
         "rsa.misc.severity": "very-high",
         "rsa.time.event_time": "2016-04-24T02:25:25.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.98.69.43"
-        ],
+        "source.ip": "10.98.69.43",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -315,9 +309,7 @@
         "rsa.time.event_time": "2016-05-08T09:27:59.000Z",
         "rsa.web.fqdn": "uradi7307.internal.corp",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.118.96.139"
-        ],
+        "source.ip": "10.118.96.139",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -432,9 +424,7 @@
         "rsa.misc.virusname": "ipi",
         "rsa.time.event_time": "2016-06-20T06:35:42.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.241.165.37"
-        ],
+        "source.ip": "10.241.165.37",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -478,9 +468,7 @@
         "rsa.network.network_service": "numqu",
         "rsa.time.event_time": "2016-07-04T13:38:16.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.232.149.140"
-        ],
+        "source.ip": "10.232.149.140",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -517,9 +505,7 @@
         "rsa.misc.severity": "low",
         "rsa.time.event_time": "2016-07-18T20:40:50.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.24.67.250"
-        ],
+        "source.ip": "10.24.67.250",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -591,9 +577,7 @@
     },
     {
         "@timestamp": "2016-08-30T17:48:33.000Z",
-        "destination.ip": [
-            "10.177.36.38"
-        ],
+        "destination.ip": "10.177.36.38",
         "event.action": "statistics",
         "event.code": "beata",
         "event.dataset": "fortinet.fortimail",
@@ -637,9 +621,7 @@
         "server.subdomain": "lamcolab3252",
         "server.top_level_domain": "invalid",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.179.124.125"
-        ],
+        "source.ip": "10.179.124.125",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -677,9 +659,7 @@
         "rsa.misc.severity": "very-high",
         "rsa.time.event_time": "2016-09-14T00:51:07.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.164.39.248"
-        ],
+        "source.ip": "10.164.39.248",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -716,9 +696,7 @@
         "rsa.time.event_time": "2016-09-28T07:53:42.000Z",
         "service.type": "fortinet",
         "source.domain": "gnaaliq",
-        "source.ip": [
-            "10.52.135.156"
-        ],
+        "source.ip": "10.52.135.156",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -838,9 +816,7 @@
         "rsa.time.event_time": "2016-11-10T05:01:24.000Z",
         "rsa.web.fqdn": "str976.internal.localhost",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.166.225.26"
-        ],
+        "source.ip": "10.166.225.26",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -882,9 +858,7 @@
         "rsa.time.event_time": "2016-11-24T12:03:59.000Z",
         "rsa.web.fqdn": "molli4306.www5.home",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.218.243.47"
-        ],
+        "source.ip": "10.218.243.47",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -964,9 +938,7 @@
         "rsa.misc.severity": "high",
         "rsa.time.event_time": "2016-12-23T02:09:07.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.16.177.212"
-        ],
+        "source.ip": "10.16.177.212",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -1006,9 +978,7 @@
         "rsa.network.network_service": "rautodi",
         "rsa.time.event_time": "2017-01-06T09:11:41.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.96.97.81"
-        ],
+        "source.ip": "10.96.97.81",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -1017,9 +987,7 @@
     },
     {
         "@timestamp": "2017-01-20T16:14:16.000Z",
-        "destination.ip": [
-            "10.68.246.187"
-        ],
+        "destination.ip": "10.68.246.187",
         "event.action": "spam",
         "event.code": "fdeF",
         "event.dataset": "fortinet.fortimail",
@@ -1054,9 +1022,7 @@
         "rsa.time.event_time": "2017-01-20T16:14:16.000Z",
         "rsa.web.fqdn": "lapariat7287.internal.host",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.140.7.83"
-        ],
+        "source.ip": "10.140.7.83",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -1142,9 +1108,7 @@
         "rsa.network.network_service": "porinc",
         "rsa.time.event_time": "2017-02-18T06:19:24.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.48.204.44"
-        ],
+        "source.ip": "10.48.204.44",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -1224,9 +1188,7 @@
         "rsa.misc.severity": "low",
         "rsa.time.event_time": "2017-03-18T20:24:33.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.111.233.194"
-        ],
+        "source.ip": "10.111.233.194",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -1276,9 +1238,7 @@
     },
     {
         "@timestamp": "2017-04-16T10:29:41.000Z",
-        "destination.ip": [
-            "10.179.210.218"
-        ],
+        "destination.ip": "10.179.210.218",
         "event.action": "statistics",
         "event.code": "lores",
         "event.dataset": "fortinet.fortimail",
@@ -1324,9 +1284,7 @@
         "server.subdomain": "atise3421",
         "server.top_level_domain": "localdomain",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.73.207.70"
-        ],
+        "source.ip": "10.73.207.70",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -1371,9 +1329,7 @@
         "rsa.network.network_service": "rcit",
         "rsa.time.event_time": "2017-04-30T17:32:16.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.43.62.246"
-        ],
+        "source.ip": "10.43.62.246",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -1454,9 +1410,7 @@
         "rsa.misc.severity": "very-high",
         "rsa.time.event_time": "2017-05-29T07:37:24.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.28.105.124"
-        ],
+        "source.ip": "10.28.105.124",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -1534,9 +1488,7 @@
         "rsa.misc.severity": "medium",
         "rsa.time.event_time": "2017-06-26T21:42:33.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.219.13.150"
-        ],
+        "source.ip": "10.219.13.150",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -1580,9 +1532,7 @@
         "rsa.network.network_service": "oriosam",
         "rsa.time.event_time": "2017-07-11T04:45:07.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.163.114.215"
-        ],
+        "source.ip": "10.163.114.215",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -1627,9 +1577,7 @@
         "rsa.network.network_service": "rautod",
         "rsa.time.event_time": "2017-07-25T11:47:41.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.124.32.120"
-        ],
+        "source.ip": "10.124.32.120",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -1829,9 +1777,7 @@
         "rsa.network.network_service": "Cicero",
         "rsa.time.event_time": "2017-10-04T23:00:32.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.247.53.179"
-        ],
+        "source.ip": "10.247.53.179",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -1872,9 +1818,7 @@
         "rsa.network.network_service": "ostr",
         "rsa.time.event_time": "2017-10-19T06:03:07.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.70.91.185"
-        ],
+        "source.ip": "10.70.91.185",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -1951,9 +1895,7 @@
         "rsa.network.network_service": "illumq",
         "rsa.time.event_time": "2017-11-16T20:08:15.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.215.65.52"
-        ],
+        "source.ip": "10.215.65.52",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -2038,9 +1980,7 @@
         "rsa.time.event_time": "2017-12-15T10:13:24.000Z",
         "rsa.web.fqdn": "edolori3822.api.home",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.63.177.46"
-        ],
+        "source.ip": "10.63.177.46",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -2120,9 +2060,7 @@
         "rsa.time.event_time": "2018-01-13T00:18:32.000Z",
         "service.type": "fortinet",
         "source.domain": "idunt",
-        "source.ip": [
-            "10.29.120.226"
-        ],
+        "source.ip": "10.29.120.226",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -2159,9 +2097,7 @@
         "rsa.misc.severity": "high",
         "rsa.time.event_time": "2018-01-27T07:21:06.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.12.86.130"
-        ],
+        "source.ip": "10.12.86.130",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -2244,9 +2180,7 @@
         "rsa.time.event_time": "2018-02-24T21:26:15.000Z",
         "rsa.web.fqdn": "magnam3267.corp",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.95.32.86"
-        ],
+        "source.ip": "10.95.32.86",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -2502,9 +2436,7 @@
         "rsa.network.network_service": "ercitati",
         "rsa.time.event_time": "2018-06-04T22:44:15.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.40.89.185"
-        ],
+        "source.ip": "10.40.89.185",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -2547,9 +2479,7 @@
         "rsa.time.event_time": "2018-06-19T05:46:49.000Z",
         "rsa.web.fqdn": "orroquis5179.local",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.252.96.71"
-        ],
+        "source.ip": "10.252.96.71",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -2591,9 +2521,7 @@
         "rsa.time.event_time": "2018-07-03T12:49:23.000Z",
         "rsa.web.fqdn": "luptasnu757.www.home",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.174.210.232"
-        ],
+        "source.ip": "10.174.210.232",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -2637,9 +2565,7 @@
         "rsa.network.network_service": "adipi",
         "rsa.time.event_time": "2018-07-17T19:51:58.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.120.232.62"
-        ],
+        "source.ip": "10.120.232.62",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -2719,9 +2645,7 @@
         "rsa.misc.severity": "medium",
         "rsa.time.event_time": "2018-08-15T09:57:06.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.200.225.45"
-        ],
+        "source.ip": "10.200.225.45",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -2729,9 +2653,7 @@
     },
     {
         "@timestamp": "2018-08-29T16:59:40.000Z",
-        "destination.ip": [
-            "10.62.61.1"
-        ],
+        "destination.ip": "10.62.61.1",
         "event.action": "statistics",
         "event.code": "rspicia",
         "event.dataset": "fortinet.fortimail",
@@ -2777,9 +2699,7 @@
         "server.subdomain": "mveni5084",
         "server.top_level_domain": "local",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.144.111.42"
-        ],
+        "source.ip": "10.144.111.42",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -2823,9 +2743,7 @@
         "rsa.network.network_service": "pta",
         "rsa.time.event_time": "2018-09-13T00:02:15.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.183.213.223"
-        ],
+        "source.ip": "10.183.213.223",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -2865,9 +2783,7 @@
         "rsa.time.event_time": "2018-09-27T07:04:49.000Z",
         "service.type": "fortinet",
         "source.domain": "tMal",
-        "source.ip": [
-            "10.52.190.18"
-        ],
+        "source.ip": "10.52.190.18",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -2948,9 +2864,7 @@
         "rsa.network.network_service": "snula",
         "rsa.time.event_time": "2018-10-25T21:09:57.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.203.110.206"
-        ],
+        "source.ip": "10.203.110.206",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -2989,9 +2903,7 @@
         "rsa.time.event_time": "2018-11-09T04:12:32.000Z",
         "service.type": "fortinet",
         "source.domain": "caecat",
-        "source.ip": [
-            "10.108.10.197"
-        ],
+        "source.ip": "10.108.10.197",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -3038,9 +2950,7 @@
         "rsa.network.network_service": "sequines",
         "rsa.time.event_time": "2018-11-23T11:15:06.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.115.154.104"
-        ],
+        "source.ip": "10.115.154.104",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -3092,9 +3002,7 @@
         "rsa.time.event_time": "2018-12-07T18:17:40.000Z",
         "service.type": "fortinet",
         "source.address": "olaboris3175.internal.home",
-        "source.ip": [
-            "10.250.94.95"
-        ],
+        "source.ip": "10.250.94.95",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -3134,9 +3042,7 @@
         "rsa.time.event_time": "2018-12-22T01:20:14.000Z",
         "service.type": "fortinet",
         "source.domain": "tquii",
-        "source.ip": [
-            "10.164.49.95"
-        ],
+        "source.ip": "10.164.49.95",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -3190,9 +3096,7 @@
     },
     {
         "@timestamp": "2019-01-19T15:25:23.000Z",
-        "destination.ip": [
-            "10.161.1.146"
-        ],
+        "destination.ip": "10.161.1.146",
         "event.action": "statistics",
         "event.code": "vol",
         "event.dataset": "fortinet.fortimail",
@@ -3238,9 +3142,7 @@
         "server.subdomain": "taevitae6868",
         "server.top_level_domain": "corp",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.60.164.100"
-        ],
+        "source.ip": "10.60.164.100",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -3285,9 +3187,7 @@
         "rsa.network.network_service": "onorumet",
         "rsa.time.event_time": "2019-02-02T22:27:57.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.157.118.41"
-        ],
+        "source.ip": "10.157.118.41",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -3296,9 +3196,7 @@
     },
     {
         "@timestamp": "2019-02-17T05:30:32.000Z",
-        "destination.ip": [
-            "10.93.239.216"
-        ],
+        "destination.ip": "10.93.239.216",
         "event.action": "statistics",
         "event.code": "tinv",
         "event.dataset": "fortinet.fortimail",
@@ -3344,9 +3242,7 @@
         "server.subdomain": "tetura7106",
         "server.top_level_domain": "corp",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.44.35.57"
-        ],
+        "source.ip": "10.44.35.57",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -3447,9 +3343,7 @@
         "rsa.time.event_time": "2019-04-01T02:38:14.000Z",
         "service.type": "fortinet",
         "source.domain": "imadmin",
-        "source.ip": [
-            "10.123.154.140"
-        ],
+        "source.ip": "10.123.154.140",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -3535,9 +3429,7 @@
         "rsa.network.network_service": "atemacc",
         "rsa.time.event_time": "2019-04-29T16:43:23.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.141.108.1"
-        ],
+        "source.ip": "10.141.108.1",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -3624,9 +3516,7 @@
         "rsa.network.network_service": "rittenby",
         "rsa.time.event_time": "2019-05-28T06:48:31.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.31.31.193"
-        ],
+        "source.ip": "10.31.31.193",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -3671,9 +3561,7 @@
         "rsa.network.network_service": "roid",
         "rsa.time.event_time": "2019-06-11T13:51:06.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.234.156.8"
-        ],
+        "source.ip": "10.234.156.8",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -3814,9 +3702,7 @@
         "rsa.misc.severity": "medium",
         "rsa.time.event_time": "2019-08-07T18:01:23.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.160.236.78"
-        ],
+        "source.ip": "10.160.236.78",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -3861,9 +3747,7 @@
         "rsa.network.network_service": "oeiusm",
         "rsa.time.event_time": "2019-08-22T01:03:57.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.244.19.62"
-        ],
+        "source.ip": "10.244.19.62",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -3908,9 +3792,7 @@
         "rsa.network.network_service": "odiconse",
         "rsa.time.event_time": "2019-09-05T08:06:31.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.147.52.164"
-        ],
+        "source.ip": "10.147.52.164",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -3919,9 +3801,7 @@
     },
     {
         "@timestamp": "2019-09-19T15:09:05.000Z",
-        "destination.ip": [
-            "10.251.183.113"
-        ],
+        "destination.ip": "10.251.183.113",
         "event.action": "spam",
         "event.code": "elaudant",
         "event.dataset": "fortinet.fortimail",
@@ -3956,9 +3836,7 @@
         "rsa.time.event_time": "2019-09-19T15:09:05.000Z",
         "rsa.web.fqdn": "ncu3839.www.localhost",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.201.105.58"
-        ],
+        "source.ip": "10.201.105.58",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -3966,9 +3844,7 @@
     },
     {
         "@timestamp": "2019-10-03T22:11:40.000Z",
-        "destination.ip": [
-            "10.132.139.98"
-        ],
+        "destination.ip": "10.132.139.98",
         "event.action": "statistics",
         "event.code": "oinB",
         "event.dataset": "fortinet.fortimail",
@@ -4001,9 +3877,7 @@
         "rsa.misc.virusname": "oremagn",
         "rsa.time.event_time": "2019-10-03T22:11:40.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.209.203.156"
-        ],
+        "source.ip": "10.209.203.156",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -4048,9 +3922,7 @@
         "rsa.network.network_service": "enbyCice",
         "rsa.time.event_time": "2019-10-18T05:14:14.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.152.196.145"
-        ],
+        "source.ip": "10.152.196.145",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -4089,9 +3961,7 @@
         "rsa.time.event_time": "2019-11-01T12:16:48.000Z",
         "service.type": "fortinet",
         "source.domain": "utaliq",
-        "source.ip": [
-            "10.78.38.143"
-        ],
+        "source.ip": "10.78.38.143",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -4175,9 +4045,7 @@
         "rsa.time.event_time": "2019-11-30T02:21:57.000Z",
         "service.type": "fortinet",
         "source.address": "ion3339.www.localdomain",
-        "source.ip": [
-            "10.209.124.81"
-        ],
+        "source.ip": "10.209.124.81",
         "tags": [
             "fortinet.fortimail",
             "forwarded"
@@ -4214,9 +4082,7 @@
         "rsa.misc.severity": "medium",
         "rsa.time.event_time": "2019-12-14T09:24:31.000Z",
         "service.type": "fortinet",
-        "source.ip": [
-            "10.176.31.145"
-        ],
+        "source.ip": "10.176.31.145",
         "tags": [
             "fortinet.fortimail",
             "forwarded"

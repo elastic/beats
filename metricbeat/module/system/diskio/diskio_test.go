@@ -22,37 +22,22 @@
 package diskio
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/elastic/beats/v7/metricbeat/internal/sysinit"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func setHostfs(pathString string) {
-	os.Setenv("HOST_PROC", filepath.Join(pathString, "proc"))
-	path := paths.Path{
-		Hostfs: pathString,
-	}
-	paths.InitPaths(&path)
-}
-
 func TestDataNameFilter(t *testing.T) {
-	oldFS := paths.Paths.Hostfs
-	setHostfs("_meta/testdata")
-
-	defer func() {
-		setHostfs(oldFS)
-	}()
-
+	sysinit.InitModule("./_meta/testdata")
 	conf := map[string]interface{}{
 		"module":                 "system",
 		"metricsets":             []string{"diskio"},
-		"diskio.include_devices": []string{"sda", "sda1", "sda2"},
+		"diskio.include_devices": []string{"sdb", "sdb1", "sdb2"},
+		"hostfs":                 "./_meta/testdata",
 	}
 
 	f := mbtest.NewReportingMetricSetV2Error(t, conf)
@@ -62,16 +47,10 @@ func TestDataNameFilter(t *testing.T) {
 }
 
 func TestDataEmptyFilter(t *testing.T) {
-	oldFS := paths.Paths.Hostfs
-	setHostfs("_meta/testdata")
-
-	defer func() {
-		setHostfs(oldFS)
-	}()
-
 	conf := map[string]interface{}{
 		"module":     "system",
 		"metricsets": []string{"diskio"},
+		"hostfs":     "./_meta/testdata",
 	}
 
 	f := mbtest.NewReportingMetricSetV2Error(t, conf)

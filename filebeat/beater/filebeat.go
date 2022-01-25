@@ -111,22 +111,6 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *common.Config) (b
 	if err != nil {
 		return nil, err
 	}
-	if !moduleRegistry.Empty() {
-		logp.Info("Enabled modules/filesets: %s", moduleRegistry.InfoString())
-		for _, mod := range moduleRegistry.ModuleNames() {
-			if mod == "" {
-				continue
-			}
-			filesets, err := moduleRegistry.ModuleConfiguredFilesets(mod)
-			if err != nil {
-				logp.Err("Failed listing filesets for module %s", mod)
-				continue
-			}
-			if len(filesets) == 0 {
-				logp.Warn("Module %s is enabled but has no enabled filesets", mod)
-			}
-		}
-	}
 
 	moduleInputs, err := moduleRegistry.GetInputConfigs()
 	if err != nil {

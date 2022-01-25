@@ -44,7 +44,9 @@
         "executable": "/usr/sbin/sshd",
         "name": "sshd",
         "pid": 1663,
-        "ppid": 1,
+        "parent": {
+            "pid": 1
+        },
         "title": "(sshd)"
     },
     "service": {

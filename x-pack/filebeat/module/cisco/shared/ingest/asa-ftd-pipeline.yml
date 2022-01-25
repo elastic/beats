@@ -315,13 +315,13 @@ processors:
       description: "111009"
       field: "message"
       patterns:
-      - "^%{NOTSPACE} '%{NOTSPACE:host.user.name}' executed %{NOTSPACE} %{GREEDYDATA:_temp_.cisco.command_line_arguments}"
+      - "^%{NOTSPACE} '%{NOTSPACE:user.name}' executed %{NOTSPACE} %{GREEDYDATA:_temp_.cisco.command_line_arguments}"
   - grok:
       if: "ctx._temp_.cisco.message_id == '111010'"
       field: "message"
       description: "111010"
       patterns:
-      - "User '%{NOTSPACE:host.user.name}', running %{QUOTEDSTRING} from IP %{IP:source.address}, executed %{QUOTEDSTRING:_temp_.cisco.command_line_arguments}"
+      - "User '%{NOTSPACE:user.name}', running %{QUOTEDSTRING} from IP %{IP:source.address}, executed %{QUOTEDSTRING:_temp_.cisco.command_line_arguments}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '113019'"
       field: "message"
@@ -383,7 +383,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '304001'"
       field: "event.outcome"
       description: "304001"
-      value: success
+      value: "allowed"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '304002'"
       field: "message"
@@ -598,7 +598,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '502103'"
       field: "message"
       description: "502103"
-      pattern: "User priv level changed: Uname: %{host.user.name} From: %{_temp_.cisco.privilege.old} To: %{_temp_.cisco.privilege.new}"
+      pattern: "User priv level changed: Uname: %{user.name} From: %{_temp_.cisco.privilege.old} To: %{_temp_.cisco.privilege.new}"
   - append:
       if: "ctx._temp_.cisco.message_id == '502103'"
       field: "event.type"
@@ -635,7 +635,7 @@ processors:
       if: '["611102", "611101"].contains(ctx._temp_.cisco.message_id)'
       field: "message"
       description: "611102, 611101"
-      pattern: 'User authentication %{event.outcome}: IP address: %{source.address}, Uname: %{host.user.name}'
+      pattern: 'User authentication %{event.outcome}: IP address: %{source.address}, Uname: %{user.name}'
   - dissect:
       if: "ctx._temp_.cisco.message_id == '710003'"
       field: "message"
@@ -750,7 +750,7 @@ processors:
   - set:
       if: '["110002"].contains(ctx._temp_.cisco.message_id)'
       field: "event.outcome"
-      value: "failure"
+      value: "dropped"
   - set:
       if: '["713120"].contains(ctx._temp_.cisco.message_id)'
       field: "event.outcome"
@@ -760,7 +760,11 @@ processors:
       field: "event.outcome"
       value: "success"
   - set:
-      if: '["713905", "713904", "713906", "713902", "713901", "710005"].contains(ctx._temp_.cisco.message_id)'
+      if: '["710005"].contains(ctx._temp_.cisco.message_id)'
+      field: "event.outcome"
+      value: "dropped"
+  - set:
+      if: '["713901", "713902", "713903", "713904", "713905"].contains(ctx._temp_.cisco.message_id)'
       field: "event.outcome"
       value: "failure"
   - set:
@@ -1447,27 +1451,19 @@ processors:
   - set:
       field: "event.outcome"
       if: 'ctx.event?.outcome == "est-allowed"'
-      value: success
+      value: "allowed"
   - set:
       field: "event.outcome"
       if: 'ctx.event?.outcome == "permitted"'
-      value: success
+      value: "allowed"
   - set:
       field: "event.outcome"
       if: 'ctx.event?.outcome == "allow"'
-      value: success
-  - set:
-      field: "event.outcome"
-      if: 'ctx.event?.outcome == "denied"'
-      value: failure
+      value: "allowed"
   - set:
       field: "event.outcome"
       if: 'ctx.event?.outcome == "deny"'
-      value: failure
-  - set:
-      field: "event.outcome"
-      if: 'ctx.event?.outcome == "dropped"'
-      value: failure
+      value: denied
   - set:
       field: "network.transport"
       if: 'ctx.network?.transport == "icmpv6"'
@@ -1773,14 +1769,12 @@ processors:
           category:
             - network
           type:
-            - connection
             - end
         connection-started:
           kind: event
           category:
             - network
           type:
-            - connection
             - start
         file-detected:
           kind: alert
@@ -1792,8 +1786,7 @@ processors:
           kind: event
           category:
             - network
-          type:
-            - info
+          type: []
         flow-expiration:
           kind: event
           category:
@@ -1847,22 +1840,36 @@ processors:
         if (ctx?.event?.action == null || !params.containsKey(ctx.event.action)) {
           return;
         }
+
         ctx.event.kind = params.get(ctx.event.action).get('kind');
         ctx.event.category = params.get(ctx.event.action).get('category').clone();
         ctx.event.type = params.get(ctx.event.action).get('type').clone();
-        if (ctx?.event?.outcome == null) {
+
+        if (ctx?.event?.outcome == null || (!ctx.event.category.contains('network') && !ctx.event.category.contains('intrusion_detection'))) {
+          if (ctx?.event?.action == 'firewall-rule') {
+            ctx.event.type.add('info');
+          } else if (ctx?.event?.action.startsWith('connection-')) {
+            ctx.event.type.add('connection');
+          }
           return;
         }
-        if (ctx.event.category.contains('network') || ctx.event.category.contains('intrusion_detection')) {
-          if (ctx.event.outcome == 'success') {
-            ctx.event.type.add('allowed');
-          }
-          if (ctx.event.outcome == 'failure') {
-            ctx.event.type.add('denied');
-          }
-          if (ctx.event.outcome == 'block') {
-            ctx.event.type.add('failure');
-          }
+
+        if (ctx.event.outcome == 'allowed') {
+          ctx.event.outcome = 'success';
+          ctx.event.type.add('connection');
+          ctx.event.type.add('allowed');
+        } else if (ctx.event.outcome == 'denied' || ctx.event.outcome == 'block') {
+          ctx.event.outcome = 'success';
+          ctx.event.type.add('connection');
+          ctx.event.type.add('denied');
+        } else if (ctx.event.outcome == 'dropped') {
+          ctx.event.outcome = 'failure';
+          ctx.event.type.add('connection');
+          ctx.event.type.add('denied');
+        } else if (ctx?.event?.action == 'firewall-rule') {
+          ctx.event.type.add('info');
+        } else if (ctx?.event?.action.startsWith('connection-')) {
+          ctx.event.type.add('connection');
         }
 
   - set:
@@ -1921,11 +1928,6 @@ processors:
       field: related.user
       value: "{{{user.name}}}"
       if: ctx?.user?.name != null && ctx?.user?.name != ''
-      allow_duplicates: false
-  - append:
-      field: related.user
-      value: "{{{host.user.name}}}"
-      if: ctx?.host?.user?.name != null && ctx?.host?.user?.name != ''
       allow_duplicates: false
   - append:
       field: related.user

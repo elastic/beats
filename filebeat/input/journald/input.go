@@ -26,14 +26,16 @@ import (
 	"github.com/coreos/go-systemd/v22/sdjournal"
 	"github.com/urso/sderr"
 
+	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
+	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalread"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
-	"github.com/elastic/beats/v7/journalbeat/pkg/journalfield"
-	"github.com/elastic/beats/v7/journalbeat/pkg/journalread"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 )
 
 type journald struct {
@@ -41,8 +43,12 @@ type journald struct {
 	MaxBackoff         time.Duration
 	Seek               journalread.SeekMode
 	CursorSeekFallback journalread.SeekMode
-	Matches            []journalfield.Matcher
+	Matches            journalfield.IncludeMatches
+	Units              []string
+	Transports         []string
+	Identifiers        []string
 	SaveRemoteHostname bool
+	Parsers            parser.Config
 }
 
 type checkpoint struct {
@@ -102,7 +108,11 @@ func configure(cfg *common.Config) ([]cursor.Source, cursor.Input, error) {
 		Seek:               config.Seek,
 		CursorSeekFallback: config.CursorSeekFallback,
 		Matches:            config.Matches,
+		Units:              config.Units,
+		Transports:         config.Transports,
+		Identifiers:        config.Identifiers,
 		SaveRemoteHostname: config.SaveRemoteHostname,
+		Parsers:            config.Parsers,
 	}, nil
 }
 
@@ -123,7 +133,7 @@ func (inp *journald) Run(
 	publisher cursor.Publisher,
 ) error {
 	log := ctx.Logger.With("path", src.Name())
-	checkpoint := initCheckpoint(log, cursor)
+	currentCheckpoint := initCheckpoint(log, cursor)
 
 	reader, err := inp.open(ctx.Logger, ctx.Cancelation, src)
 	if err != nil {
@@ -131,23 +141,20 @@ func (inp *journald) Run(
 	}
 	defer reader.Close()
 
-	if err := reader.Seek(seekBy(ctx.Logger, checkpoint, inp.Seek, inp.CursorSeekFallback)); err != nil {
+	if err := reader.Seek(seekBy(ctx.Logger, currentCheckpoint, inp.Seek, inp.CursorSeekFallback)); err != nil {
 		log.Error("Continue from current position. Seek failed with: %v", err)
 	}
 
+	parser := inp.Parsers.Create(&readerAdapter{r: reader, canceler: ctx.Cancelation})
+
 	for {
-		entry, err := reader.Next(ctx.Cancelation)
+		entry, err := parser.Next()
 		if err != nil {
 			return err
 		}
 
-		event := eventFromFields(ctx.Logger, entry.RealtimeTimestamp, entry.Fields, inp.SaveRemoteHostname)
-
-		checkpoint.Position = entry.Cursor
-		checkpoint.RealtimeTimestamp = entry.RealtimeTimestamp
-		checkpoint.MonotonicTimestamp = entry.MonotonicTimestamp
-
-		if err := publisher.Publish(event, checkpoint); err != nil {
+		event := entry.ToEvent()
+		if err := publisher.Publish(event, event.Private); err != nil {
 			return err
 		}
 	}
@@ -155,7 +162,8 @@ func (inp *journald) Run(
 
 func (inp *journald) open(log *logp.Logger, canceler input.Canceler, src cursor.Source) (*journalread.Reader, error) {
 	backoff := backoff.NewExpBackoff(canceler.Done(), inp.Backoff, inp.MaxBackoff)
-	reader, err := journalread.Open(log, src.Name(), backoff, withFilters(inp.Matches))
+	reader, err := journalread.Open(log, src.Name(), backoff,
+		withFilters(inp.Matches), withUnits(inp.Units), withTransports(inp.Transports), withSyslogIdentifiers(inp.Identifiers))
 	if err != nil {
 		return nil, sderr.Wrap(err, "failed to create reader for %{path} journal", src.Name())
 	}
@@ -183,9 +191,27 @@ func initCheckpoint(log *logp.Logger, c cursor.Cursor) checkpoint {
 	return cp
 }
 
-func withFilters(filters []journalfield.Matcher) func(*sdjournal.Journal) error {
+func withFilters(filters journalfield.IncludeMatches) func(*sdjournal.Journal) error {
 	return func(j *sdjournal.Journal) error {
-		return journalfield.ApplyMatchersOr(j, filters)
+		return journalfield.ApplyIncludeMatches(j, filters)
+	}
+}
+
+func withUnits(units []string) func(*sdjournal.Journal) error {
+	return func(j *sdjournal.Journal) error {
+		return journalfield.ApplyUnitMatchers(j, units)
+	}
+}
+
+func withTransports(transports []string) func(*sdjournal.Journal) error {
+	return func(j *sdjournal.Journal) error {
+		return journalfield.ApplyTransportMatcher(j, transports)
+	}
+}
+
+func withSyslogIdentifiers(identifiers []string) func(*sdjournal.Journal) error {
+	return func(j *sdjournal.Journal) error {
+		return journalfield.ApplySyslogIdentifierMatcher(j, identifiers)
 	}
 }
 
@@ -203,4 +229,45 @@ func seekBy(log *logp.Logger, cp checkpoint, seek, defaultSeek journalread.SeekM
 		}
 	}
 	return mode, cp.Position
+}
+
+// readerAdapter is an adapter so journalread.Reader can
+// behave like reader.Reader
+type readerAdapter struct {
+	r        *journalread.Reader
+	canceler input.Canceler
+}
+
+func (r *readerAdapter) Close() error {
+	return r.r.Close()
+}
+
+func (r *readerAdapter) Next() (reader.Message, error) {
+	data, err := r.r.Next(r.canceler)
+	if err != nil {
+		return reader.Message{}, err
+	}
+
+	content := []byte(data.Fields["MESSAGE"])
+	delete(data.Fields, "MESSAGE")
+
+	fields := make(map[string]interface{}, len(data.Fields))
+	for k, v := range data.Fields {
+		fields[k] = v
+	}
+
+	m := reader.Message{
+		Ts:      time.UnixMicro(int64(data.RealtimeTimestamp)),
+		Content: content,
+		Bytes:   len(content),
+		Fields:  fields,
+		Private: checkpoint{
+			Version:            cursorVersion,
+			RealtimeTimestamp:  data.RealtimeTimestamp,
+			MonotonicTimestamp: data.MonotonicTimestamp,
+			Position:           data.Cursor,
+		},
+	}
+
+	return m, nil
 }

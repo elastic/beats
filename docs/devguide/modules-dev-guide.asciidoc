@@ -1,6 +1,8 @@
 [[filebeat-modules-devguide]]
 == Creating a New Filebeat Module
 
+include::generator-support-note.asciidoc[tag=filebeat-generator]
+
 This guide will walk you through creating a new Filebeat module.
 
 All Filebeat modules currently live in the main

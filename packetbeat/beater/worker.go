@@ -18,7 +18,7 @@
 package beater
 
 import (
-	"github.com/tsg/gopacket/layers"
+	"github.com/google/gopacket/layers"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/decoder"

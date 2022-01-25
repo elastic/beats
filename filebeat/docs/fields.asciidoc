@@ -543,7 +543,7 @@ alias to: process.pid
 --
 type: alias
 
-alias to: process.ppid
+alias to: process.parent.pid
 
 --
 
@@ -34784,9 +34784,12 @@ format: bytes
 *`client.domain`*::
 +
 --
-Client domain.
+The domain name of the client system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -35203,6 +35206,130 @@ example: t2.medium
 
 --
 
+*`cloud.origin.account.id`*::
++
+--
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
+
+type: keyword
+
+example: 666777888999
+
+--
+
+*`cloud.origin.account.name`*::
++
+--
+The cloud account name or alias used to identify different entities in a multi-tenant environment.
+Examples: AWS account name, Google Cloud ORG display name.
+
+type: keyword
+
+example: elastic-dev
+
+--
+
+*`cloud.origin.availability_zone`*::
++
+--
+Availability zone in which this host, resource, or service is located.
+
+type: keyword
+
+example: us-east-1c
+
+--
+
+*`cloud.origin.instance.id`*::
++
+--
+Instance ID of the host machine.
+
+type: keyword
+
+example: i-1234567890abcdef0
+
+--
+
+*`cloud.origin.instance.name`*::
++
+--
+Instance name of the host machine.
+
+type: keyword
+
+--
+
+*`cloud.origin.machine.type`*::
++
+--
+Machine type of the host machine.
+
+type: keyword
+
+example: t2.medium
+
+--
+
+*`cloud.origin.project.id`*::
++
+--
+The cloud project identifier.
+Examples: Google Cloud Project id, Azure Project id.
+
+type: keyword
+
+example: my-project
+
+--
+
+*`cloud.origin.project.name`*::
++
+--
+The cloud project name.
+Examples: Google Cloud Project name, Azure Project name.
+
+type: keyword
+
+example: my project
+
+--
+
+*`cloud.origin.provider`*::
++
+--
+Name of the cloud provider. Example values are aws, azure, gcp, or digitalocean.
+
+type: keyword
+
+example: aws
+
+--
+
+*`cloud.origin.region`*::
++
+--
+Region in which this host, resource, or service is located.
+
+type: keyword
+
+example: us-east-1
+
+--
+
+*`cloud.origin.service.name`*::
++
+--
+The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
+Examples: app engine, app service, cloud run, fargate, lambda.
+
+type: keyword
+
+example: lambda
+
+--
+
 *`cloud.project.id`*::
 +
 --
@@ -35250,6 +35377,130 @@ example: us-east-1
 --
 
 *`cloud.service.name`*::
++
+--
+The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
+Examples: app engine, app service, cloud run, fargate, lambda.
+
+type: keyword
+
+example: lambda
+
+--
+
+*`cloud.target.account.id`*::
++
+--
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
+
+type: keyword
+
+example: 666777888999
+
+--
+
+*`cloud.target.account.name`*::
++
+--
+The cloud account name or alias used to identify different entities in a multi-tenant environment.
+Examples: AWS account name, Google Cloud ORG display name.
+
+type: keyword
+
+example: elastic-dev
+
+--
+
+*`cloud.target.availability_zone`*::
++
+--
+Availability zone in which this host, resource, or service is located.
+
+type: keyword
+
+example: us-east-1c
+
+--
+
+*`cloud.target.instance.id`*::
++
+--
+Instance ID of the host machine.
+
+type: keyword
+
+example: i-1234567890abcdef0
+
+--
+
+*`cloud.target.instance.name`*::
++
+--
+Instance name of the host machine.
+
+type: keyword
+
+--
+
+*`cloud.target.machine.type`*::
++
+--
+Machine type of the host machine.
+
+type: keyword
+
+example: t2.medium
+
+--
+
+*`cloud.target.project.id`*::
++
+--
+The cloud project identifier.
+Examples: Google Cloud Project id, Azure Project id.
+
+type: keyword
+
+example: my-project
+
+--
+
+*`cloud.target.project.name`*::
++
+--
+The cloud project name.
+Examples: Google Cloud Project name, Azure Project name.
+
+type: keyword
+
+example: my project
+
+--
+
+*`cloud.target.provider`*::
++
+--
+Name of the cloud provider. Example values are aws, azure, gcp, or digitalocean.
+
+type: keyword
+
+example: aws
+
+--
+
+*`cloud.target.region`*::
++
+--
+Region in which this host, resource, or service is located.
+
+type: keyword
+
+example: us-east-1
+
+--
+
+*`cloud.target.service.name`*::
 +
 --
 The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
@@ -35547,9 +35798,12 @@ format: bytes
 *`destination.domain`*::
 +
 --
-Destination domain.
+The domain name of the destination system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -37060,6 +37314,69 @@ This URL links to another system where in-depth investigation of the specific oc
 type: keyword
 
 example: https://mysystem.example.com/alert/5271dedb-f5b0-4218-87f0-4ac4870a38fe
+
+--
+
+[float]
+=== faas
+
+The user fields describe information about the function as a service that is relevant to the event.
+
+
+*`faas.coldstart`*::
++
+--
+Boolean value indicating a cold start of a function.
+
+type: boolean
+
+--
+
+*`faas.execution`*::
++
+--
+The execution ID of the current function execution.
+
+type: keyword
+
+example: af9d5aa4-a685-4c5f-a22b-444f80b3cc28
+
+--
+
+*`faas.trigger`*::
++
+--
+Details about the function trigger.
+
+type: nested
+
+--
+
+*`faas.trigger.request_id`*::
++
+--
+The ID of the trigger request , message, event, etc.
+
+type: keyword
+
+example: 123456789
+
+--
+
+*`faas.trigger.type`*::
++
+--
+The trigger for the function execution.
+Expected values are:
+  * http
+  * pubsub
+  * datasource
+  * timer
+  * other
+
+type: keyword
+
+example: http
 
 --
 
@@ -38699,121 +39016,6 @@ example: 1325
 
 --
 
-*`host.user.domain`*::
-+
---
-Name of the directory the user is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`host.user.email`*::
-+
---
-User email address.
-
-type: keyword
-
---
-
-*`host.user.full_name`*::
-+
---
-User's full name, if available.
-
-type: keyword
-
-example: Albert Einstein
-
---
-
-*`host.user.full_name.text`*::
-+
---
-type: match_only_text
-
---
-
-*`host.user.group.domain`*::
-+
---
-Name of the directory the group is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`host.user.group.id`*::
-+
---
-Unique identifier for the group on the system/platform.
-
-type: keyword
-
---
-
-*`host.user.group.name`*::
-+
---
-Name of the group.
-
-type: keyword
-
---
-
-*`host.user.hash`*::
-+
---
-Unique user hash to correlate information for a user in anonymized form.
-Useful if `user.id` or `user.name` contain confidential information and cannot be used.
-
-type: keyword
-
---
-
-*`host.user.id`*::
-+
---
-Unique identifier of the user.
-
-type: keyword
-
-example: S-1-5-21-202424912787-2692429404-2351956786-1000
-
---
-
-*`host.user.name`*::
-+
---
-Short name or login of the user.
-
-type: keyword
-
-example: a.einstein
-
---
-
-*`host.user.name.text`*::
-+
---
-type: match_only_text
-
---
-
-*`host.user.roles`*::
-+
---
-Array of user roles at the time of the event.
-
-type: keyword
-
-example: ["kibana_admin", "reporting_user"]
-
---
-
 [float]
 === http
 
@@ -38880,13 +39082,11 @@ example: 123e4567-e89b-12d3-a456-426614174000
 +
 --
 HTTP request method.
-Prior to ECS 1.6.0 the following guidance was provided:
-"The field value must be normalized to lowercase for querying."
-As of ECS 1.6.0, the guidance is deprecated because the original case of the method may be useful in anomaly detection.  Original case will be mandated in ECS 2.0.0
+The value should retain its casing from the original event. For example, `GET`, `get`, and `GeT` are all considered valid values for this field.
 
 type: keyword
 
-example: GET, POST, PUT, PoST
+example: POST
 
 --
 
@@ -39081,7 +39281,7 @@ example: org.elasticsearch.bootstrap.Bootstrap
 --
 The line number of the file containing the source code which originated the log event.
 
-type: integer
+type: long
 
 example: 42
 
@@ -39107,22 +39307,6 @@ The name of the function or method which originated the log event.
 type: keyword
 
 example: init
-
---
-
-*`log.original`*::
-+
---
-Deprecated for removal in next major version release. This field is superseded by  `event.original`.
-This is the original log message and contains the full log message before splitting it up in multiple parts.
-In contrast to the `message` field which can contain an extracted part of the log message, this field contains the original, full log message. It can have already some modifications applied like encoding or new lines removed to clean up the log message.
-This field is not indexed and doc_values are disabled so it can't be queried but the value can be retrieved from `_source`.
-
-type: keyword
-
-example: Sep 19 08:26:10 localhost My log
-
-Field is not indexed.
 
 --
 
@@ -39208,8 +39392,9 @@ The network.* fields should be populated with details about the network activity
 *`network.application`*::
 +
 --
-A name given to an application level protocol. This can be arbitrarily assigned for things like microservices, but also apply to things like skype, icq, facebook, twitter. This would be used in situations where the vendor or service can be decoded such as from the source/dest IP owners, ports, or wire format.
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+When a specific application or service is identified from network connection details (source/dest IPs, ports, certificates, or wire format), this field captures the application's or service's name.
+For example, the original event identifies the network connection being from a specific web service in a `https` network connection, like `facebook` or `twitter`.
+The field value must be normalized to lowercase for querying.
 
 type: keyword
 
@@ -39345,8 +39530,8 @@ example: 24
 *`network.protocol`*::
 +
 --
-L7 Network protocol name. ex. http, lumberjack, transport protocol.
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+In the OSI Model this would be the Application Layer protocol. For example, `http`, `dns`, or `ssh`.
+The field value must be normalized to lowercase for querying.
 
 type: keyword
 
@@ -39358,7 +39543,7 @@ example: http
 +
 --
 Same as network.iana_number, but instead using the Keyword name of the transport layer (udp, tcp, ipv6-icmp, etc.)
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+The field value must be normalized to lowercase for querying.
 
 type: keyword
 
@@ -39370,7 +39555,7 @@ example: tcp
 +
 --
 In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+The field value must be normalized to lowercase for querying.
 
 type: keyword
 
@@ -41538,19 +41723,6 @@ format: string
 
 --
 
-*`process.parent.ppid`*::
-+
---
-Parent process' pid.
-
-type: long
-
-example: 4241
-
-format: string
-
---
-
 *`process.parent.start`*::
 +
 --
@@ -41729,19 +41901,6 @@ Process id.
 type: long
 
 example: 4242
-
-format: string
-
---
-
-*`process.ppid`*::
-+
---
-Parent process' pid.
-
-type: long
-
-example: 4241
 
 format: string
 
@@ -42138,9 +42297,12 @@ format: bytes
 *`server.domain`*::
 +
 --
-Server domain.
+The domain name of the server system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -42567,12 +42729,230 @@ example: instance-0000000016
 
 --
 
+*`service.origin.address`*::
++
+--
+Address where data about this service was collected from.
+This should be a URI, network address (ipv4:port or [ipv6]:port) or a resource path (sockets).
+
+type: keyword
+
+example: 172.26.0.2:5432
+
+--
+
+*`service.origin.environment`*::
++
+--
+Identifies the environment where the service is running.
+If the same service runs in different environments (production, staging, QA, development, etc.), the environment can identify other instances of the same service. Can also group services and applications from the same environment.
+
+type: keyword
+
+example: production
+
+--
+
+*`service.origin.ephemeral_id`*::
++
+--
+Ephemeral identifier of this service (if one exists).
+This id normally changes across restarts, but `service.id` does not.
+
+type: keyword
+
+example: 8a4f500f
+
+--
+
+*`service.origin.id`*::
++
+--
+Unique identifier of the running service. If the service is comprised of many nodes, the `service.id` should be the same for all nodes.
+This id should uniquely identify the service. This makes it possible to correlate logs and metrics for one specific service, no matter which particular node emitted the event.
+Note that if you need to see the events from one specific host of the service, you should filter on that `host.name` or `host.id` instead.
+
+type: keyword
+
+example: d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6
+
+--
+
+*`service.origin.name`*::
++
+--
+Name of the service data is collected from.
+The name of the service is normally user given. This allows for distributed services that run on multiple hosts to correlate the related instances based on the name.
+In the case of Elasticsearch the `service.name` could contain the cluster name. For Beats the `service.name` is by default a copy of the `service.type` field if no name is specified.
+
+type: keyword
+
+example: elasticsearch-metrics
+
+--
+
+*`service.origin.node.name`*::
++
+--
+Name of a service node.
+This allows for two nodes of the same service running on the same host to be differentiated. Therefore, `service.node.name` should typically be unique across nodes of a given service.
+In the case of Elasticsearch, the `service.node.name` could contain the unique node name within the Elasticsearch cluster. In cases where the service doesn't have the concept of a node name, the host name or container name can be used to distinguish running instances that make up this service. If those do not provide uniqueness (e.g. multiple instances of the service running on the same host) - the node name can be manually set.
+
+type: keyword
+
+example: instance-0000000016
+
+--
+
+*`service.origin.state`*::
++
+--
+Current state of the service.
+
+type: keyword
+
+--
+
+*`service.origin.type`*::
++
+--
+The type of the service data is collected from.
+The type can be used to group and correlate logs and metrics from one service type.
+Example: If logs or metrics are collected from Elasticsearch, `service.type` would be `elasticsearch`.
+
+type: keyword
+
+example: elasticsearch
+
+--
+
+*`service.origin.version`*::
++
+--
+Version of the service the data was collected from.
+This allows to look at a data set only for a specific version of a service.
+
+type: keyword
+
+example: 3.2.4
+
+--
+
 *`service.state`*::
 +
 --
 Current state of the service.
 
 type: keyword
+
+--
+
+*`service.target.address`*::
++
+--
+Address where data about this service was collected from.
+This should be a URI, network address (ipv4:port or [ipv6]:port) or a resource path (sockets).
+
+type: keyword
+
+example: 172.26.0.2:5432
+
+--
+
+*`service.target.environment`*::
++
+--
+Identifies the environment where the service is running.
+If the same service runs in different environments (production, staging, QA, development, etc.), the environment can identify other instances of the same service. Can also group services and applications from the same environment.
+
+type: keyword
+
+example: production
+
+--
+
+*`service.target.ephemeral_id`*::
++
+--
+Ephemeral identifier of this service (if one exists).
+This id normally changes across restarts, but `service.id` does not.
+
+type: keyword
+
+example: 8a4f500f
+
+--
+
+*`service.target.id`*::
++
+--
+Unique identifier of the running service. If the service is comprised of many nodes, the `service.id` should be the same for all nodes.
+This id should uniquely identify the service. This makes it possible to correlate logs and metrics for one specific service, no matter which particular node emitted the event.
+Note that if you need to see the events from one specific host of the service, you should filter on that `host.name` or `host.id` instead.
+
+type: keyword
+
+example: d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6
+
+--
+
+*`service.target.name`*::
++
+--
+Name of the service data is collected from.
+The name of the service is normally user given. This allows for distributed services that run on multiple hosts to correlate the related instances based on the name.
+In the case of Elasticsearch the `service.name` could contain the cluster name. For Beats the `service.name` is by default a copy of the `service.type` field if no name is specified.
+
+type: keyword
+
+example: elasticsearch-metrics
+
+--
+
+*`service.target.node.name`*::
++
+--
+Name of a service node.
+This allows for two nodes of the same service running on the same host to be differentiated. Therefore, `service.node.name` should typically be unique across nodes of a given service.
+In the case of Elasticsearch, the `service.node.name` could contain the unique node name within the Elasticsearch cluster. In cases where the service doesn't have the concept of a node name, the host name or container name can be used to distinguish running instances that make up this service. If those do not provide uniqueness (e.g. multiple instances of the service running on the same host) - the node name can be manually set.
+
+type: keyword
+
+example: instance-0000000016
+
+--
+
+*`service.target.state`*::
++
+--
+Current state of the service.
+
+type: keyword
+
+--
+
+*`service.target.type`*::
++
+--
+The type of the service data is collected from.
+The type can be used to group and correlate logs and metrics from one service type.
+Example: If logs or metrics are collected from Elasticsearch, `service.type` would be `elasticsearch`.
+
+type: keyword
+
+example: elasticsearch
+
+--
+
+*`service.target.version`*::
++
+--
+Version of the service the data was collected from.
+This allows to look at a data set only for a specific version of a service.
+
+type: keyword
+
+example: 3.2.4
 
 --
 
@@ -42663,9 +43043,12 @@ format: bytes
 *`source.domain`*::
 +
 --
-Source domain.
+The domain name of the source system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -43014,7 +43397,7 @@ example: ["kibana_admin", "reporting_user"]
 === threat
 
 Fields to classify events and alerts according to a threat taxonomy such as the MITRE ATT&CK® framework.
-These fields are for users to classify alerts from all of their sources (e.g. IDS, NGFW, etc.) within a common taxonomy. The threat.tactic.* are meant to capture the high level category of the threat (e.g. "impact"). The threat.technique.* fields are meant to capture which kind of approach is used by this detected threat, to accomplish the goal (e.g. "endpoint denial of service").
+These fields are for users to classify alerts from all of their sources (e.g. IDS, NGFW, etc.) within a common taxonomy. The threat.tactic.* fields are meant to capture the high level category of the threat (e.g. "impact"). The threat.technique.* fields are meant to capture which kind of approach is used by this detected threat, to accomplish the goal (e.g. "endpoint denial of service").
 
 
 *`threat.enrichments`*::
@@ -43067,16 +43450,17 @@ type: match_only_text
 *`threat.enrichments.indicator.confidence`*::
 +
 --
-Identifies the confidence rating assigned by the provider using STIX confidence scales. Expected values:
-  * Not Specified, None, Low, Medium, High
-  * 0-10
-  * Admirality Scale (1-6)
-  * DNI Scale (5-95)
-  * WEP Scale (Impossible - Certain)
+Identifies the vendor-neutral confidence rating using the None/Low/Medium/High scale defined in Appendix A of the STIX 2.1 framework. Vendor-specific confidence scales may be added as custom fields.
+Expected values are:
+  * Not Specified
+  * None
+  * Low
+  * Medium
+  * High
 
 type: keyword
 
-example: High
+example: Medium
 
 --
 
@@ -43861,6 +44245,270 @@ The user ID (UID) or security identifier (SID) of the file owner.
 type: keyword
 
 example: 1001
+
+--
+
+*`threat.enrichments.indicator.file.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.country`*::
++
+--
+List of country (C) codes
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: Mountain View
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.organization`*::
++
+--
+List of organizations (O) of issuing certificate authority.
+
+type: keyword
+
+example: Example Inc
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.organizational_unit`*::
++
+--
+List of organizational units (OU) of issuing certificate authority.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.enrichments.indicator.file.x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39+00:00
+
+--
+
+*`threat.enrichments.indicator.file.x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25+00:00
+
+--
+
+*`threat.enrichments.indicator.file.x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`threat.enrichments.indicator.file.x509.public_key_curve`*::
++
+--
+The curve used by the elliptic curve public key algorithm. This is algorithm specific.
+
+type: keyword
+
+example: nistp521
+
+--
+
+*`threat.enrichments.indicator.file.x509.public_key_exponent`*::
++
+--
+Exponent used to derive the public key. This is algorithm specific.
+
+type: long
+
+example: 65537
+
+Field is not indexed.
+
+--
+
+*`threat.enrichments.indicator.file.x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`threat.enrichments.indicator.file.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`threat.enrichments.indicator.file.x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. We recommend using names found in Go Lang Crypto library. See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353.
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: shared.global.example.net
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.country`*::
++
+--
+List of country (C) code
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: San Francisco
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.organization`*::
++
+--
+List of organizations (O) of subject.
+
+type: keyword
+
+example: Example, Inc.
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.organizational_unit`*::
++
+--
+List of organizational units (OU) of subject.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.enrichments.indicator.file.x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
 
 --
 
@@ -44793,17 +45441,17 @@ type: match_only_text
 *`threat.indicator.confidence`*::
 +
 --
-Identifies the confidence rating assigned by the provider using STIX confidence scales.
-Recommended values:
-  * Not Specified, None, Low, Medium, High
-  * 0-10
-  * Admirality Scale (1-6)
-  * DNI Scale (5-95)
-  * WEP Scale (Impossible - Certain)
+Identifies the vendor-neutral confidence rating using the None/Low/Medium/High scale defined in Appendix A of the STIX 2.1 framework. Vendor-specific confidence scales may be added as custom fields.
+Expected values are:
+  * Not Specified
+  * None
+  * Low
+  * Medium
+  * High
 
 type: keyword
 
-example: High
+example: Medium
 
 --
 
@@ -45588,6 +46236,270 @@ The user ID (UID) or security identifier (SID) of the file owner.
 type: keyword
 
 example: 1001
+
+--
+
+*`threat.indicator.file.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+*`threat.indicator.file.x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.indicator.file.x509.issuer.country`*::
++
+--
+List of country (C) codes
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.indicator.file.x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.indicator.file.x509.issuer.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: Mountain View
+
+--
+
+*`threat.indicator.file.x509.issuer.organization`*::
++
+--
+List of organizations (O) of issuing certificate authority.
+
+type: keyword
+
+example: Example Inc
+
+--
+
+*`threat.indicator.file.x509.issuer.organizational_unit`*::
++
+--
+List of organizational units (OU) of issuing certificate authority.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`threat.indicator.file.x509.issuer.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.indicator.file.x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39+00:00
+
+--
+
+*`threat.indicator.file.x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25+00:00
+
+--
+
+*`threat.indicator.file.x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`threat.indicator.file.x509.public_key_curve`*::
++
+--
+The curve used by the elliptic curve public key algorithm. This is algorithm specific.
+
+type: keyword
+
+example: nistp521
+
+--
+
+*`threat.indicator.file.x509.public_key_exponent`*::
++
+--
+Exponent used to derive the public key. This is algorithm specific.
+
+type: long
+
+example: 65537
+
+Field is not indexed.
+
+--
+
+*`threat.indicator.file.x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`threat.indicator.file.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`threat.indicator.file.x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. We recommend using names found in Go Lang Crypto library. See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353.
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+*`threat.indicator.file.x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: shared.global.example.net
+
+--
+
+*`threat.indicator.file.x509.subject.country`*::
++
+--
+List of country (C) code
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.indicator.file.x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`threat.indicator.file.x509.subject.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: San Francisco
+
+--
+
+*`threat.indicator.file.x509.subject.organization`*::
++
+--
+List of organizations (O) of subject.
+
+type: keyword
+
+example: Example, Inc.
+
+--
+
+*`threat.indicator.file.x509.subject.organizational_unit`*::
++
+--
+List of organizational units (OU) of subject.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.x509.subject.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.indicator.file.x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
 
 --
 
@@ -85741,44 +86653,13 @@ type: ip
 
 --
 
-
-*`kubernetes.namespace.name`*::
+*`kubernetes.namespace`*::
 +
 --
-Kubernetes namespace name
+Kubernetes namespace
 
 
 type: keyword
-
---
-
-*`kubernetes.namespace.uuid`*::
-+
---
-Kubernetes namespace uuid
-
-
-type: keyword
-
---
-
-*`kubernetes.namespace.labels.*`*::
-+
---
-Kubernetes namespace labels map
-
-
-type: object
-
---
-
-*`kubernetes.namespace.annotations.*`*::
-+
---
-Kubernetes namespace annotations map
-
-
-type: object
 
 --
 
@@ -142413,6 +143294,16 @@ type: keyword
 
 --
 
+*`sophos.xg.ether_type`*::
++
+--
+The ethernet frame type
+
+
+type: keyword
+
+--
+
 [[exported-fields-squid]]
 == Squid fields
 
@@ -149741,385 +150632,8 @@ Threat intelligence Filebeat Module.
 
 
 
-[float]
-=== threatintel
 
-Fields from the threatintel Filebeat module.
-
-
-
-*`threatintel.indicator.first_seen`*::
-+
---
-The date and time when intelligence source first reported sighting this indicator.
-
-
-type: date
-
---
-
-*`threatintel.indicator.last_seen`*::
-+
---
-The date and time when intelligence source last reported sighting this indicator.
-
-
-type: date
-
---
-
-*`threatintel.indicator.sightings`*::
-+
---
-Number of times this indicator was observed conducting threat activity.
-
-
-type: long
-
---
-
-*`threatintel.indicator.type`*::
-+
---
-Type of indicator as represented by Cyber Observable in STIX 2.0. Expected values
-  * autonomous-system
-  * artifact
-  * directory
-  * domain-name
-  * email-addr
-  * file
-  * ipv4-addr
-  * ipv6-addr
-  * mac-addr
-  * mutex
-  * process
-  * software
-  * url
-  * user-account
-  * windows-registry-key
-  * x-509-certificate
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.description`*::
-+
---
-Describes the type of action conducted by the threat.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.scanner_stats`*::
-+
---
-Count of AV/EDR vendors that successfully detected malicious file or URL.
-
-
-type: long
-
---
-
-*`threatintel.indicator.provider`*::
-+
---
-Identifies the name of the intelligence provider.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.confidence`*::
-+
---
-Identifies the confidence rating assigned by the provider using STIX confidence scales. Expected values
-  * Not Specified, None, Low, Medium, High
-  * 0-10
-  * Admirality Scale (1-6)
-  * DNI Scale (5-95)
-  * WEP Scale (Impossible - Certain)
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.module`*::
-+
---
-Identifies the name of specific module this data is coming from.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.dataset`*::
-+
---
-Identifies the name of specific dataset from the intelligence source.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.reference`*::
-+
---
-Reference URL linking to additional information about this indicator.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.ip`*::
-+
---
-Identifies a threat indicator as an IP address (irrespective of direction).
-
-
-type: ip
-
---
-
-*`threatintel.indicator.port`*::
-+
---
-Identifies a threat indicator as a port number (irrespective of direction).
-
-
-type: long
-
---
-
-*`threatintel.indicator.email.address`*::
-+
---
-Identifies a threat indicator as an email address (irrespective of direction).
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.marking.tlp`*::
-+
---
-Traffic Light Protocol sharing markings. Expected values are:
-  * White
-  * Green
-  * Amber
-  * Red
-
-
-type: keyword
-
---
-
-
-*`threatintel.indicator.matched.atomic`*::
-+
---
-Identifies the atomic indicator that matched a local environment endpoint or network event.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.matched.field`*::
-+
---
-Identifies the field of the atomic indicator that matched a local environment endpoint or network event.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.matched.type`*::
-+
---
-Identifies the type of the atomic indicator that matched a local environment endpoint or network event.
-
-
-type: keyword
-
---
-
-
-*`threatintel.indicator.as.number`*::
-+
---
-Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
-
-type: long
-
-example: 15169
-
---
-
-*`threatintel.indicator.as.organization.name`*::
-+
---
-Organization name.
-
-type: keyword
-
-example: Google LLC
-
---
-
-*`threatintel.indicator.as.organization.name.text`*::
-+
---
-type: text
-
---
-
-
-*`threatintel.indicator.registry.data.strings`*::
-+
---
-Content when writing string types. Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
-
-
-type: keyword
-
-example: ["C:\rta\red_ttp\bin\myapp.exe"]
-
---
-
-*`threatintel.indicator.registry.path`*::
-+
---
-Full path, including hive, key and value
-
-type: keyword
-
-example: HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe\Debugger
-
---
-
-*`threatintel.indicator.registry.value`*::
-+
---
-Name of the value written.
-
-type: keyword
-
-example: Debugger
-
---
-
-*`threatintel.indicator.registry.key`*::
-+
---
-Registry key value
-
-type: keyword
-
---
-
-
-*`threatintel.indicator.geo.city_name`*::
-+
---
-City name.
-
-type: keyword
-
-example: Montreal
-
---
-
-*`threatintel.indicator.geo.continent_name`*::
-+
---
-Name of the continent.
-
-type: keyword
-
-example: North America
-
---
-
-*`threatintel.indicator.geo.country_iso_code`*::
-+
---
-Country ISO code.
-
-type: keyword
-
-example: CA
-
---
-
-*`threatintel.indicator.geo.country_name`*::
-+
---
-Country name.
-
-type: keyword
-
-example: Canada
-
---
-
-*`threatintel.indicator.geo.location`*::
-+
---
-Longitude and latitude.
-
-type: geo_point
-
-example: { "lon": -73.614830, "lat": 45.505918 }
-
---
-
-*`threatintel.indicator.geo.region_iso_code`*::
-+
---
-Region ISO code.
-
-type: keyword
-
-example: CA-QC
-
---
-
-*`threatintel.indicator.geo.region_name`*::
-+
---
-Region name.
-
-type: keyword
-
-example: Quebec
-
---
-
-*`threatintel.indicator.file.pe.imphash`*::
-+
---
-A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
-
-type: keyword
-
-example: 0c6803c4e922103c4dca5963aad36ddf
-
---
-
-
-
-*`threatintel.indicator.file.hash.tlsh`*::
+*`threat.indicator.file.hash.tlsh`*::
 +
 --
 The file's import tlsh, if available.
@@ -150129,47 +150643,7 @@ type: keyword
 
 --
 
-*`threatintel.indicator.file.hash.ssdeep`*::
-+
---
-The file's ssdeep hash, if available.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.file.hash.md5`*::
-+
---
-The file's md5 hash, if available.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.file.hash.sha1`*::
-+
---
-The file's sha1 hash, if available.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.file.hash.sha256`*::
-+
---
-The file's sha256 hash, if available.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.file.hash.sha384`*::
+*`threat.indicator.file.hash.sha384`*::
 +
 --
 The file's sha384 hash, if available.
@@ -150179,272 +150653,28 @@ type: keyword
 
 --
 
-*`threatintel.indicator.file.hash.sha512`*::
+*`threat.feed.name`*::
 +
 --
-The file's sha512 hash, if available.
-
-
 type: keyword
 
 --
 
-*`threatintel.indicator.file.type`*::
+*`threat.feed.dashboard_id`*::
 +
 --
-The file type.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.file.size`*::
-+
---
-The file's total size.
-
-
-type: long
-
---
-
-*`threatintel.indicator.file.name`*::
-+
---
-The file's name.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.file.extension`*::
-+
---
-The file's extension.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.file.mime_type`*::
-+
---
-The file's MIME type.
-
-
-type: keyword
-
---
-
-
-*`threatintel.indicator.url.domain`*::
-+
---
-Domain of the url, such as "www.elastic.co".
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.url.extension`*::
-+
---
-The field contains the file extension from the original request
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.url.fragment`*::
-+
---
-Portion of the url after the `#`, such as "top".
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.url.full`*::
-+
---
-If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.url.original`*::
-+
---
-Unmodified original url as seen in the event source. Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path. This field is meant to represent the URL as it was observed, complete or not.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.url.password`*::
-+
---
-Password of the request.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.url.path`*::
-+
---
-Path of the request, such as "/search".
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.url.port`*::
-+
---
-Port of the request, such as 443.
-
-
-type: long
-
-format: string
-
---
-
-*`threatintel.indicator.url.query`*::
-+
---
-The query field describes the query string of the request, such as "q=elasticsearch". The `?` is excluded from the query string. If a URL contains no `?`, there is no query field. If there is a `?` but no query, the query field exists with an empty string. The `exists` query can be used to differentiate between the two cases.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.url.registered_domain`*::
-+
---
-The highest registered url domain, stripped of the subdomain. For example, the registered domain for "foo.example.com" is "example.com". This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.url.scheme`*::
-+
---
-Scheme of the request, such as "https".
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.url.subdomain`*::
-+
---
-The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain. For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.url.top_level_domain`*::
-+
---
-The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is "com". This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
-
-
-type: keyword
-
---
-
-*`threatintel.indicator.url.username`*::
-+
---
-Username of the request.
-
-
-type: keyword
-
---
-
-
-*`threatintel.indicator.x509.serial_number`*::
-+
---
-Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
-
-type: keyword
-
-example: 55FBB9C7DEBF09809D12CCAA
-
---
-
-*`threatintel.indicator.x509.issuer`*::
-+
---
-Name of issuing certificate authority. Could be either Distinguished Name (DN) or Common Name (CN), depending on source.
-
-type: keyword
-
-example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
-
---
-
-*`threatintel.indicator.x509.subject`*::
-+
---
-Name of the certificate subject entity. Could be either Distinguished Name (DN) or Common Name (CN), depending on source.
-
-type: keyword
-
-example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
-
---
-
-*`threatintel.indicator.x509.alternative_names`*::
-+
---
-List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
-
-type: keyword
-
-example: *.elastic.co
-
---
-
-*`threatintel.indicator.signature`*::
-+
---
-Malware family of sample (if available).
-
-
 type: keyword
 
 --
 
 [float]
-=== abusemalware
+=== abusech.malware
 
 Fields for AbuseCH Malware Threat Intel
 
 
 
-*`threatintel.abusemalware.file_type`*::
+*`abusech.malware.file_type`*::
 +
 --
 File type guessed by URLhaus.
@@ -150454,7 +150684,7 @@ type: keyword
 
 --
 
-*`threatintel.abusemalware.signature`*::
+*`abusech.malware.signature`*::
 +
 --
 Malware familiy.
@@ -150464,7 +150694,7 @@ type: keyword
 
 --
 
-*`threatintel.abusemalware.urlhaus_download`*::
+*`abusech.malware.urlhaus_download`*::
 +
 --
 Location (URL) where you can download a copy of this file.
@@ -150474,7 +150704,7 @@ type: keyword
 
 --
 
-*`threatintel.abusemalware.virustotal.result`*::
+*`abusech.malware.virustotal.result`*::
 +
 --
 AV detection ration.
@@ -150484,7 +150714,7 @@ type: keyword
 
 --
 
-*`threatintel.abusemalware.virustotal.percent`*::
+*`abusech.malware.virustotal.percent`*::
 +
 --
 AV detection in percent.
@@ -150494,7 +150724,7 @@ type: float
 
 --
 
-*`threatintel.abusemalware.virustotal.link`*::
+*`abusech.malware.virustotal.link`*::
 +
 --
 Link to the Virustotal report.
@@ -150505,13 +150735,13 @@ type: keyword
 --
 
 [float]
-=== abuseurl
+=== abusech.url
 
 Fields for AbuseCH Malware Threat Intel
 
 
 
-*`threatintel.abuseurl.id`*::
+*`abusech.url.id`*::
 +
 --
 The ID of the url.
@@ -150521,7 +150751,7 @@ type: keyword
 
 --
 
-*`threatintel.abuseurl.urlhaus_reference`*::
+*`abusech.url.urlhaus_reference`*::
 +
 --
 Link to URLhaus entry.
@@ -150531,7 +150761,7 @@ type: keyword
 
 --
 
-*`threatintel.abuseurl.url_status`*::
+*`abusech.url.url_status`*::
 +
 --
 The current status of the URL. Possible values are: online, offline and unknown.
@@ -150541,7 +150771,7 @@ type: keyword
 
 --
 
-*`threatintel.abuseurl.threat`*::
+*`abusech.url.threat`*::
 +
 --
 The threat corresponding to this malware URL.
@@ -150551,7 +150781,7 @@ type: keyword
 
 --
 
-*`threatintel.abuseurl.blacklists.surbl`*::
+*`abusech.url.blacklists.surbl`*::
 +
 --
 SURBL blacklist status. Possible values are: listed and not_listed
@@ -150561,7 +150791,7 @@ type: keyword
 
 --
 
-*`threatintel.abuseurl.blacklists.spamhaus_dbl`*::
+*`abusech.url.blacklists.spamhaus_dbl`*::
 +
 --
 Spamhaus DBL blacklist status.
@@ -150571,7 +150801,7 @@ type: keyword
 
 --
 
-*`threatintel.abuseurl.reporter`*::
+*`abusech.url.reporter`*::
 +
 --
 The Twitter handle of the reporter that has reported this malware URL (or anonymous).
@@ -150581,7 +150811,7 @@ type: keyword
 
 --
 
-*`threatintel.abuseurl.larted`*::
+*`abusech.url.larted`*::
 +
 --
 Indicates whether the malware URL has been reported to the hosting provider (true or false)
@@ -150591,7 +150821,7 @@ type: boolean
 
 --
 
-*`threatintel.abuseurl.tags`*::
+*`abusech.url.tags`*::
 +
 --
 A list of tags associated with the queried malware URL
@@ -150602,13 +150832,13 @@ type: keyword
 --
 
 [float]
-=== anomali
+=== anomali.limo
 
 Fields for Anomali Threat Intel
 
 
 
-*`threatintel.anomali.id`*::
+*`anomali.limo.id`*::
 +
 --
 The ID of the indicator.
@@ -150618,7 +150848,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali.name`*::
+*`anomali.limo.name`*::
 +
 --
 The name of the indicator.
@@ -150628,7 +150858,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali.pattern`*::
+*`anomali.limo.pattern`*::
 +
 --
 The pattern ID of the indicator.
@@ -150638,7 +150868,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali.valid_from`*::
+*`anomali.limo.valid_from`*::
 +
 --
 When the indicator was first found or is considered valid.
@@ -150648,7 +150878,7 @@ type: date
 
 --
 
-*`threatintel.anomali.modified`*::
+*`anomali.limo.modified`*::
 +
 --
 When the indicator was last modified
@@ -150658,7 +150888,7 @@ type: date
 
 --
 
-*`threatintel.anomali.labels`*::
+*`anomali.limo.labels`*::
 +
 --
 The labels related to the indicator
@@ -150668,7 +150898,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali.indicator`*::
+*`anomali.limo.indicator`*::
 +
 --
 The value of the indicator, for example if the type is domain, this would be the value.
@@ -150678,7 +150908,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali.description`*::
+*`anomali.limo.description`*::
 +
 --
 A description of the indicator.
@@ -150688,7 +150918,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali.title`*::
+*`anomali.limo.title`*::
 +
 --
 Title describing the indicator.
@@ -150698,7 +150928,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali.content`*::
+*`anomali.limo.content`*::
 +
 --
 Extra text or descriptive content related to the indicator.
@@ -150708,7 +150938,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali.type`*::
+*`anomali.limo.type`*::
 +
 --
 The indicator type, can for example be "domain, email, FileHash-SHA256".
@@ -150718,7 +150948,7 @@ type: keyword
 
 --
 
-*`threatintel.anomali.object_marking_refs`*::
+*`anomali.limo.object_marking_refs`*::
 +
 --
 The STIX reference object.
@@ -150729,13 +150959,13 @@ type: keyword
 --
 
 [float]
-=== anomalithreatstream
+=== anomali.threatstream
 
 Fields for Anomali ThreatStream
 
 
 
-*`threatintel.anomalithreatstream.classification`*::
+*`anomali.threatstream.classification`*::
 +
 --
 Indicates whether an indicator is private or from a public feed and available publicly. Possible values: private, public.
@@ -150747,7 +150977,7 @@ example: private
 
 --
 
-*`threatintel.anomalithreatstream.confidence`*::
+*`anomali.threatstream.confidence`*::
 +
 --
 The measure of the accuracy (from 0 to 100) assigned by ThreatStream's predictive analytics technology to indicators.
@@ -150757,7 +150987,7 @@ type: short
 
 --
 
-*`threatintel.anomalithreatstream.detail2`*::
+*`anomali.threatstream.detail2`*::
 +
 --
 Detail text for indicator.
@@ -150769,7 +150999,7 @@ example: Imported by user 42.
 
 --
 
-*`threatintel.anomalithreatstream.id`*::
+*`anomali.threatstream.id`*::
 +
 --
 The ID of the indicator.
@@ -150779,7 +151009,7 @@ type: keyword
 
 --
 
-*`threatintel.anomalithreatstream.import_session_id`*::
+*`anomali.threatstream.import_session_id`*::
 +
 --
 ID of the import session that created the indicator on ThreatStream.
@@ -150789,7 +151019,7 @@ type: keyword
 
 --
 
-*`threatintel.anomalithreatstream.itype`*::
+*`anomali.threatstream.itype`*::
 +
 --
 Indicator type. Possible values: "apt_domain", "apt_email", "apt_ip", "apt_url", "bot_ip", "c2_domain", "c2_ip", "c2_url", "i2p_ip", "mal_domain", "mal_email", "mal_ip", "mal_md5", "mal_url", "parked_ip", "phish_email", "phish_ip", "phish_url", "scan_ip", "spam_domain", "ssh_ip", "suspicious_domain", "tor_ip" and "torrent_tracker_url".
@@ -150799,7 +151029,7 @@ type: keyword
 
 --
 
-*`threatintel.anomalithreatstream.maltype`*::
+*`anomali.threatstream.maltype`*::
 +
 --
 Information regarding a malware family, a CVE ID, or another attack or threat, associated with the indicator.
@@ -150809,7 +151039,7 @@ type: wildcard
 
 --
 
-*`threatintel.anomalithreatstream.md5`*::
+*`anomali.threatstream.md5`*::
 +
 --
 Hash for the indicator.
@@ -150819,7 +151049,7 @@ type: keyword
 
 --
 
-*`threatintel.anomalithreatstream.resource_uri`*::
+*`anomali.threatstream.resource_uri`*::
 +
 --
 Relative URI for the indicator details.
@@ -150829,7 +151059,7 @@ type: keyword
 
 --
 
-*`threatintel.anomalithreatstream.severity`*::
+*`anomali.threatstream.severity`*::
 +
 --
 Criticality associated with the threat feed that supplied the indicator. Possible values: low, medium, high, very-high.
@@ -150839,7 +151069,7 @@ type: keyword
 
 --
 
-*`threatintel.anomalithreatstream.source`*::
+*`anomali.threatstream.source`*::
 +
 --
 Source for the indicator.
@@ -150851,7 +151081,7 @@ example: Analyst
 
 --
 
-*`threatintel.anomalithreatstream.source_feed_id`*::
+*`anomali.threatstream.source_feed_id`*::
 +
 --
 ID for the integrator source.
@@ -150861,7 +151091,7 @@ type: keyword
 
 --
 
-*`threatintel.anomalithreatstream.state`*::
+*`anomali.threatstream.state`*::
 +
 --
 State for this indicator.
@@ -150873,7 +151103,7 @@ example: active
 
 --
 
-*`threatintel.anomalithreatstream.trusted_circle_ids`*::
+*`anomali.threatstream.trusted_circle_ids`*::
 +
 --
 ID of the trusted circle that imported the indicator.
@@ -150883,7 +151113,7 @@ type: keyword
 
 --
 
-*`threatintel.anomalithreatstream.update_id`*::
+*`anomali.threatstream.update_id`*::
 +
 --
 Update ID.
@@ -150893,7 +151123,7 @@ type: keyword
 
 --
 
-*`threatintel.anomalithreatstream.url`*::
+*`anomali.threatstream.url`*::
 +
 --
 URL for the indicator.
@@ -150903,7 +151133,7 @@ type: keyword
 
 --
 
-*`threatintel.anomalithreatstream.value_type`*::
+*`anomali.threatstream.value_type`*::
 +
 --
 Data type of the indicator. Possible values: ip, domain, url, email, md5.
@@ -150914,13 +151144,13 @@ type: keyword
 --
 
 [float]
-=== malwarebazaar
+=== abusech.malwarebazaar
 
 Fields for Malware Bazaar Threat Intel
 
 
 
-*`threatintel.malwarebazaar.file_type`*::
+*`abusech.malwarebazaar.file_type`*::
 +
 --
 File type guessed by Malware Bazaar.
@@ -150930,7 +151160,7 @@ type: keyword
 
 --
 
-*`threatintel.malwarebazaar.signature`*::
+*`abusech.malwarebazaar.signature`*::
 +
 --
 Malware familiy.
@@ -150940,7 +151170,7 @@ type: keyword
 
 --
 
-*`threatintel.malwarebazaar.tags`*::
+*`abusech.malwarebazaar.tags`*::
 +
 --
 A list of tags associated with the queried malware sample.
@@ -150951,7 +151181,7 @@ type: keyword
 --
 
 
-*`threatintel.malwarebazaar.intelligence.downloads`*::
+*`abusech.malwarebazaar.intelligence.downloads`*::
 +
 --
 Number of downloads from MalwareBazaar.
@@ -150961,7 +151191,7 @@ type: long
 
 --
 
-*`threatintel.malwarebazaar.intelligence.uploads`*::
+*`abusech.malwarebazaar.intelligence.uploads`*::
 +
 --
 Number of uploads from MalwareBazaar.
@@ -150972,7 +151202,7 @@ type: long
 --
 
 
-*`threatintel.malwarebazaar.intelligence.mail.Generic`*::
+*`abusech.malwarebazaar.intelligence.mail.Generic`*::
 +
 --
 Malware seen in generic spam traffic.
@@ -150982,7 +151212,7 @@ type: keyword
 
 --
 
-*`threatintel.malwarebazaar.intelligence.mail.IT`*::
+*`abusech.malwarebazaar.intelligence.mail.IT`*::
 +
 --
 Malware seen in IT spam traffic.
@@ -150992,7 +151222,7 @@ type: keyword
 
 --
 
-*`threatintel.malwarebazaar.anonymous`*::
+*`abusech.malwarebazaar.anonymous`*::
 +
 --
 Identifies if the sample was submitted anonymously.
@@ -151002,7 +151232,7 @@ type: long
 
 --
 
-*`threatintel.malwarebazaar.code_sign`*::
+*`abusech.malwarebazaar.code_sign`*::
 +
 --
 Code signing information for the sample.
@@ -151019,7 +151249,7 @@ Fields for MISP Threat Intel
 
 
 
-*`threatintel.misp.id`*::
+*`misp.id`*::
 +
 --
 Attribute ID.
@@ -151029,7 +151259,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.orgc_id`*::
+*`misp.orgc_id`*::
 +
 --
 Organization Community ID of the event.
@@ -151039,7 +151269,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.org_id`*::
+*`misp.org_id`*::
 +
 --
 Organization ID of the event.
@@ -151049,7 +151279,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.threat_level_id`*::
+*`misp.threat_level_id`*::
 +
 --
 Threat level from 5 to 1, where 1 is the most critical.
@@ -151059,7 +151289,7 @@ type: long
 
 --
 
-*`threatintel.misp.info`*::
+*`misp.info`*::
 +
 --
 Additional text or information related to the event.
@@ -151069,7 +151299,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.published`*::
+*`misp.published`*::
 +
 --
 When the event was published.
@@ -151079,7 +151309,7 @@ type: boolean
 
 --
 
-*`threatintel.misp.uuid`*::
+*`misp.uuid`*::
 +
 --
 The UUID of the event object.
@@ -151089,7 +151319,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.date`*::
+*`misp.date`*::
 +
 --
 The date of when the event object was created.
@@ -151099,7 +151329,7 @@ type: date
 
 --
 
-*`threatintel.misp.attribute_count`*::
+*`misp.attribute_count`*::
 +
 --
 How many attributes are included in a single event object.
@@ -151109,7 +151339,7 @@ type: long
 
 --
 
-*`threatintel.misp.timestamp`*::
+*`misp.timestamp`*::
 +
 --
 The timestamp of when the event object was created.
@@ -151119,7 +151349,7 @@ type: date
 
 --
 
-*`threatintel.misp.distribution`*::
+*`misp.distribution`*::
 +
 --
 Distribution type related to MISP.
@@ -151129,7 +151359,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.proposal_email_lock`*::
+*`misp.proposal_email_lock`*::
 +
 --
 Settings configured on MISP for email lock on this event object.
@@ -151139,7 +151369,7 @@ type: boolean
 
 --
 
-*`threatintel.misp.locked`*::
+*`misp.locked`*::
 +
 --
 If the current MISP event object is locked or not.
@@ -151149,7 +151379,7 @@ type: boolean
 
 --
 
-*`threatintel.misp.publish_timestamp`*::
+*`misp.publish_timestamp`*::
 +
 --
 At what time the event object was published
@@ -151159,7 +151389,7 @@ type: date
 
 --
 
-*`threatintel.misp.sharing_group_id`*::
+*`misp.sharing_group_id`*::
 +
 --
 The ID of the grouped events or sources of the event.
@@ -151169,7 +151399,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.disable_correlation`*::
+*`misp.disable_correlation`*::
 +
 --
 If correlation is disabled on the MISP event object.
@@ -151179,7 +151409,7 @@ type: boolean
 
 --
 
-*`threatintel.misp.extends_uuid`*::
+*`misp.extends_uuid`*::
 +
 --
 The UUID of the event object it might extend.
@@ -151189,7 +151419,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.org.id`*::
+*`misp.org.id`*::
 +
 --
 The organization ID related to the event object.
@@ -151199,7 +151429,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.org.name`*::
+*`misp.org.name`*::
 +
 --
 The organization name related to the event object.
@@ -151209,7 +151439,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.org.uuid`*::
+*`misp.org.uuid`*::
 +
 --
 The UUID of the organization related to the event object.
@@ -151219,7 +151449,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.org.local`*::
+*`misp.org.local`*::
 +
 --
 If the event object is local or from a remote source.
@@ -151229,7 +151459,7 @@ type: boolean
 
 --
 
-*`threatintel.misp.orgc.id`*::
+*`misp.orgc.id`*::
 +
 --
 The Organization Community ID in which the event object was reported from.
@@ -151239,7 +151469,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.orgc.name`*::
+*`misp.orgc.name`*::
 +
 --
 The Organization Community name in which the event object was reported from.
@@ -151249,7 +151479,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.orgc.uuid`*::
+*`misp.orgc.uuid`*::
 +
 --
 The Organization Community UUID in which the event object was reported from.
@@ -151259,7 +151489,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.orgc.local`*::
+*`misp.orgc.local`*::
 +
 --
 If the Organization Community was local or synced from a remote source.
@@ -151269,7 +151499,7 @@ type: boolean
 
 --
 
-*`threatintel.misp.attribute.id`*::
+*`misp.attribute.id`*::
 +
 --
 The ID of the attribute related to the event object.
@@ -151279,7 +151509,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.attribute.type`*::
+*`misp.attribute.type`*::
 +
 --
 The type of the attribute related to the event object. For example email, ipv4, sha1 and such.
@@ -151289,7 +151519,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.attribute.category`*::
+*`misp.attribute.category`*::
 +
 --
 The category of the attribute related to the event object. For example "Network Activity".
@@ -151299,7 +151529,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.attribute.to_ids`*::
+*`misp.attribute.to_ids`*::
 +
 --
 If the attribute should be automatically synced with an IDS.
@@ -151309,7 +151539,7 @@ type: boolean
 
 --
 
-*`threatintel.misp.attribute.uuid`*::
+*`misp.attribute.uuid`*::
 +
 --
 The UUID of the attribute related to the event.
@@ -151319,7 +151549,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.attribute.event_id`*::
+*`misp.attribute.event_id`*::
 +
 --
 The local event ID of the attribute related to the event.
@@ -151329,7 +151559,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.attribute.distribution`*::
+*`misp.attribute.distribution`*::
 +
 --
 How the attribute has been distributed, represented by integer numbers.
@@ -151339,7 +151569,7 @@ type: long
 
 --
 
-*`threatintel.misp.attribute.timestamp`*::
+*`misp.attribute.timestamp`*::
 +
 --
 The timestamp in which the attribute was attached to the event object.
@@ -151349,7 +151579,7 @@ type: date
 
 --
 
-*`threatintel.misp.attribute.comment`*::
+*`misp.attribute.comment`*::
 +
 --
 Comments made to the attribute itself.
@@ -151359,7 +151589,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.attribute.sharing_group_id`*::
+*`misp.attribute.sharing_group_id`*::
 +
 --
 The group ID of the sharing group related to the specific attribute.
@@ -151369,7 +151599,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.attribute.deleted`*::
+*`misp.attribute.deleted`*::
 +
 --
 If the attribute has been removed from the event object.
@@ -151379,7 +151609,7 @@ type: boolean
 
 --
 
-*`threatintel.misp.attribute.disable_correlation`*::
+*`misp.attribute.disable_correlation`*::
 +
 --
 If correlation has been enabled on the attribute related to the event object.
@@ -151389,7 +151619,7 @@ type: boolean
 
 --
 
-*`threatintel.misp.attribute.object_id`*::
+*`misp.attribute.object_id`*::
 +
 --
 The ID of the Object in which the attribute is attached.
@@ -151399,7 +151629,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.attribute.object_relation`*::
+*`misp.attribute.object_relation`*::
 +
 --
 The type of relation the attribute has with the event object itself.
@@ -151409,7 +151639,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.attribute.value`*::
+*`misp.attribute.value`*::
 +
 --
 The value of the attribute, depending on the type like "url, sha1, email-src".
@@ -151419,7 +151649,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.context.attribute.id`*::
+*`misp.context.attribute.id`*::
 +
 --
 The ID of the secondary attribute related to the event object.
@@ -151429,7 +151659,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.context.attribute.type`*::
+*`misp.context.attribute.type`*::
 +
 --
 The type of the secondary attribute related to the event object. For example email, ipv4, sha1 and such.
@@ -151439,7 +151669,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.context.attribute.category`*::
+*`misp.context.attribute.category`*::
 +
 --
 The category of the secondary attribute related to the event object. For example "Network Activity".
@@ -151449,7 +151679,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.context.attribute.to_ids`*::
+*`misp.context.attribute.to_ids`*::
 +
 --
 If the secondary attribute should be automatically synced with an IDS.
@@ -151459,7 +151689,7 @@ type: boolean
 
 --
 
-*`threatintel.misp.context.attribute.uuid`*::
+*`misp.context.attribute.uuid`*::
 +
 --
 The UUID of the secondary attribute related to the event.
@@ -151469,7 +151699,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.context.attribute.event_id`*::
+*`misp.context.attribute.event_id`*::
 +
 --
 The local event ID of the secondary attribute related to the event.
@@ -151479,7 +151709,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.context.attribute.distribution`*::
+*`misp.context.attribute.distribution`*::
 +
 --
 How the secondary attribute has been distributed, represented by integer numbers.
@@ -151489,7 +151719,7 @@ type: long
 
 --
 
-*`threatintel.misp.context.attribute.timestamp`*::
+*`misp.context.attribute.timestamp`*::
 +
 --
 The timestamp in which the secondary attribute was attached to the event object.
@@ -151499,7 +151729,7 @@ type: date
 
 --
 
-*`threatintel.misp.context.attribute.comment`*::
+*`misp.context.attribute.comment`*::
 +
 --
 Comments made to the secondary attribute itself.
@@ -151509,7 +151739,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.context.attribute.sharing_group_id`*::
+*`misp.context.attribute.sharing_group_id`*::
 +
 --
 The group ID of the sharing group related to the specific secondary attribute.
@@ -151519,7 +151749,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.context.attribute.deleted`*::
+*`misp.context.attribute.deleted`*::
 +
 --
 If the secondary attribute has been removed from the event object.
@@ -151529,7 +151759,7 @@ type: boolean
 
 --
 
-*`threatintel.misp.context.attribute.disable_correlation`*::
+*`misp.context.attribute.disable_correlation`*::
 +
 --
 If correlation has been enabled on the secondary attribute related to the event object.
@@ -151539,7 +151769,7 @@ type: boolean
 
 --
 
-*`threatintel.misp.context.attribute.object_id`*::
+*`misp.context.attribute.object_id`*::
 +
 --
 The ID of the Object in which the secondary attribute is attached.
@@ -151549,7 +151779,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.context.attribute.object_relation`*::
+*`misp.context.attribute.object_relation`*::
 +
 --
 The type of relation the secondary attribute has with the event object itself.
@@ -151559,7 +151789,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.context.attribute.value`*::
+*`misp.context.attribute.value`*::
 +
 --
 The value of the attribute, depending on the type like "url, sha1, email-src".
@@ -151576,7 +151806,7 @@ Fields for OTX Threat Intel
 
 
 
-*`threatintel.otx.id`*::
+*`otx.id`*::
 +
 --
 The ID of the indicator.
@@ -151586,7 +151816,7 @@ type: keyword
 
 --
 
-*`threatintel.otx.indicator`*::
+*`otx.indicator`*::
 +
 --
 The value of the indicator, for example if the type is domain, this would be the value.
@@ -151596,7 +151826,7 @@ type: keyword
 
 --
 
-*`threatintel.otx.description`*::
+*`otx.description`*::
 +
 --
 A description of the indicator.
@@ -151606,7 +151836,7 @@ type: keyword
 
 --
 
-*`threatintel.otx.title`*::
+*`otx.title`*::
 +
 --
 Title describing the indicator.
@@ -151616,7 +151846,7 @@ type: keyword
 
 --
 
-*`threatintel.otx.content`*::
+*`otx.content`*::
 +
 --
 Extra text or descriptive content related to the indicator.
@@ -151626,7 +151856,7 @@ type: keyword
 
 --
 
-*`threatintel.otx.type`*::
+*`otx.type`*::
 +
 --
 The indicator type, can for example be "domain, email, FileHash-SHA256".
@@ -151650,7 +151880,7 @@ Entity that represents a threat.
 
 
 
-*`threatintel.recordedfuture.entity.id`*::
+*`recordedfuture.entity.id`*::
 +
 --
 Entity ID.
@@ -151662,7 +151892,7 @@ example: ip:192.0.2.13
 
 --
 
-*`threatintel.recordedfuture.entity.name`*::
+*`recordedfuture.entity.name`*::
 +
 --
 Entity name. Value for the entity.
@@ -151674,7 +151904,7 @@ example: 192.0.2.13
 
 --
 
-*`threatintel.recordedfuture.entity.type`*::
+*`recordedfuture.entity.type`*::
 +
 --
 Entity type.
@@ -151686,7 +151916,7 @@ example: IpAddress
 
 --
 
-*`threatintel.recordedfuture.intelCard`*::
+*`recordedfuture.intelCard`*::
 +
 --
 Link to the Recorded Future Intelligence Card for to this indicator.
@@ -151696,7 +151926,7 @@ type: keyword
 
 --
 
-*`threatintel.recordedfuture.ip_range`*::
+*`recordedfuture.ip_range`*::
 +
 --
 Range of IPs for this indicator.
@@ -151715,7 +151945,7 @@ Risk fields.
 
 
 
-*`threatintel.recordedfuture.risk.criticality`*::
+*`recordedfuture.risk.criticality`*::
 +
 --
 Risk criticality (0-4).
@@ -151725,7 +151955,7 @@ type: byte
 
 --
 
-*`threatintel.recordedfuture.risk.criticalityLabel`*::
+*`recordedfuture.risk.criticalityLabel`*::
 +
 --
 Risk criticality label. One of None, Unusual, Suspicious, Malicious, Very Malicious.
@@ -151735,7 +151965,7 @@ type: keyword
 
 --
 
-*`threatintel.recordedfuture.risk.evidenceDetails`*::
+*`recordedfuture.risk.evidenceDetails`*::
 +
 --
 Risk's evidence details.
@@ -151745,7 +151975,7 @@ type: flattened
 
 --
 
-*`threatintel.recordedfuture.risk.score`*::
+*`recordedfuture.risk.score`*::
 +
 --
 Risk score (0-99).
@@ -151755,7 +151985,7 @@ type: short
 
 --
 
-*`threatintel.recordedfuture.risk.riskString`*::
+*`recordedfuture.risk.riskString`*::
 +
 --
 Number of Risk Rules observed as a factor of total number of rules.
@@ -151767,7 +151997,7 @@ example: 1/54
 
 --
 
-*`threatintel.recordedfuture.risk.riskSummary`*::
+*`recordedfuture.risk.riskSummary`*::
 +
 --
 Risk summary.
@@ -151779,14 +152009,14 @@ example: 1 of 54 Risk Rules currently observed.
 
 --
 
-*`threatintel.recordedfuture.risk.riskSummary.text`*::
+*`recordedfuture.risk.riskSummary.text`*::
 +
 --
 type: text
 
 --
 
-*`threatintel.recordedfuture.risk.rules`*::
+*`recordedfuture.risk.rules`*::
 +
 --
 Number of rules observed.
@@ -151803,7 +152033,7 @@ Fields for ThreatQ Threat Library
 
 
 
-*`threatintel.threatq.updated_at`*::
+*`threatq.updated_at`*::
 +
 --
 Last modification time
@@ -151813,7 +152043,7 @@ type: date
 
 --
 
-*`threatintel.threatq.created_at`*::
+*`threatq.created_at`*::
 +
 --
 Object creation time
@@ -151823,7 +152053,7 @@ type: date
 
 --
 
-*`threatintel.threatq.expires_at`*::
+*`threatq.expires_at`*::
 +
 --
 Expiration time
@@ -151833,7 +152063,7 @@ type: date
 
 --
 
-*`threatintel.threatq.expires_calculated_at`*::
+*`threatq.expires_calculated_at`*::
 +
 --
 Expiration calculation time
@@ -151843,7 +152073,7 @@ type: date
 
 --
 
-*`threatintel.threatq.published_at`*::
+*`threatq.published_at`*::
 +
 --
 Object publication time
@@ -151853,7 +152083,7 @@ type: date
 
 --
 
-*`threatintel.threatq.status`*::
+*`threatq.status`*::
 +
 --
 Object status within the Threat Library
@@ -151863,7 +152093,7 @@ type: keyword
 
 --
 
-*`threatintel.threatq.indicator_value`*::
+*`threatq.indicator_value`*::
 +
 --
 Original indicator value
@@ -151873,7 +152103,7 @@ type: keyword
 
 --
 
-*`threatintel.threatq.adversaries`*::
+*`threatq.adversaries`*::
 +
 --
 Adversaries that are linked to the object
@@ -151883,7 +152113,7 @@ type: keyword
 
 --
 
-*`threatintel.threatq.attributes`*::
+*`threatq.attributes`*::
 +
 --
 These provide additional context about an object

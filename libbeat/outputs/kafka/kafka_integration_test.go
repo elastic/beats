@@ -45,8 +45,9 @@ import (
 )
 
 const (
-	kafkaDefaultHost = "localhost"
-	kafkaDefaultPort = "9092"
+	kafkaDefaultHost     = "kafka"
+	kafkaDefaultPort     = "9092"
+	kafkaDefaultSASLPort = "9093"
 )
 
 type eventInfo struct {
@@ -181,6 +182,37 @@ func TestKafkaPublish(t *testing.T) {
 			randMulti(1, 10, common.MapStr{
 				"host": "test-host",
 				"type": "log",
+			}),
+		},
+		{
+			"publish single event to test topic",
+			map[string]interface{}{},
+			testTopic,
+			single(common.MapStr{
+				"host":    "test-host",
+				"message": id,
+			}),
+		},
+		{
+			// Initially I tried rerunning all tests over SASL/SCRAM, but
+			// that added a full 30sec to the test. Instead most tests run
+			// in plaintext, and individual tests can switch to SCRAM
+			// by inserting the config in this example:
+			"publish single event to test topic over SASL/SCRAM",
+			map[string]interface{}{
+				"hosts":          []string{getTestSASLKafkaHost()},
+				"protocol":       "https",
+				"sasl.mechanism": "SCRAM-SHA-512",
+				"ssl.certificate_authorities": []string{
+					"../../../testing/environments/docker/kafka/certs/ca-cert",
+				},
+				"username": "beats",
+				"password": "KafkaTest",
+			},
+			testTopic,
+			single(common.MapStr{
+				"host":    "test-host",
+				"message": id,
 			}),
 		},
 	}
@@ -319,6 +351,13 @@ func getTestKafkaHost() string {
 	return fmt.Sprintf("%v:%v",
 		getenv("KAFKA_HOST", kafkaDefaultHost),
 		getenv("KAFKA_PORT", kafkaDefaultPort),
+	)
+}
+
+func getTestSASLKafkaHost() string {
+	return fmt.Sprintf("%v:%v",
+		getenv("KAFKA_HOST", kafkaDefaultHost),
+		getenv("KAFKA_SASL_PORT", kafkaDefaultSASLPort),
 	)
 }
 

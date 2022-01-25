@@ -22,6 +22,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+// authStyleInParams sends the "client_id" and "client_secret" in the POST body as application/x-www-form-urlencoded parameters.
+const authStyleInParams = 1
+
 type authConfig struct {
 	Basic  *basicAuthConfig `config:"basic"`
 	OAuth2 *oAuth2Config    `config:"oauth2"`
@@ -83,9 +86,11 @@ type oAuth2Config struct {
 	ClientID       string              `config:"client.id"`
 	ClientSecret   string              `config:"client.secret"`
 	EndpointParams map[string][]string `config:"endpoint_params"`
+	Password       string              `config:"password"`
 	Provider       oAuth2Provider      `config:"provider"`
 	Scopes         []string            `config:"scopes"`
 	TokenURL       string              `config:"token_url"`
+	User           string              `config:"user"`
 
 	// google specific
 	GoogleCredentialsFile  string          `config:"google.credentials_file"`
@@ -103,20 +108,43 @@ func (o *oAuth2Config) isEnabled() bool {
 	return o != nil && (o.Enabled == nil || *o.Enabled)
 }
 
+// clientCredentialsGrant creates http client from token_url and client credentials
+func (o *oAuth2Config) clientCredentialsGrant(ctx context.Context, client *http.Client) *http.Client {
+	creds := clientcredentials.Config{
+		ClientID:       o.ClientID,
+		ClientSecret:   o.ClientSecret,
+		TokenURL:       o.getTokenURL(),
+		Scopes:         o.Scopes,
+		EndpointParams: o.getEndpointParams(),
+	}
+	return creds.Client(ctx)
+}
+
 // Client wraps the given http.Client and returns a new one that will use the oauth authentication.
 func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.Client, error) {
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, client)
 
 	switch o.getProvider() {
-	case oAuth2ProviderAzure, oAuth2ProviderDefault:
-		creds := clientcredentials.Config{
-			ClientID:       o.ClientID,
-			ClientSecret:   o.ClientSecret,
-			TokenURL:       o.getTokenURL(),
-			Scopes:         o.Scopes,
-			EndpointParams: o.getEndpointParams(),
+	case oAuth2ProviderDefault:
+		if o.User != "" || o.Password != "" {
+			conf := &oauth2.Config{
+				ClientID:     o.ClientID,
+				ClientSecret: o.ClientSecret,
+				Endpoint: oauth2.Endpoint{
+					TokenURL:  o.TokenURL,
+					AuthStyle: authStyleInParams,
+				},
+			}
+			token, err := conf.PasswordCredentialsToken(ctx, o.User, o.Password)
+			if err != nil {
+				return nil, fmt.Errorf("oauth2 client: error loading credentials using user and password: %w", err)
+			}
+			return conf.Client(ctx, token), nil
+		} else {
+			return o.clientCredentialsGrant(ctx, client), nil
 		}
-		return creds.Client(ctx), nil
+	case oAuth2ProviderAzure:
+		return o.clientCredentialsGrant(ctx, client), nil
 	case oAuth2ProviderGoogle:
 		if o.GoogleJWTFile != "" {
 			cfg, err := google.JWTConfigFromJSON(o.GoogleCredentialsJSON, o.Scopes...)
@@ -183,6 +211,9 @@ func (o *oAuth2Config) Validate() error {
 	case oAuth2ProviderDefault:
 		if o.TokenURL == "" || o.ClientID == "" || o.ClientSecret == "" {
 			return errors.New("both token_url and client credentials must be provided")
+		}
+		if (o.User != "" && o.Password == "") || (o.User == "" && o.Password != "") {
+			return errors.New("both user and password credentials must be provided")
 		}
 	default:
 		return fmt.Errorf("unknown provider %q", o.getProvider())

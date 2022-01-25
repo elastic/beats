@@ -3,7 +3,6 @@
   release: ga
   description: >
     Fields for Azure sign-in logs.
-  default_field: false
   fields:
     - name: operation_name
       type: keyword

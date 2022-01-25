@@ -79,7 +79,8 @@ func TestIcmpTupleHashable(t *testing.T) {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 192, 168, 0, 2,
 		1, 0,
 		0, 1,
-		4}
+		4,
+	}
 
 	assert.Equal(t, expectedHashable, actualHashable)
 }

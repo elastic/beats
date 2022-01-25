@@ -52,6 +52,8 @@ const (
 	tabMessage = "CEF:0|security|threatmanager|1.0|100|message is padded|10|spt=1232 msg=Tabs\tand\rcontrol\ncharacters are preserved\t src=127.0.0.1"
 
 	tabNoSepMessage = "CEF:0|security|threatmanager|1.0|100|message has tabs|10|spt=1232 msg=Tab is not a separator\tsrc=127.0.0.1"
+
+	escapedMessage = `CEF:0|security\\compliance|threat\|->manager|1.0|100|message contains escapes|10|spt=1232 msg=Newlines in messages\nare allowed.\r\nAnd so are carriage feeds\\newlines\\\=.`
 )
 
 var testMessages = []string{
@@ -71,6 +73,7 @@ var testMessages = []string{
 	paddedMessage,
 	crlfMessage,
 	tabMessage,
+	escapedMessage,
 }
 
 func TestGenerateFuzzCorpus(t *testing.T) {
@@ -372,6 +375,18 @@ func TestEventUnpack(t *testing.T) {
 		assert.Error(t, err)
 		assert.Equal(t, map[string]*Field{
 			"spt": IntegerField(1232),
+		}, e.Extensions)
+	})
+
+	t.Run("escapes are replaced", func(t *testing.T) {
+		var e Event
+		err := e.Unpack(escapedMessage)
+		assert.NoError(t, err)
+		assert.Equal(t, `security\compliance`, e.DeviceVendor)
+		assert.Equal(t, `threat|->manager`, e.DeviceProduct)
+		assert.Equal(t, map[string]*Field{
+			"spt": IntegerField(1232),
+			"msg": StringField("Newlines in messages\nare allowed.\r\nAnd so are carriage feeds\\newlines\\=."),
 		}, e.Extensions)
 	})
 }

@@ -2,9 +2,7 @@
     {
         "@timestamp": "2016-01-29T08:09:59.000Z",
         "destination.bytes": 1803,
-        "destination.ip": [
-            "10.206.191.17"
-        ],
+        "destination.ip": "10.206.191.17",
         "event.action": "Blocked",
         "event.code": "litesse",
         "event.dataset": "zscaler.zia",
@@ -58,9 +56,7 @@
         "rsa.web.fqdn": "rci737.www5.example",
         "service.type": "zscaler",
         "source.bytes": 1884,
-        "source.ip": [
-            "10.176.10.114"
-        ],
+        "source.ip": "10.176.10.114",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -82,9 +78,7 @@
     {
         "@timestamp": "2016-02-12T03:12:33.000Z",
         "destination.bytes": 2004,
-        "destination.ip": [
-            "10.173.22.152"
-        ],
+        "destination.ip": "10.173.22.152",
         "event.action": "Allowed",
         "event.code": "byC",
         "event.dataset": "zscaler.zia",
@@ -138,9 +132,7 @@
         "rsa.web.fqdn": "eosquir5191.www.example",
         "service.type": "zscaler",
         "source.bytes": 2977,
-        "source.ip": [
-            "10.26.46.95"
-        ],
+        "source.ip": "10.26.46.95",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -164,9 +156,7 @@
     {
         "@timestamp": "2016-02-26T10:15:08.000Z",
         "destination.bytes": 1837,
-        "destination.ip": [
-            "10.204.86.149"
-        ],
+        "destination.ip": "10.204.86.149",
         "event.action": "Blocked",
         "event.code": "laboreet",
         "event.dataset": "zscaler.zia",
@@ -220,9 +210,7 @@
         "rsa.web.fqdn": "orsitame3262.domain",
         "service.type": "zscaler",
         "source.bytes": 2935,
-        "source.ip": [
-            "10.254.146.57"
-        ],
+        "source.ip": "10.254.146.57",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -246,9 +234,7 @@
     {
         "@timestamp": "2016-03-12T05:17:42.000Z",
         "destination.bytes": 3856,
-        "destination.ip": [
-            "10.103.246.190"
-        ],
+        "destination.ip": "10.103.246.190",
         "event.action": "Allowed",
         "event.code": "suntinc",
         "event.dataset": "zscaler.zia",
@@ -302,9 +288,7 @@
         "rsa.web.fqdn": "tempor4496.www.localdomain",
         "service.type": "zscaler",
         "source.bytes": 3077,
-        "source.ip": [
-            "10.252.125.53"
-        ],
+        "source.ip": "10.252.125.53",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -328,9 +312,7 @@
     {
         "@timestamp": "2016-03-26T12:20:16.000Z",
         "destination.bytes": 5772,
-        "destination.ip": [
-            "10.61.78.108"
-        ],
+        "destination.ip": "10.61.78.108",
         "event.action": "Blocked",
         "event.code": "umdolore",
         "event.dataset": "zscaler.zia",
@@ -384,9 +366,7 @@
         "rsa.web.fqdn": "ore2933.www.test",
         "service.type": "zscaler",
         "source.bytes": 2451,
-        "source.ip": [
-            "10.136.153.149"
-        ],
+        "source.ip": "10.136.153.149",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -410,9 +390,7 @@
     {
         "@timestamp": "2016-04-09T07:22:51.000Z",
         "destination.bytes": 2984,
-        "destination.ip": [
-            "10.183.16.166"
-        ],
+        "destination.ip": "10.183.16.166",
         "event.action": "Allowed",
         "event.code": "remipsum",
         "event.dataset": "zscaler.zia",
@@ -466,9 +444,7 @@
         "rsa.web.fqdn": "ollit4105.mail.localdomain",
         "service.type": "zscaler",
         "source.bytes": 571,
-        "source.ip": [
-            "10.66.250.92"
-        ],
+        "source.ip": "10.66.250.92",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -492,9 +468,7 @@
     {
         "@timestamp": "2016-04-24T14:25:25.000Z",
         "destination.bytes": 2053,
-        "destination.ip": [
-            "10.243.224.205"
-        ],
+        "destination.ip": "10.243.224.205",
         "event.action": "Blocked",
         "event.code": "lpa",
         "event.dataset": "zscaler.zia",
@@ -548,9 +522,7 @@
         "rsa.web.fqdn": "cup1793.local",
         "service.type": "zscaler",
         "source.bytes": 941,
-        "source.ip": [
-            "10.123.104.59"
-        ],
+        "source.ip": "10.123.104.59",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -574,9 +546,7 @@
     {
         "@timestamp": "2016-05-08T09:27:59.000Z",
         "destination.bytes": 6888,
-        "destination.ip": [
-            "10.119.185.63"
-        ],
+        "destination.ip": "10.119.185.63",
         "event.action": "Blocked",
         "event.code": "amqu",
         "event.dataset": "zscaler.zia",
@@ -630,9 +600,7 @@
         "rsa.web.fqdn": "icab4668.local",
         "service.type": "zscaler",
         "source.bytes": 6907,
-        "source.ip": [
-            "10.74.17.5"
-        ],
+        "source.ip": "10.74.17.5",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -656,9 +624,7 @@
     {
         "@timestamp": "2016-05-22T04:30:33.000Z",
         "destination.bytes": 6354,
-        "destination.ip": [
-            "10.78.151.178"
-        ],
+        "destination.ip": "10.78.151.178",
         "event.action": "Allowed",
         "event.code": "mporain",
         "event.dataset": "zscaler.zia",
@@ -712,9 +678,7 @@
         "rsa.web.fqdn": "aperia4409.www5.invalid",
         "service.type": "zscaler",
         "source.bytes": 7700,
-        "source.ip": [
-            "10.25.192.202"
-        ],
+        "source.ip": "10.25.192.202",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -738,9 +702,7 @@
     {
         "@timestamp": "2016-06-05T11:33:08.000Z",
         "destination.bytes": 5269,
-        "destination.ip": [
-            "10.71.170.37"
-        ],
+        "destination.ip": "10.71.170.37",
         "event.action": "Allowed",
         "event.code": "umexerci",
         "event.dataset": "zscaler.zia",
@@ -794,9 +756,7 @@
         "rsa.web.fqdn": "sitvolup368.internal.host",
         "service.type": "zscaler",
         "source.bytes": 7355,
-        "source.ip": [
-            "10.135.225.244"
-        ],
+        "source.ip": "10.135.225.244",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -820,9 +780,7 @@
     {
         "@timestamp": "2016-06-20T06:35:42.000Z",
         "destination.bytes": 752,
-        "destination.ip": [
-            "10.223.247.86"
-        ],
+        "destination.ip": "10.223.247.86",
         "event.action": "Allowed",
         "event.code": "lup",
         "event.dataset": "zscaler.zia",
@@ -876,9 +834,7 @@
         "rsa.web.fqdn": "ite2026.www.invalid",
         "service.type": "zscaler",
         "source.bytes": 821,
-        "source.ip": [
-            "10.19.145.131"
-        ],
+        "source.ip": "10.19.145.131",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -902,9 +858,7 @@
     {
         "@timestamp": "2016-07-04T13:38:16.000Z",
         "destination.bytes": 3314,
-        "destination.ip": [
-            "10.2.53.125"
-        ],
+        "destination.ip": "10.2.53.125",
         "event.action": "Allowed",
         "event.code": "radi",
         "event.dataset": "zscaler.zia",
@@ -958,9 +912,7 @@
         "rsa.web.fqdn": "radipisc7020.home",
         "service.type": "zscaler",
         "source.bytes": 6408,
-        "source.ip": [
-            "10.181.80.139"
-        ],
+        "source.ip": "10.181.80.139",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -984,9 +936,7 @@
     {
         "@timestamp": "2016-07-18T08:40:50.000Z",
         "destination.bytes": 2742,
-        "destination.ip": [
-            "10.31.240.6"
-        ],
+        "destination.ip": "10.31.240.6",
         "event.action": "Allowed",
         "event.code": "olup",
         "event.dataset": "zscaler.zia",
@@ -1040,9 +990,7 @@
         "rsa.web.fqdn": "uamei2493.www.test",
         "service.type": "zscaler",
         "source.bytes": 3140,
-        "source.ip": [
-            "10.167.98.76"
-        ],
+        "source.ip": "10.167.98.76",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -1066,9 +1014,7 @@
     {
         "@timestamp": "2016-08-02T03:43:25.000Z",
         "destination.bytes": 5368,
-        "destination.ip": [
-            "10.0.55.9"
-        ],
+        "destination.ip": "10.0.55.9",
         "event.action": "Allowed",
         "event.code": "rcitati",
         "event.dataset": "zscaler.zia",
@@ -1122,9 +1068,7 @@
         "rsa.web.fqdn": "piscin6866.internal.host",
         "service.type": "zscaler",
         "source.bytes": 3616,
-        "source.ip": [
-            "10.135.160.125"
-        ],
+        "source.ip": "10.135.160.125",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -1148,9 +1092,7 @@
     {
         "@timestamp": "2016-08-16T10:45:59.000Z",
         "destination.bytes": 6027,
-        "destination.ip": [
-            "10.63.250.128"
-        ],
+        "destination.ip": "10.63.250.128",
         "event.action": "Allowed",
         "event.code": "ntocca",
         "event.dataset": "zscaler.zia",
@@ -1204,9 +1146,7 @@
         "rsa.web.fqdn": "spi3544.www.host",
         "service.type": "zscaler",
         "source.bytes": 1705,
-        "source.ip": [
-            "10.111.187.12"
-        ],
+        "source.ip": "10.111.187.12",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -1230,9 +1170,7 @@
     {
         "@timestamp": "2016-08-30T05:48:33.000Z",
         "destination.bytes": 1394,
-        "destination.ip": [
-            "10.5.126.127"
-        ],
+        "destination.ip": "10.5.126.127",
         "event.action": "Allowed",
         "event.code": "eprehen",
         "event.dataset": "zscaler.zia",
@@ -1286,9 +1224,7 @@
         "rsa.web.fqdn": "tlab5981.www.host",
         "service.type": "zscaler",
         "source.bytes": 1940,
-        "source.ip": [
-            "10.252.124.150"
-        ],
+        "source.ip": "10.252.124.150",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -1312,9 +1248,7 @@
     {
         "@timestamp": "2016-09-13T12:51:07.000Z",
         "destination.bytes": 248,
-        "destination.ip": [
-            "10.201.171.120"
-        ],
+        "destination.ip": "10.201.171.120",
         "event.action": "Blocked",
         "event.code": "ris",
         "event.dataset": "zscaler.zia",
@@ -1368,9 +1302,7 @@
         "rsa.web.fqdn": "upida508.example",
         "service.type": "zscaler",
         "source.bytes": 728,
-        "source.ip": [
-            "10.91.126.231"
-        ],
+        "source.ip": "10.91.126.231",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -1394,9 +1326,7 @@
     {
         "@timestamp": "2016-09-28T07:53:42.000Z",
         "destination.bytes": 2703,
-        "destination.ip": [
-            "10.135.82.97"
-        ],
+        "destination.ip": "10.135.82.97",
         "event.action": "Allowed",
         "event.code": "iat",
         "event.dataset": "zscaler.zia",
@@ -1450,9 +1380,7 @@
         "rsa.web.fqdn": "oditem5255.api.localdomain",
         "service.type": "zscaler",
         "source.bytes": 1300,
-        "source.ip": [
-            "10.107.251.87"
-        ],
+        "source.ip": "10.107.251.87",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -1476,9 +1404,7 @@
     {
         "@timestamp": "2016-10-12T14:56:16.000Z",
         "destination.bytes": 100,
-        "destination.ip": [
-            "10.31.198.58"
-        ],
+        "destination.ip": "10.31.198.58",
         "event.action": "Blocked",
         "event.code": "ditemp",
         "event.dataset": "zscaler.zia",
@@ -1532,9 +1458,7 @@
         "rsa.web.fqdn": "uamei2389.internal.example",
         "service.type": "zscaler",
         "source.bytes": 7231,
-        "source.ip": [
-            "10.215.205.216"
-        ],
+        "source.ip": "10.215.205.216",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -1558,9 +1482,7 @@
     {
         "@timestamp": "2016-10-26T09:58:50.000Z",
         "destination.bytes": 7205,
-        "destination.ip": [
-            "10.29.155.171"
-        ],
+        "destination.ip": "10.29.155.171",
         "event.action": "Allowed",
         "event.code": "aboreetd",
         "event.dataset": "zscaler.zia",
@@ -1614,9 +1536,7 @@
         "rsa.web.fqdn": "eacommod1930.internal.lan",
         "service.type": "zscaler",
         "source.bytes": 5047,
-        "source.ip": [
-            "10.229.83.165"
-        ],
+        "source.ip": "10.229.83.165",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -1640,9 +1560,7 @@
     {
         "@timestamp": "2016-11-10T05:01:24.000Z",
         "destination.bytes": 6498,
-        "destination.ip": [
-            "10.129.192.145"
-        ],
+        "destination.ip": "10.129.192.145",
         "event.action": "Blocked",
         "event.code": "oraincid",
         "event.dataset": "zscaler.zia",
@@ -1696,9 +1614,7 @@
         "rsa.web.fqdn": "tem6984.www5.domain",
         "service.type": "zscaler",
         "source.bytes": 1275,
-        "source.ip": [
-            "10.161.148.64"
-        ],
+        "source.ip": "10.161.148.64",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -1722,9 +1638,7 @@
     {
         "@timestamp": "2016-11-24T12:03:59.000Z",
         "destination.bytes": 6392,
-        "destination.ip": [
-            "10.7.200.140"
-        ],
+        "destination.ip": "10.7.200.140",
         "event.action": "Allowed",
         "event.code": "tpersp",
         "event.dataset": "zscaler.zia",
@@ -1778,9 +1692,7 @@
         "rsa.web.fqdn": "lapariat7287.internal.host",
         "service.type": "zscaler",
         "source.bytes": 3571,
-        "source.ip": [
-            "10.203.65.161"
-        ],
+        "source.ip": "10.203.65.161",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -1804,9 +1716,7 @@
     {
         "@timestamp": "2016-12-08T07:06:33.000Z",
         "destination.bytes": 7595,
-        "destination.ip": [
-            "10.86.22.67"
-        ],
+        "destination.ip": "10.86.22.67",
         "event.action": "Blocked",
         "event.code": "mquae",
         "event.dataset": "zscaler.zia",
@@ -1860,9 +1770,7 @@
         "rsa.web.fqdn": "licabo1493.api.corp",
         "service.type": "zscaler",
         "source.bytes": 2332,
-        "source.ip": [
-            "10.218.98.29"
-        ],
+        "source.ip": "10.218.98.29",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -1886,9 +1794,7 @@
     {
         "@timestamp": "2016-12-23T14:09:07.000Z",
         "destination.bytes": 2147,
-        "destination.ip": [
-            "10.39.31.115"
-        ],
+        "destination.ip": "10.39.31.115",
         "event.action": "Allowed",
         "event.code": "labo",
         "event.dataset": "zscaler.zia",
@@ -1942,9 +1848,7 @@
         "rsa.web.fqdn": "stenatu4844.www.invalid",
         "service.type": "zscaler",
         "source.bytes": 7224,
-        "source.ip": [
-            "10.24.111.229"
-        ],
+        "source.ip": "10.24.111.229",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -1968,9 +1872,7 @@
     {
         "@timestamp": "2017-01-06T09:11:41.000Z",
         "destination.bytes": 4814,
-        "destination.ip": [
-            "10.179.210.218"
-        ],
+        "destination.ip": "10.179.210.218",
         "event.action": "Blocked",
         "event.code": "undeom",
         "event.dataset": "zscaler.zia",
@@ -2024,9 +1926,7 @@
         "rsa.web.fqdn": "sitam5077.internal.host",
         "service.type": "zscaler",
         "source.bytes": 1140,
-        "source.ip": [
-            "10.32.39.220"
-        ],
+        "source.ip": "10.32.39.220",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -2050,9 +1950,7 @@
     {
         "@timestamp": "2017-01-20T04:14:16.000Z",
         "destination.bytes": 3916,
-        "destination.ip": [
-            "10.128.173.19"
-        ],
+        "destination.ip": "10.128.173.19",
         "event.action": "Blocked",
         "event.code": "tlaboree",
         "event.dataset": "zscaler.zia",
@@ -2106,9 +2004,7 @@
         "rsa.web.fqdn": "dquia107.www.test",
         "service.type": "zscaler",
         "source.bytes": 7680,
-        "source.ip": [
-            "10.88.172.34"
-        ],
+        "source.ip": "10.88.172.34",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -2132,9 +2028,7 @@
     {
         "@timestamp": "2017-02-03T11:16:50.000Z",
         "destination.bytes": 7889,
-        "destination.ip": [
-            "10.130.241.232"
-        ],
+        "destination.ip": "10.130.241.232",
         "event.action": "Allowed",
         "event.code": "redol",
         "event.dataset": "zscaler.zia",
@@ -2188,9 +2082,7 @@
         "rsa.web.fqdn": "lloin4019.www.localhost",
         "service.type": "zscaler",
         "source.bytes": 5107,
-        "source.ip": [
-            "10.238.224.49"
-        ],
+        "source.ip": "10.238.224.49",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -2214,9 +2106,7 @@
     {
         "@timestamp": "2017-02-18T06:19:24.000Z",
         "destination.bytes": 609,
-        "destination.ip": [
-            "10.115.53.31"
-        ],
+        "destination.ip": "10.115.53.31",
         "event.action": "Allowed",
         "event.code": "olorema",
         "event.dataset": "zscaler.zia",
@@ -2270,9 +2160,7 @@
         "rsa.web.fqdn": "tamet6317.www.host",
         "service.type": "zscaler",
         "source.bytes": 6156,
-        "source.ip": [
-            "10.2.67.127"
-        ],
+        "source.ip": "10.2.67.127",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -2296,9 +2184,7 @@
     {
         "@timestamp": "2017-03-04T13:21:59.000Z",
         "destination.bytes": 5328,
-        "destination.ip": [
-            "10.204.214.251"
-        ],
+        "destination.ip": "10.204.214.251",
         "event.action": "Allowed",
         "event.code": "scipitl",
         "event.dataset": "zscaler.zia",
@@ -2352,9 +2238,7 @@
         "rsa.web.fqdn": "saquaea6344.www.invalid",
         "service.type": "zscaler",
         "source.bytes": 3487,
-        "source.ip": [
-            "10.101.38.213"
-        ],
+        "source.ip": "10.101.38.213",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -2378,9 +2262,7 @@
     {
         "@timestamp": "2017-03-18T08:24:33.000Z",
         "destination.bytes": 2118,
-        "destination.ip": [
-            "10.18.226.72"
-        ],
+        "destination.ip": "10.18.226.72",
         "event.action": "Allowed",
         "event.code": "dquiaco",
         "event.dataset": "zscaler.zia",
@@ -2434,9 +2316,7 @@
         "rsa.web.fqdn": "utaliqu4248.www.localhost",
         "service.type": "zscaler",
         "source.bytes": 2352,
-        "source.ip": [
-            "10.101.85.169"
-        ],
+        "source.ip": "10.101.85.169",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -2460,9 +2340,7 @@
     {
         "@timestamp": "2017-04-02T03:27:07.000Z",
         "destination.bytes": 7509,
-        "destination.ip": [
-            "10.87.100.240"
-        ],
+        "destination.ip": "10.87.100.240",
         "event.action": "Allowed",
         "event.code": "equep",
         "event.dataset": "zscaler.zia",
@@ -2516,9 +2394,7 @@
         "rsa.web.fqdn": "mdolore473.internal.test",
         "service.type": "zscaler",
         "source.bytes": 2124,
-        "source.ip": [
-            "10.242.182.193"
-        ],
+        "source.ip": "10.242.182.193",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -2542,9 +2418,7 @@
     {
         "@timestamp": "2017-04-16T10:29:41.000Z",
         "destination.bytes": 204,
-        "destination.ip": [
-            "10.229.242.223"
-        ],
+        "destination.ip": "10.229.242.223",
         "event.action": "Blocked",
         "event.code": "dexe",
         "event.dataset": "zscaler.zia",
@@ -2598,9 +2472,7 @@
         "rsa.web.fqdn": "tatio6513.www.invalid",
         "service.type": "zscaler",
         "source.bytes": 2737,
-        "source.ip": [
-            "10.80.57.247"
-        ],
+        "source.ip": "10.80.57.247",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -2624,9 +2496,7 @@
     {
         "@timestamp": "2017-04-30T05:32:16.000Z",
         "destination.bytes": 6146,
-        "destination.ip": [
-            "10.193.66.155"
-        ],
+        "destination.ip": "10.193.66.155",
         "event.action": "Allowed",
         "event.code": "enim",
         "event.dataset": "zscaler.zia",
@@ -2680,9 +2550,7 @@
         "rsa.web.fqdn": "lapar1599.www.lan",
         "service.type": "zscaler",
         "source.bytes": 4329,
-        "source.ip": [
-            "10.106.77.138"
-        ],
+        "source.ip": "10.106.77.138",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -2706,9 +2574,7 @@
     {
         "@timestamp": "2017-05-14T12:34:50.000Z",
         "destination.bytes": 3862,
-        "destination.ip": [
-            "10.236.230.136"
-        ],
+        "destination.ip": "10.236.230.136",
         "event.action": "Allowed",
         "event.code": "quira",
         "event.dataset": "zscaler.zia",
@@ -2762,9 +2628,7 @@
         "rsa.web.fqdn": "aquioff3853.www.localdomain",
         "service.type": "zscaler",
         "source.bytes": 2446,
-        "source.ip": [
-            "10.54.159.1"
-        ],
+        "source.ip": "10.54.159.1",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -2788,9 +2652,7 @@
     {
         "@timestamp": "2017-05-29T07:37:24.000Z",
         "destination.bytes": 4968,
-        "destination.ip": [
-            "10.49.242.174"
-        ],
+        "destination.ip": "10.49.242.174",
         "event.action": "Allowed",
         "event.code": "rroqui",
         "event.dataset": "zscaler.zia",
@@ -2844,9 +2706,7 @@
         "rsa.web.fqdn": "ura675.mail.localdomain",
         "service.type": "zscaler",
         "source.bytes": 5325,
-        "source.ip": [
-            "10.131.246.134"
-        ],
+        "source.ip": "10.131.246.134",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -2870,9 +2730,7 @@
     {
         "@timestamp": "2017-06-12T14:39:58.000Z",
         "destination.bytes": 1046,
-        "destination.ip": [
-            "10.142.120.198"
-        ],
+        "destination.ip": "10.142.120.198",
         "event.action": "Blocked",
         "event.code": "ido",
         "event.dataset": "zscaler.zia",
@@ -2926,9 +2784,7 @@
         "rsa.web.fqdn": "iamea478.www5.host",
         "service.type": "zscaler",
         "source.bytes": 2522,
-        "source.ip": [
-            "10.166.10.42"
-        ],
+        "source.ip": "10.166.10.42",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -2952,9 +2808,7 @@
     {
         "@timestamp": "2017-06-26T09:42:33.000Z",
         "destination.bytes": 3520,
-        "destination.ip": [
-            "10.138.188.201"
-        ],
+        "destination.ip": "10.138.188.201",
         "event.action": "Allowed",
         "event.code": "rsitvol",
         "event.dataset": "zscaler.zia",
@@ -3008,9 +2862,7 @@
         "rsa.web.fqdn": "eaque6543.api.domain",
         "service.type": "zscaler",
         "source.bytes": 6793,
-        "source.ip": [
-            "10.128.184.241"
-        ],
+        "source.ip": "10.128.184.241",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -3034,9 +2886,7 @@
     {
         "@timestamp": "2017-07-11T04:45:07.000Z",
         "destination.bytes": 2990,
-        "destination.ip": [
-            "10.53.101.131"
-        ],
+        "destination.ip": "10.53.101.131",
         "event.action": "Allowed",
         "event.code": "itinvol",
         "event.dataset": "zscaler.zia",
@@ -3090,9 +2940,7 @@
         "rsa.web.fqdn": "eufug1756.mail.corp",
         "service.type": "zscaler",
         "source.bytes": 2135,
-        "source.ip": [
-            "10.213.57.165"
-        ],
+        "source.ip": "10.213.57.165",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -3116,9 +2964,7 @@
     {
         "@timestamp": "2017-07-25T11:47:41.000Z",
         "destination.bytes": 3601,
-        "destination.ip": [
-            "10.243.6.41"
-        ],
+        "destination.ip": "10.243.6.41",
         "event.action": "Blocked",
         "event.code": "ainc",
         "event.dataset": "zscaler.zia",
@@ -3172,9 +3018,7 @@
         "rsa.web.fqdn": "orp5697.www.invalid",
         "service.type": "zscaler",
         "source.bytes": 3606,
-        "source.ip": [
-            "10.55.81.14"
-        ],
+        "source.ip": "10.55.81.14",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -3198,9 +3042,7 @@
     {
         "@timestamp": "2017-08-08T06:50:15.000Z",
         "destination.bytes": 4241,
-        "destination.ip": [
-            "10.33.144.10"
-        ],
+        "destination.ip": "10.33.144.10",
         "event.action": "Blocked",
         "event.code": "labo",
         "event.dataset": "zscaler.zia",
@@ -3254,9 +3096,7 @@
         "rsa.web.fqdn": "pariatur7238.www5.invalid",
         "service.type": "zscaler",
         "source.bytes": 2203,
-        "source.ip": [
-            "10.202.224.79"
-        ],
+        "source.ip": "10.202.224.79",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -3280,9 +3120,7 @@
     {
         "@timestamp": "2017-08-22T13:52:50.000Z",
         "destination.bytes": 6317,
-        "destination.ip": [
-            "10.158.18.51"
-        ],
+        "destination.ip": "10.158.18.51",
         "event.action": "Allowed",
         "event.code": "exerci",
         "event.dataset": "zscaler.zia",
@@ -3336,9 +3174,7 @@
         "rsa.web.fqdn": "fficia2304.www5.home",
         "service.type": "zscaler",
         "source.bytes": 5452,
-        "source.ip": [
-            "10.20.124.138"
-        ],
+        "source.ip": "10.20.124.138",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -3362,9 +3198,7 @@
     {
         "@timestamp": "2017-09-06T08:55:24.000Z",
         "destination.bytes": 1044,
-        "destination.ip": [
-            "10.134.128.27"
-        ],
+        "destination.ip": "10.134.128.27",
         "event.action": "Allowed",
         "event.code": "olore",
         "event.dataset": "zscaler.zia",
@@ -3418,9 +3252,7 @@
         "rsa.web.fqdn": "mquisnos7453.home",
         "service.type": "zscaler",
         "source.bytes": 6908,
-        "source.ip": [
-            "10.118.177.136"
-        ],
+        "source.ip": "10.118.177.136",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -3444,9 +3276,7 @@
     {
         "@timestamp": "2017-09-20T03:57:58.000Z",
         "destination.bytes": 3034,
-        "destination.ip": [
-            "10.68.8.143"
-        ],
+        "destination.ip": "10.68.8.143",
         "event.action": "Allowed",
         "event.code": "lorem",
         "event.dataset": "zscaler.zia",
@@ -3500,9 +3330,7 @@
         "rsa.web.fqdn": "aquio748.www.localhost",
         "service.type": "zscaler",
         "source.bytes": 911,
-        "source.ip": [
-            "10.125.120.97"
-        ],
+        "source.ip": "10.125.120.97",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -3526,9 +3354,7 @@
     {
         "@timestamp": "2017-10-04T11:00:32.000Z",
         "destination.bytes": 4982,
-        "destination.ip": [
-            "10.143.0.78"
-        ],
+        "destination.ip": "10.143.0.78",
         "event.action": "Blocked",
         "event.code": "atems",
         "event.dataset": "zscaler.zia",
@@ -3582,9 +3408,7 @@
         "rsa.web.fqdn": "remagnam796.mail.corp",
         "service.type": "zscaler",
         "source.bytes": 2923,
-        "source.ip": [
-            "10.137.164.122"
-        ],
+        "source.ip": "10.137.164.122",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -3608,9 +3432,7 @@
     {
         "@timestamp": "2017-10-19T06:03:07.000Z",
         "destination.bytes": 7556,
-        "destination.ip": [
-            "10.30.87.51"
-        ],
+        "destination.ip": "10.30.87.51",
         "event.action": "Blocked",
         "event.code": "rchit",
         "event.dataset": "zscaler.zia",
@@ -3664,9 +3486,7 @@
         "rsa.web.fqdn": "etdolore4227.internal.corp",
         "service.type": "zscaler",
         "source.bytes": 6552,
-        "source.ip": [
-            "10.156.177.53"
-        ],
+        "source.ip": "10.156.177.53",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -3690,9 +3510,7 @@
     {
         "@timestamp": "2017-11-02T13:05:41.000Z",
         "destination.bytes": 470,
-        "destination.ip": [
-            "10.83.138.34"
-        ],
+        "destination.ip": "10.83.138.34",
         "event.action": "Blocked",
         "event.code": "inea",
         "event.dataset": "zscaler.zia",
@@ -3746,9 +3564,7 @@
         "rsa.web.fqdn": "rors1935.api.domain",
         "service.type": "zscaler",
         "source.bytes": 313,
-        "source.ip": [
-            "10.111.249.184"
-        ],
+        "source.ip": "10.111.249.184",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -3772,9 +3588,7 @@
     {
         "@timestamp": "2017-11-16T08:08:15.000Z",
         "destination.bytes": 7810,
-        "destination.ip": [
-            "10.141.195.13"
-        ],
+        "destination.ip": "10.141.195.13",
         "event.action": "Allowed",
         "event.code": "tautfugi",
         "event.dataset": "zscaler.zia",
@@ -3828,9 +3642,7 @@
         "rsa.web.fqdn": "idexeac1655.internal.test",
         "service.type": "zscaler",
         "source.bytes": 3940,
-        "source.ip": [
-            "10.180.150.47"
-        ],
+        "source.ip": "10.180.150.47",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -3854,9 +3666,7 @@
     {
         "@timestamp": "2017-12-01T03:10:49.000Z",
         "destination.bytes": 2266,
-        "destination.ip": [
-            "10.166.195.20"
-        ],
+        "destination.ip": "10.166.195.20",
         "event.action": "Allowed",
         "event.code": "ceroinB",
         "event.dataset": "zscaler.zia",
@@ -3910,9 +3720,7 @@
         "rsa.web.fqdn": "laboree3880.api.invalid",
         "service.type": "zscaler",
         "source.bytes": 7073,
-        "source.ip": [
-            "10.255.40.12"
-        ],
+        "source.ip": "10.255.40.12",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -3934,9 +3742,7 @@
     {
         "@timestamp": "2017-12-15T10:13:24.000Z",
         "destination.bytes": 5091,
-        "destination.ip": [
-            "10.22.122.43"
-        ],
+        "destination.ip": "10.22.122.43",
         "event.action": "Blocked",
         "event.code": "mexer",
         "event.dataset": "zscaler.zia",
@@ -3990,9 +3796,7 @@
         "rsa.web.fqdn": "tecto708.www5.example",
         "service.type": "zscaler",
         "source.bytes": 1396,
-        "source.ip": [
-            "10.100.143.226"
-        ],
+        "source.ip": "10.100.143.226",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -4016,9 +3820,7 @@
     {
         "@timestamp": "2017-12-29T05:15:58.000Z",
         "destination.bytes": 7456,
-        "destination.ip": [
-            "10.119.53.68"
-        ],
+        "destination.ip": "10.119.53.68",
         "event.action": "Blocked",
         "event.code": "illum",
         "event.dataset": "zscaler.zia",
@@ -4072,9 +3874,7 @@
         "rsa.web.fqdn": "ine3181.www.invalid",
         "service.type": "zscaler",
         "source.bytes": 497,
-        "source.ip": [
-            "10.121.9.5"
-        ],
+        "source.ip": "10.121.9.5",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -4098,9 +3898,7 @@
     {
         "@timestamp": "2018-01-12T12:18:32.000Z",
         "destination.bytes": 1428,
-        "destination.ip": [
-            "10.237.0.173"
-        ],
+        "destination.ip": "10.237.0.173",
         "event.action": "Blocked",
         "event.code": "periam",
         "event.dataset": "zscaler.zia",
@@ -4154,9 +3952,7 @@
         "rsa.web.fqdn": "tsunt3403.www5.test",
         "service.type": "zscaler",
         "source.bytes": 4350,
-        "source.ip": [
-            "10.31.153.177"
-        ],
+        "source.ip": "10.31.153.177",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -4178,9 +3974,7 @@
     {
         "@timestamp": "2018-01-27T07:21:06.000Z",
         "destination.bytes": 7612,
-        "destination.ip": [
-            "10.243.182.229"
-        ],
+        "destination.ip": "10.243.182.229",
         "event.action": "Allowed",
         "event.code": "emporin",
         "event.dataset": "zscaler.zia",
@@ -4234,9 +4028,7 @@
         "rsa.web.fqdn": "pitl6126.www.localdomain",
         "service.type": "zscaler",
         "source.bytes": 1800,
-        "source.ip": [
-            "10.229.102.140"
-        ],
+        "source.ip": "10.229.102.140",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -4256,9 +4048,7 @@
     {
         "@timestamp": "2018-02-10T14:23:41.000Z",
         "destination.bytes": 5763,
-        "destination.ip": [
-            "10.39.46.155"
-        ],
+        "destination.ip": "10.39.46.155",
         "event.action": "Blocked",
         "event.code": "BCSe",
         "event.dataset": "zscaler.zia",
@@ -4312,9 +4102,7 @@
         "rsa.web.fqdn": "remaper3297.internal.test",
         "service.type": "zscaler",
         "source.bytes": 447,
-        "source.ip": [
-            "10.120.138.109"
-        ],
+        "source.ip": "10.120.138.109",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -4338,9 +4126,7 @@
     {
         "@timestamp": "2018-02-24T09:26:15.000Z",
         "destination.bytes": 6740,
-        "destination.ip": [
-            "10.53.191.49"
-        ],
+        "destination.ip": "10.53.191.49",
         "event.action": "Blocked",
         "event.code": "idestl",
         "event.dataset": "zscaler.zia",
@@ -4394,9 +4180,7 @@
         "rsa.web.fqdn": "tamr1693.api.home",
         "service.type": "zscaler",
         "source.bytes": 6397,
-        "source.ip": [
-            "10.133.102.57"
-        ],
+        "source.ip": "10.133.102.57",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -4420,9 +4204,7 @@
     {
         "@timestamp": "2018-03-11T04:28:49.000Z",
         "destination.bytes": 5521,
-        "destination.ip": [
-            "10.91.2.225"
-        ],
+        "destination.ip": "10.91.2.225",
         "event.action": "Allowed",
         "event.code": "tcu",
         "event.dataset": "zscaler.zia",
@@ -4476,9 +4258,7 @@
         "rsa.web.fqdn": "cia5990.api.localdomain",
         "service.type": "zscaler",
         "source.bytes": 141,
-        "source.ip": [
-            "10.89.41.97"
-        ],
+        "source.ip": "10.89.41.97",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -4502,9 +4282,7 @@
     {
         "@timestamp": "2018-03-25T11:31:24.000Z",
         "destination.bytes": 4211,
-        "destination.ip": [
-            "10.221.20.165"
-        ],
+        "destination.ip": "10.221.20.165",
         "event.action": "Allowed",
         "event.code": "velites",
         "event.dataset": "zscaler.zia",
@@ -4558,9 +4336,7 @@
         "rsa.web.fqdn": "riatu2467.lan",
         "service.type": "zscaler",
         "source.bytes": 5810,
-        "source.ip": [
-            "10.7.18.226"
-        ],
+        "source.ip": "10.7.18.226",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -4584,9 +4360,7 @@
     {
         "@timestamp": "2018-04-08T06:33:58.000Z",
         "destination.bytes": 4580,
-        "destination.ip": [
-            "10.178.148.188"
-        ],
+        "destination.ip": "10.178.148.188",
         "event.action": "Allowed",
         "event.code": "rit",
         "event.dataset": "zscaler.zia",
@@ -4640,9 +4414,7 @@
         "rsa.web.fqdn": "pici1525.www5.corp",
         "service.type": "zscaler",
         "source.bytes": 6665,
-        "source.ip": [
-            "10.155.252.123"
-        ],
+        "source.ip": "10.155.252.123",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -4666,9 +4438,7 @@
     {
         "@timestamp": "2018-04-22T13:36:32.000Z",
         "destination.bytes": 3723,
-        "destination.ip": [
-            "10.190.42.245"
-        ],
+        "destination.ip": "10.190.42.245",
         "event.action": "Blocked",
         "event.code": "aeab",
         "event.dataset": "zscaler.zia",
@@ -4722,9 +4492,7 @@
         "rsa.web.fqdn": "dolo6418.internal.host",
         "service.type": "zscaler",
         "source.bytes": 2910,
-        "source.ip": [
-            "10.220.1.249"
-        ],
+        "source.ip": "10.220.1.249",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -4746,9 +4514,7 @@
     {
         "@timestamp": "2018-05-07T08:39:06.000Z",
         "destination.bytes": 363,
-        "destination.ip": [
-            "10.112.190.154"
-        ],
+        "destination.ip": "10.112.190.154",
         "event.action": "Allowed",
         "event.code": "lab",
         "event.dataset": "zscaler.zia",
@@ -4802,9 +4568,7 @@
         "rsa.web.fqdn": "imveni193.www5.host",
         "service.type": "zscaler",
         "source.bytes": 6127,
-        "source.ip": [
-            "10.55.38.153"
-        ],
+        "source.ip": "10.55.38.153",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -4828,9 +4592,7 @@
     {
         "@timestamp": "2018-05-21T03:41:41.000Z",
         "destination.bytes": 6578,
-        "destination.ip": [
-            "10.195.153.42"
-        ],
+        "destination.ip": "10.195.153.42",
         "event.action": "Allowed",
         "event.code": "rsit",
         "event.dataset": "zscaler.zia",
@@ -4884,9 +4646,7 @@
         "rsa.web.fqdn": "ionu3320.api.localhost",
         "service.type": "zscaler",
         "source.bytes": 2982,
-        "source.ip": [
-            "10.250.48.82"
-        ],
+        "source.ip": "10.250.48.82",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -4910,9 +4670,7 @@
     {
         "@timestamp": "2018-06-04T10:44:15.000Z",
         "destination.bytes": 501,
-        "destination.ip": [
-            "10.252.164.230"
-        ],
+        "destination.ip": "10.252.164.230",
         "event.action": "Blocked",
         "event.code": "iumtota",
         "event.dataset": "zscaler.zia",
@@ -4966,9 +4724,7 @@
         "rsa.web.fqdn": "remips1499.www.local",
         "service.type": "zscaler",
         "source.bytes": 2871,
-        "source.ip": [
-            "10.60.52.219"
-        ],
+        "source.ip": "10.60.52.219",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -4988,9 +4744,7 @@
     {
         "@timestamp": "2018-06-19T05:46:49.000Z",
         "destination.bytes": 3365,
-        "destination.ip": [
-            "10.187.16.73"
-        ],
+        "destination.ip": "10.187.16.73",
         "event.action": "Allowed",
         "event.code": "ptate",
         "event.dataset": "zscaler.zia",
@@ -5044,9 +4798,7 @@
         "rsa.web.fqdn": "mdoloree96.domain",
         "service.type": "zscaler",
         "source.bytes": 1704,
-        "source.ip": [
-            "10.122.102.156"
-        ],
+        "source.ip": "10.122.102.156",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -5070,9 +4822,7 @@
     {
         "@timestamp": "2018-07-03T12:49:23.000Z",
         "destination.bytes": 2104,
-        "destination.ip": [
-            "10.120.215.174"
-        ],
+        "destination.ip": "10.120.215.174",
         "event.action": "Allowed",
         "event.code": "ntexplic",
         "event.dataset": "zscaler.zia",
@@ -5126,9 +4876,7 @@
         "rsa.web.fqdn": "iatnulap7662.internal.local",
         "service.type": "zscaler",
         "source.bytes": 4620,
-        "source.ip": [
-            "10.248.108.55"
-        ],
+        "source.ip": "10.248.108.55",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -5150,9 +4898,7 @@
     {
         "@timestamp": "2018-07-17T07:51:58.000Z",
         "destination.bytes": 5410,
-        "destination.ip": [
-            "10.51.161.245"
-        ],
+        "destination.ip": "10.51.161.245",
         "event.action": "Allowed",
         "event.code": "suntex",
         "event.dataset": "zscaler.zia",
@@ -5206,9 +4952,7 @@
         "rsa.web.fqdn": "sBonoru1929.example",
         "service.type": "zscaler",
         "source.bytes": 4600,
-        "source.ip": [
-            "10.15.254.181"
-        ],
+        "source.ip": "10.15.254.181",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -5232,9 +4976,7 @@
     {
         "@timestamp": "2018-08-01T14:54:32.000Z",
         "destination.bytes": 6628,
-        "destination.ip": [
-            "10.7.152.238"
-        ],
+        "destination.ip": "10.7.152.238",
         "event.action": "Blocked",
         "event.code": "scipi",
         "event.dataset": "zscaler.zia",
@@ -5288,9 +5030,7 @@
         "rsa.web.fqdn": "onorumet4871.lan",
         "service.type": "zscaler",
         "source.bytes": 3604,
-        "source.ip": [
-            "10.129.66.196"
-        ],
+        "source.ip": "10.129.66.196",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -5314,9 +5054,7 @@
     {
         "@timestamp": "2018-08-15T09:57:06.000Z",
         "destination.bytes": 4116,
-        "destination.ip": [
-            "10.29.162.157"
-        ],
+        "destination.ip": "10.29.162.157",
         "event.action": "Blocked",
         "event.code": "remquela",
         "event.dataset": "zscaler.zia",
@@ -5370,9 +5108,7 @@
         "rsa.web.fqdn": "onproi4354.www5.invalid",
         "service.type": "zscaler",
         "source.bytes": 2977,
-        "source.ip": [
-            "10.185.107.27"
-        ],
+        "source.ip": "10.185.107.27",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -5396,9 +5132,7 @@
     {
         "@timestamp": "2018-08-29T04:59:40.000Z",
         "destination.bytes": 1926,
-        "destination.ip": [
-            "10.215.63.248"
-        ],
+        "destination.ip": "10.215.63.248",
         "event.action": "Blocked",
         "event.code": "dantium",
         "event.dataset": "zscaler.zia",
@@ -5452,9 +5186,7 @@
         "rsa.web.fqdn": "beataevi7552.api.test",
         "service.type": "zscaler",
         "source.bytes": 6682,
-        "source.ip": [
-            "10.138.0.214"
-        ],
+        "source.ip": "10.138.0.214",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -5478,9 +5210,7 @@
     {
         "@timestamp": "2018-09-12T12:02:15.000Z",
         "destination.bytes": 6315,
-        "destination.ip": [
-            "10.26.115.88"
-        ],
+        "destination.ip": "10.26.115.88",
         "event.action": "Allowed",
         "event.code": "edictas",
         "event.dataset": "zscaler.zia",
@@ -5534,9 +5264,7 @@
         "rsa.web.fqdn": "rvelill1981.www.invalid",
         "service.type": "zscaler",
         "source.bytes": 6135,
-        "source.ip": [
-            "10.12.130.224"
-        ],
+        "source.ip": "10.12.130.224",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -5560,9 +5288,7 @@
     {
         "@timestamp": "2018-09-27T07:04:49.000Z",
         "destination.bytes": 1508,
-        "destination.ip": [
-            "10.193.152.42"
-        ],
+        "destination.ip": "10.193.152.42",
         "event.action": "Blocked",
         "event.code": "nost",
         "event.dataset": "zscaler.zia",
@@ -5616,9 +5342,7 @@
         "rsa.web.fqdn": "quia7214.example",
         "service.type": "zscaler",
         "source.bytes": 2801,
-        "source.ip": [
-            "10.91.20.27"
-        ],
+        "source.ip": "10.91.20.27",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -5642,9 +5366,7 @@
     {
         "@timestamp": "2018-10-11T14:07:23.000Z",
         "destination.bytes": 7120,
-        "destination.ip": [
-            "10.146.69.38"
-        ],
+        "destination.ip": "10.146.69.38",
         "event.action": "Allowed",
         "event.code": "Exce",
         "event.dataset": "zscaler.zia",
@@ -5698,9 +5420,7 @@
         "rsa.web.fqdn": "aturExc7343.invalid",
         "service.type": "zscaler",
         "source.bytes": 1008,
-        "source.ip": [
-            "10.55.192.102"
-        ],
+        "source.ip": "10.55.192.102",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -5724,9 +5444,7 @@
     {
         "@timestamp": "2018-10-25T09:09:57.000Z",
         "destination.bytes": 3291,
-        "destination.ip": [
-            "10.249.1.143"
-        ],
+        "destination.ip": "10.249.1.143",
         "event.action": "Allowed",
         "event.code": "ntutlab",
         "event.dataset": "zscaler.zia",
@@ -5780,9 +5498,7 @@
         "rsa.web.fqdn": "olo7317.www5.localhost",
         "service.type": "zscaler",
         "source.bytes": 3736,
-        "source.ip": [
-            "10.124.177.226"
-        ],
+        "source.ip": "10.124.177.226",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -5806,9 +5522,7 @@
     {
         "@timestamp": "2018-11-09T04:12:32.000Z",
         "destination.bytes": 620,
-        "destination.ip": [
-            "10.167.176.220"
-        ],
+        "destination.ip": "10.167.176.220",
         "event.action": "Blocked",
         "event.code": "ione",
         "event.dataset": "zscaler.zia",
@@ -5862,9 +5576,7 @@
         "rsa.web.fqdn": "uiin1342.mail.invalid",
         "service.type": "zscaler",
         "source.bytes": 5298,
-        "source.ip": [
-            "10.146.228.249"
-        ],
+        "source.ip": "10.146.228.249",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -5888,9 +5600,7 @@
     {
         "@timestamp": "2018-11-23T11:15:06.000Z",
         "destination.bytes": 4822,
-        "destination.ip": [
-            "10.200.74.101"
-        ],
+        "destination.ip": "10.200.74.101",
         "event.action": "Allowed",
         "event.code": "ntmo",
         "event.dataset": "zscaler.zia",
@@ -5944,9 +5654,7 @@
         "rsa.web.fqdn": "agna5654.www.corp",
         "service.type": "zscaler",
         "source.bytes": 4429,
-        "source.ip": [
-            "10.203.47.23"
-        ],
+        "source.ip": "10.203.47.23",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -5970,9 +5678,7 @@
     {
         "@timestamp": "2018-12-07T06:17:40.000Z",
         "destination.bytes": 4147,
-        "destination.ip": [
-            "10.162.78.48"
-        ],
+        "destination.ip": "10.162.78.48",
         "event.action": "Blocked",
         "event.code": "tect",
         "event.dataset": "zscaler.zia",
@@ -6026,9 +5732,7 @@
         "rsa.web.fqdn": "ites5711.internal.host",
         "service.type": "zscaler",
         "source.bytes": 3811,
-        "source.ip": [
-            "10.24.23.209"
-        ],
+        "source.ip": "10.24.23.209",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -6052,9 +5756,7 @@
     {
         "@timestamp": "2018-12-21T13:20:14.000Z",
         "destination.bytes": 1782,
-        "destination.ip": [
-            "10.55.151.53"
-        ],
+        "destination.ip": "10.55.151.53",
         "event.action": "Allowed",
         "event.code": "commod",
         "event.dataset": "zscaler.zia",
@@ -6108,9 +5810,7 @@
         "rsa.web.fqdn": "oluptat2848.api.home",
         "service.type": "zscaler",
         "source.bytes": 5891,
-        "source.ip": [
-            "10.211.66.68"
-        ],
+        "source.ip": "10.211.66.68",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -6134,9 +5834,7 @@
     {
         "@timestamp": "2019-01-05T08:22:49.000Z",
         "destination.bytes": 409,
-        "destination.ip": [
-            "10.110.16.169"
-        ],
+        "destination.ip": "10.110.16.169",
         "event.action": "Blocked",
         "event.code": "labori",
         "event.dataset": "zscaler.zia",
@@ -6190,9 +5888,7 @@
         "rsa.web.fqdn": "ngelitse7535.internal.lan",
         "service.type": "zscaler",
         "source.bytes": 6650,
-        "source.ip": [
-            "10.209.203.156"
-        ],
+        "source.ip": "10.209.203.156",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -6216,9 +5912,7 @@
     {
         "@timestamp": "2019-01-19T03:25:23.000Z",
         "destination.bytes": 6822,
-        "destination.ip": [
-            "10.84.9.150"
-        ],
+        "destination.ip": "10.84.9.150",
         "event.action": "Allowed",
         "event.code": "nsecte",
         "event.dataset": "zscaler.zia",
@@ -6272,9 +5966,7 @@
         "rsa.web.fqdn": "tiumtot3611.internal.localdomain",
         "service.type": "zscaler",
         "source.bytes": 5724,
-        "source.ip": [
-            "10.107.68.114"
-        ],
+        "source.ip": "10.107.68.114",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -6298,9 +5990,7 @@
     {
         "@timestamp": "2019-02-02T10:27:57.000Z",
         "destination.bytes": 4127,
-        "destination.ip": [
-            "10.26.222.144"
-        ],
+        "destination.ip": "10.26.222.144",
         "event.action": "Blocked",
         "event.code": "sintoc",
         "event.dataset": "zscaler.zia",
@@ -6354,9 +6044,7 @@
         "rsa.web.fqdn": "gnaa4656.api.example",
         "service.type": "zscaler",
         "source.bytes": 7328,
-        "source.ip": [
-            "10.124.119.48"
-        ],
+        "source.ip": "10.124.119.48",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -6380,9 +6068,7 @@
     {
         "@timestamp": "2019-02-17T05:30:32.000Z",
         "destination.bytes": 4382,
-        "destination.ip": [
-            "10.164.190.2"
-        ],
+        "destination.ip": "10.164.190.2",
         "event.action": "Allowed",
         "event.code": "datatno",
         "event.dataset": "zscaler.zia",
@@ -6436,9 +6122,7 @@
         "rsa.web.fqdn": "psaqu6066.www5.localhost",
         "service.type": "zscaler",
         "source.bytes": 5241,
-        "source.ip": [
-            "10.223.11.164"
-        ],
+        "source.ip": "10.223.11.164",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -6462,9 +6146,7 @@
     {
         "@timestamp": "2019-03-03T12:33:06.000Z",
         "destination.bytes": 1460,
-        "destination.ip": [
-            "10.14.37.8"
-        ],
+        "destination.ip": "10.14.37.8",
         "event.action": "Blocked",
         "event.code": "olor",
         "event.dataset": "zscaler.zia",
@@ -6518,9 +6200,7 @@
         "rsa.web.fqdn": "iavol5202.api.example",
         "service.type": "zscaler",
         "source.bytes": 7719,
-        "source.ip": [
-            "10.121.181.243"
-        ],
+        "source.ip": "10.121.181.243",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -6544,9 +6224,7 @@
     {
         "@timestamp": "2019-03-17T07:35:40.000Z",
         "destination.bytes": 3488,
-        "destination.ip": [
-            "10.90.20.202"
-        ],
+        "destination.ip": "10.90.20.202",
         "event.action": "Blocked",
         "event.code": "ostrude",
         "event.dataset": "zscaler.zia",
@@ -6600,9 +6278,7 @@
         "rsa.web.fqdn": "uame1361.api.local",
         "service.type": "zscaler",
         "source.bytes": 7548,
-        "source.ip": [
-            "10.10.93.133"
-        ],
+        "source.ip": "10.10.93.133",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -6626,9 +6302,7 @@
     {
         "@timestamp": "2019-04-01T14:38:14.000Z",
         "destination.bytes": 4610,
-        "destination.ip": [
-            "10.34.98.144"
-        ],
+        "destination.ip": "10.34.98.144",
         "event.action": "Allowed",
         "event.code": "pariatu",
         "event.dataset": "zscaler.zia",
@@ -6682,9 +6356,7 @@
         "rsa.web.fqdn": "rsitame4049.internal.corp",
         "service.type": "zscaler",
         "source.bytes": 4143,
-        "source.ip": [
-            "10.77.102.206"
-        ],
+        "source.ip": "10.77.102.206",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -6708,9 +6380,7 @@
     {
         "@timestamp": "2019-04-15T09:40:49.000Z",
         "destination.bytes": 3976,
-        "destination.ip": [
-            "10.176.233.249"
-        ],
+        "destination.ip": "10.176.233.249",
         "event.action": "Blocked",
         "event.code": "ntin",
         "event.dataset": "zscaler.zia",
@@ -6764,9 +6434,7 @@
         "rsa.web.fqdn": "elit912.www5.test",
         "service.type": "zscaler",
         "source.bytes": 3588,
-        "source.ip": [
-            "10.75.144.118"
-        ],
+        "source.ip": "10.75.144.118",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -6790,9 +6458,7 @@
     {
         "@timestamp": "2019-04-29T04:43:23.000Z",
         "destination.bytes": 559,
-        "destination.ip": [
-            "10.149.6.107"
-        ],
+        "destination.ip": "10.149.6.107",
         "event.action": "Allowed",
         "event.code": "mveleu",
         "event.dataset": "zscaler.zia",
@@ -6846,9 +6512,7 @@
         "rsa.web.fqdn": "tat6671.www.local",
         "service.type": "zscaler",
         "source.bytes": 4686,
-        "source.ip": [
-            "10.236.55.236"
-        ],
+        "source.ip": "10.236.55.236",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -6872,9 +6536,7 @@
     {
         "@timestamp": "2019-05-13T11:45:57.000Z",
         "destination.bytes": 982,
-        "destination.ip": [
-            "10.97.202.149"
-        ],
+        "destination.ip": "10.97.202.149",
         "event.action": "Blocked",
         "event.code": "itte",
         "event.dataset": "zscaler.zia",
@@ -6928,9 +6590,7 @@
         "rsa.web.fqdn": "uis5050.www.local",
         "service.type": "zscaler",
         "source.bytes": 7772,
-        "source.ip": [
-            "10.13.125.101"
-        ],
+        "source.ip": "10.13.125.101",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -6954,9 +6614,7 @@
     {
         "@timestamp": "2019-05-28T06:48:31.000Z",
         "destination.bytes": 1324,
-        "destination.ip": [
-            "10.141.66.163"
-        ],
+        "destination.ip": "10.141.66.163",
         "event.action": "Blocked",
         "event.code": "iduntut",
         "event.dataset": "zscaler.zia",
@@ -7010,9 +6668,7 @@
         "rsa.web.fqdn": "ficiad1312.api.host",
         "service.type": "zscaler",
         "source.bytes": 3181,
-        "source.ip": [
-            "10.230.61.102"
-        ],
+        "source.ip": "10.230.61.102",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -7036,9 +6692,7 @@
     {
         "@timestamp": "2019-06-11T13:51:06.000Z",
         "destination.bytes": 6666,
-        "destination.ip": [
-            "10.10.25.145"
-        ],
+        "destination.ip": "10.10.25.145",
         "event.action": "Blocked",
         "event.code": "nrepre",
         "event.dataset": "zscaler.zia",
@@ -7092,9 +6746,7 @@
         "rsa.web.fqdn": "itaspe921.mail.invalid",
         "service.type": "zscaler",
         "source.bytes": 1954,
-        "source.ip": [
-            "10.224.249.228"
-        ],
+        "source.ip": "10.224.249.228",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -7118,9 +6770,7 @@
     {
         "@timestamp": "2019-06-25T08:53:40.000Z",
         "destination.bytes": 3750,
-        "destination.ip": [
-            "10.234.34.40"
-        ],
+        "destination.ip": "10.234.34.40",
         "event.action": "Blocked",
         "event.code": "dolori",
         "event.dataset": "zscaler.zia",
@@ -7174,9 +6824,7 @@
         "rsa.web.fqdn": "archite4407.mail.invalid",
         "service.type": "zscaler",
         "source.bytes": 245,
-        "source.ip": [
-            "10.247.255.107"
-        ],
+        "source.ip": "10.247.255.107",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -7200,9 +6848,7 @@
     {
         "@timestamp": "2019-07-10T03:56:14.000Z",
         "destination.bytes": 412,
-        "destination.ip": [
-            "10.124.81.20"
-        ],
+        "destination.ip": "10.124.81.20",
         "event.action": "Blocked",
         "event.code": "piciatis",
         "event.dataset": "zscaler.zia",
@@ -7256,9 +6902,7 @@
         "rsa.web.fqdn": "aria1424.mail.home",
         "service.type": "zscaler",
         "source.bytes": 2753,
-        "source.ip": [
-            "10.250.102.42"
-        ],
+        "source.ip": "10.250.102.42",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -7282,9 +6926,7 @@
     {
         "@timestamp": "2019-07-24T10:58:48.000Z",
         "destination.bytes": 5294,
-        "destination.ip": [
-            "10.166.205.159"
-        ],
+        "destination.ip": "10.166.205.159",
         "event.action": "Allowed",
         "event.code": "siutal",
         "event.dataset": "zscaler.zia",
@@ -7338,9 +6980,7 @@
         "rsa.web.fqdn": "Bonoru7444.www5.example",
         "service.type": "zscaler",
         "source.bytes": 4181,
-        "source.ip": [
-            "10.154.188.132"
-        ],
+        "source.ip": "10.154.188.132",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -7360,9 +7000,7 @@
     {
         "@timestamp": "2019-08-07T06:01:23.000Z",
         "destination.bytes": 274,
-        "destination.ip": [
-            "10.46.71.46"
-        ],
+        "destination.ip": "10.46.71.46",
         "event.action": "Allowed",
         "event.code": "ugiat",
         "event.dataset": "zscaler.zia",
@@ -7416,9 +7054,7 @@
         "rsa.web.fqdn": "icero1297.internal.domain",
         "service.type": "zscaler",
         "source.bytes": 745,
-        "source.ip": [
-            "10.138.193.38"
-        ],
+        "source.ip": "10.138.193.38",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -7438,9 +7074,7 @@
     {
         "@timestamp": "2019-08-21T13:03:57.000Z",
         "destination.bytes": 2804,
-        "destination.ip": [
-            "10.254.119.31"
-        ],
+        "destination.ip": "10.254.119.31",
         "event.action": "Blocked",
         "event.code": "uunturma",
         "event.dataset": "zscaler.zia",
@@ -7494,9 +7128,7 @@
         "rsa.web.fqdn": "oloremeu5047.www5.invalid",
         "service.type": "zscaler",
         "source.bytes": 2324,
-        "source.ip": [
-            "10.172.159.251"
-        ],
+        "source.ip": "10.172.159.251",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -7520,9 +7152,7 @@
     {
         "@timestamp": "2019-09-05T08:06:31.000Z",
         "destination.bytes": 4957,
-        "destination.ip": [
-            "10.195.62.230"
-        ],
+        "destination.ip": "10.195.62.230",
         "event.action": "Allowed",
         "event.code": "sequat",
         "event.dataset": "zscaler.zia",
@@ -7576,9 +7206,7 @@
         "rsa.web.fqdn": "edutpe1255.internal.lan",
         "service.type": "zscaler",
         "source.bytes": 7244,
-        "source.ip": [
-            "10.98.126.206"
-        ],
+        "source.ip": "10.98.126.206",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -7602,9 +7230,7 @@
     {
         "@timestamp": "2019-09-19T03:09:05.000Z",
         "destination.bytes": 6658,
-        "destination.ip": [
-            "10.144.93.186"
-        ],
+        "destination.ip": "10.144.93.186",
         "event.action": "Blocked",
         "event.code": "adminim",
         "event.dataset": "zscaler.zia",
@@ -7658,9 +7284,7 @@
         "rsa.web.fqdn": "nderit1171.www5.domain",
         "service.type": "zscaler",
         "source.bytes": 4943,
-        "source.ip": [
-            "10.84.140.5"
-        ],
+        "source.ip": "10.84.140.5",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -7684,9 +7308,7 @@
     {
         "@timestamp": "2019-10-03T10:11:40.000Z",
         "destination.bytes": 6855,
-        "destination.ip": [
-            "10.31.58.6"
-        ],
+        "destination.ip": "10.31.58.6",
         "event.action": "Allowed",
         "event.code": "volu",
         "event.dataset": "zscaler.zia",
@@ -7740,9 +7362,7 @@
         "rsa.web.fqdn": "nos4114.api.lan",
         "service.type": "zscaler",
         "source.bytes": 6831,
-        "source.ip": [
-            "10.198.84.190"
-        ],
+        "source.ip": "10.198.84.190",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -7766,9 +7386,7 @@
     {
         "@timestamp": "2019-10-18T05:14:14.000Z",
         "destination.bytes": 3128,
-        "destination.ip": [
-            "10.139.90.218"
-        ],
+        "destination.ip": "10.139.90.218",
         "event.action": "Allowed",
         "event.code": "umdol",
         "event.dataset": "zscaler.zia",
@@ -7822,9 +7440,7 @@
         "rsa.web.fqdn": "oremeum4231.internal.host",
         "service.type": "zscaler",
         "source.bytes": 6188,
-        "source.ip": [
-            "10.131.81.172"
-        ],
+        "source.ip": "10.131.81.172",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -7848,9 +7464,7 @@
     {
         "@timestamp": "2019-11-01T12:16:48.000Z",
         "destination.bytes": 114,
-        "destination.ip": [
-            "10.128.43.71"
-        ],
+        "destination.ip": "10.128.43.71",
         "event.action": "Blocked",
         "event.code": "ssequa",
         "event.dataset": "zscaler.zia",
@@ -7904,9 +7518,7 @@
         "rsa.web.fqdn": "ueip6097.api.host",
         "service.type": "zscaler",
         "source.bytes": 7350,
-        "source.ip": [
-            "10.152.217.174"
-        ],
+        "source.ip": "10.152.217.174",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -7930,9 +7542,7 @@
     {
         "@timestamp": "2019-11-15T07:19:22.000Z",
         "destination.bytes": 1046,
-        "destination.ip": [
-            "10.26.149.221"
-        ],
+        "destination.ip": "10.26.149.221",
         "event.action": "Blocked",
         "event.code": "umquidol",
         "event.dataset": "zscaler.zia",
@@ -7986,9 +7596,7 @@
         "rsa.web.fqdn": "fugiatqu7793.www.localdomain",
         "service.type": "zscaler",
         "source.bytes": 3382,
-        "source.ip": [
-            "10.217.193.148"
-        ],
+        "source.ip": "10.217.193.148",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -8012,9 +7620,7 @@
     {
         "@timestamp": "2019-11-30T14:21:57.000Z",
         "destination.bytes": 4053,
-        "destination.ip": [
-            "10.109.192.53"
-        ],
+        "destination.ip": "10.109.192.53",
         "event.action": "Blocked",
         "event.code": "rehen",
         "event.dataset": "zscaler.zia",
@@ -8068,9 +7674,7 @@
         "rsa.web.fqdn": "onsequ3168.www.corp",
         "service.type": "zscaler",
         "source.bytes": 212,
-        "source.ip": [
-            "10.172.17.6"
-        ],
+        "source.ip": "10.172.17.6",
         "tags": [
             "forwarded",
             "zscaler.zia"
@@ -8094,9 +7698,7 @@
     {
         "@timestamp": "2019-12-14T09:24:31.000Z",
         "destination.bytes": 391,
-        "destination.ip": [
-            "10.119.106.108"
-        ],
+        "destination.ip": "10.119.106.108",
         "event.action": "Blocked",
         "event.code": "iatisund",
         "event.dataset": "zscaler.zia",
@@ -8150,9 +7752,7 @@
         "rsa.web.fqdn": "oremquel3120.internal.localhost",
         "service.type": "zscaler",
         "source.bytes": 1902,
-        "source.ip": [
-            "10.135.38.213"
-        ],
+        "source.ip": "10.135.38.213",
         "tags": [
             "forwarded",
             "zscaler.zia"

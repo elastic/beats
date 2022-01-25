@@ -19,10 +19,24 @@
   # Enriching parameters:
   add_metadata: true
   # When used outside the cluster:
-  #host: node_name
+  #node: node_name
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  # To configure additionally node and namespace metadata, added to pod, service and container resource types,
+  # `add_resource_metadata` can be defined.
+  # By default all labels will be included while annotations are not added by default.
+  # add_resource_metadata:
+  #   namespace:
+  #     include_labels: ["namespacelabel1"]
+  #   node:
+  #     include_labels: ["nodelabel2"]
+  #     include_annotations: ["nodeannotation1"]
+  #   deployment: false
+  # Kubernetes client QPS and burst can be configured additionally
+  #kube_client_options:
+  #  qps: 5
+  #  burst: 10
 
 # State metrics from kube-state-metrics service:
 - module: kubernetes
@@ -49,10 +63,48 @@
   # Enriching parameters:
   add_metadata: true
   # When used outside the cluster:
-  #host: node_name
+  #node: node_name
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  # Set the namespace to watch for resources
+  #namespace: staging
+  # To configure additionally node and namespace metadata, added to pod, service and container resource types,
+  # `add_resource_metadata` can be defined.
+  # By default all labels will be included while annotations are not added by default.
+  # add_resource_metadata:
+  #   namespace:
+  #     include_labels: ["namespacelabel1"]
+  #   node:
+  #     include_labels: ["nodelabel2"]
+  #     include_annotations: ["nodeannotation1"]
+  #   deployment: false
+  # Kubernetes client QPS and burst can be configured additionally
+  #kube_client_options:
+  #  qps: 5
+  #  burst: 10
+
+# Kubernetes Events
+- module: kubernetes
+  enabled: true
+  metricsets:
+    - event
+  period: 10s
+  # Skip events older than Metricbeat's statup time is enabled by default.
+  # Setting to false the skip_older setting will stop filtering older events.
+  # This setting is also useful went Event's timestamps are not populated properly.
+  #skip_older: false
+  # If kube_config is not set, KUBECONFIG environment variable will be checked
+  # and if not present it will fall back to InCluster
+  #kube_config: ~/.kube/config
+  # Set the namespace to watch for events
+  #namespace: staging
+  # Set the sync period of the watchers
+  #sync_period: 10m
+  # Kubernetes client QPS and burst can be configured additionally
+  #kube_client_options:
+  #  qps: 5
+  #  burst: 10
 
 # Kubernetes API server
 # (when running metricbeat as a deployment)
@@ -65,8 +117,6 @@
   ssl.certificate_authorities:
     - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
   period: 30s
-
-
 
 # Kubernetes proxy server
 # (when running metricbeat locally at hosts or as a daemonset + host network)

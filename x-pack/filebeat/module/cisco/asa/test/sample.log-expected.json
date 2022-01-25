@@ -17,12 +17,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src dmz:10.1.2.30/63016 dst outside:192.0.0.8/53 by access-group \"acl_dmz\" [0xe3aab522, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -68,12 +68,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src dmz:10.1.2.30/63016 dst outside:192.0.0.8/53 type 3, code 0, by access-group \"acl_dmz\" [0xe3aab522, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -102,7 +102,7 @@
         ]
     },
     {
-        "@timestamp": "2014-04-15T09:34:34.000-04:00",
+        "@timestamp": "2014-04-15T11:34:34.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
@@ -125,7 +125,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -171,12 +171,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106100: access-list inside denied udp inside/172.29.2.101(1039) -> outside/192.0.2.10(53) hit-cnt 1 first hit [0xd820e56a, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "INT-FW01",
@@ -232,7 +232,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "host.hostname": "INT-FW01",
@@ -864,12 +864,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106007: Deny inbound UDP from 192.0.0.66/12981 to 10.1.2.60/53 due to DNS Query",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -920,7 +920,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -971,7 +971,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1022,7 +1022,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1073,7 +1073,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1124,7 +1124,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1175,7 +1175,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1226,7 +1226,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1277,7 +1277,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1328,7 +1328,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1379,7 +1379,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1423,12 +1423,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106006: Deny inbound UDP from 192.0.2.66/137 to 10.1.2.42/137 on interface inside",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1471,12 +1471,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106007: Deny inbound UDP from 192.0.2.66/12981 to 10.1.5.60/53 due to DNS Query",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1527,7 +1527,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1578,7 +1578,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1629,7 +1629,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1675,12 +1675,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in denied tcp inside/10.0.0.16(2011) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1726,12 +1726,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list acl_in denied tcp inside/10.0.0.16(2012) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1777,12 +1777,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:192.0.2.126/53638 dst inside:10.0.0.132/8111 by access-group \"acl_out\" [0x71761f18, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1828,12 +1828,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:192.0.2.126/53638 dst inside:10.0.0.132/8111 by access-group \"acl_out\" [0x71761f18, 0x0]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1884,7 +1884,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1935,7 +1935,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -1964,7 +1964,7 @@
         ]
     },
     {
-        "@timestamp": "2018-04-15T09:34:34.000-04:00",
+        "@timestamp": "2018-04-15T11:34:34.000-02:00",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
@@ -1987,7 +1987,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -2088,12 +2088,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group \"dmz\" [0x123a465e, 0x4c7bf613]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -2140,12 +2140,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny udp src dmz:192.168.1.33/5555 dst outside:192.0.0.12/53 by access-group \"dmz\" [0x123a465e, 0x4c7bf613]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -2470,12 +2470,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106015: Deny TCP (no connection) from 192.0.2.222/1234 to 192.168.1.34/5679 flags RST  on interface outside",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -2519,12 +2519,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106015: Deny TCP (no connection) from 192.0.2.222/1234 to 192.168.1.34/5679 flags RST  on interface outside",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -2570,12 +2570,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny udp src dmz:192.168.1.34/5679 dst outside:192.0.0.12/5000 by access-group \"dmz\" [0x123a465e, 0x8c20f21]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -2839,12 +2839,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -2887,12 +2887,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.57 on interface Mobile_Traffic",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -2935,12 +2935,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -2983,12 +2983,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.47 on interface Mobile_Traffic",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -3031,12 +3031,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.57 on interface Mobile_Traffic",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -3079,12 +3079,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.88.99.57 on interface Mobile_Traffic",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -3127,12 +3127,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.168.1.255 on interface Mobile_Traffic",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -3175,12 +3175,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106016: Deny IP spoof from (0.0.0.0) to 192.168.1.255 on interface Mobile_Traffic",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -3226,12 +3226,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:192.0.2.95/24069 dst inside:10.32.112.125/25 by access-group \"PERMIT_IN\" [0x0, 0x0]\"",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -3279,12 +3279,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-3-313001: Denied ICMP type=3, code=3 from 10.2.3.5 on interface Outside",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 3,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "GIFRCHN01",
@@ -3329,12 +3329,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-313004: Denied ICMP type=0, from laddr 172.16.30.2 on interface inside to 172.16.1.10: no matching session",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -3388,7 +3388,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -3509,8 +3509,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -3559,7 +3559,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -3602,7 +3602,7 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -3643,12 +3643,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-304002: Access denied URL http://www.example.net/images/favicon.ico SRC 10.69.6.39 DEST 192.0.0.19 on interface inside",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -3680,24 +3680,24 @@
         "@timestamp": "2021-01-13T19:12:37.000-02:00",
         "cisco.asa.connection_id": "27215708",
         "cisco.asa.destination_interface": "vlan-42",
-        "cisco.asa.mapped_destination_ip": "1.2.3.4",
+        "cisco.asa.mapped_destination_ip": "81.2.69.143",
         "cisco.asa.mapped_destination_port": 80,
-        "cisco.asa.mapped_source_ip": "1.2.3.4",
+        "cisco.asa.mapped_source_ip": "81.2.69.143",
         "cisco.asa.mapped_source_port": 49926,
         "cisco.asa.message_id": "302013",
         "cisco.asa.source_interface": "internet",
         "cisco.asa.source_username": "LOCAL\\username",
         "cisco.asa.termination_user": "username",
-        "destination.address": "1.2.3.4",
-        "destination.geo.city_name": "Moscow",
+        "destination.address": "81.2.69.143",
+        "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "RU",
-        "destination.geo.country_name": "Russia",
-        "destination.geo.location.lat": 55.7527,
-        "destination.geo.location.lon": 37.6172,
-        "destination.geo.region_iso_code": "RU-MOW",
-        "destination.geo.region_name": "Moscow",
-        "destination.ip": "1.2.3.4",
+        "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
+        "destination.geo.location.lat": 51.5142,
+        "destination.geo.location.lon": -0.0931,
+        "destination.geo.region_iso_code": "GB-ENG",
+        "destination.geo.region_name": "England",
+        "destination.ip": "81.2.69.143",
         "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": [
@@ -3707,7 +3707,7 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-6-302013: Built inbound TCP connection 27215708 for internet:10.2.3.4/49926 (1.2.3.4/49926)(LOCAL\\username) to vlan-42:1.2.3.4/80 (1.2.3.4/80) (username)",
+        "event.original": "%ASA-6-302013: Built inbound TCP connection 27215708 for internet:10.2.3.4/49926 (81.2.69.143/49926)(LOCAL\\username) to vlan-42:81.2.69.143/80 (81.2.69.143/80) (username)",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3718,7 +3718,7 @@
         "log.file.path": "sample.log",
         "log.level": "informational",
         "log.offset": 10899,
-        "network.community_id": "1:iwVZPCmO/50L3MVqIW0tC5ED+bg=",
+        "network.community_id": "1:6lxM3TRt46lcfZdd21pElFmogG0=",
         "network.direction": "inbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -3728,8 +3728,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "1.2.3.4",
-            "10.2.3.4"
+            "10.2.3.4",
+            "81.2.69.143"
         ],
         "related.user": [
             "username"
@@ -3737,7 +3737,7 @@
         "service.type": "cisco",
         "source.address": "10.2.3.4",
         "source.ip": "10.2.3.4",
-        "source.nat.ip": "1.2.3.4",
+        "source.nat.ip": "81.2.69.143",
         "source.port": 49926,
         "source.user.name": "username",
         "tags": [
@@ -3764,13 +3764,13 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "info"
+            "connection"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
-        "log.offset": 11080,
+        "log.offset": 11092,
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -3799,7 +3799,7 @@
         "@timestamp": "2021-01-13T19:12:37.000-02:00",
         "cisco.asa.connection_id": "195207391",
         "cisco.asa.destination_interface": "OUTSIDE",
-        "cisco.asa.mapped_destination_ip": "81.0.0.1",
+        "cisco.asa.mapped_destination_ip": "89.160.20.156",
         "cisco.asa.mapped_destination_port": 443,
         "cisco.asa.mapped_source_ip": "62.0.0.1",
         "cisco.asa.mapped_source_port": 34534,
@@ -3807,18 +3807,18 @@
         "cisco.asa.source_interface": "OUTSIDE",
         "cisco.asa.source_username": "LOCAL\\USER001",
         "cisco.asa.termination_user": "USER001",
-        "destination.address": "81.0.0.1",
-        "destination.as.number": 15704,
-        "destination.as.organization.name": "Xtra Telecom S.A.",
-        "destination.geo.city_name": "Madrid",
+        "destination.address": "89.160.20.156",
+        "destination.as.number": 29518,
+        "destination.as.organization.name": "Bredband2 AB",
+        "destination.geo.city_name": "Link\u00f6ping",
         "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "ES",
-        "destination.geo.country_name": "Spain",
-        "destination.geo.location.lat": 40.4143,
-        "destination.geo.location.lon": -3.7016,
-        "destination.geo.region_iso_code": "ES-M",
-        "destination.geo.region_name": "Madrid",
-        "destination.ip": "81.0.0.1",
+        "destination.geo.country_iso_code": "SE",
+        "destination.geo.country_name": "Sweden",
+        "destination.geo.location.lat": 58.4167,
+        "destination.geo.location.lon": 15.6167,
+        "destination.geo.region_iso_code": "SE-E",
+        "destination.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "destination.ip": "89.160.20.156",
         "destination.port": 443,
         "event.action": "firewall-rule",
         "event.category": [
@@ -3828,7 +3828,7 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-5-302013: Built inbound TCP connection 195207391 for OUTSIDE:85.0.0.1/12312 (62.0.0.1/34534)(LOCAL\\USER001) to OUTSIDE:81.0.0.1/443 (81.0.0.1/443) (USER001)",
+        "event.original": "%ASA-5-302013: Built inbound TCP connection 195207391 for OUTSIDE:1.128.3.4/12312 (62.0.0.1/34534)(LOCAL\\USER001) to OUTSIDE:89.160.20.156/443 (89.160.20.156/443) (USER001)",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3838,8 +3838,8 @@
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
-        "log.offset": 11220,
-        "network.community_id": "1:80+NOqHrJ3D1YMNcnBpJC7S6Pkg=",
+        "log.offset": 11232,
+        "network.community_id": "1:k/bYSo4xyVOcBd5vnxfeC3/AAzY=",
         "network.direction": "inbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -3849,26 +3849,18 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
+            "1.128.3.4",
             "62.0.0.1",
-            "81.0.0.1",
-            "85.0.0.1"
+            "89.160.20.156"
         ],
         "related.user": [
             "USER001"
         ],
         "service.type": "cisco",
-        "source.address": "85.0.0.1",
-        "source.as.number": 3303,
-        "source.as.organization.name": "Bluewin",
-        "source.geo.city_name": "Kolliken",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "CH",
-        "source.geo.country_name": "Switzerland",
-        "source.geo.location.lat": 47.3388,
-        "source.geo.location.lon": 8.0264,
-        "source.geo.region_iso_code": "CH-AG",
-        "source.geo.region_name": "Aargau",
-        "source.ip": "85.0.0.1",
+        "source.address": "1.128.3.4",
+        "source.as.number": 1221,
+        "source.as.organization.name": "Telstra Pty Ltd",
+        "source.ip": "1.128.3.4",
         "source.nat.ip": "62.0.0.1",
         "source.nat.port": "34534",
         "source.port": 12312,
@@ -3882,7 +3874,7 @@
         "@timestamp": "2021-01-13T19:12:37.000-02:00",
         "cisco.asa.connection_id": "195207391",
         "cisco.asa.destination_interface": "OUTSIDE",
-        "cisco.asa.mapped_destination_ip": "81.0.0.1",
+        "cisco.asa.mapped_destination_ip": "89.160.20.156",
         "cisco.asa.mapped_destination_port": 443,
         "cisco.asa.mapped_source_ip": "62.0.0.1",
         "cisco.asa.mapped_source_port": 34534,
@@ -3890,18 +3882,18 @@
         "cisco.asa.source_interface": "OUTSIDE",
         "cisco.asa.source_username": "LOCAL\\user@domain.tld",
         "cisco.asa.termination_user": "user@domain.tld",
-        "destination.address": "81.0.0.1",
-        "destination.as.number": 15704,
-        "destination.as.organization.name": "Xtra Telecom S.A.",
-        "destination.geo.city_name": "Madrid",
+        "destination.address": "89.160.20.156",
+        "destination.as.number": 29518,
+        "destination.as.organization.name": "Bredband2 AB",
+        "destination.geo.city_name": "Link\u00f6ping",
         "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "ES",
-        "destination.geo.country_name": "Spain",
-        "destination.geo.location.lat": 40.4143,
-        "destination.geo.location.lon": -3.7016,
-        "destination.geo.region_iso_code": "ES-M",
-        "destination.geo.region_name": "Madrid",
-        "destination.ip": "81.0.0.1",
+        "destination.geo.country_iso_code": "SE",
+        "destination.geo.country_name": "Sweden",
+        "destination.geo.location.lat": 58.4167,
+        "destination.geo.location.lon": 15.6167,
+        "destination.geo.region_iso_code": "SE-E",
+        "destination.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "destination.ip": "89.160.20.156",
         "destination.port": 443,
         "event.action": "firewall-rule",
         "event.category": [
@@ -3911,7 +3903,7 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-5-302013: Built inbound TCP connection 195207391 for OUTSIDE:85.0.0.1/12312 (62.0.0.1/34534)(LOCAL\\user@domain.tld) to OUTSIDE:81.0.0.1/443 (81.0.0.1/443) (user@domain.tld)",
+        "event.original": "%ASA-5-302013: Built inbound TCP connection 195207391 for OUTSIDE:1.128.3.4/12312 (62.0.0.1/34534)(LOCAL\\user@domain.tld) to OUTSIDE:89.160.20.156/443 (89.160.20.156/443) (user@domain.tld)",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3921,8 +3913,8 @@
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
-        "log.offset": 11404,
-        "network.community_id": "1:80+NOqHrJ3D1YMNcnBpJC7S6Pkg=",
+        "log.offset": 11427,
+        "network.community_id": "1:k/bYSo4xyVOcBd5vnxfeC3/AAzY=",
         "network.direction": "inbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -3935,26 +3927,18 @@
             "domain.tld"
         ],
         "related.ip": [
+            "1.128.3.4",
             "62.0.0.1",
-            "81.0.0.1",
-            "85.0.0.1"
+            "89.160.20.156"
         ],
         "related.user": [
             "user@domain.tld"
         ],
         "service.type": "cisco",
-        "source.address": "85.0.0.1",
-        "source.as.number": 3303,
-        "source.as.organization.name": "Bluewin",
-        "source.geo.city_name": "Kolliken",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "CH",
-        "source.geo.country_name": "Switzerland",
-        "source.geo.location.lat": 47.3388,
-        "source.geo.location.lon": 8.0264,
-        "source.geo.region_iso_code": "CH-AG",
-        "source.geo.region_name": "Aargau",
-        "source.ip": "85.0.0.1",
+        "source.address": "1.128.3.4",
+        "source.as.number": 1221,
+        "source.as.organization.name": "Telstra Pty Ltd",
+        "source.ip": "1.128.3.4",
         "source.nat.ip": "62.0.0.1",
         "source.nat.port": "34534",
         "source.port": 12312,
@@ -3970,21 +3954,13 @@
         "cisco.asa.destination_username": "LOCAL\\USER001",
         "cisco.asa.icmp_code": 3,
         "cisco.asa.icmp_type": 3,
-        "cisco.asa.mapped_source_ip": "81.0.0.1",
+        "cisco.asa.mapped_source_ip": "89.160.20.156",
         "cisco.asa.message_id": "302020",
         "cisco.asa.source_username": "USER001",
-        "destination.address": "85.0.0.1",
-        "destination.as.number": 3303,
-        "destination.as.organization.name": "Bluewin",
-        "destination.geo.city_name": "Kolliken",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "CH",
-        "destination.geo.country_name": "Switzerland",
-        "destination.geo.location.lat": 47.3388,
-        "destination.geo.location.lon": 8.0264,
-        "destination.geo.region_iso_code": "CH-AG",
-        "destination.geo.region_name": "Aargau",
-        "destination.ip": "85.0.0.1",
+        "destination.address": "1.128.3.4",
+        "destination.as.number": 1221,
+        "destination.as.organization.name": "Telstra Pty Ltd",
+        "destination.ip": "1.128.3.4",
         "destination.user.name": "USER001",
         "event.action": "flow-expiration",
         "event.category": [
@@ -3994,7 +3970,7 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-5-302020: Built inbound ICMP connection for faddr 85.0.0.1/0(LOCAL\\USER001) gaddr 81.0.0.1/0 laddr 81.0.0.1/0 (USER001) type 3 code 3",
+        "event.original": "%ASA-5-302020: Built inbound ICMP connection for faddr 1.128.3.4/0(LOCAL\\USER001) gaddr 89.160.20.156/0 laddr 89.160.20.156/0 (USER001) type 3 code 3",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4005,32 +3981,32 @@
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
-        "log.offset": 11604,
+        "log.offset": 11638,
         "network.direction": "inbound",
         "network.protocol": "icmp",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "81.0.0.1",
-            "85.0.0.1"
+            "1.128.3.4",
+            "89.160.20.156"
         ],
         "related.user": [
             "USER001"
         ],
         "service.type": "cisco",
-        "source.address": "81.0.0.1",
-        "source.as.number": 15704,
-        "source.as.organization.name": "Xtra Telecom S.A.",
-        "source.geo.city_name": "Madrid",
+        "source.address": "89.160.20.156",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
         "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 40.4143,
-        "source.geo.location.lon": -3.7016,
-        "source.geo.region_iso_code": "ES-M",
-        "source.geo.region_name": "Madrid",
-        "source.ip": "81.0.0.1",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.156",
         "source.user.name": "USER001",
         "tags": [
             "cisco-asa",
@@ -4043,21 +4019,13 @@
         "cisco.asa.destination_username": "LOCAL\\user@domain.tld",
         "cisco.asa.icmp_code": 3,
         "cisco.asa.icmp_type": 3,
-        "cisco.asa.mapped_source_ip": "81.0.0.1",
+        "cisco.asa.mapped_source_ip": "89.160.20.156",
         "cisco.asa.message_id": "302020",
         "cisco.asa.source_username": "user@domain.tld",
-        "destination.address": "85.0.0.1",
-        "destination.as.number": 3303,
-        "destination.as.organization.name": "Bluewin",
-        "destination.geo.city_name": "Kolliken",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "CH",
-        "destination.geo.country_name": "Switzerland",
-        "destination.geo.location.lat": 47.3388,
-        "destination.geo.location.lon": 8.0264,
-        "destination.geo.region_iso_code": "CH-AG",
-        "destination.geo.region_name": "Aargau",
-        "destination.ip": "85.0.0.1",
+        "destination.address": "1.128.3.4",
+        "destination.as.number": 1221,
+        "destination.as.organization.name": "Telstra Pty Ltd",
+        "destination.ip": "1.128.3.4",
         "destination.user.domain": "domain.tld",
         "destination.user.name": "user@domain.tld",
         "event.action": "flow-expiration",
@@ -4068,7 +4036,7 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-5-302020: Built inbound ICMP connection for faddr 85.0.0.1/0(LOCAL\\user@domain.tld) gaddr 81.0.0.1/0 laddr 81.0.0.1/0 (user@domain.tld) type 3 code 3",
+        "event.original": "%ASA-5-302020: Built inbound ICMP connection for faddr 1.128.3.4/0(LOCAL\\user@domain.tld) gaddr 89.160.20.156/0 laddr 89.160.20.156/0 (user@domain.tld) type 3 code 3",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4079,7 +4047,7 @@
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
-        "log.offset": 11765,
+        "log.offset": 11810,
         "network.direction": "inbound",
         "network.protocol": "icmp",
         "observer.product": "asa",
@@ -4089,25 +4057,25 @@
             "domain.tld"
         ],
         "related.ip": [
-            "81.0.0.1",
-            "85.0.0.1"
+            "1.128.3.4",
+            "89.160.20.156"
         ],
         "related.user": [
             "user@domain.tld"
         ],
         "service.type": "cisco",
-        "source.address": "81.0.0.1",
-        "source.as.number": 15704,
-        "source.as.organization.name": "Xtra Telecom S.A.",
-        "source.geo.city_name": "Madrid",
+        "source.address": "89.160.20.156",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
         "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 40.4143,
-        "source.geo.location.lon": -3.7016,
-        "source.geo.region_iso_code": "ES-M",
-        "source.geo.region_name": "Madrid",
-        "source.ip": "81.0.0.1",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.156",
         "source.user.domain": "domain.tld",
         "source.user.name": "user@domain.tld",
         "tags": [
@@ -4121,21 +4089,13 @@
         "cisco.asa.destination_username": "AD\\USER002",
         "cisco.asa.icmp_code": 3,
         "cisco.asa.icmp_type": 3,
-        "cisco.asa.mapped_source_ip": "81.0.0.1",
+        "cisco.asa.mapped_source_ip": "89.160.20.156",
         "cisco.asa.message_id": "302020",
         "cisco.asa.source_username": "USER002",
-        "destination.address": "85.0.0.1",
-        "destination.as.number": 3303,
-        "destination.as.organization.name": "Bluewin",
-        "destination.geo.city_name": "Kolliken",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "CH",
-        "destination.geo.country_name": "Switzerland",
-        "destination.geo.location.lat": 47.3388,
-        "destination.geo.location.lon": 8.0264,
-        "destination.geo.region_iso_code": "CH-AG",
-        "destination.geo.region_name": "Aargau",
-        "destination.ip": "85.0.0.1",
+        "destination.address": "1.128.3.4",
+        "destination.as.number": 1221,
+        "destination.as.organization.name": "Telstra Pty Ltd",
+        "destination.ip": "1.128.3.4",
         "destination.user.domain": "AD",
         "destination.user.name": "USER002",
         "event.action": "flow-expiration",
@@ -4146,7 +4106,7 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-5-302020: Built inbound ICMP connection for faddr 85.0.0.1/0(AD\\USER002) gaddr 81.0.0.1/0 laddr 81.0.0.1/0 (USER002) type 3 code 3",
+        "event.original": "%ASA-5-302020: Built inbound ICMP connection for faddr 1.128.3.4/0(AD\\USER002) gaddr 89.160.20.156/0 laddr 89.160.20.156/0 (USER002) type 3 code 3",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4157,7 +4117,7 @@
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "notification",
-        "log.offset": 11942,
+        "log.offset": 11998,
         "network.direction": "inbound",
         "network.protocol": "icmp",
         "observer.product": "asa",
@@ -4167,25 +4127,25 @@
             "AD"
         ],
         "related.ip": [
-            "81.0.0.1",
-            "85.0.0.1"
+            "1.128.3.4",
+            "89.160.20.156"
         ],
         "related.user": [
             "USER002"
         ],
         "service.type": "cisco",
-        "source.address": "81.0.0.1",
-        "source.as.number": 15704,
-        "source.as.organization.name": "Xtra Telecom S.A.",
-        "source.geo.city_name": "Madrid",
+        "source.address": "89.160.20.156",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
         "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 40.4143,
-        "source.geo.location.lon": -3.7016,
-        "source.geo.region_iso_code": "ES-M",
-        "source.geo.region_name": "Madrid",
-        "source.ip": "81.0.0.1",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.156",
         "source.user.name": "USER002",
         "tags": [
             "cisco-asa",
@@ -4202,14 +4162,6 @@
         "destination.address": "75.0.0.1",
         "destination.as.number": 7018,
         "destination.as.organization.name": "AT&T Services, Inc.",
-        "destination.geo.city_name": "Carson City",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 39.1507,
-        "destination.geo.location.lon": -119.7459,
-        "destination.geo.region_iso_code": "US-NV",
-        "destination.geo.region_name": "Nevada",
         "destination.ip": "75.0.0.1",
         "destination.port": 18449,
         "event.action": "flow-expiration",
@@ -4234,7 +4186,7 @@
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "informational",
-        "log.offset": 12100,
+        "log.offset": 12167,
         "network.community_id": "1:kOYfvYjW0lZrPxD+ArQ6vDYnS7g=",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -4287,7 +4239,7 @@
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "informational",
-        "log.offset": 12259,
+        "log.offset": 12326,
         "network.community_id": "1:bHWN9qumWIGMl/MbjgS2bQi/Jsw=",
         "network.iana_number": 1,
         "network.transport": "icmp",
@@ -4318,13 +4270,6 @@
         "cisco.asa.source_interface": "OUTSIDE",
         "cisco.asa.termination_user": "soc@danskecommodities.com",
         "destination.address": "2a03:2880:f253:cb:face:b00c:0:43fe",
-        "destination.as.number": 32934,
-        "destination.as.organization.name": "Facebook, Inc.",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "IE",
-        "destination.geo.country_name": "Ireland",
-        "destination.geo.location.lat": 53.0,
-        "destination.geo.location.lon": -8.0,
         "destination.ip": "2a03:2880:f253:cb:face:b00c:0:43fe",
         "destination.port": 443,
         "event.action": "firewall-rule",
@@ -4345,7 +4290,7 @@
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "informational",
-        "log.offset": 12425,
+        "log.offset": 12492,
         "network.community_id": "1:lOTrEnVpsUc4jukAUBxF/BkD8jE=",
         "network.direction": "inbound",
         "network.iana_number": 6,
@@ -4374,15 +4319,8 @@
         "cisco.asa.message_id": "305012",
         "cisco.asa.source_interface": "OUTSIDE",
         "cisco.asa.source_username": "LOCAL\\domain\\USER001",
-        "destination.address": "181.0.0.1",
-        "destination.as.number": 7303,
-        "destination.as.organization.name": "Telecom Argentina S.A.",
-        "destination.geo.continent_name": "South America",
-        "destination.geo.country_iso_code": "AR",
-        "destination.geo.country_name": "Argentina",
-        "destination.geo.location.lat": -34.6033,
-        "destination.geo.location.lon": -58.3817,
-        "destination.ip": "181.0.0.1",
+        "destination.address": "189.160.20.156",
+        "destination.ip": "189.160.20.156",
         "destination.port": 50120,
         "event.action": "flow-expiration",
         "event.category": [
@@ -4394,7 +4332,7 @@
         "event.end": "2021-01-15T19:12:37.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from OUTSIDE:81.0.0.1/50120(LOCAL\\domain\\USER001) to OUTSIDE:181.0.0.1/50120 duration 0:02:05",
+        "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from OUTSIDE:89.160.20.156/50120(LOCAL\\domain\\USER001) to OUTSIDE:189.160.20.156/50120 duration 0:02:05",
         "event.severity": 6,
         "event.start": "2021-01-15T21:10:32.000Z",
         "event.timezone": "-02:00",
@@ -4406,8 +4344,8 @@
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "informational",
-        "log.offset": 12678,
-        "network.community_id": "1:R7zADbxzUGXOH0O/Hzma4ba6iHU=",
+        "log.offset": 12745,
+        "network.community_id": "1:vXccEuUJmxpSB1JgjEhGeCaR+48=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "OUTSIDE",
@@ -4419,25 +4357,25 @@
             "domain"
         ],
         "related.ip": [
-            "181.0.0.1",
-            "81.0.0.1"
+            "189.160.20.156",
+            "89.160.20.156"
         ],
         "related.user": [
             "USER001"
         ],
         "service.type": "cisco",
-        "source.address": "81.0.0.1",
-        "source.as.number": 15704,
-        "source.as.organization.name": "Xtra Telecom S.A.",
-        "source.geo.city_name": "Madrid",
+        "source.address": "89.160.20.156",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
         "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 40.4143,
-        "source.geo.location.lon": -3.7016,
-        "source.geo.region_iso_code": "ES-M",
-        "source.geo.region_name": "Madrid",
-        "source.ip": "81.0.0.1",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.156",
         "source.port": 50120,
         "source.user.domain": "domain",
         "source.user.name": "USER001",
@@ -4456,13 +4394,6 @@
         "cisco.asa.termination_initiator": "OUTSIDE",
         "cisco.asa.termination_user": "domain\\USER001",
         "destination.address": "40.0.0.1",
-        "destination.as.number": 4249,
-        "destination.as.organization.name": "Eli Lilly and Company",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": "40.0.0.1",
         "destination.port": 443,
         "event.action": "flow-expiration",
@@ -4475,7 +4406,7 @@
         "event.end": "2021-01-15T19:12:37.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-6-302014: Teardown TCP connection 261246338 for OUTSIDE:81.0.0.1/50120(LOCAL\\domain\\USER001) to OUTSIDE:40.0.0.1/443 duration 0:02:05 bytes 9610 TCP FINs from OUTSIDE (domain\\USER001)",
+        "event.original": "%ASA-6-302014: Teardown TCP connection 261246338 for OUTSIDE:89.160.20.156/50120(LOCAL\\domain\\USER001) to OUTSIDE:40.0.0.1/443 duration 0:02:05 bytes 9610 TCP FINs from OUTSIDE (domain\\USER001)",
         "event.reason": "TCP FINs",
         "event.severity": 6,
         "event.start": "2021-01-15T21:10:32.000Z",
@@ -4488,9 +4419,9 @@
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "informational",
-        "log.offset": 12842,
+        "log.offset": 12919,
         "network.bytes": 9610,
-        "network.community_id": "1:Wki7xXtyiCACPfXpHuQV+NLf33o=",
+        "network.community_id": "1:G4ALpkc+kkJFzBlSGnNhTyQjj5c=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "OUTSIDE",
@@ -4503,24 +4434,24 @@
         ],
         "related.ip": [
             "40.0.0.1",
-            "81.0.0.1"
+            "89.160.20.156"
         ],
         "related.user": [
             "USER001"
         ],
         "service.type": "cisco",
-        "source.address": "81.0.0.1",
-        "source.as.number": 15704,
-        "source.as.organization.name": "Xtra Telecom S.A.",
-        "source.geo.city_name": "Madrid",
+        "source.address": "89.160.20.156",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
         "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 40.4143,
-        "source.geo.location.lon": -3.7016,
-        "source.geo.region_iso_code": "ES-M",
-        "source.geo.region_name": "Madrid",
-        "source.ip": "81.0.0.1",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.156",
         "source.port": 50120,
         "source.user.domain": "domain",
         "source.user.name": "USER001",
@@ -4535,7 +4466,7 @@
         "cisco.asa.destination_interface": "INSIDE",
         "cisco.asa.mapped_destination_ip": "192.168.0.1",
         "cisco.asa.mapped_destination_port": 53,
-        "cisco.asa.mapped_source_ip": "82.0.0.1",
+        "cisco.asa.mapped_source_ip": "67.43.156.13",
         "cisco.asa.mapped_source_port": 63790,
         "cisco.asa.message_id": "302015",
         "cisco.asa.source_interface": "OUTSIDE",
@@ -4552,7 +4483,7 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-6-302015: Built inbound UDP connection 261311655 for OUTSIDE:81.0.0.1/63790 (82.0.0.1/63790)(LOCAL\\domain\\USER001) to INSIDE:192.168.0.1/53 (192.168.0.1/53) (domain\\USER001)",
+        "event.original": "%ASA-6-302015: Built inbound UDP connection 261311655 for OUTSIDE:89.160.20.156/63790 (67.43.156.13/63790)(LOCAL\\domain\\USER001) to INSIDE:192.168.0.1/53 (192.168.0.1/53) (domain\\USER001)",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4562,8 +4493,8 @@
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "informational",
-        "log.offset": 13053,
-        "network.community_id": "1:BIxqdLncXeXXZrNudh3yrj2zmZc=",
+        "log.offset": 13135,
+        "network.community_id": "1:4sghryHbfd+vkUilwrakMfDSXPg=",
         "network.direction": "inbound",
         "network.iana_number": 17,
         "network.transport": "udp",
@@ -4577,26 +4508,26 @@
         ],
         "related.ip": [
             "192.168.0.1",
-            "81.0.0.1",
-            "82.0.0.1"
+            "67.43.156.13",
+            "89.160.20.156"
         ],
         "related.user": [
             "USER001"
         ],
         "service.type": "cisco",
-        "source.address": "81.0.0.1",
-        "source.as.number": 15704,
-        "source.as.organization.name": "Xtra Telecom S.A.",
-        "source.geo.city_name": "Madrid",
+        "source.address": "89.160.20.156",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
         "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 40.4143,
-        "source.geo.location.lon": -3.7016,
-        "source.geo.region_iso_code": "ES-M",
-        "source.geo.region_name": "Madrid",
-        "source.ip": "81.0.0.1",
-        "source.nat.ip": "82.0.0.1",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.156",
+        "source.nat.ip": "67.43.156.13",
         "source.port": 63790,
         "source.user.domain": "domain",
         "source.user.name": "USER001",
@@ -4626,7 +4557,7 @@
         "event.end": "2021-01-15T19:12:37.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-6-302016: Teardown UDP connection 261311655 for OUTSIDE:81.0.0.1/63790(LOCAL\\domain\\USER001) to INSIDE:192.168.0.1/53 duration 0:00:00 bytes 139 (domain\\USER001)",
+        "event.original": "%ASA-6-302016: Teardown UDP connection 261311655 for OUTSIDE:89.160.20.156/63790(LOCAL\\domain\\USER001) to INSIDE:192.168.0.1/53 duration 0:00:00 bytes 139 (domain\\USER001)",
         "event.severity": 6,
         "event.start": "2021-01-15T21:12:37.000Z",
         "event.timezone": "-02:00",
@@ -4638,9 +4569,9 @@
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "informational",
-        "log.offset": 13254,
+        "log.offset": 13345,
         "network.bytes": 139,
-        "network.community_id": "1:BIxqdLncXeXXZrNudh3yrj2zmZc=",
+        "network.community_id": "1:4sghryHbfd+vkUilwrakMfDSXPg=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "INSIDE",
@@ -4653,24 +4584,24 @@
         ],
         "related.ip": [
             "192.168.0.1",
-            "81.0.0.1"
+            "89.160.20.156"
         ],
         "related.user": [
             "USER001"
         ],
         "service.type": "cisco",
-        "source.address": "81.0.0.1",
-        "source.as.number": 15704,
-        "source.as.organization.name": "Xtra Telecom S.A.",
-        "source.geo.city_name": "Madrid",
+        "source.address": "89.160.20.156",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
         "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 40.4143,
-        "source.geo.location.lon": -3.7016,
-        "source.geo.region_iso_code": "ES-M",
-        "source.geo.region_name": "Madrid",
-        "source.ip": "81.0.0.1",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.156",
         "source.port": 63790,
         "source.user.domain": "domain",
         "source.user.name": "USER001",
@@ -4685,20 +4616,13 @@
         "cisco.asa.destination_interface": "OUTSIDE",
         "cisco.asa.mapped_destination_ip": "40.0.0.1",
         "cisco.asa.mapped_destination_port": 443,
-        "cisco.asa.mapped_source_ip": "82.0.0.1",
+        "cisco.asa.mapped_source_ip": "67.43.156.13",
         "cisco.asa.mapped_source_port": 50120,
         "cisco.asa.message_id": "302013",
         "cisco.asa.source_interface": "OUTSIDE",
         "cisco.asa.source_username": "LOCAL\\domain\\USER001",
         "cisco.asa.termination_user": "domain\\USER001",
         "destination.address": "40.0.0.1",
-        "destination.as.number": 4249,
-        "destination.as.organization.name": "Eli Lilly and Company",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": "40.0.0.1",
         "destination.port": 443,
         "event.action": "firewall-rule",
@@ -4709,7 +4633,7 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-6-302013: Built inbound TCP connection 261246338 for OUTSIDE:81.0.0.1/50120 (82.0.0.1/50120)(LOCAL\\domain\\USER001) to OUTSIDE:40.0.0.1/443 (40.0.0.1/443) (domain\\USER001)",
+        "event.original": "%ASA-6-302013: Built inbound TCP connection 261246338 for OUTSIDE:89.160.20.156/50120 (67.43.156.13/50120)(LOCAL\\domain\\USER001) to OUTSIDE:40.0.0.1/443 (40.0.0.1/443) (domain\\USER001)",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
@@ -4719,8 +4643,8 @@
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "informational",
-        "log.offset": 13443,
-        "network.community_id": "1:Wki7xXtyiCACPfXpHuQV+NLf33o=",
+        "log.offset": 13539,
+        "network.community_id": "1:G4ALpkc+kkJFzBlSGnNhTyQjj5c=",
         "network.direction": "inbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -4734,26 +4658,26 @@
         ],
         "related.ip": [
             "40.0.0.1",
-            "81.0.0.1",
-            "82.0.0.1"
+            "67.43.156.13",
+            "89.160.20.156"
         ],
         "related.user": [
             "USER001"
         ],
         "service.type": "cisco",
-        "source.address": "81.0.0.1",
-        "source.as.number": 15704,
-        "source.as.organization.name": "Xtra Telecom S.A.",
-        "source.geo.city_name": "Madrid",
+        "source.address": "89.160.20.156",
+        "source.as.number": 29518,
+        "source.as.organization.name": "Bredband2 AB",
+        "source.geo.city_name": "Link\u00f6ping",
         "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 40.4143,
-        "source.geo.location.lon": -3.7016,
-        "source.geo.region_iso_code": "ES-M",
-        "source.geo.region_name": "Madrid",
-        "source.ip": "81.0.0.1",
-        "source.nat.ip": "82.0.0.1",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 58.4167,
+        "source.geo.location.lon": 15.6167,
+        "source.geo.region_iso_code": "SE-E",
+        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.ip": "89.160.20.156",
+        "source.nat.ip": "67.43.156.13",
         "source.port": 50120,
         "source.user.domain": "domain",
         "source.user.name": "USER001",
@@ -4766,15 +4690,8 @@
         "@timestamp": "2021-07-29T08:35:29.000-02:00",
         "cisco.asa.message_id": "602304",
         "cisco.asa.tunnel_type": "LAN-to-LAN",
-        "destination.address": "12.12.12.12",
-        "destination.as.number": 32328,
-        "destination.as.organization.name": "Alascom, Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": "12.12.12.12",
+        "destination.address": "81.2.69.1452",
+        "destination.domain": "81.2.69.1452",
         "event.action": "deleted",
         "event.category": [
             "network"
@@ -4783,12 +4700,11 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-6-602304: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xABCXYZ) between 12.12.12.12 and 12.12.12.12 (user= 12.12.12.12) has been deleted.",
+        "event.original": "%ASA-6-602304: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xABCXYZ) between 81.2.69.1452 and 81.2.69.1452 (user= 81.2.69.1452) has been deleted.",
         "event.outcome": "success",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "allowed",
             "deletion",
             "info",
             "user"
@@ -4797,32 +4713,25 @@
         "input.type": "log",
         "log.file.path": "sample.log",
         "log.level": "informational",
-        "log.offset": 13641,
+        "log.offset": 13746,
         "network.direction": "outbound",
         "network.type": "ipsec",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
-        "related.ip": [
-            "12.12.12.12"
+        "related.hosts": [
+            "81.2.69.1452"
         ],
         "related.user": [
-            "12.12.12.12"
+            "81.2.69.1452"
         ],
         "service.type": "cisco",
-        "source.address": "12.12.12.12",
-        "source.as.number": 32328,
-        "source.as.organization.name": "Alascom, Inc.",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 37.751,
-        "source.geo.location.lon": -97.822,
-        "source.ip": "12.12.12.12",
+        "source.address": "81.2.69.1452",
+        "source.domain": "81.2.69.1452",
         "tags": [
             "cisco-asa",
             "forwarded"
         ],
-        "user.name": "12.12.12.12"
+        "user.name": "81.2.69.1452"
     }
 ]

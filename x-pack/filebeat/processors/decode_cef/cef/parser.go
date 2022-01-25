@@ -18,25 +18,26 @@ var _cef_eof_actions []byte = []byte{
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 16, 16, 0, 0, 0, 0,
-	19, 22, 22, 22, 19, 22, 22, 22,
-	0,
+	0, 0, 0, 0, 0, 0, 0, 25,
+	25, 0, 0, 0, 0, 28, 32, 32,
+	32, 28, 32, 32, 32, 35, 35, 0,
 }
 
 const cef_start int = 1
-const cef_first_final int = 31
+const cef_first_final int = 36
 const cef_error int = 0
 
-const cef_en_gobble_extension int = 28
+const cef_en_gobble_extension int = 33
 const cef_en_main int = 1
-const cef_en_main_cef_extensions int = 24
+const cef_en_main_cef_extensions int = 29
 
 //line cef.rl:16
 
 // unpack unpacks a CEF message.
 func (e *Event) unpack(data string) error {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
-	mark := 0
+	mark, mark_slash := 0, 0
+	var escapes []int
 
 	// Extension key.
 	var extKey string
@@ -50,12 +51,12 @@ func (e *Event) unpack(data string) error {
 
 	e.init(data)
 
-//line parser.go:55
+//line parser.go:56
 	{
 		cs = cef_start
 	}
 
-//line parser.go:60
+//line parser.go:61
 	{
 		if (p) == (pe) {
 			goto _test_eof
@@ -119,92 +120,76 @@ func (e *Event) unpack(data string) error {
 		case 9:
 			switch data[(p)] {
 			case 92:
-				goto tr11
+				goto tr14
 			case 124:
-				goto tr11
+				goto tr14
 			}
 			goto tr1
 		case 10:
 			switch data[(p)] {
 			case 92:
-				goto tr15
-			case 124:
 				goto tr16
+			case 124:
+				goto tr17
 			}
-			goto tr14
+			goto tr15
 		case 11:
 			switch data[(p)] {
 			case 92:
-				goto tr18
-			case 124:
 				goto tr19
+			case 124:
+				goto tr20
 			}
-			goto tr17
+			goto tr18
 		case 12:
 			switch data[(p)] {
 			case 92:
-				goto tr17
-			case 124:
-				goto tr17
-			}
-			goto tr1
-		case 13:
-			switch data[(p)] {
-			case 92:
-				goto tr21
-			case 124:
 				goto tr22
+			case 124:
+				goto tr23
 			}
-			goto tr20
-		case 14:
+			goto tr21
+		case 13:
 			switch data[(p)] {
 			case 92:
 				goto tr24
 			case 124:
-				goto tr25
+				goto tr24
 			}
-			goto tr23
+			goto tr1
+		case 14:
+			switch data[(p)] {
+			case 92:
+				goto tr26
+			case 124:
+				goto tr27
+			}
+			goto tr25
 		case 15:
 			switch data[(p)] {
 			case 92:
-				goto tr23
+				goto tr29
 			case 124:
-				goto tr23
+				goto tr30
 			}
-			goto tr1
+			goto tr28
 		case 16:
 			switch data[(p)] {
 			case 92:
-				goto tr27
+				goto tr32
 			case 124:
-				goto tr28
+				goto tr33
 			}
-			goto tr26
+			goto tr31
 		case 17:
 			switch data[(p)] {
 			case 92:
-				goto tr30
-			case 124:
-				goto tr31
-			}
-			goto tr29
-		case 18:
-			switch data[(p)] {
-			case 92:
-				goto tr29
-			case 124:
-				goto tr29
-			}
-			goto tr1
-		case 19:
-			switch data[(p)] {
-			case 92:
-				goto tr33
+				goto tr34
 			case 124:
 				goto tr34
 			}
-			goto tr32
-		case 20:
+			goto tr1
+		case 18:
 			switch data[(p)] {
 			case 92:
 				goto tr36
@@ -212,378 +197,468 @@ func (e *Event) unpack(data string) error {
 				goto tr37
 			}
 			goto tr35
+		case 19:
+			switch data[(p)] {
+			case 92:
+				goto tr39
+			case 124:
+				goto tr40
+			}
+			goto tr38
+		case 20:
+			switch data[(p)] {
+			case 92:
+				goto tr42
+			case 124:
+				goto tr43
+			}
+			goto tr41
 		case 21:
 			switch data[(p)] {
 			case 92:
-				goto tr35
+				goto tr44
 			case 124:
-				goto tr35
+				goto tr44
 			}
 			goto tr1
 		case 22:
 			switch data[(p)] {
-			case 45:
-				goto tr38
+			case 92:
+				goto tr46
 			case 124:
-				goto tr39
+				goto tr47
 			}
-			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr38
-				}
-			case data[(p)] > 90:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr38
-				}
-			default:
-				goto tr38
-			}
-			goto tr1
+			goto tr45
 		case 23:
 			switch data[(p)] {
-			case 45:
-				goto tr40
+			case 92:
+				goto tr49
 			case 124:
-				goto tr41
-			}
-			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr40
-				}
-			case data[(p)] > 90:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr40
-				}
-			default:
-				goto tr40
-			}
-			goto tr1
-		case 31:
-			switch data[(p)] {
-			case 32:
-				goto tr42
-			case 95:
-				goto tr43
-			}
-			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr43
-				}
-			case data[(p)] > 90:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr43
-				}
-			default:
-				goto tr43
-			}
-			goto tr1
-		case 24:
-			switch data[(p)] {
-			case 32:
-				goto tr42
-			case 95:
-				goto tr43
-			}
-			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr43
-				}
-			case data[(p)] > 90:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr43
-				}
-			default:
-				goto tr43
-			}
-			goto tr1
-		case 25:
-			switch data[(p)] {
-			case 44:
-				goto tr44
-			case 46:
-				goto tr44
-			case 61:
-				goto tr45
-			case 93:
-				goto tr44
-			case 95:
-				goto tr44
-			}
-			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr44
-				}
-			case data[(p)] > 91:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr44
-				}
-			default:
-				goto tr44
-			}
-			goto tr1
-		case 32:
-			switch data[(p)] {
-			case 32:
-				goto tr55
-			case 61:
-				goto tr46
-			case 92:
-				goto tr56
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr54
-			}
-			goto tr53
-		case 33:
-			switch data[(p)] {
-			case 32:
-				goto tr58
-			case 61:
-				goto tr46
-			case 92:
-				goto tr59
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr57
+				goto tr50
 			}
 			goto tr48
-		case 34:
+		case 24:
 			switch data[(p)] {
-			case 32:
-				goto tr58
-			case 61:
-				goto tr46
 			case 92:
+				goto tr52
+			case 124:
+				goto tr53
+			}
+			goto tr51
+		case 25:
+			switch data[(p)] {
+			case 92:
+				goto tr54
+			case 124:
+				goto tr54
+			}
+			goto tr1
+		case 26:
+			switch data[(p)] {
+			case 92:
+				goto tr56
+			case 124:
+				goto tr57
+			}
+			goto tr55
+		case 27:
+			switch data[(p)] {
+			case 45:
+				goto tr58
+			case 124:
 				goto tr59
-			case 95:
-				goto tr60
 			}
 			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr57
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr58
 				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr60
-					}
-				case data[(p)] >= 65:
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr58
+				}
+			default:
+				goto tr58
+			}
+			goto tr1
+		case 28:
+			switch data[(p)] {
+			case 45:
+				goto tr60
+			case 124:
+				goto tr61
+			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr60
+				}
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
 					goto tr60
 				}
 			default:
 				goto tr60
 			}
-			goto tr48
-		case 35:
-			switch data[(p)] {
-			case 32:
-				goto tr58
-			case 44:
-				goto tr61
-			case 46:
-				goto tr61
-			case 61:
-				goto tr62
-			case 92:
-				goto tr59
-			case 95:
-				goto tr61
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr57
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 93:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr61
-					}
-				case data[(p)] >= 65:
-					goto tr61
-				}
-			default:
-				goto tr61
-			}
-			goto tr48
+			goto tr1
 		case 36:
 			switch data[(p)] {
 			case 32:
-				goto tr65
-			case 61:
-				goto tr46
-			case 92:
-				goto tr66
+				goto tr62
+			case 95:
+				goto tr63
 			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr63
+				}
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr63
+				}
+			default:
+				goto tr63
+			}
+			goto tr1
+		case 29:
+			switch data[(p)] {
+			case 32:
+				goto tr62
+			case 95:
+				goto tr63
+			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr63
+				}
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr63
+				}
+			default:
+				goto tr63
+			}
+			goto tr1
+		case 30:
+			switch data[(p)] {
+			case 44:
+				goto tr64
+			case 46:
+				goto tr64
+			case 61:
+				goto tr65
+			case 93:
+				goto tr64
+			case 95:
 				goto tr64
 			}
-			goto tr63
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr64
+				}
+			case data[(p)] > 91:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr64
+				}
+			default:
+				goto tr64
+			}
+			goto tr1
 		case 37:
 			switch data[(p)] {
 			case 32:
-				goto tr68
+				goto tr75
 			case 61:
-				goto tr46
+				goto tr66
 			case 92:
-				goto tr69
+				goto tr76
 			}
 			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr67
+				goto tr74
 			}
-			goto tr47
+			goto tr73
 		case 38:
 			switch data[(p)] {
 			case 32:
-				goto tr68
+				goto tr79
 			case 61:
-				goto tr46
+				goto tr66
 			case 92:
-				goto tr69
+				goto tr80
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr78
+			}
+			goto tr77
+		case 39:
+			switch data[(p)] {
+			case 32:
+				goto tr79
+			case 61:
+				goto tr66
+			case 92:
+				goto tr80
 			case 95:
-				goto tr70
+				goto tr81
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr67
+					goto tr78
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 90:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr70
+						goto tr81
 					}
 				case data[(p)] >= 65:
-					goto tr70
+					goto tr81
 				}
 			default:
-				goto tr70
+				goto tr81
 			}
-			goto tr47
-		case 39:
+			goto tr77
+		case 40:
 			switch data[(p)] {
 			case 32:
-				goto tr68
+				goto tr79
 			case 44:
-				goto tr71
+				goto tr82
 			case 46:
-				goto tr71
+				goto tr82
 			case 61:
-				goto tr62
+				goto tr83
 			case 92:
-				goto tr69
+				goto tr80
 			case 95:
-				goto tr71
+				goto tr82
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr67
+					goto tr78
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 93:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr71
+						goto tr82
 					}
 				case data[(p)] >= 65:
+					goto tr82
+				}
+			default:
+				goto tr82
+			}
+			goto tr77
+		case 41:
+			switch data[(p)] {
+			case 32:
+				goto tr86
+			case 61:
+				goto tr66
+			case 92:
+				goto tr87
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr85
+			}
+			goto tr84
+		case 42:
+			switch data[(p)] {
+			case 32:
+				goto tr90
+			case 61:
+				goto tr66
+			case 92:
+				goto tr91
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr89
+			}
+			goto tr88
+		case 43:
+			switch data[(p)] {
+			case 32:
+				goto tr90
+			case 61:
+				goto tr66
+			case 92:
+				goto tr91
+			case 95:
+				goto tr92
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr89
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr92
+					}
+				case data[(p)] >= 65:
+					goto tr92
+				}
+			default:
+				goto tr92
+			}
+			goto tr88
+		case 44:
+			switch data[(p)] {
+			case 32:
+				goto tr90
+			case 44:
+				goto tr93
+			case 46:
+				goto tr93
+			case 61:
+				goto tr83
+			case 92:
+				goto tr91
+			case 95:
+				goto tr93
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr89
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr93
+					}
+				case data[(p)] >= 65:
+					goto tr93
+				}
+			default:
+				goto tr93
+			}
+			goto tr88
+		case 31:
+			switch data[(p)] {
+			case 61:
+				goto tr67
+			case 92:
+				goto tr67
+			case 110:
+				goto tr67
+			case 114:
+				goto tr67
+			}
+			goto tr66
+		case 45:
+			switch data[(p)] {
+			case 32:
+				goto tr96
+			case 61:
+				goto tr66
+			case 92:
+				goto tr97
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr95
+			}
+			goto tr94
+		case 32:
+			switch data[(p)] {
+			case 61:
+				goto tr68
+			case 92:
+				goto tr68
+			case 110:
+				goto tr68
+			case 114:
+				goto tr68
+			}
+			goto tr66
+		case 46:
+			switch data[(p)] {
+			case 32:
+				goto tr100
+			case 61:
+				goto tr66
+			case 92:
+				goto tr101
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr99
+			}
+			goto tr98
+		case 33:
+			if data[(p)] == 32 {
+				goto tr70
+			}
+			goto tr69
+		case 34:
+			switch data[(p)] {
+			case 32:
+				goto tr70
+			case 95:
+				goto tr71
+			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr71
+				}
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
 					goto tr71
 				}
 			default:
 				goto tr71
 			}
-			goto tr47
-		case 26:
-			switch data[(p)] {
-			case 61:
-				goto tr47
-			case 92:
-				goto tr47
-			}
-			goto tr46
-		case 27:
-			switch data[(p)] {
-			case 61:
-				goto tr48
-			case 92:
-				goto tr48
-			}
-			goto tr46
-		case 28:
-			if data[(p)] == 32 {
-				goto tr50
-			}
-			goto tr49
-		case 29:
+			goto tr69
+		case 35:
 			switch data[(p)] {
 			case 32:
-				goto tr50
-			case 95:
-				goto tr51
-			}
-			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr51
-				}
-			case data[(p)] > 90:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr51
-				}
-			default:
-				goto tr51
-			}
-			goto tr49
-		case 30:
-			switch data[(p)] {
-			case 32:
-				goto tr50
+				goto tr70
 			case 44:
-				goto tr51
+				goto tr71
 			case 46:
-				goto tr51
+				goto tr71
 			case 61:
-				goto tr52
+				goto tr72
 			case 93:
-				goto tr51
+				goto tr71
 			case 95:
-				goto tr51
+				goto tr71
 			}
 			switch {
 			case data[(p)] < 65:
 				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr51
+					goto tr71
 				}
 			case data[(p)] > 91:
 				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr51
+					goto tr71
 				}
 			default:
-				goto tr51
+				goto tr71
 			}
-			goto tr49
-		case 40:
+			goto tr69
+		case 47:
 			if data[(p)] == 32 {
-				goto tr50
+				goto tr70
 			}
-			goto tr49
+			goto tr69
 		}
 
 	tr1:
 		cs = 0
 		goto _again
-	tr46:
+	tr66:
 		cs = 0
-		goto f15
+		goto f24
 	tr0:
 		cs = 2
 		goto _again
@@ -611,364 +686,574 @@ func (e *Event) unpack(data string) error {
 	tr8:
 		cs = 8
 		goto f0
-	tr12:
-		cs = 9
-		goto _again
+	tr15:
+		cs = 8
+		goto f6
 	tr9:
 		cs = 9
-		goto f0
-	tr10:
-		cs = 10
 		goto f2
-	tr13:
+	tr12:
+		cs = 9
+		goto f4
+	tr16:
+		cs = 9
+		goto f7
+	tr14:
 		cs = 10
+		goto _again
+	tr10:
+		cs = 11
 		goto f3
+	tr13:
+		cs = 11
+		goto f5
 	tr17:
 		cs = 11
+		goto f8
+	tr21:
+		cs = 12
 		goto _again
-	tr14:
-		cs = 11
-		goto f0
 	tr18:
 		cs = 12
-		goto _again
-	tr15:
-		cs = 12
 		goto f0
-	tr16:
-		cs = 13
-		goto f4
+	tr25:
+		cs = 12
+		goto f6
 	tr19:
 		cs = 13
-		goto f5
-	tr23:
+		goto f2
+	tr22:
+		cs = 13
+		goto f4
+	tr26:
+		cs = 13
+		goto f7
+	tr24:
 		cs = 14
 		goto _again
 	tr20:
-		cs = 14
-		goto f0
-	tr24:
 		cs = 15
+		goto f9
+	tr23:
+		cs = 15
+		goto f10
+	tr27:
+		cs = 15
+		goto f11
+	tr31:
+		cs = 16
 		goto _again
-	tr21:
-		cs = 15
+	tr28:
+		cs = 16
 		goto f0
-	tr22:
+	tr35:
 		cs = 16
 		goto f6
-	tr25:
-		cs = 16
-		goto f7
 	tr29:
 		cs = 17
-		goto _again
-	tr26:
-		cs = 17
-		goto f0
-	tr30:
-		cs = 18
-		goto _again
-	tr27:
-		cs = 18
-		goto f0
-	tr28:
-		cs = 19
-		goto f8
-	tr31:
-		cs = 19
-		goto f9
-	tr35:
-		cs = 20
-		goto _again
+		goto f2
 	tr32:
-		cs = 20
-		goto f0
+		cs = 17
+		goto f4
 	tr36:
-		cs = 21
-		goto _again
-	tr33:
-		cs = 21
-		goto f0
+		cs = 17
+		goto f7
 	tr34:
-		cs = 22
-		goto f10
+		cs = 18
+		goto _again
+	tr30:
+		cs = 19
+		goto f12
+	tr33:
+		cs = 19
+		goto f13
 	tr37:
-		cs = 22
-		goto f11
-	tr40:
-		cs = 23
+		cs = 19
+		goto f14
+	tr41:
+		cs = 20
 		goto _again
 	tr38:
-		cs = 23
+		cs = 20
 		goto f0
+	tr45:
+		cs = 20
+		goto f6
+	tr39:
+		cs = 21
+		goto f2
 	tr42:
+		cs = 21
+		goto f4
+	tr46:
+		cs = 21
+		goto f7
+	tr44:
+		cs = 22
+		goto _again
+	tr40:
+		cs = 23
+		goto f15
+	tr43:
+		cs = 23
+		goto f16
+	tr47:
+		cs = 23
+		goto f17
+	tr51:
 		cs = 24
 		goto _again
-	tr44:
-		cs = 25
-		goto _again
-	tr43:
-		cs = 25
+	tr48:
+		cs = 24
 		goto f0
-	tr69:
-		cs = 26
-		goto _again
-	tr66:
-		cs = 26
-		goto f20
-	tr59:
-		cs = 27
-		goto _again
-	tr56:
-		cs = 27
-		goto f20
+	tr55:
+		cs = 24
+		goto f6
 	tr49:
-		cs = 28
+		cs = 25
+		goto f2
+	tr52:
+		cs = 25
+		goto f4
+	tr56:
+		cs = 25
+		goto f7
+	tr54:
+		cs = 26
 		goto _again
 	tr50:
-		cs = 29
+		cs = 27
+		goto f18
+	tr53:
+		cs = 27
+		goto f19
+	tr57:
+		cs = 27
+		goto f20
+	tr60:
+		cs = 28
+		goto _again
+	tr58:
+		cs = 28
 		goto f0
-	tr51:
+	tr62:
+		cs = 29
+		goto _again
+	tr64:
 		cs = 30
 		goto _again
-	tr39:
-		cs = 31
-		goto f12
-	tr41:
-		cs = 31
-		goto f13
-	tr45:
-		cs = 32
-		goto f14
-	tr57:
-		cs = 33
-		goto _again
-	tr48:
-		cs = 33
-		goto f16
-	tr53:
-		cs = 33
-		goto f19
-	tr54:
-		cs = 33
-		goto f20
-	tr58:
-		cs = 34
-		goto _again
-	tr55:
-		cs = 34
-		goto f20
-	tr61:
-		cs = 35
-		goto f16
-	tr60:
-		cs = 35
-		goto f22
-	tr62:
-		cs = 36
-		goto f14
-	tr67:
-		cs = 37
-		goto _again
-	tr47:
-		cs = 37
-		goto f16
 	tr63:
+		cs = 30
+		goto f0
+	tr91:
+		cs = 31
+		goto f4
+	tr97:
+		cs = 31
+		goto f7
+	tr87:
+		cs = 31
+		goto f30
+	tr80:
+		cs = 32
+		goto f4
+	tr101:
+		cs = 32
+		goto f7
+	tr76:
+		cs = 32
+		goto f30
+	tr69:
+		cs = 33
+		goto _again
+	tr70:
+		cs = 34
+		goto f0
+	tr71:
+		cs = 35
+		goto _again
+	tr59:
+		cs = 36
+		goto f21
+	tr61:
+		cs = 36
+		goto f22
+	tr65:
 		cs = 37
-		goto f19
-	tr64:
-		cs = 37
-		goto f20
-	tr68:
+		goto f23
+	tr78:
 		cs = 38
 		goto _again
-	tr65:
+	tr99:
 		cs = 38
-		goto f20
-	tr71:
+		goto f6
+	tr77:
+		cs = 38
+		goto f25
+	tr73:
+		cs = 38
+		goto f28
+	tr74:
+		cs = 38
+		goto f29
+	tr98:
+		cs = 38
+		goto f35
+	tr79:
 		cs = 39
-		goto f16
-	tr70:
+		goto _again
+	tr100:
 		cs = 39
-		goto f23
-	tr52:
+		goto f6
+	tr75:
+		cs = 39
+		goto f29
+	tr82:
 		cs = 40
-		goto f17
+		goto f25
+	tr81:
+		cs = 40
+		goto f32
+	tr83:
+		cs = 41
+		goto f23
+	tr89:
+		cs = 42
+		goto _again
+	tr95:
+		cs = 42
+		goto f6
+	tr88:
+		cs = 42
+		goto f25
+	tr84:
+		cs = 42
+		goto f28
+	tr85:
+		cs = 42
+		goto f29
+	tr94:
+		cs = 42
+		goto f35
+	tr90:
+		cs = 43
+		goto _again
+	tr96:
+		cs = 43
+		goto f6
+	tr86:
+		cs = 43
+		goto f29
+	tr93:
+		cs = 44
+		goto f25
+	tr92:
+		cs = 44
+		goto f33
+	tr67:
+		cs = 45
+		goto f25
+	tr68:
+		cs = 46
+		goto f25
+	tr72:
+		cs = 47
+		goto f26
 
 	f0:
-//line cef.rl:37
+//line cef.rl:38
 
 		mark = p
 
 		goto _again
+	f4:
+//line cef.rl:41
+
+		mark_slash = p
+
+		goto _again
+	f6:
+//line cef.rl:44
+
+		escapes = append(escapes, mark_slash, p)
+
+		goto _again
 	f1:
-//line cef.rl:40
+//line cef.rl:47
 
 		e.Version, _ = strconv.Atoi(data[mark:p])
 
 		goto _again
-	f3:
-//line cef.rl:43
-
-		e.DeviceVendor = replaceHeaderEscapes(data[mark:p])
-
-		goto _again
 	f5:
-//line cef.rl:46
+//line cef.rl:50
 
-		e.DeviceProduct = replaceHeaderEscapes(data[mark:p])
-
-		goto _again
-	f7:
-//line cef.rl:49
-
-		e.DeviceVersion = replaceHeaderEscapes(data[mark:p])
+		e.DeviceVendor = replaceEscapes(data[mark:p], mark, escapes)
+		escapes = escapes[:0]
 
 		goto _again
-	f9:
-//line cef.rl:52
+	f10:
+//line cef.rl:54
 
-		e.DeviceEventClassID = replaceHeaderEscapes(data[mark:p])
-
-		goto _again
-	f11:
-//line cef.rl:55
-
-		e.Name = replaceHeaderEscapes(data[mark:p])
+		e.DeviceProduct = replaceEscapes(data[mark:p], mark, escapes)
+		escapes = escapes[:0]
 
 		goto _again
 	f13:
 //line cef.rl:58
 
-		e.Severity = data[mark:p]
-
-		goto _again
-	f14:
-//line cef.rl:61
-
-		// A new extension key marks the end of the last extension value.
-		if len(extKey) > 0 && extValueStart <= mark-1 {
-			e.pushExtension(extKey, replaceExtensionEscapes(data[extValueStart:mark-1]))
-			extKey, extValueStart, extValueEnd = "", 0, 0
-		}
-		extKey = data[mark:p]
-
-		goto _again
-	f20:
-//line cef.rl:69
-
-		extValueStart = p
-		extValueEnd = p
+		e.DeviceVersion = replaceEscapes(data[mark:p], mark, escapes)
+		escapes = escapes[:0]
 
 		goto _again
 	f16:
-//line cef.rl:73
+//line cef.rl:62
 
-		extValueEnd = p + 1
-
-		goto _again
-	f15:
-//line cef.rl:83
-
-		recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", extKey, p+1))
-		(p)--
-		cs = 28
-		goto _again
-	f17:
-//line cef.rl:87
-
-		extKey, extValueStart, extValueEnd = "", 0, 0
-		// Resume processing at p, the start of the next extension key.
-		p = mark
-		cs = 24
-		goto _again
-	f2:
-//line cef.rl:37
-
-		mark = p
-
-//line cef.rl:43
-
-		e.DeviceVendor = replaceHeaderEscapes(data[mark:p])
+		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, escapes)
+		escapes = escapes[:0]
 
 		goto _again
-	f4:
-//line cef.rl:37
+	f19:
+//line cef.rl:66
 
-		mark = p
-
-//line cef.rl:46
-
-		e.DeviceProduct = replaceHeaderEscapes(data[mark:p])
+		e.Name = replaceEscapes(data[mark:p], mark, escapes)
+		escapes = escapes[:0]
 
 		goto _again
-	f6:
-//line cef.rl:37
-
-		mark = p
-
-//line cef.rl:49
-
-		e.DeviceVersion = replaceHeaderEscapes(data[mark:p])
-
-		goto _again
-	f8:
-//line cef.rl:37
-
-		mark = p
-
-//line cef.rl:52
-
-		e.DeviceEventClassID = replaceHeaderEscapes(data[mark:p])
-
-		goto _again
-	f10:
-//line cef.rl:37
-
-		mark = p
-
-//line cef.rl:55
-
-		e.Name = replaceHeaderEscapes(data[mark:p])
-
-		goto _again
-	f12:
-//line cef.rl:37
-
-		mark = p
-
-//line cef.rl:58
+	f22:
+//line cef.rl:70
 
 		e.Severity = data[mark:p]
 
 		goto _again
 	f23:
-//line cef.rl:37
-
-		mark = p
-
 //line cef.rl:73
 
-		extValueEnd = p + 1
+		// A new extension key marks the end of the last extension value.
+		if len(extKey) > 0 && extValueStart <= mark-1 {
+			e.pushExtension(extKey, replaceEscapes(data[extValueStart:mark-1], extValueStart, escapes))
+			extKey, extValueStart, extValueEnd, escapes = "", 0, 0, escapes[:0]
+		}
+		extKey = data[mark:p]
 
 		goto _again
-	f19:
-//line cef.rl:69
+	f29:
+//line cef.rl:81
 
 		extValueStart = p
 		extValueEnd = p
 
-//line cef.rl:73
+		goto _again
+	f25:
+//line cef.rl:85
 
 		extValueEnd = p + 1
 
 		goto _again
-	f22:
-//line cef.rl:73
+	f24:
+//line cef.rl:95
+
+		recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", extKey, p+1))
+		(p)--
+		cs = 33
+
+		goto _again
+	f26:
+//line cef.rl:99
+
+		extKey, extValueStart, extValueEnd = "", 0, 0
+		// Resume processing at p, the start of the next extension key.
+		p = mark
+		cs = 29
+
+		goto _again
+	f2:
+//line cef.rl:38
+
+		mark = p
+
+//line cef.rl:41
+
+		mark_slash = p
+
+		goto _again
+	f3:
+//line cef.rl:38
+
+		mark = p
+
+//line cef.rl:50
+
+		e.DeviceVendor = replaceEscapes(data[mark:p], mark, escapes)
+		escapes = escapes[:0]
+
+		goto _again
+	f9:
+//line cef.rl:38
+
+		mark = p
+
+//line cef.rl:54
+
+		e.DeviceProduct = replaceEscapes(data[mark:p], mark, escapes)
+		escapes = escapes[:0]
+
+		goto _again
+	f12:
+//line cef.rl:38
+
+		mark = p
+
+//line cef.rl:58
+
+		e.DeviceVersion = replaceEscapes(data[mark:p], mark, escapes)
+		escapes = escapes[:0]
+
+		goto _again
+	f15:
+//line cef.rl:38
+
+		mark = p
+
+//line cef.rl:62
+
+		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, escapes)
+		escapes = escapes[:0]
+
+		goto _again
+	f18:
+//line cef.rl:38
+
+		mark = p
+
+//line cef.rl:66
+
+		e.Name = replaceEscapes(data[mark:p], mark, escapes)
+		escapes = escapes[:0]
+
+		goto _again
+	f21:
+//line cef.rl:38
+
+		mark = p
+
+//line cef.rl:70
+
+		e.Severity = data[mark:p]
+
+		goto _again
+	f33:
+//line cef.rl:38
+
+		mark = p
+
+//line cef.rl:85
 
 		extValueEnd = p + 1
 
-//line cef.rl:37
+		goto _again
+	f7:
+//line cef.rl:44
+
+		escapes = append(escapes, mark_slash, p)
+
+//line cef.rl:41
+
+		mark_slash = p
+
+		goto _again
+	f8:
+//line cef.rl:44
+
+		escapes = append(escapes, mark_slash, p)
+
+//line cef.rl:50
+
+		e.DeviceVendor = replaceEscapes(data[mark:p], mark, escapes)
+		escapes = escapes[:0]
+
+		goto _again
+	f11:
+//line cef.rl:44
+
+		escapes = append(escapes, mark_slash, p)
+
+//line cef.rl:54
+
+		e.DeviceProduct = replaceEscapes(data[mark:p], mark, escapes)
+		escapes = escapes[:0]
+
+		goto _again
+	f14:
+//line cef.rl:44
+
+		escapes = append(escapes, mark_slash, p)
+
+//line cef.rl:58
+
+		e.DeviceVersion = replaceEscapes(data[mark:p], mark, escapes)
+		escapes = escapes[:0]
+
+		goto _again
+	f17:
+//line cef.rl:44
+
+		escapes = append(escapes, mark_slash, p)
+
+//line cef.rl:62
+
+		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, escapes)
+		escapes = escapes[:0]
+
+		goto _again
+	f20:
+//line cef.rl:44
+
+		escapes = append(escapes, mark_slash, p)
+
+//line cef.rl:66
+
+		e.Name = replaceEscapes(data[mark:p], mark, escapes)
+		escapes = escapes[:0]
+
+		goto _again
+	f35:
+//line cef.rl:44
+
+		escapes = append(escapes, mark_slash, p)
+
+//line cef.rl:85
+
+		extValueEnd = p + 1
+
+		goto _again
+	f30:
+//line cef.rl:81
+
+		extValueStart = p
+		extValueEnd = p
+
+//line cef.rl:41
+
+		mark_slash = p
+
+		goto _again
+	f28:
+//line cef.rl:81
+
+		extValueStart = p
+		extValueEnd = p
+
+//line cef.rl:85
+
+		extValueEnd = p + 1
+
+		goto _again
+	f32:
+//line cef.rl:85
+
+		extValueEnd = p + 1
+
+//line cef.rl:38
 
 		mark = p
 
@@ -986,38 +1271,50 @@ func (e *Event) unpack(data string) error {
 		}
 		if (p) == eof {
 			switch _cef_eof_actions[cs] {
-			case 22:
-//line cef.rl:76
+			case 32:
+//line cef.rl:88
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(extKey) > 0 && extValueStart <= extValueEnd {
-					e.pushExtension(extKey, replaceExtensionEscapes(data[extValueStart:extValueEnd]))
-					extKey, extValueStart, extValueEnd = "", 0, 0
+					e.pushExtension(extKey, replaceEscapes(data[extValueStart:extValueEnd], extValueStart, escapes))
+					extKey, extValueStart, extValueEnd, escapes = "", 0, 0, escapes[:0]
 				}
 
-			case 16:
-//line cef.rl:83
+			case 25:
+//line cef.rl:95
 
 				recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", extKey, p+1))
 				(p)--
-				cs = 28
-				goto _again
+				cs = 33
 
-			case 19:
-//line cef.rl:69
+			case 35:
+//line cef.rl:44
+
+				escapes = append(escapes, mark_slash, p)
+
+//line cef.rl:88
+
+				// Reaching the EOF marks the end of the final extension value.
+				if len(extKey) > 0 && extValueStart <= extValueEnd {
+					e.pushExtension(extKey, replaceEscapes(data[extValueStart:extValueEnd], extValueStart, escapes))
+					extKey, extValueStart, extValueEnd, escapes = "", 0, 0, escapes[:0]
+				}
+
+			case 28:
+//line cef.rl:81
 
 				extValueStart = p
 				extValueEnd = p
 
-//line cef.rl:76
+//line cef.rl:88
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(extKey) > 0 && extValueStart <= extValueEnd {
-					e.pushExtension(extKey, replaceExtensionEscapes(data[extValueStart:extValueEnd]))
-					extKey, extValueStart, extValueEnd = "", 0, 0
+					e.pushExtension(extKey, replaceEscapes(data[extValueStart:extValueEnd], extValueStart, escapes))
+					extKey, extValueStart, extValueEnd, escapes = "", 0, 0, escapes[:0]
 				}
 
-//line parser.go:883
+//line parser.go:1116
 			}
 		}
 
@@ -1026,7 +1323,7 @@ func (e *Event) unpack(data string) error {
 		}
 	}
 
-//line cef.rl:145
+//line cef.rl:161
 
 	// Check if state machine completed.
 	if cs < cef_first_final {

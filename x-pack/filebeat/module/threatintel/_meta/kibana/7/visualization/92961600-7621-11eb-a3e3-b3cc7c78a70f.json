@@ -33,7 +33,7 @@
                         "type": "list"
                     },
                     {
-                        "fieldName": "threatintel.indicator.provider",
+                        "fieldName": "threat.indicator.provider",
                         "id": "1614117093181",
                         "indexPatternRefName": "control_1_index_pattern",
                         "label": "Indicator Provider",
@@ -48,7 +48,7 @@
                         "type": "list"
                     },
                     {
-                        "fieldName": "threatintel.indicator.type",
+                        "fieldName": "threat.indicator.type",
                         "id": "1614117117360",
                         "indexPatternRefName": "control_2_index_pattern",
                         "label": "Indicator Type",

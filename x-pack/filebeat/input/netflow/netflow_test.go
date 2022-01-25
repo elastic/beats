@@ -16,9 +16,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/pcap"
 	"github.com/stretchr/testify/assert"
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/pcap"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -201,7 +201,7 @@ func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 				flow.Fields.Delete("event.created")
 				ev[i] = flow
 			}
-			//return TestResult{Name: name, Error: err.Error(), Events: flowsToEvents(flows)}
+			// return TestResult{Name: name, Error: err.Error(), Events: flowsToEvents(flows)}
 			events = append(events, ev...)
 		}
 	}

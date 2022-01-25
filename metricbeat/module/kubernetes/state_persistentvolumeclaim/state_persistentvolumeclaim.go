@@ -69,7 +69,7 @@ func NewpersistentvolumeclaimMetricSet(base mb.BaseMetricSet) (mb.MetricSet, err
 				"kube_persistentvolumeclaim_status_phase":                    p.LabelMetric("phase", "phase"),
 			},
 			Labels: map[string]p.LabelMap{
-				"namespace":             p.KeyLabel(mb.ModuleDataKey + ".namespace.name"),
+				"namespace":             p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 				"persistentvolumeclaim": p.KeyLabel("name"),
 				"storageclass":          p.Label("storage_class"),
 				"volumename":            p.Label("volume_name"),

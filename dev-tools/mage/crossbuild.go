@@ -43,8 +43,8 @@ const defaultCrossBuildTarget = "golangCrossBuild"
 // See NewPlatformList for details about platform filtering expressions.
 var Platforms = BuildPlatforms.Defaults()
 
-// Types is the list of package types
-var SelectedPackageTypes []PackageType
+// SelectedPackageTypes is the list of package types
+var SelectedPackageTypes []PackageType = []PackageType{TarGz}
 
 func init() {
 	// Allow overriding via PLATFORMS.
@@ -134,14 +134,35 @@ func CrossBuild(options ...CrossBuildOption) error {
 		opt(&params)
 	}
 
-	// Docker is required for this target.
-	if err := HaveDocker(); err != nil {
-		return err
-	}
-
 	if len(params.Platforms) == 0 {
 		log.Printf("Skipping cross-build of target=%v because platforms list is empty.", params.Target)
 		return nil
+	}
+
+	// AIX can't really be crossbuilt, due to cgo and various compiler shortcomings.
+	// If we have a singular AIX platform set, revert to a native build toolchain
+	if runtime.GOOS == "aix" {
+		for _, platform := range params.Platforms {
+			if platform.GOOS() == "aix" {
+				if len(params.Platforms) != 1 {
+					return errors.New("AIX cannot be crossbuilt with other platforms. Set PLATFORMS='aix/ppc64'")
+				} else {
+					// This is basically a short-out so we can attempt to build on AIX in a relatively generic way
+					log.Printf("Target is building for AIX, skipping normal crossbuild process")
+					args := DefaultBuildArgs()
+					args.OutputDir = filepath.Join("build", "golang-crossbuild")
+					args.Name += "-" + Platform.GOOS + "-" + Platform.Arch
+					return Build(args)
+				}
+			}
+		}
+		// If we're here, something isn't set.
+		return errors.New("Cannot crossbuild on AIX. Either run `mage build` or set PLATFORMS='aix/ppc64'")
+	}
+
+	// Docker is required for this target.
+	if err := HaveDocker(); err != nil {
+		return err
 	}
 
 	if CrossBuildMountModcache {
@@ -221,8 +242,8 @@ func CrossBuildImage(platform string) (string, error) {
 		tagSuffix = "s390x"
 	case strings.HasPrefix(platform, "linux"):
 		// Use an older version of libc to gain greater OS compatibility.
-		// Debian 7 uses glibc 2.13.
-		tagSuffix = "main-debian7"
+		// Debian 8 uses glibc 2.19.
+		tagSuffix = "main-debian8"
 	}
 
 	goVersion, err := GoVersion()

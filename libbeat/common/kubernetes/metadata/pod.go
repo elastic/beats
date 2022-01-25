@@ -29,11 +29,12 @@ import (
 )
 
 type pod struct {
-	store     cache.Store
-	client    k8s.Interface
-	node      MetaGen
-	namespace MetaGen
-	resource  *Resource
+	store               cache.Store
+	client              k8s.Interface
+	node                MetaGen
+	namespace           MetaGen
+	resource            *Resource
+	addResourceMetadata *AddResourceMetadataConfig
 }
 
 // NewPodMetadataGenerator creates a metagen for pod resources
@@ -42,13 +43,16 @@ func NewPodMetadataGenerator(
 	pods cache.Store,
 	client k8s.Interface,
 	node MetaGen,
-	namespace MetaGen) MetaGen {
+	namespace MetaGen,
+	addResourceMetadata *AddResourceMetadataConfig) MetaGen {
+
 	return &pod{
-		resource:  NewResourceMetadataGenerator(cfg, client),
-		store:     pods,
-		node:      node,
-		namespace: namespace,
-		client:    client,
+		resource:            NewResourceMetadataGenerator(cfg, client),
+		store:               pods,
+		node:                node,
+		namespace:           namespace,
+		client:              client,
+		addResourceMetadata: addResourceMetadata,
 	}
 }
 
@@ -84,16 +88,19 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	out := p.resource.GenerateK8s("pod", obj, opts...)
 
 	// check if Pod is handled by a ReplicaSet which is controlled by a Deployment
-	rsName, _ := out.GetValue("replicaset.name")
-	if rsName, ok := rsName.(string); ok {
-		dep := p.getRSDeployment(rsName, po.GetNamespace())
-		if dep != "" {
-			out.Put("deployment.name", dep)
+	// TODO: same happens with CronJob vs Job. The hierarcy there is CronJob->Job->Pod
+	if p.addResourceMetadata.Deployment {
+		rsName, _ := out.GetValue("replicaset.name")
+		if rsName, ok := rsName.(string); ok {
+			dep := p.getRSDeployment(rsName, po.GetNamespace())
+			if dep != "" {
+				out.Put("deployment.name", dep)
+			}
 		}
 	}
 
 	if p.node != nil {
-		meta := p.node.GenerateFromName(po.Spec.NodeName, WithLabels("node"))
+		meta := p.node.GenerateFromName(po.Spec.NodeName, WithMetadata("node"))
 		if meta != nil {
 			out.Put("node", meta["node"])
 		} else {
@@ -106,8 +113,6 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	if p.namespace != nil {
 		meta := p.namespace.GenerateFromName(po.GetNamespace())
 		if meta != nil {
-			// Use this in 8.0
-			//out.Put("namespace", meta["namespace"])
 			out.DeepUpdate(meta)
 		}
 	}

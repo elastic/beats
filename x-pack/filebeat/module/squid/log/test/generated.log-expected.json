@@ -1,9 +1,7 @@
 [
     {
         "@timestamp": "2016-01-29T08:09:59.000Z",
-        "destination.ip": [
-            "10.234.224.44"
-        ],
+        "destination.ip": "10.234.224.44",
         "event.action": "deny",
         "event.code": "PROPFIND",
         "event.dataset": "squid.log",
@@ -46,9 +44,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 5699,
-        "source.ip": [
-            "10.251.224.219"
-        ],
+        "source.ip": "10.251.224.219",
         "source.port": 7337,
         "tags": [
             "forwarded",
@@ -77,9 +73,7 @@
     },
     {
         "@timestamp": "2016-02-12T03:12:33.000Z",
-        "destination.ip": [
-            "10.70.36.222"
-        ],
+        "destination.ip": "10.70.36.222",
         "event.action": "deny",
         "event.code": "PURGE",
         "event.dataset": "squid.log",
@@ -123,9 +117,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 208,
-        "source.ip": [
-            "10.102.123.34"
-        ],
+        "source.ip": "10.102.123.34",
         "source.port": 7178,
         "tags": [
             "forwarded",
@@ -155,9 +147,7 @@
     },
     {
         "@timestamp": "2016-02-26T10:15:08.000Z",
-        "destination.ip": [
-            "10.142.172.64"
-        ],
+        "destination.ip": "10.142.172.64",
         "event.action": "accept",
         "event.code": "OPTIONS",
         "event.dataset": "squid.log",
@@ -201,9 +191,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 5493,
-        "source.ip": [
-            "10.15.135.248"
-        ],
+        "source.ip": "10.15.135.248",
         "source.port": 7269,
         "tags": [
             "forwarded",
@@ -233,9 +221,7 @@
     },
     {
         "@timestamp": "2016-03-12T05:17:42.000Z",
-        "destination.ip": [
-            "10.81.122.126"
-        ],
+        "destination.ip": "10.81.122.126",
         "event.action": "allow",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -279,9 +265,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 1156,
-        "source.ip": [
-            "10.44.134.153"
-        ],
+        "source.ip": "10.44.134.153",
         "source.port": 5162,
         "tags": [
             "forwarded",
@@ -310,9 +294,7 @@
     },
     {
         "@timestamp": "2016-03-26T12:20:16.000Z",
-        "destination.ip": [
-            "10.171.175.51"
-        ],
+        "destination.ip": "10.171.175.51",
         "event.action": "cancel",
         "event.code": "PUT",
         "event.dataset": "squid.log",
@@ -356,9 +338,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 5738,
-        "source.ip": [
-            "10.160.95.56"
-        ],
+        "source.ip": "10.160.95.56",
         "source.port": 1980,
         "tags": [
             "forwarded",
@@ -388,9 +368,7 @@
     },
     {
         "@timestamp": "2016-04-09T07:22:51.000Z",
-        "destination.ip": [
-            "10.12.195.60"
-        ],
+        "destination.ip": "10.12.195.60",
         "event.action": "accept",
         "event.code": "HEAD",
         "event.dataset": "squid.log",
@@ -437,9 +415,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 2946,
-        "source.ip": [
-            "10.175.107.139"
-        ],
+        "source.ip": "10.175.107.139",
         "source.port": 4243,
         "tags": [
             "forwarded",
@@ -469,9 +445,7 @@
     },
     {
         "@timestamp": "2016-04-24T14:25:25.000Z",
-        "destination.ip": [
-            "10.207.249.121"
-        ],
+        "destination.ip": "10.207.249.121",
         "event.action": "allow",
         "event.code": "DELETE",
         "event.dataset": "squid.log",
@@ -515,9 +489,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1296,
-        "source.ip": [
-            "10.198.136.50"
-        ],
+        "source.ip": "10.198.136.50",
         "source.port": 6875,
         "tags": [
             "forwarded",
@@ -547,9 +519,7 @@
     },
     {
         "@timestamp": "2016-05-08T09:27:59.000Z",
-        "destination.ip": [
-            "10.116.120.216"
-        ],
+        "destination.ip": "10.116.120.216",
         "event.action": "accept",
         "event.code": "PROPFIND",
         "event.dataset": "squid.log",
@@ -592,9 +562,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 1510,
-        "source.ip": [
-            "10.34.9.93"
-        ],
+        "source.ip": "10.34.9.93",
         "source.port": 124,
         "tags": [
             "forwarded",
@@ -623,9 +591,7 @@
     },
     {
         "@timestamp": "2016-05-22T04:30:33.000Z",
-        "destination.ip": [
-            "10.30.216.41"
-        ],
+        "destination.ip": "10.30.216.41",
         "event.action": "accept",
         "event.code": "HEAD",
         "event.dataset": "squid.log",
@@ -671,9 +637,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 5794,
-        "source.ip": [
-            "10.90.131.186"
-        ],
+        "source.ip": "10.90.131.186",
         "source.port": 6343,
         "tags": [
             "forwarded",
@@ -702,9 +666,7 @@
     },
     {
         "@timestamp": "2016-06-05T11:33:08.000Z",
-        "destination.ip": [
-            "10.203.172.203"
-        ],
+        "destination.ip": "10.203.172.203",
         "event.action": "accept",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
@@ -750,9 +712,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 6884,
-        "source.ip": [
-            "10.8.88.110"
-        ],
+        "source.ip": "10.8.88.110",
         "source.port": 7618,
         "tags": [
             "forwarded",
@@ -782,9 +742,7 @@
     },
     {
         "@timestamp": "2016-06-20T06:35:42.000Z",
-        "destination.ip": [
-            "10.158.185.163"
-        ],
+        "destination.ip": "10.158.185.163",
         "event.action": "allow",
         "event.code": "UNLOCK",
         "event.dataset": "squid.log",
@@ -827,9 +785,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 987,
-        "source.ip": [
-            "10.71.34.9"
-        ],
+        "source.ip": "10.71.34.9",
         "source.port": 267,
         "tags": [
             "forwarded",
@@ -859,9 +815,7 @@
     },
     {
         "@timestamp": "2016-07-04T13:38:16.000Z",
-        "destination.ip": [
-            "10.201.76.240"
-        ],
+        "destination.ip": "10.201.76.240",
         "event.action": "accept",
         "event.code": "OPTIONS",
         "event.dataset": "squid.log",
@@ -905,9 +859,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 2655,
-        "source.ip": [
-            "10.210.74.24"
-        ],
+        "source.ip": "10.210.74.24",
         "source.port": 6423,
         "tags": [
             "forwarded",
@@ -933,9 +885,7 @@
     },
     {
         "@timestamp": "2016-07-18T08:40:50.000Z",
-        "destination.ip": [
-            "10.206.136.206"
-        ],
+        "destination.ip": "10.206.136.206",
         "event.action": "deny",
         "event.code": "COPY",
         "event.dataset": "squid.log",
@@ -979,9 +929,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 6462,
-        "source.ip": [
-            "10.114.138.121"
-        ],
+        "source.ip": "10.114.138.121",
         "source.port": 1939,
         "tags": [
             "forwarded",
@@ -1011,9 +959,7 @@
     },
     {
         "@timestamp": "2016-08-02T03:43:25.000Z",
-        "destination.ip": [
-            "10.134.161.118"
-        ],
+        "destination.ip": "10.134.161.118",
         "event.action": "block",
         "event.code": "COPY",
         "event.dataset": "squid.log",
@@ -1057,9 +1003,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 3458,
-        "source.ip": [
-            "10.200.199.166"
-        ],
+        "source.ip": "10.200.199.166",
         "source.port": 3727,
         "tags": [
             "forwarded",
@@ -1089,9 +1033,7 @@
     },
     {
         "@timestamp": "2016-08-16T10:45:59.000Z",
-        "destination.ip": [
-            "10.76.3.41"
-        ],
+        "destination.ip": "10.76.3.41",
         "event.action": "allow",
         "event.code": "NONE",
         "event.dataset": "squid.log",
@@ -1135,9 +1077,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 2989,
-        "source.ip": [
-            "10.122.46.71"
-        ],
+        "source.ip": "10.122.46.71",
         "source.port": 2807,
         "tags": [
             "forwarded",
@@ -1167,9 +1107,7 @@
     },
     {
         "@timestamp": "2016-08-30T05:48:33.000Z",
-        "destination.ip": [
-            "10.249.213.83"
-        ],
+        "destination.ip": "10.249.213.83",
         "event.action": "accept",
         "event.code": "PROPFIND",
         "event.dataset": "squid.log",
@@ -1213,9 +1151,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 1250,
-        "source.ip": [
-            "10.164.250.63"
-        ],
+        "source.ip": "10.164.250.63",
         "source.port": 2530,
         "tags": [
             "forwarded",
@@ -1245,9 +1181,7 @@
     },
     {
         "@timestamp": "2016-09-13T12:51:07.000Z",
-        "destination.ip": [
-            "10.236.248.65"
-        ],
+        "destination.ip": "10.236.248.65",
         "event.action": "cancel",
         "event.code": "HEAD",
         "event.dataset": "squid.log",
@@ -1294,9 +1228,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 3280,
-        "source.ip": [
-            "10.61.242.75"
-        ],
+        "source.ip": "10.61.242.75",
         "source.port": 2591,
         "tags": [
             "forwarded",
@@ -1326,9 +1258,7 @@
     },
     {
         "@timestamp": "2016-09-28T07:53:42.000Z",
-        "destination.ip": [
-            "10.214.7.83"
-        ],
+        "destination.ip": "10.214.7.83",
         "event.action": "block",
         "event.code": "PUT",
         "event.dataset": "squid.log",
@@ -1372,9 +1302,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 2462,
-        "source.ip": [
-            "10.13.59.31"
-        ],
+        "source.ip": "10.13.59.31",
         "source.port": 5685,
         "tags": [
             "forwarded",
@@ -1404,9 +1332,7 @@
     },
     {
         "@timestamp": "2016-10-12T14:56:16.000Z",
-        "destination.ip": [
-            "10.49.92.179"
-        ],
+        "destination.ip": "10.49.92.179",
         "event.action": "accept",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -1453,9 +1379,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 3128,
-        "source.ip": [
-            "10.89.201.140"
-        ],
+        "source.ip": "10.89.201.140",
         "source.port": 2447,
         "tags": [
             "forwarded",
@@ -1485,9 +1409,7 @@
     },
     {
         "@timestamp": "2016-10-26T09:58:50.000Z",
-        "destination.ip": [
-            "10.90.86.89"
-        ],
+        "destination.ip": "10.90.86.89",
         "event.action": "deny",
         "event.code": "PURGE",
         "event.dataset": "squid.log",
@@ -1531,9 +1453,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 5516,
-        "source.ip": [
-            "10.235.7.92"
-        ],
+        "source.ip": "10.235.7.92",
         "source.port": 5787,
         "tags": [
             "forwarded",
@@ -1563,9 +1483,7 @@
     },
     {
         "@timestamp": "2016-11-10T05:01:24.000Z",
-        "destination.ip": [
-            "10.14.48.16"
-        ],
+        "destination.ip": "10.14.48.16",
         "event.action": "cancel",
         "event.code": "PROPFIND",
         "event.dataset": "squid.log",
@@ -1609,9 +1527,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 1612,
-        "source.ip": [
-            "10.14.211.43"
-        ],
+        "source.ip": "10.14.211.43",
         "source.port": 4762,
         "tags": [
             "forwarded",
@@ -1641,9 +1557,7 @@
     },
     {
         "@timestamp": "2016-11-24T12:03:59.000Z",
-        "destination.ip": [
-            "10.93.123.174"
-        ],
+        "destination.ip": "10.93.123.174",
         "event.action": "block",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
@@ -1689,9 +1603,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 1563,
-        "source.ip": [
-            "10.47.25.230"
-        ],
+        "source.ip": "10.47.25.230",
         "source.port": 5491,
         "tags": [
             "forwarded",
@@ -1721,9 +1633,7 @@
     },
     {
         "@timestamp": "2016-12-08T07:06:33.000Z",
-        "destination.ip": [
-            "10.233.48.103"
-        ],
+        "destination.ip": "10.233.48.103",
         "event.action": "cancel",
         "event.code": "MKOL",
         "event.dataset": "squid.log",
@@ -1767,9 +1677,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 584,
-        "source.ip": [
-            "10.7.46.36"
-        ],
+        "source.ip": "10.7.46.36",
         "source.port": 837,
         "tags": [
             "forwarded",
@@ -1799,9 +1707,7 @@
     },
     {
         "@timestamp": "2016-12-23T14:09:07.000Z",
-        "destination.ip": [
-            "10.27.58.92"
-        ],
+        "destination.ip": "10.27.58.92",
         "event.action": "accept",
         "event.code": "PROPATCH",
         "event.dataset": "squid.log",
@@ -1845,9 +1751,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 63,
-        "source.ip": [
-            "10.93.220.10"
-        ],
+        "source.ip": "10.93.220.10",
         "source.port": 2805,
         "tags": [
             "forwarded",
@@ -1877,9 +1781,7 @@
     },
     {
         "@timestamp": "2017-01-06T09:11:41.000Z",
-        "destination.ip": [
-            "10.135.217.12"
-        ],
+        "destination.ip": "10.135.217.12",
         "event.action": "block",
         "event.code": "PURGE",
         "event.dataset": "squid.log",
@@ -1923,9 +1825,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 5676,
-        "source.ip": [
-            "10.213.144.249"
-        ],
+        "source.ip": "10.213.144.249",
         "source.port": 4427,
         "tags": [
             "forwarded",
@@ -1955,9 +1855,7 @@
     },
     {
         "@timestamp": "2017-01-20T04:14:16.000Z",
-        "destination.ip": [
-            "10.233.239.112"
-        ],
+        "destination.ip": "10.233.239.112",
         "event.action": "cancel",
         "event.code": "PURGE",
         "event.dataset": "squid.log",
@@ -2001,9 +1899,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 3780,
-        "source.ip": [
-            "10.13.226.57"
-        ],
+        "source.ip": "10.13.226.57",
         "source.port": 3275,
         "tags": [
             "forwarded",
@@ -2033,9 +1929,7 @@
     },
     {
         "@timestamp": "2017-02-03T11:16:50.000Z",
-        "destination.ip": [
-            "10.21.169.127"
-        ],
+        "destination.ip": "10.21.169.127",
         "event.action": "accept",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
@@ -2081,9 +1975,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 2835,
-        "source.ip": [
-            "10.161.203.252"
-        ],
+        "source.ip": "10.161.203.252",
         "source.port": 301,
         "tags": [
             "forwarded",
@@ -2113,9 +2005,7 @@
     },
     {
         "@timestamp": "2017-02-18T06:19:24.000Z",
-        "destination.ip": [
-            "10.69.139.26"
-        ],
+        "destination.ip": "10.69.139.26",
         "event.action": "block",
         "event.code": "LOCK",
         "event.dataset": "squid.log",
@@ -2159,9 +2049,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 7124,
-        "source.ip": [
-            "10.17.215.111"
-        ],
+        "source.ip": "10.17.215.111",
         "source.port": 148,
         "tags": [
             "forwarded",
@@ -2191,9 +2079,7 @@
     },
     {
         "@timestamp": "2017-03-04T13:21:59.000Z",
-        "destination.ip": [
-            "10.104.80.189"
-        ],
+        "destination.ip": "10.104.80.189",
         "event.action": "accept",
         "event.code": "COPY",
         "event.dataset": "squid.log",
@@ -2237,9 +2123,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 1542,
-        "source.ip": [
-            "10.10.213.83"
-        ],
+        "source.ip": "10.10.213.83",
         "source.port": 7206,
         "tags": [
             "forwarded",
@@ -2269,9 +2153,7 @@
     },
     {
         "@timestamp": "2017-03-18T08:24:33.000Z",
-        "destination.ip": [
-            "10.116.230.217"
-        ],
+        "destination.ip": "10.116.230.217",
         "event.action": "block",
         "event.code": "UNLOCK",
         "event.dataset": "squid.log",
@@ -2314,9 +2196,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 7122,
-        "source.ip": [
-            "10.125.131.91"
-        ],
+        "source.ip": "10.125.131.91",
         "source.port": 3480,
         "tags": [
             "forwarded",
@@ -2343,9 +2223,7 @@
     },
     {
         "@timestamp": "2017-04-02T03:27:07.000Z",
-        "destination.ip": [
-            "10.119.90.128"
-        ],
+        "destination.ip": "10.119.90.128",
         "event.action": "cancel",
         "event.code": "ICP_QUERY",
         "event.dataset": "squid.log",
@@ -2389,9 +2267,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 4826,
-        "source.ip": [
-            "10.26.96.202"
-        ],
+        "source.ip": "10.26.96.202",
         "source.port": 2751,
         "tags": [
             "forwarded",
@@ -2421,9 +2297,7 @@
     },
     {
         "@timestamp": "2017-04-16T10:29:41.000Z",
-        "destination.ip": [
-            "10.76.110.144"
-        ],
+        "destination.ip": "10.76.110.144",
         "event.action": "deny",
         "event.code": "HEAD",
         "event.dataset": "squid.log",
@@ -2470,9 +2344,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 3386,
-        "source.ip": [
-            "10.0.98.205"
-        ],
+        "source.ip": "10.0.98.205",
         "source.port": 126,
         "tags": [
             "forwarded",
@@ -2502,9 +2374,7 @@
     },
     {
         "@timestamp": "2017-04-30T05:32:16.000Z",
-        "destination.ip": [
-            "10.135.46.242"
-        ],
+        "destination.ip": "10.135.46.242",
         "event.action": "deny",
         "event.code": "MOVE",
         "event.dataset": "squid.log",
@@ -2548,9 +2418,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 1940,
-        "source.ip": [
-            "10.224.11.165"
-        ],
+        "source.ip": "10.224.11.165",
         "source.port": 1646,
         "tags": [
             "forwarded",
@@ -2580,9 +2448,7 @@
     },
     {
         "@timestamp": "2017-05-14T12:34:50.000Z",
-        "destination.ip": [
-            "10.154.53.249"
-        ],
+        "destination.ip": "10.154.53.249",
         "event.action": "accept",
         "event.code": "TRACE",
         "event.dataset": "squid.log",
@@ -2625,9 +2491,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 7398,
-        "source.ip": [
-            "10.27.44.4"
-        ],
+        "source.ip": "10.27.44.4",
         "source.port": 4686,
         "tags": [
             "forwarded",
@@ -2657,9 +2521,7 @@
     },
     {
         "@timestamp": "2017-05-29T07:37:24.000Z",
-        "destination.ip": [
-            "10.150.245.88"
-        ],
+        "destination.ip": "10.150.245.88",
         "event.action": "cancel",
         "event.code": "COPY",
         "event.dataset": "squid.log",
@@ -2703,9 +2565,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 1738,
-        "source.ip": [
-            "10.93.39.140"
-        ],
+        "source.ip": "10.93.39.140",
         "source.port": 4275,
         "tags": [
             "forwarded",
@@ -2735,9 +2595,7 @@
     },
     {
         "@timestamp": "2017-06-12T14:39:58.000Z",
-        "destination.ip": [
-            "10.73.207.70"
-        ],
+        "destination.ip": "10.73.207.70",
         "event.action": "block",
         "event.code": "UNLOCK",
         "event.dataset": "squid.log",
@@ -2781,9 +2639,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 3023,
-        "source.ip": [
-            "10.61.92.2"
-        ],
+        "source.ip": "10.61.92.2",
         "source.port": 6595,
         "tags": [
             "forwarded",
@@ -2813,9 +2669,7 @@
     },
     {
         "@timestamp": "2017-06-26T09:42:33.000Z",
-        "destination.ip": [
-            "10.50.124.116"
-        ],
+        "destination.ip": "10.50.124.116",
         "event.action": "allow",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -2858,9 +2712,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 2741,
-        "source.ip": [
-            "10.84.32.178"
-        ],
+        "source.ip": "10.84.32.178",
         "source.port": 5271,
         "tags": [
             "forwarded",
@@ -2888,9 +2740,7 @@
     },
     {
         "@timestamp": "2017-07-11T04:45:07.000Z",
-        "destination.ip": [
-            "10.211.234.224"
-        ],
+        "destination.ip": "10.211.234.224",
         "event.action": "accept",
         "event.code": "TRACE",
         "event.dataset": "squid.log",
@@ -2934,9 +2784,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 5564,
-        "source.ip": [
-            "10.173.222.131"
-        ],
+        "source.ip": "10.173.222.131",
         "source.port": 918,
         "tags": [
             "forwarded",
@@ -2966,9 +2814,7 @@
     },
     {
         "@timestamp": "2017-07-25T11:47:41.000Z",
-        "destination.ip": [
-            "10.0.157.225"
-        ],
+        "destination.ip": "10.0.157.225",
         "event.action": "deny",
         "event.code": "PROPFIND",
         "event.dataset": "squid.log",
@@ -3012,9 +2858,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 1282,
-        "source.ip": [
-            "10.11.83.126"
-        ],
+        "source.ip": "10.11.83.126",
         "source.port": 6581,
         "tags": [
             "forwarded",
@@ -3044,9 +2888,7 @@
     },
     {
         "@timestamp": "2017-08-08T06:50:15.000Z",
-        "destination.ip": [
-            "10.92.237.93"
-        ],
+        "destination.ip": "10.92.237.93",
         "event.action": "cancel",
         "event.code": "PUT",
         "event.dataset": "squid.log",
@@ -3090,9 +2932,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 5107,
-        "source.ip": [
-            "10.228.77.21"
-        ],
+        "source.ip": "10.228.77.21",
         "source.port": 6889,
         "tags": [
             "forwarded",
@@ -3122,9 +2962,7 @@
     },
     {
         "@timestamp": "2017-08-22T13:52:50.000Z",
-        "destination.ip": [
-            "10.20.28.92"
-        ],
+        "destination.ip": "10.20.28.92",
         "event.action": "allow",
         "event.code": "POST",
         "event.dataset": "squid.log",
@@ -3170,9 +3008,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 409,
-        "source.ip": [
-            "10.102.215.23"
-        ],
+        "source.ip": "10.102.215.23",
         "source.port": 3665,
         "tags": [
             "forwarded",
@@ -3200,9 +3036,7 @@
     },
     {
         "@timestamp": "2017-09-06T08:55:24.000Z",
-        "destination.ip": [
-            "10.17.87.79"
-        ],
+        "destination.ip": "10.17.87.79",
         "event.action": "block",
         "event.code": "NONE",
         "event.dataset": "squid.log",
@@ -3246,9 +3080,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 4595,
-        "source.ip": [
-            "10.45.28.159"
-        ],
+        "source.ip": "10.45.28.159",
         "source.port": 5627,
         "tags": [
             "forwarded",
@@ -3278,9 +3110,7 @@
     },
     {
         "@timestamp": "2017-09-20T03:57:58.000Z",
-        "destination.ip": [
-            "10.189.94.51"
-        ],
+        "destination.ip": "10.189.94.51",
         "event.action": "allow",
         "event.code": "DELETE",
         "event.dataset": "squid.log",
@@ -3324,9 +3154,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 5704,
-        "source.ip": [
-            "10.177.238.45"
-        ],
+        "source.ip": "10.177.238.45",
         "source.port": 5137,
         "tags": [
             "forwarded",
@@ -3356,9 +3184,7 @@
     },
     {
         "@timestamp": "2017-10-04T11:00:32.000Z",
-        "destination.ip": [
-            "10.101.85.169"
-        ],
+        "destination.ip": "10.101.85.169",
         "event.action": "accept",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -3405,9 +3231,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 5697,
-        "source.ip": [
-            "10.46.77.76"
-        ],
+        "source.ip": "10.46.77.76",
         "source.port": 5169,
         "tags": [
             "forwarded",
@@ -3437,9 +3261,7 @@
     },
     {
         "@timestamp": "2017-10-19T06:03:07.000Z",
-        "destination.ip": [
-            "10.231.7.209"
-        ],
+        "destination.ip": "10.231.7.209",
         "event.action": "block",
         "event.code": "HEAD",
         "event.dataset": "squid.log",
@@ -3485,9 +3307,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 1247,
-        "source.ip": [
-            "10.24.54.129"
-        ],
+        "source.ip": "10.24.54.129",
         "source.port": 77,
         "tags": [
             "forwarded",
@@ -3516,9 +3336,7 @@
     },
     {
         "@timestamp": "2017-11-02T13:05:41.000Z",
-        "destination.ip": [
-            "10.77.129.175"
-        ],
+        "destination.ip": "10.77.129.175",
         "event.action": "allow",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
@@ -3564,9 +3382,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 2617,
-        "source.ip": [
-            "10.121.163.5"
-        ],
+        "source.ip": "10.121.163.5",
         "source.port": 7803,
         "tags": [
             "forwarded",
@@ -3596,9 +3412,7 @@
     },
     {
         "@timestamp": "2017-11-16T08:08:15.000Z",
-        "destination.ip": [
-            "10.116.146.114"
-        ],
+        "destination.ip": "10.116.146.114",
         "event.action": "deny",
         "event.code": "PROPFIND",
         "event.dataset": "squid.log",
@@ -3642,9 +3456,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1444,
-        "source.ip": [
-            "10.51.236.148"
-        ],
+        "source.ip": "10.51.236.148",
         "source.port": 329,
         "tags": [
             "forwarded",
@@ -3674,9 +3486,7 @@
     },
     {
         "@timestamp": "2017-12-01T03:10:49.000Z",
-        "destination.ip": [
-            "10.217.222.99"
-        ],
+        "destination.ip": "10.217.222.99",
         "event.action": "block",
         "event.code": "NONE",
         "event.dataset": "squid.log",
@@ -3720,9 +3530,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 2512,
-        "source.ip": [
-            "10.244.108.135"
-        ],
+        "source.ip": "10.244.108.135",
         "source.port": 6997,
         "tags": [
             "forwarded",
@@ -3752,9 +3560,7 @@
     },
     {
         "@timestamp": "2017-12-15T10:13:24.000Z",
-        "destination.ip": [
-            "10.150.198.112"
-        ],
+        "destination.ip": "10.150.198.112",
         "event.action": "block",
         "event.code": "PUT",
         "event.dataset": "squid.log",
@@ -3798,9 +3604,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 1370,
-        "source.ip": [
-            "10.4.69.152"
-        ],
+        "source.ip": "10.4.69.152",
         "source.port": 3833,
         "tags": [
             "forwarded",
@@ -3830,9 +3634,7 @@
     },
     {
         "@timestamp": "2017-12-29T05:15:58.000Z",
-        "destination.ip": [
-            "10.45.54.107"
-        ],
+        "destination.ip": "10.45.54.107",
         "event.action": "accept",
         "event.code": "POST",
         "event.dataset": "squid.log",
@@ -3877,9 +3679,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 7490,
-        "source.ip": [
-            "10.45.114.111"
-        ],
+        "source.ip": "10.45.114.111",
         "source.port": 357,
         "tags": [
             "forwarded",
@@ -3908,9 +3708,7 @@
     },
     {
         "@timestamp": "2018-01-12T12:18:32.000Z",
-        "destination.ip": [
-            "10.205.28.24"
-        ],
+        "destination.ip": "10.205.28.24",
         "event.action": "allow",
         "event.code": "TRACE",
         "event.dataset": "squid.log",
@@ -3954,9 +3752,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 742,
-        "source.ip": [
-            "10.49.242.174"
-        ],
+        "source.ip": "10.49.242.174",
         "source.port": 4078,
         "tags": [
             "forwarded",
@@ -3986,9 +3782,7 @@
     },
     {
         "@timestamp": "2018-01-27T07:21:06.000Z",
-        "destination.ip": [
-            "10.183.223.149"
-        ],
+        "destination.ip": "10.183.223.149",
         "event.action": "deny",
         "event.code": "HEAD",
         "event.dataset": "squid.log",
@@ -4035,9 +3829,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 6366,
-        "source.ip": [
-            "10.17.202.219"
-        ],
+        "source.ip": "10.17.202.219",
         "source.port": 487,
         "tags": [
             "forwarded",
@@ -4063,9 +3855,7 @@
     },
     {
         "@timestamp": "2018-02-10T14:23:41.000Z",
-        "destination.ip": [
-            "10.88.172.222"
-        ],
+        "destination.ip": "10.88.172.222",
         "event.action": "cancel",
         "event.code": "MOVE",
         "event.dataset": "squid.log",
@@ -4109,9 +3899,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 6695,
-        "source.ip": [
-            "10.81.140.173"
-        ],
+        "source.ip": "10.81.140.173",
         "source.port": 7623,
         "tags": [
             "forwarded",
@@ -4137,9 +3925,7 @@
     },
     {
         "@timestamp": "2018-02-24T09:26:15.000Z",
-        "destination.ip": [
-            "10.247.53.179"
-        ],
+        "destination.ip": "10.247.53.179",
         "event.action": "accept",
         "event.code": "OPTIONS",
         "event.dataset": "squid.log",
@@ -4183,9 +3969,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 6835,
-        "source.ip": [
-            "10.162.129.196"
-        ],
+        "source.ip": "10.162.129.196",
         "source.port": 4247,
         "tags": [
             "forwarded",
@@ -4211,9 +3995,7 @@
     },
     {
         "@timestamp": "2018-03-11T04:28:49.000Z",
-        "destination.ip": [
-            "10.172.148.223"
-        ],
+        "destination.ip": "10.172.148.223",
         "event.action": "accept",
         "event.code": "UNLOCK",
         "event.dataset": "squid.log",
@@ -4257,9 +4039,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 3066,
-        "source.ip": [
-            "10.110.86.230"
-        ],
+        "source.ip": "10.110.86.230",
         "source.port": 536,
         "tags": [
             "forwarded",
@@ -4289,9 +4069,7 @@
     },
     {
         "@timestamp": "2018-03-25T11:31:24.000Z",
-        "destination.ip": [
-            "10.232.19.43"
-        ],
+        "destination.ip": "10.232.19.43",
         "event.action": "deny",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -4338,9 +4116,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 729,
-        "source.ip": [
-            "10.93.159.170"
-        ],
+        "source.ip": "10.93.159.170",
         "source.port": 3481,
         "tags": [
             "forwarded",
@@ -4370,9 +4146,7 @@
     },
     {
         "@timestamp": "2018-04-08T06:33:58.000Z",
-        "destination.ip": [
-            "10.55.55.72"
-        ],
+        "destination.ip": "10.55.55.72",
         "event.action": "cancel",
         "event.code": "ICP_QUERY",
         "event.dataset": "squid.log",
@@ -4416,9 +4190,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 2007,
-        "source.ip": [
-            "10.207.97.192"
-        ],
+        "source.ip": "10.207.97.192",
         "source.port": 973,
         "tags": [
             "forwarded",
@@ -4448,9 +4220,7 @@
     },
     {
         "@timestamp": "2018-04-22T13:36:32.000Z",
-        "destination.ip": [
-            "10.89.73.240"
-        ],
+        "destination.ip": "10.89.73.240",
         "event.action": "deny",
         "event.code": "MOVE",
         "event.dataset": "squid.log",
@@ -4494,9 +4264,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 5561,
-        "source.ip": [
-            "10.41.156.88"
-        ],
+        "source.ip": "10.41.156.88",
         "source.port": 203,
         "tags": [
             "forwarded",
@@ -4526,9 +4294,7 @@
     },
     {
         "@timestamp": "2018-05-07T08:39:06.000Z",
-        "destination.ip": [
-            "10.101.183.86"
-        ],
+        "destination.ip": "10.101.183.86",
         "event.action": "allow",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
@@ -4574,9 +4340,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 6451,
-        "source.ip": [
-            "10.54.44.231"
-        ],
+        "source.ip": "10.54.44.231",
         "source.port": 5292,
         "tags": [
             "forwarded",
@@ -4602,9 +4366,7 @@
     },
     {
         "@timestamp": "2018-05-21T03:41:41.000Z",
-        "destination.ip": [
-            "10.130.150.189"
-        ],
+        "destination.ip": "10.130.150.189",
         "event.action": "accept",
         "event.code": "LOCK",
         "event.dataset": "squid.log",
@@ -4648,9 +4410,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 1223,
-        "source.ip": [
-            "10.181.177.74"
-        ],
+        "source.ip": "10.181.177.74",
         "source.port": 3378,
         "tags": [
             "forwarded",
@@ -4680,9 +4440,7 @@
     },
     {
         "@timestamp": "2018-06-04T10:44:15.000Z",
-        "destination.ip": [
-            "10.83.130.95"
-        ],
+        "destination.ip": "10.83.130.95",
         "event.action": "deny",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -4729,9 +4487,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 7030,
-        "source.ip": [
-            "10.76.220.3"
-        ],
+        "source.ip": "10.76.220.3",
         "source.port": 2492,
         "tags": [
             "forwarded",
@@ -4761,9 +4517,7 @@
     },
     {
         "@timestamp": "2018-06-19T05:46:49.000Z",
-        "destination.ip": [
-            "10.166.160.217"
-        ],
+        "destination.ip": "10.166.160.217",
         "event.action": "deny",
         "event.code": "COPY",
         "event.dataset": "squid.log",
@@ -4807,9 +4561,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 2429,
-        "source.ip": [
-            "10.219.245.58"
-        ],
+        "source.ip": "10.219.245.58",
         "source.port": 7073,
         "tags": [
             "forwarded",
@@ -4837,9 +4589,7 @@
     },
     {
         "@timestamp": "2018-07-03T12:49:23.000Z",
-        "destination.ip": [
-            "10.183.243.246"
-        ],
+        "destination.ip": "10.183.243.246",
         "event.action": "cancel",
         "event.code": "UNLOCK",
         "event.dataset": "squid.log",
@@ -4883,9 +4633,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 3267,
-        "source.ip": [
-            "10.121.121.153"
-        ],
+        "source.ip": "10.121.121.153",
         "source.port": 723,
         "tags": [
             "forwarded",
@@ -4915,9 +4663,7 @@
     },
     {
         "@timestamp": "2018-07-17T07:51:58.000Z",
-        "destination.ip": [
-            "10.202.224.209"
-        ],
+        "destination.ip": "10.202.224.209",
         "event.action": "cancel",
         "event.code": "OPTIONS",
         "event.dataset": "squid.log",
@@ -4961,9 +4707,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 3141,
-        "source.ip": [
-            "10.54.5.47"
-        ],
+        "source.ip": "10.54.5.47",
         "source.port": 1585,
         "tags": [
             "forwarded",
@@ -4993,9 +4737,7 @@
     },
     {
         "@timestamp": "2018-08-01T14:54:32.000Z",
-        "destination.ip": [
-            "10.170.234.233"
-        ],
+        "destination.ip": "10.170.234.233",
         "event.action": "allow",
         "event.code": "PROPFIND",
         "event.dataset": "squid.log",
@@ -5039,9 +4781,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 2046,
-        "source.ip": [
-            "10.72.99.69"
-        ],
+        "source.ip": "10.72.99.69",
         "source.port": 3172,
         "tags": [
             "forwarded",
@@ -5071,9 +4811,7 @@
     },
     {
         "@timestamp": "2018-08-15T09:57:06.000Z",
-        "destination.ip": [
-            "10.142.130.227"
-        ],
+        "destination.ip": "10.142.130.227",
         "event.action": "allow",
         "event.code": "DELETE",
         "event.dataset": "squid.log",
@@ -5117,9 +4855,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 7795,
-        "source.ip": [
-            "10.245.240.47"
-        ],
+        "source.ip": "10.245.240.47",
         "source.port": 4017,
         "tags": [
             "forwarded",
@@ -5149,9 +4885,7 @@
     },
     {
         "@timestamp": "2018-08-29T04:59:40.000Z",
-        "destination.ip": [
-            "10.61.110.7"
-        ],
+        "destination.ip": "10.61.110.7",
         "event.action": "deny",
         "event.code": "DELETE",
         "event.dataset": "squid.log",
@@ -5195,9 +4929,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 508,
-        "source.ip": [
-            "10.62.188.193"
-        ],
+        "source.ip": "10.62.188.193",
         "source.port": 4104,
         "tags": [
             "forwarded",
@@ -5223,9 +4955,7 @@
     },
     {
         "@timestamp": "2018-09-12T12:02:15.000Z",
-        "destination.ip": [
-            "10.68.198.188"
-        ],
+        "destination.ip": "10.68.198.188",
         "event.action": "block",
         "event.code": "COPY",
         "event.dataset": "squid.log",
@@ -5269,9 +4999,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 2119,
-        "source.ip": [
-            "10.172.139.78"
-        ],
+        "source.ip": "10.172.139.78",
         "source.port": 6533,
         "tags": [
             "forwarded",
@@ -5301,9 +5029,7 @@
     },
     {
         "@timestamp": "2018-09-27T07:04:49.000Z",
-        "destination.ip": [
-            "10.169.63.169"
-        ],
+        "destination.ip": "10.169.63.169",
         "event.action": "block",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
@@ -5349,9 +5075,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 3465,
-        "source.ip": [
-            "10.172.47.7"
-        ],
+        "source.ip": "10.172.47.7",
         "source.port": 2805,
         "tags": [
             "forwarded",
@@ -5379,9 +5103,7 @@
     },
     {
         "@timestamp": "2018-10-11T14:07:23.000Z",
-        "destination.ip": [
-            "10.62.10.137"
-        ],
+        "destination.ip": "10.62.10.137",
         "event.action": "cancel",
         "event.code": "PURGE",
         "event.dataset": "squid.log",
@@ -5424,9 +5146,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 3880,
-        "source.ip": [
-            "10.32.98.109"
-        ],
+        "source.ip": "10.32.98.109",
         "source.port": 5012,
         "tags": [
             "forwarded",
@@ -5455,9 +5175,7 @@
     },
     {
         "@timestamp": "2018-10-25T09:09:57.000Z",
-        "destination.ip": [
-            "10.255.40.12"
-        ],
+        "destination.ip": "10.255.40.12",
         "event.action": "deny",
         "event.code": "COPY",
         "event.dataset": "squid.log",
@@ -5501,9 +5219,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 5192,
-        "source.ip": [
-            "10.176.62.146"
-        ],
+        "source.ip": "10.176.62.146",
         "source.port": 5945,
         "tags": [
             "forwarded",
@@ -5533,9 +5249,7 @@
     },
     {
         "@timestamp": "2018-11-09T04:12:32.000Z",
-        "destination.ip": [
-            "10.88.98.31"
-        ],
+        "destination.ip": "10.88.98.31",
         "event.action": "deny",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -5579,9 +5293,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 2694,
-        "source.ip": [
-            "10.194.198.46"
-        ],
+        "source.ip": "10.194.198.46",
         "source.port": 3387,
         "tags": [
             "forwarded",
@@ -5610,9 +5322,7 @@
     },
     {
         "@timestamp": "2018-11-23T11:15:06.000Z",
-        "destination.ip": [
-            "10.1.27.133"
-        ],
+        "destination.ip": "10.1.27.133",
         "event.action": "block",
         "event.code": "OPTIONS",
         "event.dataset": "squid.log",
@@ -5655,9 +5365,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 6881,
-        "source.ip": [
-            "10.5.49.20"
-        ],
+        "source.ip": "10.5.49.20",
         "source.port": 7503,
         "tags": [
             "forwarded",
@@ -5686,9 +5394,7 @@
     },
     {
         "@timestamp": "2018-12-07T06:17:40.000Z",
-        "destination.ip": [
-            "10.70.244.155"
-        ],
+        "destination.ip": "10.70.244.155",
         "event.action": "accept",
         "event.code": "POST",
         "event.dataset": "squid.log",
@@ -5734,9 +5440,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 2160,
-        "source.ip": [
-            "10.11.73.145"
-        ],
+        "source.ip": "10.11.73.145",
         "source.port": 6972,
         "tags": [
             "forwarded",
@@ -5766,9 +5470,7 @@
     },
     {
         "@timestamp": "2018-12-21T13:20:14.000Z",
-        "destination.ip": [
-            "10.121.80.158"
-        ],
+        "destination.ip": "10.121.80.158",
         "event.action": "accept",
         "event.code": "PURGE",
         "event.dataset": "squid.log",
@@ -5812,9 +5514,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 7663,
-        "source.ip": [
-            "10.204.214.98"
-        ],
+        "source.ip": "10.204.214.98",
         "source.port": 985,
         "tags": [
             "forwarded",
@@ -5844,9 +5544,7 @@
     },
     {
         "@timestamp": "2019-01-05T08:22:49.000Z",
-        "destination.ip": [
-            "10.139.151.19"
-        ],
+        "destination.ip": "10.139.151.19",
         "event.action": "block",
         "event.code": "PURGE",
         "event.dataset": "squid.log",
@@ -5890,9 +5588,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 5533,
-        "source.ip": [
-            "10.74.115.33"
-        ],
+        "source.ip": "10.74.115.33",
         "source.port": 4006,
         "tags": [
             "forwarded",
@@ -5922,9 +5618,7 @@
     },
     {
         "@timestamp": "2019-01-19T03:25:23.000Z",
-        "destination.ip": [
-            "10.242.48.203"
-        ],
+        "destination.ip": "10.242.48.203",
         "event.action": "deny",
         "event.code": "DELETE",
         "event.dataset": "squid.log",
@@ -5968,9 +5662,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 3872,
-        "source.ip": [
-            "10.191.220.1"
-        ],
+        "source.ip": "10.191.220.1",
         "source.port": 6454,
         "tags": [
             "forwarded",
@@ -6000,9 +5692,7 @@
     },
     {
         "@timestamp": "2019-02-02T10:27:57.000Z",
-        "destination.ip": [
-            "10.254.10.98"
-        ],
+        "destination.ip": "10.254.10.98",
         "event.action": "accept",
         "event.code": "PROPATCH",
         "event.dataset": "squid.log",
@@ -6046,9 +5736,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 6661,
-        "source.ip": [
-            "10.109.88.27"
-        ],
+        "source.ip": "10.109.88.27",
         "source.port": 5568,
         "tags": [
             "forwarded",
@@ -6078,9 +5766,7 @@
     },
     {
         "@timestamp": "2019-02-17T05:30:32.000Z",
-        "destination.ip": [
-            "10.175.138.42"
-        ],
+        "destination.ip": "10.175.138.42",
         "event.action": "deny",
         "event.code": "LOCK",
         "event.dataset": "squid.log",
@@ -6124,9 +5810,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 890,
-        "source.ip": [
-            "10.5.148.114"
-        ],
+        "source.ip": "10.5.148.114",
         "source.port": 4749,
         "tags": [
             "forwarded",
@@ -6156,9 +5840,7 @@
     },
     {
         "@timestamp": "2019-03-03T12:33:06.000Z",
-        "destination.ip": [
-            "10.18.199.203"
-        ],
+        "destination.ip": "10.18.199.203",
         "event.action": "allow",
         "event.code": "PROPFIND",
         "event.dataset": "squid.log",
@@ -6202,9 +5884,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 366,
-        "source.ip": [
-            "10.0.0.240"
-        ],
+        "source.ip": "10.0.0.240",
         "source.port": 1795,
         "tags": [
             "forwarded",
@@ -6234,9 +5914,7 @@
     },
     {
         "@timestamp": "2019-03-17T07:35:40.000Z",
-        "destination.ip": [
-            "10.73.80.251"
-        ],
+        "destination.ip": "10.73.80.251",
         "event.action": "allow",
         "event.code": "NONE",
         "event.dataset": "squid.log",
@@ -6280,9 +5958,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 5939,
-        "source.ip": [
-            "10.1.220.47"
-        ],
+        "source.ip": "10.1.220.47",
         "source.port": 6685,
         "tags": [
             "forwarded",
@@ -6312,9 +5988,7 @@
     },
     {
         "@timestamp": "2019-04-01T14:38:14.000Z",
-        "destination.ip": [
-            "10.22.34.206"
-        ],
+        "destination.ip": "10.22.34.206",
         "event.action": "block",
         "event.code": "PURGE",
         "event.dataset": "squid.log",
@@ -6358,9 +6032,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 1745,
-        "source.ip": [
-            "10.153.109.61"
-        ],
+        "source.ip": "10.153.109.61",
         "source.port": 7499,
         "tags": [
             "forwarded",
@@ -6390,9 +6062,7 @@
     },
     {
         "@timestamp": "2019-04-15T09:40:49.000Z",
-        "destination.ip": [
-            "10.199.103.185"
-        ],
+        "destination.ip": "10.199.103.185",
         "event.action": "allow",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
@@ -6438,9 +6108,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 5243,
-        "source.ip": [
-            "10.62.168.226"
-        ],
+        "source.ip": "10.62.168.226",
         "source.port": 5334,
         "tags": [
             "forwarded",
@@ -6470,9 +6138,7 @@
     },
     {
         "@timestamp": "2019-04-29T04:43:23.000Z",
-        "destination.ip": [
-            "10.128.84.27"
-        ],
+        "destination.ip": "10.128.84.27",
         "event.action": "block",
         "event.code": "COPY",
         "event.dataset": "squid.log",
@@ -6515,9 +6181,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 2478,
-        "source.ip": [
-            "10.97.33.56"
-        ],
+        "source.ip": "10.97.33.56",
         "source.port": 3541,
         "tags": [
             "forwarded",
@@ -6546,9 +6210,7 @@
     },
     {
         "@timestamp": "2019-05-13T11:45:57.000Z",
-        "destination.ip": [
-            "10.115.154.104"
-        ],
+        "destination.ip": "10.115.154.104",
         "event.action": "allow",
         "event.code": "HEAD",
         "event.dataset": "squid.log",
@@ -6594,9 +6256,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 7767,
-        "source.ip": [
-            "10.49.169.175"
-        ],
+        "source.ip": "10.49.169.175",
         "source.port": 2103,
         "tags": [
             "forwarded",
@@ -6625,9 +6285,7 @@
     },
     {
         "@timestamp": "2019-05-28T06:48:31.000Z",
-        "destination.ip": [
-            "10.33.112.100"
-        ],
+        "destination.ip": "10.33.112.100",
         "event.action": "block",
         "event.code": "PROPFIND",
         "event.dataset": "squid.log",
@@ -6671,9 +6329,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 1594,
-        "source.ip": [
-            "10.213.100.153"
-        ],
+        "source.ip": "10.213.100.153",
         "source.port": 2571,
         "tags": [
             "forwarded",
@@ -6703,9 +6359,7 @@
     },
     {
         "@timestamp": "2019-06-11T13:51:06.000Z",
-        "destination.ip": [
-            "10.25.53.93"
-        ],
+        "destination.ip": "10.25.53.93",
         "event.action": "cancel",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
@@ -6751,9 +6405,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 6127,
-        "source.ip": [
-            "10.216.143.226"
-        ],
+        "source.ip": "10.216.143.226",
         "source.port": 2632,
         "tags": [
             "forwarded",
@@ -6783,9 +6435,7 @@
     },
     {
         "@timestamp": "2019-06-25T08:53:40.000Z",
-        "destination.ip": [
-            "10.246.115.57"
-        ],
+        "destination.ip": "10.246.115.57",
         "event.action": "allow",
         "event.code": "HEAD",
         "event.dataset": "squid.log",
@@ -6832,9 +6482,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 5926,
-        "source.ip": [
-            "10.139.195.188"
-        ],
+        "source.ip": "10.139.195.188",
         "source.port": 893,
         "tags": [
             "forwarded",
@@ -6864,9 +6512,7 @@
     },
     {
         "@timestamp": "2019-07-10T03:56:14.000Z",
-        "destination.ip": [
-            "10.82.148.126"
-        ],
+        "destination.ip": "10.82.148.126",
         "event.action": "block",
         "event.code": "NONE",
         "event.dataset": "squid.log",
@@ -6910,9 +6556,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 2214,
-        "source.ip": [
-            "10.60.56.205"
-        ],
+        "source.ip": "10.60.56.205",
         "source.port": 4345,
         "tags": [
             "forwarded",
@@ -6942,9 +6586,7 @@
     },
     {
         "@timestamp": "2019-07-24T10:58:48.000Z",
-        "destination.ip": [
-            "10.6.11.124"
-        ],
+        "destination.ip": "10.6.11.124",
         "event.action": "accept",
         "event.code": "DELETE",
         "event.dataset": "squid.log",
@@ -6988,9 +6630,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 5930,
-        "source.ip": [
-            "10.245.251.98"
-        ],
+        "source.ip": "10.245.251.98",
         "source.port": 261,
         "tags": [
             "forwarded",
@@ -7020,9 +6660,7 @@
     },
     {
         "@timestamp": "2019-08-07T06:01:23.000Z",
-        "destination.ip": [
-            "10.145.25.55"
-        ],
+        "destination.ip": "10.145.25.55",
         "event.action": "block",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
@@ -7068,9 +6706,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 2079,
-        "source.ip": [
-            "10.99.55.115"
-        ],
+        "source.ip": "10.99.55.115",
         "source.port": 1537,
         "tags": [
             "forwarded",
@@ -7100,9 +6736,7 @@
     },
     {
         "@timestamp": "2019-08-21T13:03:57.000Z",
-        "destination.ip": [
-            "10.6.88.105"
-        ],
+        "destination.ip": "10.6.88.105",
         "event.action": "allow",
         "event.code": "TRACE",
         "event.dataset": "squid.log",
@@ -7146,9 +6780,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 249,
-        "source.ip": [
-            "10.187.86.64"
-        ],
+        "source.ip": "10.187.86.64",
         "source.port": 3325,
         "tags": [
             "forwarded",
@@ -7178,9 +6810,7 @@
     },
     {
         "@timestamp": "2019-09-05T08:06:31.000Z",
-        "destination.ip": [
-            "10.163.9.35"
-        ],
+        "destination.ip": "10.163.9.35",
         "event.action": "accept",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
@@ -7226,9 +6856,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 4562,
-        "source.ip": [
-            "10.252.146.132"
-        ],
+        "source.ip": "10.252.146.132",
         "source.port": 503,
         "tags": [
             "forwarded",
@@ -7258,9 +6886,7 @@
     },
     {
         "@timestamp": "2019-09-19T03:09:05.000Z",
-        "destination.ip": [
-            "10.235.160.245"
-        ],
+        "destination.ip": "10.235.160.245",
         "event.action": "deny",
         "event.code": "DELETE",
         "event.dataset": "squid.log",
@@ -7304,9 +6930,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 4857,
-        "source.ip": [
-            "10.249.101.177"
-        ],
+        "source.ip": "10.249.101.177",
         "source.port": 4465,
         "tags": [
             "forwarded",
@@ -7336,9 +6960,7 @@
     },
     {
         "@timestamp": "2019-10-03T10:11:40.000Z",
-        "destination.ip": [
-            "10.73.218.58"
-        ],
+        "destination.ip": "10.73.218.58",
         "event.action": "block",
         "event.code": "TRACE",
         "event.dataset": "squid.log",
@@ -7382,9 +7004,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1831,
-        "source.ip": [
-            "10.140.170.171"
-        ],
+        "source.ip": "10.140.170.171",
         "source.port": 773,
         "tags": [
             "forwarded",
@@ -7414,9 +7034,7 @@
     },
     {
         "@timestamp": "2019-10-18T05:14:14.000Z",
-        "destination.ip": [
-            "10.67.148.40"
-        ],
+        "destination.ip": "10.67.148.40",
         "event.action": "deny",
         "event.code": "OPTIONS",
         "event.dataset": "squid.log",
@@ -7459,9 +7077,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 2155,
-        "source.ip": [
-            "10.248.156.138"
-        ],
+        "source.ip": "10.248.156.138",
         "source.port": 2125,
         "tags": [
             "forwarded",
@@ -7488,9 +7104,7 @@
     },
     {
         "@timestamp": "2019-11-01T12:16:48.000Z",
-        "destination.ip": [
-            "10.37.33.179"
-        ],
+        "destination.ip": "10.37.33.179",
         "event.action": "accept",
         "event.code": "UNLOCK",
         "event.dataset": "squid.log",
@@ -7534,9 +7148,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 6106,
-        "source.ip": [
-            "10.83.154.75"
-        ],
+        "source.ip": "10.83.154.75",
         "source.port": 4260,
         "tags": [
             "forwarded",
@@ -7566,9 +7178,7 @@
     },
     {
         "@timestamp": "2019-11-15T07:19:22.000Z",
-        "destination.ip": [
-            "10.84.107.38"
-        ],
+        "destination.ip": "10.84.107.38",
         "event.action": "deny",
         "event.code": "MKOL",
         "event.dataset": "squid.log",
@@ -7612,9 +7222,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 2097,
-        "source.ip": [
-            "10.14.29.202"
-        ],
+        "source.ip": "10.14.29.202",
         "source.port": 7842,
         "tags": [
             "forwarded",
@@ -7644,9 +7252,7 @@
     },
     {
         "@timestamp": "2019-11-30T14:21:57.000Z",
-        "destination.ip": [
-            "10.204.223.184"
-        ],
+        "destination.ip": "10.204.223.184",
         "event.action": "deny",
         "event.code": "POST",
         "event.dataset": "squid.log",
@@ -7692,9 +7298,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 6861,
-        "source.ip": [
-            "10.221.86.133"
-        ],
+        "source.ip": "10.221.86.133",
         "source.port": 6682,
         "tags": [
             "forwarded",
@@ -7724,9 +7328,7 @@
     },
     {
         "@timestamp": "2019-12-14T09:24:31.000Z",
-        "destination.ip": [
-            "10.229.39.190"
-        ],
+        "destination.ip": "10.229.39.190",
         "event.action": "deny",
         "event.code": "PUT",
         "event.dataset": "squid.log",
@@ -7770,9 +7372,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 2574,
-        "source.ip": [
-            "10.195.4.70"
-        ],
+        "source.ip": "10.195.4.70",
         "source.port": 3844,
         "tags": [
             "forwarded",

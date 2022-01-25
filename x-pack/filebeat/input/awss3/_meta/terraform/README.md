@@ -1,9 +1,9 @@
 # Terraform setup for AWS S3 Input Integration Tests
 
-This directory contains a Terrafrom module that creates the AWS resources needed
+This directory contains a Terraform module that creates the AWS resources needed
 for executing the integration tests for the `aws-s3` Filebeat input. It creates
 an S3 bucket and SQS queue and configures S3 `ObjectCreated:*` notifications to
-be delivered to SQS.
+be delivered to SQS. It also creates a second S3 bucket, SNS topic, SQS queue and configures S3 `ObjectCreated:*` notifications to be delivered to SNS and also creates a subscription for this SNS topic to SQS queue to automatically place messages sent to SNS topic in SQS queue.
 
 It outputs configuration information that is consumed by the tests to
 `outputs.yml`. The AWS resources are randomly named to prevent name collisions
@@ -33,7 +33,7 @@ to match the AWS region of the profile you are using.
 4. Execute the integration test.
 
     ```
-    cd x-pack/filebeat/inputs/awss3
+    cd x-pack/filebeat/input/awss3
     go test -tags aws,integration -run TestInputRun.+ -v .
     ```
 

@@ -201,7 +201,6 @@ func (c *client) logger() *logp.Logger {
 }
 
 func (c *client) onClosing() {
-	c.pipeline.observer.clientClosing()
 	if c.eventer != nil {
 		c.eventer.Closing()
 	}

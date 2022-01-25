@@ -478,7 +478,6 @@
               ignore_above: 1024
               description: Version of x509 format.
               example: 3
-              default_field: false
 
 - key: icmp
   title: "ICMP"

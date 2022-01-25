@@ -49,7 +49,7 @@ func ContextProviderBuilder(logger *logger.Logger, c *config.Config) (corecomp.C
 
 // Run runs the leaderelection provider.
 func (p *contextProvider) Run(comm corecomp.ContextProviderComm) error {
-	client, err := kubernetes.GetKubernetesClient(p.config.KubeConfig)
+	client, err := kubernetes.GetKubernetesClient(p.config.KubeConfig, p.config.KubeClientOptions)
 	if err != nil {
 		// info only; return nil (do nothing)
 		p.logger.Debugf("Kubernetes leaderelection provider skipped, unable to connect: %s", err)

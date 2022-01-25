@@ -45,7 +45,7 @@
           fields:
             - name: extract_worker_pool
               type: group
-              description: Status information for the extrator workers pool.
+              description: Status information for the extractor workers pool.
               fields:
                 - name: size
                   type: long
@@ -73,7 +73,7 @@
 
             - name: subextract_worker_pool
               type: group
-              description: Status information for the sub-extrator workers pool.
+              description: Status information for the sub-extractor workers pool.
               fields:
                 - name: size
                   type: long
@@ -230,6 +230,157 @@
         - name: failed.count
           type: long
           description: Total number of jobs waiting in the failed queue.
+
+
+    - name: crawler
+      type: group
+      description: Aggregate stats on the functioning of the crawler subsystem within Enterprise Search.
+      fields:
+        - name: global
+          type: group
+          description: Global deployment-wide metrics for the crawler.
+          fields:
+            - name: crawl_requests
+              type: group
+              description: Crawl request summary for the deployment.
+              fields:
+                - name: pending
+                  type: long
+                  description: Total number of crawl requests waiting to be processed.
+                - name: active
+                  type: long
+                  description: Total number of crawl requests currently being processed (running crawls).
+                - name: successful
+                  type: long
+                  description: Total number of crawl requests that have succeeded.
+                - name: failed
+                  type: long
+                  description: Total number of failed crawl requests.
+
+        - name: node
+          type: group
+          description: Node-level statistics for the crawler.
+          fields:
+            - name: pages_visited
+              type: long
+              description: Total number of pages visited by the crawler since the instance start.
+
+            - name: urls_allowed
+              type: long
+              description: Total number of URLs allowed by the crawler during discovery since the instance start.
+
+            - name: urls_denied
+              type: group
+              description: Total number of URLs denied by the crawler during discovery since the instance start, broken down by deny reason.
+              fields:
+                - name: already_seen
+                  type: long
+                  description: Total number of URLs not followed because of URL de-duplication (each URL is visited only once).
+
+                - name: domain_filter_denied
+                  type: long
+                  description: Total number of URLs denied because of an unknown domain.
+
+                - name: incorrect_protocol
+                  type: long
+                  description: Total number of URLs with incorrect/invalid/unsupported protocols.
+
+                - name: link_too_deep
+                  type: long
+                  description: Total number of URLs not followed due to crawl depth limits.
+
+                - name: nofollow
+                  type: long
+                  description: Total number of URLs denied due to a nofollow meta tag or an HTML link attribute.
+
+                - name: unsupported_content_type
+                  type: long
+                  description: Total number of URLs denied due to an unsupported content type.
+
+            - name: status_codes
+              type: group
+              description: HTTP request result counts, by status code.
+              fields:
+                - name: "200"
+                  type: long
+                  description: Total number of HTTP 200 responses seen by the crawler since the instance start.
+                - name: "301"
+                  type: long
+                  description: Total number of HTTP 301 responses seen by the crawler since the instance start.
+                - name: "302"
+                  type: long
+                  description: Total number of HTTP 302 responses seen by the crawler since the instance start.
+                - name: "400"
+                  type: long
+                  description: Total number of HTTP 400 responses seen by the crawler since the instance start.
+                - name: "401"
+                  type: long
+                  description: Total number of HTTP 401 responses seen by the crawler since the instance start.
+                - name: "402"
+                  type: long
+                  description: Total number of HTTP 402 responses seen by the crawler since the instance start.
+                - name: "403"
+                  type: long
+                  description: Total number of HTTP 403 responses seen by the crawler since the instance start.
+                - name: "404"
+                  type: long
+                  description: Total number of HTTP 404 responses seen by the crawler since the instance start.
+                - name: "405"
+                  type: long
+                  description: Total number of HTTP 405 responses seen by the crawler since the instance start.
+                - name: "410"
+                  type: long
+                  description: Total number of HTTP 410 responses seen by the crawler since the instance start.
+                - name: "422"
+                  type: long
+                  description: Total number of HTTP 422 responses seen by the crawler since the instance start.
+                - name: "429"
+                  type: long
+                  description: Total number of HTTP 429 responses seen by the crawler since the instance start.
+                - name: "500"
+                  type: long
+                  description: Total number of HTTP 500 responses seen by the crawler since the instance start.
+                - name: "501"
+                  type: long
+                  description: Total number of HTTP 501 responses seen by the crawler since the instance start.
+                - name: "502"
+                  type: long
+                  description: Total number of HTTP 502 responses seen by the crawler since the instance start.
+                - name: "503"
+                  type: long
+                  description: Total number of HTTP 503 responses seen by the crawler since the instance start.
+                - name: "504"
+                  type: long
+                  description: Total number of HTTP 504 responses seen by the crawler since the instance start.
+
+            - name: queue_size
+              type: group
+              description: Total current URL queue size for the instance.
+              fields:
+                - name: primary
+                  type: long
+                  description: Total number of URLs waiting to be crawled by the instance.
+                - name: purge
+                  type: long
+                  description: Total number of URLs waiting to be checked by the purge crawl phase.
+
+            - name: active_threads
+              type: long
+              description: Total number of crawler worker threads currently active on the instance.
+
+            - name: workers
+              type: group
+              description: Crawler workers information for the instance.
+              fields:
+                - name: pool_size
+                  type: long
+                  description: Total size of the crawl workers pool (number of concurrent crawls possible) for the instance.
+                - name: active
+                  type: long
+                  description: Total number of currently active crawl workers (running crawls) for the instance.
+                - name: available
+                  type: long
+                  description: Total number of currently available (free) crawl workers for the instance.
 
     - name: product_usage
       type: group

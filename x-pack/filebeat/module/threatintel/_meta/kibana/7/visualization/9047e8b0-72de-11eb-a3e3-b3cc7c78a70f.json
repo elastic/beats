@@ -34,7 +34,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "Threat Indicator Provider",
-                        "field": "threatintel.indicator.provider",
+                        "field": "threat.indicator.provider",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

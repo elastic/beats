@@ -43,6 +43,7 @@ import (
 
 const (
 	expectedExtension = "-expected.json"
+	applicationJson   = "application/json"
 )
 
 // DataConfig is the configuration for testdata tests
@@ -74,6 +75,9 @@ type DataConfig struct {
 
 	// URL of the endpoint that must be tested depending on each module
 	URL string
+
+	// ContentType of the data being returned by server
+	ContentType string `yaml:"content_type"`
 
 	// Suffix is the extension of the source file with the input contents. Defaults to `json`, `plain` is also a common use.
 	Suffix string
@@ -107,9 +111,10 @@ type DataConfig struct {
 
 func defaultDataConfig() DataConfig {
 	return DataConfig{
-		Path:      ".",
-		WritePath: ".",
-		Suffix:    "json",
+		Path:        ".",
+		WritePath:   ".",
+		Suffix:      "json",
+		ContentType: applicationJson,
 	}
 }
 
@@ -189,7 +194,7 @@ func TestMetricsetFieldsDocumented(t *testing.T, metricSet mb.MetricSet, events 
 
 func runTest(t *testing.T, file string, module, metricSetName string, config DataConfig) {
 	// starts a server serving the given file under the given url
-	s := server(t, file, config.URL)
+	s := server(t, file, config.URL, config.ContentType)
 	defer s.Close()
 
 	moduleConfig := getConfig(module, metricSetName, s.URL, config)
@@ -440,7 +445,7 @@ func getConfig(module, metricSet, url string, config DataConfig) map[string]inte
 }
 
 // server starts a server with a mock output
-func server(t *testing.T, path string, url string) *httptest.Server {
+func server(t *testing.T, path string, url string, contentType string) *httptest.Server {
 
 	body, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -455,7 +460,7 @@ func server(t *testing.T, path string, url string) *httptest.Server {
 		}
 
 		if r.URL.Path+query == url {
-			w.Header().Set("Content-Type", "application/json;")
+			w.Header().Set("Content-Type", contentType)
 			w.WriteHeader(200)
 			w.Write(body)
 		} else {

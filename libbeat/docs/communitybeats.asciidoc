@@ -6,6 +6,8 @@
 [[community-beats]]
 == Community Beats
 
+Please note that generating new Beats is deprecated since 7.16.
+
 The open source community has been hard at work developing new Beats. You can check
 out some of them here.
 

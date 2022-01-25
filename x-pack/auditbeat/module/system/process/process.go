@@ -121,10 +121,12 @@ func (p Process) Hash() uint64 {
 func (p Process) toMapStr() common.MapStr {
 	return common.MapStr{
 		// https://github.com/elastic/ecs#-process-fields
-		"name":              p.Info.Name,
-		"args":              p.Info.Args,
-		"pid":               p.Info.PID,
-		"ppid":              p.Info.PPID,
+		"name": p.Info.Name,
+		"args": p.Info.Args,
+		"pid":  p.Info.PID,
+		"parent": common.MapStr{
+			"pid": p.Info.PPID,
+		},
 		"working_directory": p.Info.CWD,
 		"executable":        p.Info.Exe,
 		"start":             p.Info.StartTime,
@@ -317,15 +319,26 @@ func (ms *MetricSet) enrichProcess(process *Process) {
 	}
 
 	if process.Info.Exe != "" {
+		sharedMntNS, err := isNsSharedWith(process.Info.PID, "mnt")
+		if err != nil {
+			if process.Error == nil {
+				process.Error = errors.Wrapf(err, "failed to get namespaces for %v PID %v", process.Info.Exe,
+					process.Info.PID)
+			}
+			return
+		}
+		if !sharedMntNS {
+			return
+		}
 		hashes, err := ms.hasher.HashFile(process.Info.Exe)
 		if err != nil {
 			if process.Error == nil {
 				process.Error = errors.Wrapf(err, "failed to hash executable %v for PID %v", process.Info.Exe,
 					process.Info.PID)
 			}
-		} else {
-			process.Hashes = hashes
+			return
 		}
+		process.Hashes = hashes
 	}
 }
 

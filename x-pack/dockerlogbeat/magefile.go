@@ -168,7 +168,7 @@ func BuildContainer(ctx context.Context) error {
 		}
 
 		// create the container that will become our rootfs
-		CreatedContainerBody, err := cli.ContainerCreate(ctx, &container.Config{Image: rootImageName}, nil, nil, "")
+		CreatedContainerBody, err := cli.ContainerCreate(ctx, &container.Config{Image: rootImageName}, nil, nil, nil, "")
 		if err != nil {
 			return errors.Wrap(err, "error creating container")
 		}

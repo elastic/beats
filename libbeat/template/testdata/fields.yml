@@ -3,6 +3,8 @@
   description: >
     Contains all types for testing
   fields:
+    - name: '@timestamp'
+      type: date
 
     - name: object
       type: object

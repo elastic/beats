@@ -1,7 +1,6 @@
 - name: elb
   type: group
   release: ga
-  default_field: false
   description: >
     Fields for AWS ELB logs.
   fields:

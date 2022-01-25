@@ -56,6 +56,9 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Remove Metricbeat EventFetcher and EventsFetcher interface. Use the reporter interface instead. {pull}25093[25093]
 - Update Darwin build image to a debian 10 base that increases the MacOS SDK and minimum supported version used in build to 10.14. {issue}24193[24193]
 - Removed the `common.Float` type. {issue}28279[28279] {pull}28280[28280] {pull}28376[28376]
+- Removed Beat generators. {pull}28816[28816]
+- libbeat.logp package forces ECS compliant logs. Logs are JSON formatted. Options to enable ECS/JSON have been removed. {issue}15544[15544] {pull}28573[28573]
+- Removed deprecated disk spool from Beats. Use disk queue instead. {pull}28869[28869]
 
 ==== Bugfixes
 
@@ -65,6 +68,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Remove `event.dataset` (ECS) annotion from `libbeat.logp`. {issue}27404[27404]
 - Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
 - Avoid panicking in `add_fields` processor when input event.Fields is a nil map. {pull}28219[28219]
+- Drop event batch when get HTTP status 413 from Elasticsearch to avoid infinite loop {issue}14350[14350] {pull}29368[29368]
 
 ==== Added
 
@@ -129,3 +133,4 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 ==== Deprecated
 
 - Deprecated the `common.Float` type. {issue}28279[28279] {pull}28280[28280]
+- Deprecate Beat generators. {pull}28814[28814]

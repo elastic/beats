@@ -101,7 +101,6 @@ pipeline {
                   'auditbeat',
                   'filebeat',
                   'heartbeat',
-                  'journalbeat',
                   'metricbeat',
                   'packetbeat',
                   'winlogbeat',
@@ -111,7 +110,6 @@ pipeline {
                   'x-pack/filebeat',
                   'x-pack/functionbeat',
                    'x-pack/heartbeat',
-                  // 'x-pack/journalbeat',
                   'x-pack/metricbeat',
                   'x-pack/osquerybeat',
                   'x-pack/packetbeat',
@@ -199,7 +197,6 @@ pipeline {
                   'auditbeat',
                   'filebeat',
                   'heartbeat',
-                  'journalbeat',
                   'metricbeat',
                   'packetbeat',
                   'x-pack/auditbeat',
@@ -277,8 +274,6 @@ def pushCIDockerImages(Map args = [:]) {
       tagAndPush(beatName: 'filebeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('heartbeat')) {
       tagAndPush(beatName: 'heartbeat', arch: arch)
-    } else if ("${env.BEATS_FOLDER}" == "journalbeat"){
-      tagAndPush(beatName: 'journalbeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('metricbeat')) {
       tagAndPush(beatName: 'metricbeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('osquerybeat')) {
@@ -311,8 +306,6 @@ def tagAndPush(Map args = [:]) {
   if (isPR()) {
     tagName = "pr-${env.CHANGE_ID}"
   }
-
-  dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
 
   // supported tags
   def tags = [tagName, "${env.GIT_BASE_COMMIT}"]
@@ -391,6 +384,7 @@ def release(){
     withEnv([
       "DEV=true"
     ]) {
+      dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dir("${env.BEATS_FOLDER}") {
         sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
       }

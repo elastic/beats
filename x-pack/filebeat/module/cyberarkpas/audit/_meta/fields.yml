@@ -1,5 +1,4 @@
 - name: audit
-  default_field: false
   type: group
   description: >
     Cyberark Privileged Access Security Audit fields.

@@ -22,11 +22,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/ecs/code/go/ecs"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/x509util"
+	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -171,10 +170,9 @@ func (plugin *tlsPlugin) doParse(
 	tcptuple *common.TCPTuple,
 	dir uint8,
 ) *tlsConnectionData {
-
 	// Ignore further traffic after the handshake is completed (encrypted connection)
 	// TODO: request/response analysis
-	if 0 != conn.handshakeCompleted&(1<<dir) {
+	if conn.handshakeCompleted&(1<<dir) != 0 {
 		return conn
 	}
 
@@ -230,8 +228,8 @@ func newStream(tcptuple *common.TCPTuple) *stream {
 }
 
 func (plugin *tlsPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
-
+	private protos.ProtocolData,
+) protos.ProtocolData {
 	if conn := ensureTLSConnection(private); conn != nil {
 		plugin.sendEvent(conn)
 	}
@@ -280,20 +278,13 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	}
 	detailed := common.MapStr{}
 
-	// Fixups for non array datatypes (1)
-	var (
-		tlsServerCertificateChain,
-		tlsClientCertificateChain,
-		tlsClientSupportedCiphers []string
-	)
-
 	emptyHello := &helloMessage{}
 	var clientHello, serverHello *helloMessage
 	if client.parser.hello != nil {
 		clientHello = client.parser.hello
 		detailed["client_hello"] = clientHello.toMap()
 		tls.ClientJa3, _ = getJa3Fingerprint(clientHello)
-		tlsClientSupportedCiphers = clientHello.supportedCiphers()
+		tls.ClientSupportedCiphers = clientHello.supportedCiphers()
 	} else {
 		clientHello = emptyHello
 	}
@@ -319,8 +310,8 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		}
 	}
 	if plugin.includeRawCertificates {
-		tlsClientCertificateChain = getPEMCertChain(client.parser.certificates)
-		tlsServerCertificateChain = getPEMCertChain(server.parser.certificates)
+		tls.ClientCertificateChain = getPEMCertChain(client.parser.certificates)
+		tls.ServerCertificateChain = getPEMCertChain(server.parser.certificates)
 	}
 	if list := client.parser.certificates; len(list) > 0 {
 		cert := list[0]
@@ -456,23 +447,14 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 		fields.Put("tls.detailed", detailed)
 	}
 
-	// Fixes for non-array datatypes
-	// =============================
-	//
-	// Code at github.com/elastic/ecs/code/go/ecs has some fields as string
-	// when they should be []string.
-	//
-	// Once the code generator is fixed, the if statements below will cause
-	// a compilation error. To fix it, remove the if statements and replace
-	// all uses of the tlsSomething variables with tls.Something.
-	if tls.ServerCertificateChain == "" && len(tlsServerCertificateChain) > 0 {
-		fields.Put("tls.server.certificate_chain", tlsServerCertificateChain)
+	if len(tls.ServerCertificateChain) > 0 {
+		fields.Put("tls.server.certificate_chain", tls.ServerCertificateChain)
 	}
-	if tls.ClientCertificateChain == "" && len(tlsClientCertificateChain) > 0 {
-		fields.Put("tls.client.certificate_chain", tlsClientCertificateChain)
+	if len(tls.ClientCertificateChain) > 0 {
+		fields.Put("tls.client.certificate_chain", tls.ClientCertificateChain)
 	}
-	if tls.ClientSupportedCiphers == "" && len(tlsClientSupportedCiphers) > 0 {
-		fields.Put("tls.client.supported_ciphers", tlsClientSupportedCiphers)
+	if len(tls.ClientSupportedCiphers) > 0 {
+		fields.Put("tls.client.supported_ciphers", tls.ClientSupportedCiphers)
 	}
 	// Enforce booleans (not serialized when false)
 	if !tls.Established {

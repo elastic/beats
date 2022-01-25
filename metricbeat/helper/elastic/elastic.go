@@ -79,7 +79,7 @@ func (p Product) String() string {
 // MakeXPackMonitoringIndexName method returns the name of the monitoring index for
 // a given product { elasticsearch, kibana, logstash, beats }
 func MakeXPackMonitoringIndexName(product Product) string {
-	const version = "7"
+	const version = "8"
 
 	return fmt.Sprintf(".monitoring-%v-%v-mb", product.xPackMonitoringIndexString(), version)
 }

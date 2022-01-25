@@ -152,32 +152,42 @@ func (e *Event) Unpack(data string, opts ...Option) error {
 	return multierr.Combine(errs...)
 }
 
-const (
-	backslash        = `\`
-	escapedBackslash = `\\`
-
-	pipe        = `|`
-	escapedPipe = `\|`
-
-	equalsSign        = `=`
-	escapedEqualsSign = `\=`
-)
-
-var (
-	headerEscapes    = strings.NewReplacer(escapedBackslash, backslash, escapedPipe, pipe)
-	extensionEscapes = strings.NewReplacer(escapedBackslash, backslash, escapedEqualsSign, equalsSign)
-)
-
-func replaceHeaderEscapes(b string) string {
-	if strings.Index(b, escapedBackslash) != -1 || strings.Index(b, escapedPipe) != -1 {
-		return headerEscapes.Replace(b)
+// replaceEscapes replaces the escaped characters contained in v with their
+// unescaped value.
+func replaceEscapes(v string, startOffset int, escapes []int) string {
+	if len(escapes) == 0 {
+		return v
 	}
-	return b
-}
 
-func replaceExtensionEscapes(b string) string {
-	if strings.Index(b, escapedBackslash) != -1 || strings.Index(b, escapedEqualsSign) != -1 {
-		return extensionEscapes.Replace(b)
+	// Adjust escape offsets relative to the start offset of v.
+	for i := 0; i < len(escapes); i++ {
+		escapes[i] = escapes[i] - startOffset
 	}
-	return b
+
+	var buf strings.Builder
+	var end int
+
+	// Iterate over escapes and replace them.
+	for i := 0; i < len(escapes); i += 2 {
+		start := escapes[i]
+		buf.WriteString(v[end:start])
+
+		end = escapes[i+1]
+		value := v[start:end]
+
+		switch value {
+		case `\n`:
+			buf.WriteByte('\n')
+		case `\r`:
+			buf.WriteByte('\r')
+		default:
+			// Remove leading slash.
+			if len(value) > 0 && value[0] == '\\' {
+				buf.WriteString(value[1:])
+			}
+		}
+	}
+	buf.WriteString(v[end:])
+
+	return buf.String()
 }

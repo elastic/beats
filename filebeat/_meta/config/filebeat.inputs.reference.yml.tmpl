@@ -10,8 +10,8 @@ filebeat.inputs:
 # The different types cannot be mixed in one input
 #
 # Possible options are:
-# * log: Reads every line of the log file (default)
-# * filestream: Improved version of log input
+# * filestream: Reads every line of the log file
+# * log: Reads every line of the log file (deprecated)
 # * stdin: Reads the standard in
 
 #------------------------------ Log input --------------------------------
@@ -94,7 +94,8 @@ filebeat.inputs:
   #max_bytes: 10485760
 
   # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
-  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
+  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator,
+  # null_terminator
   #line_terminator: auto
 
   ### Recursive glob configuration
@@ -348,7 +349,8 @@ filebeat.inputs:
   #message_max_bytes: 10485760
 
   # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
-  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
+  # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator,
+  # null_terminator
   #line_terminator: auto
 
   # The ingest pipeline ID associated with this input. If this is set, it
@@ -556,4 +558,34 @@ filebeat.inputs:
 
   # Configure stream to filter to a specific stream: stdout, stderr or all (default)
   #stream: all
+
+#------------------------------ Journald input --------------------------------
+# Journald input is experimental.
+#- type: journald
+  #enabled: true
+  #id: service-foo
+
+  # You may wish to have separate inputs for each service. You can use
+  # include_matches.or to specify a list of filter expressions that are
+  # applied as a logical OR. You may specify filter
+  #include_matches.or:
+    #- equals:
+      #- _SYSTEMD_UNIT=foo.service
+
+  # List of syslog identifiers
+  #syslog_identifiers: ["audit"]
+
+  # Collect events from the service and messages about the service,
+  # including coredumps.
+  #units: ["docker.service"]
+
+  # The list of transports (_TRANSPORT field of journald entries)
+  #transports: ["audit"]
+
+  # Parsers are also supported, here is an example of the multiline
+  # parser.
+  #parsers:
+  #- multiline:
+    #type: count
+    #count_lines: 3
 

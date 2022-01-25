@@ -1,9 +1,10 @@
 [[creating-metricsets]]
 === Creating a Metricset
 
+include::generator-support-note.asciidoc[tag=metricset-generator]
+
 A metricset is the part of a Metricbeat module that fetches and structures the
-data from the remote service. Each module can have multiple metricsets. In this guide, you learn how to create your own metricset. If you want to create
-your own Beat that uses Metricbeat as a library, see <<creating-beat-from-metricbeat>>.
+data from the remote service. Each module can have multiple metricsets. In this guide, you learn how to create your own metricset.
 
 When creating a metricset for the first time, it generally helps to look at the
 implementation of existing metricsets for inspiration.

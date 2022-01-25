@@ -21,14 +21,14 @@ const (
 )
 
 // addMetadata adds metadata to the given events map based on namespace
-func addMetadata(namespace string, endpoint string, regionName string, awsConfig awssdk.Config, events map[string]mb.Event) map[string]mb.Event {
+func addMetadata(namespace string, endpoint string, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) map[string]mb.Event {
 	switch namespace {
 	case namespaceEC2:
-		return ec2.AddMetadata(endpoint, regionName, awsConfig, events)
+		return ec2.AddMetadata(endpoint, regionName, awsConfig, fips_enabled, events)
 	case namespaceRDS:
-		return rds.AddMetadata(endpoint, regionName, awsConfig, events)
+		return rds.AddMetadata(endpoint, regionName, awsConfig, fips_enabled, events)
 	case namespaceSQS:
-		return sqs.AddMetadata(endpoint, regionName, awsConfig, events)
+		return sqs.AddMetadata(endpoint, regionName, awsConfig, fips_enabled, events)
 	default:
 		return events
 	}

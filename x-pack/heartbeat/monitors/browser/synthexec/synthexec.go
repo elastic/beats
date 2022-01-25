@@ -122,17 +122,20 @@ func runCmd(
 	cmd.Env = append(os.Environ(), "NODE_ENV=production")
 	cmd.Args = append(cmd.Args, "--rich-events")
 
-	if len(params) > 0 {
-		paramsBytes, _ := json.Marshal(params)
-		cmd.Args = append(cmd.Args, "--params", string(paramsBytes))
-	}
-
 	if len(filterJourneys.Tags) > 0 {
 		cmd.Args = append(cmd.Args, "--tags", strings.Join(filterJourneys.Tags, " "))
 	}
 
 	if filterJourneys.Match != "" {
 		cmd.Args = append(cmd.Args, "--match", filterJourneys.Match)
+	}
+
+	// Variant of the command with no params, which could contain sensitive stuff
+	loggableCmd := exec.Command(cmd.Path, cmd.Args...)
+	if len(params) > 0 {
+		paramsBytes, _ := json.Marshal(params)
+		cmd.Args = append(cmd.Args, "--params", string(paramsBytes))
+		loggableCmd.Args = append(loggableCmd.Args, "--params", fmt.Sprintf("\"{%d hidden params}\"", len(params)))
 	}
 
 	// We need to pass both files in here otherwise we get a broken pipe, even
@@ -142,7 +145,7 @@ func runCmd(
 	// see the docs for ExtraFiles in https://golang.org/pkg/os/exec/#Cmd
 	cmd.Args = append(cmd.Args, "--outfd", "3")
 
-	logp.Info("Running command: %s in directory: '%s'", cmd.String(), cmd.Dir)
+	logp.Info("Running command: %s in directory: '%s'", loggableCmd.String(), cmd.Dir)
 
 	if stdinStr != nil {
 		logp.Debug(debugSelector, "Using stdin str %s", *stdinStr)
@@ -189,14 +192,15 @@ func runCmd(
 		err := cmd.Wait()
 		jsonWriter.Close()
 		jsonReader.Close()
-		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd.String())
+		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), loggableCmd.String())
 		if err != nil {
 			str := fmt.Sprintf("command exited with status %d: %s", cmd.ProcessState.ExitCode(), err)
 			mpx.writeSynthEvent(&SynthEvent{
-				Type:  "cmd/status",
-				Error: &SynthError{Name: "cmdexit", Message: str},
+				Type:                 "cmd/status",
+				Error:                &SynthError{Name: "cmdexit", Message: str},
+				TimestampEpochMicros: float64(time.Now().UnixMicro()),
 			})
-			logp.Warn("Error executing command '%s' (%d): %s", cmd.String(), cmd.ProcessState.ExitCode(), err)
+			logp.Warn("Error executing command '%s' (%d): %s", loggableCmd.String(), cmd.ProcessState.ExitCode(), err)
 		}
 		wg.Wait()
 		mpx.Close()
@@ -240,7 +244,7 @@ func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *S
 		logp.Info("%s: %s", typ, text)
 		return &SynthEvent{
 			Type:                 typ,
-			TimestampEpochMicros: float64(time.Now().UnixNano() / int64(time.Millisecond)),
+			TimestampEpochMicros: float64(time.Now().UnixMicro()),
 			Payload: map[string]interface{}{
 				"message": text,
 			},

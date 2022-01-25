@@ -1,7 +1,6 @@
 {{ if eq .input "httpjson" }}
 
 type: httpjson
-config_version: "2"
 interval: {{ .interval }}
 
 auth.oauth2:
@@ -50,22 +49,12 @@ exclude_files: [".gz$"]
 
 {{ end }}
 
-tags: {{.tags | tojson}}
-publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+tags:
+{{if .preserve_original_event}}
+  - preserve_original_event
+{{end}}
+{{range $val := .tags}}
+  - {{$val}}
+{{end}}
 
-processors:
-  - decode_json_fields:
-      fields: [message]
-      target: json
-      process_array: true
-      max_depth: 5
-      overwrite_keys: true
-      add_error_key: true
-  - fingerprint:
-      fields: ["json.id", "json.indicator_id"]
-      target_field: "@metadata._id"
-      ignore_missing: true
-  - add_fields:
-      target: ''
-      fields:
-        ecs.version: 1.12.0
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}

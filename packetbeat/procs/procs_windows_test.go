@@ -42,21 +42,33 @@ func TestParseTableRaw(t *testing.T) {
 		expected []portProcMapping
 		mustErr  bool
 	}{
-		{"Empty table IPv4", IPv4,
-			"00000000", nil, false},
-		{"Empty table IPv6", IPv6,
-			"00000000", nil, false},
-		{"Short table (no length)", IPv4,
-			"000000", nil, true},
-		{"Short table (partial entry)", IPv6,
-			"01000000AAAAAAAAAAAAAAAAAAAA", nil, true},
-		{"One entry (IPv4)", IPv4,
+		{
+			"Empty table IPv4", IPv4,
+			"00000000", nil, false,
+		},
+		{
+			"Empty table IPv6", IPv6,
+			"00000000", nil, false,
+		},
+		{
+			"Short table (no length)", IPv4,
+			"000000", nil, true,
+		},
+		{
+			"Short table (partial entry)", IPv6,
+			"01000000AAAAAAAAAAAAAAAAAAAA", nil, true,
+		},
+		{
+			"One entry (IPv4)", IPv4,
 			"01000000" +
 				"77777777AAAAAAAA12340000BBBBBBBBFFFF0000CCCCCCCC",
 			[]portProcMapping{
 				{endpoint: endpoint{address: "170.170.170.170", port: 0x1234}, pid: int(pid)},
-			}, false},
-		{"Two entries (IPv6)", IPv6,
+			},
+			false,
+		},
+		{
+			"Two entries (IPv6)", IPv6,
 			"02000000" +
 				// First entry
 				"11112222333344445555666677778888F0F0F0F0" +
@@ -76,7 +88,9 @@ func TestParseTableRaw(t *testing.T) {
 			[]portProcMapping{
 				{endpoint: endpoint{address: "1111:2222:3333:4444:5555:6666:7777:8888", port: 0xABCD}, pid: 1},
 				{endpoint: endpoint{address: "aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa:aaaa", port: 0}, pid: 0xffff},
-			}, false},
+			},
+			false,
+		},
 	} {
 		msg := fmt.Sprintf("Test case #%d: %s", idx+1, testCase.name)
 		table, err := hex.DecodeString(testCase.raw)

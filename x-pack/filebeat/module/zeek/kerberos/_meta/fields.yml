@@ -1,6 +1,5 @@
 - name: kerberos
   type: group
-  default_field: false
   description: >
     Fields exported by the Zeek Kerberos log
   fields:

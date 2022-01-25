@@ -18,45 +18,11 @@
 package pb
 
 import (
-	"github.com/elastic/ecs/code/go/ecs"
+	"github.com/elastic/beats/v7/libbeat/ecs"
 )
-
-// Fixes for non-array datatypes
-// =============================
-//
-// Code at github.com/elastic/ecs/code/go/ecs has some fields as string
-// when they should be []string.
-//
-// Once the code generator is fixed, this code will no longer compile
-// which reminds us to strip out the overrides below
-var (
-	compileTimeUpgradeCheckEvent = ecs.Event{
-		Type: "remove this when we upgrade ECS",
-	}
-	compileTimeUpgradeCheckRelated = ecs.Related{
-		User: "remove this when we upgrade ECS",
-	}
-)
-
-type ecsEvent struct {
-	ecs.Event `ecs:",inline"`
-	// overridden because this needs to be an array
-	Category []string `ecs:"category"`
-	// overridden because this needs to be an array
-	Type []string `ecs:"type"`
-}
 
 type ecsRelated struct {
 	ecs.Related `ecs:",inline"`
-	// overridden because this needs to be an array
-	IP []string `ecs:"ip"`
-	// overridden because this needs to be an array
-	User []string `ecs:"user"`
-	// overridden because this needs to be an array
-	Hash []string `ecs:"hash"`
-	// overridden because this needs to be an array
-	Hosts []string `ecs:"hosts"`
-
 	// for de-dup
 	ipSet   map[string]struct{}
 	userSet map[string]struct{}

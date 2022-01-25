@@ -126,12 +126,12 @@ func newProcessorConfig(cfg *common.Config, register *Register) (kubeAnnotatorCo
 		return config, fmt.Errorf("fail to unpack the kubernetes configuration: %s", err)
 	}
 
-	//Load and append default indexer configs
+	// Load and append default indexer configs
 	if config.DefaultIndexers.Enabled {
 		config.Indexers = append(config.Indexers, register.GetDefaultIndexerConfigs()...)
 	}
 
-	//Load and append default matcher configs
+	// Load and append default matcher configs
 	if config.DefaultMatchers.Enabled {
 		config.Matchers = append(config.Matchers, register.GetDefaultMatcherConfigs()...)
 	}
@@ -141,7 +141,7 @@ func newProcessorConfig(cfg *common.Config, register *Register) (kubeAnnotatorCo
 
 func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Config) {
 	k.initOnce.Do(func() {
-		client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
+		client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 		if err != nil {
 			if kubernetes.IsInCluster(config.KubeConfig) {
 				k.log.Debugf("Could not create kubernetes client using in_cluster config: %+v", err)
@@ -166,23 +166,23 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 
 		k.matchers = matchers
 		nd := &kubernetes.DiscoverKubernetesNodeParams{
-			ConfigHost:  config.Host,
+			ConfigHost:  config.Node,
 			Client:      client,
 			IsInCluster: kubernetes.IsInCluster(config.KubeConfig),
 			HostUtils:   &kubernetes.DefaultDiscoveryUtils{},
 		}
 		if config.Scope == "node" {
-			config.Host, err = kubernetes.DiscoverKubernetesNode(k.log, nd)
+			config.Node, err = kubernetes.DiscoverKubernetesNode(k.log, nd)
 			if err != nil {
 				k.log.Errorf("Couldn't discover Kubernetes node: %w", err)
 				return
 			}
-			k.log.Debugf("Initializing a new Kubernetes watcher using host: %s", config.Host)
+			k.log.Debugf("Initializing a new Kubernetes watcher using host: %s", config.Node)
 		}
 
-		watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
+		watcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_pod", client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
-			Node:        config.Host,
+			Node:        config.Node,
 			Namespace:   config.Namespace,
 		}, nil)
 		if err != nil {
@@ -191,22 +191,18 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 		}
 
 		metaConf := config.AddResourceMetadata
-		if metaConf == nil {
-			metaConf = metadata.GetDefaultResourceMetadataConfig()
-		}
 
 		options := kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
-			Node:        config.Host,
+			Node:        config.Node,
+			Namespace:   config.Namespace,
 		}
-		if config.Namespace != "" {
-			options.Namespace = config.Namespace
-		}
-		nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
+
+		nodeWatcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_node", client, &kubernetes.Node{}, options, nil)
 		if err != nil {
 			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
 		}
-		namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+		namespaceWatcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
 		}, nil)
 		if err != nil {

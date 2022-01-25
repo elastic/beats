@@ -1,12 +1,18 @@
 import os
 import unittest
 from filebeat import BaseTest
-from elasticsearch import Elasticsearch
 from beat.beat import INTEGRATION_TESTS
 from beat import common_tests
 
 
 class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMixin):
+
+    def setUp(self):
+        super(Test, self).setUp()
+        self.render_config_template(
+            elasticsearch=self.get_elasticsearch_template_config(),
+        )
+        self.es = self.get_elasticsearch_instance()
 
     def test_base(self):
         """
@@ -28,32 +34,15 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
         assert "input.type" in output
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    def test_template(self):
+    def test_index_management(self):
         """
-        Test that the template can be loaded with `setup --template`
+        Test that the template can be loaded with `setup --index-management`
         """
-        es = Elasticsearch([self.get_elasticsearch_url()])
         self.render_config_template(
-            elasticsearch={"host": self.get_elasticsearch_url()},
+            elasticsearch=self.get_elasticsearch_template_config(),
         )
-        exit_code = self.run_beat(extra_args=["setup", "--template"])
+        exit_code = self.run_beat(extra_args=["setup", "--index-management"])
 
         assert exit_code == 0
         assert self.log_contains('Loaded index template')
-        assert len(es.cat.templates(name='filebeat-*', h='name')) > 0
-
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    def test_template_migration(self):
-        """
-        Test that the template can be loaded with `setup --template`
-        """
-        es = Elasticsearch([self.get_elasticsearch_url()])
-        self.render_config_template(
-            elasticsearch={"host": self.get_elasticsearch_url()},
-        )
-        exit_code = self.run_beat(extra_args=["setup", "--template",
-                                              "-E", "setup.template.overwrite=true", "-E", "migration.6_to_7.enabled=true"])
-
-        assert exit_code == 0
-        assert self.log_contains('Loaded index template')
-        assert len(es.cat.templates(name='filebeat-*', h='name')) > 0
+        assert len(self.es.cat.templates(name='filebeat-*', h='name')) > 0

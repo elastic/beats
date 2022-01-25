@@ -36,13 +36,10 @@ stages:
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
-    goIntegTest:
-        mage: "mage goIntegTest"
-        stage: mandatory
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.
-            - "macosx&&x86_64"
+            - "orka && darwin && poc"
         when:                  ## Override the top-level when.
             comments:
                 - "/test x-pack/elastic-agent for macos"

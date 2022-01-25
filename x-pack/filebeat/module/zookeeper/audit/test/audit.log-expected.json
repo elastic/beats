@@ -4,6 +4,7 @@
         "event.action": "serverStart",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: user=zookeeper/192.168.1.3 operation=serverStart   result=success",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -11,7 +12,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 0,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: user=zookeeper/192.168.1.3 operation=serverStart   result=success",
         "related.user": [
             "zookeeper/192.168.1.3"
         ],
@@ -29,6 +29,7 @@
         "event.action": "create",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=create    znode=/a    znode_type=persistent  result=success",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -36,7 +37,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 119,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=create    znode=/a    znode_type=persistent  result=success",
         "related.ip": [
             "192.168.1.2"
         ],
@@ -61,6 +61,7 @@
         "event.action": "create",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=create    znode=/a    znode_type=persistent  result=failure",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -68,7 +69,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 319,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=create    znode=/a    znode_type=persistent  result=failure",
         "related.ip": [
             "192.168.1.2"
         ],
@@ -93,6 +93,7 @@
         "event.action": "setData",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=setData   znode=/a    result=failure",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -100,7 +101,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 519,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=setData   znode=/a    result=failure",
         "related.ip": [
             "192.168.1.2"
         ],
@@ -124,6 +124,7 @@
         "event.action": "setData",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=setData   znode=/a    result=success",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -131,7 +132,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 696,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=setData   znode=/a    result=success",
         "related.ip": [
             "192.168.1.2"
         ],
@@ -155,6 +155,7 @@
         "event.action": "setAcl",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=setAcl    znode=/a    acl=world:anyone:cdrwa  result=failure",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -162,7 +163,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 873,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=setAcl    znode=/a    acl=world:anyone:cdrwa  result=failure",
         "related.ip": [
             "192.168.1.2"
         ],
@@ -187,6 +187,7 @@
         "event.action": "setAcl",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=setAcl    znode=/a    acl=world:anyone:cdrwa  result=success",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -194,7 +195,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 1074,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=setAcl    znode=/a    acl=world:anyone:cdrwa  result=success",
         "related.ip": [
             "192.168.1.2"
         ],
@@ -219,6 +219,7 @@
         "event.action": "create",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=create    znode=/b    znode_type=persistent  result=success",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -226,7 +227,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 1275,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=create    znode=/b    znode_type=persistent  result=success",
         "related.ip": [
             "192.168.1.2"
         ],
@@ -251,6 +251,7 @@
         "event.action": "setData",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=setData   znode=/b    result=success",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -258,7 +259,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 1475,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=setData   znode=/b    result=success",
         "related.ip": [
             "192.168.1.2"
         ],
@@ -282,6 +282,7 @@
         "event.action": "delete",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=delete    znode=/b    result=success",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -289,7 +290,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 1652,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=delete    znode=/b    result=success",
         "related.ip": [
             "192.168.1.2"
         ],
@@ -313,6 +313,7 @@
         "event.action": "multiOperation",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=multiOperation    result=failure",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -320,7 +321,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 1829,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=multiOperation    result=failure",
         "related.ip": [
             "192.168.1.2"
         ],
@@ -343,6 +343,7 @@
         "event.action": "delete",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=delete    znode=/a    result=failure",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -350,7 +351,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 2002,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=delete    znode=/a    result=failure",
         "related.ip": [
             "192.168.1.2"
         ],
@@ -374,6 +374,7 @@
         "event.action": "delete",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=delete    znode=/a    result=success",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -381,7 +382,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 2179,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=delete    znode=/a    result=success",
         "related.ip": [
             "192.168.1.2"
         ],
@@ -405,6 +405,7 @@
         "event.action": "create",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730001   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=create   znode=/ephemral znode_type=ephemral result=success",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -412,7 +413,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 2356,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730001   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=create   znode=/ephemral znode_type=ephemral result=success",
         "related.ip": [
             "192.168.1.2"
         ],
@@ -435,6 +435,7 @@
         "event.action": "ephemeralZNodeDeletionOnSessionCloseOrExpire",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730001   user=zookeeper/192.168.1.3   operation=ephemeralZNodeDeletionOnSessionCloseOrExpire  znode=/ephemral result=success",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -442,7 +443,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 2556,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730001   user=zookeeper/192.168.1.3   operation=ephemeralZNodeDeletionOnSessionCloseOrExpire  znode=/ephemral result=success",
         "related.user": [
             "zookeeper/192.168.1.3"
         ],
@@ -462,6 +462,7 @@
         "event.action": "reconfig",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=reconfig  znode=/zookeeper/config result=success",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -469,7 +470,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 2749,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: session=0x19344730000   user=192.168.1.2,zkcli@HADOOP.COM  ip=192.168.1.2    operation=reconfig  znode=/zookeeper/config result=success",
         "related.ip": [
             "192.168.1.2"
         ],
@@ -491,13 +491,13 @@
         "event.action": "serverStop",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: user=zookeeper/192.168.1.3 operation=serverStop    result=invoked",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 2938,
-        "log.original": "2021-04-19 01:58:20,588 INFO audit.Log4jAuditLogger: user=zookeeper/192.168.1.3 operation=serverStop    result=invoked",
         "related.user": [
             "zookeeper/192.168.1.3"
         ],
@@ -513,6 +513,7 @@
         "event.action": "serverStart",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-27 11:51:32,074 INFO audit.Log4jAuditLogger: user=jaime\toperation=serverStart\tresult=success",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -520,7 +521,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 3057,
-        "log.original": "2021-04-27 11:51:32,074 INFO audit.Log4jAuditLogger: user=jaime\toperation=serverStart\tresult=success",
         "related.user": [
             "jaime"
         ],
@@ -538,6 +538,7 @@
         "event.action": "create",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-27 11:52:05,689 INFO audit.Log4jAuditLogger: session=0x1004380147c0000\tuser=127.0.0.1\tip=127.0.0.1\toperation=create\tznode=/a\tznode_type=persistent\tresult=success",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -545,7 +546,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 3158,
-        "log.original": "2021-04-27 11:52:05,689 INFO audit.Log4jAuditLogger: session=0x1004380147c0000\tuser=127.0.0.1\tip=127.0.0.1\toperation=create\tznode=/a\tznode_type=persistent\tresult=success",
         "related.ip": [
             "127.0.0.1"
         ],
@@ -569,6 +569,7 @@
         "event.action": "setData",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-27 11:53:56,256 INFO audit.Log4jAuditLogger: session=0x1004380147c0000\tuser=127.0.0.1\tip=127.0.0.1\toperation=setData\tznode=/a\tresult=success",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -576,7 +577,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 3328,
-        "log.original": "2021-04-27 11:53:56,256 INFO audit.Log4jAuditLogger: session=0x1004380147c0000\tuser=127.0.0.1\tip=127.0.0.1\toperation=setData\tznode=/a\tresult=success",
         "related.ip": [
             "127.0.0.1"
         ],
@@ -599,6 +599,7 @@
         "event.action": "setData",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-27 11:53:58,941 INFO audit.Log4jAuditLogger: session=0x1004380147c0000\tuser=127.0.0.1\tip=127.0.0.1\toperation=setData\tznode=/a\tresult=success",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -606,7 +607,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 3477,
-        "log.original": "2021-04-27 11:53:58,941 INFO audit.Log4jAuditLogger: session=0x1004380147c0000\tuser=127.0.0.1\tip=127.0.0.1\toperation=setData\tznode=/a\tresult=success",
         "related.ip": [
             "127.0.0.1"
         ],
@@ -629,6 +629,7 @@
         "event.action": "delete",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-27 11:55:01,453 INFO audit.Log4jAuditLogger: session=0x1004380147c0000\tuser=127.0.0.1\tip=127.0.0.1\toperation=delete\tznode=/a\tresult=success",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
@@ -636,7 +637,6 @@
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 3626,
-        "log.original": "2021-04-27 11:55:01,453 INFO audit.Log4jAuditLogger: session=0x1004380147c0000\tuser=127.0.0.1\tip=127.0.0.1\toperation=delete\tznode=/a\tresult=success",
         "related.ip": [
             "127.0.0.1"
         ],
@@ -657,13 +657,13 @@
         "event.action": "serverStop",
         "event.dataset": "zookeeper.audit",
         "event.module": "zookeeper",
+        "event.original": "2021-04-27 11:55:36,466 INFO audit.Log4jAuditLogger: user=jaime\toperation=serverStop\tresult=invoked",
         "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
         "log.level": "INFO",
         "log.logger": "audit.Log4jAuditLogger",
         "log.offset": 3774,
-        "log.original": "2021-04-27 11:55:36,466 INFO audit.Log4jAuditLogger: user=jaime\toperation=serverStop\tresult=invoked",
         "related.user": [
             "jaime"
         ],

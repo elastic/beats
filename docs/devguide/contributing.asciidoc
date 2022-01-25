@@ -36,17 +36,6 @@ any bugs/issues related to the pull request. Please also add a changelog entry t
 https://github.com/elastic/beats/blob/master/CHANGELOG.next.asciidoc[CHANGELOG.next.asciidoc].
 
 [float]
-[[adding-new-beat]]
-=== Adding a New Beat
-
-If you want to create a new Beat, please read <<new-beat>>. You don't need to
-submit the code to this repository. Most new Beats start in their own repository
-and just make use of the libbeat packages. After you have a working Beat that
-you'd like to share with others, open a PR to add it to our list of
-https://github.com/elastic/beats/blob/master/libbeat/docs/communitybeats.asciidoc[community
-Beats].
-
-[float]
 [[setting-up-dev-environment]]
 === Setting Up Your Dev Environment
 

@@ -79,8 +79,6 @@ The password for connecting to Kafka.
 
 ===== `sasl.mechanism`
 
-beta[]
-
 The SASL mechanism to use when connecting to Kafka. It can be one of:
 
 * `PLAIN` for SASL/PLAIN.

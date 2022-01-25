@@ -162,7 +162,7 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 			"armv5":    "armv5",
 			"armv6":    "armv6",
 			"armv7":    "armv7",
-			"arm64":    "arm64",
+			"arm64":    "aarch64",
 			"mips":     "mips",
 			"mipsle":   "mipsel",
 			"mips64":   "mips64",
@@ -174,6 +174,11 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 		Docker: map[string]string{
 			"amd64": "amd64",
 			"arm64": "arm64",
+		},
+	},
+	"aix": map[PackageType]map[string]string{
+		TarGz: map[string]string{
+			"ppc64": "ppc64",
 		},
 	},
 }

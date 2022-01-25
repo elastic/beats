@@ -19,5 +19,5 @@ func init() {
 // AssetAwsfargate returns asset data.
 // This is the base64 encoded zlib format compressed contents of module/awsfargate.
 func AssetAwsfargate() string {
-	return "eJx0kDFuwzAMRXef4l8gPoCGAkHRbJ06dCxYmxKE0qJB0SjS0xc2YsMJnD9S0n9PPOGHrwH0WyNZIucG8OzCAefPD1y2obEwVQ74ZqcG6Ll2lkfPWgJeGgB4134SRlRDpyLceS4JnRanXNggmiqi6YDzQH9a8Pa6EdoGiJmlr2HpOqHQwA9ic/w6ckAyncbb5MBkzmVpe8ZbZNrb5T14DxdN2+yIPOdxL2t6jjSJfy3dAZGk8t3xofReXG31Xp3vV9nuXq0/+A8AAP//VOqIaQ=="
+	return "eJx0kEFqwzAQRfc+xb9AfAAtCqE0u6666Hpqj4XoWGNGE0p6+mITGTXEf/mR5j3+Cd98C6CfMpFFcu4ATy4ccP78wGUvjYWpcMAXO3XAyGWwtHjSHPDSAcC7jldhTGoYVIQHTzli0OyUMhtEY8FkOuM8069mvL3uhL4DpsQylrDdOiHTzA9ia/y2cEA0vS735onJmst27Yi3yfT3xy24hYvGvXtGXvO4S82BVWumVsWq1P+t+uZXVfwLAAD//0tEf3I="
 }

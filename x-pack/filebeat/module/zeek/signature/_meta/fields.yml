@@ -1,6 +1,5 @@
 - name: signature
   type: group
-  default_field: false
   description: >
     Fields exported by the Zeek Signature log.
   fields:

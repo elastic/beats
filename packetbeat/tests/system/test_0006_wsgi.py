@@ -23,7 +23,7 @@ class Test(BaseTest):
         assert o["client.port"] == 46249
         assert o["server.port"] == 8888
         assert o["status"] == "OK"
-        assert o["http.request.method"] == "get"
+        assert o["http.request.method"] == "GET"
         assert o["url.path"] == "/"
         assert o["http.response.status_code"] == 200
         assert o["http.response.status_phrase"] == "ok"
@@ -100,7 +100,7 @@ class Test(BaseTest):
         )
         self.run_packetbeat(pcap="wsgi_loopback.pcap")
 
-        objs = self.read_output()
+        objs = self.read_output(output_file="output/packetbeat-" + self.today + "-1.ndjson")
         assert len(objs) == 1
         o = objs[0]
 
@@ -119,7 +119,7 @@ class Test(BaseTest):
         )
         self.run_packetbeat(pcap="wsgi_loopback.pcap")
 
-        objs = self.read_output()
+        objs = self.read_output(output_file="output/packetbeat-" + self.today + "-2.ndjson")
         assert len(objs) == 1
         o = objs[0]
 

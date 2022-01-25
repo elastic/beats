@@ -21,8 +21,6 @@ include::./contributing.asciidoc[]
 
 include::{libbeat-dir}/communitybeats.asciidoc[]
 
-include::./newbeat.asciidoc[]
-
 include::./fields-yml.asciidoc[]
 
 include::./event-conventions.asciidoc[]

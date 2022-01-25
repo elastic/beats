@@ -795,9 +795,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.88.126.165"
-        ],
+        "destination.ip": "10.88.126.165",
         "event.action": "RPD_LDP_SESSIONDOWN:",
         "event.code": "RPD_LDP_SESSIONDOWN",
         "event.dataset": "juniper.junos",
@@ -1423,9 +1421,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.148.255.126"
-        ],
+        "destination.ip": "10.148.255.126",
         "event.action": "RPD_LDP_SESSIONDOWN:",
         "event.code": "RPD_LDP_SESSIONDOWN",
         "event.dataset": "juniper.junos",
@@ -2091,9 +2087,7 @@
         "rsa.time.month": "Jan",
         "service.type": "juniper",
         "source.address": "oreve2538.www.localdomain",
-        "source.ip": [
-            "10.44.24.103"
-        ],
+        "source.ip": "10.44.24.103",
         "tags": [
             "forwarded",
             "juniper.junos"
@@ -2505,9 +2499,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.49.190.163"
-        ],
+        "destination.ip": "10.49.190.163",
         "event.action": "RPD_OSPF_NBRUP",
         "event.code": "RPD_OSPF_NBRUP",
         "event.dataset": "juniper.junos",
@@ -2561,9 +2553,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.101.99.109"
-        ],
+        "destination.ip": "10.101.99.109",
         "event.action": "emu",
         "event.code": "RPD_LDP_NBRDOWN",
         "event.dataset": "juniper.junos",

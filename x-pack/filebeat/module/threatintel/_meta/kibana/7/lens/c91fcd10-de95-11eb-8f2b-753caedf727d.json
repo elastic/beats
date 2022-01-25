@@ -36,7 +36,7 @@
                                         "size": 10
                                     },
                                     "scale": "ordinal",
-                                    "sourceField": "threatintel.indicator.provider"
+                                    "sourceField": "threat.indicator.provider"
                                 }
                             },
                             "incompleteColumns": {}

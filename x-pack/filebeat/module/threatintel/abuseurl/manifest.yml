@@ -11,6 +11,8 @@ var:
   - name: tags
     default: [threatintel-abuseurls, forwarded]
   - name: proxy_url
+  - name: preserve_original_event
+    default: false
 
 ingest_pipeline:
   - ingest/pipeline.yml
