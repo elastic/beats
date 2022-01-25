@@ -18,12 +18,9 @@
 package status
 
 import (
-<<<<<<< HEAD
 	"fmt"
 
-=======
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
->>>>>>> 5f3dd3e39d (Add the Elastic product origin header when talking to Elasticsearch or Kibana. (#29966))
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
