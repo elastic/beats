@@ -1,4 +1,7 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 // license agreements. See the NOTICE file distributed with
 // this work for additional information regarding copyright
 // ownership. Elasticsearch B.V. licenses this file to you under
@@ -15,19 +18,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !windows
-// +build !windows
+//go:build !integration
+// +build !integration
 
-package instance
+package blkio
 
 import (
-	"errors"
-	"syscall"
+	"testing"
+
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/containerd"
 )
 
-var errNotImplemented = errors.New("not implemented on platform")
-
-func setUmask(newmask int) error {
-	syscall.Umask(newmask)
-	return nil // the umask syscall always succeeds: http://man7.org/linux/man-pages/man2/umask.2.html#RETURN_VALUE
+func TestEventMapping(t *testing.T) {
+	ptest.TestMetricSet(t, "containerd", "blkio",
+		ptest.TestCases{
+			{
+				MetricsFile:  "../_meta/test/containerd.v1.5.2",
+				ExpectedFile: "./_meta/test/containerd.v1.5.2.expected",
+			},
+		},
+	)
 }
