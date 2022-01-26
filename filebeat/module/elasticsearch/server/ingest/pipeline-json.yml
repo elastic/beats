@@ -7,10 +7,22 @@ processors:
 - json:
     field: message
     target_field: elasticsearch.server
+- dot_expander:
+    field: event.dataset
+    path: elasticsearch.server
 - drop:
-    if: ctx.elasticsearch.server.type != 'server'
-- remove:
-    field: elasticsearch.server.type
+    if: ctx.elasticsearch.server.event.dataset != 'elasticsearch.server'
+- rename:
+    field: elasticsearch.server.event.dataset
+    target_field: event.dataset
+    ignore_missing: true
+- dot_expander:
+    field: ecs.version
+    path: elasticsearch.server
+- rename:
+    field: elasticsearch.server.ecs.version
+    target_field: ecs.version
+    ignore_missing: true
 - dot_expander:
     field: service.name
     path: elasticsearch.server
@@ -18,39 +30,31 @@ processors:
     field: elasticsearch.server.service.name
     target_field: service.name
     ignore_missing: true
-- rename:
-    field: elasticsearch.server.component
-    target_field: elasticsearch.component
-    ignore_missing: true
 - dot_expander:
-    field: cluster.name
+    field: elasticsearch.cluster.name
     path: elasticsearch.server
 - rename:
-    field: elasticsearch.server.cluster.name
+    field: elasticsearch.server.elasticsearch.cluster.name
     target_field: elasticsearch.cluster.name
 - dot_expander:
-    field: node.name
+    field: elasticsearch.node.name
     path: elasticsearch.server
 - rename:
-    field: elasticsearch.server.node.name
+    field: elasticsearch.server.elasticsearch.node.name
     target_field: elasticsearch.node.name
 - dot_expander:
-    field: cluster.uuid
+    field: elasticsearch.cluster.uuid
     path: elasticsearch.server
 - rename:
-    field: elasticsearch.server.cluster.uuid
+    field: elasticsearch.server.elasticsearch.cluster.uuid
     target_field: elasticsearch.cluster.uuid
     ignore_missing: true
 - dot_expander:
-    field: node.id
+    field: elasticsearch.node.id
     path: elasticsearch.server
 - rename:
-    field: elasticsearch.server.node.id
+    field: elasticsearch.server.elasticsearch.node.id
     target_field: elasticsearch.node.id
-    ignore_missing: true
-- rename:
-    field: elasticsearch.server.level
-    target_field: log.level
     ignore_missing: true
 - dot_expander:
     field: log.level
