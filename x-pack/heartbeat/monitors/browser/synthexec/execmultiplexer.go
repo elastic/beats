@@ -25,19 +25,15 @@ func (e ExecMultiplexer) writeSynthEvent(se *SynthEvent) {
 	}
 
 	if se.Type == "journey/start" {
-		// e.currentJourney.Store(true)
+		e.currentJourney.Store(true)
 		e.eventCounter.Store(-1)
 	}
 	se.index = e.eventCounter.Inc()
-	// hasCurrentJourney := e.currentJourney.Load()
-	// if se.Type == "journey/end" || se.Type == "cmd/status" {
-	// e.currentJourney.Store(false)
-	// }
-	// If its an inline monitor, we pipe the events to the SynthEvents channel
-	// as we can associate the monitors, same is not the case with suite monitors
-	// if e.Inline.Load() || hasCurrentJourney {
+
+	if se.Type == "journey/end" || se.Type == "cmd/status" {
+		e.currentJourney.Store(false)
+	}
 	e.synthEvents <- se
-	// }
 }
 
 // SynthEvents returns a read only channel for synth events

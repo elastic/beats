@@ -116,7 +116,6 @@ func runCmd(
 	params common.MapStr,
 	filterJourneys FilterJourneyConfig,
 ) (mpx *ExecMultiplexer, err error) {
-	isInlineJob := stdinStr != nil
 	mpx = NewExecMultiplexer()
 	// Setup a pipe for JSON structured output
 	jsonReader, jsonWriter, err := os.Pipe()
@@ -153,7 +152,7 @@ func runCmd(
 
 	logp.Info("Running command: %s in directory: '%s'", loggableCmd.String(), cmd.Dir)
 
-	if isInlineJob {
+	if stdinStr != nil {
 		logp.Debug(debugSelector, "Using stdin str %s", *stdinStr)
 		cmd.Stdin = strings.NewReader(*stdinStr)
 	}
