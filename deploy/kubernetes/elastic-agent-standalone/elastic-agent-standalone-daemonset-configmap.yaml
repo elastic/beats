@@ -427,6 +427,8 @@ data:
               - proxy
             hosts:
               - 'localhost:10249'
+              # Openshift:
+              # - 'localhost:29101'
             period: 10s
           - data_stream:
               dataset: kubernetes.container

@@ -118,6 +118,12 @@ specify the following settings under `kubernetes.yml` in the `data` section:
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
       ssl.certificate_authorities:
         - /path/to/kubelet-service-ca.crt
+    - module: kubernetes
+      metricsets:
+        - proxy
+      period: 10s
+      host: ${NODE_NAME}
+      hosts: ["localhost:29101"]
 -----
 NOTE: `kubelet-service-ca.crt` can be any CA bundle that contains the issuer of the certificate used in the Kubelet API.
 According to each specific installation of Openshift this can be found either in `secrets` or in `configmaps`.
