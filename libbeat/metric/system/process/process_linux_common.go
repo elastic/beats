@@ -61,7 +61,7 @@ func GetSelfPid(hostfs resolve.Resolver) (int, error) {
 func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 	dir, err := os.Open(procStats.Hostfs.ResolveHostFS("proc"))
 	if err != nil {
-		return nil, nil, errors.Wrapf(err, "error reading from procfs %s", procStats.Hostfs)
+		return nil, nil, errors.Wrapf(err, "error reading from procfs %s", procStats.Hostfs.ResolveHostFS("/"))
 	}
 	defer dir.Close()
 

@@ -203,6 +203,22 @@ func BenchmarkGetProcess(b *testing.B) {
 	}
 }
 
+func BenchmarkGetTop(b *testing.B) {
+	stat, err := initTestResolver()
+	if err != nil {
+		b.Fatalf("Failed init: %s", err)
+	}
+	procs := make(map[int][]common.MapStr)
+
+	for i := 0; i < b.N; i++ {
+		list, err := stat.Get()
+		if err != nil {
+			b.Fatalf("error: %s", err)
+		}
+		procs[i] = list
+	}
+}
+
 func TestIncludeTopProcesses(t *testing.T) {
 	processes := []ProcState{
 		{
@@ -424,18 +440,18 @@ func TestIncludeTopProcesses(t *testing.T) {
 }
 
 func initTestResolver() (Stats, error) {
-	logp.DevelopmentSetup()
+	//logp.DevelopmentSetup()
 	testConfig := Stats{
 		Procs:        []string{".*"},
-		Hostfs:       resolve.NewTestResolver("/proc"),
+		Hostfs:       resolve.NewTestResolver("/"),
 		CPUTicks:     true,
 		CacheCmdLine: true,
 		IncludeTop: IncludeTopConfig{
 			Enabled:  true,
-			ByCPU:    4,
-			ByMemory: 4,
+			ByCPU:    5,
+			ByMemory: 5,
 		},
-		EnableCgroups: false,
+		EnableCgroups: true,
 		CgroupOpts: cgroup.ReaderOptions{
 			RootfsMountpoint:  resolve.NewTestResolver("/"),
 			IgnoreRootCgroups: true,
