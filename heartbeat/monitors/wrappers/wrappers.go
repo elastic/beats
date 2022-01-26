@@ -97,22 +97,22 @@ func addMonitorMetaFields(event *beat.Event, started time.Time, sf stdfields.Std
 		id = fmt.Sprintf("%s-%x", sf.ID, urlHash)
 	}
 
-	// Allow jobs to override the ID, useful for browser suites
-	// which do this logic on their own
-	if v, _ := event.GetValue("monitor.id"); v != nil {
-		id = fmt.Sprintf("%s-%s", sf.ID, v.(string))
-	}
-	if v, _ := event.GetValue("monitor.name"); v != nil {
-		name = fmt.Sprintf("%s - %s", sf.Name, v.(string))
-	}
-
 	fieldsToMerge := common.MapStr{
 		"monitor": common.MapStr{
-			"id":       id,
-			"name":     name,
-			"type":     sf.Type,
 			"timespan": timespan(started, sf.Schedule, sf.Timeout),
 		},
+	}
+	// Browser monitor fields are enriched separately
+	// in the synthexec package - x-pack/heartbeat/monitors/browser/synthexec/enrich.go
+	if sf.Type != "browser" {
+		fieldsToMerge = common.MapStr{
+			"monitor": common.MapStr{
+				"id":       id,
+				"name":     name,
+				"type":     sf.Type,
+				"timespan": timespan(started, sf.Schedule, sf.Timeout),
+			},
+		}
 	}
 
 	// Add service.name for APM interop

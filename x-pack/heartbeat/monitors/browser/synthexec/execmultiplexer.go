@@ -25,23 +25,27 @@ func (e ExecMultiplexer) writeSynthEvent(se *SynthEvent) {
 	}
 
 	if se.Type == "journey/start" {
-		e.currentJourney.Store(true)
+		// e.currentJourney.Store(true)
 		e.eventCounter.Store(-1)
 	}
-	hasCurrentJourney := e.currentJourney.Load()
-	if se.Type == "journey/end" || se.Type == "cmd/status" {
-		e.currentJourney.Store(false)
-	}
-
 	se.index = e.eventCounter.Inc()
-	if hasCurrentJourney {
-		e.synthEvents <- se
-	}
+	// hasCurrentJourney := e.currentJourney.Load()
+	// if se.Type == "journey/end" || se.Type == "cmd/status" {
+	// e.currentJourney.Store(false)
+	// }
+	// If its an inline monitor, we pipe the events to the SynthEvents channel
+	// as we can associate the monitors, same is not the case with suite monitors
+	// if e.Inline.Load() || hasCurrentJourney {
+	e.synthEvents <- se
+	// }
 }
 
 // SynthEvents returns a read only channel for synth events
-func (e ExecMultiplexer) SynthEvents() <-chan *SynthEvent {
-	return e.synthEvents
+func (e ExecMultiplexer) SynthEvents(inline bool) <-chan *SynthEvent {
+	if inline || e.currentJourney.Load() {
+		return e.synthEvents
+	}
+	return make(chan *SynthEvent)
 }
 
 // Done returns a channel that is closed when all output has been received

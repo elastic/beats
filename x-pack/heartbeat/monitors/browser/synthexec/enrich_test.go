@@ -84,8 +84,9 @@ func TestJourneyEnricher(t *testing.T) {
 	// on the nil data.
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
+		stdFields := StandardSuiteFields{Inline: false}
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
-			enrichErr := je.enrich(e, se)
+			enrichErr := je.enrich(e, se, stdFields)
 
 			if se != nil && se.Type != "journey/end" {
 				// Test that the created event includes the mapped
@@ -258,8 +259,9 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
+		stdFields := StandardSuiteFields{Inline: false}
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
-			enrichErr := je.enrich(e, se)
+			enrichErr := je.enrich(e, se, stdFields)
 
 			if se != nil && se.Type == "cmd/status" {
 				t.Run("no summary in cmd/status", func(t *testing.T) {

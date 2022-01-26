@@ -18,18 +18,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-type enricher func(event *beat.Event, se *SynthEvent) error
+type enricher func(event *beat.Event, se *SynthEvent, fields StandardSuiteFields) error
 
 type streamEnricher struct {
 	je *journeyEnricher
 }
 
-func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent) error {
+func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent, fields StandardSuiteFields) error {
 	if e.je == nil || (se != nil && se.Type == "journey/start") {
 		e.je = newJourneyEnricher()
 	}
 
-	return e.je.enrich(event, se)
+	return e.je.enrich(event, se, fields)
 }
 
 // journeyEnricher holds state across received SynthEvents retaining fields
@@ -62,7 +62,7 @@ func makeUuid() string {
 	return u.String()
 }
 
-func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
+func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StandardSuiteFields) error {
 	if se == nil {
 		return nil
 	}
@@ -84,20 +84,40 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 	}
 
 	eventext.MergeEventFields(event, common.MapStr{
+		"event": common.MapStr{
+			"type": se.Type,
+		},
 		"monitor": common.MapStr{
 			"check_group": je.checkGroup,
 		},
 	})
-	// Inline jobs have no journey
+
+	// Id and name differs for inline and suite monitors
+	// - We use the monitor id and name for inline journeys
+	// - Monitor id/name is concatenated with the journey id/name for
+	// 	 suite journeys
+	id := fields.Id
+	name := fields.Name
 	if je.journey != nil {
+		id = fmt.Sprintf("%s-%s", id, je.journey.Id)
+		name = fmt.Sprintf("%s - %s", name, je.journey.Name)
+	}
+	eventext.MergeEventFields(event, common.MapStr{
+		"monitor": common.MapStr{
+			"id":   id,
+			"name": name,
+		},
+	})
+
+	// Write suite level fields for suite jobs
+	if !fields.Inline {
 		eventext.MergeEventFields(event, common.MapStr{
-			"monitor": common.MapStr{
-				"id":   je.journey.Id,
-				"name": je.journey.Name,
+			"suite": common.MapStr{
+				"id":   id,
+				"name": name,
 			},
 		})
 	}
-
 	return je.enrichSynthEvent(event, se)
 }
 
