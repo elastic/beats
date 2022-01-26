@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package awss3
+package aws
 
 import (
 	"sync"
@@ -12,7 +12,7 @@ import (
 )
 
 func TestSemaphore(t *testing.T) {
-	s := newSem(5)
+	s := NewSem(5)
 
 	assert.Equal(t, s.Acquire(5), 5)
 

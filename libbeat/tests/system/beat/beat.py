@@ -16,6 +16,8 @@ from datetime import datetime, timedelta
 
 from .compose import ComposeMixin
 
+from elasticsearch import Elasticsearch
+
 
 BEAT_REQUIRED_FIELDS = ["@timestamp",
                         "agent.type", "agent.name", "agent.version"]
@@ -669,8 +671,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
     def get_elasticsearch_url(self):
         """
-        Returns an elasticsearch.Elasticsearch instance built from the
-        env variables like the integration tests.
+        Returns a string with the Elasticsearch URL
         """
         return "http://{host}:{port}".format(
             host=os.getenv("ES_HOST", "localhost"),
@@ -679,13 +680,45 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
     def get_elasticsearch_url_ssl(self):
         """
-        Returns an elasticsearch.Elasticsearch instance built from the
-        env variables like the integration tests.
+        Returns a string with the Elasticsearch URL
         """
         return "https://{host}:{port}".format(
             host=os.getenv("ES_HOST_SSL", "localhost"),
             port=os.getenv("ES_PORT_SSL", "9205"),
         )
+
+    def get_elasticsearch_template_config(self, security=True, user=None):
+        """
+        Returns a template suitable for a Beats config
+        """
+        template = {
+            "host": self.get_elasticsearch_url(),
+        }
+
+        if security:
+            template["user"] = user or os.getenv("ES_USER", "")
+            template["pass"] = os.getenv("ES_PASS", "")
+
+        return template
+
+    def get_elasticsearch_instance(self, security=True, ssl=False, url=None, user=None):
+        """
+        Returns an elasticsearch.Elasticsearch instance built from the
+        env variables like the integration tests.
+        """
+        if url is None:
+            if ssl:
+                url = self.get_elasticsearch_url_ssl()
+            else:
+                url = self.get_elasticsearch_url()
+
+        if security:
+            username = user or os.getenv("ES_USER", "")
+            password = os.getenv("ES_PASS", "")
+            es_instance = Elasticsearch([url], http_auth=(username, password))
+        else:
+            es_instance = Elasticsearch([url])
+        return es_instance
 
     def get_kibana_url(self):
         """
@@ -695,6 +728,20 @@ class TestCase(unittest.TestCase, ComposeMixin):
             host=os.getenv("KIBANA_HOST", "localhost"),
             port=os.getenv("KIBANA_PORT", "5601"),
         )
+
+    def get_kibana_template_config(self, security=True, user=None):
+        """
+        Returns a Kibana template suitable for a Beat
+        """
+        template = {
+            "host": self.get_kibana_url()
+        }
+
+        if security:
+            template["user"] = user or os.getenv("ES_USER", "")
+            template["pass"] = os.getenv("ES_PASS", "")
+
+        return template
 
     def assert_fields_are_documented(self, evt):
         """

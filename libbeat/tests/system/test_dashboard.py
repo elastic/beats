@@ -33,7 +33,11 @@ class Test(BaseTest):
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),
                         "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-E", "setup.kibana.username=beats",
+                        "-E", "setup.kibana.password=testing",
                         "-E", "output.elasticsearch.hosts=['" + self.get_host() + "']",
+                        "-E", "output.elasticsearch.username=admin",
+                        "-E", "output.elasticsearch.password=testing",
                         "-E", "output.file.enabled=false"]
         )
 
@@ -58,10 +62,13 @@ class Test(BaseTest):
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),
                         "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-E", "setup.kibana.username=beats",
+                        "-E", "setup.kibana.password=testing",
                         "-E", "output.elasticsearch.hosts=['" + self.get_host() + "']",
+                        "-E", "output.elasticsearch.username=admin",
+                        "-E", "output.elasticsearch.password=testing",
                         "-E", "output.file.enabled=false"]
         )
-
         beat.check_wait(exit_code=0)
 
         assert self.log_contains("Kibana dashboards successfully loaded") is True
@@ -91,8 +98,12 @@ class Test(BaseTest):
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),
                         "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-E", "setup.kibana.username=beats",
+                        "-E", "setup.kibana.password=testing",
                         "-E", "setup.kibana.space.id=foo-bar",
                         "-E", "output.elasticsearch.hosts=['" + self.get_host() + "']",
+                        "-E", "output.elasticsearch.username=admin",
+                        "-E", "output.elasticsearch.password=testing",
                         "-E", "output.file.enabled=false"]
         )
 
@@ -118,7 +129,11 @@ class Test(BaseTest):
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),
                         "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-E", "setup.kibana.username=beats",
+                        "-E", "setup.kibana.password=testing",
                         "-E", "output.elasticsearch.hosts=['" + self.get_host() + "']",
+                        "-E", "output.elasticsearch.username=admin",
+                        "-E", "output.elasticsearch.password=testing",
                         "-E", "output.file.enabled=false"]
         )
 
@@ -141,6 +156,8 @@ class Test(BaseTest):
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),
                         "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-E", "setup.kibana.username=beats",
+                        "-E", "setup.kibana.password=testing",
                         "-id", "Metricbeat-system-overview",
                         "-folder", "system-overview"]
         )
@@ -162,6 +179,8 @@ class Test(BaseTest):
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),
                         "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-E", "setup.kibana.username=beats",
+                        "-E", "setup.kibana.password=testing",
                         "-id", "No-such-dashboard",
                         "-folder", "system-overview"]
         )
@@ -187,7 +206,6 @@ class Test(BaseTest):
 
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         content, err = p.communicate()
-
         assert p.returncode == 0
 
         self._check_if_dashboard_exported(folder_name)
@@ -267,7 +285,7 @@ class Test(BaseTest):
             "kbn-xsrf": "1"
         }
 
-        r = requests.post(url, json=data, headers=headers)
+        r = requests.post(url, json=data, headers=headers, auth=("beats", "testing"))
         if r.status_code != 200 and r.status_code != 409:
             self.fail('Bad Kibana status code when creating space: {}'.format(r.status_code))
 
@@ -275,7 +293,7 @@ class Test(BaseTest):
         url = "http://" + self.get_kibana_host() + ":" + self.get_kibana_port() + \
             "/api/status"
 
-        r = requests.get(url)
+        r = requests.get(url, auth=("beats", "testing"))
         body = r.json()
         version = body["version"]["number"]
 

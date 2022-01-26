@@ -44,7 +44,7 @@ const defaultCrossBuildTarget = "golangCrossBuild"
 var Platforms = BuildPlatforms.Defaults()
 
 // SelectedPackageTypes is the list of package types
-var SelectedPackageTypes = []PackageType{TarGz}
+var SelectedPackageTypes []PackageType = []PackageType{}
 
 func init() {
 	// Allow overriding via PLATFORMS.
