@@ -10,6 +10,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/magefile/mage/mg"
@@ -27,6 +28,11 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
+
+// NpcapVersion specifies the version of the OEM Npcap installer to bundle with
+// the packetbeat executable. It is used to specify which npcap builder crossbuild
+// image to use.
+const NpcapVersion = "1.60"
 
 func init() {
 	common.RegisterCheckDeps(Update)
@@ -59,7 +65,7 @@ func Build() error {
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
 	if devtools.Platform.GOOS == "windows" && (devtools.Platform.GOARCH == "amd64" || devtools.Platform.GOARCH == "386") {
-		const installer = "npcap-" + packetbeat.NpcapVersion + "-oem.exe"
+		const installer = "npcap-" + NpcapVersion + "-oem.exe"
 		err := sh.Copy("./npcap/installer/"+installer, "/installer/"+installer)
 		if err != nil {
 			return fmt.Errorf("failed to copy Npcap installer into source tree: %w", err)
@@ -69,8 +75,32 @@ func GolangCrossBuild() error {
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
+//
+// On Windows platforms, if CrossBuild is invoked with the environment variables
+// CI or NPCAP_LOCAL set to "true", a private cross-build image is selected that
+// provides the OEM Npcap installer for the build. This behaviour requires access
+// to the private image.
 func CrossBuild() error {
-	return packetbeat.CrossBuild()
+	return devtools.CrossBuild(
+		// Run all builds serially to try to address failures that might be caused
+		// by concurrent builds. See https://github.com/elastic/beats/issues/24304.
+		devtools.Serially(),
+
+		devtools.ImageSelector(func(platform string) (string, error) {
+			image, err := devtools.CrossBuildImage(platform)
+			if err != nil {
+				return "", err
+			}
+			if os.Getenv("CI") != "true" && os.Getenv("NPCAP_LOCAL") != "true" {
+				return image, nil
+			}
+			if platform == "windows/amd64" || platform == "windows/386" {
+				image = strings.ReplaceAll(image, "beats-dev", "observability-ci") // Temporarily work around naming of npcap image.
+				image = strings.ReplaceAll(image, "main", "npcap-"+NpcapVersion+"-debian9")
+			}
+			return image, nil
+		}),
+	)
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).

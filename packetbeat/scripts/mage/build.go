@@ -17,43 +17,11 @@
 
 package mage
 
-import (
-	"os"
-	"strings"
-
-	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-)
-
-// NpcapVersion specifies the version of the OEM Npcap installer to bundle with
-// the packetbeat executable. It is used to specify which npcap builder crossbuild
-// image to use.
-const NpcapVersion = "1.60"
+import devtools "github.com/elastic/beats/v7/dev-tools/mage"
 
 // CrossBuild cross-builds the beat for all target platforms.
-//
-// On Windows platforms, if CrossBuild is invoked with the environment variables
-// CI or NPCAP_LOCAL set to "true", a private cross-build image is selected that
-// provides the OEM Npcap installer for the build. This behaviour requires access
-// to the private image.
 func CrossBuild() error {
-	return devtools.CrossBuild(
-		// Run all builds serially to try to address failures that might be caused
-		// by concurrent builds. See https://github.com/elastic/beats/issues/24304.
-		devtools.Serially(),
-
-		devtools.ImageSelector(func(platform string) (string, error) {
-			image, err := devtools.CrossBuildImage(platform)
-			if err != nil {
-				return "", err
-			}
-			if os.Getenv("CI") != "true" && os.Getenv("NPCAP_LOCAL") != "true" {
-				return image, nil
-			}
-			if platform == "windows/amd64" || platform == "windows/386" {
-				image = strings.ReplaceAll(image, "beats-dev", "observability-ci") // Temporarily work around naming of npcap image.
-				image = strings.ReplaceAll(image, "main", "npcap-"+NpcapVersion+"-debian9")
-			}
-			return image, nil
-		}),
-	)
+	// Run all builds serially to try to address failures that might be caused
+	// by concurrent builds. See https://github.com/elastic/beats/issues/24304.
+	return devtools.CrossBuild(devtools.Serially())
 }
