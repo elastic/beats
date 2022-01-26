@@ -1,5 +1,5 @@
 # Module: prometheus
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.16/metricbeat-module-prometheus.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/7.17/metricbeat-module-prometheus.html
 
 # Metrics collected from a Prometheus endpoint
 - module: prometheus
