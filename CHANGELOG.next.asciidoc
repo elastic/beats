@@ -26,7 +26,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Index template's default_fields setting is only populated with ECS fields. {pull}28596[28596] {issue}28215[28215]
 - tar.gz packages for ARM64 will now use the suffix `aarch64` rather than `arm64`. {pull}28813[28813]
 - Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
-- Remove options `logging.files.suffix` and default to datetime endings. {pull}28927[28927]
+- Remove options `logging.files.suffix` and default to datetime endings log file names. {pull}28927[28927]
 - Remove Journalbeat. Use `journald` input of Filebeat instead. {pull}29131[29131]
 - `include_matches` option of `journald` input no longer accepts a list of string. {pull}29294[29294]
 - Add job.name in pods controlled by Jobs {pull}28954[28954]
