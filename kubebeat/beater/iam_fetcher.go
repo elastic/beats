@@ -5,6 +5,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 )
 
+const IAMType = "aws-iam"
+
 type IAMFetcher struct {
 	iamProvider *IAMProvider
 	roleName    string
@@ -19,11 +21,11 @@ func NewIAMFetcher(cfg aws.Config, roleName string) (Fetcher, error) {
 	}, nil
 }
 
-func (f IAMFetcher) Fetch() ([]interface{}, error) {
-	results := make([]interface{}, 0)
+func (f IAMFetcher) Fetch() ([]FetcherResult, error) {
+	results := make([]FetcherResult, 0)
 	ctx := context.Background()
 	result, err := f.iamProvider.GetIAMRolePermissions(ctx, f.roleName)
-	results = append(results, result)
+	results = append(results, FetcherResult{IAMType, result})
 
 	return results, err
 }

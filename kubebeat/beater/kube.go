@@ -68,12 +68,6 @@ type requiredResource struct {
 	namespace string
 }
 
-// KubeAPIResource is a single resource from the Kube API.
-type KubeAPIResource struct {
-	Type     string      `json:"type"`
-	Resource interface{} `json:"resource"`
-}
-
 type KubeFetcher struct {
 	kubeconfig string
 	interval   time.Duration
@@ -137,7 +131,7 @@ func (f *KubeFetcher) initWatchers() error {
 	return nil
 }
 
-func (f *KubeFetcher) Fetch() ([]interface{}, error) {
+func (f *KubeFetcher) Fetch() ([]FetcherResult, error) {
 	var err error
 	watcherlock.Do(func() {
 		err = f.initWatchers()
@@ -148,7 +142,7 @@ func (f *KubeFetcher) Fetch() ([]interface{}, error) {
 		return nil, fmt.Errorf("could not initate Kubernetes watchers: %w", err)
 	}
 
-	ret := make([]interface{}, 0)
+	ret := make([]FetcherResult, 0)
 
 	for _, w := range f.watchers {
 		resources := w.Store().List()
@@ -163,7 +157,7 @@ func (f *KubeFetcher) Fetch() ([]interface{}, error) {
 
 			addTypeInformationToObject(o) // See https://github.com/kubernetes/kubernetes/issues/3030
 
-			ret = append(ret, KubeAPIResource{KubeAPIType, o})
+			ret = append(ret, FetcherResult{KubeAPIType, o})
 		}
 	}
 

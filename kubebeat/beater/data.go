@@ -16,15 +16,17 @@ import (
 // against it. It sends the cache to an output channel at the defined interval.
 type Data struct {
 	interval time.Duration
-	output   chan map[string][]interface{}
+	output   chan resourcesMap
 
 	ctx             context.Context
 	cancel          context.CancelFunc
-	state           map[string][]interface{}
+	state           resourcesMap
 	fetcherRegistry map[string]registeredFetcher
 	leaseInfo       *LeaseInfo
 	wg              *sync.WaitGroup
 }
+
+type resourcesMap map[string][]FetcherResult
 
 type registeredFetcher struct {
 	f          Fetcher
@@ -42,17 +44,17 @@ func NewData(ctx context.Context, interval time.Duration) (*Data, error) {
 
 	return &Data{
 		interval:        interval,
-		output:          make(chan map[string][]interface{}),
+		output:          make(chan resourcesMap),
 		ctx:             ctx,
 		cancel:          cancel,
-		state:           make(map[string][]interface{}),
+		state:           make(resourcesMap),
 		fetcherRegistry: make(map[string]registeredFetcher),
 		leaseInfo:       li,
 	}, nil
 }
 
 // Output returns the output channel.
-func (d *Data) Output() <-chan map[string][]interface{} {
+func (d *Data) Output() <-chan resourcesMap {
 	return d.output
 }
 
@@ -108,7 +110,7 @@ func (d *Data) Run() error {
 // update is a single update sent from a worker to a manager.
 type update struct {
 	key string
-	val []interface{}
+	val []FetcherResult
 }
 
 func (d *Data) fetchWorker(updates chan update, k string, rf registeredFetcher) {
@@ -144,9 +146,9 @@ func (d *Data) fetchManager(updates chan update) {
 		case <-ticker.C:
 			// Generate input ID?
 
-			c, err := copy(d.state)
+			c, err := copyState(d.state)
 			if err != nil {
-				logp.L().Errorf("could not copy data state: %v", err)
+				logp.L().Errorf("could not copyState data state: %v", err)
 				continue
 			}
 
@@ -173,8 +175,8 @@ func (d *Data) Stop() {
 	d.wg.Wait()
 }
 
-// copy makes a copy of the given map.
-func copy(m map[string][]interface{}) (map[string][]interface{}, error) {
+// copyState makes a copyState of the given map.
+func copyState(m resourcesMap) (resourcesMap, error) {
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
 	dec := gob.NewDecoder(&buf)
@@ -182,20 +184,20 @@ func copy(m map[string][]interface{}) (map[string][]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	var copy map[string][]interface{}
-	err = dec.Decode(&copy)
+	var newState resourcesMap
+	err = dec.Decode(&newState)
 	if err != nil {
 		return nil, err
 	}
-	return copy, nil
+	return newState, nil
 }
 
 func init() {
 	gob.Register([]interface{}{})
-	gob.Register(Process{})
-	gob.Register(FileSystemResourceData{})
+	gob.Register(ProcessResource{})
+	gob.Register(FileSystemResource{})
+	gob.Register(FetcherResult{})
 
-	gob.Register(KubeAPIResource{})
 	gob.Register(kubernetes.Pod{})
 	gob.Register(kubernetes.Secret{})
 	gob.Register(kubernetes.Role{})
