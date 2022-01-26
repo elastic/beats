@@ -20,7 +20,6 @@ package icmp
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"math/rand"
 	"net"
@@ -159,29 +158,6 @@ func newICMPLoop() (*stdICMPLoop, error) {
 	return l, nil
 }
 
-func (l *stdICMPLoop) checkNetworkMode(mode string) error {
-	ip4, ip6 := false, false
-	switch mode {
-	case "ip4":
-		ip4 = true
-	case "ip6":
-		ip6 = true
-	case "ip":
-		ip4, ip6 = true, true
-	default:
-		return fmt.Errorf("'%v' is not supported", mode)
-	}
-
-	if ip4 && l.conn4 == nil {
-		return errors.New("failed to initiate IPv4 support. Check log details for permission configuration")
-	}
-	if ip6 && l.conn6 == nil {
-		return errors.New("failed to initiate IPv6 support. Check log details for permission configuration")
-	}
-
-	return nil
-}
-
 func (l *stdICMPLoop) runICMPRecv(conn *icmp.PacketConn, proto int) {
 	for {
 		bytes := make([]byte, 512)
@@ -251,6 +227,14 @@ func (l *stdICMPLoop) ping(
 	timeout time.Duration,
 	interval time.Duration,
 ) (time.Duration, int, error) {
+	isIPv6 := addr.IP.To4() == nil
+	if isIPv6 && l.conn6 == nil {
+		return -1, -1, fmt.Errorf("cannot ping IPv6 address '%s', no IPv6 connection available", addr)
+	}
+	if !isIPv6 && l.conn4 == nil {
+		return -1, -1, fmt.Errorf("cannot ping IPv4 address '%s', no IPv4 connection available", addr)
+	}
+
 	var err error
 	toTimer := time.NewTimer(timeout)
 	defer toTimer.Stop()
@@ -362,7 +346,7 @@ func (l *stdICMPLoop) sendEchoRequest(addr *net.IPAddr) (*requestContext, error)
 	l.requests[id] = ctx
 	l.mutex.Unlock()
 
-	payloadBuf := make([]byte, 0, 8)
+	payloadBuf := make([]byte, 48, 48)
 	payload := bytes.NewBuffer(payloadBuf)
 	ts := time.Now()
 	binary.Write(payload, binary.BigEndian, ts.UnixNano())
@@ -379,7 +363,7 @@ func (l *stdICMPLoop) sendEchoRequest(addr *net.IPAddr) (*requestContext, error)
 
 	_, err := conn.WriteTo(encoded, addr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not write to conn: %w", err)
 	}
 
 	ctx.ts = ts

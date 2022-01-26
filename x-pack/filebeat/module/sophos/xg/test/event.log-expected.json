@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2020-05-18T14:38:57.000-02:00",
         "client.ip": "172.17.35.116",
         "event.category": [
             "authentication"
@@ -56,6 +57,7 @@
         "user.name": "elastic.user@elastic.test.com"
     },
     {
+        "@timestamp": "2020-05-18T14:38:58.000-02:00",
         "client.ip": "89.160.20.112",
         "destination.as.number": 721,
         "destination.as.organization.name": "DoD Network Information Center",
@@ -119,6 +121,7 @@
         ]
     },
     {
+        "@timestamp": "2020-05-18T14:38:59.000-02:00",
         "event.code": "062511318057",
         "event.dataset": "sophos.xg",
         "event.kind": "event",
@@ -155,6 +158,7 @@
         ]
     },
     {
+        "@timestamp": "2020-05-18T14:39:00.000-02:00",
         "client.ip": "67.43.156.13",
         "event.category": [
             "authentication"
@@ -215,6 +219,7 @@
         "user.name": "elastic.user@elastic.test.com"
     },
     {
+        "@timestamp": "2020-05-18T14:39:01.000-02:00",
         "event.category": [
             "host",
             "malware"
@@ -259,6 +264,7 @@
         ]
     },
     {
+        "@timestamp": "2020-05-18T14:39:02.000-02:00",
         "event.code": "063411660022",
         "event.dataset": "sophos.xg",
         "event.kind": "event",
@@ -296,6 +302,7 @@
         ]
     },
     {
+        "@timestamp": "2020-05-18T14:39:03.000-02:00",
         "client.ip": "81.2.69.145",
         "event.category": [
             "authentication"
@@ -358,6 +365,7 @@
         "user.name": "elastic.user@elastic.test.com"
     },
     {
+        "@timestamp": "2020-05-20T05:47:46.000-02:00",
         "client.bytes": 0,
         "destination.bytes": 0,
         "event.code": "062811617824",
@@ -406,6 +414,7 @@
         ]
     },
     {
+        "@timestamp": "2020-05-18T14:39:05.000-02:00",
         "client.ip": "1.128.3.4",
         "event.category": [
             "authentication"
@@ -459,6 +468,7 @@
         "user.name": "hendrikl"
     },
     {
+        "@timestamp": "2020-05-18T14:39:06.000-02:00",
         "event.code": "066911518017",
         "event.dataset": "sophos.xg",
         "event.kind": "event",
@@ -496,6 +506,7 @@
         ]
     },
     {
+        "@timestamp": "2020-05-18T14:39:07.000-02:00",
         "client.ip": "10.83.234.5",
         "event.code": "062009617502",
         "event.dataset": "sophos.xg",
@@ -541,6 +552,7 @@
         ]
     },
     {
+        "@timestamp": "2020-05-18T14:39:08.000-02:00",
         "client.ip": "175.16.199.1",
         "event.code": "062109517507",
         "event.dataset": "sophos.xg",
@@ -594,6 +606,7 @@
         ]
     },
     {
+        "@timestamp": "2020-05-18T14:39:09.000-02:00",
         "event.code": "063911517818",
         "event.dataset": "sophos.xg",
         "event.kind": "event",
@@ -631,6 +644,7 @@
         ]
     },
     {
+        "@timestamp": "2020-05-18T14:39:10.000-02:00",
         "event.code": "063311617923",
         "event.dataset": "sophos.xg",
         "event.kind": "event",
@@ -666,6 +680,7 @@
         ]
     },
     {
+        "@timestamp": "2020-06-02T06:29:36.000-02:00",
         "client.bytes": 0,
         "client.ip": "10.84.234.38",
         "destination.bytes": 0,
@@ -729,6 +744,7 @@
         "user.name": "elastic.user@elastic.test.com"
     },
     {
+        "@timestamp": "2017-03-16T12:56:01.000-02:00",
         "client.bytes": 0,
         "destination.bytes": 0,
         "event.code": "066811618014",
@@ -774,6 +790,7 @@
         ]
     },
     {
+        "@timestamp": "2017-03-16T12:53:27.000-02:00",
         "client.bytes": 22368,
         "destination.bytes": 31488,
         "event.code": "066811618015",
@@ -819,6 +836,7 @@
         ]
     },
     {
+        "@timestamp": "2017-03-16T12:46:26.000-02:00",
         "client.bytes": 0,
         "destination.bytes": 0,
         "event.code": "066811618016",
@@ -864,6 +882,7 @@
         ]
     },
     {
+        "@timestamp": "2018-06-06T11:12:10.000-02:00",
         "event.code": "063711517815",
         "event.dataset": "sophos.xg",
         "event.kind": "event",

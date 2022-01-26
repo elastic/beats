@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2017-01-31T18:44:31.000-02:00",
         "client.ip": "10.198.47.71",
         "client.port": 22623,
         "destination.ip": "46.161.30.47",
@@ -64,6 +65,7 @@
         "url.original": "46.161.30.47"
     },
     {
+        "@timestamp": "2020-05-18T14:38:34.000-02:00",
         "client.ip": "172.16.34.24",
         "client.port": 57579,
         "destination.ip": "13.226.155.22",
@@ -128,6 +130,7 @@
         "url.scheme": "http"
     },
     {
+        "@timestamp": "2020-05-18T14:38:35.000-02:00",
         "client.ip": "172.16.34.24",
         "client.port": 57540,
         "destination.ip": "13.226.155.22",
@@ -192,6 +195,7 @@
         "url.scheme": "http"
     },
     {
+        "@timestamp": "2018-06-05T08:49:00.000-02:00",
         "client.ip": "10.198.32.89",
         "client.port": 0,
         "destination.ip": "82.211.30.202",

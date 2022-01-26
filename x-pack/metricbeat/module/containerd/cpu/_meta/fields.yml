@@ -1,0 +1,54 @@
+- name: cpu
+  type: group
+  description: >
+    Containerd Runtime CPU metrics.
+  release: beta
+  fields:
+    - name: system.total
+      type: double
+      description: >
+        Total user and system CPU time spent in seconds.
+    - name: usage
+      type: group
+      fields:
+        - name: kernel
+          type: group
+          fields:
+            - name: ns
+              type: double
+              description: >
+                CPU Kernel usage nanoseconds
+        - name: user
+          type: group
+          fields:
+            - name: ns
+              type: double
+              description: >
+                CPU User usage nanoseconds
+        - name: total
+          type: group
+          fields:
+            - name: ns
+              type: double
+              description: >
+                CPU total usage nanoseconds
+        - name: total.pct
+          type: scaled_float
+          format: percent
+          description: >
+            Percentage of total CPU time normalized by the number of CPU cores
+        - name: kernel.pct
+          type: scaled_float
+          format: percent
+          description: >
+            Percentage of time in kernel space normalized by the number of CPU cores.
+        - name: user.pct
+          type: scaled_float
+          format: percent
+          description: >
+            Percentage of time in user space normalized by the number of CPU cores.
+        - name: cpu.*.ns
+          type: object
+          object_type: double
+          description: >
+            CPU usage nanoseconds in this cpu.

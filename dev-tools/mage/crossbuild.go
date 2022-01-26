@@ -43,8 +43,8 @@ const defaultCrossBuildTarget = "golangCrossBuild"
 // See NewPlatformList for details about platform filtering expressions.
 var Platforms = BuildPlatforms.Defaults()
 
-// Types is the list of package types
-var SelectedPackageTypes []PackageType
+// SelectedPackageTypes is the list of package types
+var SelectedPackageTypes []PackageType = []PackageType{}
 
 func init() {
 	// Allow overriding via PLATFORMS.
@@ -242,8 +242,8 @@ func CrossBuildImage(platform string) (string, error) {
 		tagSuffix = "s390x"
 	case strings.HasPrefix(platform, "linux"):
 		// Use an older version of libc to gain greater OS compatibility.
-		// Debian 7 uses glibc 2.13.
-		tagSuffix = "main-debian7"
+		// Debian 8 uses glibc 2.19.
+		tagSuffix = "main-debian8"
 	}
 
 	goVersion, err := GoVersion()

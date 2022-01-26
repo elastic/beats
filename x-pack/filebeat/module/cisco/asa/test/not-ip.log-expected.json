@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2019-10-04T15:27:55.000-02:00",
         "cisco.asa.destination_interface": "OUTSIDE",
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "AL-DMZ-LB-IN",
@@ -16,12 +17,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list AL-DMZ-LB-IN denied tcp LB-DMZ/WHAT-IS-THIS-A-HOSTNAME-192.0.2.244(27218) -> OUTSIDE/203.0.113.42(53) hit-cnt 1 first hit [0x16847359, 0x00000000]",
-        "event.outcome": "failure",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "input.type": "log",
@@ -52,6 +53,7 @@
         ]
     },
     {
+        "@timestamp": "2020-01-01T10:42:53.000-02:00",
         "cisco.asa.mapped_source_host": "mydomain.example.net",
         "cisco.asa.message_id": "302021",
         "destination.address": "172.24.177.29",
@@ -100,6 +102,7 @@
         ]
     },
     {
+        "@timestamp": "2020-01-02T11:33:20.000-02:00",
         "cisco.asa.destination_interface": "wan",
         "cisco.asa.mapped_destination_host": "www.example.org",
         "cisco.asa.mapped_destination_port": 80,
@@ -127,8 +130,8 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "info"
+            "connection",
+            "denied"
         ],
         "fileset.name": "asa",
         "host.hostname": "localhost",
