@@ -98,13 +98,21 @@ processors:
     - \[%{INDEXNAME:elasticsearch.index.name}\]\[%{NUMBER:elasticsearch.shard.id}\]
 - remove:
     field: elasticsearch.slowlog.message
-- rename:
+- set:
+    copy_from: elasticsearch.slowlog.@timestamp
+    target_field: "@timestamp"
+    override: true
+    if: "ctx.elasticsearch.slowlog.@timestamp != null"
+- set:
+    copy_from: elasticsearch.slowlog.timestamp
+    target_field: "@timestamp"
+    override: true
+    if: "ctx.elasticsearch.slowlog.timestamp != null"
+- remove:
     field: elasticsearch.slowlog.@timestamp
-    target_field: '@timestamp'
     ignore_missing: true
-- rename:
+- remove:
     field: elasticsearch.slowlog.timestamp
-    target_field: '@timestamp'
     ignore_missing: true
 - date:
     field: '@timestamp'
