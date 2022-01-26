@@ -8,6 +8,7 @@ import json
 import ast
 from filebeat import BaseTest
 from requests.auth import HTTPBasicAuth
+import unittest
 
 
 class Test(BaseTest):
