@@ -46,7 +46,7 @@ func CrossBuild() error {
 			if err != nil {
 				return "", err
 			}
-			if os.ExpandEnv("CI") != "true" && os.ExpandEnv("NPCAP_LOCAL") != "true" {
+			if os.Getenv("CI") != "true" && os.Getenv("NPCAP_LOCAL") != "true" {
 				return image, nil
 			}
 			if platform == "windows/amd64" || platform == "windows/386" {
