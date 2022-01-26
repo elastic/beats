@@ -485,8 +485,10 @@ run.
 In order to test the filesets with the sample logs and/or generate the expected output one should run the tests
 locally for a specific module, using the following procedure under Filebeat directory:
 
-. Run an Elasticsearch instance locally using docker: `docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:8.0.0-SNAPSHOT`
+. Run an Elasticsearch instance locally using docker: `docker run --rm --name elasticsearch -p 9200:9200 -p 9300:9300 -e "ELASTIC_PASSWORD=changeme" -e "discovery.type=single-node" -e "xpack.security.http.ssl.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:8.1.0-SNAPSHOT`
+. Create an "admin" user on that Elasticsearch instance: `curl -u elastic:changeme http://localhost:9200/_security/user/admin -X POST -H 'Content-Type: application/json' -d '{"password": "changeme", "roles": ["superuser"]}'`
 . Create python env: `make python-env`
 . Source python env: `source ./build/python-env/bin/activate`
 . Create the testing binary: `make filebeat.test`
-. Run the test, ie: `GENERATE=1 INTEGRATION_TESTS=1 BEAT_STRICT_PERMS=false TESTING_FILEBEAT_MODULES=nginx pytest tests/system/test_modules.py`
+. Run the test, ie: `GENERATE=1 INTEGRATION_TESTS=1 BEAT_STRICT_PERMS=false TESTING_FILEBEAT_MODULES=nginx ES_PASS=changeme pytest tests/system/test_modules.py -v --full-trace`
+. Remove the `GENERATE=1` once you have the expected output, so you can modify it to meet ingest expectations.
