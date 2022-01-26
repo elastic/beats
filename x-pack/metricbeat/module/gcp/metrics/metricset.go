@@ -104,6 +104,7 @@ type config struct {
 	ProjectID           string `config:"project_id" validate:"required"`
 	ExcludeLabels       bool   `config:"exclude_labels"`
 	CredentialsFilePath string `config:"credentials_file_path"`
+	CredentialsJSON     string `config:"credentials_json"`
 
 	opt    []option.ClientOption
 	period *duration.Duration
@@ -129,7 +130,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	m.MetricsConfig = metricsConfigs.Metrics
-	m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
+
+	if m.config.CredentialsFilePath != "" && m.config.CredentialsJSON != "" {
+		return m, errors.New("both credentials_file_path and credentials_json specified, you must use only one of them")
+	} else if m.config.CredentialsFilePath != "" {
+		m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
+	} else if m.config.CredentialsJSON != "" {
+		m.config.opt = []option.ClientOption{option.WithCredentialsJSON([]byte(m.config.CredentialsJSON))}
+	} else {
+		return m, errors.New("no credentials_file_path or credentials_json specified")
+	}
+
 	m.config.period = &duration.Duration{
 		Seconds: int64(m.Module().Config().Period.Seconds()),
 	}
