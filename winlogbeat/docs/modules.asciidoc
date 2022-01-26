@@ -2,35 +2,65 @@
 [role="xpack"]
 = Modules
 
+NOTE: Winlogbeat modules have changed in 8.0.0 to use Elasticsearch Ingest Node
+for processing. If you are upgrading from 7.x please review the documentation
+and see the default configuration file.
+
 [partintro]
 --
 This section contains detailed information about the available Windows event
 log processing modules contained in {beatname_uc}. More details about each
 module can be found in the module's documentation.
 
-Winlogbeat modules are constructed using the
-<<processor-script,script processor>> where all processing happens within
-Winlogbeat before the events are delivered to the output.
+{beatname_uc} modules are implemented using Elasticsearch Ingest Node pipelines.
+The events receive their transformations within Elasticsearch. All events are
+sent through {beatname_uc}'s "routing" pipeline that routes events to specific
+module pipelines based on their `winlog.channel` value.
+
+{beatname_uc}'s default config file contains the option to send all events to
+the routing pipeline. If you remove this option then the module processing
+will not be applied.
+
+[source,yaml,subs="attributes"]
+----
+output.elasticsearch.pipeline: winlogbeat-%{[agent.version]}-routing
+----
 
 The general goal of each module is to transform events by renaming fields to
 comply with the {ecs-ref}/index.html[Elastic Common Schema] (ECS). The modules
 may also apply additional categorization, tagging, and parsing as necessary.
 
-The default configuration file included in packages has each of the modules
-configured. To apply the modules to your own configuration file you must add
-a `script` processor to your configuration file and point it at the included
-script file for the module. The documentation for each module includes an
-example.
-
 NOTE: The provided modules only support events in English. For more information
 about how to configure the language in `winlogbeat`, refer to <<configuration-winlogbeat-options>>.
+
+[id="{beatname_lc}-modules-setup"]
+[float]
+=== Setup of Ingest Node pipelines
+
+{beatname_uc}'s Ingest Node pipelines must be installed to Elasticsearch if you
+want to apply the module processing to events. The simplest way to get started
+is to use the Elasticsearch output and Winlogbeat will automatically install
+the pipelines when it first connects to Elasticsearch.
+
+// TODO:
+// Update getting started pages.
+// Update required permissions on security docs to include manage_ingest_pipelines.
+// Document the export pipelines command.
+
+Installation Methods
+
+1. Automatic Installing
+2. `{beatname_lc} setup`
+3. Manual
 
 [float]
 === Usage with Forwarded Events
 
-The `ForwardedEvents` channel can contain events from multiple producers so you
-may want to use multiple modules. This can be achieved by applying multiple
-script processors that are guarded by a conditional `when` statement.
+No special configuration options are required when working with the
+`ForwardedEvents` channel. The events in this log retain the channel name
+of their origin (e.g. `winlog.channel: Security`). And because the routing
+pipeline processes events based on the channel name no special config is
+necessary.
 
 [source,yaml]
 ----
@@ -38,17 +68,8 @@ winlogbeat.event_logs:
 - name: ForwardedEvents
   tags: [forwarded]
   language: 0x0409 # en-US
-  processors:
-    - script:
-        when.equals.winlog.channel: Security
-        lang: javascript
-        id: security
-        file: ${path.home}/module/security/config/winlogbeat-security.js
-    - script:
-        when.equals.winlog.channel: Microsoft-Windows-Sysmon/Operational
-        lang: javascript
-        id: sysmon
-        file: ${path.home}/module/sysmon/config/winlogbeat-sysmon.js
+
+output.elasticsearch.pipeline: winlogbeat-%{[agent.version]}-routing
 ----
 
 [float]

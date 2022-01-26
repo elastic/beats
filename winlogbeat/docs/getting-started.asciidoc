@@ -133,8 +133,11 @@ and deploys the sample dashboards for visualizing the data in {kib}.
 [TIP]
 =====
 A connection to {es} (or {ess}) is required to set up the initial
-environment. If you're using a different output, such as {ls}, see
-<<load-template-manually>> and <<load-kibana-dashboards>>.
+environment. If you're using a different output, such as {ls}, see:
+
+* <<load-template-manually>>
+* <<load-kibana-dashboards>>
+* <<load-ingest-pipelines>> (x-pack only)
 =====
 
 [float]

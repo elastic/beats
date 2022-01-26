@@ -81,6 +81,7 @@ func ExportPipelines(info beat.Info, version common.Version, directory string) e
 		}
 		enc := json.NewEncoder(f)
 		enc.SetEscapeHTML(false)
+		enc.SetIndent("", "  ")
 		err = enc.Encode(pipeline.contents)
 		if err != nil {
 			return fmt.Errorf("unable to JSON encode pipeline %s: %w", f.Name(), err)
