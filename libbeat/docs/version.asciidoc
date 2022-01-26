@@ -1,13 +1,6 @@
-<<<<<<< HEAD
 :stack-version: 7.17.0
 :doc-branch: 7.16
-:go-version: 1.17.2
-:go-version: 1.17.5
-=======
-:stack-version: 8.0.0
-:doc-branch: master
 :go-version: 1.17.6
->>>>>>> b4ca6baba1 ([Automation] Update go release version to 1.17.6 (#29761))
 :release-state: unreleased
 :python: 3.7
 :docker: 1.12
