@@ -16,9 +16,9 @@ processors:
         (.|
         |	)*
     ignore_missing: true
-- rename:
-    field: '@timestamp'
-    target_field: event.created
+- set:
+    copy_from: '@timestamp'
+    field: event.created
 - date:
     if: ctx.event.timezone == null
     field: nginx.error.time
