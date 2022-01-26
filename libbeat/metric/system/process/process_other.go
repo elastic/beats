@@ -21,8 +21,9 @@
 package process
 
 import (
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"os"
+
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 )
 
 // GetSelfPid returns the PID for this process

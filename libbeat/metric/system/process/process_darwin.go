@@ -40,10 +40,11 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
-	"github.com/pkg/errors"
 )
 
 // FetchPids returns a map and array of pids
@@ -255,12 +256,4 @@ func sysctl(mib []C.int, old *byte, oldlen *uintptr,
 		err = e1
 	}
 	return
-}
-
-func stripNullByte(buf []byte) string {
-	return string(buf[0 : len(buf)-1])
-}
-
-func stripNullByteRaw(buf []byte) []byte {
-	return buf[0 : len(buf)-1]
 }

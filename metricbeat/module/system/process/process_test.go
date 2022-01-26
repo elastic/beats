@@ -38,7 +38,7 @@ func TestFetch(t *testing.T) {
 	assert.Empty(t, errs)
 	assert.NotEmpty(t, events)
 
-	time.Sleep(3 * time.Second)
+	time.Sleep(10 * time.Second)
 
 	events, errs = mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
@@ -65,7 +65,7 @@ func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":                        "system",
 		"metricsets":                    []string{"process"},
-		"processes":                     []string{".*"}, // in case we want a prettier looking example for data.json
+		"processes":                     []string{".*node.*"}, // in case we want a prettier looking example for data.json
 		"process.cgroups.enabled":       false,
 		"process.include_cpu_ticks":     true,
 		"process.cmdline.cache.enabled": true,
