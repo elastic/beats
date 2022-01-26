@@ -1,10 +1,10 @@
 package bundle
 
 import (
-	"log"
 	"net/http"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	csppolicies "github.com/elastic/csp-security-policies/bundle"
 )
 
@@ -46,7 +46,7 @@ func CreateServer() (*http.Server, error) {
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
-			log.Println(err)
+			logp.L().Errorf("bundle server closed: %v", err)
 		}
 	}()
 

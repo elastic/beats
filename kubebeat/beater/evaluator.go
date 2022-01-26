@@ -54,7 +54,7 @@ func (e *evaluator) Decision(input interface{}) (interface{}, error) {
 }
 
 func (e *evaluator) Stop() {
-	stopCtx := context.Background()
-	e.opa.Stop(stopCtx)
-	e.bundleServer.Shutdown(stopCtx)
+	ctx := context.Background()
+	e.opa.Stop(ctx)
+	e.bundleServer.Shutdown(ctx)
 }
