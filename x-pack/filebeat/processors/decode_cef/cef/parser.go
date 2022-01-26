@@ -1060,7 +1060,7 @@ func (e *Event) unpack(data string) error {
 	f26:
 //line cef.rl:99
 
-		extKey, extValueStart, extValueEnd = "", 0, 0
+		extKey, extValueStart, extValueEnd, escapes = "", 0, 0, escapes[:0]
 		// Resume processing at p, the start of the next extension key.
 		p = mark
 		cs = 29
