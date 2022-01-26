@@ -287,7 +287,7 @@ func (a *Application) gracefulKill(proc *process.Info) {
 
 	// send stop signal to request stop
 	if err := proc.Stop(); err != nil {
-		a.logger.Errorf("failed to stop %s: %v", a.Name(), err))
+		a.logger.Errorf("failed to stop %s: %v", a.Name(), err)
 	}
 
 	var wg sync.WaitGroup
