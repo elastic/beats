@@ -98,7 +98,7 @@
                 },
                 "panelIndex": "9d604bbc-ce5e-49c8-b961-d974fa9d7891",
                 "type": "visualization",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -167,7 +167,7 @@
                 "panelIndex": "a4a26c8f-3415-4cb2-a44e-27fe2e706862",
                 "title": "Clusters",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -236,7 +236,7 @@
                 "panelIndex": "6018a29a-f6f0-4dec-9940-9094b3ed841d",
                 "title": "Nodes",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -305,7 +305,7 @@
                 "panelIndex": "6f1f7601-f921-4051-899d-10fda75d07df",
                 "title": "Namespaces",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -374,7 +374,7 @@
                 "panelIndex": "1d22e757-a6ec-43df-a60f-decda1d057c2",
                 "title": "Pods",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -451,7 +451,7 @@
                 "panelIndex": "7541ca7c-3333-4065-9d98-f8fa11c29ebf",
                 "title": "Container restarts",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -487,7 +487,7 @@
                 },
                 "panelIndex": "00e7a3a4-e042-4f46-8637-3159cd608047",
                 "type": "visualization",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -523,7 +523,7 @@
                 },
                 "panelIndex": "20e84709-926a-4588-a76c-dd9c5583873a",
                 "type": "visualization",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -661,7 +661,7 @@
                 "panelIndex": "10a4fa84-84c1-45ac-921a-7d4e7ba0a461",
                 "title": "Pods per cluster",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -802,7 +802,7 @@
                 "panelIndex": "8261db16-766d-4c27-b988-87c90ed067d0",
                 "title": "Nodes per cluster",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -991,7 +991,156 @@
                 "panelIndex": "1df880b1-44bc-468b-aba7-0cec27b74b12",
                 "title": "CPU usage by Pod (seconds)",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-f4259765-f8eb-47de-8472-a04528f8219e",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "f4259765-f8eb-47de-8472-a04528f8219e": {
+                                            "columnOrder": [
+                                                "18e2e114-77eb-4a85-afdb-ddd837e6f05a",
+                                                "3153e211-b16a-4f92-b775-6d06a4edaf44",
+                                                "61256570-b7dd-4bec-b73d-d12d993ae091"
+                                            ],
+                                            "columns": {
+                                                "18e2e114-77eb-4a85-afdb-ddd837e6f05a": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top values of gcp.labels.resource.pod_name",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "61256570-b7dd-4bec-b73d-d12d993ae091",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 100
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "gcp.labels.resource.pod_name"
+                                                },
+                                                "3153e211-b16a-4f92-b775-6d06a4edaf44": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "60s"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "61256570-b7dd-4bec-b73d-d12d993ae091": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Median of gcp.gke.container.memory.limit_utilization.pct",
+                                                    "operationType": "median",
+                                                    "params": {
+                                                        "format": {
+                                                            "id": "percent",
+                                                            "params": {
+                                                                "decimals": 0
+                                                            }
+                                                        }
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "gcp.gke.container.memory.limit_utilization.pct"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": false,
+                                    "yLeft": false,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "Linear",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "61256570-b7dd-4bec-b73d-d12d993ae091"
+                                        ],
+                                        "layerId": "f4259765-f8eb-47de-8472-a04528f8219e",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "splitAccessor": "18e2e114-77eb-4a85-afdb-ddd837e6f05a",
+                                        "xAccessor": "3153e211-b16a-4f92-b775-6d06a4edaf44"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": false,
+                                    "position": "bottom",
+                                    "showSingleSeries": false
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "lowerBound": 0,
+                                    "mode": "custom",
+                                    "upperBound": 1
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "ce28d9df-4506-4020-b2de-6274ac0d46b7",
+                    "w": 12,
+                    "x": 12,
+                    "y": 21
+                },
+                "panelIndex": "ce28d9df-4506-4020-b2de-6274ac0d46b7",
+                "title": "CPU limit utilization by Pod",
+                "type": "lens",
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -1132,7 +1281,7 @@
                 "panelIndex": "f3275c69-84ce-4c6d-bd49-3cd6f1c606f9",
                 "title": "CPU usage per Node (seconds)",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -1331,7 +1480,7 @@
                 "panelIndex": "cadc827f-4efb-4045-b98b-7395264e4c16",
                 "title": "Memory usage",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -1485,7 +1634,7 @@
                 "panelIndex": "5551e0b7-722f-401c-90fd-a0094e919618",
                 "title": "Memory usage",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -1498,7 +1647,7 @@
                             },
                             {
                                 "id": "metricbeat-*",
-                                "name": "indexpattern-datasource-layer-f4259765-f8eb-47de-8472-a04528f8219e",
+                                "name": "indexpattern-datasource-layer-3888dded-b04b-45ec-b466-c121715bc0c1",
                                 "type": "index-pattern"
                             }
                         ],
@@ -1506,32 +1655,14 @@
                             "datasourceStates": {
                                 "indexpattern": {
                                     "layers": {
-                                        "f4259765-f8eb-47de-8472-a04528f8219e": {
+                                        "3888dded-b04b-45ec-b466-c121715bc0c1": {
                                             "columnOrder": [
-                                                "18e2e114-77eb-4a85-afdb-ddd837e6f05a",
-                                                "3153e211-b16a-4f92-b775-6d06a4edaf44",
-                                                "61256570-b7dd-4bec-b73d-d12d993ae091"
+                                                "18948f36-88ec-476d-8593-352b13485e53",
+                                                "118e3ebc-e414-495d-a99d-a356e436b074",
+                                                "98d45c49-c3b2-43ff-bf13-9b289ba154af"
                                             ],
                                             "columns": {
-                                                "18e2e114-77eb-4a85-afdb-ddd837e6f05a": {
-                                                    "dataType": "string",
-                                                    "isBucketed": true,
-                                                    "label": "Top values of gcp.labels.resource.pod_name",
-                                                    "operationType": "terms",
-                                                    "params": {
-                                                        "missingBucket": false,
-                                                        "orderBy": {
-                                                            "columnId": "61256570-b7dd-4bec-b73d-d12d993ae091",
-                                                            "type": "column"
-                                                        },
-                                                        "orderDirection": "desc",
-                                                        "otherBucket": true,
-                                                        "size": 100
-                                                    },
-                                                    "scale": "ordinal",
-                                                    "sourceField": "gcp.labels.resource.pod_name"
-                                                },
-                                                "3153e211-b16a-4f92-b775-6d06a4edaf44": {
+                                                "118e3ebc-e414-495d-a99d-a356e436b074": {
                                                     "dataType": "date",
                                                     "isBucketed": true,
                                                     "label": "@timestamp",
@@ -1542,21 +1673,40 @@
                                                     "scale": "interval",
                                                     "sourceField": "@timestamp"
                                                 },
-                                                "61256570-b7dd-4bec-b73d-d12d993ae091": {
+                                                "18948f36-88ec-476d-8593-352b13485e53": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top values of gcp.labels.resource.pod_name",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "98d45c49-c3b2-43ff-bf13-9b289ba154af",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 5
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "gcp.labels.resource.pod_name"
+                                                },
+                                                "98d45c49-c3b2-43ff-bf13-9b289ba154af": {
+                                                    "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Median of gcp.gke.container.memory.limit_utilization.pct",
+                                                    "label": "Median memory used",
                                                     "operationType": "median",
                                                     "params": {
                                                         "format": {
-                                                            "id": "percent",
+                                                            "id": "bytes",
                                                             "params": {
-                                                                "decimals": 0
+                                                                "decimals": 2
                                                             }
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.memory.limit_utilization.pct"
+                                                    "sourceField": "gcp.gke.container.memory.used.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -1584,15 +1734,15 @@
                                 "layers": [
                                     {
                                         "accessors": [
-                                            "61256570-b7dd-4bec-b73d-d12d993ae091"
+                                            "98d45c49-c3b2-43ff-bf13-9b289ba154af"
                                         ],
-                                        "layerId": "f4259765-f8eb-47de-8472-a04528f8219e",
+                                        "layerId": "3888dded-b04b-45ec-b466-c121715bc0c1",
                                         "layerType": "data",
                                         "position": "top",
                                         "seriesType": "line",
                                         "showGridlines": false,
-                                        "splitAccessor": "18e2e114-77eb-4a85-afdb-ddd837e6f05a",
-                                        "xAccessor": "3153e211-b16a-4f92-b775-6d06a4edaf44"
+                                        "splitAccessor": "18948f36-88ec-476d-8593-352b13485e53",
+                                        "xAccessor": "118e3ebc-e414-495d-a99d-a356e436b074"
                                     }
                                 ],
                                 "legend": {
@@ -1607,10 +1757,9 @@
                                     "yRight": true
                                 },
                                 "valueLabels": "hide",
+                                "valuesInLegend": true,
                                 "yLeftExtent": {
-                                    "lowerBound": 0,
-                                    "mode": "custom",
-                                    "upperBound": 1
+                                    "mode": "full"
                                 },
                                 "yRightExtent": {
                                     "mode": "full"
@@ -1626,15 +1775,15 @@
                 },
                 "gridData": {
                     "h": 9,
-                    "i": "ce28d9df-4506-4020-b2de-6274ac0d46b7",
+                    "i": "610b04b2-7483-4995-b3f6-a11c09c2b2f2",
                     "w": 12,
                     "x": 12,
-                    "y": 21
+                    "y": 30
                 },
-                "panelIndex": "ce28d9df-4506-4020-b2de-6274ac0d46b7",
-                "title": "CPU limit utilization by Pod",
+                "panelIndex": "610b04b2-7483-4995-b3f6-a11c09c2b2f2",
+                "title": "Memory usage by Pod",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -1848,7 +1997,7 @@
                 "panelIndex": "a1714037-fe75-468b-bfea-d4a8e1769cbf",
                 "title": "Network traffic (bytes count)",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -1901,7 +2050,7 @@
                                                     "label": "Media received bytes count",
                                                     "operationType": "median",
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.network.received_bytes.count"
+                                                    "sourceField": "gcp.gke.node.network.received.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -1950,7 +2099,7 @@
                 "panelIndex": "f09d76ba-490b-4392-b6cb-051e4fcc03c9",
                 "title": "Inbound network traffic top nodes",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -2118,7 +2267,7 @@
                 "panelIndex": "eea592ea-3598-4104-96b6-ea33a0d9845d",
                 "title": "Storage requests",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -2131,7 +2280,7 @@
                             },
                             {
                                 "id": "metricbeat-*",
-                                "name": "indexpattern-datasource-layer-3888dded-b04b-45ec-b466-c121715bc0c1",
+                                "name": "indexpattern-datasource-layer-abc1288b-8de8-4cd4-ae39-c2d9c700396e",
                                 "type": "index-pattern"
                             }
                         ],
@@ -2139,14 +2288,30 @@
                             "datasourceStates": {
                                 "indexpattern": {
                                     "layers": {
-                                        "3888dded-b04b-45ec-b466-c121715bc0c1": {
+                                        "abc1288b-8de8-4cd4-ae39-c2d9c700396e": {
                                             "columnOrder": [
-                                                "18948f36-88ec-476d-8593-352b13485e53",
-                                                "118e3ebc-e414-495d-a99d-a356e436b074",
-                                                "98d45c49-c3b2-43ff-bf13-9b289ba154af"
+                                                "d40af55e-4c31-4a17-b71f-63ee7e598131",
+                                                "b47b55db-eb5b-4a10-8c49-c6920135fedf",
+                                                "374bc09a-188c-4cdf-b993-b31eb3754e46"
                                             ],
                                             "columns": {
-                                                "118e3ebc-e414-495d-a99d-a356e436b074": {
+                                                "374bc09a-188c-4cdf-b993-b31eb3754e46": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Maximum of gcp.gke.pod.volume.utilization.pct",
+                                                    "operationType": "max",
+                                                    "params": {
+                                                        "format": {
+                                                            "id": "percent",
+                                                            "params": {
+                                                                "decimals": 2
+                                                            }
+                                                        }
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "gcp.gke.pod.volume.utilization.pct"
+                                                },
+                                                "b47b55db-eb5b-4a10-8c49-c6920135fedf": {
                                                     "dataType": "date",
                                                     "isBucketed": true,
                                                     "label": "@timestamp",
@@ -2157,7 +2322,7 @@
                                                     "scale": "interval",
                                                     "sourceField": "@timestamp"
                                                 },
-                                                "18948f36-88ec-476d-8593-352b13485e53": {
+                                                "d40af55e-4c31-4a17-b71f-63ee7e598131": {
                                                     "dataType": "string",
                                                     "isBucketed": true,
                                                     "label": "Top values of gcp.labels.resource.pod_name",
@@ -2165,7 +2330,7 @@
                                                     "params": {
                                                         "missingBucket": false,
                                                         "orderBy": {
-                                                            "columnId": "98d45c49-c3b2-43ff-bf13-9b289ba154af",
+                                                            "columnId": "374bc09a-188c-4cdf-b993-b31eb3754e46",
                                                             "type": "column"
                                                         },
                                                         "orderDirection": "desc",
@@ -2174,23 +2339,6 @@
                                                     },
                                                     "scale": "ordinal",
                                                     "sourceField": "gcp.labels.resource.pod_name"
-                                                },
-                                                "98d45c49-c3b2-43ff-bf13-9b289ba154af": {
-                                                    "customLabel": true,
-                                                    "dataType": "number",
-                                                    "isBucketed": false,
-                                                    "label": "Median memory used",
-                                                    "operationType": "median",
-                                                    "params": {
-                                                        "format": {
-                                                            "id": "bytes",
-                                                            "params": {
-                                                                "decimals": 2
-                                                            }
-                                                        }
-                                                    },
-                                                    "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.memory.used.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -2218,15 +2366,14 @@
                                 "layers": [
                                     {
                                         "accessors": [
-                                            "98d45c49-c3b2-43ff-bf13-9b289ba154af"
+                                            "374bc09a-188c-4cdf-b993-b31eb3754e46"
                                         ],
-                                        "layerId": "3888dded-b04b-45ec-b466-c121715bc0c1",
+                                        "layerId": "abc1288b-8de8-4cd4-ae39-c2d9c700396e",
                                         "layerType": "data",
-                                        "position": "top",
                                         "seriesType": "line",
-                                        "showGridlines": false,
-                                        "splitAccessor": "18948f36-88ec-476d-8593-352b13485e53",
-                                        "xAccessor": "118e3ebc-e414-495d-a99d-a356e436b074"
+                                        "splitAccessor": "d40af55e-4c31-4a17-b71f-63ee7e598131",
+                                        "xAccessor": "b47b55db-eb5b-4a10-8c49-c6920135fedf",
+                                        "yConfig": []
                                     }
                                 ],
                                 "legend": {
@@ -2259,15 +2406,15 @@
                 },
                 "gridData": {
                     "h": 9,
-                    "i": "610b04b2-7483-4995-b3f6-a11c09c2b2f2",
+                    "i": "17973ffd-05c1-4075-97eb-4990a3e9b61e",
                     "w": 12,
                     "x": 12,
-                    "y": 30
+                    "y": 39
                 },
-                "panelIndex": "610b04b2-7483-4995-b3f6-a11c09c2b2f2",
-                "title": "Memory usage by Pod",
+                "panelIndex": "17973ffd-05c1-4075-97eb-4990a3e9b61e",
+                "title": "Volume utilization by Pod",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -2421,7 +2568,7 @@
                 "panelIndex": "4611dd47-5619-485a-8a19-8edcc37d2f4e",
                 "title": "Ephemeral storage usage",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -2571,154 +2718,7 @@
                 "panelIndex": "fe426912-61f1-4913-81d1-1dc734c50111",
                 "title": "Ephemeral storage usage by Node",
                 "type": "lens",
-                "version": "7.15.0"
-            },
-            {
-                "embeddableConfig": {
-                    "attributes": {
-                        "references": [
-                            {
-                                "id": "metricbeat-*",
-                                "name": "indexpattern-datasource-current-indexpattern",
-                                "type": "index-pattern"
-                            },
-                            {
-                                "id": "metricbeat-*",
-                                "name": "indexpattern-datasource-layer-abc1288b-8de8-4cd4-ae39-c2d9c700396e",
-                                "type": "index-pattern"
-                            }
-                        ],
-                        "state": {
-                            "datasourceStates": {
-                                "indexpattern": {
-                                    "layers": {
-                                        "abc1288b-8de8-4cd4-ae39-c2d9c700396e": {
-                                            "columnOrder": [
-                                                "d40af55e-4c31-4a17-b71f-63ee7e598131",
-                                                "b47b55db-eb5b-4a10-8c49-c6920135fedf",
-                                                "374bc09a-188c-4cdf-b993-b31eb3754e46"
-                                            ],
-                                            "columns": {
-                                                "374bc09a-188c-4cdf-b993-b31eb3754e46": {
-                                                    "dataType": "number",
-                                                    "isBucketed": false,
-                                                    "label": "Maximum of gcp.gke.pod.volume.utilization.pct",
-                                                    "operationType": "max",
-                                                    "params": {
-                                                        "format": {
-                                                            "id": "percent",
-                                                            "params": {
-                                                                "decimals": 2
-                                                            }
-                                                        }
-                                                    },
-                                                    "scale": "ratio",
-                                                    "sourceField": "gcp.gke.pod.volume.utilization.pct"
-                                                },
-                                                "b47b55db-eb5b-4a10-8c49-c6920135fedf": {
-                                                    "dataType": "date",
-                                                    "isBucketed": true,
-                                                    "label": "@timestamp",
-                                                    "operationType": "date_histogram",
-                                                    "params": {
-                                                        "interval": "60s"
-                                                    },
-                                                    "scale": "interval",
-                                                    "sourceField": "@timestamp"
-                                                },
-                                                "d40af55e-4c31-4a17-b71f-63ee7e598131": {
-                                                    "dataType": "string",
-                                                    "isBucketed": true,
-                                                    "label": "Top values of gcp.labels.resource.pod_name",
-                                                    "operationType": "terms",
-                                                    "params": {
-                                                        "missingBucket": false,
-                                                        "orderBy": {
-                                                            "columnId": "374bc09a-188c-4cdf-b993-b31eb3754e46",
-                                                            "type": "column"
-                                                        },
-                                                        "orderDirection": "desc",
-                                                        "otherBucket": true,
-                                                        "size": 5
-                                                    },
-                                                    "scale": "ordinal",
-                                                    "sourceField": "gcp.labels.resource.pod_name"
-                                                }
-                                            },
-                                            "incompleteColumns": {}
-                                        }
-                                    }
-                                }
-                            },
-                            "filters": [],
-                            "query": {
-                                "language": "kuery",
-                                "query": ""
-                            },
-                            "visualization": {
-                                "axisTitlesVisibilitySettings": {
-                                    "x": false,
-                                    "yLeft": false,
-                                    "yRight": true
-                                },
-                                "fittingFunction": "Linear",
-                                "gridlinesVisibilitySettings": {
-                                    "x": true,
-                                    "yLeft": true,
-                                    "yRight": true
-                                },
-                                "layers": [
-                                    {
-                                        "accessors": [
-                                            "374bc09a-188c-4cdf-b993-b31eb3754e46"
-                                        ],
-                                        "layerId": "abc1288b-8de8-4cd4-ae39-c2d9c700396e",
-                                        "layerType": "data",
-                                        "seriesType": "line",
-                                        "splitAccessor": "d40af55e-4c31-4a17-b71f-63ee7e598131",
-                                        "xAccessor": "b47b55db-eb5b-4a10-8c49-c6920135fedf",
-                                        "yConfig": []
-                                    }
-                                ],
-                                "legend": {
-                                    "isVisible": false,
-                                    "position": "bottom",
-                                    "showSingleSeries": false
-                                },
-                                "preferredSeriesType": "line",
-                                "tickLabelsVisibilitySettings": {
-                                    "x": true,
-                                    "yLeft": true,
-                                    "yRight": true
-                                },
-                                "valueLabels": "hide",
-                                "valuesInLegend": true,
-                                "yLeftExtent": {
-                                    "mode": "full"
-                                },
-                                "yRightExtent": {
-                                    "mode": "full"
-                                }
-                            }
-                        },
-                        "title": "",
-                        "type": "lens",
-                        "visualizationType": "lnsXY"
-                    },
-                    "enhancements": {},
-                    "hidePanelTitles": false
-                },
-                "gridData": {
-                    "h": 9,
-                    "i": "17973ffd-05c1-4075-97eb-4990a3e9b61e",
-                    "w": 12,
-                    "x": 12,
-                    "y": 39
-                },
-                "panelIndex": "17973ffd-05c1-4075-97eb-4990a3e9b61e",
-                "title": "Volume utilization by Pod",
-                "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             },
             {
                 "embeddableConfig": {
@@ -2853,17 +2853,17 @@
                 },
                 "panelIndex": "6f9ca350-a898-4865-8aef-4b593bd341ff",
                 "type": "lens",
-                "version": "7.15.0"
+                "version": "7.16.2"
             }
         ],
         "timeRestore": false,
         "title": "[Metricbeat GCP] GKE Overview",
         "version": 1
     },
-    "coreMigrationVersion": "7.15.0",
+    "coreMigrationVersion": "7.16.2",
     "id": "1ae960c0-f9f8-11eb-bc38-79936db7c106",
     "migrationVersion": {
-        "dashboard": "7.15.0"
+        "dashboard": "7.16.0"
     },
     "references": [
         {
@@ -2968,6 +2968,16 @@
         },
         {
             "id": "metricbeat-*",
+            "name": "ce28d9df-4506-4020-b2de-6274ac0d46b7:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "ce28d9df-4506-4020-b2de-6274ac0d46b7:indexpattern-datasource-layer-f4259765-f8eb-47de-8472-a04528f8219e",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
             "name": "f3275c69-84ce-4c6d-bd49-3cd6f1c606f9:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
@@ -3003,12 +3013,12 @@
         },
         {
             "id": "metricbeat-*",
-            "name": "ce28d9df-4506-4020-b2de-6274ac0d46b7:indexpattern-datasource-current-indexpattern",
+            "name": "610b04b2-7483-4995-b3f6-a11c09c2b2f2:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
         {
             "id": "metricbeat-*",
-            "name": "ce28d9df-4506-4020-b2de-6274ac0d46b7:indexpattern-datasource-layer-f4259765-f8eb-47de-8472-a04528f8219e",
+            "name": "610b04b2-7483-4995-b3f6-a11c09c2b2f2:indexpattern-datasource-layer-3888dded-b04b-45ec-b466-c121715bc0c1",
             "type": "index-pattern"
         },
         {
@@ -3043,12 +3053,12 @@
         },
         {
             "id": "metricbeat-*",
-            "name": "610b04b2-7483-4995-b3f6-a11c09c2b2f2:indexpattern-datasource-current-indexpattern",
+            "name": "17973ffd-05c1-4075-97eb-4990a3e9b61e:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
         {
             "id": "metricbeat-*",
-            "name": "610b04b2-7483-4995-b3f6-a11c09c2b2f2:indexpattern-datasource-layer-3888dded-b04b-45ec-b466-c121715bc0c1",
+            "name": "17973ffd-05c1-4075-97eb-4990a3e9b61e:indexpattern-datasource-layer-abc1288b-8de8-4cd4-ae39-c2d9c700396e",
             "type": "index-pattern"
         },
         {
@@ -3073,16 +3083,6 @@
         },
         {
             "id": "metricbeat-*",
-            "name": "17973ffd-05c1-4075-97eb-4990a3e9b61e:indexpattern-datasource-current-indexpattern",
-            "type": "index-pattern"
-        },
-        {
-            "id": "metricbeat-*",
-            "name": "17973ffd-05c1-4075-97eb-4990a3e9b61e:indexpattern-datasource-layer-abc1288b-8de8-4cd4-ae39-c2d9c700396e",
-            "type": "index-pattern"
-        },
-        {
-            "id": "metricbeat-*",
             "name": "6f9ca350-a898-4865-8aef-4b593bd341ff:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
@@ -3093,6 +3093,6 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2021-08-26T15:37:59.949Z",
-    "version": "WzIxODAsMV0="
+    "updated_at": "2022-01-19T14:08:38.278Z",
+    "version": "WzIyMTYsMV0="
 }

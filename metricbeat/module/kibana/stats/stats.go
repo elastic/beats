@@ -22,6 +22,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -105,6 +106,8 @@ func (m *MetricSet) init() error {
 	if err != nil {
 		return err
 	}
+
+	statsHTTP.SetHeaderDefault(productorigin.Header, productorigin.Beats)
 
 	kibanaVersion, err := kibana.GetVersion(statsHTTP, statsPath)
 	if err != nil {

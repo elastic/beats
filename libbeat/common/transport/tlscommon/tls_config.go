@@ -74,6 +74,9 @@ type TLSConfig struct {
 	// the server certificate.
 	CASha256 []string
 
+	// ServerName is the remote server we're connecting to. It can be a hostname or IP address.
+	ServerName string
+
 	// time returns the current time as the number of seconds since the epoch.
 	// If time is nil, TLS uses time.Now.
 	time func() time.Time
@@ -123,12 +126,18 @@ func (c *TLSConfig) BuildModuleClientConfig(host string) *tls.Config {
 			InsecureSkipVerify: true,
 			VerifyConnection: makeVerifyConnection(&TLSConfig{
 				Verification: VerifyFull,
+				ServerName:   host,
 			}),
 		}
 	}
 
 	config := c.ToConfig()
+	// config.ServerName does not verify IP addresses
 	config.ServerName = host
+
+	// Keep a copy of the host (wheather an IP or hostname)
+	// for later validation. It is used by makeVerifyConnection
+	c.ServerName = host
 	return config
 }
 
@@ -141,6 +150,7 @@ func (c *TLSConfig) BuildServerConfig(host string) *tls.Config {
 			InsecureSkipVerify: true,
 			VerifyConnection: makeVerifyServerConnection(&TLSConfig{
 				Verification: VerifyFull,
+				ServerName:   host,
 			}),
 		}
 	}
@@ -154,6 +164,9 @@ func (c *TLSConfig) BuildServerConfig(host string) *tls.Config {
 func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 	switch cfg.Verification {
 	case VerifyFull:
+		// Cert is trusted by CA
+		// Hostname or IP matches the certificate
+		// tls.Config.InsecureSkipVerify  is set to true
 		return func(cs tls.ConnectionState) error {
 			// On the client side, PeerCertificates can't be empty.
 			if len(cs.PeerCertificates) == 0 {
@@ -164,13 +177,15 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 				Roots:         cfg.RootCAs,
 				Intermediates: x509.NewCertPool(),
 			}
-			err := verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
-			if err != nil {
+			if err := verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts); err != nil {
 				return err
 			}
-			return verifyHostname(cs.PeerCertificates[0], cs.ServerName)
+			return verifyHostname(cs.PeerCertificates[0], cfg.ServerName)
 		}
 	case VerifyCertificate:
+		// Cert is trusted by CA
+		// Does NOT validate hostname or IP addresses
+		// tls.Config.InsecureSkipVerify  is set to true
 		return func(cs tls.ConnectionState) error {
 			// On the client side, PeerCertificates can't be empty.
 			if len(cs.PeerCertificates) == 0 {
@@ -184,6 +199,12 @@ func makeVerifyConnection(cfg *TLSConfig) func(tls.ConnectionState) error {
 			return verifyCertsWithOpts(cs.PeerCertificates, cfg.CASha256, opts)
 		}
 	case VerifyStrict:
+		// Cert is trusted by CA
+		// Hostname or IP matches the certificate
+		// Returns error if SNA is empty
+		// The whole validation is done by Go's standard library default
+		// SSL/TLS verification (tls.Config.InsecureSkipVerify is set to false)
+		// so we only need to check the pin
 		if len(cfg.CASha256) > 0 {
 			return func(cs tls.ConnectionState) error {
 				return verifyCAPin(cfg.CASha256, cs.VerifiedChains)
@@ -262,6 +283,9 @@ func verifyCertsWithOpts(certs []*x509.Certificate, casha256 []string, opts x509
 	return nil
 }
 
+// verifyHostname verifies if the provided hostnmae matches
+// cert.DNSNames, cert.OPAddress (SNA)
+// For hostnames, if SNA is empty, validate the hostname against cert.Subject.CommonName
 func verifyHostname(cert *x509.Certificate, hostname string) error {
 	if hostname == "" {
 		return nil
@@ -278,6 +302,14 @@ func verifyHostname(cert *x509.Certificate, hostname string) error {
 				return nil
 			}
 		}
+
+		parsedCNIP := net.ParseIP(cert.Subject.CommonName)
+		if parsedCNIP != nil {
+			if parsedIP.Equal(parsedCNIP) {
+				return nil
+			}
+		}
+
 		return x509.HostnameError{Certificate: cert, Host: hostname}
 	}
 
