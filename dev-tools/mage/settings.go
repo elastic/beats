@@ -209,6 +209,7 @@ BeatUser         = {{.BeatUser}}
 VersionQualifier = {{.Qualifier}}
 PLATFORMS        = {{.PLATFORMS}}
 PACKAGES         = {{.PACKAGES}}
+CI               = {{.CI}}
 
 ## Functions
 
