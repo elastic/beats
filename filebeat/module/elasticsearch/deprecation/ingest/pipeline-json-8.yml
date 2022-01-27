@@ -1,0 +1,105 @@
+description: Pipeline for parsing the Elasticsearch deprecation log file in JSON format.
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'
+processors:
+- drop:
+    if: ctx.event.dataset != 'elasticsearch.deprecation'
+- set:
+    value: '{{ elasticsearch.deprecation.event.dataset }}'
+    field: event.dataset
+    ignore_empty_value: true
+- dot_expander:
+    field: ecs.version
+    path: elasticsearch.deprecation
+- set:
+    value: '{{ elasticsearch.deprecation.ecs.version }}'
+    field: ecs.version
+    ignore_empty_value: true
+- remove:
+    field: elasticsearch.deprecation.ecs.version
+- dot_expander:
+    field: service.name
+    path: elasticsearch.deprecation
+- rename:
+    field: elasticsearch.deprecation.service.name
+    target_field: service.name
+    ignore_missing: true
+- rename:
+    field: elasticsearch.deprecation.level
+    target_field: log.level
+    ignore_missing: true
+- dot_expander:
+    field: log.level
+    path: elasticsearch.deprecation
+- rename:
+    field: elasticsearch.deprecation.log.level
+    target_field: log.level
+    ignore_missing: true
+- dot_expander:
+    field: log.logger
+    path: elasticsearch.deprecation
+- rename:
+    field: elasticsearch.deprecation.log.logger
+    target_field: log.logger
+    ignore_missing: true
+- dot_expander:
+    field: process.thread.name
+    path: elasticsearch.deprecation
+- rename:
+    field: elasticsearch.deprecation.process.thread.name
+    target_field: process.thread.name
+    ignore_missing: true
+- rename:
+    field: elasticsearch.deprecation.component
+    target_field: elasticsearch.component
+    ignore_missing: true
+- dot_expander:
+    field: elasticsearch.cluster.name
+    path: elasticsearch.deprecation
+- rename:
+    field: elasticsearch.deprecation.elasticsearch.cluster.name
+    target_field: elasticsearch.cluster.name
+- dot_expander:
+    field: elasticsearch.node.name
+    path: elasticsearch.deprecation
+- rename:
+    field: elasticsearch.deprecation.elasticsearch.node.name
+    target_field: elasticsearch.node.name
+- dot_expander:
+    field: elasticsearch.cluster.uuid
+    path: elasticsearch.deprecation
+- rename:
+    field: elasticsearch.deprecation.elasticsearch.cluster.uuid
+    target_field: elasticsearch.cluster.uuid
+    ignore_missing: true
+- dot_expander:
+    field: elasticsearch.node.id
+    path: elasticsearch.deprecation
+- rename:
+    field: elasticsearch.deprecation.elasticsearch.node.id
+    target_field: elasticsearch.node.id
+    ignore_missing: true
+- remove:
+    field: message
+- rename:
+    field: elasticsearch.deprecation.message
+    target_field: message
+- date:
+    field: 'elasticsearch.deprecation.@timestamp'
+    formats:
+    - ISO8601
+    ignore_failure: true
+    if: 'ctx.elasticsearch?.deprecation["@timestamp"] != null'
+- date:
+    field: 'elasticsearch.deprecation.timestamp'
+    formats:
+    - ISO8601
+    ignore_failure: true
+    if: 'ctx.elasticsearch?.deprecation?.timestamp != null'
+- remove:
+    field:
+      - elasticsearch.deprecation.timestamp
+      - elasticsearch.deprecation.@timestamp
+    ignore_missing: true
