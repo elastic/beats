@@ -2,6 +2,7 @@
 # Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-enterprisesearch.html
 
 - module: enterprisesearch
+  xpack.enabled: true
   metricsets: ["health", "stats"]
   enabled: true
   period: 10s
