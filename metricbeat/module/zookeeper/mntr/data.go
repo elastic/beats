@@ -53,8 +53,8 @@ var (
 		"approximate_data_size": c.Int("zk_approximate_data_size"),
 	}
 	schemaLeader = s.Schema{
-		"learners":         c.Int("zk_learners"),
-		"followers":        c.Int("zk_followers"), // Not present anymore in ZooKeeper 3.7 mntr responses
+		"learners":         c.Int("zk_learners", s.Optional),
+		"followers":        c.Int("zk_followers", s.Optional), // Not present anymore in ZooKeeper 3.7 mntr responses
 		"synced_followers": c.Int("zk_synced_followers"),
 		"pending_syncs":    c.Int("zk_pending_syncs"),
 	}
