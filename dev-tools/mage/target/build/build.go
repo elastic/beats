@@ -63,16 +63,20 @@ func AssembleDarwinUniversal() error {
 			cmd, err)
 	}
 
-	var lipoArgs []string
-	args := []string{
-		"build/golang-crossbuild/%s-darwin-universal",
-		"build/golang-crossbuild/%s-darwin-arm64",
-		"build/golang-crossbuild/%s-darwin-amd64"}
+	universal := fmt.Sprintf("build/golang-crossbuild/%s-darwin-universal", devtools.BeatName)
+	arm := fmt.Sprintf("build/golang-crossbuild/%s-darwin-arm64", devtools.BeatName)
+	amd := fmt.Sprintf("build/golang-crossbuild/%s-darwin-amd64", devtools.BeatName)
 
-	for _, arg := range args {
-		lipoArgs = append(lipoArgs, fmt.Sprintf(arg, devtools.BeatName))
+	if err := sh.Run(cmd, "-create", "-output", universal, arm, amd); err != nil {
+		return fmt.Errorf("AssembleDarwinUniversal failed: %w", err)
 	}
 
-	lipo := sh.RunCmd(cmd, "-create", "-output")
-	return lipo(lipoArgs...)
+	if err := sh.Run("cp", universal, arm); err != nil {
+		return fmt.Errorf("AssembleDarwinUniversal failed: %w", err)
+	}
+	if err := sh.Run("cp", universal, amd); err != nil {
+		return fmt.Errorf("AssembleDarwinUniversal failed: %w", err)
+	}
+
+	return nil
 }
