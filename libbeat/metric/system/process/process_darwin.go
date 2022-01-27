@@ -147,21 +147,21 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 // FillPidMetrics is the darwin implementation
 func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(string) bool) (ProcState, error) {
 
-	args, exe, env, err := getProcArgs(pid)
+	args, exe, env, err := getProcArgs(pid, filter)
 	if err != nil {
 		return state, errors.Wrap(err, "error fetching string data from process")
 	}
 
 	state.Args = args
 	state.Exe = exe
-	if state.Env = nil {
+	if state.Env == nil {
 		state.Env = env
 	}
 
 	return state, nil
 }
 
-func getProcArgs(pid int) ([]string, string, common.MapStr, error) {
+func getProcArgs(pid int, filter func(string) bool) ([]string, string, common.MapStr, error) {
 
 	exeName := ""
 
