@@ -154,7 +154,7 @@ func tlsDialWith(
 		}
 	}
 
-	if tlsConfig.InsecureSkipVerify {
+	if config.Verification == tlscommon.VerifyNone {
 		d.Warn("security", "server's certificate chain verification is disabled")
 	} else {
 		d.Info("security", "server's certificate chain verification is enabled")
