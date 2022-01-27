@@ -33,17 +33,31 @@ const cef_en_main_cef_extensions int = 29
 
 //line cef.rl:16
 
+type cefState struct {
+	key        string           // Extension key.
+	valueStart int              // Start index of extension value.
+	valueEnd   int              // End index of extension value.
+	escapes    []escapePosition // Array of escapes indices within the current value.
+}
+
+func (s *cefState) reset() {
+	s.key = ""
+	s.valueStart = 0
+	s.valueEnd = 0
+	s.escapes = s.escapes[:0]
+}
+
+func (s *cefState) pushEscape(start, end int) {
+	s.escapes = append(s.escapes, escapePosition{start, end})
+}
+
 // unpack unpacks a CEF message.
 func (e *Event) unpack(data string) error {
 	cs, p, pe, eof := 0, 0, len(data), len(data)
 	mark, mark_slash := 0, 0
-	var escapes []int
 
-	// Extension key.
-	var extKey string
-
-	// Extension value start and end indices.
-	extValueStart, extValueEnd := 0, 0
+	// state related to CEF values.
+	var state cefState
 
 	// recoveredErrs are problems with the message that the parser was able to
 	// recover from (though the parsing might not be "correct").
@@ -51,12 +65,12 @@ func (e *Event) unpack(data string) error {
 
 	e.init(data)
 
-//line parser.go:56
+//line parser.go:70
 	{
 		cs = cef_start
 	}
 
-//line parser.go:61
+//line parser.go:75
 	{
 		if (p) == (pe) {
 			goto _test_eof
@@ -961,299 +975,299 @@ func (e *Event) unpack(data string) error {
 		goto f26
 
 	f0:
-//line cef.rl:38
+//line cef.rl:52
 
 		mark = p
 
 		goto _again
 	f4:
-//line cef.rl:41
+//line cef.rl:55
 
 		mark_slash = p
 
 		goto _again
 	f6:
-//line cef.rl:44
+//line cef.rl:58
 
-		escapes = append(escapes, mark_slash, p)
+		state.pushEscape(mark_slash, p)
 
 		goto _again
 	f1:
-//line cef.rl:47
+//line cef.rl:61
 
 		e.Version, _ = strconv.Atoi(data[mark:p])
 
 		goto _again
 	f5:
-//line cef.rl:50
+//line cef.rl:64
 
-		e.DeviceVendor = replaceEscapes(data[mark:p], mark, escapes)
-		escapes = escapes[:0]
+		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
 
 		goto _again
 	f10:
-//line cef.rl:54
+//line cef.rl:68
 
-		e.DeviceProduct = replaceEscapes(data[mark:p], mark, escapes)
-		escapes = escapes[:0]
+		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
 
 		goto _again
 	f13:
-//line cef.rl:58
+//line cef.rl:72
 
-		e.DeviceVersion = replaceEscapes(data[mark:p], mark, escapes)
-		escapes = escapes[:0]
+		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
 
 		goto _again
 	f16:
-//line cef.rl:62
+//line cef.rl:76
 
-		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, escapes)
-		escapes = escapes[:0]
+		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
 
 		goto _again
 	f19:
-//line cef.rl:66
+//line cef.rl:80
 
-		e.Name = replaceEscapes(data[mark:p], mark, escapes)
-		escapes = escapes[:0]
+		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
 
 		goto _again
 	f22:
-//line cef.rl:70
+//line cef.rl:84
 
 		e.Severity = data[mark:p]
 
 		goto _again
 	f23:
-//line cef.rl:73
+//line cef.rl:87
 
 		// A new extension key marks the end of the last extension value.
-		if len(extKey) > 0 && extValueStart <= mark-1 {
-			e.pushExtension(extKey, replaceEscapes(data[extValueStart:mark-1], extValueStart, escapes))
-			extKey, extValueStart, extValueEnd, escapes = "", 0, 0, escapes[:0]
+		if len(state.key) > 0 && state.valueStart <= mark-1 {
+			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:mark-1], state.valueStart, state.escapes))
+			state.reset()
 		}
-		extKey = data[mark:p]
+		state.key = data[mark:p]
 
 		goto _again
 	f29:
-//line cef.rl:81
+//line cef.rl:95
 
-		extValueStart = p
-		extValueEnd = p
+		state.valueStart = p
+		state.valueEnd = p
 
 		goto _again
 	f25:
-//line cef.rl:85
+//line cef.rl:99
 
-		extValueEnd = p + 1
+		state.valueEnd = p + 1
 
 		goto _again
 	f24:
-//line cef.rl:95
+//line cef.rl:109
 
-		recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", extKey, p+1))
+		recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
 		(p)--
 		cs = 33
 
 		goto _again
 	f26:
-//line cef.rl:99
+//line cef.rl:113
 
-		extKey, extValueStart, extValueEnd = "", 0, 0
+		state.reset()
 		// Resume processing at p, the start of the next extension key.
 		p = mark
 		cs = 29
 
 		goto _again
 	f2:
-//line cef.rl:38
+//line cef.rl:52
 
 		mark = p
 
-//line cef.rl:41
+//line cef.rl:55
 
 		mark_slash = p
 
 		goto _again
 	f3:
-//line cef.rl:38
+//line cef.rl:52
 
 		mark = p
 
-//line cef.rl:50
+//line cef.rl:64
 
-		e.DeviceVendor = replaceEscapes(data[mark:p], mark, escapes)
-		escapes = escapes[:0]
+		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
 
 		goto _again
 	f9:
-//line cef.rl:38
+//line cef.rl:52
 
 		mark = p
 
-//line cef.rl:54
+//line cef.rl:68
 
-		e.DeviceProduct = replaceEscapes(data[mark:p], mark, escapes)
-		escapes = escapes[:0]
+		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
 
 		goto _again
 	f12:
-//line cef.rl:38
+//line cef.rl:52
 
 		mark = p
 
-//line cef.rl:58
+//line cef.rl:72
 
-		e.DeviceVersion = replaceEscapes(data[mark:p], mark, escapes)
-		escapes = escapes[:0]
+		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
 
 		goto _again
 	f15:
-//line cef.rl:38
+//line cef.rl:52
 
 		mark = p
 
-//line cef.rl:62
+//line cef.rl:76
 
-		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, escapes)
-		escapes = escapes[:0]
+		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
 
 		goto _again
 	f18:
-//line cef.rl:38
+//line cef.rl:52
 
 		mark = p
 
-//line cef.rl:66
+//line cef.rl:80
 
-		e.Name = replaceEscapes(data[mark:p], mark, escapes)
-		escapes = escapes[:0]
+		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
 
 		goto _again
 	f21:
-//line cef.rl:38
+//line cef.rl:52
 
 		mark = p
 
-//line cef.rl:70
+//line cef.rl:84
 
 		e.Severity = data[mark:p]
 
 		goto _again
 	f33:
-//line cef.rl:38
+//line cef.rl:52
 
 		mark = p
 
-//line cef.rl:85
+//line cef.rl:99
 
-		extValueEnd = p + 1
+		state.valueEnd = p + 1
 
 		goto _again
 	f7:
-//line cef.rl:44
+//line cef.rl:58
 
-		escapes = append(escapes, mark_slash, p)
+		state.pushEscape(mark_slash, p)
 
-//line cef.rl:41
+//line cef.rl:55
 
 		mark_slash = p
 
 		goto _again
 	f8:
-//line cef.rl:44
+//line cef.rl:58
 
-		escapes = append(escapes, mark_slash, p)
+		state.pushEscape(mark_slash, p)
 
-//line cef.rl:50
+//line cef.rl:64
 
-		e.DeviceVendor = replaceEscapes(data[mark:p], mark, escapes)
-		escapes = escapes[:0]
+		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
 
 		goto _again
 	f11:
-//line cef.rl:44
+//line cef.rl:58
 
-		escapes = append(escapes, mark_slash, p)
+		state.pushEscape(mark_slash, p)
 
-//line cef.rl:54
+//line cef.rl:68
 
-		e.DeviceProduct = replaceEscapes(data[mark:p], mark, escapes)
-		escapes = escapes[:0]
+		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
 
 		goto _again
 	f14:
-//line cef.rl:44
-
-		escapes = append(escapes, mark_slash, p)
-
 //line cef.rl:58
 
-		e.DeviceVersion = replaceEscapes(data[mark:p], mark, escapes)
-		escapes = escapes[:0]
+		state.pushEscape(mark_slash, p)
+
+//line cef.rl:72
+
+		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
 
 		goto _again
 	f17:
-//line cef.rl:44
+//line cef.rl:58
 
-		escapes = append(escapes, mark_slash, p)
+		state.pushEscape(mark_slash, p)
 
-//line cef.rl:62
+//line cef.rl:76
 
-		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, escapes)
-		escapes = escapes[:0]
+		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
 
 		goto _again
 	f20:
-//line cef.rl:44
+//line cef.rl:58
 
-		escapes = append(escapes, mark_slash, p)
+		state.pushEscape(mark_slash, p)
 
-//line cef.rl:66
+//line cef.rl:80
 
-		e.Name = replaceEscapes(data[mark:p], mark, escapes)
-		escapes = escapes[:0]
+		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
+		state.reset()
 
 		goto _again
 	f35:
-//line cef.rl:44
+//line cef.rl:58
 
-		escapes = append(escapes, mark_slash, p)
+		state.pushEscape(mark_slash, p)
 
-//line cef.rl:85
+//line cef.rl:99
 
-		extValueEnd = p + 1
+		state.valueEnd = p + 1
 
 		goto _again
 	f30:
-//line cef.rl:81
+//line cef.rl:95
 
-		extValueStart = p
-		extValueEnd = p
+		state.valueStart = p
+		state.valueEnd = p
 
-//line cef.rl:41
+//line cef.rl:55
 
 		mark_slash = p
 
 		goto _again
 	f28:
-//line cef.rl:81
+//line cef.rl:95
 
-		extValueStart = p
-		extValueEnd = p
+		state.valueStart = p
+		state.valueEnd = p
 
-//line cef.rl:85
+//line cef.rl:99
 
-		extValueEnd = p + 1
+		state.valueEnd = p + 1
 
 		goto _again
 	f32:
-//line cef.rl:85
+//line cef.rl:99
 
-		extValueEnd = p + 1
+		state.valueEnd = p + 1
 
-//line cef.rl:38
+//line cef.rl:52
 
 		mark = p
 
@@ -1272,49 +1286,49 @@ func (e *Event) unpack(data string) error {
 		if (p) == eof {
 			switch _cef_eof_actions[cs] {
 			case 32:
-//line cef.rl:88
+//line cef.rl:102
 
 				// Reaching the EOF marks the end of the final extension value.
-				if len(extKey) > 0 && extValueStart <= extValueEnd {
-					e.pushExtension(extKey, replaceEscapes(data[extValueStart:extValueEnd], extValueStart, escapes))
-					extKey, extValueStart, extValueEnd, escapes = "", 0, 0, escapes[:0]
+				if len(state.key) > 0 && state.valueStart <= state.valueEnd {
+					e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+					state.reset()
 				}
 
 			case 25:
-//line cef.rl:95
+//line cef.rl:109
 
-				recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", extKey, p+1))
+				recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
 				(p)--
 				cs = 33
 
 			case 35:
-//line cef.rl:44
+//line cef.rl:58
 
-				escapes = append(escapes, mark_slash, p)
+				state.pushEscape(mark_slash, p)
 
-//line cef.rl:88
+//line cef.rl:102
 
 				// Reaching the EOF marks the end of the final extension value.
-				if len(extKey) > 0 && extValueStart <= extValueEnd {
-					e.pushExtension(extKey, replaceEscapes(data[extValueStart:extValueEnd], extValueStart, escapes))
-					extKey, extValueStart, extValueEnd, escapes = "", 0, 0, escapes[:0]
+				if len(state.key) > 0 && state.valueStart <= state.valueEnd {
+					e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+					state.reset()
 				}
 
 			case 28:
-//line cef.rl:81
+//line cef.rl:95
 
-				extValueStart = p
-				extValueEnd = p
+				state.valueStart = p
+				state.valueEnd = p
 
-//line cef.rl:88
+//line cef.rl:102
 
 				// Reaching the EOF marks the end of the final extension value.
-				if len(extKey) > 0 && extValueStart <= extValueEnd {
-					e.pushExtension(extKey, replaceEscapes(data[extValueStart:extValueEnd], extValueStart, escapes))
-					extKey, extValueStart, extValueEnd, escapes = "", 0, 0, escapes[:0]
+				if len(state.key) > 0 && state.valueStart <= state.valueEnd {
+					e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+					state.reset()
 				}
 
-//line parser.go:1116
+//line parser.go:1130
 			}
 		}
 
@@ -1323,7 +1337,7 @@ func (e *Event) unpack(data string) error {
 		}
 	}
 
-//line cef.rl:161
+//line cef.rl:175
 
 	// Check if state machine completed.
 	if cs < cef_first_final {
