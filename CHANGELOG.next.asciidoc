@@ -14,9 +14,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-==== Added
-Added description into add_fields to reflect that it can overwrite the desired field.
-
 *Heartbeat*
 
 *Metricbeat*
