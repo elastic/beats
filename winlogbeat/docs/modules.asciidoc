@@ -2,12 +2,12 @@
 [role="xpack"]
 = Modules
 
+[partintro]
+--
 NOTE: Winlogbeat modules have changed in 8.0.0 to use Elasticsearch Ingest Node
 for processing. If you are upgrading from 7.x please review the documentation
 and see the default configuration file.
 
-[partintro]
---
 This section contains detailed information about the available Windows event
 log processing modules contained in {beatname_uc}. More details about each
 module can be found in the module's documentation.
@@ -42,16 +42,11 @@ want to apply the module processing to events. The simplest way to get started
 is to use the Elasticsearch output and Winlogbeat will automatically install
 the pipelines when it first connects to Elasticsearch.
 
-// TODO:
-// Update getting started pages.
-// Update required permissions on security docs to include manage_ingest_pipelines.
-// Document the export pipelines command.
-
 Installation Methods
 
-1. Automatic Installing
-2. `{beatname_lc} setup`
-3. Manual
+1. <<{beatname_lc}-load-pipeline-auto>>
+2. <<{beatname_lc}-load-pipeline-setup>>
+3. <<{beatname_lc}-load-pipeline-manual>>
 
 [float]
 === Usage with Forwarded Events

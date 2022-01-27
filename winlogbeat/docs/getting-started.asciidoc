@@ -127,8 +127,10 @@ visualizing your data. To load these assets:
 include::{libbeat-dir}/tab-widgets/setup.asciidoc[tag=win]
 --
 
-This step loads the recommended {ref}/index-templates.html[index template] for writing to {es}
-and deploys the sample dashboards for visualizing the data in {kib}.
+This step loads the recommended {ref}/index-templates.html[index
+template] for writing to {es} , loads the ingest pipelines to parse
+the events (x-pack only), and deploys the sample dashboards for
+visualizing the data in {kib}.
 
 [TIP]
 =====

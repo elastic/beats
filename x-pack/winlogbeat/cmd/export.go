@@ -15,7 +15,7 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/module"
 )
 
-// GenExportPipelineCmd is the command used to export the elasticsearch template.
+// GenTemplateConfigCmd is the command used to export the elasticsearch template.
 func GenExportPipelineCmd(settings instance.Settings) *cobra.Command {
 	genExportPipelineCmd := &cobra.Command{
 		Use:   "pipelines",
@@ -38,15 +38,12 @@ func GenExportPipelineCmd(settings instance.Settings) *cobra.Command {
 				fatalf("Failed to initialize 'pipeline' command: %+v", err)
 			}
 
-			if err = os.MkdirAll(dir, 0755); err != nil {
-				fatalf("Failed to create directory: %+v", err)
-			}
-
-			if err = module.ExportPipelines(b.Info, *ver, dir); err != nil {
+			err = module.ExportPipelines(b.Info, *ver, dir)
+			if err != nil {
 				fatalf("Failed to export pipelines: %+v", err)
 			}
 
-			fmt.Fprintf(os.Stdout, "Exported pipelines\n")
+			fmt.Fprintf(os.Stdout, "Exported pipelines")
 		},
 	}
 

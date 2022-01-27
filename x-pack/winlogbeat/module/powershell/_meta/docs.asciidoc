@@ -46,7 +46,7 @@ winlogbeat.event_logs:
 output.elasticsearch.pipeline: winlogbeat-%{[agent.version]}-routing <1>
 ----
 <1> All module processing is handled via Elasticsearch Ingest Node pipelines.
-See <<{beatname_lc}-modules-setup}>> for details.
+See <<{beatname_lc}-modules-setup>> for details.
 
 [float]
 === Example dashboard
