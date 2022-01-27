@@ -58,14 +58,14 @@
         "source.address": "89.160.20.112",
         "source.as.number": 29518,
         "source.as.organization.name": "Bredband2 AB",
-        "source.geo.city_name": "Link\u00f6ping",
+        "source.geo.city_name": "Rimbo",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "SE",
         "source.geo.country_name": "Sweden",
-        "source.geo.location.lat": 58.4167,
-        "source.geo.location.lon": 15.6167,
-        "source.geo.region_iso_code": "SE-E",
-        "source.geo.region_name": "\u00d6sterg\u00f6tland County",
+        "source.geo.location.lat": 59.7526,
+        "source.geo.location.lon": 18.3651,
+        "source.geo.region_iso_code": "SE-AB",
+        "source.geo.region_name": "Stockholm County",
         "source.ip": "89.160.20.112"
     },
     {
@@ -86,12 +86,6 @@
         "process.pid": 15934,
         "service.type": "apache",
         "source.address": "67.43.156.12",
-        "source.as.number": 35908,
-        "source.geo.continent_name": "Asia",
-        "source.geo.country_iso_code": "BT",
-        "source.geo.country_name": "Bhutan",
-        "source.geo.location.lat": 27.5,
-        "source.geo.location.lon": 90.5,
         "source.ip": "67.43.156.12",
         "source.port": "12345"
     }
