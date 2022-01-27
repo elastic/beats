@@ -40,7 +40,6 @@ import (
 var numCPU = runtime.NumCPU()
 
 func TestGetOne(t *testing.T) {
-	logp.DevelopmentSetup()
 	testConfig := Stats{
 		Procs:        []string{".*"},
 		Hostfs:       resolve.NewTestResolver("/"),
@@ -144,7 +143,7 @@ func TestProcMemPercentage(t *testing.T) {
 	procStats.ProcsMap[p.Pid.ValueOr(0)] = p
 
 	rssPercent := GetProcMemPercentage(&p, 10000)
-	assert.Equal(t, rssPercent, 0.1416)
+	assert.Equal(t, rssPercent.ValueOr(0), 0.1416)
 }
 
 func TestProcCpuPercentage(t *testing.T) {
@@ -440,7 +439,7 @@ func TestIncludeTopProcesses(t *testing.T) {
 }
 
 func initTestResolver() (Stats, error) {
-	//logp.DevelopmentSetup()
+	logp.DevelopmentSetup()
 	testConfig := Stats{
 		Procs:        []string{".*"},
 		Hostfs:       resolve.NewTestResolver("/"),

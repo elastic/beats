@@ -105,7 +105,7 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 	return procMap, plist, nil
 }
 
-func FillPidMetrics(hostfs resolve.Resolver, pid int, state ProcState) (ProcState, error) {
+func FillPidMetrics(hostfs resolve.Resolver, pid int, state ProcState, filter func(string) bool) (ProcState, error) {
 	// Memory Data
 	var err error
 	state.Memory, err = getMemData(hostfs, pid)
@@ -125,7 +125,7 @@ func FillPidMetrics(hostfs resolve.Resolver, pid int, state ProcState) (ProcStat
 		if err != nil {
 			return state, errors.Wrapf(err, "error getting CLI args for pid %d", pid)
 		}
-		state.Cmdline = strings.Join(state.Args, " ")
+
 	}
 
 	// FD metrics
@@ -136,7 +136,7 @@ func FillPidMetrics(hostfs resolve.Resolver, pid int, state ProcState) (ProcStat
 
 	if state.Env == nil {
 		// env vars
-		state.Env, err = getEnvData(hostfs, pid)
+		state.Env, err = getEnvData(hostfs, pid, filter)
 	}
 
 	state.Exe, state.Cwd, err = getProcStringData(hostfs, pid)
@@ -248,7 +248,7 @@ func getUser(hostfs resolve.Resolver, pid int) (string, error) {
 	return userFinal, nil
 }
 
-func getEnvData(hostfs resolve.Resolver, pid int) (common.MapStr, error) {
+func getEnvData(hostfs resolve.Resolver, pid int, filter func(string) bool) (common.MapStr, error) {
 	path := hostfs.Join("proc", strconv.Itoa(pid), "environ")
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -268,7 +268,11 @@ func getEnvData(hostfs resolve.Resolver, pid int) (common.MapStr, error) {
 			continue
 		}
 
-		env[key] = string(bytes.TrimSpace(parts[1]))
+		if filter == nil || filter(key) {
+
+			env[key] = string(bytes.TrimSpace(parts[1]))
+		}
+
 	}
 	return env, nil
 }
@@ -310,7 +314,6 @@ func getCPUTime(hostfs resolve.Resolver, pid int) (ProcCPUInfo, error) {
 	if err != nil {
 		return state, errors.Wrapf(err, "error opening file %s", pathCPU)
 	}
-
 	fields := strings.Fields(string(data))
 
 	user, err := strconv.ParseUint(fields[13], 10, 64)

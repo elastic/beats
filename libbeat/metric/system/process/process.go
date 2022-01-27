@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -198,9 +199,12 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	}
 
 	//If we've passed the filter, continue to fill out the rest of the metrics
-	status, err = FillPidMetrics(procStats.Hostfs, pid, status)
+	status, err = FillPidMetrics(procStats.Hostfs, pid, status, procStats.isWhitelistedEnvVar)
 	if err != nil {
 		return status, true, errors.Wrap(err, "FillPidMetrics")
+	}
+	if len(status.Args) > 0 && status.Cmdline == "" {
+		status.Cmdline = strings.Join(status.Args, " ")
 	}
 
 	//postprocess with cgroups and percentages
@@ -229,8 +233,8 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 func (procStats *Stats) cacheCmdLine(in ProcState) ProcState {
 	if previousProc, ok := procStats.ProcsMap[in.Pid.ValueOr(0)]; ok {
 		if procStats.CacheCmdLine {
-			cmdline := previousProc.Cmdline
-			in.Cmdline = cmdline
+			in.Args = previousProc.Args
+			in.Cmdline = previousProc.Cmdline
 		}
 		env := previousProc.Env
 		in.Env = env
@@ -318,22 +322,11 @@ func (procStats *Stats) includeTopProcesses(processes []ProcState) []ProcState {
 	return result
 }
 
-// isProcessInSlice looks up proc in the processes slice and returns if
-// found or not
-func isProcessInSlice(processes []ProcState, proc *ProcState) bool {
-	for _, p := range processes {
-		if p.Pid == proc.Pid {
-			return true
-		}
-	}
-	return false
-}
-
 // isWhitelistedEnvVar returns true if the given variable name is a match for
-// the whitelist. If the whitelist is empty it returns false.
+// the whitelist. If the whitelist is empty it returns true.
 func (procStats Stats) isWhitelistedEnvVar(varName string) bool {
 	if len(procStats.envRegexps) == 0 {
-		return false
+		return true
 	}
 
 	for _, p := range procStats.envRegexps {

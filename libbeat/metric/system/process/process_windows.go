@@ -79,7 +79,7 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 }
 
 // FillPidMetrics is the darwin implementation
-func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState) (ProcState, error) {
+func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, _ func(string) bool) (ProcState, error) {
 	status, err := getPidStatus(pid)
 	if err != nil {
 		return state, errors.Wrap(err, "error fetching status")

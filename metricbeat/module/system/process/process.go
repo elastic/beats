@@ -21,7 +21,6 @@
 package process
 
 import (
-	"fmt"
 	"os"
 	"runtime"
 
@@ -61,7 +60,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	sys := base.Module().(resolve.Resolver)
-	fmt.Printf("sys: %#v\n", sys.ResolveHostFS(""))
 	enableCgroups := false
 	if runtime.GOOS == "linux" {
 		if config.Cgroups == nil || *config.Cgroups {

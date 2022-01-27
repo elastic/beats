@@ -145,7 +145,7 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 }
 
 // FillPidMetrics is the darwin implementation
-func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState) (ProcState, error) {
+func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(string) bool) (ProcState, error) {
 
 	args, exe, env, err := getProcArgs(pid)
 	if err != nil {
@@ -154,7 +154,9 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState) (ProcState, er
 
 	state.Args = args
 	state.Exe = exe
-	state.Env = env
+	if state.Env = nil {
+		state.Env = env
+	}
 
 	return state, nil
 }
@@ -225,8 +227,11 @@ func getProcArgs(pid int) ([]string, string, common.MapStr, error) {
 		if len(pair) != 2 {
 			return argv, exeName, nil, errors.Wrap(err, "Error reading process information from KERN_PROCARGS2")
 		}
+		eKey := string(pair[0])
+		if filter == nil || filter(eKey) {
+			envVars[string(pair[0])] = string(pair[1])
+		}
 
-		envVars[string(pair[0])] = string(pair[1])
 	}
 
 	return argv, exeName, envVars, nil

@@ -33,6 +33,17 @@ func GetProcMemPercentage(proc *ProcState, totalPhyMem uint64) opt.Float {
 	return opt.FloatWith(common.Round(perc, 4))
 }
 
+// isProcessInSlice looks up proc in the processes slice and returns if
+// found or not
+func isProcessInSlice(processes []ProcState, proc *ProcState) bool {
+	for _, p := range processes {
+		if p.Pid == proc.Pid {
+			return true
+		}
+	}
+	return false
+}
+
 // GetProcCPUPercentage returns the percentage of total CPU time consumed by
 // the process during the period between the given samples. Two percentages are
 // returned (these must be multiplied by 100). The first is a normalized based

@@ -113,7 +113,7 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 }
 
 // FillPidMetrics is the aix implementation
-func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState) (ProcState, error) {
+func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(string) bool) (ProcState, error) {
 	pagesize := uint64(os.Getpagesize())
 	info := C.struct_procsinfo64{}
 	cpid := C.pid_t(pid)
@@ -168,6 +168,10 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState) (ProcState, er
 		return state, errors.Wrap(err, "error in getevars")
 	}
 
+	if state.Env != nil {
+		return state, nil
+	}
+
 	bbuf = bytes.NewBuffer(buf)
 	delim := []byte{61} // "="
 	vars := map[string]string{}
@@ -184,8 +188,13 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState) (ProcState, er
 		if len(pair) != 2 {
 			return state, errors.Wrap(err, "error reading environment")
 		}
-		vars[string(pair[0])] = string(pair[1])
+		eKey := string(pair[0])
+		if filter == nil || filter(eKey) {
+			vars[string(pair[0])] = string(pair[1])
+		}
+
 	}
+	state.Env = vars
 
 	return state, nil
 }
