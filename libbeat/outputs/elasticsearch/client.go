@@ -317,8 +317,8 @@ func (client *Client) createEventBulkMeta(version common.Version, event *beat.Ev
 		ID:       id,
 	}
 
-	if isRequireAliasSupported(version) {
-		meta.RequireAlias = client.index.IsAlias()
+	if isRequireAliasSupported(version) && client.index.IsAlias() {
+		meta.RequireAlias = isAlias(event)
 	}
 
 	if opType == events.OpTypeDelete {
@@ -339,6 +339,23 @@ func (client *Client) createEventBulkMeta(version common.Version, event *beat.Ev
 
 func isRequireAliasSupported(version common.Version) bool {
 	return !version.LessThan(common.MustNewVersion("7.10.0"))
+}
+
+// isAlias determines if the target is an alias or an index.
+// If meta.alias is set in the event, it is an alias because the
+// field takes precedence the over the contents of index and raw_index.
+// If nothing is set, it is deemed to be an alias.
+func isAlias(event *beat.Event) bool {
+	if v, _ := events.GetMetaStringValue(*event, events.FieldMetaAlias); v != "" {
+		return true
+	}
+	if v, _ := events.GetMetaStringValue(*event, events.FieldMetaIndex); v != "" {
+		return false
+	}
+	if v, _ := events.GetMetaStringValue(*event, events.FieldMetaRawIndex); v != "" {
+		return false
+	}
+	return true
 }
 
 func (client *Client) getPipeline(event *beat.Event) (string, error) {

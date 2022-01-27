@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
@@ -93,7 +94,7 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 
 	// Set index prefix to overwrite default
 	if e.Index != "" {
-		b.Meta = common.MapStr{"index": e.Index}
+		b.Meta = common.MapStr{events.FieldMetaIndex: e.Index}
 	}
 
 	if e.ID != "" {
