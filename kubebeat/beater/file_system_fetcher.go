@@ -16,18 +16,17 @@ type FileSystemFetcher struct {
 }
 
 const (
-	FileSystemInputType = "file-system"
+	FileSystemType = "file-system"
 )
 
-// FileSystemResourceData represents a struct for a system resource data
+// FileSystemResource represents a struct for a system resource data
 // This struct is being used by the fileSystemFetcher when
-type FileSystemResourceData struct {
-	FileName  string `json:"filename"`
-	FileMode  string `json:"mode"`
-	Gid       string `json:"gid"`
-	Uid       string `json:"uid"`
-	InputType string `json:"type"`
-	Path      string `json:"path"`
+type FileSystemResource struct {
+	FileName string `json:"filename"`
+	FileMode string `json:"mode"`
+	Gid      string `json:"gid"`
+	Uid      string `json:"uid"`
+	Path     string `json:"path"`
 }
 
 func NewFileFetcher(filesPaths []string) Fetcher {
@@ -36,8 +35,8 @@ func NewFileFetcher(filesPaths []string) Fetcher {
 	}
 }
 
-func (f *FileSystemFetcher) Fetch() ([]interface{}, error) {
-	results := make([]interface{}, 0)
+func (f *FileSystemFetcher) Fetch() ([]FetcherResult, error) {
+	results := make([]FetcherResult, 0)
 
 	// Input files might contain glob pattern
 	for _, filePattern := range f.inputFilePatterns {
@@ -47,7 +46,7 @@ func (f *FileSystemFetcher) Fetch() ([]interface{}, error) {
 		}
 		for _, file := range matchedFiles {
 			resource := f.fetchSystemResource(file)
-			results = append(results, resource)
+			results = append(results, FetcherResult{FileSystemType, resource})
 		}
 	}
 	return results, nil
@@ -65,10 +64,10 @@ func (f *FileSystemFetcher) fetchSystemResource(filePath string) interface{} {
 	return file
 }
 
-func FromFileInfo(info os.FileInfo, path string) FileSystemResourceData {
+func FromFileInfo(info os.FileInfo, path string) FileSystemResource {
 
 	if info == nil {
-		return FileSystemResourceData{}
+		return FileSystemResource{}
 	}
 
 	stat := info.Sys().(*syscall.Stat_t)
@@ -80,13 +79,12 @@ func FromFileInfo(info os.FileInfo, path string) FileSystemResourceData {
 	group, _ := user.LookupGroupId(g)
 	mod := strconv.FormatUint(uint64(info.Mode().Perm()), 8)
 
-	data := FileSystemResourceData{
-		FileName:  info.Name(),
-		FileMode:  mod,
-		Uid:       usr.Name,
-		Gid:       group.Name,
-		Path:      path,
-		InputType: FileSystemInputType,
+	data := FileSystemResource{
+		FileName: info.Name(),
+		FileMode: mod,
+		Uid:      usr.Name,
+		Gid:      group.Name,
+		Path:     path,
 	}
 
 	return data

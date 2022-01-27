@@ -9,8 +9,7 @@ const (
 	ProcessType = "process"
 )
 
-type Process struct {
-	Type string        `json:"type"`
+type ProcessResource struct {
 	PID  string        `json:"pid"`
 	Cmd  string        `json:"command"`
 	Stat proc.ProcStat `json:"stat"`
@@ -26,13 +25,13 @@ func NewProcessesFetcher(dir string) Fetcher {
 	}
 }
 
-func (f *ProcessesFetcher) Fetch() ([]interface{}, error) {
+func (f *ProcessesFetcher) Fetch() ([]FetcherResult, error) {
 	pids, err := proc.List(f.directory)
 	if err != nil {
 		return nil, err
 	}
 
-	ret := make([]interface{}, 0)
+	ret := make([]FetcherResult, 0)
 
 	// If errors occur during read, then return what we have till now
 	// without reporting errors.
@@ -47,7 +46,7 @@ func (f *ProcessesFetcher) Fetch() ([]interface{}, error) {
 			return ret, nil
 		}
 
-		ret = append(ret, Process{ProcessType, p, cmd, stat})
+		ret = append(ret, FetcherResult{ProcessType, ProcessResource{p, cmd, stat}})
 	}
 
 	return ret, nil

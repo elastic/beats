@@ -2,6 +2,11 @@ package beater
 
 // Fetcher represents a data fetcher.
 type Fetcher interface {
-	Fetch() ([]interface{}, error)
+	Fetch() ([]FetcherResult, error)
 	Stop()
+}
+
+type FetcherResult struct {
+	Type     string      `json:"type"`
+	Resource interface{} `json:"resource"`
 }
