@@ -7,7 +7,7 @@
 
 The `add_fields` processor adds additional fields to the event.  Fields can be
 scalar values, arrays, dictionaries, or any nested combination of these. 
-The add_fields processor does have the ability to overwrite taget field if it already exists. 
+The `add_fields` processor will overwrite the target field if it already exists. 
 By default the fields that you specify will be grouped under the `fields`
 sub-dictionary in the event. To group the fields under a different
 sub-dictionary, use the `target` setting. To store the fields as
