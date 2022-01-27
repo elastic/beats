@@ -49927,6 +49927,49 @@ type: boolean
 
 
 
+
+*`elasticsearch.deprecation.data_stream.dataset`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.deprecation.data_stream.namespace`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.deprecation.data_stream.type`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.deprecation.event.code`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.deprecation.event.dataset`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.deprecation.elasticsearch.event.category`*::
++
+--
+type: keyword
+
+--
+
 [float]
 === gc
 
