@@ -63,6 +63,11 @@ data:
             hosts:
               - 'kube-state-metrics:8080'
             period: 10s
+            # If used https to access kube-state-metrics, below lines should be uncomment
+            # and added to all kubernetes.state_* datasets:
+            # bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            # ssl.certificate_authorities:
+            #   - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
           - data_stream:
               dataset: kubernetes.state_cronjob
               type: metrics
@@ -585,10 +590,10 @@ spec:
             runAsUser: 0
           resources:
             limits:
-              memory: 500Mi
+              memory: 700Mi
             requests:
               cpu: 100m
-              memory: 200Mi
+              memory: 400Mi
           volumeMounts:
             - name: datastreams
               mountPath: /etc/agent.yml
