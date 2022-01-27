@@ -415,6 +415,7 @@ func TestBulkEncodeEvents(t *testing.T) {
 		ilmConfig *common.Config
 		isAlias   bool
 		events    []common.MapStr
+		metas     []common.MapStr
 	}{
 		"6.x": {
 			version:   "6.8.0",
@@ -446,6 +447,31 @@ func TestBulkEncodeEvents(t *testing.T) {
 			isAlias:   true,
 			events:    []common.MapStr{{"message": "test"}},
 		},
+		"latest with ILM but to monitoring index": {
+			version:   version.GetDefaultVersion(),
+			docType:   "",
+			config:    common.MapStr{},
+			ilmConfig: common.NewConfig(),
+			events:    []common.MapStr{{"message": "test"}},
+			metas:     []common.MapStr{common.MapStr{"index": ".monitoring-index"}},
+		},
+		"latest with ILM but to raw_index": {
+			version:   version.GetDefaultVersion(),
+			docType:   "",
+			config:    common.MapStr{},
+			ilmConfig: common.NewConfig(),
+			events:    []common.MapStr{{"message": "test"}},
+			metas:     []common.MapStr{common.MapStr{"index": "my-raw-index"}},
+		},
+		"latest with ILM and to alias": {
+			version:   version.GetDefaultVersion(),
+			docType:   "",
+			config:    common.MapStr{},
+			ilmConfig: common.NewConfig(),
+			isAlias:   true,
+			events:    []common.MapStr{{"message": "test"}},
+			metas:     []common.MapStr{common.MapStr{"alias": "my-alias"}},
+		},
 		"latest without ILM": {
 			version:   version.GetDefaultVersion(),
 			docType:   "",
@@ -472,10 +498,15 @@ func TestBulkEncodeEvents(t *testing.T) {
 
 			events := make([]publisher.Event, len(test.events))
 			for i, fields := range test.events {
+				var meta common.MapStr
+				if len(test.metas) > i {
+					meta = test.metas[i]
+				}
 				events[i] = publisher.Event{
 					Content: beat.Event{
 						Timestamp: time.Now(),
 						Fields:    fields,
+						Meta:      meta,
 					},
 				}
 			}

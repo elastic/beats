@@ -337,7 +337,7 @@ func (s *ilmIndexSelector) Select(evt *beat.Event) (string, error) {
 	return idx, err
 }
 
-func (s ilmIndexSelector) IsAlias() bool { return s.st.withILM.Load() }
+func (s ilmIndexSelector) IsAlias() bool { return true }
 
 func (s indexSelector) Select(evt *beat.Event) (string, error) {
 	if idx := getEventCustomIndex(evt, s.beatInfo); idx != "" {
