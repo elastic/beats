@@ -36,9 +36,9 @@ var (
 	schema       = s.Schema{
 		"version": c.Str("zk_version"),
 		"latency": s.Object{
-			"avg": c.Int("zk_avg_latency"),
-			"min": c.Int("zk_min_latency"),
-			"max": c.Int("zk_max_latency"),
+			"avg": c.Float("zk_avg_latency"),
+			"min": c.Float("zk_min_latency"),
+			"max": c.Float("zk_max_latency"),
 		},
 		"packets": s.Object{
 			"received": c.Int("zk_packets_received"),
@@ -53,7 +53,8 @@ var (
 		"approximate_data_size": c.Int("zk_approximate_data_size"),
 	}
 	schemaLeader = s.Schema{
-		"followers":        c.Int("zk_followers"),
+		"learners":         c.Int("zk_learners"),
+		"followers":        c.Int("zk_followers"), // Not present anymore in ZooKeeper 3.7 mntr responses
 		"synced_followers": c.Int("zk_synced_followers"),
 		"pending_syncs":    c.Int("zk_pending_syncs"),
 	}
