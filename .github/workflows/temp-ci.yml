@@ -21,6 +21,7 @@ env:
   AWS_ECR_KEY: ${{ secrets.AWS_ECR_KEY_DEVELOP }}
   AWS_ECR_SECRET: ${{ secrets.AWS_ECR_SECRET_DEVELOP }}
   AWS_ECR_REGION: ${{ secrets.AWS_ECR_REGION_DEVELOP }}
+  K8S_MANIFEST_DIR: kubebeat/deploy/k8s
   DEV: true
   SNAPSHOT: true
   PLATFORMS: linux/amd64
@@ -63,6 +64,24 @@ jobs:
         working-directory: ./kubebeat
         run: |
             GOOS=linux go test
+      
+      - name: Get diff k8s manifests
+        uses: technote-space/get-diff-action@v4
+        with:
+          PATTERNS: ${{ env.K8S_MANIFEST_DIR }}/**
+
+      - name: Run K8s manifest tests
+        if: env.GIT_DIFF
+        uses: stefanprodan/kube-tools@v1
+        with:
+          kubectl: 1.18.2
+          kubeval: v0.16.1
+          command: |
+            echo "Run kubeval"
+            kubeval --strict ${{ env.K8S_MANIFEST_DIR }}/kubebeat-ds.yaml
+          # kubeval --strict ${{ env.K8S_MANIFEST_DIR }}/standalone-agent.yaml
+          # kubeval --strict ${{ env.K8S_MANIFEST_DIR }}/fleet-managed-agent.yaml 
+# Todo Will transfer to parallel job & add conftest for other deploy yamls
       # - name: Notify job failure
       #   if: failure()
       #   uses: archive/github-actions-slack@v1.0.3
