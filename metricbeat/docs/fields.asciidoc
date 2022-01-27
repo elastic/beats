@@ -34848,6 +34848,39 @@ type: long
 --
 
 [float]
+=== firestore
+
+Google Cloud Firestore metrics
+
+
+*`gcp.firestore.document.delete.count`*::
++
+--
+The number of successful document deletes.
+
+type: long
+
+--
+
+*`gcp.firestore.document.read.count`*::
++
+--
+The number of successful document reads from queries or lookups.
+
+type: long
+
+--
+
+*`gcp.firestore.document.write.count`*::
++
+--
+The number of successful document writes.
+
+type: long
+
+--
+
+[float]
 === gke
 
 `gke` contains the metrics that we scraped from GCP Stackdriver API containing monitoring metrics for GCP GKE

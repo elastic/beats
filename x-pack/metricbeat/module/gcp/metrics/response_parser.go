@@ -213,6 +213,11 @@ var reMapping = map[string]string{
 	"storage.object_count.value":                     "storage.object.count",
 	"storage.total_byte_seconds.value":               "storage.total_byte_seconds.bytes",
 	"storage.total_bytes.value":                      "storage.total.bytes",
+
+	// gcp.firestore metricset
+	"document.delete_count.value": "document.delete.count",
+	"document.read_count.value":   "document.read.count",
+	"document.write_count.value":  "document.write.count",
 }
 
 func remap(l *logp.Logger, s string) string {
