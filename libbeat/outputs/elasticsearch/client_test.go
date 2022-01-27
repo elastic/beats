@@ -461,7 +461,7 @@ func TestBulkEncodeEvents(t *testing.T) {
 			config:    common.MapStr{},
 			ilmConfig: common.NewConfig(),
 			events:    []common.MapStr{{"message": "test"}},
-			metas:     []common.MapStr{common.MapStr{"index": "my-raw-index"}},
+			metas:     []common.MapStr{common.MapStr{"raw_index": "my-raw-index"}},
 		},
 		"latest with ILM and to alias": {
 			version:   version.GetDefaultVersion(),
