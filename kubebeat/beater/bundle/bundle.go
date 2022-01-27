@@ -37,7 +37,7 @@ func CreateServer() (*http.Server, error) {
 	}
 
 	srv := &http.Server{
-		Addr:         "0.0.0.0:8080",
+		Addr:         "127.0.0.1:18080",
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
