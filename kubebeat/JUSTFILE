@@ -23,7 +23,7 @@ build-kubebeat:
   GOOS=linux go build -v && docker build -t kubebeat .
 
 deploy-kubebeat:
-  kubectl delete -f deploy/k8s/kubebeat-ds-local.yaml -n kube-system & kubectl apply -f deploy/k8s/kubebeat-ds-local.yaml -n kube-system
+  kubectl delete -f deploy/k8s/kubebeat-ds-local.yaml -n kube-system && kubectl apply -f deploy/k8s/kubebeat-ds-local.yaml -n kube-system
 
 build-deploy-kubebeat: build-kubebeat load-kubebeat-image deploy-kubebeat
 
@@ -34,6 +34,12 @@ deploy-kubebeat-debug:
   kubectl delete -f deploy/k8s/kubebeat-ds-debug-local.yaml -n kube-system & kubectl apply -f deploy/k8s/kubebeat-ds-debug-local.yaml -n kube-system
 
 build-deploy-kubebeat-debug: build-kubebeat-debug load-kubebeat-image deploy-kubebeat-debug
+
+logs-kubebeat:
+  POD=`kubectl get pod -A -o custom-columns=name:metadata.name,namespace:metadata.namespace | grep kubebeat | head -n 1 | sed -E 's/[ ]+/ /'` && \
+  POD_NAME=$( echo ${POD} | cut -f 1 -d" " ) && \
+  POD_NAMESPACE=$( echo ${POD} | cut -f 2 -d" " ) && \
+  kubectl logs -f ${POD_NAME} -n ${POD_NAMESPACE}
 
 package-agent:
   cd ../x-pack/elastic-agent & DEV=true SNAPSHOT=true PLATFORMS=linux/amd64 TYPES=docker mage -v package
