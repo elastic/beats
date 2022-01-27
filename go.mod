@@ -269,13 +269,8 @@ require (
 	github.com/xdg/stringprep v1.0.3 // indirect
 	go.elastic.co/fastjson v1.1.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
-<<<<<<< HEAD
 	go.uber.org/tools v0.0.0-20190618225709-2cfd321de3ee // indirect
-	golang.org/x/mod v0.5.1 // indirect
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
-=======
-	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
->>>>>>> 72a43be9e (x-pack/packetbeat: install Npcap at start-up when required (#29112))
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
