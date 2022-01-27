@@ -37,11 +37,6 @@ func TestTLSVersion(t *testing.T) {
 			nil,
 		},
 		{
-			"SSLv3",
-			tls.VersionSSL30,
-			&TLSVersionDetails{Version: "3.0", Protocol: "ssl", Combined: "SSLv3"},
-		},
-		{
 			"TLSv1.0",
 			tls.VersionTLS10,
 			&TLSVersionDetails{Version: "1.0", Protocol: "tls", Combined: "TLSv1.0"},
