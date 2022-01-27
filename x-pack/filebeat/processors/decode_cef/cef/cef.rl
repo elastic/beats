@@ -15,17 +15,31 @@ import (
     variable pe pe;
 }%%
 
+type cefState struct {
+    key        string           // Extension key.
+    valueStart int              // Start index of extension value.
+    valueEnd   int              // End index of extension value.
+    escapes    []escapePosition // Array of escapes indices within the current value.
+}
+
+func (s *cefState) reset() {
+    s.key = ""
+    s.valueStart = 0
+    s.valueEnd = 0
+    s.escapes = s.escapes[:0]
+}
+
+func (s *cefState) pushEscape(start, end int) {
+    s.escapes = append(s.escapes, escapePosition{start, end})
+}
+
 // unpack unpacks a CEF message.
 func (e *Event) unpack(data string) error {
     cs, p, pe, eof := 0, 0, len(data), len(data)
     mark, mark_slash := 0, 0
-    var escapes []int
 
-    // Extension key.
-    var extKey string
-
-    // Extension value start and end indices.
-    extValueStart, extValueEnd := 0, 0
+    // state related to CEF values.
+    var state cefState
 
     // recoveredErrs are problems with the message that the parser was able to
     // recover from (though the parsing might not be "correct").
@@ -42,62 +56,62 @@ func (e *Event) unpack(data string) error {
             mark_slash = p
         }
         action mark_escape {
-            escapes = append(escapes, mark_slash, p)
+            state.pushEscape(mark_slash, p)
         }
         action version {
             e.Version, _ = strconv.Atoi(data[mark:p])
         }
         action device_vendor {
-            e.DeviceVendor = replaceEscapes(data[mark:p], mark, escapes)
-            escapes = escapes[:0]
+            e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
+            state.reset()
         }
         action device_product {
-            e.DeviceProduct = replaceEscapes(data[mark:p], mark, escapes)
-            escapes = escapes[:0]
+            e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
+            state.reset()
         }
         action device_version {
-            e.DeviceVersion = replaceEscapes(data[mark:p], mark, escapes)
-            escapes = escapes[:0]
+            e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
+            state.reset()
         }
         action device_event_class_id {
-            e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, escapes)
-            escapes = escapes[:0]
+            e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
+            state.reset()
         }
         action name {
-            e.Name = replaceEscapes(data[mark:p], mark, escapes)
-            escapes = escapes[:0]
+            e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
+            state.reset()
         }
         action severity {
             e.Severity = data[mark:p]
         }
         action extension_key {
             // A new extension key marks the end of the last extension value.
-            if len(extKey) > 0 && extValueStart <= mark - 1 {
-                e.pushExtension(extKey, replaceEscapes(data[extValueStart:mark-1], extValueStart, escapes))
-                extKey, extValueStart, extValueEnd, escapes = "", 0, 0, escapes[:0]
+            if len(state.key) > 0 && state.valueStart <= mark - 1 {
+                e.pushExtension(state.key, replaceEscapes(data[state.valueStart:mark-1], state.valueStart, state.escapes))
+                state.reset()
             }
-            extKey = data[mark:p]
+            state.key = data[mark:p]
         }
         action extension_value_start {
-            extValueStart = p;
-            extValueEnd = p
+            state.valueStart = p;
+            state.valueEnd = p
         }
         action extension_value_mark {
-            extValueEnd = p+1
+            state.valueEnd = p+1
         }
         action extension_eof {
             // Reaching the EOF marks the end of the final extension value.
-            if len(extKey) > 0 && extValueStart <= extValueEnd {
-                e.pushExtension(extKey, replaceEscapes(data[extValueStart:extValueEnd], extValueStart, escapes))
-                extKey, extValueStart, extValueEnd, escapes = "", 0, 0, escapes[:0]
+            if len(state.key) > 0 && state.valueStart <= state.valueEnd {
+                e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+                state.reset()
             }
         }
         action extension_err {
-            recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", extKey, p+1))
+            recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
             fhold; fnext gobble_extension;
         }
         action recover_next_extension {
-            extKey, extValueStart, extValueEnd = "", 0, 0
+            state.reset()
             // Resume processing at p, the start of the next extension key.
             p = mark;
             fnext extensions;

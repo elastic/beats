@@ -60,6 +60,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make Cisco ASA and FTD modules conform to the ECS definition for event.outcome and event.type. {issue}29581[29581] {pull}29698[29698]
 - ibmmq: Fixed `@timestamp` not being populated with correct values. {pull}29773[29773]
 - aws-s3: Improve gzip detection to avoid false negatives. {issue}29968[29968]
+- decode_cef: Fix panic when recovering from invalid CEF extensions that contain escape characters. {issue}30010[30010]
 
 *Heartbeat*
 
