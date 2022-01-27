@@ -5,7 +5,6 @@ import unittest
 import glob
 import subprocess
 
-from elasticsearch import Elasticsearch
 import json
 import logging
 from parameterized import parameterized
@@ -118,9 +117,7 @@ def load_fileset_test_cases():
 class Test(BaseTest):
 
     def init(self):
-        self.elasticsearch_url = self.get_elasticsearch_url()
-        print("Using elasticsearch: {}".format(self.elasticsearch_url))
-        self.es = Elasticsearch([self.elasticsearch_url])
+        self.es = self.get_elasticsearch_instance(user='admin')
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
@@ -146,7 +143,7 @@ class Test(BaseTest):
             template_name="filebeat_modules",
             output=cfgfile,
             index_name=self.index_name,
-            elasticsearch_url=self.elasticsearch_url,
+            elasticsearch=self.get_elasticsearch_template_config(user='admin')
         )
 
         self.run_on_file(
