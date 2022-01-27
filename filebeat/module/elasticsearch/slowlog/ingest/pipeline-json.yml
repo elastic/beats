@@ -99,15 +99,13 @@ processors:
 - remove:
     field: elasticsearch.slowlog.message
 - set:
-    copy_from: elasticsearch.slowlog.@timestamp
-    target_field: "@timestamp"
-    override: true
-    if: "ctx.elasticsearch.slowlog.@timestamp != null"
+    value: "{{ elasticsearch.slowlog.@timestamp }}"
+    field: "@timestamp"
+    ignore_empty_value: true
 - set:
-    copy_from: elasticsearch.slowlog.timestamp
-    target_field: "@timestamp"
-    override: true
-    if: "ctx.elasticsearch.slowlog.timestamp != null"
+    value: "{{ elasticsearch.slowlog.timestamp }}"
+    field: "@timestamp"
+    ignore_empty_value: true
 - remove:
     field: elasticsearch.slowlog.@timestamp
     ignore_missing: true
