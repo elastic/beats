@@ -51,11 +51,10 @@ type BulkDeleteAction struct {
 }
 
 type BulkMeta struct {
-	Index        string `json:"_index" struct:"_index"`
-	DocType      string `json:"_type,omitempty" struct:"_type,omitempty"`
-	Pipeline     string `json:"pipeline,omitempty" struct:"pipeline,omitempty"`
-	ID           string `json:"_id,omitempty" struct:"_id,omitempty"`
-	RequireAlias bool   `json:"require_alias,omitempty" struct:"require_alias,omitempty"`
+	Index    string `json:"_index" struct:"_index"`
+	DocType  string `json:"_type,omitempty" struct:"_type,omitempty"`
+	Pipeline string `json:"pipeline,omitempty" struct:"pipeline,omitempty"`
+	ID       string `json:"_id,omitempty" struct:"_id,omitempty"`
 }
 
 type bulkRequest struct {

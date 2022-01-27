@@ -317,10 +317,6 @@ func (client *Client) createEventBulkMeta(version common.Version, event *beat.Ev
 		ID:       id,
 	}
 
-	if isRequireAliasSupported(version) {
-		meta.RequireAlias = client.index.IsAlias()
-	}
-
 	if opType == events.OpTypeDelete {
 		if id != "" {
 			return eslegclient.BulkDeleteAction{Delete: meta}, nil
@@ -335,10 +331,6 @@ func (client *Client) createEventBulkMeta(version common.Version, event *beat.Ev
 		return eslegclient.BulkCreateAction{Create: meta}, nil
 	}
 	return eslegclient.BulkIndexAction{Index: meta}, nil
-}
-
-func isRequireAliasSupported(version common.Version) bool {
-	return !version.LessThan(common.MustNewVersion("7.10.0"))
 }
 
 func (client *Client) getPipeline(event *beat.Event) (string, error) {
