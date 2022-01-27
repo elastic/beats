@@ -70,15 +70,13 @@ RUN apt-get update -y && \
         libasound2\
         libatspi2.0-0\
         libxshmfence1 \
-        fonts-arphic-ukai \
-        fonts-arphic-uming \
-        fonts-ipafont-mincho \
-        fonts-ipafont-gothic \
-        fonts-unfonts-core && \
+        fonts-noto-core\
+        fonts-noto-cjk &&\
         apt-get clean all && \
         exit_code=0 && break || exit_code=$? && echo "apt-get error: retry $iter in 10s" && sleep 10; \
     done; \
     (exit $exit_code)
+RUN apt install fonts-noto-cjk
 ENV NODE_PATH={{ $beatHome }}/.node
 RUN echo \
     $NODE_PATH \
