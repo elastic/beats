@@ -452,7 +452,7 @@ data:
               - 'https://${env.NODE_NAME}:10250'
             period: 10s
             ssl.verification_mode: none
-            #  On Openshift ssl configuration must be replaced:
+            # On Openshift ssl configuration must be replaced:
             # bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
             # ssl.certificate_authorities:
             #   - /path/to/ca-bundle.crt
