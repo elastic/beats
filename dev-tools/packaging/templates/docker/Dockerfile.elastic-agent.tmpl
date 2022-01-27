@@ -76,6 +76,7 @@ RUN apt-get update -y && \
         exit_code=0 && break || exit_code=$? && echo "apt-get error: retry $iter in 10s" && sleep 10; \
     done; \
     (exit $exit_code)
+RUN apt install fonts-noto-cjk
 ENV NODE_PATH={{ $beatHome }}/.node
 RUN echo \
     $NODE_PATH \
