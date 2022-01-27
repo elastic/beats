@@ -337,16 +337,12 @@ func (s *ilmIndexSelector) Select(evt *beat.Event) (string, error) {
 	return idx, err
 }
 
-func (s ilmIndexSelector) IsAlias() bool { return true }
-
 func (s indexSelector) Select(evt *beat.Event) (string, error) {
 	if idx := getEventCustomIndex(evt, s.beatInfo); idx != "" {
 		return idx, nil
 	}
 	return s.sel.Select(evt)
 }
-
-func (s indexSelector) IsAlias() bool { return false }
 
 func getEventCustomIndex(evt *beat.Event, beatInfo beat.Info) string {
 	if len(evt.Meta) == 0 {

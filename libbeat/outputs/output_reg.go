@@ -43,10 +43,8 @@ type IndexManager interface {
 }
 
 // IndexSelector is used to find the index name an event shall be indexed to.
-// It also used to check if during indexing required_alias should be set.
 type IndexSelector interface {
 	Select(event *beat.Event) (string, error)
-	IsAlias() bool
 }
 
 // Group configures and combines multiple clients into load-balanced group of clients
