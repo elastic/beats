@@ -2,7 +2,7 @@ description: Pipeline for parsing the Elasticsearch slow logs in JSON format.
 on_failure:
 - set:
     field: error.message
-    value: '{{ _ingest.on_failure_message }} ({{ _ingest.on_failure_pipeline }}/{{ _ingest.on_failure_processor_type }})'
+    value: '{{ _ingest.on_failure_message }}'
 processors:
 - drop:
     if: ctx.event.dataset != 'elasticsearch.slowlog'
