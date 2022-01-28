@@ -2,7 +2,7 @@ description: Pipeline for parsing the Elasticsearch slow logs in JSON format.
 on_failure:
 - set:
     field: error.message
-    value: '{{ _ingest.on_failure_message }}'
+    value: '{{ _ingest.on_failure_message }} ({{ _ingest.on_failure_pipeline }}/{{ _ingest.on_failure_processor_type }})'
 processors:
 - drop:
     if: ctx.event.dataset != 'elasticsearch.slowlog'
@@ -108,6 +108,62 @@ processors:
     ignore_empty_value: true
 - remove:
     field: elasticsearch.slowlog.ecs.version
+- dot_expander:
+    field: elasticsearch.slowlog.id
+    path: elasticsearch.slowlog
+- rename:
+    field: elasticsearch.slowlog.elasticsearch.slowlog.id
+    target_field: elasticsearch.slowlog.id
+    ignore_missing: true
+- dot_expander:
+    field: elasticsearch.slowlog.search_type
+    path: elasticsearch.slowlog
+- rename:
+    field: elasticsearch.slowlog.elasticsearch.slowlog.search_type
+    target_field: elasticsearch.slowlog.search_type
+    ignore_missing: true
+- dot_expander:
+    field: elasticsearch.slowlog.source
+    path: elasticsearch.slowlog
+- rename:
+    field: elasticsearch.slowlog.elasticsearch.slowlog.source
+    target_field: elasticsearch.slowlog.source
+    ignore_missing: true
+- dot_expander:
+    field: elasticsearch.slowlog.stats
+    path: elasticsearch.slowlog
+- rename:
+    field: elasticsearch.slowlog.elasticsearch.slowlog.stats
+    target_field: elasticsearch.slowlog.stats
+    ignore_missing: true
+- dot_expander:
+    field: elasticsearch.slowlog.took
+    path: elasticsearch.slowlog
+- rename:
+    field: elasticsearch.slowlog.elasticsearch.slowlog.took
+    target_field: elasticsearch.slowlog.took
+    ignore_missing: true
+- dot_expander:
+    field: elasticsearch.slowlog.total_hits
+    path: elasticsearch.slowlog
+- rename:
+    field: elasticsearch.slowlog.elasticsearch.slowlog.total_hits
+    target_field: elasticsearch.slowlog.total_hits
+    ignore_missing: true
+- dot_expander:
+    field: elasticsearch.slowlog.total_shards
+    path: elasticsearch.slowlog
+- rename:
+    field: elasticsearch.slowlog.elasticsearch.slowlog.total_shards
+    target_field: elasticsearch.slowlog.total_shards
+    ignore_missing: true
+- dot_expander:
+    field: trace.id
+    path: elasticsearch.slowlog
+- rename:
+    field: elasticsearch.slowlog.trace.id
+    target_field: trace.id
+    ignore_missing: true
 - set:
     value: "{{ elasticsearch.slowlog.@timestamp }}"
     field: "@timestamp"
