@@ -28,6 +28,11 @@ import (
 // FlagField fields used to keep information or errors when events are parsed.
 const FlagField = "log.flags"
 
+const (
+	timestampFieldKey = "@timestamp"
+	metadataFieldKey  = "@metadata"
+)
+
 // Event is the common event format shared by all beats.
 // Every event must have a timestamp and provide encodable Fields in `Fields`.
 // The `Meta`-fields can be used to pass additional meta-data to the outputs.
@@ -55,28 +60,113 @@ func (e *Event) SetID(id string) {
 }
 
 func (e *Event) GetValue(key string) (interface{}, error) {
-	if key == "@timestamp" {
+	if e == nil {
+		return nil, common.ErrKeyNotFound
+	}
+
+	if key == timestampFieldKey {
 		return e.Timestamp, nil
 	} else if subKey, ok := metadataKey(key); ok {
-		if subKey == "" || e.Meta == nil {
+		if subKey == "" {
 			return e.Meta, nil
 		}
+		if e.Meta == nil {
+			return nil, common.ErrKeyNotFound
+		}
+
 		return e.Meta.GetValue(subKey)
 	}
+
+	if e.Fields == nil {
+		return nil, common.ErrKeyNotFound
+	}
+
 	return e.Fields.GetValue(key)
+
+}
+
+func (e *Event) DeepUpdate(d common.MapStr) {
+	e.deepUpdate(d, true)
+}
+
+func (e *Event) DeepUpdateNoOverwrite(d common.MapStr) {
+	e.deepUpdate(d, false)
+}
+
+func (e *Event) deepUpdate(d common.MapStr, overwrite bool) {
+	if len(d) == 0 {
+		return
+	}
+	fieldsUpdate := d.Clone() // so we can delete redundant keys
+
+	var metaUpdate common.MapStr
+
+	for fieldKey, value := range d {
+		switch fieldKey {
+
+		// one of the updates is the timestamp which is not a part of the event fields
+		case timestampFieldKey:
+			if overwrite {
+				_ = e.setTimestamp(value)
+			}
+			delete(fieldsUpdate, fieldKey)
+
+		// some updates are addressed for the metadata not the fields
+		case metadataFieldKey:
+			switch meta := value.(type) {
+			case common.MapStr:
+				metaUpdate = meta
+			case map[string]interface{}:
+				metaUpdate = common.MapStr(meta)
+			}
+
+			delete(fieldsUpdate, fieldKey)
+		}
+	}
+
+	if metaUpdate != nil {
+		if e.Meta == nil {
+			e.Meta = common.MapStr{}
+		}
+		if overwrite {
+			e.Meta.DeepUpdate(metaUpdate)
+		} else {
+			e.Meta.DeepUpdateNoOverwrite(metaUpdate)
+		}
+	}
+
+	if len(fieldsUpdate) == 0 {
+		return
+	}
+
+	if e.Fields == nil {
+		e.Fields = common.MapStr{}
+	}
+
+	if overwrite {
+		e.Fields.DeepUpdate(fieldsUpdate)
+	} else {
+		e.Fields.DeepUpdateNoOverwrite(fieldsUpdate)
+	}
+}
+
+func (e *Event) setTimestamp(v interface{}) error {
+	switch ts := v.(type) {
+	case time.Time:
+		e.Timestamp = ts
+	case common.Time:
+		e.Timestamp = time.Time(ts)
+	default:
+		return errNoTimestamp
+	}
+
+	return nil
 }
 
 func (e *Event) PutValue(key string, v interface{}) (interface{}, error) {
-	if key == "@timestamp" {
-		switch ts := v.(type) {
-		case time.Time:
-			e.Timestamp = ts
-		case common.Time:
-			e.Timestamp = time.Time(ts)
-		default:
-			return nil, errNoTimestamp
-		}
-		return nil, nil
+	if key == timestampFieldKey {
+		err := e.setTimestamp(v)
+		return nil, err
 	} else if subKey, ok := metadataKey(key); ok {
 		if subKey == "" {
 			switch meta := v.(type) {
@@ -92,7 +182,9 @@ func (e *Event) PutValue(key string, v interface{}) (interface{}, error) {
 		}
 		return e.Meta.Put(subKey, v)
 	}
-
+	if e.Fields == nil {
+		e.Fields = common.MapStr{}
+	}
 	return e.Fields.Put(key, v)
 }
 
@@ -111,11 +203,11 @@ func (e *Event) Delete(key string) error {
 }
 
 func metadataKey(key string) (string, bool) {
-	if !strings.HasPrefix(key, "@metadata") {
+	if !strings.HasPrefix(key, metadataFieldKey) {
 		return "", false
 	}
 
-	subKey := key[len("@metadata"):]
+	subKey := key[len(metadataFieldKey):]
 	if subKey == "" {
 		return "", true
 	}
