@@ -154,6 +154,13 @@ func tlsDialWith(
 		}
 	}
 
+	// We only chech the status of config.Verification (`ssl.verirication_mode`
+	// in the configuration file) because we have a custom verification logic
+	// implemented by setting tlsConfig.VerifyConnection that runs regardless of
+	// the status of tlsConfig.InsecureSkipVerify.
+	// For verification modes VerifyFull and VerifyCeritifcate we set
+	// tlsConfig.InsecureSkipVerify to true, hence it's not an indicator of
+	// whether TLS verification is enabled or not.
 	if config.Verification == tlscommon.VerifyNone {
 		d.Warn("security", "server's certificate chain verification is disabled")
 	} else {
