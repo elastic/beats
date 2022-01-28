@@ -161,6 +161,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add FIPS configuration option for all AWS API calls. {pull}28899[28899]
 - Add `default_region` config to AWS common module. {pull}29415[29415]
 - Add support for latest k8s versions v1.23 and v1.22 {pull}29575[29575]
+- Add `script` processor to all beats {issue}29269[29269] {pull}29752[29752]
 - Only connect to Elasticsearch instances with the same version or newer. {pull}29683[29683]
 - Move umask from code to service files. {pull}29708[29708]
 
