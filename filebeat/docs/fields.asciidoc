@@ -49751,6 +49751,8 @@ example: kibana
 --
 Used by Elasticsearch to throttle and deduplicate deprecation warnings
 
+type: keyword
+
 example: v7app
 
 --
@@ -49759,6 +49761,8 @@ example: v7app
 +
 --
 Category of the deprecation event
+
+type: keyword
 
 example: compatible_api
 
