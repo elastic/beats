@@ -142,6 +142,7 @@ func (procStats *Stats) Get() ([]common.MapStr, error) {
 	// filter the process list that will be passed down to users
 	procStats.includeTopProcesses(plist)
 
+	//Format the list to the MapStr type used by the outputs
 	procs := make([]common.MapStr, 0, len(plist))
 	for _, process := range plist {
 		proc, err := procStats.getProcessEvent(&process)
@@ -179,6 +180,24 @@ func (procStats *Stats) GetSelf() (ProcState, error) {
 	return pidStat, nil
 }
 
+// pidIter wraps a few lines of generic code that all OS-specific FetchPids() functions must call.
+// this also handles the process of adding to the maps/lists in order to limit the code duplication in all the OS implementations
+func (procStats *Stats) pidIter(pid int, procMap map[int]ProcState, proclist []ProcState) (map[int]ProcState, []ProcState) {
+	status, saved, err := procStats.pidFill(pid, true)
+	if err != nil {
+		procStats.logger.Debugf("Error fetching PID info for %d, skipping: %s", pid, err)
+		return procMap, proclist
+	}
+	if !saved {
+		procStats.logger.Debugf("Process name does not matches the provided regex; PID=%d; name=%s", pid, status.Name)
+		return procMap, proclist
+	}
+	procMap[pid] = status
+	proclist = append(proclist, status)
+
+	return procMap, proclist
+}
+
 // pidFill is an entrypoint used by OS-specific code to fill out a pid.
 // This in turn calls various OS-specific code to fill out the various bits of PID data
 // This is done to minimize the code duplication between different OS implementations
@@ -186,11 +205,13 @@ func (procStats *Stats) GetSelf() (ProcState, error) {
 func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	// Fetch proc state so we can get the name for filtering based on user's filter.
 
+	// OS-specific entrypoint, get basic info so we can at least run matchProcess
 	status, err := GetInfoForPid(procStats.Hostfs, pid)
 	if err != nil {
 		return status, true, errors.Wrap(err, "GetInfoForPid")
 	}
 	status = procStats.cacheCmdLine(status)
+
 	// Filter based on user-supplied func
 	if filter {
 		if !procStats.matchProcess(status.Name) {
@@ -230,6 +251,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	return status, true, nil
 }
 
+// cacheCmdLine fills out Env and arg metrics from any stored previous metrics for the pid
 func (procStats *Stats) cacheCmdLine(in ProcState) ProcState {
 	if previousProc, ok := procStats.ProcsMap[in.Pid.ValueOr(0)]; ok {
 		if procStats.CacheCmdLine {
@@ -283,6 +305,7 @@ func (procStats *Stats) matchProcess(name string) bool {
 	return false
 }
 
+// includeTopProcesses filters down the metrics based on top CPU or top Memory settings
 func (procStats *Stats) includeTopProcesses(processes []ProcState) []ProcState {
 	if !procStats.IncludeTop.Enabled ||
 		(procStats.IncludeTop.ByCPU == 0 && procStats.IncludeTop.ByMemory == 0) {

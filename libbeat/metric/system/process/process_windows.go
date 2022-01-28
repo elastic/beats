@@ -47,18 +47,7 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 	var plist []ProcState
 	// This is probably the only implementation that doesn't benefit from our little fillPid callback system. We'll need to iterate over everything manually.
 	for _, pid := range pids {
-		status, saved, err := procStats.pidFill(int(pid), true)
-		if err != nil {
-			procStats.logger.Debugf("Error fetching PID info for %d, skipping: %s", pid, err)
-			continue
-		}
-		if !saved {
-			procStats.logger.Debugf("Process name does not matches the provided regex; PID=%d; name=%s", pid, status.Name)
-			continue
-		}
-
-		procMap[int(pid)] = status
-		plist = append(plist, status)
+		procMap, plist = procStats.pidIter(int(pid), procMap, plist)
 	}
 
 	return procMap, plist, nil

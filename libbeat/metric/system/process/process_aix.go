@@ -46,18 +46,7 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 		if err != nil {
 			return nil, nil, errors.Wrap(err, "error fetching PIDs")
 		}
-
-		status, saved, err := procStats.pidFill(int(info.pi_pid), true)
-		if err != nil {
-			procStats.logger.Debugf("Error fetching PID info for %d, skipping: %s", pid, err)
-			continue
-		}
-		if !saved {
-			procStats.logger.Debugf("Process name does not matches the provided regex; PID=%d; name=%s", pid, status.Name)
-			continue
-		}
-		procMap[int(info.pi_pid)] = status
-		plist = append(plist, status)
+		procMap, plist = procStats.pidIter(int(info.pi_pid), procMap, plist)
 
 		if num == 0 {
 			break
