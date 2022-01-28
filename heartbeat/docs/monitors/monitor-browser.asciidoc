@@ -186,7 +186,7 @@ Defaults to false.
 
 Set this option to control the network throttling. By default, all journeys are
 run with 5Mbps download, 3Mbps upload and 20ms latency which emulates a standard
-Cabel connection.
+Cable connection.
 
 Users can control the throttling parameters, Below is an example of emulating a
 3G connection with 1.6Mbps download, 750Kbps upload and 150ms round trip time.
