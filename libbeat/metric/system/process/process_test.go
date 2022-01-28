@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // numCPU is the number of CPUs of the host
@@ -142,7 +143,7 @@ func TestProcMemPercentage(t *testing.T) {
 	procStats.ProcsMap = make(ProcsMap)
 	procStats.ProcsMap[p.Pid.ValueOr(0)] = p
 
-	rssPercent := GetProcMemPercentage(&p, 10000)
+	rssPercent := GetProcMemPercentage(p, 10000)
 	assert.Equal(t, rssPercent.ValueOr(0), 0.1416)
 }
 
@@ -207,7 +208,7 @@ func BenchmarkGetTop(b *testing.B) {
 	if err != nil {
 		b.Fatalf("Failed init: %s", err)
 	}
-	procs := make(map[int][]common.MapStr)
+	procs := make(map[int][]mb.Event)
 
 	for i := 0; i < b.N; i++ {
 		list, err := stat.Get()

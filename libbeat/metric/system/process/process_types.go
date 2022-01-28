@@ -112,3 +112,73 @@ func (t CPUTicks) IsZero() bool {
 func (t ProcFDInfo) IsZero() bool {
 	return t.Open.IsZero() && t.Limit.Hard.IsZero() && t.Limit.Soft.IsZero()
 }
+
+func (p *ProcState) FormatForRoot() ProcStateRootEvent {
+	root := ProcStateRootEvent{}
+
+	root.Process.Name = p.Name
+	p.Name = ""
+
+	root.Process.Pid = p.Pid
+	p.Pid = opt.NewIntNone()
+
+	root.Process.Parent.Pid = p.Ppid
+	p.Ppid = opt.NewIntNone()
+
+	root.Process.Pgid = p.Pgid
+	p.Pgid = opt.NewIntNone()
+
+	root.User.Name = p.Username
+	p.Username = ""
+
+	root.Process.Cmdline = p.Cmdline
+	root.Process.State = p.State
+	root.Process.CPU.StartTime = p.CPU.StartTime
+	root.Process.CPU.Pct = p.CPU.Total.Norm.Pct
+	root.Process.Memory.Pct = p.Memory.Rss.Pct
+
+	root.Process.Cwd = p.Cwd
+	p.Cwd = ""
+
+	root.Process.Exe = p.Exe
+	p.Exe = ""
+
+	root.Process.Args = p.Args
+	p.Args = nil
+
+	return root
+}
+
+// ProcStateRootEvent represents the "root" beat/agent ECS event fields that are copied from the integration-level event.
+type ProcStateRootEvent struct {
+	Process ProcessRoot `struct:"process,omitempty"`
+	User    Name        `struct:"user,omitempty"`
+}
+
+// ProcessRoot wraps the process metrics for the root ECS fields
+type ProcessRoot struct {
+	Cmdline string        `struct:"command_line,omitempty"`
+	State   string        `struct:"state,omitempty"`
+	CPU     RootCPUFields `struct:"cpu,omitempty"`
+	Memory  opt.PctOpt    `struct:"memory,omitempty"`
+	Cwd     string        `struct:"working_directory,omitempty"`
+	Exe     string        `struct:"executable,omitempty"`
+	Args    []string      `struct:"args,omitempty"`
+	Name    string        `struct:"name,omitempty"`
+	Pid     opt.Int       `struct:"pid,omitempty"`
+	Parent  Parent        `struct:"parent,omitempty"`
+	Pgid    opt.Int       `struct:"pgid,omitempty"`
+}
+
+type Parent struct {
+	Pid opt.Int `struct:"pid,omitempty"`
+}
+
+type Name struct {
+	Name string `struct:"name,omitempty"`
+}
+
+type RootCPUFields struct {
+	StartTime string    `struct:"start_time,omitempty"`
+	Pct       opt.Float `struct:"pct,omitempty"`
+}

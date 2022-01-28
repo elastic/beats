@@ -19,58 +19,9 @@ package opt
 
 import "github.com/elastic/go-structform"
 
-// String
-
-// String is a wrapper for "optional" types, with the bool value indicating
-// if the stored int is a legitimate value.
-type String struct {
-	exists bool
-	value  string
-}
-
-// NewStringNone returns a new OptUint wrapper
-func NewStringNone() String {
-	return String{
-		exists: false,
-		value:  "",
-	}
-}
-
-// StringWith returns a new OptUint wrapper with a given int
-func StringWith(s string) String {
-	return String{
-		exists: true,
-		value:  s,
-	}
-}
-
-// IsZero returns true if the underlying value nil
-func (opt String) IsZero() bool {
-	return !opt.exists
-}
-
-// Exists returns true if the underlying value exists
-func (opt String) Exists() bool {
-	return opt.exists
-}
-
-// StringOrEmpty returns the string, or ""
-func (opt String) StringOrEmpty() string {
-	if opt.exists {
-		return opt.value
-	}
-	return ""
-}
-
-// Fold implements the folder interface for OptUint
-func (in *String) Fold(v structform.ExtVisitor) error {
-	if in.exists {
-		value := in.value
-		v.OnString(value)
-	} else {
-		v.OnNil()
-	}
-	return nil
+// ZeroInterface is a type interface for cases where we need to cast from a void pointer
+type ZeroInterface interface {
+	IsZero() bool
 }
 
 // Int
@@ -83,8 +34,8 @@ type Int struct {
 }
 
 // NewUintNone returns a new OptUint wrapper
-func NewIntNone() Uint {
-	return Uint{
+func NewIntNone() Int {
+	return Int{
 		exists: false,
 		value:  0,
 	}

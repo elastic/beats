@@ -11,30 +11,26 @@
     },
     "process": {
         "args": [
-            "/home/alexk/.vscode-server/bin/7f6ab5485bbc008386c4386d08766667e155244e/node",
-            "/home/alexk/.vscode-server/bin/7f6ab5485bbc008386c4386d08766667e155244e/out/vs/server/main.js",
-            "--start-server",
-            "--host=127.0.0.1",
-            "--enable-remote-auto-shutdown",
-            "--port=0",
-            "--connection-secret",
-            "/home/alexk/.vscode-server/.7f6ab5485bbc008386c4386d08766667e155244e.token"
+            "/home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/node",
+            "/home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/out/bootstrap-fork",
+            "--type=extensionHost",
+            "--uriTransformerPath=/home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/out/vs/server/uriTransformer.js"
         ],
-        "command_line": "/home/alexk/.vscode-server/bin/7f6ab5485bbc008386c4386d08766667e155244e/node /home/alexk/.vscode-server/bin/7f6ab5485bbc008386c4386d08766667e155244e/out/vs/server/main.js --start-server --host=127.0.0.1 --enable-remote-auto-shutdown --port=0 --connection-secret /home/alexk/.vscode-server/.7f6ab5485bbc008386c4386d08766667e155244e.token",
+        "command_line": "/home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/node /home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/out/bootstrap-fork --type=extensionHost --uriTransformerPath=/home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/out/vs/server/uriTransformer.js",
         "cpu": {
-            "pct": 0,
-            "start_time": "2021-11-15T05:02:43.000Z"
+            "pct": 0.0044,
+            "start_time": "2022-01-26T22:33:31.000Z"
         },
-        "executable": "/home/alexk/.vscode-server/bin/7f6ab5485bbc008386c4386d08766667e155244e/node",
+        "executable": "/home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/node",
         "memory": {
-            "pct": 0.001
+            "pct": 0.0027
         },
         "name": "node",
         "parent": {
-            "pid": 932570
+            "pid": 3932
         },
-        "pgid": 932516,
-        "pid": 932578,
+        "pgid": 3866,
+        "pid": 1517341,
         "state": "sleeping",
         "working_directory": "/home/alexk"
     },
@@ -43,11 +39,11 @@
     },
     "system": {
         "process": {
-            "cgroup": {
+            "cgroups": {
                 "cgroups_version": 2,
                 "cpu": {
-                    "id": "session-6.scope",
-                    "path": "/user.slice/user-1000.slice/session-6.scope",
+                    "id": "session-3.scope",
+                    "path": "/user.slice/user-1000.slice/session-3.scope",
                     "pressure": {
                         "full": {
                             "10": {
@@ -59,19 +55,19 @@
                             "60": {
                                 "pct": 0
                             },
-                            "total": 3879840
+                            "total": 41622197425
                         },
                         "some": {
                             "10": {
-                                "pct": 0
+                                "pct": 0.28
                             },
                             "300": {
-                                "pct": 0
+                                "pct": 0.15
                             },
                             "60": {
-                                "pct": 0
+                                "pct": 0.31
                             },
-                            "total": 3899569
+                            "total": 44879249709
                         }
                     },
                     "stats": {
@@ -79,28 +75,28 @@
                             "norm": {
                                 "pct": 0
                             },
-                            "ns": 69699800,
-                            "pct": 0
+                            "ns": 42759669745,
+                            "pct": 0.0001
                         },
                         "usage": {
                             "norm": {
                                 "pct": 0
                             },
-                            "ns": 311034237,
-                            "pct": 0
+                            "ns": 175249141994,
+                            "pct": 0.0002
                         },
                         "user": {
                             "norm": {
                                 "pct": 0
                             },
-                            "ns": 241334437,
-                            "pct": 0
+                            "ns": 132489472249,
+                            "pct": 0.0001
                         }
                     }
                 },
-                "id": "session-6.scope",
+                "id": "session-3.scope",
                 "memory": {
-                    "id": "session-6.scope",
+                    "id": "session-3.scope",
                     "mem": {
                         "events": {
                             "high": 0,
@@ -113,7 +109,7 @@
                             "bytes": 0
                         },
                         "usage": {
-                            "bytes": 81653760
+                            "bytes": 19519815680
                         }
                     },
                     "memsw": {
@@ -126,31 +122,31 @@
                             "bytes": 0
                         },
                         "usage": {
-                            "bytes": 0
+                            "bytes": 49192960
                         }
                     },
-                    "path": "/user.slice/user-1000.slice/session-6.scope",
+                    "path": "/user.slice/user-1000.slice/session-3.scope",
                     "stats": {
                         "active_anon": {
-                            "bytes": 12288
+                            "bytes": 173719552
                         },
                         "active_file": {
-                            "bytes": 507904
+                            "bytes": 5222309888
                         },
                         "anon": {
-                            "bytes": 42983424
+                            "bytes": 4153999360
                         },
                         "anon_thp": {
-                            "bytes": 0
+                            "bytes": 249561088
                         },
                         "file": {
-                            "bytes": 34598912
+                            "bytes": 14433026048
                         },
                         "file_dirty": {
                             "bytes": 0
                         },
                         "file_mapped": {
-                            "bytes": 28467200
+                            "bytes": 88780800
                         },
                         "file_thp": {
                             "bytes": 0
@@ -158,76 +154,83 @@
                         "file_writeback": {
                             "bytes": 0
                         },
-                        "htp_collapse_alloc": 0,
+                        "htp_collapse_alloc": 565,
                         "inactive_anon": {
-                            "bytes": 42967040
+                            "bytes": 4497219584
                         },
                         "inactive_file": {
-                            "bytes": 34091008
+                            "bytes": 9164648448
                         },
                         "kernel_stack": {
-                            "bytes": 376832
+                            "bytes": 3063808
                         },
-                        "major_page_faults": 289,
-                        "page_activate": 135,
-                        "page_deactivate": 0,
-                        "page_faults": 766278,
+                        "major_page_faults": 12739,
+                        "page_activate": 3565607,
+                        "page_deactivate": 289941,
+                        "page_faults": 766722940,
                         "page_lazy_free": 0,
                         "page_lazy_freed": 0,
-                        "page_refill": 0,
-                        "page_scan": 0,
-                        "page_steal": 0,
+                        "page_refill": 299271,
+                        "page_scan": 9095305,
+                        "page_steal": 8904374,
                         "page_tables": {
-                            "bytes": 2310144
+                            "bytes": 41185280
                         },
                         "per_cpu": {
                             "bytes": 0
                         },
                         "shmem": {
-                            "bytes": 0
+                            "bytes": 46067712
                         },
                         "shmem_thp": {
                             "bytes": 0
                         },
                         "slab": {
-                            "bytes": 766496
+                            "bytes": 413503728
                         },
                         "slab_reclaimable": {
-                            "bytes": 298512
+                            "bytes": 399503176
                         },
                         "slab_unreclaimable": {
-                            "bytes": 467984
+                            "bytes": 14000552
                         },
                         "sock": {
-                            "bytes": 0
+                            "bytes": 4096
                         },
                         "swap_cached": {
-                            "bytes": 0
+                            "bytes": 237568
                         },
-                        "thp_fault_alloc": 0,
+                        "thp_fault_alloc": 5646,
                         "unevictable": {
-                            "bytes": 0
+                            "bytes": 20480
                         },
-                        "workingset_activate_anon": 0,
-                        "workingset_activate_file": 0,
+                        "workingset_activate_anon": 1456,
+                        "workingset_activate_file": 107169,
                         "workingset_node_reclaim": 0,
-                        "workingset_refault_anon": 0,
-                        "workingset_refault_file": 0,
+                        "workingset_refault_anon": 3841,
+                        "workingset_refault_file": 1422155,
                         "workingset_restore_anon": 0,
-                        "workingset_restore_file": 0
+                        "workingset_restore_file": 3851
                     }
                 },
-                "path": "/user.slice/user-1000.slice/session-6.scope"
+                "path": "/user.slice/user-1000.slice/session-3.scope"
             },
-            "cmdline": "/home/alexk/.vscode-server/bin/7f6ab5485bbc008386c4386d08766667e155244e/node /home/alexk/.vscode-server/bin/7f6ab5485bbc008386c4386d08766667e155244e/out/vs/server/main.js --start-server --host=127.0.0.1 --enable-remote-auto-shutdown --port=0 --connection-secret /home/alexk/.vscode-server/.7f6ab5485bbc008386c4386d08766667e155244e.token",
+            "cmdline": "/home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/node /home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/out/bootstrap-fork --type=extensionHost --uriTransformerPath=/home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/out/vs/server/uriTransformer.js",
             "cpu": {
-                "start_time": "2021-11-15T05:02:43.000Z",
+                "start_time": "2022-01-26T22:33:31.000Z",
+                "system": {
+                    "ticks": 3007180
+                },
                 "total": {
                     "norm": {
-                        "pct": 0
+                        "pct": 0.0044
                     },
-                    "pct": 0,
-                    "value": 226260
+                    "pct": 0.0528,
+                    "ticks": 8559930,
+                    "value": 8559930
+                },
+                "user": {
+                    "ticks": 5552750
                 }
             },
             "fd": {
@@ -235,15 +238,15 @@
                     "hard": 524288,
                     "soft": 524288
                 },
-                "open": 23
+                "open": 41
             },
             "memory": {
                 "rss": {
-                    "bytes": 64372736,
-                    "pct": 0.001
+                    "bytes": 170172416,
+                    "pct": 0.0027
                 },
-                "share": 32768000,
-                "size": 948490240
+                "share": 39923712,
+                "size": 1041936384
             },
             "state": "sleeping"
         }

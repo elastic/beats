@@ -38,6 +38,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	sysinfo "github.com/elastic/go-sysinfo"
 )
 
@@ -123,8 +124,8 @@ func (procStats *Stats) Init() error {
 	return nil
 }
 
-// Get fetches the configured processes and returns a formatted map
-func (procStats *Stats) Get() ([]common.MapStr, error) {
+// Get fetches the configured processes and returns a formatted map, plus the root event
+func (procStats *Stats) Get() ([]mb.Event, error) {
 	//If the user hasn't configured any kind of process glob, return
 	if len(procStats.Procs) == 0 {
 		return nil, nil
@@ -142,14 +143,38 @@ func (procStats *Stats) Get() ([]common.MapStr, error) {
 	// filter the process list that will be passed down to users
 	procStats.includeTopProcesses(plist)
 
+	// This is a holdover until we migrate this library to metricbeat/internal
+	// At which point we'll use the memory code there.
+	var totalPhyMem uint64
+	if procStats.host != nil {
+		memStats, err := procStats.host.Memory()
+		if err != nil {
+			procStats.logger.Warnf("Getting memory details: %v", err)
+		} else {
+			totalPhyMem = memStats.Total
+		}
+
+	}
+
 	//Format the list to the MapStr type used by the outputs
-	procs := make([]common.MapStr, 0, len(plist))
+	procs := make([]mb.Event, 0, len(plist))
 	for _, process := range plist {
+		// Add the RSS pct memory first
+		process.Memory.Rss.Pct = GetProcMemPercentage(process, totalPhyMem)
+		//Create the root event
+		root := process.FormatForRoot()
+		rootMap := common.MapStr{}
+		err := typeconv.Convert(&rootMap, root)
+
 		proc, err := procStats.getProcessEvent(&process)
 		if err != nil {
 			return nil, errors.Wrapf(err, "error converting process for pid %d", process.Pid.ValueOr(0))
 		}
-		procs = append(procs, proc)
+		procEvt := mb.Event{
+			MetricSetFields: proc,
+			RootFields:      rootMap,
+		}
+		procs = append(procs, procEvt)
 	}
 
 	return procs, nil
@@ -230,6 +255,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 
 	//postprocess with cgroups and percentages
 	last, ok := procStats.ProcsMap[status.Pid.ValueOr(0)]
+	status.SampleTime = time.Now()
 	if procStats.EnableCgroups {
 		cgStats, err := procStats.cgroups.GetStatsForPid(status.Pid.ValueOr(0))
 		if err != nil {
@@ -240,7 +266,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 			status.Cgroup.FillPercentages(last.Cgroup, status.SampleTime, last.SampleTime)
 		}
 	} // end cgroups processor
-	status.SampleTime = time.Now()
+
 	if ok {
 		cpuTotalPctNorm, cpuTotalPct, cpuTotalValue := GetProcCPUPercentage(last, status)
 		status.CPU.Total.Norm.Pct = opt.FloatWith(cpuTotalPctNorm)
@@ -266,21 +292,6 @@ func (procStats *Stats) cacheCmdLine(in ProcState) ProcState {
 
 // return a formatted MapStr of the process metrics
 func (procStats *Stats) getProcessEvent(process *ProcState) (common.MapStr, error) {
-
-	// This is a holdover until we migrate this library to metricbeat/internal
-	// At which point we'll use the memory code there.
-	var totalPhyMem uint64
-	if procStats.host != nil {
-		memStats, err := procStats.host.Memory()
-		if err != nil {
-			procStats.logger.Warnf("Getting memory details: %v", err)
-		} else {
-			totalPhyMem = memStats.Total
-		}
-
-	}
-
-	process.Memory.Rss.Pct = GetProcMemPercentage(process, totalPhyMem)
 
 	// Remove CPUTicks if needed
 	if !procStats.CPUTicks {
@@ -346,10 +357,10 @@ func (procStats *Stats) includeTopProcesses(processes []ProcState) []ProcState {
 }
 
 // isWhitelistedEnvVar returns true if the given variable name is a match for
-// the whitelist. If the whitelist is empty it returns true.
+// the whitelist. If the whitelist is empty it returns false.
 func (procStats Stats) isWhitelistedEnvVar(varName string) bool {
 	if len(procStats.envRegexps) == 0 {
-		return true
+		return false
 	}
 
 	for _, p := range procStats.envRegexps {

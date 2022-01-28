@@ -26,6 +26,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/metric/system/process"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 )
@@ -65,8 +66,9 @@ func getConfig() map[string]interface{} {
 		"module":                        "system",
 		"metricsets":                    []string{"process"},
 		"processes":                     []string{".*"}, // in case we want a prettier looking example for data.json
-		"process.cgroups.enabled":       false,
+		"process.cgroups.enabled":       true,
 		"process.include_cpu_ticks":     true,
 		"process.cmdline.cache.enabled": true,
+		"process.include_top_n":         process.IncludeTopConfig{Enabled: true, ByCPU: 5},
 	}
 }

@@ -40,7 +40,7 @@ func stripNullByteRaw(buf []byte) []byte {
 }
 
 // GetProcMemPercentage returns process memory usage as a percent of total memory usage
-func GetProcMemPercentage(proc *ProcState, totalPhyMem uint64) opt.Float {
+func GetProcMemPercentage(proc ProcState, totalPhyMem uint64) opt.Float {
 	if totalPhyMem == 0 {
 		return opt.NewFloatNone()
 	}
