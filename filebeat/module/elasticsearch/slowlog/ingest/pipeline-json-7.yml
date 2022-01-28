@@ -4,9 +4,6 @@ on_failure:
     field: error.message
     value: '{{ _ingest.on_failure_message }}'
 processors:
-- json:
-    field: message
-    target_field: elasticsearch.slowlog
 - drop:
     if: ctx.elasticsearch.slowlog.type != 'index_indexing_slowlog' && ctx.elasticsearch.slowlog.type
       != 'index_search_slowlog'
