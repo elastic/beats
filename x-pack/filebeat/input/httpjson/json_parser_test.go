@@ -175,9 +175,9 @@ func TestGetArrayValue(t *testing.T) {
 	}
 }
 
-func TestParse(t *testing.T) {
+func TestGetKeyedArrayValue(t *testing.T) {
 	type args struct {
-		rawJSON string
+		rawData []byte
 		key     string
 	}
 	tests := []struct {
@@ -189,7 +189,7 @@ func TestParse(t *testing.T) {
 		{
 			name: "will return a array of string from JSON",
 			args: args{
-				rawJSON: `{"a": "a_value"}`,
+				rawData: []byte(`{"a": "a_value"}`),
 				key:     "a",
 			},
 			want:    []string{"a_value"},
@@ -198,7 +198,7 @@ func TestParse(t *testing.T) {
 		{
 			name: "will return a array of string from JSON",
 			args: args{
-				rawJSON: `{"a": {"b": "b_value"}}`,
+				rawData: []byte(`{"a": {"b": "b_value"}}`),
 				key:     "a.b",
 			},
 			want:    []string{"b_value"},
@@ -207,7 +207,7 @@ func TestParse(t *testing.T) {
 		{
 			name: "will return a array of string from JSON",
 			args: args{
-				rawJSON: `{"a": [{"b": "b_value_1"},{"b": "b_value_2"},{"b": "b_value_3"}]}`,
+				rawData: []byte(`{"a": [{"b": "b_value_1"},{"b": "b_value_2"},{"b": "b_value_3"}]}`),
 				key:     "a.#.b",
 			},
 			want:    []string{"b_value_1", "b_value_2", "b_value_3"},
@@ -216,7 +216,7 @@ func TestParse(t *testing.T) {
 		{
 			name: "will return a array of string from JSON",
 			args: args{
-				rawJSON: `[{"b": "b_value_1"},{"b": "b_value_2"},{"b": "b_value_3"}]`,
+				rawData: []byte(`[{"b": "b_value_1"},{"b": "b_value_2"},{"b": "b_value_3"}]`),
 				key:     "#.b",
 			},
 			want:    []string{"b_value_1", "b_value_2", "b_value_3"},
@@ -225,7 +225,7 @@ func TestParse(t *testing.T) {
 		{
 			name: "will return a array of string from JSON",
 			args: args{
-				rawJSON: `{"a":[{"b":{"c":"c_value_1"}},{"b":{"c":"c_value_2"}},{"b":{"c":"c_value_3"}}]}`,
+				rawData: []byte(`{"a":[{"b":{"c":"c_value_1"}},{"b":{"c":"c_value_2"}},{"b":{"c":"c_value_3"}}]}`),
 				key:     "a.#.b.c",
 			},
 			want:    []string{"c_value_1", "c_value_2", "c_value_3"},
@@ -234,7 +234,7 @@ func TestParse(t *testing.T) {
 		{
 			name: "returns an error if the key is not found",
 			args: args{
-				rawJSON: `{"a":[{"b":{"c":"c_value_1"}},{"b":{"c":"c_value_2"}},{"b":{"c":"c_value_3"}}]}`,
+				rawData: []byte(`{"a":[{"b":{"c":"c_value_1"}},{"b":{"c":"c_value_2"}},{"b":{"c":"c_value_3"}}]}`),
 				key:     "a.b.c",
 			},
 			wantErr: true,
@@ -242,7 +242,7 @@ func TestParse(t *testing.T) {
 		{
 			name: "returns an error if the key is not found",
 			args: args{
-				rawJSON: `{"a":[{"b":{"c":"c_value_1"}},{"b":{"c":"c_value_2"}},{"b":{"c":"c_value_3"}}]}`,
+				rawData: []byte(`{"a":[{"b":{"c":"c_value_1"}},{"b":{"c":"c_value_2"}},{"b":{"c":"c_value_3"}}]}`),
 				key:     "a.b.#.c",
 			},
 			wantErr: true,
@@ -250,19 +250,19 @@ func TestParse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := parse(tt.args.rawJSON, tt.args.key)
+			got, err := getKeyedArrayValue(tt.args.rawData, tt.args.key)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("parse() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("getKeyedArrayValue() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("parse() = %v, want %v", got, tt.want)
+				t.Errorf("getKeyedArrayValue() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestParseInterface(t *testing.T) {
+func TestGetKeyedInterfaceValues(t *testing.T) {
 	type args struct {
 		data interface{}
 		key  string
@@ -419,13 +419,13 @@ func TestParseInterface(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotValues, err := parseInterface(tt.args.data, tt.args.key)
+			gotValues, err := getKeyedInterfaceValues(tt.args.data, tt.args.key)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("parseInterface() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("getKeyedInterfaceValues() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(gotValues, tt.wantValues) {
-				t.Errorf("parseInterface() = %v, want %v", gotValues, tt.wantValues)
+				t.Errorf("getKeyedInterfaceValues() = %v, want %v", gotValues, tt.wantValues)
 			}
 		})
 	}

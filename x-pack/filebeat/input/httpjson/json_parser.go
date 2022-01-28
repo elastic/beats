@@ -10,43 +10,43 @@ import (
 	"strings"
 )
 
-// parse returns array of string values from JSON string
+// getKeyedArrayValue returns array of string values from JSON string
 //
 // Examples:
 // input:
-//   rawJSON={"a":[{"b":"b_value_1"},{"b":"b_value_2"},{"b":"b_value_3"}]}
+//   rawData={"a":[{"b":"b_value_1"},{"b":"b_value_2"},{"b":"b_value_3"}]}
 //   key=a.#.b
 // output:
-//   ["a_value_1", "a_value_2"]
+//   ["b_value_1", "b_value_2", "b_value_3"]
 // input:
-//   rawJSON=[{"a":"a_value_1"},{"a":"a_value_2"}]
+//   rawData=[{"a":"a_value_1"},{"a":"a_value_2"}]
 //   key=#.a
 // output:
 //   ["a_value_1", "a_value_2"]
-func parse(rawJSON, key string) ([]string, error) {
+func getKeyedArrayValue(rawData []byte, key string) ([]string, error) {
 	var data interface{}
-	err := json.Unmarshal([]byte(rawJSON), &data)
+	err := json.Unmarshal(rawData, &data)
 	if err != nil {
 		return nil, fmt.Errorf("cannot unmarshal input data: %w", err)
 	}
-	values, err := parseInterface(data, key)
+	values, err := getKeyedInterfaceValues(data, key)
 	if err != nil {
 		return nil, fmt.Errorf("error while parsing JSON: %w", err)
 	}
 	return values, nil
 }
 
-// parseInterface returns array of string values from JSON data interface
+// getKeyedInterfaceValues returns array of string values from JSON data interface
 //
 // Examples:
 // input:
-// 	 data=
-//   {
-//   	"a": {
-//   		"b": "b_value",
-//   	},
-//   }
-//   key=a..b
+//   data=
+// 	 {
+// 	 	"a": {
+// 	 		"b": "b_value",
+// 	 	},
+// 	 }
+//   key=a.b
 // output:
 //   ["b_value"]
 // input:
@@ -64,7 +64,7 @@ func parse(rawJSON, key string) ([]string, error) {
 //   key=a.#.b
 // output:
 //   ["b_value_1", "b_value_2"]
-func parseInterface(data interface{}, key string) (values []string, err error) {
+func getKeyedInterfaceValues(data interface{}, key string) (values []string, err error) {
 	splitKey := strings.Split(key, ".")
 	for i, key := range splitKey {
 		switch key {
@@ -86,7 +86,7 @@ func parseInterface(data interface{}, key string) (values []string, err error) {
 					values = append(values, value)
 				} else {
 					joinKey := strings.Join(splitKey[i+2:], ".")
-					final, err := parseInterface(el, joinKey)
+					final, err := getKeyedInterfaceValues(el, joinKey)
 					if err != nil {
 						return nil, fmt.Errorf("error while parsing json: %w", err)
 					}
@@ -122,14 +122,14 @@ func parseInterface(data interface{}, key string) (values []string, err error) {
 // input:
 //   key=a
 //   array=
-//   [
-//   	{
+// 	 [
+// 	 	{
 //   		"a": "a_value_1",
-//   	},
-//   	{
-//   		"a": "a_value_2",
-//   	},
-//   ]
+// 	 	},
+// 	 	{
+// 	 		"a": "a_value_2",
+// 	 	},
+// 	 ]
 // output:
 //   ["a_value_1", "a_value_2"]
 func getArrayValue(key string, array []interface{}) ([]interface{}, error) {
@@ -158,23 +158,23 @@ func getArrayValue(key string, array []interface{}) ([]interface{}, error) {
 // input:
 //   key=a
 //   data=
-//   {
-//   	"a": "a_value",
-//   }
+// 	 {
+// 	 	"a": "a_value",
+// 	 }
 // output:
 //   a_value
 // input:
 //   key=a
 //   data=
-//   {
-//   	"a": {
-//   		"b": "b_value",
-//   	},
-//   }
+// 	 {
+// 	 	"a": {
+// 	 		"b": "b_value",
+// 	 	},
+// 	 }
 // output:
-//   {
-//   	"b": "b_value",
-//   }
+// 	 {
+// 	 	"b": "b_value",
+// 	 }
 func getMapValue(key string, data interface{}) (interface{}, error) {
 	if m, ok := data.(map[string]interface{}); ok {
 		if value, ok := m[key]; ok {

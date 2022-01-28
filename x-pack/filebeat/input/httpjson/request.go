@@ -220,7 +220,6 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		intermediateResps []*http.Response
 		finalResps        []*http.Response
 	)
-	rfSize := len(r.requestFactories)
 	for i, rf := range r.requestFactories {
 		// iterate over collected ids from last response
 		if i == 0 {
@@ -229,7 +228,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			if err != nil {
 				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
-			if rfSize == 1 {
+			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
 				n, err = r.processAndPublishEvents(stdCtx, trCtx, publisher, finalResps, true)
 				if err != nil {
@@ -268,7 +267,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 					return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 				}
 				// store data according to response type
-				if i == rfSize-1 && len(ids) != 0 {
+				if i == len(r.requestFactories)-1 && len(ids) != 0 {
 					finalResps = append(finalResps, httpResp)
 				} else {
 					intermediateResps = append(intermediateResps, httpResp)
@@ -276,29 +275,25 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			}
 			rf.url = urlCopy
 
-			if i == rfSize-1 {
-				split = r.responseProcessor.split
-				r.responseProcessor.split = rf.split
-				n, err = r.processAndPublishEvents(stdCtx, trCtx, publisher, finalResps, true)
-				if err != nil {
-					return err
-				}
-				r.responseProcessor.split = split
+			var resps []*http.Response
+			if i < len(r.requestFactories) {
+				resps = finalResps
 			} else {
-				// The if comdition (i == rfSize-1) ensures this branch never runs to the last element
+				// The if comdition (i < len(r.requestFactories)) ensures this branch never runs to the last element
 				// of r.requestFactories, therefore r.requestFactories[i+1] will never be out of bounds.
 				ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[i+1].replace)
 				if err != nil {
 					return err
 				}
-				split = r.responseProcessor.split
-				r.responseProcessor.split = rf.split
-				n, err = r.processAndPublishEvents(stdCtx, trCtx, publisher, intermediateResps, false)
-				if err != nil {
-					return err
-				}
-				r.responseProcessor.split = split
+				resps = intermediateResps
 			}
+			split = r.responseProcessor.split
+			r.responseProcessor.split = rf.split
+			n, err = r.processAndPublishEvents(stdCtx, trCtx, publisher, resps, i < len(r.requestFactories))
+			if err != nil {
+				return err
+			}
+			r.responseProcessor.split = split
 		}
 	}
 
@@ -324,7 +319,7 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 		}
 
 		// get replace values from collected json
-		ids, err = parse(string(b), replace.String())
+		ids, err = getKeyedArrayValue(b, replace.String())
 		if err != nil {
 			return nil, fmt.Errorf("error while getting keys: %w", err)
 		}
