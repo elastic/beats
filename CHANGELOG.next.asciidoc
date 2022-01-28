@@ -354,7 +354,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support in aws-s3 input for s3 notification from SNS to SQS. {pull}28800[28800]
 - Add support in aws-s3 input for custom script parsing of s3 notifications. {pull}28946[28946]
 - Improve error handling in aws-s3 input for malformed s3 notifications. {issue}28828[28828] {pull}28946[28946]
-- Add commetD input to retrieve logs from Salesforce Streaming API. {pull}#[#]
 - Add support for parsers on journald input {pull}29070[29070]
 - Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
 
