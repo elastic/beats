@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 // this work for additional information regarding copyright
 // ownership. Elasticsearch B.V. licenses this file to you under
 // the Apache License, Version 2.0 (the "License"); you may
