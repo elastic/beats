@@ -49951,6 +49951,20 @@ type: boolean
 
 --
 
+*`elasticsearch.audit.authentication.type`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.audit.opaque_id`*::
++
+--
+type: text
+
+--
+
 [float]
 === deprecation
 
