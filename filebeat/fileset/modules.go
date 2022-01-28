@@ -55,7 +55,6 @@ func newModuleRegistry(modulesPath string,
 		if mcfg.Module == "" || (mcfg.Enabled != nil && !(*mcfg.Enabled)) {
 			continue
 		}
-		logp.Info("Enabled " + mcfg.Module)
 		// Look for moved modules
 		if module, moved := getCurrentModuleName(modulesPath, mcfg.Module); moved {
 			reg.log.Warnf("Configuration uses the old name %q for module %q, please update your configuration.", mcfg.Module, module)
@@ -101,14 +100,14 @@ func newModuleRegistry(modulesPath string,
 		reg.registry = append(reg.registry, registry)
 	}
 
-	logp.Info("Enabled modules/filesets: %s", reg.InfoString())
+	reg.log.Infof("Enabled modules/filesets: %s", reg.InfoString())
 	for _, mod := range reg.ModuleNames() {
 		if mod == "" {
 			continue
 		}
 		filesets, err := reg.ModuleConfiguredFilesets(mod)
 		if err != nil {
-			logp.Err("Failed listing filesets for module %s", mod)
+			reg.log.Errorf("Failed listing filesets for module %s", mod)
 			continue
 		}
 		if len(filesets) == 0 {
