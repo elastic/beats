@@ -88,16 +88,7 @@ spec:
 ===== Red Hat OpenShift configuration
 
 If you are using Red Hat OpenShift, you need to specify additional settings in
-the manifest file and enable the container to run as privileged.
-
-. Modify the `DaemonSet` container spec in the manifest file:
-+
-[source,yaml]
------
-  securityContext:
-    runAsUser: 0
-    privileged: true
------
+the manifest file and enable the container to run as privileged.åå
 
 . In the manifest file, edit the `metricbeat-daemonset-modules` ConfigMap, and
 specify the following settings under `kubernetes.yml` in the `data` section:
@@ -145,14 +136,6 @@ Data
 ca-bundle.crt:
 -----
 
-. Under the `metricbeat` ClusterRole, add the following resources:
-+
-[source,yaml]
------
-  - nodes/metrics
-  - nodes/stats
------
-
 . Grant the `metricbeat` service account access to the privileged SCC:
 +
 [source,shell]
@@ -163,8 +146,9 @@ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:metri
 This command enables the container to be privileged as an administrator for
 OpenShift.
 
-. Override the default node selector for the `kube-system` namespace (or your
-custom namespace) to allow for scheduling on any node:
+. If namespace, where elastic-agent is running, has `"openshift.io/node-selector"` annotation set, elastic-agent
+might get running not on all nodes. In this case consider overriding node selector for the namespace to allow
+scheduling on any node:
 +
 [source,shell]
 ----
