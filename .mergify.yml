@@ -21,6 +21,7 @@ pull_request_rules:
       - -merged
       - -closed
       - conflict
+      - -author=apmmachine
     actions:
         comment:
           message: |
@@ -32,6 +33,18 @@ pull_request_rules:
             git merge upstream/{{base}}
             git push upstream {{head}}
             ```
+  - name: close automated pull requests with bump updates if any conflict
+    conditions:
+      - -merged
+      - -closed
+      - conflict
+      - author=apmmachine
+      - label=automation
+    actions:
+      close:
+        message: |
+          This pull request has been automatically closed by Mergify.
+          There are some other up-to-date pull requests.
   - name: automatic approval for automated pull requests with bump updates
     conditions:
       - author=apmmachine

@@ -135,6 +135,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 
 			if memLimit > 0 {
 				containerEvent.Put("memory.usage.limit.pct", float64(container.Memory.UsageBytes)/memLimit)
+				containerEvent.Put("memory.workingset.limit.pct", float64(container.Memory.WorkingSetBytes)/memLimit)
 			}
 
 			events = append(events, containerEvent)

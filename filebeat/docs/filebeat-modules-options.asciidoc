@@ -1,4 +1,4 @@
-:modulename: system nginx mysql
+:modulename: nginx
 
 [id="configuration-{beatname_lc}-modules"]
 == Configure modules

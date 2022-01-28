@@ -159,10 +159,6 @@ func initRand() {
 // instance.
 // XXX Move this as a *Beat method?
 func Run(settings Settings, bt beat.Creator) error {
-	err := setUmaskWithSettings(settings)
-	if err != nil && err != errNotImplemented {
-		return errw.Wrap(err, "could not set umask")
-	}
 
 	return handleError(func() error {
 		defer func() {
@@ -327,6 +323,8 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	logSystemInfo(b.Info)
 	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
+
+	b.checkElasticsearchVersion()
 
 	err = b.registerESIndexManagement()
 	if err != nil {
@@ -871,6 +869,37 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	return nil
 }
 
+// checkElasticsearchVersion registers a global callback to make sure ES instance we are connecting
+// to is at least on the same version as the Beat.
+// If the check is disabled or the output is not Elasticsearch, nothing happens.
+func (b *Beat) checkElasticsearchVersion() {
+	if b.Config.Output.Name() != "elasticsearch" || b.isConnectionToOlderVersionAllowed() {
+		return
+	}
+
+	elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
+		esVersion := conn.GetVersion()
+		beatVersion, err := common.NewVersion(b.Info.Version)
+		if err != nil {
+			return err
+		}
+		if esVersion.LessThan(beatVersion) {
+			return fmt.Errorf("%v ES=%s, Beat=%s.", elasticsearch.ErrTooOld, esVersion.String(), b.Info.Version)
+		}
+		return nil
+	})
+}
+
+func (b *Beat) isConnectionToOlderVersionAllowed() bool {
+	config := struct {
+		AllowOlder bool `config:"allow_older_versions"`
+	}{false}
+
+	b.Config.Output.Config().Unpack(&config)
+
+	return config.AllowOlder
+}
+
 // registerESIndexManagement registers the loading of the template and ILM
 // policy as a callback with the elasticsearch output. It is important the
 // registration happens before the publisher is created.
@@ -1156,11 +1185,4 @@ func initPaths(cfg *common.Config) error {
 		return fmt.Errorf("error setting default paths: %+v", err)
 	}
 	return nil
-}
-
-func setUmaskWithSettings(settings Settings) error {
-	if settings.Umask != nil {
-		return setUmask(*settings.Umask)
-	}
-	return setUmask(0027) // 0640 for files | 0750 for dirs
 }

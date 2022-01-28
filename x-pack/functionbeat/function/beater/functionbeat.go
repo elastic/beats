@@ -56,6 +56,7 @@ type Functionbeat struct {
 
 // New creates an instance of functionbeat.
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+
 	c := &config.DefaultConfig
 	if err := cfg.Unpack(c); err != nil {
 		return nil, fmt.Errorf("error reading config file: %+v", err)
@@ -83,6 +84,8 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 // Run starts functionbeat.
 func (bt *Functionbeat) Run(b *beat.Beat) error {
 	defer bt.cancel()
+
+	bt.log.Warn("Functionbeat is going to be removed in 8.1")
 
 	outputName := b.Config.Output.Name()
 	if !isOutputSupported(outputName) {

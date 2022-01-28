@@ -1,0 +1,20 @@
+---
+description: Winlogbeat Routing Pipeline
+processors:
+  - pipeline:
+      name: '{< IngestPipeline "security" >}'
+      if: ctx?.winlog?.channel == 'Security' && ['Microsoft-Windows-Eventlog', 'Microsoft-Windows-Security-Auditing'].contains(ctx?.winlog?.provider_name)
+  - pipeline:
+      name: '{< IngestPipeline "sysmon" >}'
+      if: ctx?.winlog?.channel == 'Microsoft-Windows-Sysmon/Operational'
+  - pipeline:
+      name: '{< IngestPipeline "powershell" >}'
+      if: ctx?.winlog?.channel == 'Windows Powershell'
+  - pipeline:
+      name: '{< IngestPipeline "powershell_operational" >}'
+      if: ctx?.winlog?.channel == 'Microsoft-Windows-PowerShell/Operational'
+on_failure:
+  - set:
+      field: error.message
+      value: |-
+        Processor "{{ _ingest.on_failure_processor_type }}" with tag "{{ _ingest.on_failure_processor_tag }}" in pipeline "{{ _ingest.on_failure_pipeline }}" failed with message "{{ _ingest.on_failure_message }}"
