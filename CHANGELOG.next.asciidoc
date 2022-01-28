@@ -33,7 +33,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change Docker base image from CentOS 7 to Ubuntu 20.04 {pull}29681[29681]
 - Enrich kubernetes metadata with node annotations. {pull}29605[29605]
 - Allign kubernetes configuration settings. {pull}29908[29908]
-- The extension of the log files of Beats and Elastic Agent is changed to `.ndjson`. If you are collecting their logs, you must change the path configuration to `/path/to/logs/{beatname}*.ndjson` to avoid any issues. {pull}28927[28927]
+- The extension of the log files of Beats and Elastic Agent is changed to `.ndjson`. If you are collecting the logs, you must change the path configuration to `/path/to/logs/{beatname}*.ndjson` to avoid any issues. {pull}28927[28927]
 
 *Auditbeat*
 
