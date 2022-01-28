@@ -77,7 +77,7 @@ processors:
     type: float
     ignore_missing: true
 - rename:
-    field: elasticsearch.slowlog.took_millis
+    field: elasticsearch.slowlog.elasticsearch.slowlog.took_millis
     target_field: elasticsearch.slowlog.duration
     ignore_missing: true
 - dot_expander:
