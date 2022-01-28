@@ -23,7 +23,6 @@ import (
 )
 
 type ICMPLoop interface {
-	checkNetworkMode(mode string) error
 	ping(
 		addr *net.IPAddr,
 		timeout time.Duration,

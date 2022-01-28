@@ -512,7 +512,7 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 	auditEvent, err := aucoalesce.CoalesceMessages(msgs)
 	if err != nil {
 		// Add messages on error so that it's possible to debug the problem.
-		out := mb.Event{RootFields: common.MapStr{}}
+		out := mb.Event{RootFields: common.MapStr{}, Error: err}
 		addEventOriginal(msgs, out.RootFields)
 		return out
 	}
