@@ -49735,6 +49735,35 @@ example: 0
 
 --
 
+*`elasticsearch.elastic_product_origin`*::
++
+--
+Used by Elastic stack to identify which component of the stack sent the request
+
+type: keyword
+
+example: kibana
+
+--
+
+*`elasticsearch.http.request.x_opaque_id`*::
++
+--
+Used by Elasticsearch to throttle and deduplicate deprecation warnings
+
+example: v7app
+
+--
+
+*`elasticsearch.event.category`*::
++
+--
+Category of the deprecation event
+
+example: compatible_api
+
+--
+
 
 *`elasticsearch.audit.layer`*::
 +
@@ -49926,49 +49955,6 @@ type: boolean
 === deprecation
 
 
-
-
-*`elasticsearch.deprecation.data_stream.dataset`*::
-+
---
-type: keyword
-
---
-
-*`elasticsearch.deprecation.data_stream.namespace`*::
-+
---
-type: keyword
-
---
-
-*`elasticsearch.deprecation.data_stream.type`*::
-+
---
-type: keyword
-
---
-
-*`elasticsearch.deprecation.event.code`*::
-+
---
-type: keyword
-
---
-
-*`elasticsearch.deprecation.event.dataset`*::
-+
---
-type: keyword
-
---
-
-*`elasticsearch.deprecation.elasticsearch.event.category`*::
-+
---
-type: keyword
-
---
 
 [float]
 === gc

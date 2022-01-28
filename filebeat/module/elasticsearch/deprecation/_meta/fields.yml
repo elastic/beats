@@ -2,15 +2,3 @@
   type: group
   description: >
   fields:
-    - name: data_stream.dataset
-      type: keyword
-    - name: data_stream.namespace
-      type: keyword
-    - name: data_stream.type
-      type: keyword
-    - name: event.code
-      type: keyword
-    - name: event.dataset
-      type: keyword
-    - name: elasticsearch.event.category
-      type: keyword

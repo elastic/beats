@@ -40,3 +40,13 @@
           description: "Id of the shard"
           example: "0"
           type: keyword
+        - name: elastic_product_origin
+          type: keyword
+          description: "Used by Elastic stack to identify which component of the stack sent the request"
+          example: "kibana"
+        - name: http.request.x_opaque_id
+          description: "Used by Elasticsearch to throttle and deduplicate deprecation warnings"
+          example: "v7app"
+        - name: event.category
+          description: "Category of the deprecation event"
+          example: "compatible_api"
