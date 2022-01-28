@@ -4,13 +4,9 @@ on_failure:
     field: error.message
     value: '{{ _ingest.on_failure_message }}'
 processors:
-- json:
-    field: message
-    target_field: elasticsearch.deprecation
-- pipeline:
-    if: ctx.elasticsearch.deprecation.containsKey('type')
-    name: '{< IngestPipeline "pipeline-json-7" >}'
-- pipeline:
-    if: ctx.elasticsearch.deprecation.containsKey('ecs.version')
-    name: '{< IngestPipeline "pipeline-json-8" >}'
-
+  - pipeline:
+      if: '!ctx.message.contains("ecs.version")'
+      name: '{< IngestPipeline "pipeline-json-7" >}'
+  - pipeline:
+      if: 'ctx.message.contains("ecs.version")'
+      name: '{< IngestPipeline "pipeline-json-8" >}'
