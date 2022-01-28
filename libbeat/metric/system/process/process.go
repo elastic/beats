@@ -88,6 +88,11 @@ func (procStats *Stats) Init() error {
 		procStats.logger.Warnf("Getting host details: %v", err)
 	}
 
+	//footcannon prevention
+	if procStats.Hostfs == nil {
+		procStats.Hostfs = resolve.NewTestResolver("/")
+	}
+
 	procStats.ProcsMap = make(ProcsMap)
 
 	if len(procStats.Procs) == 0 {

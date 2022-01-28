@@ -46,6 +46,7 @@ func TestGetOne(t *testing.T) {
 		Hostfs:       resolve.NewTestResolver("/"),
 		CPUTicks:     true,
 		CacheCmdLine: true,
+		EnvWhitelist: []string{".*"},
 		IncludeTop: IncludeTopConfig{
 			Enabled:  true,
 			ByCPU:    4,
@@ -446,6 +447,7 @@ func initTestResolver() (Stats, error) {
 		Hostfs:       resolve.NewTestResolver("/"),
 		CPUTicks:     true,
 		CacheCmdLine: true,
+		EnvWhitelist: []string{".*"},
 		IncludeTop: IncludeTopConfig{
 			Enabled:  true,
 			ByCPU:    5,

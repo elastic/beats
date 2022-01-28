@@ -75,7 +75,7 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 		if pid == 0 {
 			continue
 		}
-		procMap, plist = procStats.pidIter(pid, procMap, plist)
+		procMap, plist = procStats.pidIter(int(pid), procMap, plist)
 	}
 
 	return procMap, plist, nil
