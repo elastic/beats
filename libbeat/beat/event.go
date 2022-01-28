@@ -60,29 +60,15 @@ func (e *Event) SetID(id string) {
 }
 
 func (e *Event) GetValue(key string) (interface{}, error) {
-	if e == nil {
-		return nil, common.ErrKeyNotFound
-	}
-
 	if key == timestampFieldKey {
 		return e.Timestamp, nil
 	} else if subKey, ok := metadataKey(key); ok {
-		if subKey == "" {
+		if subKey == "" || e.Meta == nil {
 			return e.Meta, nil
 		}
-		if e.Meta == nil {
-			return nil, common.ErrKeyNotFound
-		}
-
 		return e.Meta.GetValue(subKey)
 	}
-
-	if e.Fields == nil {
-		return nil, common.ErrKeyNotFound
-	}
-
 	return e.Fields.GetValue(key)
-
 }
 
 func (e *Event) DeepUpdate(d common.MapStr) {
@@ -182,9 +168,7 @@ func (e *Event) PutValue(key string, v interface{}) (interface{}, error) {
 		}
 		return e.Meta.Put(subKey, v)
 	}
-	if e.Fields == nil {
-		e.Fields = common.MapStr{}
-	}
+
 	return e.Fields.Put(key, v)
 }
 
