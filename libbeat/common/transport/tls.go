@@ -154,7 +154,7 @@ func tlsDialWith(
 		}
 	}
 
-	// We only chech the status of config.Verification (`ssl.verirication_mode`
+	// We only check the status of config.Verification (`ssl.verification_mode`
 	// in the configuration file) because we have a custom verification logic
 	// implemented by setting tlsConfig.VerifyConnection that runs regardless of
 	// the status of tlsConfig.InsecureSkipVerify.
