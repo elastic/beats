@@ -4,15 +4,9 @@ on_failure:
     field: error.message
     value: '{{ _ingest.on_failure_message }}'
 processors:
-- json:
-    field: message
-    target_field: elasticsearch.slowlog
-  # Drop unrecognized document structures present in test suite until https://github.com/elastic/beats/issues/30080 resolved
-- drop:
-    if: '!ctx.elasticsearch.slowlog.containsKey("type") && !ctx.elasticsearch.slowlog.containsKey("ecs.version")'
-- pipeline:
-    if: ctx.elasticsearch.slowlog.containsKey('type')
-    name: '{< IngestPipeline "pipeline-json-7" >}'
-- pipeline:
-    if: ctx.elasticsearch.slowlog.containsKey('ecs.version')
-    name: '{< IngestPipeline "pipeline-json-8" >}'
+  - pipeline:
+      if: '!ctx.message.contains("ecs.version")'
+      name: '{< IngestPipeline "pipeline-json-7" >}'
+  - pipeline:
+      if: 'ctx.message.contains("ecs.version")'
+      name: '{< IngestPipeline "pipeline-json-8" >}'

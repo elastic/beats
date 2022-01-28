@@ -2,89 +2,24 @@ description: Pipeline for parsing the Elasticsearch slow logs in JSON format.
 on_failure:
 - set:
     field: error.message
-    value: '{{ _ingest.on_failure_message }}'
+    value: '{{ _ingest.on_failure_message }} ({{ _ingest.on_failure_pipeline }}/{{ _ingest.on_failure_processor_type }})'
 processors:
-- drop:
-    if: ctx.event.dataset != 'elasticsearch.slowlog'
+- json:
+    field: message
+    add_to_root: true
 - dot_expander:
-    field: event.dataset
-    path: elasticsearch.slowlog
-- set:
-    value: '{{ elasticsearch.slowlog.event.dataset }}'
-    field: event.dataset
-    ignore_empty_value: true
-- remove:
-    field: elasticsearch.slowlog.event.dataset
-- dot_expander:
-    field: service.name
-    path: elasticsearch.slowlog
-- rename:
-    field: elasticsearch.slowlog.service.name
-    target_field: service.name
-    ignore_missing: true
-- dot_expander:
-    field: log.level
-    path: elasticsearch.slowlog
-- rename:
-    field: elasticsearch.slowlog.log.level
-    target_field: log.level
-    ignore_missing: true
-- dot_expander:
-    field: log.logger
-    path: elasticsearch.slowlog
-- rename:
-    field: elasticsearch.slowlog.log.logger
-    target_field: log.logger
-    ignore_missing: true
-- dot_expander:
-    field: process.thread.name
-    path: elasticsearch.slowlog
-- rename:
-    field: elasticsearch.slowlog.process.thread.name
-    target_field: process.thread.name
-    ignore_missing: true
-- dot_expander:
-    field: elasticsearch.cluster.name
-    path: elasticsearch.slowlog
-- rename:
-    field: elasticsearch.slowlog.elasticsearch.cluster.name
-    target_field: elasticsearch.cluster.name
-- dot_expander:
-    field: elasticsearch.node.name
-    path: elasticsearch.slowlog
-- rename:
-    field: elasticsearch.slowlog.elasticsearch.node.name
-    target_field: elasticsearch.node.name
-- dot_expander:
-    field: elasticsearch.cluster.uuid
-    path: elasticsearch.slowlog
-- rename:
-    field: elasticsearch.slowlog.elasticsearch.cluster.uuid
-    target_field: elasticsearch.cluster.uuid
-    ignore_missing: true
-- dot_expander:
-    field: elasticsearch.node.id
-    path: elasticsearch.slowlog
-- rename:
-    field: elasticsearch.slowlog.elasticsearch.node.id
-    target_field: elasticsearch.node.id
-    ignore_missing: true
-- dot_expander:
-    field: elasticsearch.slowlog.took_millis
-    path: elasticsearch.slowlog
+    field: '*'
+    override: true
 - convert:
-    field: elasticsearch.slowlog.elasticsearch.slowlog.took_millis
+    field: elasticsearch.slowlog.took_millis
     type: float
     ignore_missing: true
 - rename:
-    field: elasticsearch.slowlog.elasticsearch.slowlog.took_millis
+    field: elasticsearch.slowlog.took_millis
     target_field: elasticsearch.slowlog.duration
     ignore_missing: true
-- dot_expander:
-    field: elasticsearch.slowlog.message
-    path: elasticsearch.slowlog
 - grok:
-    field: elasticsearch.slowlog.elasticsearch.slowlog.message
+    field: elasticsearch.slowlog.message
     pattern_definitions:
       GREEDYMULTILINE: |-
         (.|
@@ -95,92 +30,7 @@ processors:
     - \[%{INDEXNAME:elasticsearch.index.name}\]\[%{NUMBER:elasticsearch.shard.id}\]
 - set:
     field: message
-    value: '{{ elasticsearch.slowlog.elasticsearch.slowlog.message }}'
+    value: '{{ elasticsearch.slowlog.message }}'
     ignore_empty_value: true
 - remove:
-    field: elasticsearch.slowlog.elasticsearch.slowlog.message
-- dot_expander:
-    field: ecs.version
-    path: elasticsearch.slowlog
-- set:
-    value: '{{ elasticsearch.slowlog.ecs.version }}'
-    field: ecs.version
-    ignore_empty_value: true
-- remove:
-    field: elasticsearch.slowlog.ecs.version
-- dot_expander:
-    field: elasticsearch.slowlog.id
-    path: elasticsearch.slowlog
-- rename:
-    field: elasticsearch.slowlog.elasticsearch.slowlog.id
-    target_field: elasticsearch.slowlog.id
-    ignore_missing: true
-- dot_expander:
-    field: elasticsearch.slowlog.search_type
-    path: elasticsearch.slowlog
-- rename:
-    field: elasticsearch.slowlog.elasticsearch.slowlog.search_type
-    target_field: elasticsearch.slowlog.search_type
-    ignore_missing: true
-- dot_expander:
-    field: elasticsearch.slowlog.source
-    path: elasticsearch.slowlog
-- rename:
-    field: elasticsearch.slowlog.elasticsearch.slowlog.source
-    target_field: elasticsearch.slowlog.source
-    ignore_missing: true
-- dot_expander:
-    field: elasticsearch.slowlog.stats
-    path: elasticsearch.slowlog
-- rename:
-    field: elasticsearch.slowlog.elasticsearch.slowlog.stats
-    target_field: elasticsearch.slowlog.stats
-    ignore_missing: true
-- dot_expander:
-    field: elasticsearch.slowlog.took
-    path: elasticsearch.slowlog
-- rename:
-    field: elasticsearch.slowlog.elasticsearch.slowlog.took
-    target_field: elasticsearch.slowlog.took
-    ignore_missing: true
-- dot_expander:
-    field: elasticsearch.slowlog.total_hits
-    path: elasticsearch.slowlog
-- rename:
-    field: elasticsearch.slowlog.elasticsearch.slowlog.total_hits
-    target_field: elasticsearch.slowlog.total_hits
-    ignore_missing: true
-- dot_expander:
-    field: elasticsearch.slowlog.total_shards
-    path: elasticsearch.slowlog
-- rename:
-    field: elasticsearch.slowlog.elasticsearch.slowlog.total_shards
-    target_field: elasticsearch.slowlog.total_shards
-    ignore_missing: true
-- dot_expander:
-    field: trace.id
-    path: elasticsearch.slowlog
-- rename:
-    field: elasticsearch.slowlog.trace.id
-    target_field: trace.id
-    ignore_missing: true
-- set:
-    value: "{{ elasticsearch.slowlog.@timestamp }}"
-    field: "@timestamp"
-    ignore_empty_value: true
-- set:
-    value: "{{ elasticsearch.slowlog.timestamp }}"
-    field: "@timestamp"
-    ignore_empty_value: true
-- remove:
-    field: elasticsearch.slowlog.@timestamp
-    ignore_missing: true
-- remove:
-    field: elasticsearch.slowlog.timestamp
-    ignore_missing: true
-- date:
-    field: '@timestamp'
-    target_field: '@timestamp'
-    formats:
-    - ISO8601
-    ignore_failure: true
+    field: elasticsearch.slowlog.message
