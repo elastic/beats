@@ -27,10 +27,10 @@ import (
 const debugSelector = "synthexec"
 
 type StandardSuiteFields struct {
-	Name   string
-	Id     string
-	Type   string
-	Inline bool
+	Name     string
+	Id       string
+	Type     string
+	IsInline bool
 }
 
 type FilterJourneyConfig struct {
@@ -89,7 +89,7 @@ func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string,
 			return nil, err
 		}
 		senr := streamEnricher{}
-		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(fields.Inline), senr.enrich, fields)}, nil
+		return []jobs.Job{readResultsJob(ctx, mpx.SynthEvents(), senr.enrich, fields)}, nil
 	}
 }
 
@@ -250,7 +250,7 @@ func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *S
 		return &SynthEvent{
 			Type:                 typ,
 			TimestampEpochMicros: float64(time.Now().UnixMicro()),
-			Payload: map[string]interface{}{
+			Payload: common.MapStr{
 				"message": text,
 			},
 		}, nil

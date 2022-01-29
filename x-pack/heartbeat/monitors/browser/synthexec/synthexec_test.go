@@ -110,7 +110,7 @@ func TestRunCmd(t *testing.T) {
 Loop:
 	for {
 		select {
-		case se := <-mpx.SynthEvents(true):
+		case se := <-mpx.SynthEvents():
 			if se == nil {
 				break Loop
 			}

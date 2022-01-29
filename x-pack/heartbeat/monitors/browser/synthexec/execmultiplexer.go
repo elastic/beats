@@ -9,10 +9,9 @@ import (
 )
 
 type ExecMultiplexer struct {
-	currentJourney *atomic.Bool
-	eventCounter   *atomic.Int
-	synthEvents    chan *SynthEvent
-	done           chan struct{}
+	eventCounter *atomic.Int
+	synthEvents  chan *SynthEvent
+	done         chan struct{}
 }
 
 func (e ExecMultiplexer) Close() {
@@ -25,23 +24,16 @@ func (e ExecMultiplexer) writeSynthEvent(se *SynthEvent) {
 	}
 
 	if se.Type == "journey/start" {
-		e.currentJourney.Store(true)
 		e.eventCounter.Store(-1)
 	}
 	se.index = e.eventCounter.Inc()
 
-	if se.Type == "journey/end" || se.Type == "cmd/status" {
-		e.currentJourney.Store(false)
-	}
 	e.synthEvents <- se
 }
 
 // SynthEvents returns a read only channel for synth events
-func (e ExecMultiplexer) SynthEvents(inline bool) <-chan *SynthEvent {
-	if inline || e.currentJourney.Load() {
-		return e.synthEvents
-	}
-	return make(chan *SynthEvent)
+func (e ExecMultiplexer) SynthEvents() <-chan *SynthEvent {
+	return e.synthEvents
 }
 
 // Done returns a channel that is closed when all output has been received
@@ -56,9 +48,8 @@ func (e ExecMultiplexer) Wait() {
 
 func NewExecMultiplexer() *ExecMultiplexer {
 	return &ExecMultiplexer{
-		currentJourney: atomic.NewBool(false),
-		eventCounter:   atomic.NewInt(-1), // Start from -1 so first call to Inc returns 0
-		synthEvents:    make(chan *SynthEvent),
-		done:           make(chan struct{}),
+		eventCounter: atomic.NewInt(-1), // Start from -1 so first call to Inc returns 0
+		synthEvents:  make(chan *SynthEvent),
+		done:         make(chan struct{}),
 	}
 }

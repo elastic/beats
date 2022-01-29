@@ -34,6 +34,12 @@ func makeStepEvent(typ string, ts float64, name string, index int, status string
 }
 
 func TestJourneyEnricher(t *testing.T) {
+	var stdFields = StandardSuiteFields{
+		Id:       "mysuite",
+		Name:     "mysuite",
+		Type:     "browser",
+		IsInline: false,
+	}
 	journey := &Journey{
 		Name: "A Journey Name",
 		Id:   "my-journey-id",
@@ -84,14 +90,22 @@ func TestJourneyEnricher(t *testing.T) {
 	// on the nil data.
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
-		stdFields := StandardSuiteFields{Inline: false}
-		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
+		stdFields.IsInline = false
+		t.Run(fmt.Sprintf("suites monitor event %d", idx), func(t *testing.T) {
 			enrichErr := je.enrich(e, se, stdFields)
 
 			if se != nil && se.Type != "journey/end" {
 				// Test that the created event includes the mapped
 				// version of the event
 				testslike.Test(t, lookslike.MustCompile(se.ToMap()), e.Fields)
+				// check suite and monitor meta fields
+				testslike.Test(t, lookslike.MustCompile(common.MapStr{
+					"suite.id":     stdFields.Id,
+					"suite.name":   stdFields.Name,
+					"monitor.id":   fmt.Sprintf("%s-%s", stdFields.Id, journey.Id),
+					"monitor.name": fmt.Sprintf("%s - %s", stdFields.Name, journey.Name),
+				}), e.Fields)
+
 				require.Equal(t, se.Timestamp().Unix(), e.Timestamp.Unix())
 
 				if se.Error != nil {
@@ -111,6 +125,82 @@ func TestJourneyEnricher(t *testing.T) {
 					testslike.Test(t, v, e.Fields)
 				})
 			}
+		})
+
+	}
+
+	for idx, se := range synthEvents {
+		e := &beat.Event{}
+		stdFields.IsInline = true
+		t.Run(fmt.Sprintf("inline monitor event %d", idx), func(t *testing.T) {
+			je.enrich(e, se, stdFields)
+			testslike.Test(t, lookslike.MustCompile(common.MapStr{
+				"monitor.id":   stdFields.Id,
+				"monitor.name": stdFields.Name,
+			}), e.Fields)
+
+			sv, _ := e.Fields.GetValue("suite")
+			require.Nil(t, sv)
+		})
+	}
+}
+
+func TestEnrichConsoleSynthEvents(t *testing.T) {
+	tests := []struct {
+		name  string
+		je    *journeyEnricher
+		se    *SynthEvent
+		check func(t *testing.T, e *beat.Event, je *journeyEnricher)
+	}{
+		{
+			"stderr",
+			&journeyEnricher{},
+			&SynthEvent{
+				Type: "stderr",
+				Payload: common.MapStr{
+					"message": "Error from synthetics",
+				},
+			},
+			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
+				v := lookslike.MustCompile(common.MapStr{
+					"synthetics": common.MapStr{
+						"payload": common.MapStr{
+							"message": "Error from synthetics",
+						},
+						"type": "stderr",
+					},
+				})
+				testslike.Test(t, v, e.Fields)
+			},
+		},
+		{
+			"stdout",
+			&journeyEnricher{},
+			&SynthEvent{
+				Type: "stdout",
+				Payload: common.MapStr{
+					"message": "debug output",
+				},
+			},
+			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
+				v := lookslike.MustCompile(common.MapStr{
+					"synthetics": common.MapStr{
+						"payload": common.MapStr{
+							"message": "debug output",
+						},
+						"type": "stdout",
+					},
+				})
+				testslike.Test(t, v, e.Fields)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := &beat.Event{}
+			tt.je.enrichSynthEvent(e, tt.se)
+			tt.check(t, e, tt.je)
 		})
 	}
 }
@@ -132,7 +222,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 			},
 			true,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				v := lookslike.MustCompile(map[string]interface{}{
+				v := lookslike.MustCompile(common.MapStr{
 					"summary": map[string]int{
 						"up":   0,
 						"down": 1,
@@ -147,7 +237,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 			&SynthEvent{Type: "journey/end"},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				v := lookslike.MustCompile(map[string]interface{}{
+				v := lookslike.MustCompile(common.MapStr{
 					"summary": map[string]int{
 						"up":   1,
 						"down": 0,
@@ -259,7 +349,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
-		stdFields := StandardSuiteFields{Inline: false}
+		stdFields := StandardSuiteFields{IsInline: false}
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
 			enrichErr := je.enrich(e, se, stdFields)
 

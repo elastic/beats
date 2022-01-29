@@ -67,12 +67,12 @@ func (s *Suite) FilterJourneys() synthexec.FilterJourneyConfig {
 }
 
 func (s *Suite) Fields() synthexec.StandardSuiteFields {
-	_, inline := s.InlineSource()
+	_, isInline := s.InlineSource()
 	return synthexec.StandardSuiteFields{
-		Name:   s.suiteCfg.Name,
-		Id:     s.suiteCfg.Id,
-		Inline: inline,
-		Type:   "browser",
+		Name:     s.suiteCfg.Name,
+		Id:       s.suiteCfg.Id,
+		IsInline: isInline,
+		Type:     "browser",
 	}
 }
 
