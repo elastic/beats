@@ -1,0 +1,228 @@
+
+NPCAP COPYRIGHT / END USER LICENSE AGREEMENT
+
+Npcap is a Windows packet sniffing driver and library and is copyright
+(c) 2013-2021 by Insecure.Com LLC ("The Nmap Project").  All rights
+reserved.
+
+Even though Npcap source code is publicly available for review, it is
+not open source software and may not be redistributed without special
+permission from the Nmap Project.  The standard version is also
+limited to installation on five systems. We fund the Npcap project by
+selling two types of commercial licenses to a special Npcap OEM
+edition:
+
+1) Npcap OEM Redistribution License allows companies to redistribute
+Npcap with their products.
+
+2) Npcap OEM Internal Use License allows companies to use Npcap OEM
+internally in excess of the free/demo version's normal 5-system
+limitation.
+
+Both of these licenses include updates and support as well as a
+warranty.  Npcap OEM also includes a silent installer for unattended
+installation.  Further details about Npcap OEM are available from
+https://nmap.org/npcap/oem/, and you are also welcome to contact us at
+sales@nmap.com to ask any questions or set up a license for your
+organization.
+
+Free and open source software producers are also welcome to contact us
+for redistribution requests.  However, we normally recommend that such
+authors instead ask your users to download and install Npcap themselves.
+
+If the Nmap Project (directly or through one of our commercial
+licensing customers) has granted you additional rights to Npcap or
+Npcap OEM, those additional rights take precedence where they conflict
+with the terms of this license agreement.
+
+Since the Npcap source code is available for download and review,
+users sometimes contribute code patches to fix bugs or add new
+features.  By sending these changes to the Nmap Project (including
+through direct email or our mailing lists or submitting pull requests
+through our source code repository), it is understood unless you
+specify otherwise that you are offering the Nmap Project the
+unlimited, non-exclusive right to reuse, modify, and relicence your
+code contribution so that we may (but are not obligated to)
+incorporate it into Npcap.  If you wish to specify special license
+conditions or restrictions on your contributions, just say so when you
+send them.
+
+This copy of Npcap (the "Software") and accompanying documentation is
+licensed and not sold. This Software is protected by copyright laws
+and treaties, as well as laws and treaties related to other forms of
+intellectual property. The Nmap Project owns intellectual property
+rights in the Software.  The Licensee's ("you" or "your") license to
+download, use, copy, or change the Software is subject to these rights
+and to all the terms and conditions of this End User License Agreement
+("Agreement").
+
+ACCEPTANCE
+
+By accepting this agreement or by downloading, installing, using, or
+copying the Software, or by clicking "I Agree", you agree to be bound
+by the terms of this EULA.  If you do not agree to the terms of this
+EULA, do not install, use, or copy the Software.
+
+LICENSE GRANT
+
+This Agreement entitles you to install and use five (5) copies of the
+Software. In addition, you may make archival copies of the Software
+which may only be used for the reinstallation of the Software. This
+Agreement does not permit the installation or use of more than 5
+copies of the Software, or the installation of the Software on more
+than five computer at any given time, on a system that allows shared
+used of applications by more than five users, or on any configuration
+or system of computers that allows more than five users. A user may
+only have one instance of this Agreement active at once.  For example,
+downloading the software multiple times, downloading multiple versions
+of the software, and/or executing the software installer multiple
+times do not grant any additional rights such as using the software on
+more machines.
+
+The terms "computer" and "machine" in this license include any
+computing device, including software computing instances such as
+virtual machines and Docker containers.
+
+Copies of Npcap do not count toward the five copy, five computer, or
+five user limitations imposed by this section if they are installed
+and used solely in conjunction with any of the following software:
+
+o The Nmap Security Scanner, as distributed from https://nmap.org
+
+o The Wireshark network protocol analyzer, as distributed from
+  https://www.wireshark.org/
+  
+o Microsoft Defender for Identity, as distributed from
+  https://www.microsoft.com/en-us/microsoft-365/security/identity-defender
+
+Users wishing to redistribute Npcap or exceed the usage limits imposed
+by this free license or benefit from commercial support and features
+such as a silent installer should contact sales@nmap.com to obtain an
+appropriate commercial license agreement.  More details on our OEM
+edition is also available from https://nmap.org/npcap/oem/.
+
+DISCLAIMER OF WARRANTIES AND LIMITATION OF LIABILITY
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+RESTRICTIONS ON TRANSFER
+
+Without first obtaining the express written consent of the Nmap
+Project, you may not assign your rights and obligations under this
+Agreement, or redistribute, encumber, sell, rent, lease, sublicense,
+or otherwise transfer your rights to the Software Product.
+
+RESTRICTIONS ON USE
+
+You may not use, copy, or install the Software Product on more than
+five computers, or permit the use, copying, or installation of the
+Software Product by more than five users or on more than five
+computers.
+
+RESTRICTIONS ON COPYING
+
+You may not copy any part of the Software except to the extent that
+licensed use inherently demands the creation of a temporary copy
+stored in computer memory and not permanently affixed on storage
+medium. You may make archival copies as well.
+
+DISCLAIMER OF WARRANTIES AND LIMITATION OF LIABILITY
+
+UNLESS OTHERWISE EXPLICITLY AGREED TO IN WRITING BY THE NMAP PROJECT,
+THE NMAP PROJECT MAKES NO OTHER WARRANTIES, EXPRESS OR IMPLIED, IN
+FACT OR IN LAW, INCLUDING, BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE OTHER THAN AS
+SET FORTH IN THIS AGREEMENT OR IN THE LIMITED WARRANTY DOCUMENTS
+PROVIDED WITH THE SOFTWARE.
+
+The Nmap Project makes no warranty that the Software will meet your
+requirements or operate under your specific conditions of use. The
+Nmap Project makes no warranty that operation of the Software Product
+will be secure, error free, or free from interruption. YOU MUST
+DETERMINE WHETHER THE SOFTWARE SUFFICIENTLY MEETS YOUR REQUIREMENTS
+FOR SECURITY AND UNINTERRUPTABILITY. YOU BEAR SOLE RESPONSIBILITY AND
+ALL LIABILITY FOR ANY LOSS INCURRED DUE TO FAILURE OF THE SOFTWARE TO
+MEET YOUR REQUIREMENTS. THE NMAP PROJECT WILL NOT, UNDER ANY
+CIRCUMSTANCES, BE RESPONSIBLE OR LIABLE FOR THE LOSS OF DATA ON ANY
+COMPUTER OR INFORMATION STORAGE DEVICE.
+
+UNDER NO CIRCUMSTANCES SHALL THE NMAP PROJECT, ITS DIRECTORS,
+OFFICERS, EMPLOYEES OR AGENTS BE LIABLE TO YOU OR ANY OTHER PARTY FOR
+INDIRECT, CONSEQUENTIAL, SPECIAL, INCIDENTAL, PUNITIVE, OR EXEMPLARY
+DAMAGES OF ANY KIND (INCLUDING LOST REVENUES OR PROFITS OR LOSS OF
+BUSINESS) RESULTING FROM THIS AGREEMENT, OR FROM THE FURNISHING,
+PERFORMANCE, INSTALLATION, OR USE OF THE SOFTWARE, WHETHER DUE TO A
+BREACH OF CONTRACT, BREACH OF WARRANTY, OR THE NEGLIGENCE OF THE NMAP
+PROJECT OR ANY OTHER PARTY, EVEN IF THE NMAP PROJECT IS ADVISED
+BEFOREHAND OF THE POSSIBILITY OF SUCH DAMAGES. TO THE EXTENT THAT THE
+APPLICABLE JURISDICTION LIMITS THE NMAP PROJECT'S ABILITY TO DISCLAIM
+ANY IMPLIED WARRANTIES, THIS DISCLAIMER SHALL BE EFFECTIVE TO THE
+MAXIMUM EXTENT PERMITTED.
+
+LIMITATIONS OF REMEDIES AND DAMAGES
+
+Your remedy for a breach of this Agreement or of any warranty included
+in this Agreement is the correction or replacement of the Software or
+a refund of the purchase price of the Software, exclusive of any costs
+for shipping and handling. Selection of whether to correct or replace
+or refund shall be solely at the discretion of the Nmap Project. The
+Nmap Project reserves the right to substitute a functionally
+equivalent copy of the Software Product as a replacement.
+
+Any claim must be made within the applicable warranty period. All
+warranties cover only defects arising under normal use and do not
+include malfunctions or failure resulting from misuse, abuse, neglect,
+alteration, problems with electrical power, acts of nature, unusual
+temperatures or humidity, improper installation, or damage determined
+by the Nmap Project to have been caused by you. All limited warranties
+on the Software Product are granted only to you and are
+non-transferable.
+
+You agree to indemnify and hold the Nmap Project harmless from all
+claims, judgments, liabilities, expenses, or costs arising from your
+breach of this Agreement and/or acts or omissions.
+
+GOVERNING LAW, JURISDICTION AND COSTS
+
+This Agreement is governed by the laws the United States of America
+and Washington State, without regard to Washington's conflict or
+choice of law provisions.
+
+SEVERABILITY
+
+If any provision of this Agreement shall be held to be invalid or
+unenforceable, the remainder of this Agreement shall remain in full
+force and effect. To the extent any express or implied restrictions
+are not permitted by applicable laws, these express or implied
+restrictions shall remain in force and effect to the maximum extent
+permitted by such applicable laws.
+
+THIRD PARTY SOFTWARE ATTRIBUTION
+
+Npcap uses several 3rd party open source software libraries:
+
+* The libpcap portable packet capturing library from https://tcpdump.org
+* The Winpcap packet capturing library. It has been abandoned, but is
+  currently still available from https://www.winpcap.org/.
+* The ieee80211_radiotap.h header file from David Young
+
+All of these are open source with BSD-style licenses that allow for
+unlimited use and royalty-free redistribution within other software
+(including commercial/proprietary software). Some include a warranty
+disclaimer (relating to the original authors) and require a small
+amount of acknowledgment text be added somewhere in the documentation
+of any software which includes them (including indirect inclusion
+through Npcap).
+
+The required acknowledgement text as well as full license text and
+source details for these libraries is available from:
+https://npcap.org/src/docs/Npcap-Third-Party-Open-Source.pdf .
+
+Since Insecure.Com LLC is not the author of this 3rd party code, we
+can not waive or modify it’s software copyright or license.  Npcap
+users and redistributors must comply with the relevant Npcap license
+(either the free/demo license or a commercial Npcap OEM license they
+may have purchased) as well as the minimal requirements of this 3rd
+party open source software.
