@@ -1,4 +1,3 @@
-# Todo delete before merge to elastic/beats
 name: OpaBeat-CI
 
 on:
@@ -34,10 +33,10 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: add rego repo ssh key
-        uses: shaunco/ssh-agent@git-repo-mapping # this action will configure git to use the right SSH key per each repo. 
+        uses: shaunco/ssh-agent@git-repo-mapping # this action will configure git to use the right SSH key per each repo.
         with:
           ssh-private-key: |
-                ${{ secrets.REGO_LIB_KEY }}
+            ${{ secrets.REGO_LIB_KEY }}
           repo-mappings: |
             github.com/elastic/csp-security-policies
 
@@ -53,18 +52,18 @@ jobs:
 
       - name: Setup Mage
         run: |
-            make mage
-        
+          make mage
+
       - name: Build Opabeat Bin
         working-directory: kubebeat
         run: |
-            GOOS=linux go build -v && docker build -t opabeat .
+          GOOS=linux go build -v && docker build -t opabeat .
 
       - name: Unit Test Opabeat
         working-directory: ./kubebeat
         run: |
-            GOOS=linux go test
-      
+          GOOS=linux go test ./...
+
       - name: Get diff k8s manifests
         uses: technote-space/get-diff-action@v4
         with:
@@ -79,35 +78,16 @@ jobs:
           command: |
             echo "Run kubeval"
             kubeval --strict ${{ env.K8S_MANIFEST_DIR }}/kubebeat-ds.yaml
-          # kubeval --strict ${{ env.K8S_MANIFEST_DIR }}/standalone-agent.yaml
-          # kubeval --strict ${{ env.K8S_MANIFEST_DIR }}/fleet-managed-agent.yaml 
-# Todo Will transfer to parallel job & add conftest for other deploy yamls
-      # - name: Notify job failure
-      #   if: failure()
-      #   uses: archive/github-actions-slack@v1.0.3
-      #   with:
-      #     slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_OAUTH_ACCESS_TOKEN }}
-      #     slack-channel: deployment-notifications
-      #     slack-text: |
-      #       Hello @here !
-      #       :no_entry: Deployment to ${{ env.OPABEAT_CLUSTER }} cluster failed :no_entry:
-      #       :no_entry: :no_entry: Building Opabeat docker image failed :no_entry: :no_entry:
-      #       *Please review the logs of the failed deployment*
-      #       repo: ${{ github.repository }}
-      #       branch: ${{ github.ref }}
-      #       author: *${{ github.event.head_commit.author.name }}*
-      #       commit desc: "'${{ github.event.head_commit.message }}'' --> '${{ github.event.head_commit.url }}''"
-      #       gitflow action: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
   build_elastic_agent:
     name: Elastic-Agent CI
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       - name: add rego repo ssh key
-        uses: shaunco/ssh-agent@git-repo-mapping # this action will configure git to use the right SSH key per each repo. 
+        uses: shaunco/ssh-agent@git-repo-mapping # this action will configure git to use the right SSH key per each repo.
         with:
           ssh-private-key: |
-                ${{ secrets.REGO_LIB_KEY }}
+            ${{ secrets.REGO_LIB_KEY }}
           repo-mappings: |
             github.com/elastic/csp-security-policies
 
@@ -130,26 +110,9 @@ jobs:
 
       - name: Setup Mage
         run: |
-            make mage
+          make mage
 
       - name: Package Elastic-Agent
         working-directory: x-pack/elastic-agent
         run: |
-            DEV=true SNAPSHOT=true PLATFORMS=linux/amd64 TYPES=docker mage -v package
-
-      # - name: Notify job failure
-      #   if: failure()
-      #   uses: archive/github-actions-slack@v1.0.3
-      #   with:
-      #     slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_OAUTH_ACCESS_TOKEN }}
-      #     slack-channel: deployment-notifications
-      #     slack-text: |
-      #       Hello @here !
-      #       :no_entry: Deployment to ${{ env.OPABEAT_CLUSTER }} cluster failed :no_entry:
-      #       :no_entry: :no_entry: Building buildserver docker image failed :no_entry: :no_entry:
-      #       *Please review the logs of the failed deployment*
-      #       repo: ${{ github.repository }}
-      #       branch: ${{ github.ref }}
-      #       author: *${{ github.event.head_commit.author.name }}*
-      #       commit desc: "'${{ github.event.head_commit.message }}'' --> '${{ github.event.head_commit.url }}''"
-      #       gitflow action: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          DEV=true SNAPSHOT=true PLATFORMS=linux/amd64 TYPES=docker mage -v package

@@ -3,13 +3,11 @@ package beater
 import (
 	"context"
 	"fmt"
+	"k8s.io/client-go/kubernetes"
 	"os"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	k8s "k8s.io/client-go/kubernetes"
 )
 
 const (
@@ -19,16 +17,11 @@ const (
 
 type LeaseInfo struct {
 	ctx    context.Context
-	client k8s.Interface
+	client kubernetes.Interface
 }
 
-func NewLeaseInfo(ctx context.Context) (*LeaseInfo, error) {
-	c, err := kubernetes.GetKubernetesClient("", kubernetes.KubeClientOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	return &LeaseInfo{ctx, c}, nil
+func NewLeaseInfo(ctx context.Context, client kubernetes.Interface) (*LeaseInfo, error) {
+	return &LeaseInfo{ctx, client}, nil
 }
 
 func (l *LeaseInfo) IsLeader() (bool, error) {

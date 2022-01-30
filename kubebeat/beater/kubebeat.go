@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	libevents "github.com/elastic/beats/v7/libbeat/beat/events"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"time"
 
 	"github.com/elastic/beats/v7/kubebeat/config"
@@ -41,7 +42,11 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 
 	logp.Info("Config initiated.")
 
-	data, err := NewData(ctx, c.Period)
+	client, err := kubernetes.GetKubernetesClient("", kubernetes.KubeClientOptions{})
+	if err != nil {
+		return nil, err
+	}
+	data, err := NewData(ctx, c.Period, client)
 	if err != nil {
 		return nil, err
 	}

@@ -22,7 +22,7 @@ func TestFileFetcherFetchASingleFile(t *testing.T) {
 	assert.Nil(t, err, "Fetcher was not able to fetch files from FS")
 	assert.Equal(t, 1, len(results))
 
-	result := results[0].(FileSystemResource)
+	result := results[0].Resource.(FileSystemResource)
 	assert.Equal(t, files[0], result.FileName)
 	assert.Equal(t, "600", result.FileMode)
 }
@@ -40,11 +40,11 @@ func TestFileFetcherFetchTwoPatterns(t *testing.T) {
 	assert.Nil(t, err, "Fetcher was not able to fetch files from FS")
 	assert.Equal(t, 2, len(results))
 
-	firstResult := results[0].(FileSystemResource)
+	firstResult := results[0].Resource.(FileSystemResource)
 	assert.Equal(t, outerFiles[0], firstResult.FileName)
 	assert.Equal(t, "600", firstResult.FileMode)
 
-	secResult := results[1].(FileSystemResource)
+	secResult := results[1].Resource.(FileSystemResource)
 	assert.Equal(t, outerFiles[1], secResult.FileName)
 	assert.Equal(t, "600", secResult.FileMode)
 }
@@ -61,7 +61,7 @@ func TestFileFetcherFetchDirectoryOnly(t *testing.T) {
 
 	assert.Nil(t, err, "Fetcher was not able to fetch files from FS")
 	assert.Equal(t, 1, len(results))
-	result := results[0].(FileSystemResource)
+	result := results[0].Resource.(FileSystemResource)
 
 	expectedResult := filepath.Base(dir)
 	assert.Equal(t, expectedResult, result.FileName)
@@ -87,7 +87,7 @@ func TestFileFetcherFetchOuterDirectoryOnly(t *testing.T) {
 	//All inner files should exist in the final result
 	expectedResult := []string{"output.txt", filepath.Base(innerDir)}
 	for i := 0; i < len(results); i++ {
-		fileSystemDataResources := results[i].(FileSystemResource)
+		fileSystemDataResources := results[i].Resource.(FileSystemResource)
 		assert.Contains(t, expectedResult, fileSystemDataResources.FileName)
 	}
 }
@@ -118,8 +118,7 @@ func TestFileFetcherFetchDirectoryRecursively(t *testing.T) {
 
 	//All inner files should exist in the final result
 	for i := 0; i < len(results); i++ {
-
-		fileSystemDataResources := results[i].(FileSystemResource)
+		fileSystemDataResources := results[i].Resource.(FileSystemResource)
 		assert.Contains(t, allFilesName, fileSystemDataResources.FileName)
 	}
 }
