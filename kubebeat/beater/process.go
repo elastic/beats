@@ -1,7 +1,7 @@
 package beater
 
 import (
-	"github.com/elastic/beats/v7/kubebeat/proc"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/proc"
 )
 
 const (
