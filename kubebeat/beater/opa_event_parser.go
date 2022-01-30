@@ -11,7 +11,6 @@ type opaEventParser struct {
 }
 
 func NewOpaEventParser() (*opaEventParser, error) {
-
 	return &opaEventParser{}, nil
 }
 

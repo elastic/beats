@@ -4,14 +4,18 @@ import (
 	"context"
 	"fmt"
 	libevents "github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"time"
 
 	"github.com/elastic/beats/v7/kubebeat/config"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/gofrs/uuid"
+
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	// Add kubebeat default processors
+	_ "github.com/elastic/beats/v7/kubebeat/processor"
 )
 
 // kubebeat configuration.
@@ -69,9 +73,15 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	data.RegisterFetcher("kube_api", kubef, true)
-	data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir), false)
-	data.RegisterFetcher("file_system", NewFileFetcher(c.Files), false)
+	if err = data.RegisterFetcher("kube_api", kubef, true); err != nil {
+		return nil, err
+	}
+	if err = data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir), false); err != nil {
+		return nil, err
+	}
+	if err = data.RegisterFetcher("file_system", NewFileFetcher(c.Files), false); err != nil {
+		return nil, err
+	}
 
 	bt := &kubebeat{
 		done:         make(chan struct{}),
@@ -88,13 +98,22 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 func (bt *kubebeat) Run(b *beat.Beat) error {
 	logp.Info("kubebeat is running! Hit CTRL-C to stop it.")
 
-	err := bt.data.Run()
-	if err != nil {
+	if err := bt.data.Run(); err != nil {
 		return err
 	}
 	defer bt.data.Stop()
 
-	if bt.client, err = b.Publisher.Connect(); err != nil {
+	procs, err := bt.configureProcessors(bt.config.Processors)
+	if err != nil {
+		return err
+	}
+
+	// Connect publisher (with beat's processors)
+	if bt.client, err = b.Publisher.ConnectWith(beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			Processor: procs,
+		},
+	}); err != nil {
 		return err
 	}
 
@@ -157,4 +176,9 @@ func (bt *kubebeat) updateCycleStatus(cycleId uuid.UUID, status string) {
 		},
 	}
 	bt.client.Publish(cycleEndedEvent)
+}
+
+// configureProcessors configure processors to be used by the beat
+func (bt *kubebeat) configureProcessors(processorsList processors.PluginConfig) (procs *processors.Processors, err error) {
+	return processors.New(processorsList)
 }

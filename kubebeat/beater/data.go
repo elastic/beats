@@ -36,7 +36,6 @@ type registeredFetcher struct {
 // NewData returns a new Data instance with the given interval.
 func NewData(ctx context.Context, interval time.Duration, client kubernetes.Interface) (*Data, error) {
 	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
 
 	li, err := NewLeaseInfo(ctx, client)
 	if err != nil {
