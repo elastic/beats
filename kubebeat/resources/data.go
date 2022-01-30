@@ -1,4 +1,4 @@
-package beater
+package resources
 
 import (
 	"bytes"
@@ -16,17 +16,17 @@ import (
 // against it. It sends the cache to an output channel at the defined interval.
 type Data struct {
 	interval time.Duration
-	output   chan resourcesMap
+	output   chan Map
 
 	ctx             context.Context
 	cancel          context.CancelFunc
-	state           resourcesMap
+	state           Map
 	fetcherRegistry map[string]registeredFetcher
 	leaseInfo       *LeaseInfo
 	wg              *sync.WaitGroup
 }
 
-type resourcesMap map[string][]FetcherResult
+type Map map[string][]FetcherResult
 
 type registeredFetcher struct {
 	f          Fetcher
@@ -45,17 +45,17 @@ func NewData(ctx context.Context, interval time.Duration, client kubernetes.Inte
 
 	return &Data{
 		interval:        interval,
-		output:          make(chan resourcesMap),
+		output:          make(chan Map),
 		ctx:             ctx,
 		cancel:          cancel,
-		state:           make(resourcesMap),
+		state:           make(Map),
 		fetcherRegistry: make(map[string]registeredFetcher),
 		leaseInfo:       li,
 	}, nil
 }
 
 // Output returns the output channel.
-func (d *Data) Output() <-chan resourcesMap {
+func (d *Data) Output() <-chan Map {
 	return d.output
 }
 
@@ -177,7 +177,7 @@ func (d *Data) Stop() {
 }
 
 // copyState makes a copyState of the given map.
-func copyState(m resourcesMap) (resourcesMap, error) {
+func copyState(m Map) (Map, error) {
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
 	dec := gob.NewDecoder(&buf)
@@ -185,7 +185,7 @@ func copyState(m resourcesMap) (resourcesMap, error) {
 	if err != nil {
 		return nil, err
 	}
-	var newState resourcesMap
+	var newState Map
 	err = dec.Decode(&newState)
 	if err != nil {
 		return nil, err
@@ -195,7 +195,5 @@ func copyState(m resourcesMap) (resourcesMap, error) {
 
 func init() {
 	gob.Register([]interface{}{})
-	gob.Register(ProcessResource{})
-	gob.Register(FileSystemResource{})
 	gob.Register(FetcherResult{})
 }

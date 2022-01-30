@@ -1,4 +1,4 @@
-package beater
+package resources
 
 // Fetcher represents a data fetcher.
 type Fetcher interface {

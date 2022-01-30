@@ -1,11 +1,12 @@
-package beater
+package opa
 
 import (
 	"encoding/json"
+	"testing"
+
 	"github.com/elastic/beats/v7/kubebeat/config"
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestEvaluationResultParserParseResult(t *testing.T) {

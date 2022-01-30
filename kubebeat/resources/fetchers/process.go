@@ -1,11 +1,11 @@
-package beater
+package fetchers
 
 import (
+	"github.com/elastic/beats/v7/kubebeat/resources"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/proc"
 )
 
 const (
-	procfsdir   = "/hostfs"
 	ProcessType = "process"
 )
 
@@ -19,19 +19,19 @@ type ProcessesFetcher struct {
 	directory string // parent directory of target procfs
 }
 
-func NewProcessesFetcher(dir string) Fetcher {
+func NewProcessesFetcher(dir string) resources.Fetcher {
 	return &ProcessesFetcher{
 		directory: dir,
 	}
 }
 
-func (f *ProcessesFetcher) Fetch() ([]FetcherResult, error) {
+func (f *ProcessesFetcher) Fetch() ([]resources.FetcherResult, error) {
 	pids, err := proc.List(f.directory)
 	if err != nil {
 		return nil, err
 	}
 
-	ret := make([]FetcherResult, 0)
+	ret := make([]resources.FetcherResult, 0)
 
 	// If errors occur during read, then return what we have till now
 	// without reporting errors.
@@ -46,7 +46,10 @@ func (f *ProcessesFetcher) Fetch() ([]FetcherResult, error) {
 			return ret, nil
 		}
 
-		ret = append(ret, FetcherResult{ProcessType, ProcessResource{p, cmd, stat}})
+		ret = append(ret, resources.FetcherResult{
+			Type:     ProcessType,
+			Resource: ProcessResource{p, cmd, stat},
+		})
 	}
 
 	return ret, nil

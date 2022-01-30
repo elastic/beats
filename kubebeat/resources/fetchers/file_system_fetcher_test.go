@@ -1,4 +1,4 @@
-package beater
+package fetchers
 
 import (
 	"io/ioutil"
@@ -19,7 +19,7 @@ func TestFileFetcherFetchASingleFile(t *testing.T) {
 	fileFetcher := NewFileFetcher(filePaths)
 	results, err := fileFetcher.Fetch()
 
-	assert.Nil(t, err, "Fetcher was not able to fetch files from FS")
+	assert.Nil(t, err, "resources.Fetcher was not able to fetch files from FS")
 	assert.Equal(t, 1, len(results))
 
 	result := results[0].Resource.(FileSystemResource)
@@ -37,7 +37,7 @@ func TestFileFetcherFetchTwoPatterns(t *testing.T) {
 	fileFetcher := NewFileFetcher(path)
 	results, err := fileFetcher.Fetch()
 
-	assert.Nil(t, err, "Fetcher was not able to fetch files from FS")
+	assert.Nil(t, err, "resources.Fetcher was not able to fetch files from FS")
 	assert.Equal(t, 2, len(results))
 
 	firstResult := results[0].Resource.(FileSystemResource)
@@ -59,7 +59,7 @@ func TestFileFetcherFetchDirectoryOnly(t *testing.T) {
 	fileFetcher := NewFileFetcher(filePaths)
 	results, err := fileFetcher.Fetch()
 
-	assert.Nil(t, err, "Fetcher was not able to fetch files from FS")
+	assert.Nil(t, err, "resources.Fetcher was not able to fetch files from FS")
 	assert.Equal(t, 1, len(results))
 	result := results[0].Resource.(FileSystemResource)
 
@@ -81,7 +81,7 @@ func TestFileFetcherFetchOuterDirectoryOnly(t *testing.T) {
 	fileFetcher := NewFileFetcher(path)
 	results, err := fileFetcher.Fetch()
 
-	assert.Nil(t, err, "Fetcher was not able to fetch files from FS")
+	assert.Nil(t, err, "resources.Fetcher was not able to fetch files from FS")
 	assert.Equal(t, 2, len(results))
 
 	//All inner files should exist in the final result
@@ -110,7 +110,7 @@ func TestFileFetcherFetchDirectoryRecursively(t *testing.T) {
 	fileFetcher := NewFileFetcher(path)
 	results, err := fileFetcher.Fetch()
 
-	assert.Nil(t, err, "Fetcher was not able to fetch files from FS")
+	assert.Nil(t, err, "resources.Fetcher was not able to fetch files from FS")
 	assert.Equal(t, 6, len(results))
 
 	directories := []string{filepath.Base(outerDir), filepath.Base(innerDir), filepath.Base(innerInnerDir)}
