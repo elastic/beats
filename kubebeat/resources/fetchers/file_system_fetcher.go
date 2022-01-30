@@ -1,14 +1,16 @@
-package beater
+package fetchers
 
 import (
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"os"
 	"os/user"
 	"strconv"
 	"syscall"
+
+	"github.com/elastic/beats/v7/kubebeat/resources"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-// FileSystemFetcher implement the Fetcher interface
+// FileSystemFetcher implement the resources.Fetcher interface
 // The FileSystemFetcher meant to fetch file/directories from the file system and ship it
 // to the Kubebeat
 type FileSystemFetcher struct {
@@ -29,14 +31,14 @@ type FileSystemResource struct {
 	Path     string `json:"path"`
 }
 
-func NewFileFetcher(filesPaths []string) Fetcher {
+func NewFileFetcher(filesPaths []string) resources.Fetcher {
 	return &FileSystemFetcher{
 		inputFilePatterns: filesPaths,
 	}
 }
 
-func (f *FileSystemFetcher) Fetch() ([]FetcherResult, error) {
-	results := make([]FetcherResult, 0)
+func (f *FileSystemFetcher) Fetch() ([]resources.FetcherResult, error) {
+	results := make([]resources.FetcherResult, 0)
 
 	// Input files might contain glob pattern
 	for _, filePattern := range f.inputFilePatterns {
@@ -46,7 +48,10 @@ func (f *FileSystemFetcher) Fetch() ([]FetcherResult, error) {
 		}
 		for _, file := range matchedFiles {
 			resource := f.fetchSystemResource(file)
-			results = append(results, FetcherResult{FileSystemType, resource})
+			results = append(results, resources.FetcherResult{
+				Type:     FileSystemType,
+				Resource: resource,
+			})
 		}
 	}
 	return results, nil

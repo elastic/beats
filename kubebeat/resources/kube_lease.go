@@ -1,4 +1,4 @@
-package beater
+package resources
 
 import (
 	"context"
@@ -25,7 +25,7 @@ func NewLeaseInfo(ctx context.Context, client kubernetes.Interface) (*LeaseInfo,
 }
 
 func (l *LeaseInfo) IsLeader() (bool, error) {
-	leases, err := l.client.CoordinationV1().Leases(kubeSystemNamespace).List(l.ctx, v1.ListOptions{})
+	leases, err := l.client.CoordinationV1().Leases("kube-system").List(l.ctx, v1.ListOptions{})
 	if err != nil {
 		return false, err
 	}

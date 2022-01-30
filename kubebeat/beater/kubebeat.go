@@ -3,19 +3,20 @@ package beater
 import (
 	"context"
 	"fmt"
-	libevents "github.com/elastic/beats/v7/libbeat/beat/events"
 	"time"
 
 	"github.com/elastic/beats/v7/kubebeat/config"
+	"github.com/elastic/beats/v7/kubebeat/opa"
+	_ "github.com/elastic/beats/v7/kubebeat/processor" // Add kubebeat default processors.
+	"github.com/elastic/beats/v7/kubebeat/resources"
+	"github.com/elastic/beats/v7/kubebeat/resources/fetchers"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	libevents "github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/gofrs/uuid"
-
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	// Add kubebeat default processors
-	_ "github.com/elastic/beats/v7/kubebeat/processor"
 )
 
 // kubebeat configuration.
@@ -23,9 +24,9 @@ type kubebeat struct {
 	done         chan struct{}
 	config       config.Config
 	client       beat.Client
-	eval         *evaluator
-	data         *Data
-	resultParser *evaluationResultParser
+	data         *resources.Data
+	eval         *opa.Evaluator
+	resultParser *opa.EvaluationResultParser
 	scheduler    ResourceScheduler
 }
 
@@ -50,25 +51,26 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, err := NewData(ctx, c.Period, client)
+
+	data, err := resources.NewData(ctx, c.Period, client)
 	if err != nil {
 		return nil, err
 	}
 
 	scheduler := NewSynchronousScheduler()
-	evaluator, err := NewEvaluator()
+	evaluator, err := opa.NewEvaluator()
 	if err != nil {
 		return nil, err
 	}
 
 	// namespace will be passed as param from fleet on https://github.com/elastic/security-team/issues/2383 and it's user configurable
 	resultsIndex := config.Datastream("", config.ResultsDatastreamIndexPrefix)
-	eventParser, err := NewEvaluationResultParser(resultsIndex)
+	eventParser, err := opa.NewEvaluationResultParser(resultsIndex)
 	if err != nil {
 		return nil, err
 	}
 
-	kubef, err := NewKubeFetcher(c.KubeConfig, c.Period)
+	kubef, err := fetchers.NewKubeFetcher(c.KubeConfig, c.Period)
 	if err != nil {
 		return nil, err
 	}
@@ -76,10 +78,10 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	if err = data.RegisterFetcher("kube_api", kubef, true); err != nil {
 		return nil, err
 	}
-	if err = data.RegisterFetcher("processes", NewProcessesFetcher(procfsdir), false); err != nil {
+	if err = data.RegisterFetcher("processes", fetchers.NewProcessesFetcher("/hostfs/proc"), false); err != nil {
 		return nil, err
 	}
-	if err = data.RegisterFetcher("file_system", NewFileFetcher(c.Files), false); err != nil {
+	if err = data.RegisterFetcher("file_system", fetchers.NewFileFetcher(c.Files), false); err != nil {
 		return nil, err
 	}
 

@@ -1,10 +1,11 @@
-package beater
+package fetchers
 
 import (
 	"fmt"
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/kubebeat/resources"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
@@ -74,7 +75,7 @@ type KubeFetcher struct {
 	watchers   []kubernetes.Watcher
 }
 
-func NewKubeFetcher(kubeconfig string, interval time.Duration) (Fetcher, error) {
+func NewKubeFetcher(kubeconfig string, interval time.Duration) (resources.Fetcher, error) {
 	f := &KubeFetcher{
 		kubeconfig: kubeconfig,
 		interval:   interval,
@@ -131,7 +132,7 @@ func (f *KubeFetcher) initWatchers() error {
 	return nil
 }
 
-func (f *KubeFetcher) Fetch() ([]FetcherResult, error) {
+func (f *KubeFetcher) Fetch() ([]resources.FetcherResult, error) {
 	var err error
 	watcherlock.Do(func() {
 		err = f.initWatchers()
@@ -142,12 +143,12 @@ func (f *KubeFetcher) Fetch() ([]FetcherResult, error) {
 		return nil, fmt.Errorf("could not initate Kubernetes watchers: %w", err)
 	}
 
-	ret := make([]FetcherResult, 0)
+	ret := make([]resources.FetcherResult, 0)
 
 	for _, w := range f.watchers {
-		resources := w.Store().List()
+		rs := w.Store().List()
 
-		for _, r := range resources {
+		for _, r := range rs {
 			o, ok := r.(runtime.Object)
 
 			if !ok {
@@ -157,7 +158,10 @@ func (f *KubeFetcher) Fetch() ([]FetcherResult, error) {
 
 			addTypeInformationToObject(o) // See https://github.com/kubernetes/kubernetes/issues/3030
 
-			ret = append(ret, FetcherResult{KubeAPIType, o})
+			ret = append(ret, resources.FetcherResult{
+				Type:     KubeAPIType,
+				Resource: o,
+			})
 		}
 	}
 
