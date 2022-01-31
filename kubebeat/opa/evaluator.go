@@ -18,7 +18,7 @@ type Evaluator struct {
 }
 
 func NewEvaluator() (*Evaluator, error) {
-	server, err := bundle.CreateServer()
+	server, err := bundle.StartServer()
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func NewEvaluator() (*Evaluator, error) {
 	// provide the OPA configuration which specifies
 	// fetching policy bundles from the mock bundleServer
 	// and logging decisions locally to the console
-	config := []byte(fmt.Sprintf(bundle.Config, server.Addr))
+	config := []byte(fmt.Sprintf(bundle.Config, bundle.ServerAddress))
 
 	// create an instance of the OPA object
 	opaLogger := newEvaluatorLogger()

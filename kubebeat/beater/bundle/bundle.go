@@ -8,6 +8,10 @@ import (
 	csppolicies "github.com/elastic/csp-security-policies/bundle"
 )
 
+var address = "127.0.0.1:18080"
+
+var ServerAddress = "http://" + address
+
 var Config = `{
         "services": {
             "test": {
@@ -24,7 +28,7 @@ var Config = `{
         }
     }`
 
-func CreateServer() (*http.Server, error) {
+func StartServer() (*http.Server, error) {
 	policies, err := csppolicies.CISKubernetes()
 	if err != nil {
 		return nil, err
@@ -37,7 +41,7 @@ func CreateServer() (*http.Server, error) {
 	}
 
 	srv := &http.Server{
-		Addr:         "127.0.0.1:18080",
+		Addr:         address,
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,

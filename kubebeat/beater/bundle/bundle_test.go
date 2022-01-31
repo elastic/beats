@@ -10,7 +10,7 @@ import (
 func TestCreateServer(t *testing.T) {
 	assert := assert.New(t)
 
-	server, err := CreateServer()
+	_, err := StartServer()
 	assert.NoError(err)
 
 	var tests = []struct {
@@ -29,7 +29,7 @@ func TestCreateServer(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		target := "http://" + server.Addr + test.path
+		target := ServerAddress + test.path
 		client := &http.Client{}
 		res, err := client.Get(target)
 
