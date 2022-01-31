@@ -10299,6 +10299,16 @@ Block I/O metrics.
 
 
 
+*`containerd.blkio.device`*::
++
+--
+Name of block device
+
+
+type: keyword
+
+--
+
 [float]
 === read
 
