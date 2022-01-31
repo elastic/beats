@@ -12,7 +12,6 @@ https://github.com/elastic/beats/compare/v7.16.3...v7.17.0[View commits]
 *Affecting all Beats*
 
 - Change Docker base image from CentOS 7 to Ubuntu 20.04 {pull}29681[29681]
-- Add job.name in pods controlled by Jobs {pull}28954[28954]
 
 *Auditbeat*
 
@@ -21,8 +20,6 @@ https://github.com/elastic/beats/compare/v7.16.3...v7.17.0[View commits]
 *Heartbeat*
 
 *Metricbeat*
-
-- Remove overriding of index pattern on the Kubernetes overview dashboard. {pull}29676[29676]
 
 *Packetbeat*
 
@@ -73,6 +70,7 @@ https://github.com/elastic/beats/compare/v7.16.3...v7.17.0[View commits]
 - Enhance filter check in kubernetes event metricset. {pull}29470[29470]
 - Fix gcp metrics metricset apply aligner to all metric_types {pull}29514[29513]
 - Fixed GCP GKE Overview dashboard {pull}29913[29913]
+- Remove overriding of index pattern on the Kubernetes overview dashboard. {pull}29676[29676]
 
 *Packetbeat*
 
@@ -91,6 +89,7 @@ https://github.com/elastic/beats/compare/v7.16.3...v7.17.0[View commits]
 *Affecting all Beats*
 
 - SASL/SCRAM in the Kafka output is no longer beta. {pull}29126[29126]
+- Add job.name in pods controlled by Jobs {pull}28954[28954]
 
 *Auditbeat*
 
