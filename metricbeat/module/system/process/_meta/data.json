@@ -11,39 +11,41 @@
     },
     "process": {
         "args": [
-            "/home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/node",
-            "/home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/out/bootstrap-fork",
-            "--type=extensionHost",
-            "--uriTransformerPath=/home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/out/vs/server/uriTransformer.js"
+            "/tmp/go-build2412913392/b001/process.test",
+            "-test.paniconexit0",
+            "-test.timeout=10m0s",
+            "-test.v=true",
+            "-data",
+            "-test.run=TestData"
         ],
-        "command_line": "/home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/node /home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/out/bootstrap-fork --type=extensionHost --uriTransformerPath=/home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/out/vs/server/uriTransformer.js",
+        "command_line": "/tmp/go-build2412913392/b001/process.test -test.paniconexit0 -test.timeout=10m0s -test.v=true -data -test.run=TestData",
         "cpu": {
-            "pct": 0.0044,
-            "start_time": "2022-01-26T22:33:31.000Z"
+            "pct": 0.0013,
+            "start_time": "2022-01-31T21:06:54.000Z"
         },
-        "executable": "/home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/node",
+        "executable": "/tmp/go-build2412913392/b001/process.test",
         "memory": {
-            "pct": 0.0027
+            "pct": 0.0004
         },
-        "name": "node",
+        "name": "process.test",
         "parent": {
-            "pid": 3932
+            "pid": 3334369
         },
-        "pgid": 3866,
-        "pid": 1517341,
+        "pgid": 3334369,
+        "pid": 3334614,
         "state": "sleeping",
-        "working_directory": "/home/alexk"
+        "working_directory": "/home/alexk/go/src/github.com/elastic/beats/metricbeat/module/system/process"
     },
     "service": {
         "type": "system"
     },
     "system": {
         "process": {
-            "cgroups": {
+            "cgroup": {
                 "cgroups_version": 2,
                 "cpu": {
-                    "id": "session-3.scope",
-                    "path": "/user.slice/user-1000.slice/session-3.scope",
+                    "id": "session-27.scope",
+                    "path": "/user.slice/user-1000.slice/session-27.scope",
                     "pressure": {
                         "full": {
                             "10": {
@@ -55,19 +57,19 @@
                             "60": {
                                 "pct": 0
                             },
-                            "total": 41622197425
+                            "total": 3431214
                         },
                         "some": {
                             "10": {
-                                "pct": 0.28
+                                "pct": 0
                             },
                             "300": {
-                                "pct": 0.15
+                                "pct": 0
                             },
                             "60": {
-                                "pct": 0.31
+                                "pct": 0
                             },
-                            "total": 44879249709
+                            "total": 3626431
                         }
                     },
                     "stats": {
@@ -75,28 +77,28 @@
                             "norm": {
                                 "pct": 0
                             },
-                            "ns": 42759669745,
-                            "pct": 0.0001
+                            "ns": 70940728,
+                            "pct": 0
                         },
                         "usage": {
                             "norm": {
                                 "pct": 0
                             },
-                            "ns": 175249141994,
-                            "pct": 0.0002
+                            "ns": 502653872,
+                            "pct": 0
                         },
                         "user": {
                             "norm": {
                                 "pct": 0
                             },
-                            "ns": 132489472249,
-                            "pct": 0.0001
+                            "ns": 431713143,
+                            "pct": 0
                         }
                     }
                 },
-                "id": "session-3.scope",
+                "id": "session-27.scope",
                 "memory": {
-                    "id": "session-3.scope",
+                    "id": "session-27.scope",
                     "mem": {
                         "events": {
                             "high": 0,
@@ -109,7 +111,7 @@
                             "bytes": 0
                         },
                         "usage": {
-                            "bytes": 19519815680
+                            "bytes": 2462191616
                         }
                     },
                     "memsw": {
@@ -122,31 +124,31 @@
                             "bytes": 0
                         },
                         "usage": {
-                            "bytes": 49192960
+                            "bytes": 0
                         }
                     },
-                    "path": "/user.slice/user-1000.slice/session-3.scope",
+                    "path": "/user.slice/user-1000.slice/session-27.scope",
                     "stats": {
                         "active_anon": {
-                            "bytes": 173719552
+                            "bytes": 19554304
                         },
                         "active_file": {
-                            "bytes": 5222309888
+                            "bytes": 4419584
                         },
                         "anon": {
-                            "bytes": 4153999360
+                            "bytes": 2368811008
                         },
                         "anon_thp": {
-                            "bytes": 249561088
+                            "bytes": 205520896
                         },
                         "file": {
-                            "bytes": 14433026048
+                            "bytes": 48955392
                         },
                         "file_dirty": {
                             "bytes": 0
                         },
                         "file_mapped": {
-                            "bytes": 88780800
+                            "bytes": 14315520
                         },
                         "file_thp": {
                             "bytes": 0
@@ -154,83 +156,83 @@
                         "file_writeback": {
                             "bytes": 0
                         },
-                        "htp_collapse_alloc": 565,
+                        "htp_collapse_alloc": 28,
                         "inactive_anon": {
-                            "bytes": 4497219584
+                            "bytes": 2370981888
                         },
                         "inactive_file": {
-                            "bytes": 9164648448
+                            "bytes": 24166400
                         },
                         "kernel_stack": {
-                            "bytes": 3063808
+                            "bytes": 2621440
                         },
-                        "major_page_faults": 12739,
-                        "page_activate": 3565607,
-                        "page_deactivate": 289941,
-                        "page_faults": 766722940,
+                        "major_page_faults": 45,
+                        "page_activate": 12197,
+                        "page_deactivate": 0,
+                        "page_faults": 3623174,
                         "page_lazy_free": 0,
                         "page_lazy_freed": 0,
-                        "page_refill": 299271,
-                        "page_scan": 9095305,
-                        "page_steal": 8904374,
+                        "page_refill": 0,
+                        "page_scan": 0,
+                        "page_steal": 0,
                         "page_tables": {
-                            "bytes": 41185280
+                            "bytes": 22589440
                         },
                         "per_cpu": {
                             "bytes": 0
                         },
                         "shmem": {
-                            "bytes": 46067712
+                            "bytes": 20369408
                         },
                         "shmem_thp": {
                             "bytes": 0
                         },
                         "slab": {
-                            "bytes": 413503728
+                            "bytes": 13215832
                         },
                         "slab_reclaimable": {
-                            "bytes": 399503176
+                            "bytes": 8919768
                         },
                         "slab_unreclaimable": {
-                            "bytes": 14000552
+                            "bytes": 4296064
                         },
                         "sock": {
-                            "bytes": 4096
+                            "bytes": 16384
                         },
                         "swap_cached": {
-                            "bytes": 237568
+                            "bytes": 0
                         },
-                        "thp_fault_alloc": 5646,
+                        "thp_fault_alloc": 91,
                         "unevictable": {
-                            "bytes": 20480
+                            "bytes": 0
                         },
-                        "workingset_activate_anon": 1456,
-                        "workingset_activate_file": 107169,
+                        "workingset_activate_anon": 0,
+                        "workingset_activate_file": 0,
                         "workingset_node_reclaim": 0,
-                        "workingset_refault_anon": 3841,
-                        "workingset_refault_file": 1422155,
+                        "workingset_refault_anon": 0,
+                        "workingset_refault_file": 1381,
                         "workingset_restore_anon": 0,
-                        "workingset_restore_file": 3851
+                        "workingset_restore_file": 0
                     }
                 },
-                "path": "/user.slice/user-1000.slice/session-3.scope"
+                "path": "/user.slice/user-1000.slice/session-27.scope"
             },
-            "cmdline": "/home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/node /home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/out/bootstrap-fork --type=extensionHost --uriTransformerPath=/home/alexk/.vscode-server/bin/899d46d82c4c95423fb7e10e68eba52050e30ba3/out/vs/server/uriTransformer.js",
+            "cmdline": "/tmp/go-build2412913392/b001/process.test -test.paniconexit0 -test.timeout=10m0s -test.v=true -data -test.run=TestData",
             "cpu": {
-                "start_time": "2022-01-26T22:33:31.000Z",
+                "start_time": "2022-01-31T21:06:54.000Z",
                 "system": {
-                    "ticks": 3007180
+                    "ticks": 140
                 },
                 "total": {
                     "norm": {
-                        "pct": 0.0044
+                        "pct": 0.0013
                     },
-                    "pct": 0.0528,
-                    "ticks": 8559930,
-                    "value": 8559930
+                    "pct": 0.0158,
+                    "ticks": 340,
+                    "value": 340
                 },
                 "user": {
-                    "ticks": 5552750
+                    "ticks": 200
                 }
             },
             "fd": {
@@ -238,15 +240,15 @@
                     "hard": 524288,
                     "soft": 524288
                 },
-                "open": 41
+                "open": 11
             },
             "memory": {
                 "rss": {
-                    "bytes": 170172416,
-                    "pct": 0.0027
+                    "bytes": 23404544,
+                    "pct": 0.0004
                 },
-                "share": 39923712,
-                "size": 1041936384
+                "share": 14946304,
+                "size": 1725992960
             },
             "state": "sleeping"
         }

@@ -48,7 +48,7 @@ type ProcState struct {
 	FD     ProcFDInfo  `struct:"fd,omitempty"`
 
 	// cgroups
-	Cgroup cgroup.CGStats `struct:"cgroups,omitempty"`
+	Cgroup cgroup.CGStats `struct:"cgroup,omitempty"`
 
 	// meta
 	SampleTime time.Time `struct:"-,omitempty"`
