@@ -29,29 +29,29 @@ func TestAddLabels(t *testing.T) {
 
 	testProcessors(t, map[string]testCase{
 		"add label": {
-			event: common.MapStr{},
-			want: common.MapStr{
+			eventFields: common.MapStr{},
+			wantFields: common.MapStr{
 				"labels": common.MapStr{"label": "test"},
 			},
 			cfg: single(`{add_labels: {labels: {label: test}}}`),
 		},
 		"add dotted label": {
-			event: common.MapStr{},
-			want: common.MapStr{
+			eventFields: common.MapStr{},
+			wantFields: common.MapStr{
 				"labels": common.MapStr{"a.b": "test"},
 			},
 			cfg: single(`{add_labels: {labels: {a.b: test}}}`),
 		},
 		"add nested labels": {
-			event: common.MapStr{},
-			want: common.MapStr{
+			eventFields: common.MapStr{},
+			wantFields: common.MapStr{
 				"labels": common.MapStr{"a.b": "test", "a.c": "test2"},
 			},
 			cfg: single(`{add_labels: {labels: {a: {b: test, c: test2}}}}`),
 		},
 		"merge labels": {
-			event: common.MapStr{},
-			want: common.MapStr{
+			eventFields: common.MapStr{},
+			wantFields: common.MapStr{
 				"labels": common.MapStr{"l1": "a", "l2": "b", "lc": "b"},
 			},
 			cfg: multi(
@@ -60,8 +60,8 @@ func TestAddLabels(t *testing.T) {
 			),
 		},
 		"add array": {
-			event: common.MapStr{},
-			want: common.MapStr{
+			eventFields: common.MapStr{},
+			wantFields: common.MapStr{
 				"labels": common.MapStr{
 					"array.0":       "foo",
 					"array.1":       "bar",
