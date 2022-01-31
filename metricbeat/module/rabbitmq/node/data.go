@@ -147,7 +147,7 @@ var (
 	}
 )
 
-func eventsMapping(r mb.ReporterV2, content []byte, m *ClusterMetricSet) error {
+func eventsMapping(r mb.ReporterV2, content []byte) error {
 	var nodes []map[string]interface{}
 	err := json.Unmarshal(content, &nodes)
 	if err != nil {
@@ -155,26 +155,16 @@ func eventsMapping(r mb.ReporterV2, content []byte, m *ClusterMetricSet) error {
 	}
 
 	for _, node := range nodes {
-		evt, err := eventMapping(node)
-		if err != nil {
-			m.Logger().Errorf("error in mapping: %s", err)
-			r.Error(err)
-			continue
-		}
-		if !r.Event(evt) {
-			return nil
-		}
+		evt := eventMapping(node)
+		r.Event(evt)
 	}
 	return nil
 }
 
-func eventMapping(node map[string]interface{}) (mb.Event, error) {
-	event, err := schema.Apply(node)
-	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "error applying schema")
-	}
+func eventMapping(node map[string]interface{}) mb.Event {
+	event, _ := schema.Apply(node)
 	return mb.Event{
 		MetricSetFields: event,
-	}, nil
+	}
 
 }
