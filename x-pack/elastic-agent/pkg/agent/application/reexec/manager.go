@@ -54,7 +54,7 @@ func (m *manager) ReExec(shutdownCallback ShutdownCallbackFn, argOverrides ...st
 		if shutdownCallback != nil {
 			if err := shutdownCallback(); err != nil {
 				// panic; because there is no going back, everything is shutdown
-				panic(errors.New(errors.TypeUnexpected, err, "failure occurred during shutdown cleanup"))
+				panic(errors.New(errors.TypeUnexpected, err, "failure occured during shutdown cleanup"))
 			}
 		}
 
