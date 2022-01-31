@@ -198,9 +198,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `elasticsearch.cluster.id` field to Beat and Kibana modules. {pull}29577[29577]
 - Add `elasticsearch.cluster.id` field to Logstash module. {pull}29625[29625]
 - Add `xpack.enabled` support for Enterprise Search module. {pull}29871[29871]
-- Add gcp firestore metricset. {pull}29918[29918] 
-- Remove strict parsing on RabbitMQ module {pull}30090[30090]
 - Add gcp firestore metricset. {pull}29918[29918]
+- Remove strict parsing on RabbitMQ module {pull}30090[30090]
 
 *Packetbeat*
 
