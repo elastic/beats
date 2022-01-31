@@ -57,8 +57,7 @@ func (e *Evaluator) Decision(input interface{}) (interface{}, error) {
 	return result.Result, nil
 }
 
-<<<<<<< HEAD:kubebeat/beater/evaluator.go
-func (e *evaluator) Stop() {
+func (e *Evaluator) Stop() {
 	ctx := context.Background()
 	e.opa.Stop(ctx)
 	e.bundleServer.Shutdown(ctx)
@@ -68,9 +67,4 @@ func newEvaluatorLogger() logging.Logger {
 	opaLogger := logging.New()
 	opaLogger.SetFormatter(&logrus.JSONFormatter{})
 	return opaLogger.WithFields(map[string]interface{}{"goroutine": "opa"})
-=======
-func (e *Evaluator) Stop() {
-	e.opa.Stop(context.Background())
-	e.bundleServer.Stop()
->>>>>>> master:kubebeat/opa/evaluator.go
 }
