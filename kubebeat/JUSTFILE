@@ -29,6 +29,9 @@ deploy-kubebeat-debug:
 
 build-deploy-kubebeat-debug: build-kubebeat-debug load-kubebeat-image deploy-kubebeat-debug
 
+logs-kubebeat:
+  kubectl logs -f --selector="k8s-app=kubebeat" -n kube-system
+
 package-agent:
   cd ../x-pack/elastic-agent & DEV=true SNAPSHOT=true PLATFORMS=linux/amd64 TYPES=docker mage -v package
 

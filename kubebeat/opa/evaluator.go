@@ -4,33 +4,35 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"net/http"
 
-	"github.com/elastic/beats/v7/kubebeat/bundle"
+	"github.com/elastic/beats/v7/kubebeat/beater/bundle"
+	"github.com/open-policy-agent/opa/logging"
 	"github.com/open-policy-agent/opa/sdk"
-	sdktest "github.com/open-policy-agent/opa/sdk/test"
+	"github.com/sirupsen/logrus"
 )
 
 type Evaluator struct {
-	bundleServer *sdktest.Server
+	bundleServer *http.Server
 	opa          *sdk.OPA
 }
 
 func NewEvaluator() (*Evaluator, error) {
-	policies := bundle.CreateCISPolicy(bundle.EmbeddedPolicy)
-	// create a mock HTTP bundle bundleServer
-	bundleServer, err := sdktest.NewServer(sdktest.MockBundle("/bundles/bundle.tar.gz", policies))
+	server, err := bundle.StartServer()
 	if err != nil {
-		return nil, fmt.Errorf("fail to init bundle server: %s", err.Error())
+		return nil, err
 	}
 
 	// provide the OPA configuration which specifies
 	// fetching policy bundles from the mock bundleServer
 	// and logging decisions locally to the console
-	config := []byte(fmt.Sprintf(bundle.Config, bundleServer.URL()))
+	config := []byte(fmt.Sprintf(bundle.Config, bundle.ServerAddress))
 
 	// create an instance of the OPA object
+	opaLogger := newEvaluatorLogger()
 	opa, err := sdk.New(context.Background(), sdk.Options{
 		Config: bytes.NewReader(config),
+		Logger: opaLogger,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("fail to init opa: %s", err.Error())
@@ -38,7 +40,7 @@ func NewEvaluator() (*Evaluator, error) {
 
 	return &Evaluator{
 		opa:          opa,
-		bundleServer: bundleServer,
+		bundleServer: server,
 	}, nil
 }
 
@@ -56,6 +58,13 @@ func (e *Evaluator) Decision(input interface{}) (interface{}, error) {
 }
 
 func (e *Evaluator) Stop() {
-	e.opa.Stop(context.Background())
-	e.bundleServer.Stop()
+	ctx := context.Background()
+	e.opa.Stop(ctx)
+	e.bundleServer.Shutdown(ctx)
+}
+
+func newEvaluatorLogger() logging.Logger {
+	opaLogger := logging.New()
+	opaLogger.SetFormatter(&logrus.JSONFormatter{})
+	return opaLogger.WithFields(map[string]interface{}{"goroutine": "opa"})
 }
