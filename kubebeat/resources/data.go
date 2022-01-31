@@ -195,4 +195,6 @@ func copyState(m Map) (Map, error) {
 func init() {
 	gob.Register([]interface{}{})
 	gob.Register(FetcherResult{})
+	gob.Register(ProcessResource{})
+	gob.Register(FileSystemResource{})
 }

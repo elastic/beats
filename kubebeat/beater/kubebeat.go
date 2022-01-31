@@ -33,6 +33,7 @@ type kubebeat struct {
 const (
 	cycleStatusStart = "start"
 	cycleStatusEnd   = "end"
+	processesDir     = "/hostfs"
 	cycleStatusFail  = "fail"
 )
 
@@ -78,7 +79,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	if err = data.RegisterFetcher("kube_api", kubef, true); err != nil {
 		return nil, err
 	}
-	if err = data.RegisterFetcher("processes", fetchers.NewProcessesFetcher("/hostfs/proc"), false); err != nil {
+	if err = data.RegisterFetcher("processes", fetchers.NewProcessesFetcher(processesDir), false); err != nil {
 		return nil, err
 	}
 	if err = data.RegisterFetcher("file_system", fetchers.NewFileFetcher(c.Files), false); err != nil {
