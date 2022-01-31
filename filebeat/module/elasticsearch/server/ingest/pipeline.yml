@@ -1,4 +1,4 @@
-dpacheescription: Pipeline for parsing elasticsearch server logs
+description: Pipeline for parsing elasticsearch server logs
 processors:
 - set:
     field: event.ingested
