@@ -216,7 +216,8 @@ class Test(BaseTest):
             error_line)
 
         # Make sure index exists
-        self.wait_until(lambda: self.es.indices.exists(self.index_name), name="indices present for {}".format(test_file))
+        self.wait_until(lambda: self.es.indices.exists(self.index_name),
+                        name="indices present for {}".format(test_file))
 
         self.es.indices.refresh(index=self.index_name)
         # Loads the first 100 events to be checked
