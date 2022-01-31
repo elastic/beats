@@ -6,6 +6,7 @@ package application
 
 import (
 	"context"
+	"path/filepath"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
@@ -114,7 +115,7 @@ func newLocal(
 		return nil, errors.New(err, "failed to initialize composable controller")
 	}
 
-	discover := discoverer(pathConfigFile, cfg.Settings.Path, cfg.Settings.InputsConfig.Path)
+	discover := discoverer(pathConfigFile, cfg.Settings.Path, configuration.ExternalInputsPattern)
 	emit, err := emitter.New(
 		localApplication.bgContext,
 		log,
@@ -132,7 +133,7 @@ func newLocal(
 		return nil, err
 	}
 
-	loader := config.NewLoader(log, cfg.Settings.InputsConfig.Path)
+	loader := config.NewLoader(log, externalConfigsGlob())
 
 	var cfgSource source
 	if !cfg.Settings.Reload.Enabled {
@@ -158,6 +159,10 @@ func newLocal(
 	uc.SetUpgrader(upgrader)
 
 	return localApplication, nil
+}
+
+func externalConfigsGlob() string {
+	return filepath.Join(paths.Config(), configuration.ExternalInputsPattern)
 }
 
 // Routes returns a list of routes handled by agent.
