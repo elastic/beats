@@ -11,6 +11,7 @@ https://github.com/elastic/beats/compare/v7.16.3...v7.17.0[View commits]
 
 *Affecting all Beats*
 
+- Change Docker base image from CentOS 7 to Ubuntu 20.04 {pull}29681[29681]
 - Add job.name in pods controlled by Jobs {pull}28954[28954]
 - Enrich kubernetes metadata with node annotations. {pull}29605[29605]
 
