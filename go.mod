@@ -164,6 +164,7 @@ require (
 	go.uber.org/zap v1.14.1
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
+	golang.org/x/mod v0.5.1
 	golang.org/x/net v0.0.0-20211020060615-d418f374d309
 	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
@@ -268,7 +269,6 @@ require (
 	github.com/xdg/stringprep v1.0.3 // indirect
 	go.elastic.co/fastjson v1.1.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	golang.org/x/mod v0.5.1 // indirect
 	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
@@ -285,6 +285,7 @@ require (
 replace (
 	github.com/Microsoft/go-winio => github.com/bi-zone/go-winio v0.4.15
 	github.com/Shopify/sarama => github.com/elastic/sarama v1.19.1-0.20210823122811-11c3ef800752
+	github.com/apoydence/eachers => github.com/poy/eachers v0.0.0-20181020210610-23942921fe77 //indirect, see https://github.com/elastic/beats/pull/29780 for details.
 	github.com/cucumber/godog => github.com/cucumber/godog v0.8.1
 	github.com/docker/go-plugins-helpers => github.com/elastic/go-plugins-helpers v0.0.0-20200207104224-bdf17607b79f
 	github.com/dop251/goja => github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20

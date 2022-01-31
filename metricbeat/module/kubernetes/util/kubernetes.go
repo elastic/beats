@@ -51,12 +51,13 @@ type kubernetesConfig struct {
 	KubeConfig        string                       `config:"kube_config"`
 	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
 
-	Host       string        `config:"host"`
+	Node       string        `config:"node"`
 	SyncPeriod time.Duration `config:"sync_period"`
 
 	// AddMetadata enables enriching metricset events with metadata from the API server
 	AddMetadata         bool                                `config:"add_metadata"`
 	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
+	Namespace           string                              `config:"namespace"`
 }
 
 type enricher struct {
@@ -262,6 +263,7 @@ func getResourceMetadataWatchers(config *kubernetesConfig, resource kubernetes.R
 
 	options := kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
+		Namespace:   config.Namespace,
 	}
 
 	log := logp.NewLogger(selector)
@@ -269,7 +271,7 @@ func getResourceMetadataWatchers(config *kubernetesConfig, resource kubernetes.R
 	// Watch objects in the node only
 	if nodeScope {
 		nd := &kubernetes.DiscoverKubernetesNodeParams{
-			ConfigHost:  config.Host,
+			ConfigHost:  config.Node,
 			Client:      client,
 			IsInCluster: kubernetes.IsInCluster(config.KubeConfig),
 			HostUtils:   &kubernetes.DefaultDiscoveryUtils{},
@@ -281,7 +283,7 @@ func getResourceMetadataWatchers(config *kubernetesConfig, resource kubernetes.R
 		}
 	}
 
-	log.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Host)
+	log.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Node)
 
 	watcher, err := kubernetes.NewNamedWatcher("resource_metadata_enricher", client, resource, options, nil)
 	if err != nil {

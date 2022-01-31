@@ -269,7 +269,7 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		return run(streams, logToStderr)
 	}
 
-	if cfg.Kibana.Fleet.Setup || cfg.Fleet.Enroll {
+	if cfg.Kibana.Fleet.Setup || cfg.FleetServer.Enable {
 		err = ensureServiceToken(streams, &cfg)
 		if err != nil {
 			return err

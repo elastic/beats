@@ -60,6 +60,8 @@ queue.mem:
 
 {% if kibana -%}
 setup.kibana.host: "{{ kibana.host }}"
+setup.kibana.username: "{{ kibana.user }}"
+setup.kibana.password: "{{ kibana.pass }}"
 {%- endif %}
 
 #================================ Outputs =====================================
@@ -71,6 +73,8 @@ setup.kibana.host: "{{ kibana.host }}"
 output:
   elasticsearch:
     hosts: ["{{ elasticsearch.host }}"]
+    username: {{ elasticsearch.user }}
+    password: {{ elasticsearch.pass }}
   {% if elasticsearch.pipeline %}
     pipeline: {{elasticsearch.pipeline}}
   {% endif %}

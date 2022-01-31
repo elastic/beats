@@ -72,6 +72,10 @@ This file is generated! See scripts/mage/docs_collector.go
 .1+| .1+|  |<<metricbeat-metricset-cockroachdb-status,status>> beta[]  
 |<<metricbeat-module-consul,Consul>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-consul-agent,agent>> beta[]  
+|<<metricbeat-module-containerd,Containerd>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.3+| .3+|  |<<metricbeat-metricset-containerd-blkio,blkio>> beta[]  
+|<<metricbeat-metricset-containerd-cpu,cpu>> beta[]  
+|<<metricbeat-metricset-containerd-memory,memory>> beta[]  
 |<<metricbeat-module-coredns,Coredns>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-coredns-stats,stats>>   
 |<<metricbeat-module-couchbase,Couchbase>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -116,8 +120,9 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-etcd-self,self>>   
 |<<metricbeat-metricset-etcd-store,store>>   
 |<<metricbeat-module-gcp,Google Cloud Platform>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.7+| .7+|  |<<metricbeat-metricset-gcp-billing,billing>> beta[]  
+.8+| .8+|  |<<metricbeat-metricset-gcp-billing,billing>> beta[]  
 |<<metricbeat-metricset-gcp-compute,compute>> beta[]  
+|<<metricbeat-metricset-gcp-firestore,firestore>> beta[]  
 |<<metricbeat-metricset-gcp-gke,gke>> beta[]  
 |<<metricbeat-metricset-gcp-loadbalancing,loadbalancing>> beta[]  
 |<<metricbeat-metricset-gcp-metrics,metrics>> beta[]  
@@ -322,6 +327,7 @@ include::modules/ceph.asciidoc[]
 include::modules/cloudfoundry.asciidoc[]
 include::modules/cockroachdb.asciidoc[]
 include::modules/consul.asciidoc[]
+include::modules/containerd.asciidoc[]
 include::modules/coredns.asciidoc[]
 include::modules/couchbase.asciidoc[]
 include::modules/couchdb.asciidoc[]

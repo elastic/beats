@@ -107,7 +107,7 @@ func configure(cfg *common.Config) ([]cursor.Source, cursor.Input, error) {
 		MaxBackoff:         config.MaxBackoff,
 		Seek:               config.Seek,
 		CursorSeekFallback: config.CursorSeekFallback,
-		Matches:            config.Matches,
+		Matches:            journalfield.IncludeMatches(config.Matches),
 		Units:              config.Units,
 		Transports:         config.Transports,
 		Identifiers:        config.Identifiers,
