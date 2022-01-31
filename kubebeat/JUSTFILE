@@ -30,10 +30,7 @@ deploy-kubebeat-debug:
 build-deploy-kubebeat-debug: build-kubebeat-debug load-kubebeat-image deploy-kubebeat-debug
 
 logs-kubebeat:
-  POD=`kubectl get pod -A -o custom-columns=name:metadata.name,namespace:metadata.namespace | grep kubebeat | head -n 1 | sed -E 's/[ ]+/ /'` && \
-  POD_NAME=$( echo ${POD} | cut -f 1 -d" " ) && \
-  POD_NAMESPACE=$( echo ${POD} | cut -f 2 -d" " ) && \
-  kubectl logs -f ${POD_NAME} -n ${POD_NAMESPACE}
+  kubectl logs -f --selector="k8s-app=kubebeat" -n kube-system
 
 package-agent:
   cd ../x-pack/elastic-agent & DEV=true SNAPSHOT=true PLATFORMS=linux/amd64 TYPES=docker mage -v package
