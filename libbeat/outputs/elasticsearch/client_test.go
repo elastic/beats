@@ -409,49 +409,22 @@ func TestClientWithHeaders(t *testing.T) {
 
 func TestBulkEncodeEvents(t *testing.T) {
 	cases := map[string]struct {
-		version   string
-		docType   string
-		config    common.MapStr
-		ilmConfig *common.Config
-		isAlias   bool
-		events    []common.MapStr
+		version string
+		docType string
+		config  common.MapStr
+		events  []common.MapStr
 	}{
 		"6.x": {
-			version:   "6.8.0",
-			docType:   "doc",
-			config:    common.MapStr{},
-			ilmConfig: common.NewConfig(),
-			events:    []common.MapStr{{"message": "test"}},
+			version: "6.8.0",
+			docType: "doc",
+			config:  common.MapStr{},
+			events:  []common.MapStr{{"message": "test"}},
 		},
-		"require_alias not supported": {
-			version:   "7.9.0",
-			docType:   "",
-			config:    common.MapStr{},
-			ilmConfig: common.NewConfig(),
-			events:    []common.MapStr{{"message": "test"}},
-		},
-		"require_alias is supported": {
-			version:   "7.10.0",
-			docType:   "",
-			config:    common.MapStr{},
-			ilmConfig: common.NewConfig(),
-			isAlias:   true,
-			events:    []common.MapStr{{"message": "test"}},
-		},
-		"latest with ILM": {
-			version:   version.GetDefaultVersion(),
-			docType:   "",
-			config:    common.MapStr{},
-			ilmConfig: common.NewConfig(),
-			isAlias:   true,
-			events:    []common.MapStr{{"message": "test"}},
-		},
-		"latest without ILM": {
-			version:   version.GetDefaultVersion(),
-			docType:   "",
-			config:    common.MapStr{},
-			ilmConfig: disabledILMConfig(),
-			events:    []common.MapStr{{"message": "test"}},
+		"latest": {
+			version: version.GetDefaultVersion(),
+			docType: "",
+			config:  common.MapStr{},
+			events:  []common.MapStr{{"message": "test"}},
 		},
 	}
 
@@ -464,7 +437,7 @@ func TestBulkEncodeEvents(t *testing.T) {
 				Version:     test.version,
 			}
 
-			im, err := idxmgmt.DefaultSupport(nil, info, test.ilmConfig)
+			im, err := idxmgmt.DefaultSupport(nil, info, common.NewConfig())
 			require.NoError(t, err)
 
 			index, pipeline, err := buildSelectors(im, info, cfg)
@@ -506,17 +479,12 @@ func TestBulkEncodeEvents(t *testing.T) {
 				}
 
 				assert.NotEqual(t, "", meta.Index)
-				assert.Equal(t, test.isAlias, meta.RequireAlias)
 				assert.Equal(t, test.docType, meta.DocType)
 			}
 
 			// TODO: customer per test case validation
 		})
 	}
-}
-
-func disabledILMConfig() *common.Config {
-	return common.MustNewConfigFrom(map[string]interface{}{"setup": map[string]interface{}{"ilm": map[string]interface{}{"enabled": false}}})
 }
 
 func TestBulkEncodeEventsWithOpType(t *testing.T) {

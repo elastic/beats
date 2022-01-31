@@ -23,6 +23,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Only add monitor.status to browser events when summary. {pull}29460[29460]
 - Also add summary to journeys for which the synthetics runner crashes. {pull}29606[29606]
 - Update size of ICMP packets to adhere to standard min size. {pull}29948[29948]
+- Add fonts to support more different types of characters for multiple languages. {pull}29606[29861]
 
 *Metricbeat*
 
@@ -38,8 +39,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Bugfixes
 
 *Affecting all Beats*
-
-- Enable `require_alias` for Bulk requests for all actions when target is a write alias. {issue}27874[27874] {pull}29879[29879]
 
 
 *Auditbeat*
@@ -60,6 +59,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make Cisco ASA and FTD modules conform to the ECS definition for event.outcome and event.type. {issue}29581[29581] {pull}29698[29698]
 - ibmmq: Fixed `@timestamp` not being populated with correct values. {pull}29773[29773]
 - aws-s3: Improve gzip detection to avoid false negatives. {issue}29968[29968]
+- decode_cef: Fix panic when recovering from invalid CEF extensions that contain escape characters. {issue}30010[30010]
 
 *Heartbeat*
 
@@ -91,6 +91,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - SASL/SCRAM in the Kafka output is no longer beta. {pull}29126[29126]
+- add_process_metadata processor: add `process.parent.pid` to reflect `process.ppid`. {issue}30070[30070] {pull}30077[30077]
 
 *Auditbeat*
 

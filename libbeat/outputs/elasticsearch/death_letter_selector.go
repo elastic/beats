@@ -34,5 +34,3 @@ func (d DeadLetterSelector) Select(event *beat.Event) (string, error) {
 	}
 	return d.Selector.Select(event)
 }
-
-func (d DeadLetterSelector) IsAlias() bool { return false }
