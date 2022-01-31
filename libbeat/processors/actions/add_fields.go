@@ -71,7 +71,7 @@ func NewAddFields(fields common.MapStr, shared bool, overwrite bool) processors.
 	return &addFields{fields: fields, shared: shared, overwrite: overwrite}
 }
 
-func (af *addFields) Run(event *beat.Event) (_ *beat.Event, err error) {
+func (af *addFields) Run(event *beat.Event) (*beat.Event, error) {
 	if event == nil || len(af.fields) == 0 {
 		return event, nil
 	}
