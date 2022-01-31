@@ -21,16 +21,6 @@ const (
 	FileSystemType = "file-system"
 )
 
-// FileSystemResource represents a struct for a system resource data
-// This struct is being used by the fileSystemFetcher when
-type FileSystemResource struct {
-	FileName string `json:"filename"`
-	FileMode string `json:"mode"`
-	Gid      string `json:"gid"`
-	Uid      string `json:"uid"`
-	Path     string `json:"path"`
-}
-
 func NewFileFetcher(filesPaths []string) resources.Fetcher {
 	return &FileSystemFetcher{
 		inputFilePatterns: filesPaths,
@@ -69,10 +59,10 @@ func (f *FileSystemFetcher) fetchSystemResource(filePath string) interface{} {
 	return file
 }
 
-func FromFileInfo(info os.FileInfo, path string) FileSystemResource {
+func FromFileInfo(info os.FileInfo, path string) resources.FileSystemResource {
 
 	if info == nil {
-		return FileSystemResource{}
+		return resources.FileSystemResource{}
 	}
 
 	stat := info.Sys().(*syscall.Stat_t)
@@ -84,7 +74,7 @@ func FromFileInfo(info os.FileInfo, path string) FileSystemResource {
 	group, _ := user.LookupGroupId(g)
 	mod := strconv.FormatUint(uint64(info.Mode().Perm()), 8)
 
-	data := FileSystemResource{
+	data := resources.FileSystemResource{
 		FileName: info.Name(),
 		FileMode: mod,
 		Uid:      usr.Name,
