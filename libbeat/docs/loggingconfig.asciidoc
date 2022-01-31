@@ -231,9 +231,6 @@ The permissions mask to apply when rotating log files. The default value is
 expressed in octal notation. In Go, numbers in octal notation must start with
 '0'.
 
-The most permissive mask allowed is 0640. If a higher permissions mask is
-specified via this setting, it will be subject to an umask of 0027.
-
 This option is not supported on Windows.
 
 Examples:

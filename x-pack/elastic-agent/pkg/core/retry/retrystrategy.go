@@ -8,7 +8,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/backoff"
 )
 
 // DoWithBackoff ignores retry config of delays and lets backoff decide how much time it needs.

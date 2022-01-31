@@ -149,6 +149,18 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		}
 
 		objType = "service"
+	case *CronJob:
+		cronjob := client.BatchV1().CronJobs(opts.Namespace)
+		listwatch = &cache.ListWatch{
+			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				return cronjob.List(ctx, options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return cronjob.Watch(ctx, options)
+			},
+		}
+
+		objType = "cronjob"
 	case *Job:
 		job := client.BatchV1().Jobs(opts.Namespace)
 		listwatch = &cache.ListWatch{

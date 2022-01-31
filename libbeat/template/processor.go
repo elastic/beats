@@ -136,7 +136,7 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output, an
 
 		if *field.DefaultField {
 			switch field.Type {
-			case "", "keyword", "text":
+			case "", "keyword", "text", "match_only_text", "wildcard":
 				addToDefaultFields(&field)
 			}
 		}

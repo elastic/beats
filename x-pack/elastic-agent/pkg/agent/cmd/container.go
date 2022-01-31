@@ -109,6 +109,8 @@ The following actions are possible and grouped based on the actions.
 
   KIBANA_FLEET_SETUP - set to 1 enables the setup of Fleet in Kibana by Elastic Agent. This was previously FLEET_SETUP.
   KIBANA_FLEET_HOST - Kibana host accessible from fleet-server. [$KIBANA_HOST]
+  KIBANA_FLEET_USERNAME - kibana username to service token [$KIBANA_USERNAME]
+  KIBANA_FLEET_PASSWORD - kibana password to service token [$KIBANA_PASSWORD]
   KIBANA_FLEET_CA - path to certificate authority to use with communicate with Kibana [$KIBANA_CA]
   KIBANA_REQUEST_RETRY_SLEEP - specifies sleep duration taken when agent performs a request to kibana [default 1s]
   KIBANA_REQUEST_RETRY_COUNT - specifies number of retries agent performs when executing a request to kibana [default 30]
@@ -117,8 +119,12 @@ The following environment variables are provided as a convenience to prevent a l
 be used when the same credentials will be used across all the possible actions above.
 
   ELASTICSEARCH_HOST - elasticsearch host [http://elasticsearch:9200]
+  ELASTICSEARCH_USERNAME - elasticsearch username [elastic]
+  ELASTICSEARCH_PASSWORD - elasticsearch password [changeme]
   ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch
   KIBANA_HOST - kibana host [http://kibana:5601]
+  KIBANA_FLEET_USERNAME - kibana username to enable Fleet [$ELASTICSEARCH_USERNAME]
+  KIBANA_FLEET_PASSWORD - kibana password to enable Fleet [$ELASTICSEARCH_PASSWORD]
   KIBANA_CA - path to certificate authority to use with communicate with Kibana [$ELASTICSEARCH_CA]
 
 
@@ -263,11 +269,18 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		return run(streams, logToStderr)
 	}
 
+	if cfg.Kibana.Fleet.Setup || cfg.FleetServer.Enable {
+		err = ensureServiceToken(streams, &cfg)
+		if err != nil {
+			return err
+		}
+	}
 	if cfg.Kibana.Fleet.Setup {
 		client, err = kibanaClient(cfg.Kibana, cfg.Kibana.Headers)
 		if err != nil {
 			return err
 		}
+
 		logInfo(streams, "Performing setup of Fleet in Kibana\n")
 		err = kibanaSetup(cfg, client, streams)
 		if err != nil {
@@ -297,7 +310,10 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		if policy != nil {
 			policyID = policy.ID
 		}
-		logInfo(streams, "Policy selected for enrollment: ", policyID)
+		if policyID != "" {
+			logInfo(streams, "Policy selected for enrollment: ", policyID)
+		}
+
 		cmdArgs, err := buildEnrollArgs(cfg, token, policyID)
 		if err != nil {
 			return err
@@ -316,6 +332,50 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 	}
 
 	return run(streams, logToStderr)
+}
+
+// TokenResp is used to decode a response for generating a service token
+type TokenResp struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// ensureServiceToken will ensure that the cfg specified has the service_token attributes filled.
+//
+// If no token is specified it will use the elasticsearch username/password to request a new token from Kibana
+func ensureServiceToken(streams *cli.IOStreams, cfg *setupConfig) error {
+	// There's already a service token
+	if cfg.Kibana.Fleet.ServiceToken != "" || cfg.FleetServer.Elasticsearch.ServiceToken != "" {
+		return nil
+	}
+	if cfg.Kibana.Fleet.Username == "" || cfg.Kibana.Fleet.Password == "" {
+		return fmt.Errorf("username/password must be provided to retrieve service token")
+	}
+
+	logInfo(streams, "Requesting service_token from Kibana.")
+
+	// Client is not passed in to this function because this function will use username/password and then
+	// all the following clients will use the created service token.
+	client, err := kibanaClient(cfg.Kibana, cfg.Kibana.Headers)
+	if err != nil {
+		return err
+	}
+	code, r, err := client.Connection.Request("POST", "/api/fleet/service-tokens", nil, nil, nil)
+	if err != nil {
+		return fmt.Errorf("request to get security token from Kibana failed: %w", err)
+	}
+	if code >= 400 {
+		return fmt.Errorf("request to get security token from Kibana failed with status %d, body: %s", code, string(r))
+	}
+	t := TokenResp{}
+	err = json.Unmarshal(r, &t)
+	if err != nil {
+		return fmt.Errorf("unable to decode response: %w", err)
+	}
+	logInfo(streams, "Created service_token named:", t.Name)
+	cfg.Kibana.Fleet.ServiceToken = t.Value
+	cfg.FleetServer.Elasticsearch.ServiceToken = t.Value
+	return nil
 }
 
 func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, error) {
@@ -472,6 +532,8 @@ func kibanaClient(cfg kibanaConfig, headers map[string]string) (*kibana.Client, 
 
 	return kibana.NewClientWithConfigDefault(&kibana.ClientConfig{
 		Host:          cfg.Fleet.Host,
+		Username:      cfg.Fleet.Username,
+		Password:      cfg.Fleet.Password,
 		ServiceToken:  cfg.Fleet.ServiceToken,
 		IgnoreVersion: true,
 		Transport:     transport,

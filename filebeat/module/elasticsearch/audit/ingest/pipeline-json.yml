@@ -176,6 +176,16 @@ processors:
       field: elasticsearch.audit.level
       target_field: log.level
       ignore_missing: true
+  - dot_expander:
+      field: trace.id
+      path: elasticsearch.audit
+  - rename:
+      field: elasticsearch.audit.trace.id
+      target_field: trace.id
+      ignore_missing: true
+  - remove:
+      field: elasticsearch.audit.trace.id
+      ignore_missing: true
   - date:
       field: elasticsearch.audit.@timestamp
       target_field: "@timestamp"

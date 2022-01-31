@@ -3,6 +3,11 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.0.0-rc1]]
+=== Beats version 8.0.0-rc1
+
+Changes will be described in a later RC / GA.
+
 [[release-notes-8.0.0-beta1]]
 === Beats version 8.0.0-beta1
 
@@ -17,6 +22,16 @@ Changes will be described in a later alpha / beta.
 === Beats version 8.0.0-alpha1
 
 Changes will be described in a later alpha / beta.
+[[release-notes-7.16.3]]
+=== Beats version 7.16.3
+https://github.com/elastic/beats/compare/v7.16.2...v7.16.3[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fields of type `match_only_text` (i.e. `message`) and `wildcard` were missing from the template's `default_field` list. {issue}29633[29633] {pull}29634[29634]
+
 [[release-notes-7.16.2]]
 === Beats version 7.16.2
 https://github.com/elastic/beats/compare/v7.16.1...v7.16.2[View commits]
