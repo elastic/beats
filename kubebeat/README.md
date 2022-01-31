@@ -82,7 +82,7 @@ kubectl port-forward ${pod-name} -n kube-system 40000:40000 8080:8080
 The app will wait for the debugger to connect before starting
 
 ```zsh
-kubectl logs -f --selector="k8s-app=kubebeat" -n kube-system
+just logs-kubebeat
 ```
 
 Use your favorite IDE to connect to the debugger on `localhost:40000` (for example [Goland](https://www.jetbrains.com/help/go/attach-to-running-go-processes-with-debugger.html#step-3-create-the-remote-run-debug-configuration-on-the-client-computer))
