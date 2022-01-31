@@ -150,11 +150,7 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 	control.SetRouteFn(app.Routes)
 	control.SetMonitoringCfg(cfg.Settings.MonitoringConfig)
 
-	serverStopFn, err := setupMetrics(
-		agentInfo,
-		logger, cfg.Settings.DownloadConfig.OS(),
-		cfg.Settings.MonitoringConfig,
-		app)
+	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS(), cfg.Settings.MonitoringConfig, app)
 	if err != nil {
 		return err
 	}
@@ -330,12 +326,7 @@ func isProcessStatsEnabled(cfg *monitoringCfg.MonitoringHTTPConfig) bool {
 	return cfg != nil && cfg.Enabled
 }
 
-func tryDelayEnroll(
-	ctx context.Context,
-	logger *logger.Logger,
-	cfg *configuration.Configuration,
-	override cfgOverrider) (*configuration.Configuration, error) {
-
+func tryDelayEnroll(ctx context.Context, logger *logger.Logger, cfg *configuration.Configuration, override cfgOverrider) (*configuration.Configuration, error) {
 	enrollPath := paths.AgentEnrollFile()
 	if _, err := os.Stat(enrollPath); err != nil {
 		// no enrollment file exists or failed to stat it; nothing to do
