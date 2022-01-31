@@ -1,4 +1,4 @@
-package beater
+package fetchers
 
 import (
 	"io/ioutil"

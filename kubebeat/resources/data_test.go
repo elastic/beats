@@ -1,4 +1,4 @@
-package beater
+package resources
 
 import (
 	"context"
@@ -28,9 +28,12 @@ func (f *numberFetcher) Fetch() ([]FetcherResult, error) {
 }
 
 func fetchValue(num int) []FetcherResult {
-	results := make([]FetcherResult, 0)
-	results = append(results, FetcherResult{"number", num})
-	return results
+	return []FetcherResult{
+		{
+			Type:     "number",
+			Resource: num,
+		},
+	}
 }
 
 func (f *numberFetcher) Stop() {
@@ -55,7 +58,7 @@ func TestDataRegisterFetcher(t *testing.T) {
 	client := k8sfake.NewSimpleClientset()
 	d, err := NewData(context.Background(), duration, client)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	registerNFetchers(t, d, fetcherCount)

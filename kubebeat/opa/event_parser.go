@@ -1,20 +1,21 @@
-package beater
+package opa
 
 import (
+	"time"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/gofrs/uuid"
-	"time"
 )
 
-type opaEventParser struct {
+type EventParser struct {
 }
 
-func NewOpaEventParser() (*opaEventParser, error) {
-	return &opaEventParser{}, nil
+func NewEventParser() (*EventParser, error) {
+	return &EventParser{}, nil
 }
 
-func (parser *opaEventParser) ParseResult(result interface{}, uuid uuid.UUID, timestamp time.Time) ([]beat.Event, error) {
+func (parser *EventParser) ParseResult(result interface{}, uuid uuid.UUID, timestamp time.Time) ([]beat.Event, error) {
 
 	events := make([]beat.Event, 0)
 	var opaResult = result.(map[string]interface{})

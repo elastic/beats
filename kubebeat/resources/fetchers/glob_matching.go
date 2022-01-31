@@ -1,11 +1,10 @@
-package beater
+package fetchers
 
 import (
 	"os"
 	"path/filepath"
 	"strings"
 )
-
 
 // Based on https://github.com/yargevad/filepathx/blob/master/filepathx.go
 // Globs represents one filepath glob, with its elements joined by "**".

@@ -1,4 +1,4 @@
-package beater
+package opa
 
 import (
 	"time"
@@ -11,15 +11,15 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-type evaluationResultParser struct {
+type EvaluationResultParser struct {
 	index string
 }
 
-func NewEvaluationResultParser(index string) (*evaluationResultParser, error) {
-	return &evaluationResultParser{index: index}, nil
+func NewEvaluationResultParser(index string) (*EvaluationResultParser, error) {
+	return &EvaluationResultParser{index: index}, nil
 }
 
-func (parser *evaluationResultParser) ParseResult(result interface{}, cycleId uuid.UUID) ([]beat.Event, error) {
+func (parser *EvaluationResultParser) ParseResult(result interface{}, cycleId uuid.UUID) ([]beat.Event, error) {
 	events := make([]beat.Event, 0)
 	var opaResultMap = result.(map[string]interface{})
 	var opaResult RuleResult

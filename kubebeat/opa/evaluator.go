@@ -1,4 +1,4 @@
-package beater
+package opa
 
 import (
 	"bytes"
@@ -10,12 +10,12 @@ import (
 	sdktest "github.com/open-policy-agent/opa/sdk/test"
 )
 
-type evaluator struct {
+type Evaluator struct {
 	bundleServer *sdktest.Server
 	opa          *sdk.OPA
 }
 
-func NewEvaluator() (*evaluator, error) {
+func NewEvaluator() (*Evaluator, error) {
 	policies := bundle.CreateCISPolicy(bundle.EmbeddedPolicy)
 	// create a mock HTTP bundle bundleServer
 	bundleServer, err := sdktest.NewServer(sdktest.MockBundle("/bundles/bundle.tar.gz", policies))
@@ -36,13 +36,13 @@ func NewEvaluator() (*evaluator, error) {
 		return nil, fmt.Errorf("fail to init opa: %s", err.Error())
 	}
 
-	return &evaluator{
+	return &Evaluator{
 		opa:          opa,
 		bundleServer: bundleServer,
 	}, nil
 }
 
-func (e *evaluator) Decision(input interface{}) (interface{}, error) {
+func (e *Evaluator) Decision(input interface{}) (interface{}, error) {
 	// get the named policy decision for the specified input
 	result, err := e.opa.Decision(context.Background(), sdk.DecisionOptions{
 		Path:  "main",
@@ -55,7 +55,7 @@ func (e *evaluator) Decision(input interface{}) (interface{}, error) {
 	return result.Result, nil
 }
 
-func (e *evaluator) Stop() {
+func (e *Evaluator) Stop() {
 	e.opa.Stop(context.Background())
 	e.bundleServer.Stop()
 }
