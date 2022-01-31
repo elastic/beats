@@ -1,8 +1,0 @@
-version: '2.3'
-services:
-  containerd:
-    image: docker.elastic.co/integrations-ci/beats-containerd:latest-1
-    build:
-      context: ./_meta
-    ports:
-      - 8080

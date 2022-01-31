@@ -1,29 +1,3 @@
-# TYPE container_blkio_io_service_bytes_recursive_bytes gauge
-container_blkio_io_service_bytes_recursive_bytes{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Async"} 0
-container_blkio_io_service_bytes_recursive_bytes{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Discard"} 0
-container_blkio_io_service_bytes_recursive_bytes{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Read"} 6.9246976e+07
-container_blkio_io_service_bytes_recursive_bytes{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Sync"} 6.9271552e+07
-container_blkio_io_service_bytes_recursive_bytes{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Total"} 6.9271552e+07
-container_blkio_io_service_bytes_recursive_bytes{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Write"} 24576
-# TYPE container_blkio_io_serviced_recursive_total gauge
-container_blkio_io_serviced_recursive_total{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Async"} 0
-container_blkio_io_serviced_recursive_total{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Discard"} 0
-container_blkio_io_serviced_recursive_total{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Read"} 830
-container_blkio_io_serviced_recursive_total{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Sync"} 832
-container_blkio_io_serviced_recursive_total{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Total"} 832
-container_blkio_io_serviced_recursive_total{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",device="/dev/vda",major="254",minor="0",namespace="k8s.io",op="Write"} 2
-# TYPE container_cpu_kernel_nanoseconds gauge
-container_cpu_kernel_nanoseconds{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",namespace="k8s.io"} 5.3218e+11
-# TYPE container_cpu_throttle_periods_total gauge
-container_cpu_throttle_periods_total{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",namespace="k8s.io"} 0
-# TYPE container_cpu_throttled_periods_total gauge
-container_cpu_throttled_periods_total{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",namespace="k8s.io"} 0
-# TYPE container_cpu_throttled_time_nanoseconds gauge
-container_cpu_throttled_time_nanoseconds{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",namespace="k8s.io"} 0
-# TYPE container_cpu_total_nanoseconds gauge
-container_cpu_total_nanoseconds{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",namespace="k8s.io"} 1.236339003984e+12
-# TYPE container_cpu_user_nanoseconds gauge
-container_cpu_user_nanoseconds{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",namespace="k8s.io"} 5.2547e+11
 # TYPE container_memory_active_anon_bytes gauge
 container_memory_active_anon_bytes{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",namespace="k8s.io"} 0
 # TYPE container_memory_active_file_bytes gauge
@@ -84,17 +58,4 @@ container_memory_usage_limit_bytes{container_id="7434687dbe3684407afa899582f2909
 container_memory_usage_max_bytes{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",namespace="k8s.io"} 2.09608704e+08
 # TYPE container_memory_usage_usage_bytes gauge
 container_memory_usage_usage_bytes{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",namespace="k8s.io"} 1.91848448e+08
-# TYPE container_per_cpu_nanoseconds gauge
-container_per_cpu_nanoseconds{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",cpu="0",namespace="k8s.io"} 9.913781757e+10
-container_per_cpu_nanoseconds{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",cpu="1",namespace="k8s.io"} 1.16475261138e+11
-container_per_cpu_nanoseconds{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",cpu="10",namespace="k8s.io"} 1.0670990577e+11
-container_per_cpu_nanoseconds{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",cpu="11",namespace="k8s.io"} 1.0487838037e+11
-container_per_cpu_nanoseconds{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",cpu="2",namespace="k8s.io"} 1.05305653633e+11
-container_per_cpu_nanoseconds{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",cpu="3",namespace="k8s.io"} 1.01195506344e+11
-container_per_cpu_nanoseconds{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",cpu="4",namespace="k8s.io"} 1.05731762224e+11
-container_per_cpu_nanoseconds{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",cpu="5",namespace="k8s.io"} 9.8155683224e+10
-container_per_cpu_nanoseconds{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",cpu="6",namespace="k8s.io"} 9.5075348914e+10
-container_per_cpu_nanoseconds{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",cpu="7",namespace="k8s.io"} 9.713478277e+10
-container_per_cpu_nanoseconds{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",cpu="8",namespace="k8s.io"} 1.04266711568e+11
-container_per_cpu_nanoseconds{container_id="7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d",cpu="9",namespace="k8s.io"} 1.02272190459e+11
 
