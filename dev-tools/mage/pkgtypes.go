@@ -162,7 +162,7 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 			"armv5":    "armv5",
 			"armv6":    "armv6",
 			"armv7":    "armv7",
-			"arm64":    "aarch64",
+			"arm64":    "arm64",
 			"mips":     "mips",
 			"mipsle":   "mipsel",
 			"mips64":   "mips64",

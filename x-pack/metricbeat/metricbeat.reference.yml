@@ -524,8 +524,8 @@ metricbeat.modules:
   enabled: true
   period: 10s
   hosts: ["http://localhost:3002"]
-  username: elastic
-  password: changeme
+  #username: "user"
+  #password: "secret"
 
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
@@ -553,6 +553,7 @@ metricbeat.modules:
   metricsets:
     - pubsub
     - loadbalancing
+    - firestore
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
