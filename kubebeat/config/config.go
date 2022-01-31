@@ -3,7 +3,10 @@
 
 package config
 
-import "time"
+import (
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"time"
+)
 
 // Todo add consts as configurable vars from integration package - add datastream struct
 const DefaultNamespace = "default"
@@ -12,9 +15,10 @@ const ResultsDatastreamIndexPrefix = "logs-k8s_cis.result"
 const MetadataDatastreamIndexPrefix = ".logs-k8s_cis.metadata"
 
 type Config struct {
-	KubeConfig string        `config:"kube_config"`
-	Period     time.Duration `config:"period"`
-	Files      []string      `config:"files"`
+	KubeConfig string                  `config:"kube_config"`
+	Period     time.Duration           `config:"period"`
+	Files      []string                `config:"files"`
+	Processors processors.PluginConfig `config:"processors"`
 }
 
 var DefaultConfig = Config{

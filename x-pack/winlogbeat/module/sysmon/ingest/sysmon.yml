@@ -146,6 +146,11 @@ processors:
             - process
           type:
             - change
+        "26":
+          category:
+            - file
+          type:
+            - deletion
       tag: Add ECS categorization fields
       source: |-
         if (ctx?.event?.code == null || params.get(ctx.event.code) == null) {
@@ -237,7 +242,7 @@ processors:
       target_field: process.hash
       if: |-
         ctx?._temp?.hashes != null &&
-        ["1", "23", "24", "25"].contains(ctx.event.code)
+        ["1", "23", "24", "25", "26"].contains(ctx.event.code)
   - rename:
       field: process.hash.imphash
       target_field: process.pe.imphash

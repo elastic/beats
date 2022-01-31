@@ -14,7 +14,7 @@ The interesting files are:
 - [POC Documentation](#poc-documentation)
   - [Table of contents](#table-of-contents)
   - [Prerequisites](#prerequisites)
-  - [Running Kubebeat](#running-kubebeat-without-the-agent)
+  - [Running Kubebeat (without the agent)](#running-kubebeat-without-the-agent)
     - [Clean up](#clean-up)
     - [Remote Debugging](#remote-debugging)
 - [{Beat}](#beat)
@@ -64,7 +64,7 @@ note: when changing the fields kibana will reject events dent from the kubebeat 
 
 To stop this example and clean up the pod, run:
 ```zsh
-kubectl delete -f deploy/k8s/kubebeat-ds-local.yaml -n kube-system
+kubectl delete -f deploy/k8s/kubebeat-ds.yaml -n kube-system
 ```
 ### Remote Debugging
 
