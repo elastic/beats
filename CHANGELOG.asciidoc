@@ -13,21 +13,6 @@ https://github.com/elastic/beats/compare/v7.16.3...v7.17.0[View commits]
 
 - Change Docker base image from CentOS 7 to Ubuntu 20.04 {pull}29681[29681]
 
-*Auditbeat*
-
-*Filebeat*
-
-*Heartbeat*
-
-*Metricbeat*
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -72,18 +57,6 @@ https://github.com/elastic/beats/compare/v7.16.3...v7.17.0[View commits]
 - Fixed GCP GKE Overview dashboard {pull}29913[29913]
 - Remove overriding of index pattern on the Kubernetes overview dashboard. {pull}29676[29676]
 
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
 ==== Added
 
 *Affecting all Beats*
@@ -91,60 +64,17 @@ https://github.com/elastic/beats/compare/v7.16.3...v7.17.0[View commits]
 - SASL/SCRAM in the Kafka output is no longer beta. {pull}29126[29126]
 - Add job.name in pods controlled by Jobs {pull}28954[28954]
 
-*Auditbeat*
-
-*Filebeat*
-
 *Heartbeat*
 
 - More errors are now visible in ES with new logic failing monitors later to ease debugging. {pull}29413[pull]
-
-
-*Metricbeat*
-
-*Packetbeat*
-
-
-*Functionbeat*
-
 
 *Winlogbeat*
 
 - Add support for custom XML queries {issue}1054[1054] {pull}29330[29330]
 
-
-*Elastic Log Driver*
-
-
 ==== Deprecated
 
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
 ==== Known Issue
-
-*Journalbeat*
-
-
-
-
-
-
-
 
 
 [[release-notes-7.16.3]]
