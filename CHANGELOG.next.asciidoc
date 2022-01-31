@@ -121,7 +121,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Only add monitor.status to browser events when summary. {pull}29460[29460]
 - Also add summary to journeys for which the synthetics runner crashes. {pull}29606[29606]
 - Update size of ICMP packets to adhere to standard min size. {pull}29948[29948]
-- Add fonts to support more different types of characters for multiple languages. {pull}29606[29861]
+- Add fonts to support more different types of characters for multiple languages. {pull}29861[29861]
 
 *Metricbeat*
 
