@@ -31,6 +31,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - `include_matches` option of `journald` input no longer accepts a list of string. {pull}29294[29294]
 - Add job.name in pods controlled by Jobs {pull}28954[28954]
 - Change Docker base image from CentOS 7 to Ubuntu 20.04 {pull}29681[29681]
+- Enrich kubernetes metadata with node annotations. {pull}29605[29605]
+- Allign kubernetes configuration settings. {pull}29908[29908]
+- Remove legacy support for SSLv3. {pull}30071[30071]
+- `add_fields` processor is now able to set metadata in events {pull}30092[30092]
 
 *Auditbeat*
 
