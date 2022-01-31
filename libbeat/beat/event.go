@@ -71,10 +71,25 @@ func (e *Event) GetValue(key string) (interface{}, error) {
 	return e.Fields.GetValue(key)
 }
 
+// DeepUpdate recursively copies the key-value pairs from `d` to various properties of the event.
+// When the key equals `@timestamp` it's set as the `Timestamp` property of the event.
+// When the key equals `@metadata` the update is routed into the `Meta` map instead of `Fields`
+// The rest of the keys are set to the `Fields` map.
+// If the key is present and the value is a map as well, the sub-map will be updated recursively
+// via `DeepUpdate`.
+// `DeepUpdateNoOverwrite` is a version of this function that does not
+// overwrite existing values.
 func (e *Event) DeepUpdate(d common.MapStr) {
 	e.deepUpdate(d, true)
 }
 
+// DeepUpdateNoOverwrite recursively copies the key-value pairs from `d` to various properties of the event.
+// The `@timestamp` update is ignored due to "no overwrite" behavior.
+// When the key equals `@metadata` the update is routed into the `Meta` map instead of `Fields`.
+// The rest of the keys are set to the `Fields` map.
+// If the key is present and the value is a map as well, the sub-map will be updated recursively
+// via `DeepUpdateNoOverwrite`.
+// `DeepUpdate` is a version of this function that overwrites existing values.
 func (e *Event) DeepUpdateNoOverwrite(d common.MapStr) {
 	e.deepUpdate(d, false)
 }
