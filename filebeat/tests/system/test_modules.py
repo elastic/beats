@@ -107,7 +107,7 @@ def load_fileset_test_cases():
                 continue
 
             test_files = glob.glob(os.path.join(modules_dir, module,
-                                                fileset, "test", "*.log"))
+                                                fileset, "test", os.getenv("TESTING_FILEBEAT_FILEPATTERN", "*.log")))
             for test_file in test_files:
                 test_cases.append([module, fileset, test_file])
 
