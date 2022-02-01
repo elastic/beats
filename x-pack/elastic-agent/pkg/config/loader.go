@@ -37,28 +37,31 @@ func (l *Loader) Load(files []string) (*Config, error) {
 	for _, f := range files {
 		cfg, err := LoadFile(f)
 		if err != nil {
+			if l.isFileUnderInputsFolder(f) {
+				return nil, fmt.Errorf("failed to load external configuration file '%s': %w. Are you sure it contains an inputs section?", f, err)
+			}
 			return nil, fmt.Errorf("failed to load configuration file '%s': %w", f, err)
 		}
-		l.logger.Debug("Loaded configuration from %s", f)
+		l.logger.Debugf("Loaded configuration from %s", f)
 		if l.isFileUnderInputsFolder(f) {
 			inp, err := getInput(cfg)
 			if err != nil {
 				return nil, fmt.Errorf("cannot get configuration from '%s': %w", f, err)
 			}
 			inputsList = append(inputsList, inp...)
-			l.logger.Debug("Loaded %s input(s) from configuration from %s", len(inp), f)
+			l.logger.Debugf("Loaded %s input(s) from configuration from %s", len(inp), f)
 		} else {
 			if err := merger.Add(cfg.access(), err); err != nil {
 				return nil, fmt.Errorf("failed to merge configuration file '%s' to existing one: %w", f, err)
 			}
-			l.logger.Debug("Merged configuration from %s into result", f)
+			l.logger.Debugf("Merged configuration from %s into result", f)
 		}
 	}
 	config := merger.Config()
 
 	// if there is no input configuration, return what we have collected.
 	if len(inputsList) == 0 {
-		l.logger.Debug("Merged all configuration files from %v, no external input files", files)
+		l.logger.Debugf("Merged all configuration files from %v, no external input files", files)
 		return newConfigFrom(config), nil
 	}
 
@@ -78,7 +81,7 @@ func (l *Loader) Load(files []string) (*Config, error) {
 		}
 	}
 
-	l.logger.Debug("Merged all configuration files from %v, with external input files", files)
+	l.logger.Debugf("Merged all configuration files from %v, with external input files", files)
 	return newConfigFrom(config), nil
 }
 
