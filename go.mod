@@ -193,7 +193,10 @@ require (
 	kernel.org/pub/linux/libs/security/libcap/cap v1.2.57
 )
 
-require github.com/open-policy-agent/opa v0.36.1
+require (
+	github.com/open-policy-agent/opa v0.36.1
+	go.uber.org/goleak v1.1.12
+)
 
 require (
 	cloud.google.com/go v0.99.0 // indirect
