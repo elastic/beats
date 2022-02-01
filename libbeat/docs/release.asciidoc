@@ -8,15 +8,12 @@ This section summarizes the changes in each release. Also read
 <<breaking-changes>> for more detail about changes that affect
 upgrade.
 
-<<<<<<< HEAD
 * <<release-notes-8.0.0-rc2>>
 * <<release-notes-8.0.0-rc1>>
 * <<release-notes-8.0.0-beta1>>
 * <<release-notes-8.0.0-alpha2>>
 * <<release-notes-8.0.0-alpha1>>
-=======
 * <<release-notes-7.17.0>>
->>>>>>> 3026dfd2b5 (docs: Prepare Changelog for 7.17.0 (#30111))
 * <<release-notes-7.16.3>>
 * <<release-notes-7.16.2>>
 * <<release-notes-7.16.1>>
