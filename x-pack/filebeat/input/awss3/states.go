@@ -21,6 +21,7 @@ const (
 )
 
 type listingInfo struct {
+	mu            *sync.Mutex
 	totObjects    int
 	storedObjects int
 	errorObjects  int
@@ -105,6 +106,8 @@ func (s *states) Delete(id string) {
 func (s *states) IsListingFullyStored(listingID string) bool {
 	info, _ := s.listingInfo.Load(listingID)
 	listingInfo := info.(*listingInfo)
+	listingInfo.mu.Lock()
+	defer listingInfo.mu.Unlock()
 	if listingInfo.finalCheck {
 		return false
 	}
@@ -154,6 +157,8 @@ func (s *states) Update(newState state, listingID string) {
 	// here we increase the number of stored object
 	info, _ := s.listingInfo.Load(listingID)
 	listingInfo := info.(*listingInfo)
+	listingInfo.mu.Lock()
+	defer listingInfo.mu.Unlock()
 	if newState.Stored {
 		listingInfo.storedObjects++
 	}
