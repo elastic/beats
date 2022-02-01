@@ -5,6 +5,7 @@
 package application
 
 import (
+	"context"
 	"strings"
 	"time"
 
@@ -89,7 +90,7 @@ func (p *periodic) work() error {
 			p.log.Debugf("Unchanged %d files: %s", len(s.Unchanged), strings.Join(s.Updated, ", "))
 		}
 
-		err := readfiles(files, p.emitter)
+		err := readfiles(context.Background(), files, p.emitter)
 		if err != nil {
 			// assume something when really wrong and invalidate any cache
 			// so we get a full new config on next tick.

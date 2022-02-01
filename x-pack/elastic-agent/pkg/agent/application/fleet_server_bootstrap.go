@@ -7,6 +7,8 @@ package application
 import (
 	"context"
 
+	"go.elastic.co/apm"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
@@ -51,6 +53,7 @@ func newFleetServerBootstrap(
 	rawConfig *config.Config,
 	statusCtrl status.Controller,
 	agentInfo *info.AgentInfo,
+	tracer *apm.Tracer,
 ) (*FleetServerBootstrap, error) {
 	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
@@ -79,7 +82,7 @@ func newFleetServerBootstrap(
 	}
 
 	bootstrapApp.bgContext, bootstrapApp.cancelCtxFn = context.WithCancel(ctx)
-	bootstrapApp.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{})
+	bootstrapApp.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{}, tracer)
 	if err != nil {
 		return nil, errors.New(err, "initialize GRPC listener")
 	}
@@ -166,20 +169,22 @@ func bootstrapEmitter(ctx context.Context, log *logger.Logger, agentInfo transpi
 			case c = <-ch:
 			}
 
-			err := emit(log, agentInfo, router, modifiers, c)
+			err := emit(ctx, log, agentInfo, router, modifiers, c)
 			if err != nil {
 				log.Error(err)
 			}
 		}
 	}()
 
-	return func(c *config.Config) error {
+	return func(ctx context.Context, c *config.Config) error {
+		span, _ := apm.StartSpan(ctx, "emit", "app.internal")
+		defer span.End()
 		ch <- c
 		return nil
 	}, nil
 }
 
-func emit(log *logger.Logger, agentInfo transpiler.AgentInfo, router pipeline.Router, modifiers *pipeline.ConfigModifiers, c *config.Config) error {
+func emit(ctx context.Context, log *logger.Logger, agentInfo transpiler.AgentInfo, router pipeline.Router, modifiers *pipeline.ConfigModifiers, c *config.Config) error {
 	if err := info.InjectAgentConfig(c); err != nil {
 		return err
 	}
@@ -218,7 +223,7 @@ func emit(log *logger.Logger, agentInfo transpiler.AgentInfo, router pipeline.Ro
 		return errors.New("bootstrap configuration is incorrect causing fleet-server to not be started")
 	}
 
-	return router.Route(ast.HashStr(), map[pipeline.RoutingKey][]program.Program{
+	return router.Route(ctx, ast.HashStr(), map[pipeline.RoutingKey][]program.Program{
 		pipeline.DefaultRK: {
 			{
 				Spec:   spec,
