@@ -27,9 +27,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
 - Remove options `logging.files.suffix` and default to datetime endings. {pull}28927[28927]
 - `include_matches` option of `journald` input no longer accepts a list of string. {pull}29294[29294]
-- Add job.name in pods controlled by Jobs {pull}28954[28954]
-- Change Docker base image from CentOS 7 to Ubuntu 20.04 {pull}29681[29681]
-- Enrich kubernetes metadata with node annotations. {pull}29605[29605]
 - Allign kubernetes configuration settings. {pull}29908[29908]
 - Remove legacy support for SSLv3. {pull}30071[30071]
 - `add_fields` processor is now able to set metadata in events {pull}30092[30092]
@@ -63,7 +60,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated config option perfmon.counters from windows/perfmon metricset. {pull}28282[28282]
 - Remove deprecated fields in Redis module. {issue}11835[11835] {pull}28246[28246]
 - system/process metricset: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
-- Remove overriding of index pattern on the Kubernetes overview dashboard. {pull}29676[29676]
 
  *Packetbeat*
 
@@ -107,10 +103,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
-- Use xpack.enabled on SM modules to write into .monitoring indices when using Metricbeat standalone {pull}28365[28365]
-- Fix in rename processor to ingest metrics for `write.iops` to proper field instead of `write_iops` in rds metricset. {pull}28960[28960]
-- Enhance filter check in kubernetes event metricset. {pull}29470[29470]
-- Fix gcp metrics metricset apply aligner to all metric_types {pull}29514[29513]
 - Extract correct index property in kibana.stats metricset {pull}29622[29622]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {pull}29711[29711]
 
@@ -141,7 +133,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Support self signed certificates on outputs {pull}29229[29229]
 - Update k8s library {pull}29394[29394]
 - Add FIPS configuration option for all AWS API calls. {pull}28899[28899]
-- Add `default_region` config to AWS common module. {pull}29415[29415]
 - Add support for latest k8s versions v1.23 and v1.22 {pull}29575[29575]
 - Add `script` processor to all beats {issue}29269[29269] {pull}29752[29752]
 - Only connect to Elasticsearch instances with the same version or newer. {pull}29683[29683]
