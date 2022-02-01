@@ -26,7 +26,7 @@ import (
 
 const debugSelector = "synthexec"
 
-type StandardSuiteFields struct {
+type StdSuiteFields struct {
 	Name     string
 	Id       string
 	Type     string
@@ -39,7 +39,7 @@ type FilterJourneyConfig struct {
 }
 
 // SuiteJob will run a single journey by name from the given suite.
-func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, filterJourneys FilterJourneyConfig, fields StandardSuiteFields, extraArgs ...string) (jobs.Job, error) {
+func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, filterJourneys FilterJourneyConfig, fields StdSuiteFields, extraArgs ...string) (jobs.Job, error) {
 	// Run the command in the given suitePath, use '.' as the first arg since the command runs
 	// in the correct dir
 	cmdFactory, err := suiteCommandFactory(suitePath, extraArgs...)
@@ -71,7 +71,7 @@ func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, er
 }
 
 // InlineJourneyJob returns a job that runs the given source as a single journey.
-func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, fields StandardSuiteFields, extraArgs ...string) jobs.Job {
+func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, fields StdSuiteFields, extraArgs ...string) jobs.Job {
 	newCmd := func() *exec.Cmd {
 		return exec.Command("elastic-synthetics", append(extraArgs, "--inline")...)
 	}
@@ -82,7 +82,7 @@ func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, 
 // startCmdJob adapts commands into a heartbeat job. This is a little awkward given that the command's output is
 // available via a sequence of events in the multiplexer, while heartbeat jobs are tail recursive continuations.
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
-func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params common.MapStr, filterJourneys FilterJourneyConfig, fields StandardSuiteFields) jobs.Job {
+func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params common.MapStr, filterJourneys FilterJourneyConfig, fields StdSuiteFields) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys)
 		if err != nil {
@@ -95,7 +95,7 @@ func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string,
 
 // readResultsJob adapts the output of an ExecMultiplexer into a Job, that uses continuations
 // to read all output.
-func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich enricher, fields StandardSuiteFields) jobs.Job {
+func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich enricher, fields StdSuiteFields) jobs.Job {
 	return func(event *beat.Event) (conts []jobs.Job, err error) {
 		se := <-synthEvents
 		err = enrich(event, se, fields)
@@ -160,14 +160,20 @@ func runCmd(
 	wg := sync.WaitGroup{}
 
 	// Send stdout into the output
-	stdoutPipe, _ := cmd.StdoutPipe()
+	stdoutPipe, err := cmd.StdoutPipe()
+	if err != nil {
+		return nil, fmt.Errorf("could not open stdout pipe: %w", err)
+	}
 	wg.Add(1)
 	go func() {
 		scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
 		wg.Done()
 	}()
 
-	stderrPipe, _ := cmd.StderrPipe()
+	stderrPipe, err := cmd.StderrPipe()
+	if err != nil {
+		return nil, fmt.Errorf("could not open stderr pipe: %w", err)
+	}
 	wg.Add(1)
 	go func() {
 		scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)

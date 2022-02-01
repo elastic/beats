@@ -66,9 +66,9 @@ func (s *Suite) FilterJourneys() synthexec.FilterJourneyConfig {
 	return s.suiteCfg.FilterJourneys
 }
 
-func (s *Suite) Fields() synthexec.StandardSuiteFields {
+func (s *Suite) Fields() synthexec.StdSuiteFields {
 	_, isInline := s.InlineSource()
-	return synthexec.StandardSuiteFields{
+	return synthexec.StdSuiteFields{
 		Name:     s.suiteCfg.Name,
 		Id:       s.suiteCfg.Id,
 		IsInline: isInline,

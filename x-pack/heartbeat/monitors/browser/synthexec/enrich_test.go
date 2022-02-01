@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
+	"github.com/elastic/go-lookslike/validator"
 )
 
 func makeStepEvent(typ string, ts float64, name string, index int, status string, urlstr string, err *SynthError) *SynthEvent {
@@ -34,7 +35,7 @@ func makeStepEvent(typ string, ts float64, name string, index int, status string
 }
 
 func TestJourneyEnricher(t *testing.T) {
-	var stdFields = StandardSuiteFields{
+	var stdFields = StdSuiteFields{
 		Id:       "mysuite",
 		Name:     "mysuite",
 		Type:     "browser",
@@ -83,64 +84,83 @@ func TestJourneyEnricher(t *testing.T) {
 		journeyEnd,
 	}
 
-	je := &journeyEnricher{}
-
-	// We need an expectation for each input
-	// plus a final expectation for the summary which comes
-	// on the nil data.
-	for idx, se := range synthEvents {
-		e := &beat.Event{}
-		stdFields.IsInline = false
-		t.Run(fmt.Sprintf("suites monitor event %d", idx), func(t *testing.T) {
-			enrichErr := je.enrich(e, se, stdFields)
-
-			if se != nil && se.Type != "journey/end" {
-				// Test that the created event includes the mapped
-				// version of the event
-				testslike.Test(t, lookslike.MustCompile(se.ToMap()), e.Fields)
-				// check suite and monitor meta fields
-				testslike.Test(t, lookslike.MustCompile(common.MapStr{
-					"suite.id":     stdFields.Id,
-					"suite.name":   stdFields.Name,
-					"monitor.id":   fmt.Sprintf("%s-%s", stdFields.Id, journey.Id),
-					"monitor.name": fmt.Sprintf("%s - %s", stdFields.Name, journey.Name),
-				}), e.Fields)
-
-				require.Equal(t, se.Timestamp().Unix(), e.Timestamp.Unix())
-
-				if se.Error != nil {
-					require.Equal(t, stepError(se.Error), enrichErr)
-				}
-			} else { // journey end gets a summary
-				require.Equal(t, stepError(syntherr), enrichErr)
-
-				u, _ := url.Parse(url1)
-				t.Run("summary", func(t *testing.T) {
-					v := lookslike.MustCompile(common.MapStr{
-						"synthetics.type":     "heartbeat/summary",
-						"url":                 wrappers.URLFields(u),
-						"monitor.duration.us": int64(journeyEnd.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
-					})
-
-					testslike.Test(t, v, e.Fields)
-				})
-			}
+	suiteValidator := func() validator.Validator {
+		return lookslike.MustCompile(common.MapStr{
+			"suite.id":     stdFields.Id,
+			"suite.name":   stdFields.Name,
+			"monitor.id":   fmt.Sprintf("%s-%s", stdFields.Id, journey.Id),
+			"monitor.name": fmt.Sprintf("%s - %s", stdFields.Name, journey.Name),
 		})
+	}
+	inlineValidator := func() validator.Validator {
+		return lookslike.MustCompile(common.MapStr{
+			"monitor.id":   stdFields.Id,
+			"monitor.name": stdFields.Name,
+		})
+	}
+	commonValidator := func(se *SynthEvent) validator.Validator {
+		var v []validator.Validator
 
+		// We need an expectation for each input plus a final
+		// expectation for the summary which comes on the nil data.
+		if se.Type != "journey/end" {
+			// Test that the created event includes the mapped
+			// version of the event
+			v = append(v, lookslike.MustCompile(se.ToMap()))
+		} else {
+			u, _ := url.Parse(url1)
+			// journey end gets a summary
+			v = append(v, lookslike.MustCompile(common.MapStr{
+				"synthetics.type":     "heartbeat/summary",
+				"url":                 wrappers.URLFields(u),
+				"monitor.duration.us": int64(journeyEnd.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
+			}))
+		}
+		return lookslike.Compose(v...)
 	}
 
-	for idx, se := range synthEvents {
+	je := &journeyEnricher{}
+	check := func(t *testing.T, se *SynthEvent, ssf StdSuiteFields) {
 		e := &beat.Event{}
-		stdFields.IsInline = true
-		t.Run(fmt.Sprintf("inline monitor event %d", idx), func(t *testing.T) {
-			je.enrich(e, se, stdFields)
-			testslike.Test(t, lookslike.MustCompile(common.MapStr{
-				"monitor.id":   stdFields.Id,
-				"monitor.name": stdFields.Name,
-			}), e.Fields)
+		t.Run(fmt.Sprintf("event: %s", se.Type), func(t *testing.T) {
+			enrichErr := je.enrich(e, se, ssf)
+			if se.Error != nil {
+				require.Equal(t, stepError(se.Error), enrichErr)
+			}
+			if ssf.IsInline {
+				sv, _ := e.Fields.GetValue("suite")
+				require.Nil(t, sv)
+				testslike.Test(t, inlineValidator(), e.Fields)
+			} else {
+				testslike.Test(t, suiteValidator(), e.Fields)
+			}
+			testslike.Test(t, commonValidator(se), e.Fields)
 
-			sv, _ := e.Fields.GetValue("suite")
-			require.Nil(t, sv)
+			require.Equal(t, se.Timestamp().Unix(), e.Timestamp.Unix())
+		})
+	}
+
+	tests := []struct {
+		name     string
+		isInline bool
+		se       []*SynthEvent
+	}{
+		{
+			name:     "suite monitor",
+			isInline: false,
+		},
+		{
+			name:     "inline monitor",
+			isInline: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			stdFields.IsInline = tt.isInline
+			for _, se := range synthEvents {
+				check(t, se, stdFields)
+			}
 		})
 	}
 }
@@ -160,6 +180,7 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 				Payload: common.MapStr{
 					"message": "Error from synthetics",
 				},
+				PackageVersion: "1.0.0",
 			},
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
 				v := lookslike.MustCompile(common.MapStr{
@@ -167,7 +188,9 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 						"payload": common.MapStr{
 							"message": "Error from synthetics",
 						},
-						"type": "stderr",
+						"type":            "stderr",
+						"package_version": "1.0.0",
+						"index":           0,
 					},
 				})
 				testslike.Test(t, v, e.Fields)
@@ -181,6 +204,7 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 				Payload: common.MapStr{
 					"message": "debug output",
 				},
+				PackageVersion: "1.0.0",
 			},
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
 				v := lookslike.MustCompile(common.MapStr{
@@ -188,10 +212,12 @@ func TestEnrichConsoleSynthEvents(t *testing.T) {
 						"payload": common.MapStr{
 							"message": "debug output",
 						},
-						"type": "stdout",
+						"type":            "stdout",
+						"package_version": "1.0.0",
+						"index":           0,
 					},
 				})
-				testslike.Test(t, v, e.Fields)
+				testslike.Test(t, lookslike.Strict(v), e.Fields)
 			},
 		},
 	}
@@ -349,7 +375,7 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 
 	for idx, se := range synthEvents {
 		e := &beat.Event{}
-		stdFields := StandardSuiteFields{IsInline: false}
+		stdFields := StdSuiteFields{IsInline: false}
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
 			enrichErr := je.enrich(e, se, stdFields)
 

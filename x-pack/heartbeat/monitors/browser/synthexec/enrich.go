@@ -18,13 +18,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-type enricher func(event *beat.Event, se *SynthEvent, fields StandardSuiteFields) error
+type enricher func(event *beat.Event, se *SynthEvent, fields StdSuiteFields) error
 
 type streamEnricher struct {
 	je *journeyEnricher
 }
 
-func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent, fields StandardSuiteFields) error {
+func (e *streamEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdSuiteFields) error {
 	if e.je == nil || (se != nil && se.Type == "journey/start") {
 		e.je = newJourneyEnricher()
 	}
@@ -62,7 +62,7 @@ func makeUuid() string {
 	return u.String()
 }
 
-func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StandardSuiteFields) error {
+func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdSuiteFields) error {
 	if se == nil {
 		return nil
 	}
@@ -162,6 +162,7 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		// In that case we always want to issue an update op
 		event.Meta.Put(events.FieldMetaOpType, events.OpTypeCreate)
 	}
+
 	eventext.MergeEventFields(event, se.ToMap())
 
 	if je.urlFields == nil {
