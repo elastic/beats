@@ -28422,52 +28422,6 @@ alias to: elasticsearch.node.stats.thread_pool.write.rejected.count
 --
 
 
-*`node_stats.indexing_pressure.elasticsearch.node.stats.indexing_pressure.memory.current.combined_coordinating_and_primary_in_bytes`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indexing_pressure.memory.current.combined_coordinating_and_primary_in_bytes
-
---
-
-*`node_stats.indexing_pressure.memory.total.combined_coordinating_and_primary_in_bytes`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indexing_pressure.memory.total.combined_coordinating_and_primary_in_bytes
-
---
-
-*`node_stats.indexing_pressure.memory.current.coordinating_in_bytes`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indexing_pressure.memory.current.coordinating_in_bytes
-
---
-
-*`node_stats.indexing_pressure.memory.total.coordinating_in_bytes`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indexing_pressure.memory.total.coordinating_in_bytes
-
---
-
-*`node_stats.indexing_pressure.limit_in_bytes`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indexing_pressure.limit_in_bytes
-
---
-
-
 
 
 
@@ -31023,48 +30977,40 @@ type: long
 --
 
 
-*`elasticsearch.node.stats.indexing_pressure.elasticsearch.node.stats.indexing_pressure.memory.current.combined_coordinating_and_primary_in_bytes`*::
+
+*`elasticsearch.node.stats.indexing_pressure.memory.current.combined_coordinating_and_primary.bytes`*::
 +
 --
-type: alias
+type: long
 
-alias to: elasticsearch.node.stats.indexing_pressure.memory.current.combined_coordinating_and_primary_in_bytes
+format: bytes
 
 --
 
-*`elasticsearch.node.stats.indexing_pressure.memory.total.combined_coordinating_and_primary_in_bytes`*::
+*`elasticsearch.node.stats.indexing_pressure.memory.total.combined_coordinating_and_primary.bytes`*::
 +
 --
-type: alias
+type: long
 
-alias to: elasticsearch.node.stats.indexing_pressure.memory.total.combined_coordinating_and_primary_in_bytes
+format: bytes
 
 --
 
-*`elasticsearch.node.stats.indexing_pressure.memory.current.coordinating_in_bytes`*::
+*`elasticsearch.node.stats.indexing_pressure.memory.current.coordinating.bytes`*::
 +
 --
-type: alias
+type: long
 
-alias to: elasticsearch.node.stats.indexing_pressure.memory.current.coordinating_in_bytes
+format: bytes
 
 --
 
-*`elasticsearch.node.stats.indexing_pressure.memory.total.coordinating_in_bytes`*::
+*`elasticsearch.node.stats.indexing_pressure.memory.limit_in_bytes`*::
 +
 --
-type: alias
+type: long
 
-alias to: elasticsearch.node.stats.indexing_pressure.memory.total.coordinating_in_bytes
-
---
-
-*`elasticsearch.node.stats.indexing_pressure.limit_in_bytes`*::
-+
---
-type: alias
-
-alias to: elasticsearch.node.stats.indexing_pressure.limit_in_bytes
+format: bytes
 
 --
 

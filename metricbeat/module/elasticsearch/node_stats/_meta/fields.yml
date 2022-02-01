@@ -314,19 +314,49 @@
               type: long
     - name: indexing_pressure
       type: group
-      fields: 
-        - name: elasticsearch.node.stats.indexing_pressure.memory.current.combined_coordinating_and_primary_in_bytes
-          type: alias
-          path: elasticsearch.node.stats.indexing_pressure.memory.current.combined_coordinating_and_primary_in_bytes
-        - name: memory.total.combined_coordinating_and_primary_in_bytes
-          type: alias
-          path: elasticsearch.node.stats.indexing_pressure.memory.total.combined_coordinating_and_primary_in_bytes
-        - name: memory.current.coordinating_in_bytes
-          type: alias
-          path: elasticsearch.node.stats.indexing_pressure.memory.current.coordinating_in_bytes
-        - name: memory.total.coordinating_in_bytes
-          type: alias
-          path: elasticsearch.node.stats.indexing_pressure.memory.total.coordinating_in_bytes
-        - name: limit_in_bytes
-          type: alias
-          path: elasticsearch.node.stats.indexing_pressure.limit_in_bytes        
+      fields:
+        - name: memory
+          type: group
+          fields:
+            - name: current.combined_coordinating_and_primary.bytes
+              type: long
+              format: bytes
+            - name: total.primary.rejections
+              type: long
+              format: bytes
+            - name: total.primary.bytes
+              type: long
+              format: bytes
+            - name: total.coordinating.rejections
+              type: long
+              format: bytes
+            - name: total.coordinating.bytes
+              type: long
+              format: bytes
+            - name: total.replica.rejections
+              type: long
+              format: bytes
+            - name: total.replica.bytes
+              type: long
+              format: bytes
+            - name: total.combined_coordinating_and_primary.bytes
+              type: long
+              format: bytes
+            - name: current.coordinating.bytes
+              type: long
+              format: bytes
+            - name: current.primary.bytes
+              type: long
+              format: bytes
+            - name: current.replica.bytes
+              type: long
+              format: bytes
+            - name: current.all.bytes
+              type: long
+              format: bytes
+            - name: total.all.bytes
+              type: long
+              format: bytes
+            - name: limit_in_bytes
+              type: long
+              format: bytes

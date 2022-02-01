@@ -282,22 +282,42 @@ var (
 	}
 
 	current_memory_pressure = s.Schema{
-		"combined_coordinating_and_primary_in_bytes": c.Int("combined_coordinating_and_primary_in_bytes"),
-		"coordinating_in_bytes":                      c.Int("coordinating_in_bytes"),
-		"primary_in_bytes":                           c.Int("primary_in_bytes"),
-		"replica_in_bytes":                           c.Int("replica_in_bytes"),
-		"all_in_bytes":                               c.Int("all_in_bytes"),
+		"all": s.Object{
+			"bytes": c.Int("all_in_bytes"),
+		},
+		"primary": s.Object{
+			"bytes": c.Int("primary_in_bytes"),
+		},
+		"coordinating": s.Object{
+			"bytes": c.Int("coordinating_in_bytes"),
+		},
+		"replica": s.Object{
+			"bytes": c.Int("replica_in_bytes"),
+		},
+		"combined_coordinating_and_primary": s.Object{
+			"bytes": c.Int("combined_coordinating_and_primary_in_bytes"),
+		},
 	}
 
 	total_memory_pressure = s.Schema{
-		"combined_coordinating_and_primary_in_bytes": c.Int("combined_coordinating_and_primary_in_bytes"),
-		"coordinating_in_bytes":                      c.Int("coordinating_in_bytes"),
-		"primary_in_bytes":                           c.Int("primary_in_bytes"),
-		"replica_in_bytes":                           c.Int("replica_in_bytes"),
-		"all_in_bytes":                               c.Int("all_in_bytes"),
-		"coordinating_rejections":                    c.Int("coordinating_rejections"),
-		"primary_rejections":                         c.Int("primary_rejections"),
-		"replica_rejections":                         c.Int("replica_rejections"),
+		"primary": s.Object{
+			"rejections": c.Int("primary_rejections"),
+			"bytes":      c.Int("primary_in_bytes"),
+		},
+		"coordinating": s.Object{
+			"rejections": c.Int("coordinating_rejections"),
+			"bytes":      c.Int("coordinating_in_bytes"),
+		},
+		"replica": s.Object{
+			"rejections": c.Int("replica_rejections"),
+			"bytes":      c.Int("replica_in_bytes"),
+		},
+		"combined_coordinating_and_primary": s.Object{
+			"bytes": c.Int("combined_coordinating_and_primary_in_bytes"),
+		},
+		"all": s.Object{
+			"bytes": c.Int("all_in_bytes"),
+		},
 	}
 
 	threadPoolStatsSchema = s.Schema{
