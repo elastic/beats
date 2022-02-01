@@ -22,11 +22,21 @@ package journald
 
 import (
 	"errors"
+	"sync"
 	"time"
+
+	"github.com/elastic/go-ucfg"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalread"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+)
+
+var (
+	// includeMatchesWarnOnce allow for a config deprecation warning to be
+	// logged only once if an old config format is detected.
+	includeMatchesWarnOnce sync.Once
 )
 
 // Config stores the options of a journald input.
@@ -35,7 +45,7 @@ type config struct {
 	Paths []string `config:"paths"`
 
 	// Backoff is the current interval to wait before
-	// attemting to read again from the journal.
+	// attempting to read again from the journal.
 	Backoff time.Duration `config:"backoff" validate:"min=0,nonzero"`
 
 	// MaxBackoff is the limit of the backoff time.
@@ -48,13 +58,49 @@ type config struct {
 	CursorSeekFallback journalread.SeekMode `config:"cursor_seek_fallback"`
 
 	// Matches store the key value pairs to match entries.
-	Matches []journalfield.Matcher `config:"include_matches"`
+	Matches bwcIncludeMatches `config:"include_matches"`
+
+	// Units stores the units to monitor.
+	Units []string `config:"units"`
+
+	// Transports stores the list of transports to include in the messages.
+	Transports []string `config:"transports"`
+
+	// Identifiers stores the syslog identifiers to watch.
+	Identifiers []string `config:"syslog_identifiers"`
 
 	// SaveRemoteHostname defines if the original source of the entry needs to be saved.
 	SaveRemoteHostname bool `config:"save_remote_hostname"`
 
 	// Parsers configuration
 	Parsers parser.Config `config:",inline"`
+}
+
+// bwcIncludeMatches is a wrapper that accepts include_matches configuration
+// from 7.x to allow old config to remain compatible.
+type bwcIncludeMatches journalfield.IncludeMatches
+
+func (im *bwcIncludeMatches) Unpack(c *ucfg.Config) error {
+	// Handle 7.x config format in a backwards compatible manner. Old format:
+	// include_matches: [_SYSTEMD_UNIT=foo.service, _SYSTEMD_UNIT=bar.service]
+	if c.IsArray() {
+		var matches []journalfield.Matcher
+		if err := c.Unpack(&matches); err != nil {
+			return err
+		}
+		for _, x := range matches {
+			im.OR = append(im.OR, journalfield.IncludeMatches{
+				Matches: []journalfield.Matcher{x},
+			})
+		}
+		includeMatchesWarnOnce.Do(func() {
+			cfgwarn.Deprecate("", "Please migrate your journald input's "+
+				"include_matches config to the new more expressive format.")
+		})
+		return nil
+	}
+
+	return c.Unpack((*journalfield.IncludeMatches)(im))
 }
 
 var errInvalidSeekFallback = errors.New("invalid setting for cursor_seek_fallback")

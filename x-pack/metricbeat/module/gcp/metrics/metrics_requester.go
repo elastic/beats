@@ -69,22 +69,21 @@ func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType s
 	return
 }
 
-func (r *metricsRequester) Metrics(ctx context.Context, sdc metricsConfig, metricsMeta map[string]metricMeta) ([]timeSeriesWithAligner, error) {
+func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, aligner string, metricsToCollect map[string]metricMeta) ([]timeSeriesWithAligner, error) {
 	var lock sync.Mutex
 	var wg sync.WaitGroup
 	results := make([]timeSeriesWithAligner, 0)
 
-	aligner := sdc.Aligner
-	for mt, meta := range metricsMeta {
+	for mt, meta := range metricsToCollect {
 		wg.Add(1)
 
 		metricMeta := meta
 		go func(mt string) {
 			defer wg.Done()
 
-			r.logger.Debugf("For metricType %s, metricMeta = %d", mt, metricMeta)
+			r.logger.Debugf("For metricType %s, metricMeta = %d,  aligner = %s", mt, metricMeta, aligner)
 			interval, aligner := getTimeIntervalAligner(metricMeta.ingestDelay, metricMeta.samplePeriod, r.config.period, aligner)
-			ts := r.Metric(ctx, sdc.ServiceName, mt, interval, aligner)
+			ts := r.Metric(ctx, serviceName, mt, interval, aligner)
 			lock.Lock()
 			defer lock.Unlock()
 			results = append(results, ts)
@@ -125,7 +124,7 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) (f string) 
 			}
 			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, zone)
 		}
-	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions:
+	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions, gcp.ServiceFirestore:
 		return
 	case gcp.ServiceStorage:
 		if r.config.Region == "" {

@@ -307,8 +307,6 @@ def tagAndPush(Map args = [:]) {
     tagName = "pr-${env.CHANGE_ID}"
   }
 
-  dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
-
   // supported tags
   def tags = [tagName, "${env.GIT_BASE_COMMIT}"]
   if (!isPR() && aliasVersion != "") {
@@ -386,6 +384,7 @@ def release(){
     withEnv([
       "DEV=true"
     ]) {
+      dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dir("${env.BEATS_FOLDER}") {
         sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
       }

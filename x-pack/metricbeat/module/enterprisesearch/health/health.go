@@ -38,7 +38,8 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	http *helper.HTTP
+	http         *helper.HTTP
+	XPackEnabled bool
 }
 
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -48,9 +49,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+	config := struct {
+		XPackEnabled bool `config:"xpack.enabled"`
+	}{
+		XPackEnabled: false,
+	}
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
 	return &MetricSet{
 		base,
 		http,
+		config.XPackEnabled,
 	}, nil
 }
 
@@ -63,7 +74,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return errors.Wrap(err, "error in fetch")
 	}
 
-	err = eventMapping(report, content)
+	err = eventMapping(report, content, m.XPackEnabled)
 	if err != nil {
 		return errors.Wrap(err, "error converting event")
 	}

@@ -40,6 +40,10 @@ shared_credential_file: {{ .shared_credential_file }}
 endpoint: {{ .endpoint }}
 {{ end }}
 
+{{ if .default_region }}
+default_region: {{ .default_region }}
+{{ end }}
+
 {{ if .access_key_id }}
 access_key_id: {{ .access_key_id }}
 {{ end }}

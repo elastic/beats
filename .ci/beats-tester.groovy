@@ -7,7 +7,7 @@ pipeline {
   environment {
     BASE_DIR = 'src/github.com/elastic/beats'
     PIPELINE_LOG_LEVEL = "INFO"
-    BEATS_TESTER_JOB = 'Beats/beats-tester-mbp/master'
+    BEATS_TESTER_JOB = 'Beats/beats-tester-mbp/main'
   }
   options {
     timeout(time: 1, unit: 'HOURS')
