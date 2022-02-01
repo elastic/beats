@@ -8,6 +8,8 @@ services:
     - REDIS_HOST=redis
     - REDIS_PORT=6379
     - ES_HOST=elasticsearch
+    - ES_USER=heartbeat_user
+    - ES_PASS=testing
     - ES_PORT=9200
     working_dir: /go/src/github.com/elastic/beats/heartbeat
     volumes:
@@ -28,6 +30,10 @@ services:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+      retries: 300
+      interval: 1s
 
   redis:
     build: ${PWD}/tests/docker_support/redis

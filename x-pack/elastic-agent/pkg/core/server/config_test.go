@@ -17,7 +17,7 @@ func TestNewFromConfig(t *testing.T) {
 		Address: "0.0.0.0",
 		Port:    9876,
 	}
-	srv, err := NewFromConfig(l, cfg, &StubHandler{})
+	srv, err := NewFromConfig(l, cfg, &StubHandler{}, nil)
 	require.NoError(t, err)
 	assert.Equal(t, "0.0.0.0:9876", srv.getListenAddr())
 }

@@ -23,6 +23,7 @@ package dev_tools
 import (
 	"archive/tar"
 	"archive/zip"
+	"bufio"
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
@@ -169,7 +170,7 @@ func checkTar(t *testing.T, file string) {
 }
 
 func checkZip(t *testing.T, file string) {
-	p, err := readZip(file)
+	p, err := readZip(t, file, checkNpcapNotices)
 	if err != nil {
 		t.Error(err)
 		return
@@ -181,6 +182,49 @@ func checkZip(t *testing.T, file string) {
 	checkModulesDPresent(t, "", p)
 	checkModulesPermissions(t, p)
 	checkLicensesPresent(t, "", p)
+}
+
+const (
+	npcapSettings   = "Windows Npcap installation settings"
+	npcapGrant      = `Insecure.Com LLC \(“The Nmap Project”\) has granted Elasticsearch`
+	npcapLicense    = `Dependency : Npcap \(https://nmap.org/npcap/\)`
+	libpcapLicense  = `Dependency : Libpcap \(http://www.tcpdump.org/\)`
+	winpcapLicense  = `Dependency : Winpcap \(https://www.winpcap.org/\)`
+	radiotapLicense = `Dependency : ieee80211_radiotap.h Header File`
+)
+
+// This reflects the order that the licenses and notices appear in the relevant files.
+var npcapLicensePattern = regexp.MustCompile(
+	"(?s)" + npcapLicense +
+		".*" + libpcapLicense +
+		".*" + winpcapLicense +
+		".*" + radiotapLicense,
+)
+
+func checkNpcapNotices(pkg, file string, contents io.Reader) error {
+	if !strings.Contains(pkg, "packetbeat") {
+		return nil
+	}
+
+	wantNotices := strings.Contains(pkg, "windows") && !strings.Contains(pkg, "oss")
+
+	// If the packetbeat README.md is made to be generated
+	// conditionally then it should also be checked here.
+	pkg = filepath.Base(pkg)
+	file, err := filepath.Rel(pkg[:len(pkg)-len(filepath.Ext(pkg))], file)
+	if err != nil {
+		return err
+	}
+	switch file {
+	case "NOTICE.txt":
+		if npcapLicensePattern.MatchReader(bufio.NewReader(contents)) != wantNotices {
+			if wantNotices {
+				return fmt.Errorf("Npcap license section not found in %s file in %s", file, pkg)
+			}
+			return fmt.Errorf("unexpected Npcap license section found in %s file in %s", file, pkg)
+		}
+	}
+	return nil
 }
 
 func checkDocker(t *testing.T, file string) {
@@ -623,7 +667,11 @@ func readTarContents(tarName string, data io.Reader) (*packageFile, error) {
 	return p, nil
 }
 
-func readZip(zipFile string) (*packageFile, error) {
+// inspector is a file contents inspector. It vets the contents of the file
+// within a package for a requirement and returns an error if it is not met.
+type inspector func(pkg, file string, contents io.Reader) error
+
+func readZip(t *testing.T, zipFile string, inspectors ...inspector) (*packageFile, error) {
 	r, err := zip.OpenReader(zipFile)
 	if err != nil {
 		return nil, err
@@ -635,6 +683,18 @@ func readZip(zipFile string) (*packageFile, error) {
 		p.Contents[f.Name] = packageEntry{
 			File: f.Name,
 			Mode: f.Mode(),
+		}
+		for _, inspect := range inspectors {
+			r, err := f.Open()
+			if err != nil {
+				t.Errorf("failed to open %s in %s: %v", f.Name, zipFile, err)
+				break
+			}
+			err = inspect(zipFile, f.Name, r)
+			if err != nil {
+				t.Error(err)
+			}
+			r.Close()
 		}
 	}
 
@@ -740,7 +800,6 @@ func readDockerManifest(r io.Reader) (*dockerManifest, error) {
 	err = json.Unmarshal(data, &manifests)
 	if err != nil {
 		return nil, err
-
 	}
 
 	if len(manifests) != 1 {
