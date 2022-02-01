@@ -192,6 +192,8 @@ require (
 	kernel.org/pub/linux/libs/security/libcap/cap v1.2.57
 )
 
+require github.com/kush-elastic/bayeux v1.0.1
+
 require (
 	code.cloudfoundry.org/gofileutils v0.0.0-20170111115228-4d0c80011a0f // indirect
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.1 // indirect
@@ -249,7 +251,6 @@ require (
 	github.com/jstemmer/go-junit-report v0.9.1 // indirect
 	github.com/karrick/godirwalk v1.15.6 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
-	github.com/kush-elastic/bayeux v1.0.1 // indirect
 	github.com/markbates/pkger v0.17.0 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
