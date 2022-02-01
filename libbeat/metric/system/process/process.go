@@ -38,7 +38,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
-	"github.com/elastic/beats/v7/metricbeat/mb"
 	sysinfo "github.com/elastic/go-sysinfo"
 )
 
@@ -129,18 +128,18 @@ func (procStats *Stats) Init() error {
 	return nil
 }
 
-// Get fetches the configured processes and returns a formatted map, plus the root event
-func (procStats *Stats) Get() ([]mb.Event, error) {
+// Get fetches the configured processes and returns a list of formatted events and root ECS fields
+func (procStats *Stats) Get() ([]common.MapStr, []common.MapStr, error) {
 	//If the user hasn't configured any kind of process glob, return
 	if len(procStats.Procs) == 0 {
-		return nil, nil
+		return nil, nil, nil
 	}
 
 	// actually fetch the PIDs from the OS-specific code
 	pidMap, plist, err := procStats.FetchPids()
 
 	if err != nil {
-		return nil, errors.Wrap(err, "error gathering PIDs")
+		return nil, nil, errors.Wrap(err, "error gathering PIDs")
 	}
 	// We use this to track processes over time.
 	procStats.ProcsMap = pidMap
@@ -162,7 +161,9 @@ func (procStats *Stats) Get() ([]mb.Event, error) {
 	}
 
 	//Format the list to the MapStr type used by the outputs
-	procs := make([]mb.Event, 0, len(plist))
+	procs := []common.MapStr{}
+	rootEvents := []common.MapStr{}
+
 	for _, process := range plist {
 		// Add the RSS pct memory first
 		process.Memory.Rss.Pct = GetProcMemPercentage(process, totalPhyMem)
@@ -173,16 +174,14 @@ func (procStats *Stats) Get() ([]mb.Event, error) {
 
 		proc, err := procStats.getProcessEvent(&process)
 		if err != nil {
-			return nil, errors.Wrapf(err, "error converting process for pid %d", process.Pid.ValueOr(0))
+			return nil, nil, errors.Wrapf(err, "error converting process for pid %d", process.Pid.ValueOr(0))
 		}
-		procEvt := mb.Event{
-			MetricSetFields: proc,
-			RootFields:      rootMap,
-		}
-		procs = append(procs, procEvt)
+
+		procs = append(procs, proc)
+		rootEvents = append(rootEvents, rootMap)
 	}
 
-	return procs, nil
+	return procs, rootEvents, nil
 }
 
 // GetOne fetches process data for a given PID if its name matches the regexes provided from the host.

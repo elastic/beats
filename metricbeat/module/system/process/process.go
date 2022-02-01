@@ -103,13 +103,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches metrics for all processes. It iterates over each PID and
 // collects process metadata, CPU metrics, and memory metrics.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	procs, err := m.stats.Get()
+	procs, roots, err := m.stats.Get()
 	if err != nil {
 		return errors.Wrap(err, "process stats")
 	}
 
-	for _, proc := range procs {
-		isOpen := r.Event(proc)
+	for evtI := range procs {
+		isOpen := r.Event(mb.Event{
+			MetricSetFields: procs[evtI],
+			RootFields:      roots[evtI],
+		})
 		if !isOpen {
 			return nil
 		}

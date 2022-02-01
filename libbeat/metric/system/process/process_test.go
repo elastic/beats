@@ -34,7 +34,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
-	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // numCPU is the number of CPUs of the host
@@ -209,10 +208,10 @@ func BenchmarkGetTop(b *testing.B) {
 	if err != nil {
 		b.Fatalf("Failed init: %s", err)
 	}
-	procs := make(map[int][]mb.Event)
+	procs := make(map[int][]common.MapStr)
 
 	for i := 0; i < b.N; i++ {
-		list, err := stat.Get()
+		list, _, err := stat.Get()
 		if err != nil {
 			b.Fatalf("error: %s", err)
 		}
