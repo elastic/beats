@@ -69,8 +69,8 @@
         "log.offset": 360,
         "process.args": [
             "/usr/libexec/xpcproxy",
-            "com.apple.systemstats.daily",
-            "xpcproxy"
+            "xpcproxy",
+            "com.apple.systemstats.daily"
         ],
         "process.executable": "/usr/libexec/xpcproxy",
         "process.hash.sha256": "c4bc09fd2f248534552f517acf3edb9a635aba2b02e46f49df683ea9b778e5b4",
@@ -163,9 +163,9 @@
         "log.level": "I",
         "log.offset": 1095,
         "process.args": [
-            "--daily",
             "/usr/sbin/systemstats",
-            "/usr/sbin/systemstats"
+            "/usr/sbin/systemstats",
+            "--daily"
         ],
         "process.executable": "/usr/sbin/systemstats",
         "process.hash.sha256": "d6be9bfbd777ac5dcd30488014acc787a2df5ce840f1fe4d5742d323ee00392f",
@@ -259,8 +259,8 @@
         "log.offset": 1825,
         "process.args": [
             "/usr/libexec/xpcproxy",
-            "com.adobe.AAM.Scheduler-1.0",
-            "xpcproxy"
+            "xpcproxy",
+            "com.adobe.AAM.Scheduler-1.0"
         ],
         "process.executable": "/usr/libexec/xpcproxy",
         "process.hash.sha256": "c4bc09fd2f248534552f517acf3edb9a635aba2b02e46f49df683ea9b778e5b4",
@@ -305,10 +305,10 @@
         "log.level": "I",
         "log.offset": 2202,
         "process.args": [
-            "--flagfile=/private/var/osquery/osquery.flags",
-            "--logger_min_stderr=1",
             "/usr/local/Cellar/osquery/3.3.0_1/bin/osqueryd",
-            "/usr/local/bin/osqueryd"
+            "/usr/local/bin/osqueryd",
+            "--flagfile=/private/var/osquery/osquery.flags",
+            "--logger_min_stderr=1"
         ],
         "process.executable": "/usr/local/Cellar/osquery/3.3.0_1/bin/osqueryd",
         "process.hash.sha256": "08bd61582657cd6d78c9e071d34d79a32bb59e7210077a44919d2c5477e988a1",
@@ -397,19 +397,19 @@
         "log.level": "I",
         "log.offset": 2899,
         "process.args": [
+            "/Applications/Google Chrome.app/Contents/Versions/70.0.3538.110/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+            "/Applications/Google",
+            "Chrome.app/Contents/Versions/70.0.3538.110/Google",
+            "Chrome",
+            "Helper.app/Contents/MacOS/Google",
+            "Chrome",
+            "Helper",
+            "--type=utility",
             "--field-trial-handle=120122713615061869,9401617251746517350,131072",
             "--lang=en-US",
-            "--seatbelt-client=262",
-            "--service-request-channel-token=10458143409865682077",
             "--service-sandbox-type=utility",
-            "--type=utility",
-            "/Applications/Google",
-            "/Applications/Google Chrome.app/Contents/Versions/70.0.3538.110/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
-            "Chrome",
-            "Chrome",
-            "Chrome.app/Contents/Versions/70.0.3538.110/Google",
-            "Helper",
-            "Helper.app/Contents/MacOS/Google"
+            "--service-request-channel-token=10458143409865682077",
+            "--seatbelt-client=262"
         ],
         "process.executable": "/Applications/Google Chrome.app/Contents/Versions/70.0.3538.110/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
         "process.hash.sha256": "a8defc1b24c45f6dabeb8298af5f8e1daf39e1504e16f878345f15ac94ae96d7",
