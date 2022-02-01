@@ -3,6 +3,7 @@ package bundle
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -28,6 +29,7 @@ func TestCreateServer(t *testing.T) {
 		},
 	}
 
+	time.Sleep(time.Second * 2)
 	for _, test := range tests {
 		target := ServerAddress + test.path
 		client := &http.Client{}
