@@ -519,6 +519,7 @@ TESTING_FILEBEAT_MODULES=nginx \
 pytest tests/system/test_modules.py -v --full-trace
 ----
 . Add and remove option env vars as required. Here are some useful ones:
+* `TESTING_FILEBEAT_ALLOW_OLDER`: if set to 1, allow connecting older versions of Elasticsearch
 * `TESTING_FILEBEAT_MODULES`: comma separated list of modules to test.
 * `TESTING_FILEBEAT_FILESETS`: comma separated list of filesets to test.
 * `TESTING_FILEBEAT_FILEPATTERN`: glob pattern for log files within the fileset to test.
