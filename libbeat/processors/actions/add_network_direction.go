@@ -100,9 +100,7 @@ func (m *networkDirectionProcessor) Run(event *beat.Event) (*beat.Event, error) 
 		return event, err
 	}
 
-	event.Fields.DeepUpdate(common.MapStr{
-		m.Target: networkDirection(internalSource, internalDestination),
-	})
+	event.PutValue(m.Target, networkDirection(internalSource, internalDestination))
 	return event, nil
 }
 
