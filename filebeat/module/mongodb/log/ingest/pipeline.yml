@@ -3,9 +3,9 @@ processors:
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
-- rename:
-    field: '@timestamp'
-    target_field: event.created
+- set:
+    copy_from: '@timestamp'
+    field: event.created
 - grok:
     field: message
     patterns:
