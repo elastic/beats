@@ -228,8 +228,12 @@ func (o *Operator) Shutdown() {
 
 	for _, a := range o.apps {
 		go func(a Application) {
+			started := time.Now()
 			a.Shutdown()
 			wg.Done()
+			o.logger.Debugf("took %s to shutdown %s",
+				time.Now().Sub(started), a.Name())
+
 		}(a)
 	}
 	wg.Wait()
