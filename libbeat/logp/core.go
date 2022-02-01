@@ -67,7 +67,7 @@ func Configure(cfg Config) error {
 	return ConfigureWithOutputs(cfg)
 }
 
-// XXX: ConfigureWithOutputs is used by elastic-agent only (See file: x-pack/elastic-agent/pkg/core/logger/logger.go).
+// ConfigureWithOutputs XXX: is used by elastic-agent only (See file: x-pack/elastic-agent/pkg/core/logger/logger.go).
 // The agent requires that the output specified in the config object is configured and merged with the
 // logging outputs given.
 func ConfigureWithOutputs(cfg Config, outputs ...zapcore.Core) error {

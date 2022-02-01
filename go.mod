@@ -153,9 +153,11 @@ require (
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/xdg/scram v1.0.3
 	github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7 // indirect
-	go.elastic.co/apm v1.11.0
+	go.elastic.co/apm v1.14.0
 	go.elastic.co/apm/module/apmelasticsearch v1.7.2
-	go.elastic.co/apm/module/apmhttp v1.7.2
+	go.elastic.co/apm/module/apmgorilla v1.14.0
+	go.elastic.co/apm/module/apmgrpc v1.14.0
+	go.elastic.co/apm/module/apmhttp v1.14.0
 	go.elastic.co/ecszap v0.3.0
 	go.elastic.co/go-licence-detector v0.4.0
 	go.etcd.io/bbolt v1.3.6
@@ -164,6 +166,7 @@ require (
 	go.uber.org/zap v1.14.1
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
+	golang.org/x/mod v0.5.1
 	golang.org/x/net v0.0.0-20211020060615-d418f374d309
 	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
@@ -239,6 +242,7 @@ require (
 	github.com/hashicorp/go-version v1.2.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/jcchavezs/porto v0.1.0 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
 	github.com/jcmturner/gofork v1.0.0 // indirect
@@ -268,10 +272,10 @@ require (
 	github.com/xdg/stringprep v1.0.3 // indirect
 	go.elastic.co/fastjson v1.1.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	golang.org/x/mod v0.5.1 // indirect
 	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
+	google.golang.org/grpc/examples v0.0.0-20211115174500-b2317c762757 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	k8s.io/klog/v2 v2.30.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20211115234752-e816edb12b65 // indirect

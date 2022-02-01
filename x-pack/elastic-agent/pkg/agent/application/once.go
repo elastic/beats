@@ -5,6 +5,8 @@
 package application
 
 import (
+	"context"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -31,18 +33,18 @@ func (o *once) Start() error {
 		return ErrNoConfiguration
 	}
 
-	return readfiles(files, o.emitter)
+	return readfiles(context.Background(), files, o.emitter)
 }
 
 func (o *once) Stop() error {
 	return nil
 }
 
-func readfiles(files []string, emitter pipeline.EmitterFunc) error {
+func readfiles(ctx context.Context, files []string, emitter pipeline.EmitterFunc) error {
 	c, err := config.LoadFiles(files...)
 	if err != nil {
 		return errors.New(err, "could not load or merge configuration", errors.TypeConfig)
 	}
 
-	return emitter(c)
+	return emitter(ctx, c)
 }
