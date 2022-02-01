@@ -24,7 +24,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove option `setup.template.type` and always load composable template with data streams. {pull}28450[28450]
 - Remove several ILM options (`rollover_alias` and `pattern`) as data streams does not require index aliases. {pull}28450[28450]
 - Index template's default_fields setting is only populated with ECS fields. {pull}28596[28596] {issue}28215[28215]
-- tar.gz packages for ARM64 will now use the suffix `aarch64` rather than `arm64`. {pull}28813[28813]
 - Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
 - Remove options `logging.files.suffix` and default to datetime endings. {pull}28927[28927]
 - Remove Journalbeat. Use `journald` input of Filebeat instead. {pull}29131[29131]
@@ -33,6 +32,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change Docker base image from CentOS 7 to Ubuntu 20.04 {pull}29681[29681]
 - Enrich kubernetes metadata with node annotations. {pull}29605[29605]
 - Allign kubernetes configuration settings. {pull}29908[29908]
+- Remove legacy support for SSLv3. {pull}30071[30071]
+- `add_fields` processor is now able to set metadata in events {pull}30092[30092]
 
 *Auditbeat*
 
@@ -53,6 +54,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Only add monitor.status to browser events when summary. {pull}29460[29460]
 - Also add summary to journeys for which the synthetics runner crashes. {pull}29606[29606]
 - Update size of ICMP packets to adhere to standard min size. {pull}29948[29948]
+- Add fonts to support more different types of characters for multiple languages. {pull}29606[29861]
 
 *Metricbeat*
 
@@ -102,6 +104,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/socket: Fix process name and arg truncation for long names, paths and args lists. {issue}24667[24667] {pull}29410[29410]
 - system/socket: Fix startup errors on newer 5.x kernels due to missing _do_fork function. {issue}29607[29607] {pull}29744[29744]
 - libbeat/processors/add_process_metadata: Fix memory leak in process cache. {issue}24890[24890] {pull}29717[29717]
+- auditd: Add error.message to events when processing fails. {pull}30009[30009]
 
 *Filebeat*
 
@@ -113,6 +116,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - ibmmq: Fixed `@timestamp` not being populated with correct values. {pull}29773[29773]
 - Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
 - aws-s3: Improve gzip detection to avoid false negatives. {issue}29968[29968]
+- decode_cef: Fix panic when recovering from invalid CEF extensions that contain escape characters. {issue}30010[30010]
 
 *Heartbeat*
 
@@ -158,6 +162,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add FIPS configuration option for all AWS API calls. {pull}28899[28899]
 - Add `default_region` config to AWS common module. {pull}29415[29415]
 - Add support for latest k8s versions v1.23 and v1.22 {pull}29575[29575]
+- Add `script` processor to all beats {issue}29269[29269] {pull}29752[29752]
 - Only connect to Elasticsearch instances with the same version or newer. {pull}29683[29683]
 - Move umask from code to service files. {pull}29708[29708]
 
@@ -192,8 +197,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add k8s metadata in state_cronjob metricset. {pull}29572[29572]
 - Add `elasticsearch.cluster.id` field to Beat and Kibana modules. {pull}29577[29577]
 - Add `elasticsearch.cluster.id` field to Logstash module. {pull}29625[29625]
+- Add `xpack.enabled` support for Enterprise Search module. {pull}29871[29871]
+- Add gcp firestore metricset. {pull}29918[29918] 
+- Remove strict parsing on RabbitMQ module {pull}30090[30090]
 
 *Packetbeat*
+
+- Add automated OEM Npcap installation handling. {pull}29112[29112]
 
 *Functionbeat*
 
