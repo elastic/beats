@@ -39,7 +39,8 @@ class Test(metricbeat.BaseTest):
         ]), evt.keys())
         network = evt["system"]["network"]
         print(list(network.keys()))
-        self.assertCountEqual(self.de_dot(["name", "out", "in"]), network.keys())
+        self.assertCountEqual(self.de_dot(
+            ["name", "out", "in"]), network.keys())
 
     def test_dropfields_with_condition(self):
         """
@@ -49,7 +50,8 @@ class Test(metricbeat.BaseTest):
             modules=[{
                 "name": "system",
                 "metricsets": ["process"],
-                "period": "1s"
+                "period": "1s",
+                "processes": ["^pytest"]
             }],
             processors=[{
                 "drop_fields": {
@@ -60,20 +62,19 @@ class Test(metricbeat.BaseTest):
         )
         metricbeat = self.start_beat()
         self.wait_until(
-            lambda: self.output_count(lambda x: x >= 1),
+            lambda: self.output_count(lambda x: x >= 2),
             max_timeout=15)
 
         metricbeat.kill_and_wait()
 
         output = self.read_output(
             required_fields=["@timestamp"],
-        )
+        )[1]
 
-        for event in output:
-            if float(event["system.process.cpu.total.pct"]) < 0.5:
-                assert "system.process.memory.size" not in event
-            else:
-                assert "system.process.memory.size" in event
+        if float(output["system.process.cpu.total.pct"]) < 0.5:
+            assert "system.process.memory.size" not in output
+        else:
+            assert "system.process.memory.size" in output
 
     def test_dropevent_with_condition(self):
         """
@@ -83,7 +84,8 @@ class Test(metricbeat.BaseTest):
             modules=[{
                 "name": "system",
                 "metricsets": ["process"],
-                "period": "1s"
+                "period": "1s",
+                "processes": ["^pytest"]
             }],
             processors=[{
                 "drop_event": {
@@ -93,16 +95,16 @@ class Test(metricbeat.BaseTest):
         )
         metricbeat = self.start_beat()
         self.wait_until(
-            lambda: self.output_count(lambda x: x >= 1),
+            lambda: self.output_count(lambda x: x >= 2),
             max_timeout=15)
 
         metricbeat.kill_and_wait()
 
         output = self.read_output(
             required_fields=["@timestamp"],
-        )
-        for event in output:
-            assert float(event["system.process.cpu.total.pct"]) >= 0.001
+        )[1]
+        print(output)
+        assert float(output["system.process.cpu.total.pct"]) >= 0.001
 
     def test_dropevent_with_complex_condition(self):
         """
@@ -140,7 +142,9 @@ class Test(metricbeat.BaseTest):
             modules=[{
                 "name": "system",
                 "metricsets": ["process"],
-                "period": "1s"
+                "period": "1s",
+                # filter down to one process, since this test suite doesn't have a way to specify X iterations of the metricbeat fetcher
+                "processes": ["^pytest"]
             }],
             processors=[{
                 "include_fields": {"fields": ["system.process.cpu", "system.process.memory"]},
@@ -148,14 +152,14 @@ class Test(metricbeat.BaseTest):
         )
         metricbeat = self.start_beat()
         self.wait_until(
-            lambda: self.output_count(lambda x: x >= 1),
+            lambda: self.output_count(lambda x: x >= 2),
             max_timeout=15)
 
         metricbeat.kill_and_wait()
 
         output = self.read_output(
             required_fields=["@timestamp"],
-        )[0]
+        )[1]
         print(output)
 
         for key in [
@@ -182,7 +186,8 @@ class Test(metricbeat.BaseTest):
             modules=[{
                 "name": "system",
                 "metricsets": ["process"],
-                "period": "1s"
+                "period": "1s",
+                "processes": ["^pytest"]
             }],
             processors=[{
                 "include_fields": {"fields": ["system.process", "process"]},
@@ -192,14 +197,14 @@ class Test(metricbeat.BaseTest):
         )
         metricbeat = self.start_beat()
         self.wait_until(
-            lambda: self.output_count(lambda x: x >= 1),
+            lambda: self.output_count(lambda x: x >= 2),
             max_timeout=15)
 
         metricbeat.kill_and_wait()
 
         output = self.read_output(
             required_fields=["@timestamp"],
-        )[0]
+        )[1]
 
         for key in [
             "system.process.cpu.start_time",
