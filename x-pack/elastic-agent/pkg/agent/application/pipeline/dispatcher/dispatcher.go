@@ -10,6 +10,8 @@ import (
 	"reflect"
 	"strings"
 
+	"go.elastic.co/apm"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/actions"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
@@ -74,7 +76,15 @@ func (ad *ActionDispatcher) key(a fleetapi.Action) string {
 }
 
 // Dispatch dispatches an action using pre-registered set of handlers.
-func (ad *ActionDispatcher) Dispatch(acker store.FleetAcker, actions ...fleetapi.Action) error {
+func (ad *ActionDispatcher) Dispatch(ctx context.Context, acker store.FleetAcker, actions ...fleetapi.Action) (err error) {
+	span, ctx := apm.StartSpan(ctx, "dispatch", "app.internal")
+	defer func() {
+		if err != nil {
+			apm.CaptureError(ctx, err).Send()
+		}
+		span.End()
+	}()
+
 	if len(actions) == 0 {
 		ad.log.Debug("No action to dispatch")
 		return nil
@@ -87,18 +97,19 @@ func (ad *ActionDispatcher) Dispatch(acker store.FleetAcker, actions ...fleetapi
 	)
 
 	for _, action := range actions {
-		if err := ad.ctx.Err(); err != nil {
+		if err = ad.ctx.Err(); err != nil {
 			return err
 		}
 
-		if err := ad.dispatchAction(action, acker); err != nil {
+		if err = ad.dispatchAction(action, acker); err != nil {
 			ad.log.Debugf("Failed to dispatch action '%+v', error: %+v", action, err)
 			return err
 		}
 		ad.log.Debugf("Successfully dispatched action: '%+v'", action)
 	}
 
-	return acker.Commit(ad.ctx)
+	err = acker.Commit(ctx)
+	return err
 }
 
 func (ad *ActionDispatcher) dispatchAction(a fleetapi.Action, acker store.FleetAcker) error {

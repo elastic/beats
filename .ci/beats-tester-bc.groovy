@@ -7,7 +7,7 @@ pipeline {
   environment {
     BASE_DIR = 'src/github.com/elastic/beats'
     PIPELINE_LOG_LEVEL = "INFO"
-    BEATS_TESTER_JOB = 'Beats/beats-tester-mbp/master'
+    BEATS_TESTER_JOB = 'Beats/beats-tester-mbp/main'
     BASE_URL = "https://staging.elastic.co/${params.version}/downloads"
     APM_BASE_URL = "${env.BASE_URL}/apm-server"
     BEATS_BASE_URL = "${env.BASE_URL}/beats"

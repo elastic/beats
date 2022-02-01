@@ -89,7 +89,7 @@ func (h *PolicyChange) Handle(ctx context.Context, a fleetapi.Action, acker stor
 	if err != nil {
 		return err
 	}
-	if err := h.emitter(c); err != nil {
+	if err := h.emitter(ctx, c); err != nil {
 		return err
 	}
 
@@ -197,9 +197,10 @@ func fleetToReader(agentInfo *info.AgentInfo, cfg *configuration.Configuration) 
 	configToStore := map[string]interface{}{
 		"fleet": cfg.Fleet,
 		"agent": map[string]interface{}{
-			"id":              agentInfo.AgentID(),
-			"logging.level":   cfg.Settings.LoggingConfig.Level,
-			"monitoring.http": cfg.Settings.MonitoringConfig.HTTP,
+			"id":               agentInfo.AgentID(),
+			"logging.level":    cfg.Settings.LoggingConfig.Level,
+			"monitoring.http":  cfg.Settings.MonitoringConfig.HTTP,
+			"monitoring.pprof": cfg.Settings.MonitoringConfig.Pprof,
 		},
 	}
 

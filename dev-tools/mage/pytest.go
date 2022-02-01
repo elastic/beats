@@ -133,6 +133,14 @@ func PythonTest(params PythonTestArgs) error {
 	pytestOptions := []string{
 		"--timeout=90",
 		"--durations=20",
+		// Enable -x to stop at the first failing test
+		// "-x",
+		// Enable --tb=long to produce long tracebacks
+		//"--tb=long",
+		// Enable -v to produce verbose output
+		//"-v",
+		// Don't capture test output
+		//"-s",
 	}
 	if mg.Verbose() {
 		pytestOptions = append(pytestOptions, "-v")

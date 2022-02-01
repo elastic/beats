@@ -22,7 +22,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/tsg/gopacket/pcap"
+	"github.com/google/gopacket/pcap"
 )
 
 var formatDeviceNamesTests = []struct {

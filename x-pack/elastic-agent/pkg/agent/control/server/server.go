@@ -7,6 +7,8 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"runtime"
@@ -14,6 +16,8 @@ import (
 	"sync"
 	"time"
 
+	"go.elastic.co/apm"
+	"go.elastic.co/apm/module/apmgrpc"
 	"google.golang.org/grpc"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
@@ -23,7 +27,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
 	monitoring "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
+	monitoringCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/socket"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
@@ -33,26 +39,35 @@ import (
 
 // Server is the daemon side of the control protocol.
 type Server struct {
-	logger     *logger.Logger
-	rex        reexec.ExecManager
-	statusCtrl status.Controller
-	up         *upgrade.Upgrader
-	routeFn    func() *sorted.Set
-	listener   net.Listener
-	server     *grpc.Server
-	lock       sync.RWMutex
+	logger        *logger.Logger
+	rex           reexec.ExecManager
+	statusCtrl    status.Controller
+	up            *upgrade.Upgrader
+	routeFn       func() *sorted.Set
+	monitoringCfg *monitoringCfg.MonitoringConfig
+	listener      net.Listener
+	server        *grpc.Server
+	tracer        *apm.Tracer
+	lock          sync.RWMutex
 }
 
 type specer interface {
 	Specs() map[string]program.Spec
 }
 
+type specInfo struct {
+	spec program.Spec
+	app  string
+	rk   string
+}
+
 // New creates a new control protocol server.
-func New(log *logger.Logger, rex reexec.ExecManager, statusCtrl status.Controller, up *upgrade.Upgrader) *Server {
+func New(log *logger.Logger, rex reexec.ExecManager, statusCtrl status.Controller, up *upgrade.Upgrader, tracer *apm.Tracer) *Server {
 	return &Server{
 		logger:     log,
 		rex:        rex,
 		statusCtrl: statusCtrl,
+		tracer:     tracer,
 		up:         up,
 	}
 }
@@ -71,6 +86,14 @@ func (s *Server) SetRouteFn(routesFetchFn func() *sorted.Set) {
 	s.routeFn = routesFetchFn
 }
 
+// SetMonitoringCfg sets a reference to the monitoring config used by the running agent.
+// the controller references this config to find out if pprof is enabled for the agent or not
+func (s *Server) SetMonitoringCfg(cfg *monitoringCfg.MonitoringConfig) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+	s.monitoringCfg = cfg
+}
+
 // Start starts the GRPC endpoint and accepts new connections.
 func (s *Server) Start() error {
 	if s.server != nil {
@@ -84,7 +107,12 @@ func (s *Server) Start() error {
 		return err
 	}
 	s.listener = lis
-	s.server = grpc.NewServer()
+	if s.tracer != nil {
+		apmInterceptor := apmgrpc.NewUnaryServerInterceptor(apmgrpc.WithRecovery(), apmgrpc.WithTracer(s.tracer))
+		s.server = grpc.NewServer(grpc.UnaryInterceptor(apmInterceptor))
+	} else {
+		s.server = grpc.NewServer()
+	}
 	proto.RegisterElasticAgentControlServer(s.server, s)
 
 	// start serving GRPC connections
@@ -194,84 +222,273 @@ func (s *Server) ProcMeta(ctx context.Context, _ *proto.Empty) (*proto.ProcMetaR
 		Procs: []*proto.ProcMeta{},
 	}
 
-	routes := s.routeFn()
-	for _, rk := range routes.Keys() {
-		programs, ok := routes.Get(rk)
-		if !ok {
-			s.logger.With("route_key", rk).Warn("Unable to retrieve route.")
-			continue
-		}
+	// gather spec data for all rk/apps running
+	specs := s.getSpecInfo("", "")
+	for _, si := range specs {
+		endpoint := monitoring.MonitoringEndpoint(si.spec, runtime.GOOS, si.rk)
+		client := newSocketRequester(si.app, si.rk, endpoint)
 
+		procMeta := client.procMeta(ctx)
+		resp.Procs = append(resp.Procs, procMeta)
+	}
+
+	return resp, nil
+}
+
+// Pprof returns /debug/pprof data for the requested applicaiont-route_key or all running applications.
+func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.PprofResponse, error) {
+	if s.monitoringCfg == nil || s.monitoringCfg.Pprof == nil || !s.monitoringCfg.Pprof.Enabled {
+		return nil, fmt.Errorf("agent.monitoring.pprof disabled")
+	}
+
+	if s.routeFn == nil {
+		return nil, errors.New("route function is nil")
+	}
+
+	dur, err := time.ParseDuration(req.TraceDuration)
+	if err != nil {
+		return nil, fmt.Errorf("unable to parse trace duration: %w", err)
+	}
+
+	resp := &proto.PprofResponse{
+		Results: []*proto.PprofResult{},
+	}
+
+	var wg sync.WaitGroup
+	ch := make(chan *proto.PprofResult, 1)
+
+	// retrieve elastic-agent pprof data if requested or application is unspecified.
+	if req.AppName == "" || req.AppName == "elastic-agent" {
+		endpoint := beats.AgentMonitoringEndpoint(runtime.GOOS, s.monitoringCfg.HTTP)
+		c := newSocketRequester("elastic-agent", "", endpoint)
+		for _, opt := range req.PprofType {
+			wg.Add(1)
+			go func(opt proto.PprofOption) {
+				res := c.getPprof(ctx, opt, dur)
+				ch <- res
+				wg.Done()
+			}(opt)
+		}
+	}
+
+	// get requested rk/appname spec or all specs
+	var specs []specInfo
+	if req.AppName != "elastic-agent" {
+		specs = s.getSpecInfo(req.RouteKey, req.AppName)
+	}
+	for _, si := range specs {
+		endpoint := monitoring.MonitoringEndpoint(si.spec, runtime.GOOS, si.rk)
+		c := newSocketRequester(si.app, si.rk, endpoint)
+		// Launch a concurrent goroutine to gather all pprof endpoints from a socket.
+		for _, opt := range req.PprofType {
+			wg.Add(1)
+			go func(opt proto.PprofOption) {
+				res := c.getPprof(ctx, opt, dur)
+				ch <- res
+				wg.Done()
+			}(opt)
+		}
+	}
+
+	// wait for the waitgroup to be done and close the channel
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+
+	// gather all results from channel until closed.
+	for res := range ch {
+		resp.Results = append(resp.Results, res)
+	}
+	return resp, nil
+}
+
+// getSpecs will return the specs for the program associated with the specified route key/app name, or all programs if no key(s) are specified.
+// if matchRK or matchApp are empty all results will be returned.
+func (s *Server) getSpecInfo(matchRK, matchApp string) []specInfo {
+	routes := s.routeFn()
+
+	// find specInfo for a specified rk/app
+	if matchRK != "" && matchApp != "" {
+		programs, ok := routes.Get(matchRK)
+		if !ok {
+			s.logger.With("route_key", matchRK).Debug("No matching route key found.")
+			return []specInfo{}
+		}
 		sp, ok := programs.(specer)
 		if !ok {
-			s.logger.With("route_key", rk, "route", programs).Warn("Unable to cast route as specer.")
-			continue
+			s.logger.With("route_key", matchRK, "route", programs).Warn("Unable to cast route as specer.")
+			return []specInfo{}
 		}
 		specs := sp.Specs()
 
-		for n, spec := range specs {
-			procMeta := &proto.ProcMeta{
-				Name:     n,
-				RouteKey: rk,
-			}
+		spec, ok := specs[matchApp]
+		if !ok {
+			s.logger.With("route_key", matchRK, "application_name", matchApp).Debug("No matching route key/application name found.")
+			return []specInfo{}
+		}
+		return []specInfo{specInfo{spec: spec, app: matchApp, rk: matchRK}}
+	}
 
-			client := http.Client{
-				Timeout: time.Second * 5,
-			}
-			endpoint := monitoring.MonitoringEndpoint(spec, runtime.GOOS, rk)
-			if strings.HasPrefix(endpoint, "unix://") {
-				client.Transport = &http.Transport{
-					Proxy:       nil,
-					DialContext: socket.DialContext(strings.TrimPrefix(endpoint, "unix://")),
-				}
-				endpoint = "unix"
-			} else if strings.HasPrefix(endpoint, "npipe://") {
-				client.Transport = &http.Transport{
-					Proxy:       nil,
-					DialContext: socket.DialContext(strings.TrimPrefix(endpoint, "npipe:///")),
-				}
-				endpoint = "npipe"
-			}
-
-			res, err := client.Get("http://" + endpoint + "/")
-			if err != nil {
-				procMeta.Error = err.Error()
-				resp.Procs = append(resp.Procs, procMeta)
-				continue
-			}
-			if res.StatusCode != 200 {
-				procMeta.Error = "response status is: " + res.Status
-				resp.Procs = append(resp.Procs, procMeta)
-				continue
-			}
-
-			bi := &BeatInfo{}
-			dec := json.NewDecoder(res.Body)
-			if err := dec.Decode(bi); err != nil {
-				res.Body.Close()
-				procMeta.Error = err.Error()
-				resp.Procs = append(resp.Procs, procMeta)
-				continue
-			}
-			res.Body.Close()
-
-			procMeta.Process = bi.Beat
-			procMeta.Hostname = bi.Hostname
-			procMeta.Id = bi.ID
-			procMeta.EphemeralId = bi.EphemeralID
-			procMeta.Version = bi.Version
-			procMeta.BuildCommit = bi.Commit
-			procMeta.BuildTime = bi.Time
-			procMeta.Username = bi.Username
-			procMeta.UserId = bi.UserID
-			procMeta.UserGid = bi.GroupID
-			procMeta.Architecture = bi.BinaryArch
-			procMeta.ElasticLicensed = bi.ElasticLicensed
-
-			resp.Procs = append(resp.Procs, procMeta)
+	// gather specInfo for all rk/app values
+	res := make([]specInfo, 0)
+	for _, rk := range routes.Keys() {
+		programs, ok := routes.Get(rk)
+		if !ok {
+			// we do not expect to ever hit this code path
+			// if this log message occurs then the agent is unable to access one of the keys that is returned by the route function
+			// might be a race condition if someone tries to update the policy to remove an output?
+			s.logger.With("route_key", rk).Warn("Unable to retrieve route.")
+			continue
+		}
+		sp, ok := programs.(specer)
+		if !ok {
+			s.logger.With("route_key", matchRK, "route", programs).Warn("Unable to cast route as specer.")
+			continue
+		}
+		for n, spec := range sp.Specs() {
+			res = append(res, specInfo{
+				rk:   rk,
+				app:  n,
+				spec: spec,
+			})
 		}
 	}
-	return resp, nil
+	return res
+}
+
+// socketRequester is a struct to gather (diagnostics) data from a socket opened by elastic-agent or one if it's processes
+type socketRequester struct {
+	c        http.Client
+	endpoint string
+	appName  string
+	routeKey string
+}
+
+func newSocketRequester(appName, routeKey, endpoint string) *socketRequester {
+	c := http.Client{}
+	if strings.HasPrefix(endpoint, "unix://") {
+		c.Transport = &http.Transport{
+			Proxy:       nil,
+			DialContext: socket.DialContext(strings.TrimPrefix(endpoint, "unix://")),
+		}
+		endpoint = "unix"
+	} else if strings.HasPrefix(endpoint, "npipe://") {
+		c.Transport = &http.Transport{
+			Proxy:       nil,
+			DialContext: socket.DialContext(strings.TrimPrefix(endpoint, "npipe:///")),
+		}
+		endpoint = "npipe"
+	}
+	return &socketRequester{
+		c:        c,
+		appName:  appName,
+		routeKey: routeKey,
+		endpoint: endpoint,
+	}
+}
+
+// getPath creates a get request for the specified path.
+// Will return an error if that status code is not 200.
+func (r *socketRequester) getPath(ctx context.Context, path string) (*http.Response, error) {
+	req, err := http.NewRequest("GET", "http://"+r.endpoint+path, nil)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	res, err := r.c.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode != 200 {
+		res.Body.Close()
+		return nil, fmt.Errorf("response status is %d", res.StatusCode)
+	}
+	return res, nil
+
+}
+
+// procMeta will return process metadata by querying the "/" path.
+func (r *socketRequester) procMeta(ctx context.Context) *proto.ProcMeta {
+	pm := &proto.ProcMeta{
+		Name:     r.appName,
+		RouteKey: r.routeKey,
+	}
+
+	res, err := r.getPath(ctx, "/")
+	if err != nil {
+		pm.Error = err.Error()
+		return pm
+	}
+	defer res.Body.Close()
+
+	bi := &BeatInfo{}
+	dec := json.NewDecoder(res.Body)
+	if err := dec.Decode(bi); err != nil {
+		pm.Error = err.Error()
+		return pm
+	}
+
+	pm.Process = bi.Beat
+	pm.Hostname = bi.Hostname
+	pm.Id = bi.ID
+	pm.EphemeralId = bi.EphemeralID
+	pm.Version = bi.Version
+	pm.BuildCommit = bi.Commit
+	pm.BuildTime = bi.Time
+	pm.Username = bi.Username
+	pm.UserId = bi.UserID
+	pm.UserGid = bi.GroupID
+	pm.Architecture = bi.BinaryArch
+	pm.ElasticLicensed = bi.ElasticLicensed
+
+	return pm
+}
+
+var pprofEndpoints = map[proto.PprofOption]string{
+	proto.PprofOption_ALLOCS:       "/debug/pprof/allocs",
+	proto.PprofOption_BLOCK:        "/debug/pprof/block",
+	proto.PprofOption_CMDLINE:      "/debug/pprof/cmdline",
+	proto.PprofOption_GOROUTINE:    "/debug/pprof/goroutine",
+	proto.PprofOption_HEAP:         "/debug/pprof/heap",
+	proto.PprofOption_MUTEX:        "/debug/pprof/mutex",
+	proto.PprofOption_PROFILE:      "/debug/pprof/profile",
+	proto.PprofOption_THREADCREATE: "/debug/pprof/threadcreate",
+	proto.PprofOption_TRACE:        "/debug/pprof/trace",
+}
+
+// getProf will gather pprof data specified by the option.
+func (r *socketRequester) getPprof(ctx context.Context, opt proto.PprofOption, dur time.Duration) *proto.PprofResult {
+	res := &proto.PprofResult{
+		AppName:   r.appName,
+		RouteKey:  r.routeKey,
+		PprofType: opt,
+	}
+
+	path, ok := pprofEndpoints[opt]
+	if !ok {
+		res.Error = "unknown path for option"
+		return res
+	}
+
+	if opt == proto.PprofOption_PROFILE || opt == proto.PprofOption_TRACE {
+		path += fmt.Sprintf("?seconds=%0.f", dur.Seconds())
+	}
+
+	resp, err := r.getPath(ctx, path)
+	if err != nil {
+		res.Error = err.Error()
+		return res
+	}
+	defer resp.Body.Close()
+
+	p, err := io.ReadAll(resp.Body)
+	if err != nil {
+		res.Error = err.Error()
+		return res
+	}
+	res.Result = p
+	return res
 }
 
 type upgradeRequest struct {

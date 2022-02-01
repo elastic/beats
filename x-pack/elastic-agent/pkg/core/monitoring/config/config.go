@@ -15,7 +15,9 @@ type MonitoringConfig struct {
 	LogMetrics     bool                  `yaml:"-" config:"-"`
 	HTTP           *MonitoringHTTPConfig `yaml:"http" config:"http"`
 	Namespace      string                `yaml:"namespace" config:"namespace"`
-	Pprof          bool                  `yaml:"pprof" config:"pprof"`
+	Pprof          *PprofConfig          `yaml:"pprof" config:"pprof"`
+	MonitorTraces  bool                  `yaml:"traces" config:"traces"`
+	APM            APMConfig             `yaml:"apm,omitempty" config:"apm,omitempty" json:"apm,omitempty"`
 }
 
 // MonitoringHTTPConfig is a config defining HTTP endpoint published by agent
@@ -27,6 +29,13 @@ type MonitoringHTTPConfig struct {
 	Port    int    `yaml:"port" config:"port" validate:"min=0,max=65535,nonzero"`
 }
 
+// PprofConfig is a struct for the pprof enablement flag.
+// It is a nil struct by default to allow the agent to use the a value that the user has injected into fleet.yml as the source of truth that is passed to beats
+// TODO get this value from Kibana?
+type PprofConfig struct {
+	Enabled bool `yaml:"enabled" config:"enabled"`
+}
+
 // DefaultConfig creates a config with pre-set default values.
 func DefaultConfig() *MonitoringConfig {
 	return &MonitoringConfig{
@@ -34,11 +43,33 @@ func DefaultConfig() *MonitoringConfig {
 		MonitorLogs:    true,
 		MonitorMetrics: true,
 		LogMetrics:     true,
+		MonitorTraces:  false,
 		HTTP: &MonitoringHTTPConfig{
 			Enabled: false,
 			Port:    defaultPort,
 		},
 		Namespace: defaultNamespace,
-		Pprof:     false,
+		APM:       defaultAPMConfig(),
 	}
+}
+
+// APMConfig configures APM Tracing.
+type APMConfig struct {
+	Environment string   `config:"environment"`
+	APIKey      string   `config:"api_key"`
+	SecretToken string   `config:"secret_token"`
+	Hosts       []string `config:"hosts"`
+	TLS         APMTLS   `config:"tls"`
+}
+
+// APMTLS contains the configuration options necessary for configuring TLS in
+// apm-agent-go.
+type APMTLS struct {
+	SkipVerify        bool   `config:"skip_verify"`
+	ServerCertificate string `config:"server_certificate"`
+	ServerCA          string `config:"server_ca"`
+}
+
+func defaultAPMConfig() APMConfig {
+	return APMConfig{}
 }

@@ -58,7 +58,12 @@ class TestExportsMixin:
         """
         output = self.run_export_cmd("template")
         js = json.loads(output)
-        assert "index_patterns" in js and "mappings" in js
+        assert "index_patterns" in js
+        assert "template" in js
+        assert "priority" in js
+        assert "order" not in js
+        assert "mappings" in js["template"]
+        assert "settings" in js["template"]
 
     def test_export_index_pattern(self):
         """
@@ -111,8 +116,8 @@ class TestDashboardMixin:
 
         es = Elasticsearch([self.get_elasticsearch_url()])
         self.render_config_template(
-            elasticsearch={"host": self.get_elasticsearch_url()},
-            kibana={"host": self.get_kibana_url()},
+            elasticsearch=self.get_elasticsearch_template_config(),
+            kibana=self.get_kibana_template_config(),
         )
         exit_code = self.run_beat(extra_args=["setup", "--dashboards"])
 
@@ -126,7 +131,7 @@ class TestDashboardMixin:
     def get_version(self):
         url = self.get_kibana_url() + "/api/status"
 
-        r = requests.get(url)
+        r = requests.get(url, auth=(os.getenv('ES_USER'), os.getenv('ES_PASS')))
         body = r.json()
         version = body["version"]["number"]
 

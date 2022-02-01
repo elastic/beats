@@ -35,11 +35,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/docker"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 )
 
 func init() {
 	// Stub out the procfs.
-	processCgroupPaths = func(_ string, pid int) (cgroup.PathList, error) {
+	processCgroupPaths = func(_ resolve.Resolver, pid int) (cgroup.PathList, error) {
 
 		switch pid {
 		case 1000:

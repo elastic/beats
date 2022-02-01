@@ -34784,9 +34784,12 @@ format: bytes
 *`client.domain`*::
 +
 --
-Client domain.
+The domain name of the client system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -35795,9 +35798,12 @@ format: bytes
 *`destination.domain`*::
 +
 --
-Destination domain.
+The domain name of the destination system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -42291,9 +42297,12 @@ format: bytes
 *`server.domain`*::
 +
 --
-Server domain.
+The domain name of the server system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -43034,9 +43043,12 @@ format: bytes
 *`source.domain`*::
 +
 --
-Source domain.
+The domain name of the source system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -49723,6 +49735,39 @@ example: 0
 
 --
 
+*`elasticsearch.elastic_product_origin`*::
++
+--
+Used by Elastic stack to identify which component of the stack sent the request
+
+type: keyword
+
+example: kibana
+
+--
+
+*`elasticsearch.http.request.x_opaque_id`*::
++
+--
+Used by Elasticsearch to throttle and deduplicate deprecation warnings
+
+type: keyword
+
+example: v7app
+
+--
+
+*`elasticsearch.event.category`*::
++
+--
+Category of the deprecation event
+
+type: keyword
+
+example: compatible_api
+
+--
+
 
 *`elasticsearch.audit.layer`*::
 +
@@ -49907,6 +49952,20 @@ type: text
 +
 --
 type: boolean
+
+--
+
+*`elasticsearch.audit.authentication.type`*::
++
+--
+type: keyword
+
+--
+
+*`elasticsearch.audit.opaque_id`*::
++
+--
+type: text
 
 --
 
@@ -143282,6 +143341,16 @@ type: keyword
 
 --
 
+*`sophos.xg.ether_type`*::
++
+--
+The ethernet frame type
+
+
+type: keyword
+
+--
+
 [[exported-fields-squid]]
 == Squid fields
 
@@ -151851,156 +151920,33 @@ Fields for Recorded Future Threat Intel
 
 
 
-[float]
-=== entity
-
-Entity that represents a threat.
-
-
-
-*`recordedfuture.entity.id`*::
+*`recordedfuture.evidence_details`*::
 +
 --
-Entity ID.
-
-
-type: keyword
-
-example: ip:192.0.2.13
-
---
-
-*`recordedfuture.entity.name`*::
-+
---
-Entity name. Value for the entity.
-
-
-type: keyword
-
-example: 192.0.2.13
-
---
-
-*`recordedfuture.entity.type`*::
-+
---
-Entity type.
-
-
-type: keyword
-
-example: IpAddress
-
---
-
-*`recordedfuture.intelCard`*::
-+
---
-Link to the Recorded Future Intelligence Card for to this indicator.
-
-
-type: keyword
-
---
-
-*`recordedfuture.ip_range`*::
-+
---
-Range of IPs for this indicator.
-
-
-type: ip_range
-
-example: 192.0.2.0/16
-
---
-
-[float]
-=== risk
-
-Risk fields.
-
-
-
-*`recordedfuture.risk.criticality`*::
-+
---
-Risk criticality (0-4).
-
-
-type: byte
-
---
-
-*`recordedfuture.risk.criticalityLabel`*::
-+
---
-Risk criticality label. One of None, Unusual, Suspicious, Malicious, Very Malicious.
-
-
-type: keyword
-
---
-
-*`recordedfuture.risk.evidenceDetails`*::
-+
---
-Risk's evidence details.
+List of sightings used as evidence for this indicator.
 
 
 type: flattened
 
 --
 
-*`recordedfuture.risk.score`*::
+*`recordedfuture.name`*::
 +
 --
-Risk score (0-99).
-
-
-type: short
-
---
-
-*`recordedfuture.risk.riskString`*::
-+
---
-Number of Risk Rules observed as a factor of total number of rules.
+Indicator value.
 
 
 type: keyword
 
-example: 1/54
-
 --
 
-*`recordedfuture.risk.riskSummary`*::
+*`recordedfuture.risk_string`*::
 +
 --
-Risk summary.
+Details of risk rules observed.
 
 
 type: keyword
-
-example: 1 of 54 Risk Rules currently observed.
-
---
-
-*`recordedfuture.risk.riskSummary.text`*::
-+
---
-type: text
-
---
-
-*`recordedfuture.risk.rules`*::
-+
---
-Number of rules observed.
-
-
-type: long
 
 --
 

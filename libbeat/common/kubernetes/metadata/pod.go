@@ -46,10 +46,6 @@ func NewPodMetadataGenerator(
 	namespace MetaGen,
 	addResourceMetadata *AddResourceMetadataConfig) MetaGen {
 
-	if addResourceMetadata == nil {
-		addResourceMetadata = GetDefaultResourceMetadataConfig()
-	}
-
 	return &pod{
 		resource:            NewResourceMetadataGenerator(cfg, client),
 		store:               pods,
@@ -92,6 +88,7 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	out := p.resource.GenerateK8s("pod", obj, opts...)
 
 	// check if Pod is handled by a ReplicaSet which is controlled by a Deployment
+	// TODO: same happens with CronJob vs Job. The hierarcy there is CronJob->Job->Pod
 	if p.addResourceMetadata.Deployment {
 		rsName, _ := out.GetValue("replicaset.name")
 		if rsName, ok := rsName.(string); ok {
@@ -103,7 +100,7 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	}
 
 	if p.node != nil {
-		meta := p.node.GenerateFromName(po.Spec.NodeName, WithLabels("node"))
+		meta := p.node.GenerateFromName(po.Spec.NodeName, WithMetadata("node"))
 		if meta != nil {
 			out.Put("node", meta["node"])
 		} else {

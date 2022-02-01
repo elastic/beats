@@ -25,7 +25,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 type mockPublishFn func(publisher.Batch) error
@@ -54,24 +53,6 @@ type mockNetworkClient struct {
 
 func (c *mockNetworkClient) Connect() error { return nil }
 
-type mockQueue struct{}
-
-func (q mockQueue) Close() error                                     { return nil }
-func (q mockQueue) BufferConfig() queue.BufferConfig                 { return queue.BufferConfig{} }
-func (q mockQueue) Producer(cfg queue.ProducerConfig) queue.Producer { return mockProducer{} }
-func (q mockQueue) Consumer() queue.Consumer                         { return mockConsumer{} }
-
-type mockProducer struct{}
-
-func (p mockProducer) Publish(event publisher.Event) bool    { return true }
-func (p mockProducer) TryPublish(event publisher.Event) bool { return true }
-func (p mockProducer) Cancel() int                           { return 0 }
-
-type mockConsumer struct{}
-
-func (c mockConsumer) Get(eventCount int) (queue.Batch, error) { return &batch{}, nil }
-func (c mockConsumer) Close() error                            { return nil }
-
 type mockBatch struct {
 	mu     sync.Mutex
 	events []publisher.Event
@@ -81,7 +62,6 @@ type mockBatch struct {
 	onDrop      func()
 	onRetry     func()
 	onCancelled func()
-	onReduceTTL func() bool
 }
 
 func (b *mockBatch) Events() []publisher.Event {
@@ -95,21 +75,10 @@ func (b *mockBatch) ACK()       { signalFn(b.onACK) }
 func (b *mockBatch) Drop()      { signalFn(b.onDrop) }
 func (b *mockBatch) Retry()     { signalFn(b.onRetry) }
 func (b *mockBatch) Cancelled() { signalFn(b.onCancelled) }
+
 func (b *mockBatch) RetryEvents(events []publisher.Event) {
 	b.updateEvents(events)
 	signalFn(b.onRetry)
-}
-
-func (b *mockBatch) reduceTTL() bool {
-	if b.onReduceTTL != nil {
-		return b.onReduceTTL()
-	}
-	return true
-}
-
-func (b *mockBatch) CancelledEvents(events []publisher.Event) {
-	b.updateEvents(events)
-	signalFn(b.onCancelled)
 }
 
 func (b *mockBatch) updateEvents(events []publisher.Event) {
@@ -124,15 +93,61 @@ func (b *mockBatch) Len() int {
 	return len(b.events)
 }
 
-func (b *mockBatch) withRetryer(r *retryer) *mockBatch {
-	return &mockBatch{
-		events:      b.events,
-		onACK:       b.onACK,
-		onDrop:      b.onDrop,
-		onRetry:     func() { r.retry(b) },
-		onCancelled: func() { r.cancelled(b) },
-		onReduceTTL: b.onReduceTTL,
+func (b *mockBatch) withRetryer(r standaloneRetryer) *mockBatch {
+	wrapper := &mockBatch{
+		events: b.events,
+		onACK:  b.onACK,
+		onDrop: b.onDrop,
 	}
+	wrapper.onRetry = func() { r.retryChan <- wrapper }
+	wrapper.onCancelled = func() { r.retryChan <- wrapper }
+	return wrapper
+}
+
+// standaloneRetryer is a helper that can be used to simulate retry
+// behavior when unit testing outputWorker without a full pipeline. (In
+// a live pipeline the retry calls are handled by the eventConsumer).
+type standaloneRetryer struct {
+	workQueue chan publisher.Batch
+	retryChan chan publisher.Batch
+	done      chan struct{}
+}
+
+func newStandaloneRetryer(workQueue chan publisher.Batch) standaloneRetryer {
+	sr := standaloneRetryer{
+		workQueue: workQueue,
+		retryChan: make(chan publisher.Batch),
+		done:      make(chan struct{}),
+	}
+	go sr.run()
+	return sr
+}
+
+func (sr standaloneRetryer) run() {
+	var batches []publisher.Batch
+	for {
+		var active publisher.Batch
+		var outChan chan publisher.Batch
+		// If we have a batch to send, set the batch and output channel.
+		// Otherwise they'll be nil, and the select statement below will
+		// ignore them.
+		if len(batches) > 0 {
+			active = batches[0]
+			outChan = sr.workQueue
+		}
+		select {
+		case batch := <-sr.retryChan:
+			batches = append(batches, batch)
+		case outChan <- active:
+			batches = batches[1:]
+		case <-sr.done:
+			return
+		}
+	}
+}
+
+func (sr standaloneRetryer) close() {
+	close(sr.done)
 }
 
 func signalFn(fn func()) {

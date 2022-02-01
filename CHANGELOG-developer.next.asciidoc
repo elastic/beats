@@ -68,6 +68,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Remove `event.dataset` (ECS) annotion from `libbeat.logp`. {issue}27404[27404]
 - Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
 - Avoid panicking in `add_fields` processor when input event.Fields is a nil map. {pull}28219[28219]
+- Drop event batch when get HTTP status 413 from Elasticsearch to avoid infinite loop {issue}14350[14350] {pull}29368[29368]
 
 ==== Added
 
@@ -128,6 +129,9 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Introduce `libbeat/beat.Beat.OutputConfigReloader` {pull}28048[28048]
 - Update Go version to 1.17.1. {pull}27543[27543]
 - Whitelist `GCP_*` environment variables in dev tools {pull}28364[28364]
+- Add support for `credentials_json` in `gcp` module, all metricsets {pull}29584[29584]
+- Add gcp firestore metricset. {pull}29918[29918]
+- Added TESTING_FILEBEAT_FILEPATTERN option for filebeat module pytests {pull}30103[30103]
 
 ==== Deprecated
 

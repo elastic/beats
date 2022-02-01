@@ -31,7 +31,6 @@ import (
 const DefaultField = false
 
 var (
-	minVersionAlias                   = common.MustNewVersion("6.4.0")
 	minVersionFieldMeta               = common.MustNewVersion("7.6.0")
 	minVersionHistogram               = common.MustNewVersion("7.6.0")
 	minVersionWildcard                = common.MustNewVersion("7.9.0")
@@ -137,7 +136,7 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output, an
 
 		if *field.DefaultField {
 			switch field.Type {
-			case "", "keyword", "text":
+			case "", "keyword", "text", "match_only_text", "wildcard":
 				addToDefaultFields(&field)
 			}
 		}
@@ -204,11 +203,6 @@ func (p *Processor) scaledFloat(f *mapping.Field, params ...common.MapStr) commo
 	property := p.getDefaultProperties(f)
 	property["type"] = "scaled_float"
 
-	if p.EsVersion.IsMajor(2) {
-		property["type"] = "float"
-		return property
-	}
-
 	// Set scaling factor
 	scalingFactor := defaultScalingFactor
 	if f.ScalingFactor != 0 && len(f.ObjectTypeParams) == 0 {
@@ -270,22 +264,12 @@ func (p *Processor) halfFloat(f *mapping.Field) common.MapStr {
 	property := p.getDefaultProperties(f)
 	property["type"] = "half_float"
 
-	if p.EsVersion.IsMajor(2) {
-		property["type"] = "float"
-	}
 	return property
 }
 
 func (p *Processor) ip(f *mapping.Field) common.MapStr {
 	property := p.getDefaultProperties(f)
-
 	property["type"] = "ip"
-
-	if p.EsVersion.IsMajor(2) {
-		property["type"] = "string"
-		property["ignore_above"] = 1024
-		property["index"] = "not_analyzed"
-	}
 	return property
 }
 
@@ -317,11 +301,6 @@ func (p *Processor) keyword(f *mapping.Field, analyzers common.MapStr) common.Ma
 	case -1: // Use ES default
 	default: // Use user value
 		property["ignore_above"] = f.IgnoreAbove
-	}
-
-	if p.EsVersion.IsMajor(2) {
-		property["type"] = "string"
-		property["index"] = "not_analyzed"
 	}
 
 	if len(f.MultiFields) > 0 {
@@ -360,18 +339,8 @@ func (p *Processor) text(f *mapping.Field, analyzers common.MapStr) (properties 
 
 	properties["type"] = "text"
 
-	if p.EsVersion.IsMajor(2) {
-		properties["type"] = "string"
-		properties["index"] = "analyzed"
-		if !f.Norms {
-			properties["norms"] = common.MapStr{
-				"enabled": false,
-			}
-		}
-	} else {
-		if !f.Norms {
-			properties["norms"] = false
-		}
+	if !f.Norms {
+		properties["norms"] = false
 	}
 
 	if f.Analyzer.Name != "" {
@@ -426,11 +395,6 @@ func (p *Processor) array(f *mapping.Field) common.MapStr {
 }
 
 func (p *Processor) alias(f *mapping.Field) common.MapStr {
-	// Aliases were introduced in Elasticsearch 6.4, ignore if unsupported
-	if p.EsVersion.LessThan(minVersionAlias) {
-		return nil
-	}
-
 	// In case migration is disabled and it's a migration alias, field is not created
 	if !p.Migration && f.MigrationAlias {
 		return nil
@@ -483,11 +447,6 @@ func (p *Processor) object(f *mapping.Field) common.MapStr {
 			matchingType = matchType("*", otp.ObjectTypeMappingType)
 		case "text":
 			dynProperties["type"] = "text"
-
-			if p.EsVersion.IsMajor(2) {
-				dynProperties["type"] = "string"
-				dynProperties["index"] = "analyzed"
-			}
 			matchingType = matchType("string", otp.ObjectTypeMappingType)
 		case "keyword":
 			dynProperties["type"] = otp.ObjectType

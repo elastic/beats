@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 )
 
 func TestAddProcessMetadata(t *testing.T) {
@@ -74,7 +75,7 @@ func TestAddProcessMetadata(t *testing.T) {
 	}
 
 	// mock of the cgroup processCgroupPaths
-	processCgroupPaths = func(_ string, pid int) (cgroup.PathList, error) {
+	processCgroupPaths = func(_ resolve.Resolver, pid int) (cgroup.PathList, error) {
 
 		testMap := map[int]cgroup.PathList{
 			1: {
@@ -758,7 +759,7 @@ func TestUsingCache(t *testing.T) {
 	selfPID := os.Getpid()
 
 	// mock of the cgroup processCgroupPaths
-	processCgroupPaths = func(_ string, pid int) (cgroup.PathList, error) {
+	processCgroupPaths = func(_ resolve.Resolver, pid int) (cgroup.PathList, error) {
 		testStruct := cgroup.PathList{
 			V1: map[string]cgroup.ControllerPath{
 
@@ -1057,7 +1058,7 @@ func TestPIDToInt(t *testing.T) {
 }
 
 func TestV2CID(t *testing.T) {
-	processCgroupPaths = func(_ string, _ int) (cgroup.PathList, error) {
+	processCgroupPaths = func(_ resolve.Resolver, _ int) (cgroup.PathList, error) {
 		testMap := cgroup.PathList{
 			V1: map[string]cgroup.ControllerPath{
 				"cpu": cgroup.ControllerPath{IsV2: true, ControllerPath: "system.slice/docker-2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805.scope"},
@@ -1065,7 +1066,7 @@ func TestV2CID(t *testing.T) {
 		}
 		return testMap, nil
 	}
-	provider := newCidProvider("", []string{}, "", processCgroupPaths, nil)
+	provider := newCidProvider(resolve.NewTestResolver(""), []string{}, "", processCgroupPaths, nil)
 	result, err := provider.GetCid(1)
 	assert.NoError(t, err)
 	assert.Equal(t, "2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805", result)

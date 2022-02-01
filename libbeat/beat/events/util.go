@@ -27,9 +27,8 @@ const (
 	// precedence over values defined using FieldMetaIndex or FieldMetaRawIndex.
 	FieldMetaAlias = "alias"
 
-	// FieldMetaIndex defines the base index name to use for the event. The value is suffixed
-	// with a Y-m-d value based on the event's timestamp. If set, it takes precedence over the
-	// value defined using FieldMetaRawIndex.
+	// FieldMetaIndex defines the data stream name to use for the event.
+	// If set, it takes precedence over the value defined using FieldMetaRawIndex.
 	FieldMetaIndex = "index"
 
 	// FieldMetaRawIndex defines the raw index name to use for the event. It is used as-is, without

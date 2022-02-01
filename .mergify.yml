@@ -6,7 +6,7 @@ pull_request_rules:
   - name: forward-port patches to master branch
     conditions:
       - merged
-      - label=backport-v8.1.0
+      - label=forwardport-master
     actions:
       backport:
         assignees:
@@ -21,6 +21,7 @@ pull_request_rules:
       - -merged
       - -closed
       - conflict
+      - -author=apmmachine
     actions:
         comment:
           message: |
@@ -32,6 +33,18 @@ pull_request_rules:
             git merge upstream/{{base}}
             git push upstream {{head}}
             ```
+  - name: close automated pull requests with bump updates if any conflict
+    conditions:
+      - -merged
+      - -closed
+      - conflict
+      - author=apmmachine
+      - label=automation
+    actions:
+      close:
+        message: |
+          This pull request has been automatically closed by Mergify.
+          There are some other up-to-date pull requests.
   - name: automatic approval for automated pull requests with bump updates
     conditions:
       - author=apmmachine
@@ -182,6 +195,19 @@ pull_request_rules:
           - "{{ author }}"
         branches:
           - "7.16"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 7.17 branch
+    conditions:
+      - merged
+      - label=backport-v7.17.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.17"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"

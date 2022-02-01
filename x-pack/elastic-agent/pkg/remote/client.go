@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"go.elastic.co/apm/module/apmhttp"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
@@ -60,19 +61,10 @@ func NewConfigFromURL(kURL string) (Config, error) {
 		return Config{}, errors.Wrap(err, "could not parse url")
 	}
 
-	var username, password string
-	if u.User != nil {
-		username = u.User.Username()
-		// _ is true when password is set.
-		password, _ = u.User.Password()
-	}
-
 	c := DefaultClientConfig()
 	c.Protocol = Protocol(u.Scheme)
 	c.Host = u.Host
 	c.Path = u.Path
-	c.Username = username
-	c.Password = password
 
 	return c, nil
 }
@@ -126,17 +118,14 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 			return nil, err
 		}
 
-		if cfg.IsBasicAuth() {
-			// Pass basic auth credentials to all the underlying calls.
-			transport = NewBasicAuthRoundTripper(transport, cfg.Username, cfg.Password)
-		}
-
 		if wrapper != nil {
 			transport, err = wrapper(transport)
 			if err != nil {
 				return nil, errors.Wrap(err, "fail to create transport client")
 			}
 		}
+
+		transport = apmhttp.WrapRoundTripper(transport)
 
 		httpClient := http.Client{
 			Transport: transport,

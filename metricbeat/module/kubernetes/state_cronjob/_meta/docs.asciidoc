@@ -1,1 +1,6 @@
 This is the `state_cronjob` metricset of the Kubernetes module.
+
+This metricset does not add metadata by default and hence in order to
+add metadata for this one need to configure the metricset with `add_metadata: true`
+and uncomment the proper `apiGroup` in the `ClusterRole`. Metadata are only available
+for versions of k8s >= v1.21.

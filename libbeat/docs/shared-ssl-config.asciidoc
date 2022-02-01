@@ -120,7 +120,7 @@ SSL settings are disabled if either `enabled` is set to `false` or the
 List of allowed SSL/TLS versions. If SSL/TLS server decides for protocol versions
 not configured, the connection will be dropped during or after the handshake. The
 setting is a list of allowed protocol versions:
-`SSLv3`, `TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1`, `TLSv1.2`, and
+`TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1`, `TLSv1.2`, and
 `TLSv1.3`.
 
 The default value is `[TLSv1.1, TLSv1.2, TLSv1.3]`.
@@ -376,6 +376,15 @@ diagnostic mechanism when attempting to resolve TLS errors; its use in
 production environments is strongly discouraged.
 +
 The default value is `full`.
+
+[float]
+[[ca_trusted_fingerprint]]
+==== `ca_trusted_fingerprint`
+A HEX encoded SHA-256 of a CA certificate. If this certificate is
+present in the chain during the handshake, it will be added to the
+`certificate_authorities` list and the handshake will continue
+normaly.
+
 
 [discrete]
 [[ssl-server-config]]

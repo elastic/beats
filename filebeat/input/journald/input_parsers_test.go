@@ -36,8 +36,8 @@ func TestInputParsers(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	inp := env.mustCreateInput(common.MapStr{
-		"paths":           []string{path.Join("testdata", "input-multiline-parser.journal")},
-		"include_matches": []string{"_SYSTEMD_USER_UNIT=log-service.service"},
+		"paths":                 []string{path.Join("testdata", "input-multiline-parser.journal")},
+		"include_matches.match": []string{"_SYSTEMD_USER_UNIT=log-service.service"},
 		"parsers": []common.MapStr{
 			{
 				"multiline": common.MapStr{

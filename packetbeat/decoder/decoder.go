@@ -20,15 +20,15 @@ package decoder
 import (
 	"fmt"
 
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/icmp"
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 	"github.com/elastic/beats/v7/packetbeat/protos/udp"
-
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/layers"
 )
 
 var debugf = logp.MakeDebug("decoder")
@@ -313,6 +313,11 @@ func (d *Decoder) onICMPv6(packet *protos.Packet) {
 	}
 
 	if d.icmp6Proc != nil {
+		// google/gopacket treats the first four bytes
+		// after the typo, code and checksum as part of
+		// the payload. So drop those bytes.
+		// See https://github.com/google/gopacket/pull/423/
+		d.icmp6.Payload = d.icmp6.Payload[4:]
 		packet.Payload = d.icmp6.Payload
 		packet.Tuple.ComputeHashables()
 		d.icmp6Proc.ProcessICMPv6(d.flowID, &d.icmp6, packet)

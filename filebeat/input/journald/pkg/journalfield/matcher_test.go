@@ -24,6 +24,7 @@ import (
 	"testing"
 
 	"github.com/coreos/go-systemd/v22/sdjournal"
+	"github.com/stretchr/testify/require"
 )
 
 func TestApplyMatchersOr(t *testing.T) {
@@ -78,4 +79,26 @@ func TestApplyMatchersOr(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestApplySyslogIdentifier(t *testing.T) {
+	journal, err := sdjournal.NewJournal()
+	if err != nil {
+		t.Fatalf("error while creating test journal: %v", err)
+	}
+	defer journal.Close()
+
+	err = ApplySyslogIdentifierMatcher(journal, []string{"audit"})
+	require.NoError(t, err)
+}
+
+func TestApplyUnit(t *testing.T) {
+	journal, err := sdjournal.NewJournal()
+	if err != nil {
+		t.Fatalf("error while creating test journal: %v", err)
+	}
+	defer journal.Close()
+
+	err = ApplyUnitMatchers(journal, []string{"docker.service"})
+	require.NoError(t, err)
 }

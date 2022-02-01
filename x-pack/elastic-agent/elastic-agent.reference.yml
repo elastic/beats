@@ -11,8 +11,9 @@ outputs:
   default:
     type: elasticsearch
     hosts: [127.0.0.1:9200]
-    username: elastic
-    password: changeme
+    api-key: "example-key"
+    # username: "elastic"
+    # password: "changeme"
 
 inputs:
   - type: system/metrics
@@ -49,8 +50,7 @@ inputs:
 
 #     # optional values
 #     #protocol: "https"
-#     #username: "elastic"
-#     #password: "changeme"
+#     #service_token: "example-token"
 #     #path: ""
 #     #ssl.verification_mode: full
 #     #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
@@ -115,7 +115,7 @@ inputs:
 #   metrics: false
 #   # exposes /debug/pprof/ endpoints
 #   # recommended that these endpoints are only enabled if the monitoring endpoint is set to localhost
-#   pprof: false
+#   pprof.enabled: false
 #   # exposes agent metrics using http, by default sockets and named pipes are used
 #   http:
 #       # enables http endpoint

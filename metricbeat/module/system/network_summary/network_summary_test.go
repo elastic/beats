@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/network"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 	"github.com/elastic/go-sysinfo/types"
 )
 

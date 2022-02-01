@@ -8,6 +8,8 @@ import (
 	"context"
 	"fmt"
 
+	"go.elastic.co/apm"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
@@ -39,10 +41,18 @@ type upgraderControl interface {
 }
 
 // New creates a new Agent and bootstrap the required subsystem.
-func New(log *logger.Logger, pathConfigFile string, reexec reexecManager, statusCtrl status.Controller, uc upgraderControl, agentInfo *info.AgentInfo) (Application, error) {
+func New(
+	log *logger.Logger,
+	reexec reexecManager,
+	statusCtrl status.Controller,
+	uc upgraderControl,
+	agentInfo *info.AgentInfo,
+	tracer *apm.Tracer,
+) (Application, error) {
 	// Load configuration from disk to understand in which mode of operation
 	// we must start the elastic-agent, the mode of operation cannot be changed without restarting the
 	// elastic-agent.
+	pathConfigFile := paths.ConfigFile()
 	rawConfig, err := config.LoadFile(pathConfigFile)
 	if err != nil {
 		return nil, err
@@ -52,7 +62,7 @@ func New(log *logger.Logger, pathConfigFile string, reexec reexecManager, status
 		return nil, err
 	}
 
-	return createApplication(log, pathConfigFile, rawConfig, reexec, statusCtrl, uc, agentInfo)
+	return createApplication(log, pathConfigFile, rawConfig, reexec, statusCtrl, uc, agentInfo, tracer)
 }
 
 func createApplication(
@@ -63,10 +73,10 @@ func createApplication(
 	statusCtrl status.Controller,
 	uc upgraderControl,
 	agentInfo *info.AgentInfo,
+	tracer *apm.Tracer,
 ) (Application, error) {
 	log.Info("Detecting execution mode")
 	ctx := context.Background()
-
 	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
 		return nil, err
@@ -74,7 +84,7 @@ func createApplication(
 
 	if configuration.IsStandalone(cfg.Fleet) {
 		log.Info("Agent is managed locally")
-		return newLocal(ctx, log, paths.ConfigFile(), rawConfig, reexec, statusCtrl, uc, agentInfo)
+		return newLocal(ctx, log, paths.ConfigFile(), rawConfig, reexec, statusCtrl, uc, agentInfo, tracer)
 	}
 
 	// not in standalone; both modes require reading the fleet.yml configuration file
@@ -86,11 +96,11 @@ func createApplication(
 
 	if configuration.IsFleetServerBootstrap(cfg.Fleet) {
 		log.Info("Agent is in Fleet Server bootstrap mode")
-		return newFleetServerBootstrap(ctx, log, pathConfigFile, rawConfig, statusCtrl, agentInfo)
+		return newFleetServerBootstrap(ctx, log, pathConfigFile, rawConfig, statusCtrl, agentInfo, tracer)
 	}
 
 	log.Info("Agent is managed by Fleet")
-	return newManaged(ctx, log, store, cfg, rawConfig, reexec, statusCtrl, agentInfo)
+	return newManaged(ctx, log, store, cfg, rawConfig, reexec, statusCtrl, agentInfo, tracer)
 }
 
 func mergeFleetConfig(rawConfig *config.Config) (storage.Store, *configuration.Configuration, error) {

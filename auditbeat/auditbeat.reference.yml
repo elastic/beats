@@ -414,10 +414,9 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional index name. The default is "auditbeat" plus date
-  # and generates [auditbeat-]YYYY.MM.DD keys.
+  # Optional data stream or index name. The default is "auditbeat-%{[agent.version]}".
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "auditbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+  #index: "auditbeat-%{[agent.version]}"
 
   # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -459,6 +458,10 @@ output.elasticsearch:
 
   # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
+
+  # auditbeat expects Elasticsearch to be the same version or newer than the Beat.
+  # Lift the version restriction by setting allow_older_versions to true.
+  #allow_older_versions: false
 
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
@@ -512,6 +515,13 @@ output.elasticsearch:
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
+
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
@@ -644,6 +654,13 @@ output.elasticsearch:
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
+
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
 
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
@@ -846,6 +863,13 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
+
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
 
@@ -1010,6 +1034,13 @@ output.elasticsearch:
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
 
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
+
 
 # -------------------------------- File Output ---------------------------------
 #output.file:
@@ -1029,7 +1060,7 @@ output.elasticsearch:
   #path: "/tmp/auditbeat"
 
   # Name of the generated files. The default is `auditbeat` and it generates
-  # files: `auditbeat`, `auditbeat.1`, `auditbeat.2`, etc.
+  # files: `auditbeat-{datetime}.ndjson`, `auditbeat-{datetime}-1.ndjson`, etc.
   #filename: auditbeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
@@ -1047,6 +1078,7 @@ output.elasticsearch:
   
   # Configure automatic file rotation on every startup. The default is true.
   #rotate_on_startup: true
+
 # ------------------------------- Console Output -------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.
@@ -1145,19 +1177,13 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
-# Select the kind of index template. From Elasticsearch 7.8, it is possible to
-# use component templates. Available options: legacy, component, index.
-# By default auditbeat uses the legacy index templates.
-#setup.template.type: legacy
-
 # Template name. By default the template name is "auditbeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
 #setup.template.name: "auditbeat-%{[agent.version]}"
 
-# Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
-# The first part is the version of the beat and then -* is used to match all daily indices.
+# Template pattern. By default the template pattern is "auditbeat-%{[agent.version]}" to apply to the default index settings.
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.pattern: "auditbeat-%{[agent.version]}-*"
+#setup.template.pattern: "auditbeat-%{[agent.version]}"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
@@ -1199,22 +1225,11 @@ setup.template.settings:
 
 # ====================== Index Lifecycle Management (ILM) ======================
 
-# Configure index lifecycle management (ILM). These settings create a write
-# alias and add additional settings to the index template. When ILM is enabled,
-# output.elasticsearch.index is ignored, and the write alias is used to set the
-# index name.
+# Configure index lifecycle management (ILM) to manage the backing indices
+# of your data streams.
 
-# Enable ILM support. Valid values are true, false, and auto. When set to auto
-# (the default), the Beat uses index lifecycle management when it connects to a
-# cluster that supports ILM; otherwise, it creates daily indices.
-#setup.ilm.enabled: auto
-
-# Set the prefix used in the index lifecycle write alias name. The default alias
-# name is 'auditbeat-%{[agent.version]}'.
-#setup.ilm.rollover_alias: 'auditbeat'
-
-# Set the rollover index pattern. The default is "%{now/d}-000001".
-#setup.ilm.pattern: "{now/d}-000001"
+# Enable ILM support. Valid values are true, false.
+#setup.ilm.enabled: true
 
 # Set the lifecycle policy name. The default policy name is
 # 'beatname'.
@@ -1311,6 +1326,13 @@ setup.kibana:
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
+
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
 
 
 # ================================== Logging ===================================
@@ -1509,6 +1531,13 @@ logging.files:
   #
   # The pin is a base64 encoded string of the SHA-256 fingerprint.
   #ssl.ca_sha256: ""
+
+  # A root CA HEX encoded fingerprint. During the SSL handshake if the
+  # fingerprint matches the root CA certificate, it will be added to
+  # the provided list of root CAs (`certificate_authorities`), if the
+  # list is empty or not defined, the matching certificate will be the
+  # only one in the list. Then the normal SSL validation happens.
+  #ssl.ca_trusted_fingerprint: ""
 
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true

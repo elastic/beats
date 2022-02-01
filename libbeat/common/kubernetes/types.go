@@ -76,6 +76,9 @@ type Service = v1.Service
 // Job data
 type Job = batchv1.Job
 
+// CronJob data
+type CronJob = batchv1.CronJob
+
 const (
 	// PodPending phase
 	PodPending = v1.PodPending
@@ -91,6 +94,11 @@ const (
 
 // Time extracts time from k8s.Time type
 func Time(t *metav1.Time) time.Time {
+	return t.Time
+}
+
+// MicroTime extracts time from k8s.MicroTime type
+func MicroTime(t *metav1.MicroTime) time.Time {
 	return t.Time
 }
 

@@ -14,6 +14,7 @@
 - Default to port 80 and 443 for Kibana and Fleet Server connections. {pull}25723[25723]
 - Remove deprecated/undocumented IncludeCreatorMetadata setting from kubernetes metadata config options {pull}28006[28006]
 - The `/processes/<subprocess>` endpoint proxies to the subprocess's monitoring endpoint, instead of querying its `/stats` endpoint {pull}28165[28165]
+- Remove username/password for fleet-server authentication. {pull}29458[29458]
 
 ==== Bugfixes
 - Fix rename *ConfigChange to *PolicyChange to align on changes in the UI. {pull}20779[20779]
@@ -91,6 +92,8 @@
 - Snapshot artifact lookup will use agent.download proxy settings. {issue}27903[27903] {pull}27904[27904]
 - Fix lazy acker to only add new actions to the batch. {pull}27981[27981]
 - Allow HTTP metrics to run in bootstrap mode. Add ability to adjust timeouts for Fleet Server. {pull}28260[28260]
+- Fix agent configuration overwritten by default fleet config. {pull}29297[29297]
+- Allow agent containers to use basic auth to create a service token. {pull}29651[29651]
 
 ==== New features
 
@@ -149,4 +152,9 @@
 - Add diagnostics command to gather beat metadata. {pull}28265[28265]
 - Add diagnostics collect command to gather beat metadata, config, policy, and logs and bundle it into an archive. {pull}28461[28461]
 - Add `KIBANA_FLEET_SERVICE_TOKEN` to Elastic Agent container. {pull}28096[28096]
+- Enable pprof endpoints for beats processes. Allow pprof endpoints for elastic-agent if enabled. {pull}28983[28983]
+- Add `--pprof` flag to `elastic-agent diagnostics` and an `elastic-agent pprof` command to allow operators to gather pprof data from the agent and beats running under it. {pull}28798[28798]
 - Allow pprof endpoints for elastic-agent or beats if enabled. {pull}28983[28983] {pull}29155[29155]
+- Add --fleet-server-es-ca-trusted-fingerprint flag to allow agent/fleet-server to work with elasticsearch clusters using self signed certs. {pull}29128[29128]
+- Discover changes in Kubernetes nodes metadata as soon as they happen. {pull}23139[23139]
+- Add results of inspect output command into archive produced by diagnostics collect. {pull}29902[29902]

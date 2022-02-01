@@ -25,9 +25,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/layers"
-	"github.com/tsg/gopacket/pcap"
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
+	"github.com/google/gopacket/pcap"
+	"github.com/google/gopacket/pcapgo"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -139,24 +140,22 @@ func New(
 // Run opens the sniffing device and processes packets being read from that device.
 // Worker instances are instantiated as needed.
 func (s *Sniffer) Run() error {
-	var (
-		counter = 0
-		dumper  *pcap.Dumper
-	)
-
 	handle, err := s.open()
 	if err != nil {
 		return fmt.Errorf("Error starting sniffer: %s", err)
 	}
 	defer handle.Close()
 
+	var w *pcapgo.Writer
 	if s.config.Dumpfile != "" {
-		dumper, err = openDumper(s.config.Dumpfile, handle.LinkType())
+		f, err := os.Create(s.config.Dumpfile)
 		if err != nil {
 			return err
 		}
+		defer f.Close()
 
-		defer dumper.Close()
+		w = pcapgo.NewWriterNanos(f)
+		w.WriteFileHeader(65535, handle.LinkType())
 	}
 
 	worker, err := s.factory(handle.LinkType())
@@ -172,6 +171,7 @@ func (s *Sniffer) Run() error {
 	}
 	defer s.state.Store(snifferInactive)
 
+	var packets int
 	for s.state.Load() == snifferActive {
 		if s.config.OneAtATime {
 			fmt.Println("Press enter to read packet")
@@ -191,7 +191,7 @@ func (s *Sniffer) Run() error {
 			}
 
 			s.state.Store(snifferInactive)
-			return fmt.Errorf("Sniffing error: %s", err)
+			return fmt.Errorf("Sniffing error: %w", err)
 		}
 
 		if len(data) == 0 {
@@ -199,12 +199,16 @@ func (s *Sniffer) Run() error {
 			continue
 		}
 
-		if dumper != nil {
-			dumper.WritePacketData(data, ci)
+		packets++
+
+		if w != nil {
+			err = w.WritePacket(ci, data)
+			if err != nil {
+				return fmt.Errorf("failed to write packet %d: %w", packets, err)
+			}
 		}
 
-		counter++
-		logp.Debug("sniffer", "Packet number: %d", counter)
+		logp.Debug("sniffer", "Packet number: %d", packets)
 		worker.OnPacket(data, &ci)
 	}
 
@@ -263,20 +267,8 @@ func validatePcapFilter(expr string) error {
 	if expr == "" {
 		return nil
 	}
-
-	// Open a dummy pcap handle to compile the filter
-	p, err := pcap.OpenDead(layers.LinkTypeEthernet, 65535)
-	if err != nil {
-		return fmt.Errorf("OpenDead: %s", err)
-	}
-
-	defer p.Close()
-
-	_, err = p.NewBPF(expr)
-	if err != nil {
-		return fmt.Errorf("invalid filter '%s': %v", expr, err)
-	}
-	return nil
+	_, err := pcap.NewBPF(layers.LinkTypeEthernet, 65535, expr)
+	return err
 }
 
 func openPcap(filter string, cfg *config.InterfacesConfig) (snifferHandle, error) {
@@ -315,13 +307,4 @@ func openAFPacket(filter string, cfg *config.InterfacesConfig) (snifferHandle, e
 	}
 
 	return h, nil
-}
-
-func openDumper(file string, linkType layers.LinkType) (*pcap.Dumper, error) {
-	p, err := pcap.OpenDead(linkType, 65535)
-	if err != nil {
-		return nil, err
-	}
-
-	return p.NewDumper(file)
 }
