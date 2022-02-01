@@ -120,7 +120,7 @@ SSL settings are disabled if either `enabled` is set to `false` or the
 List of allowed SSL/TLS versions. If SSL/TLS server decides for protocol versions
 not configured, the connection will be dropped during or after the handshake. The
 setting is a list of allowed protocol versions:
-`SSLv3`, `TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1`, `TLSv1.2`, and
+`TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1`, `TLSv1.2`, and
 `TLSv1.3`.
 
 The default value is `[TLSv1.1, TLSv1.2, TLSv1.3]`.

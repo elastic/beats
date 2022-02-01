@@ -199,11 +199,6 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 		}
 	}
 
-	err = ensureServiceToken(streams, &cfg)
-	if err != nil {
-		return err
-	}
-
 	// start apm-server legacy process when in cloud mode
 	var wg sync.WaitGroup
 	var apmProc *process.Info
@@ -274,6 +269,12 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		return run(streams, logToStderr)
 	}
 
+	if cfg.Kibana.Fleet.Setup || cfg.FleetServer.Enable {
+		err = ensureServiceToken(streams, &cfg)
+		if err != nil {
+			return err
+		}
+	}
 	if cfg.Kibana.Fleet.Setup {
 		client, err = kibanaClient(cfg.Kibana, cfg.Kibana.Headers)
 		if err != nil {
@@ -309,7 +310,10 @@ func runContainerCmd(streams *cli.IOStreams, cmd *cobra.Command, cfg setupConfig
 		if policy != nil {
 			policyID = policy.ID
 		}
-		logInfo(streams, "Policy selected for enrollment: ", policyID)
+		if policyID != "" {
+			logInfo(streams, "Policy selected for enrollment: ", policyID)
+		}
+
 		cmdArgs, err := buildEnrollArgs(cfg, token, policyID)
 		if err != nil {
 			return err
@@ -349,11 +353,13 @@ func ensureServiceToken(streams *cli.IOStreams, cfg *setupConfig) error {
 	}
 
 	logInfo(streams, "Requesting service_token from Kibana.")
+
+	// Client is not passed in to this function because this function will use username/password and then
+	// all the following clients will use the created service token.
 	client, err := kibanaClient(cfg.Kibana, cfg.Kibana.Headers)
 	if err != nil {
 		return err
 	}
-
 	code, r, err := client.Connection.Request("POST", "/api/fleet/service-tokens", nil, nil, nil)
 	if err != nil {
 		return fmt.Errorf("request to get security token from Kibana failed: %w", err)

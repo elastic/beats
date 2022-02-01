@@ -8,7 +8,7 @@ services:
     environment:
       - ES_HOST=elasticsearch
       - ES_PORT=9200
-      - ES_USER=beats
+      - ES_USER=auditbeat_user
       - ES_PASS=testing
       - KIBANA_HOST=kibana
       - KIBANA_PORT=5601
@@ -32,8 +32,15 @@ services:
     extends:
       file: ../testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+      retries: 300
+      interval: 1s
 
   kibana:
     extends:
       file: ../testing/environments/${TESTING_ENVIRONMENT}.yml
       service: kibana
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
+      retries: 600

@@ -60,6 +60,9 @@ This output works with all compatible versions of Elasticsearch. See the
 https://www.elastic.co/support/matrix#matrix_compatibility[Elastic Support
 Matrix].
 
+For optimal experience, {beatname_uc} only connects to instances that are at least on the
+same version as the Beat. The check can be disabled by setting `output.elasticsearch.allow_older_versions`.
+
 ==== Configuration options
 
 You can specify the following options in the `elasticsearch` section of the +{beatname_lc}.yml+ config file:
@@ -667,6 +670,14 @@ Elasticsearch after a network error. The default is `60s`.
 ===== `timeout`
 
 The http request timeout in seconds for the Elasticsearch request. The default is 90.
+
+==== `allow_older_versions`
+
+By default, {beatname_uc} expects the Elasticsearch instance to be on the same or newer version to provide
+optimal experience. We suggest you connect to the same version to make sure all features {beatname_uc} is using are
+available in your Elasticsearch instance.
+
+You can disable the check for example during updating the Elastic Stack, so data collection can go on.
 
 ===== `ssl`
 
