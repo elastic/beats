@@ -5,7 +5,7 @@ The following topics describe how to add a new protocol to Packetbeat:
 
 * <<getting-ready-new-protocol>>
 * <<protocol-modules>>
-* <<testing>>
+* <<protocol-testing>>
 
 [[getting-ready-new-protocol]]
 === Getting Ready
