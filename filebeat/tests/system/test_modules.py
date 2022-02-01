@@ -107,7 +107,7 @@ def load_fileset_test_cases():
                 continue
 
             test_files = glob.glob(os.path.join(modules_dir, module,
-                                                fileset, "test", "*.log"))
+                                                fileset, "test", os.getenv("TESTING_FILEBEAT_FILEPATTERN", "*.log")))
             for test_file in test_files:
                 test_cases.append([module, fileset, test_file])
 
@@ -216,7 +216,8 @@ class Test(BaseTest):
             error_line)
 
         # Make sure index exists
-        self.wait_until(lambda: self.es.indices.exists(self.index_name))
+        self.wait_until(lambda: self.es.indices.exists(self.index_name),
+                        name="indices present for {}".format(test_file))
 
         self.es.indices.refresh(index=self.index_name)
         # Loads the first 100 events to be checked
