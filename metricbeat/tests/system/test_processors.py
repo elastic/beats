@@ -51,7 +51,7 @@ class Test(metricbeat.BaseTest):
                 "name": "system",
                 "metricsets": ["process"],
                 "period": "1s",
-                "processes": ["pytest"]
+                "processes": [".*pytest.*"]
             }],
             processors=[{
                 "drop_fields": {
@@ -85,7 +85,7 @@ class Test(metricbeat.BaseTest):
                 "name": "system",
                 "metricsets": ["process"],
                 "period": "1s",
-                "processes": ["pytest"]
+                "processes": [".*pytest.*"]
             }],
             processors=[{
                 "drop_event": {
@@ -144,7 +144,7 @@ class Test(metricbeat.BaseTest):
                 "metricsets": ["process"],
                 "period": "1s",
                 # filter down to one process, since this test suite doesn't have a way to specify X iterations of the metricbeat fetcher
-                "processes": ["pytest"]
+                "processes": [".*pytest.*"]
             }],
             processors=[{
                 "include_fields": {"fields": ["system.process.cpu", "system.process.memory"]},
@@ -187,7 +187,7 @@ class Test(metricbeat.BaseTest):
                 "name": "system",
                 "metricsets": ["process"],
                 "period": "1s",
-                "processes": ["pytest"]
+                "processes": [".*pytest.*"]
             }],
             processors=[{
                 "include_fields": {"fields": ["system.process", "process"]},
