@@ -295,7 +295,7 @@ func getProgramsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *c
 		return nil, err
 	}
 
-	if err := emit(cfg); err != nil {
+	if err := emit(ctx, cfg); err != nil {
 		return nil, err
 	}
 	composableWaiter.Wait()
@@ -310,7 +310,7 @@ func (r *inmemRouter) Routes() *sorted.Set {
 	return nil
 }
 
-func (r *inmemRouter) Route(id string, grpProg map[pipeline.RoutingKey][]program.Program) error {
+func (r *inmemRouter) Route(_ context.Context, _ string, grpProg map[pipeline.RoutingKey][]program.Program) error {
 	r.programs = grpProg
 	return nil
 }
