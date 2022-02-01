@@ -66,6 +66,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated fields in Redis module. {issue}11835[11835] {pull}28246[28246]
 - system/process metricset: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
 
+*Metricbeat*
+
+
 *Packetbeat*
 
 - Redis: fix incorrectly handle with two-words redis command. {issue}14872[14872] {pull}14873[14873]
@@ -114,10 +117,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - aws-s3: Improve gzip detection to avoid false negatives. {issue}29968[29968]
 - decode_cef: Fix panic when recovering from invalid CEF extensions that contain escape characters. {issue}30010[30010]
 
+*Filebeat*
+
+
 *Heartbeat*
 
-- Fix race condition in http monitors using `mode:all` that can cause crashes. {pull}29697[pull]
-- Fix broken ICMP availability check that prevented heartbeat from starting in rare cases. {pull}29413[pull]
+- Add fonts to support more different types of characters for multiple languages. {pull}29861[29861]
 
 *Journalbeat*
 
@@ -158,6 +163,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `default_region` config to AWS common module. {pull}29415[29415]
 - SASL/SCRAM in the Kafka output is no longer beta. {pull}29126[29126]
 - Warn users when connecting to older versions of Elasticsearch instances. {pull}29723[29723]
+- add_process_metadata processor: add `process.parent.pid` to reflect `process.ppid`. {issue}30070[30070] {pull}30077[30077]
 
 *Auditbeat*
 
@@ -172,7 +178,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
-- More errors are now visible in ES with new logic failing monitors later to ease debugging. {pull}29413[pull]
 
 
 *Metricbeat*
@@ -191,6 +196,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Add support for custom XML queries {issue}1054[1054] {pull}29330[29330]
 - Add support for sysmon event ID 26; FileDeleteDetected. {issue}26280[26280] {pull}29957[29957]
+
 
 *Elastic Log Driver*
 
