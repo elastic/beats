@@ -218,7 +218,7 @@ func (procStats *Stats) pidIter(pid int, procMap map[int]ProcState, proclist []P
 		return procMap, proclist
 	}
 	if !saved {
-		procStats.logger.Debugf("Process name does not matches the provided regex; PID=%d; name=%s", pid, status.Name)
+		procStats.logger.Debugf("Process name does not match the provided regex; PID=%d; name=%s", pid, status.Name)
 		return procMap, proclist
 	}
 	procMap[pid] = status
