@@ -34,7 +34,7 @@ To run the tests without the services running locally, the command `make system-
 
 All Python tests are under `tests/system` directory.
 
-Filebeat's module python tests have additional documentation found in the <<filebeat-modules-devguide>> guide.
+Filebeat's module python tests have additional documentation found in the <<filebeat-modules-devguide,Filebeat module>> guide.
 
 ==== Test commands
 
