@@ -73,24 +73,24 @@ func getKeyedInterfaceValues(data interface{}, key string) (values []string, err
 			// next key from each object in the array
 			tmp, ok := data.([]interface{})
 			if !ok {
-				return nil, fmt.Errorf("error while parsing json: %w", err)
+				return nil, fmt.Errorf("error while parsing JSON: %w", err)
 			}
 			tmp, err = getArrayValue(splitKey[i+1], tmp)
 			if err != nil {
-				return nil, fmt.Errorf("error while parsing json: %w", err)
+				return nil, fmt.Errorf("error while parsing JSON: %w", err)
 			}
 
 			// interate over []interface{}
 			for _, el := range tmp {
-				if value, ok := el.(string); ok {
-					values = append(values, value)
-				} else {
+				if value, ok := el.(map[string]interface{}); ok {
 					joinKey := strings.Join(splitKey[i+2:], ".")
-					final, err := getKeyedInterfaceValues(el, joinKey)
+					final, err := getKeyedInterfaceValues(value, joinKey)
 					if err != nil {
-						return nil, fmt.Errorf("error while parsing json: %w", err)
+						return nil, fmt.Errorf("error while parsing JSON: %w", err)
 					}
 					values = append(values, final...)
+				} else {
+					values = append(values, fmt.Sprintf("%v", el))
 				}
 			}
 
@@ -99,12 +99,10 @@ func getKeyedInterfaceValues(data interface{}, key string) (values []string, err
 			// map[string]interface{}
 			data, err = getMapValue(key, data)
 			if err != nil {
-				return nil, fmt.Errorf("json is: %w", err)
+				return nil, fmt.Errorf("JSON is: %w", err)
 			}
 			if len(splitKey) == i+1 {
-				if value, ok := data.(string); ok {
-					values = append(values, value)
-				}
+				values = append(values, fmt.Sprintf("%v", data))
 			}
 		}
 		if key == "#" {

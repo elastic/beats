@@ -189,6 +189,15 @@ func TestGetKeyedArrayValue(t *testing.T) {
 		{
 			name: "will return a array of string from JSON",
 			args: args{
+				rawData: []byte(`{"a":[{"b":1},{"b":2},{"b":3},{"b":4},{"b":5},{"b":6}]}`),
+				key:     "a.#.b",
+			},
+			want:    []string{"1", "2", "3", "4", "5", "6"},
+			wantErr: false,
+		},
+		{
+			name: "will return a array of string from JSON",
+			args: args{
 				rawData: []byte(`{"a": "a_value"}`),
 				key:     "a",
 			},

@@ -235,16 +235,15 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 					return err
 				}
 				continue
-			} else {
-				intermediateResps = append(intermediateResps, httpResp)
-				ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[i+1].replace)
-				if err != nil {
-					return err
-				}
-				n, err = r.processAndPublishEvents(stdCtx, trCtx, publisher, intermediateResps, false)
-				if err != nil {
-					return err
-				}
+			}
+			intermediateResps = append(intermediateResps, httpResp)
+			ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[i+1].replace)
+			if err != nil {
+				return err
+			}
+			n, err = r.processAndPublishEvents(stdCtx, trCtx, publisher, intermediateResps, false)
+			if err != nil {
+				return err
 			}
 		} else {
 			if len(ids) == 0 {
@@ -311,8 +310,8 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 	for _, resp := range intermediateResps {
 		resp := resp
 		if resp.Body != nil {
-			defer resp.Body.Close()
 			b, err = io.ReadAll(resp.Body)
+			resp.Body.Close()
 			if err != nil {
 				return nil, fmt.Errorf("error while reading response body: %w", err)
 			}
