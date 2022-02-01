@@ -1,0 +1,651 @@
+[
+    {
+        "event.category": "threat",
+        "event.dataset": "threatintel.recordedfuture",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.risk_score": 87.0,
+        "event.type": "indicator",
+        "fileset.name": "recordedfuture",
+        "input.type": "log",
+        "log.offset": 45,
+        "recordedfuture.evidence_details": [
+            {
+                "Criticality": 1.0,
+                "CriticalityLabel": "Unusual",
+                "EvidenceString": "66 sightings on 22 sources including: Ars Technica, fook.news, urdupresss.com, HackDig Posts, apple.news. Most recent link (Jul 20, 2021): https://techsecuritenews.com/solarwinds-pirates-utilisent-nouvelle-faille-zero-day-attaques/",
+                "MitigationString": "",
+                "Name": "defangedURL",
+                "Rule": "Historically Reported as a Defanged URL",
+                "Sources": [
+                    "Ctq",
+                    "idn:fook.news",
+                    "idn:urdupresss.com",
+                    "POs2u-",
+                    "idn:apple.news",
+                    "idn:cryptoinfoos.com.ng",
+                    "g9rk5F",
+                    "idn:thewindowsupdate.com",
+                    "idn:nationalcybersecuritynews.today",
+                    "gBDK5G",
+                    "idn:microsoft.com",
+                    "idn:techsecuritenews.com",
+                    "idn:mblogs.info",
+                    "J6UzbO",
+                    "idn:viralamo.com",
+                    "idn:sellorbuyhomefast.com",
+                    "idn:crazyboy.tech",
+                    "idn:times24h.com",
+                    "idn:buzzfeeg.com",
+                    "idn:dsmenders.com",
+                    "WroSbs",
+                    "idn:vzonetvgh.com"
+                ],
+                "Timestamp": "2021-07-20T00:00:00.000Z"
+            },
+            {
+                "Criticality": 3.0,
+                "CriticalityLabel": "Malicious",
+                "EvidenceString": "1 sighting on 1 source: Insikt Group. 1 report: SolarWinds Fixes Critical Vulnerability in Serv-U Managed File Transfer and Secure FTP Products. Most recent link (Jul 10, 2021): https://app.recordedfuture.com/live/sc/1GnDrn8zigTd",
+                "MitigationString": "",
+                "Name": "recentAnalystNote",
+                "Rule": "Recently Reported by Insikt Group",
+                "Sources": [
+                    "VKz42X"
+                ],
+                "Timestamp": "2021-07-10T00:00:00.000Z"
+            }
+        ],
+        "recordedfuture.risk_string": "2/24",
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.type": "url",
+        "threat.indicator.url.domain": "144.34.179.162",
+        "threat.indicator.url.original": "http://144.34.179.162/a",
+        "threat.indicator.url.path": "/a",
+        "threat.indicator.url.scheme": "http"
+    },
+    {
+        "event.category": "threat",
+        "event.dataset": "threatintel.recordedfuture",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.risk_score": 85.0,
+        "event.type": "indicator",
+        "fileset.name": "recordedfuture",
+        "input.type": "log",
+        "log.offset": 1565,
+        "recordedfuture.evidence_details": [
+            {
+                "Criticality": 1.0,
+                "CriticalityLabel": "Unusual",
+                "EvidenceString": "1 sighting on 1 source: Bitdefender. Detected malicious behavior from an endpoint agent via global telemetry. Last observed on Nov 14, 2021.",
+                "MitigationString": "",
+                "Name": "malwareSiteDetected",
+                "Rule": "Historically Detected Malware Distribution",
+                "Sources": [
+                    "d3Awkm"
+                ],
+                "Timestamp": "2021-11-14T00:00:00.000Z"
+            },
+            {
+                "Criticality": 1.0,
+                "CriticalityLabel": "Unusual",
+                "EvidenceString": "1 sighting on 1 source: Bitdefender. Detected malicious behavior from an endpoint agent via global telemetry. Last observed on Nov 14, 2021.",
+                "MitigationString": "",
+                "Name": "phishingSiteDetected",
+                "Rule": "Historically Detected Phishing Techniques",
+                "Sources": [
+                    "d3Awkm"
+                ],
+                "Timestamp": "2021-11-14T00:00:00.000Z"
+            },
+            {
+                "Criticality": 1.0,
+                "CriticalityLabel": "Unusual",
+                "EvidenceString": "41 sightings on 19 sources including: Stock market news Company News  MarketScreenercom, GlobeNewswire | Software, Yahoo!, globenewswirecom, otcdynamics.com. Most recent link (Oct 3, 2021): https://telecomkh.info/?p=4004",
+                "MitigationString": "",
+                "Name": "defangedURL",
+                "Rule": "Historically Reported as a Defanged URL",
+                "Sources": [
+                    "XBl0xf",
+                    "c2unu0",
+                    "DVW",
+                    "NPgRlV",
+                    "idn:otcdynamics.com",
+                    "idn:norteenlinea.com",
+                    "N4OmGX",
+                    "idn:snewsonline.com",
+                    "idn:nationalcybersecuritynews.today",
+                    "dCod5e",
+                    "hZ14Az",
+                    "idn:securityopenlab.it",
+                    "idn:clevertechmx.blogspot.com",
+                    "cJzvLR",
+                    "eNeV39",
+                    "dCotni",
+                    "dCo6X1",
+                    "jB6Hnn",
+                    "idn:telecomkh.info"
+                ],
+                "Timestamp": "2021-10-03T12:53:49.605Z"
+            },
+            {
+                "Criticality": 3.0,
+                "CriticalityLabel": "Malicious",
+                "EvidenceString": "1 sighting on 1 source: Recorded Future Domain Analysis URLs. Service provider: No-IP. Behavior observed: Malware Distribution, Phishing Techniques. Last observed on Dec 20, 2021.",
+                "MitigationString": "",
+                "Name": "recentWeaponizedURL",
+                "Rule": "Recently Active URL on Weaponized Domain",
+                "Sources": [
+                    "report:aRJ1CU"
+                ],
+                "Timestamp": "2021-12-29T07:08:29.105Z"
+            }
+        ],
+        "recordedfuture.risk_string": "4/24",
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.type": "url",
+        "threat.indicator.url.domain": "adminsys.serveftp.com",
+        "threat.indicator.url.original": "http://adminsys.serveftp.com/nensa/fabio/ex/478632215/zer7855/nuns566623",
+        "threat.indicator.url.path": "/nensa/fabio/ex/478632215/zer7855/nuns566623",
+        "threat.indicator.url.scheme": "http"
+    },
+    {
+        "event.category": "threat",
+        "event.dataset": "threatintel.recordedfuture",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.risk_score": 79.0,
+        "event.type": "indicator",
+        "fileset.name": "recordedfuture",
+        "input.type": "log",
+        "log.offset": 3798,
+        "recordedfuture.evidence_details": [
+            {
+                "Criticality": 1.0,
+                "CriticalityLabel": "Unusual",
+                "EvidenceString": "17 sightings on 14 sources including: Security Affairs, sensorstechforum.com, Heimdal Security Blog, securitynewspaper, BBS Kafan Card Forum. Most recent link (Dec 22, 2021): https://d335luupugsy2.cloudfront.net/cms%2Ffiles%2F183750%2F1640120040Log4j_-_Explorao_por_grupos_APT.pdf",
+                "MitigationString": "",
+                "Name": "defangedURL",
+                "Rule": "Historically Reported as a Defanged URL",
+                "Sources": [
+                    "JNe6Hu",
+                    "TQnwKJ",
+                    "OfMf0W",
+                    "TefIEN",
+                    "VyuDZP",
+                    "Z7kln5",
+                    "bd-Dtt",
+                    "kKLjNc",
+                    "Y7TWfI",
+                    "idn:redpacketsecurity.com",
+                    "idn:eccouncil.org",
+                    "idn:comparaland.com",
+                    "idn:d335luupugsy2.cloudfront.net",
+                    "KVRURg"
+                ],
+                "Timestamp": "2021-12-22T16:01:42.134Z"
+            },
+            {
+                "Criticality": 3.0,
+                "CriticalityLabel": "Malicious",
+                "EvidenceString": "1 sighting on 1 source: Insikt Group. 1 report: Khonsari Ransomware and Orcus RAT Exploit Log4Shell (CVE-2021-44228), Samples Uploaded on MalwareBazaar. Most recent link (Dec 17, 2021): https://app.recordedfuture.com/live/sc/4SWiMAS816Gj",
+                "MitigationString": "",
+                "Name": "recentAnalystNote",
+                "Rule": "Recently Reported by Insikt Group",
+                "Sources": [
+                    "VKz42X"
+                ],
+                "Timestamp": "2021-12-17T00:00:00.000Z"
+            }
+        ],
+        "recordedfuture.risk_string": "2/24",
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.type": "url",
+        "threat.indicator.url.domain": "3.145.115.94",
+        "threat.indicator.url.extension": "exe",
+        "threat.indicator.url.original": "http://3.145.115.94/zambo/groenhuyzen.exe",
+        "threat.indicator.url.path": "/zambo/groenhuyzen.exe",
+        "threat.indicator.url.scheme": "http"
+    },
+    {
+        "event.category": "threat",
+        "event.dataset": "threatintel.recordedfuture",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.risk_score": 79.0,
+        "event.type": "indicator",
+        "fileset.name": "recordedfuture",
+        "input.type": "log",
+        "log.offset": 5158,
+        "recordedfuture.evidence_details": [
+            {
+                "Criticality": 1.0,
+                "CriticalityLabel": "Unusual",
+                "EvidenceString": "53 sightings on 14 sources including: HackDig Posts, Anquanke News, mrhacker.co, Sesin at, Check Point Research. Most recent link (Feb 6, 2021): https://cdn.www.gob.pe/uploads/document/file/1580907/Alerta%20integrada%20de%20seguridad%20digital%20N%C2%B0%xxx-xx-xxxx-PECERT%20.pdf",
+                "MitigationString": "",
+                "Name": "defangedURL",
+                "Rule": "Historically Reported as a Defanged URL",
+                "Sources": [
+                    "POs2u-",
+                    "U13S_U",
+                    "idn:mrhacker.co",
+                    "Z3TZAQ",
+                    "N4OmGX",
+                    "UqKvRr",
+                    "gBDK5G",
+                    "JExgHv",
+                    "QxXv_c",
+                    "J6UzbO",
+                    "eTNyK6",
+                    "idn:privacy.com.sg",
+                    "e6Ewt_",
+                    "idn:reportcybercrime.com"
+                ],
+                "Timestamp": "2021-02-06T12:52:09.042Z"
+            },
+            {
+                "Criticality": 3.0,
+                "CriticalityLabel": "Malicious",
+                "EvidenceString": "1 sighting on 1 source: Bitdefender. Detected malicious behavior from an endpoint agent via global telemetry. Last observed on Dec 28, 2021.",
+                "MitigationString": "",
+                "Name": "recentMalwareSiteDetected",
+                "Rule": "Recently Detected Malware Distribution",
+                "Sources": [
+                    "d3Awkm"
+                ],
+                "Timestamp": "2021-12-28T00:00:00.000Z"
+            }
+        ],
+        "recordedfuture.risk_string": "2/24",
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.type": "url",
+        "threat.indicator.url.domain": "gxbrowser.net",
+        "threat.indicator.url.original": "http://gxbrowser.net",
+        "threat.indicator.url.path": "",
+        "threat.indicator.url.scheme": "http"
+    },
+    {
+        "event.category": "threat",
+        "event.dataset": "threatintel.recordedfuture",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.risk_score": 78.0,
+        "event.type": "indicator",
+        "fileset.name": "recordedfuture",
+        "input.type": "log",
+        "log.offset": 6382,
+        "recordedfuture.evidence_details": [
+            {
+                "Criticality": 1.0,
+                "CriticalityLabel": "Unusual",
+                "EvidenceString": "2 sightings on 1 source: Insikt Group. 2 reports including \"Fractured Block\u201d Campaign Targets Korean Users. Most recent link (Dec 09, 2018): https://app.recordedfuture.com/live/sc/1RuTxKrDf8Qt",
+                "MitigationString": "",
+                "Name": "relatedNote",
+                "Rule": "Historically Referenced by Insikt Group",
+                "Sources": [
+                    "VKz42X"
+                ],
+                "Timestamp": "2018-12-09T00:00:00.000Z"
+            },
+            {
+                "Criticality": 1.0,
+                "CriticalityLabel": "Unusual",
+                "EvidenceString": "33 sightings on 12 sources including: Palo Alto Networks, tistory.com, HackDig Posts, Anquanke News, airmagnet.technology. Most recent tweet: Continued MR.Dropper's attack. (Targething korean cryptocurrency exchange) #hcapital #ioc MD5 : eb459b47be479b61375d7b3c7c568425 URL : hxxps://881[.]000webhostapp[.]com/1.txt PDB : D:\\Attack\\DropperBuild\\x64\\Release\\Dropper.pdb https://t.co/FpsinliQqx [Beyond The Binary]. Most recent link (Sep 3, 2018): https://twitter.com/wugeej/statuses/1036413512732426240",
+                "MitigationString": "",
+                "Name": "defangedURL",
+                "Rule": "Historically Reported as a Defanged URL",
+                "Sources": [
+                    "JwO7jp",
+                    "idn:tistory.com",
+                    "POs2u-",
+                    "U13S_U",
+                    "ThoB0I",
+                    "idn:airmagnet.technology",
+                    "LErKlN",
+                    "WuLz1r",
+                    "KdwTwF",
+                    "VfsacJ",
+                    "jjf3_B",
+                    "idn:brica.de"
+                ],
+                "Timestamp": "2018-09-03T00:40:11.000Z"
+            },
+            {
+                "Criticality": 3.0,
+                "CriticalityLabel": "Malicious",
+                "EvidenceString": "1 sighting on 1 source: Recorded Future Domain Analysis URLs. Service provider: 000Webhost. Behavior observed: Malware Distribution. Last observed on Oct 16, 2021.",
+                "MitigationString": "",
+                "Name": "recentWeaponizedURL",
+                "Rule": "Recently Active URL on Weaponized Domain",
+                "Sources": [
+                    "report:aRJ1CU"
+                ],
+                "Timestamp": "2021-12-29T07:07:42.477Z"
+            }
+        ],
+        "recordedfuture.risk_string": "3/24",
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.type": "url",
+        "threat.indicator.url.domain": "881.000webhostapp.com",
+        "threat.indicator.url.extension": "txt",
+        "threat.indicator.url.original": "https://881.000webhostapp.com/1.txt",
+        "threat.indicator.url.path": "/1.txt",
+        "threat.indicator.url.scheme": "https"
+    },
+    {
+        "event.category": "threat",
+        "event.dataset": "threatintel.recordedfuture",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.risk_score": 78.0,
+        "event.type": "indicator",
+        "fileset.name": "recordedfuture",
+        "input.type": "log",
+        "log.offset": 8308,
+        "recordedfuture.evidence_details": [
+            {
+                "Criticality": 1.0,
+                "CriticalityLabel": "Unusual",
+                "EvidenceString": "1 sighting on 1 source: Bitdefender. Detected malicious behavior from an endpoint agent via global telemetry. Last observed on Jun 15, 2021.",
+                "MitigationString": "",
+                "Name": "malwareSiteDetected",
+                "Rule": "Historically Detected Malware Distribution",
+                "Sources": [
+                    "d3Awkm"
+                ],
+                "Timestamp": "2021-06-15T00:00:00.000Z"
+            },
+            {
+                "Criticality": 1.0,
+                "CriticalityLabel": "Unusual",
+                "EvidenceString": "38 sightings on 7 sources including: cybersecdn.com, WeLiveSecurity Spain, deepcheck.one, hackeridiot.com, PasteBin. Most recent link (May 27, 2021): https://cybersecdn.com/index.php/2021/05/27/janeleiro-the-time-traveler-a-new-old-banking-trojan-in-brazil/",
+                "MitigationString": "",
+                "Name": "defangedURL",
+                "Rule": "Historically Reported as a Defanged URL",
+                "Sources": [
+                    "idn:cybersecdn.com",
+                    "fWD1r9",
+                    "idn:deepcheck.one",
+                    "idn:hackeridiot.com",
+                    "Jv_xrR",
+                    "ONMgMx",
+                    "idn:nationalcybersecuritynews.today"
+                ],
+                "Timestamp": "2021-05-27T22:48:00.256Z"
+            },
+            {
+                "Criticality": 3.0,
+                "CriticalityLabel": "Malicious",
+                "EvidenceString": "1 sighting on 1 source: Recorded Future Domain Analysis URLs. Service provider: DuckDNS. Behavior observed: Malware Distribution. Last observed on Oct 15, 2021.",
+                "MitigationString": "",
+                "Name": "recentWeaponizedURL",
+                "Rule": "Recently Active URL on Weaponized Domain",
+                "Sources": [
+                    "report:aRJ1CU"
+                ],
+                "Timestamp": "2021-12-29T06:34:00.698Z"
+            },
+            {
+                "Criticality": 3.0,
+                "CriticalityLabel": "Malicious",
+                "EvidenceString": "1 sighting on 1 source: Insikt Group. 1 report: New Janeleiro Banking Trojan Targets Corporate Users in Brazil. Most recent link (Apr 06, 2021): https://app.recordedfuture.com/live/sc/4wolQHrxLiwd",
+                "MitigationString": "",
+                "Name": "recentAnalystNote",
+                "Rule": "Recently Reported by Insikt Group",
+                "Sources": [
+                    "VKz42X"
+                ],
+                "Timestamp": "2021-04-06T00:00:00.000Z"
+            }
+        ],
+        "recordedfuture.risk_string": "4/24",
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.type": "url",
+        "threat.indicator.url.domain": "comunicador.duckdns.org",
+        "threat.indicator.url.extension": "php",
+        "threat.indicator.url.original": "http://comunicador.duckdns.org/catalista/lixo/index.php",
+        "threat.indicator.url.path": "/catalista/lixo/index.php",
+        "threat.indicator.url.scheme": "http"
+    },
+    {
+        "event.category": "threat",
+        "event.dataset": "threatintel.recordedfuture",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.risk_score": 75.0,
+        "event.type": "indicator",
+        "fileset.name": "recordedfuture",
+        "input.type": "log",
+        "log.offset": 10393,
+        "recordedfuture.evidence_details": [
+            {
+                "Criticality": 3.0,
+                "CriticalityLabel": "Malicious",
+                "EvidenceString": "1 sighting on 1 source: Recorded Future Domain Analysis URLs. Service provider: Afraid.org. Behavior observed: Malware Distribution, Phishing Techniques. Last observed on Dec 28, 2021.",
+                "MitigationString": "",
+                "Name": "recentWeaponizedURL",
+                "Rule": "Recently Active URL on Weaponized Domain",
+                "Sources": [
+                    "report:aRJ1CU"
+                ],
+                "Timestamp": "2021-12-28T22:15:49.631Z"
+            },
+            {
+                "Criticality": 3.0,
+                "CriticalityLabel": "Malicious",
+                "EvidenceString": "1 sighting on 1 source: Bitdefender. Detected malicious behavior from an endpoint agent via global telemetry. Last observed on Dec 28, 2021.",
+                "MitigationString": "",
+                "Name": "recentMalwareSiteDetected",
+                "Rule": "Recently Detected Malware Distribution",
+                "Sources": [
+                    "d3Awkm"
+                ],
+                "Timestamp": "2021-12-28T00:00:00.000Z"
+            },
+            {
+                "Criticality": 3.0,
+                "CriticalityLabel": "Malicious",
+                "EvidenceString": "2 sightings on 2 sources: Bitdefender, Urlscan.io. Detected malicious behavior from an endpoint agent via global telemetry. Last observed on Dec 28, 2021.",
+                "MitigationString": "",
+                "Name": "recentPhishingSiteDetected",
+                "Rule": "Recently Detected Phishing Techniques",
+                "Sources": [
+                    "d3Awkm",
+                    "eKv4Jm"
+                ],
+                "Timestamp": "2021-12-28T00:00:00.000Z"
+            }
+        ],
+        "recordedfuture.risk_string": "3/24",
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.type": "url",
+        "threat.indicator.url.domain": "www.jeanninecatddns.chickenkiller.com",
+        "threat.indicator.url.original": "https://www.jeanninecatddns.chickenkiller.com/signin-authflow",
+        "threat.indicator.url.path": "/signin-authflow",
+        "threat.indicator.url.scheme": "https"
+    },
+    {
+        "event.category": "threat",
+        "event.dataset": "threatintel.recordedfuture",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.risk_score": 75.0,
+        "event.type": "indicator",
+        "fileset.name": "recordedfuture",
+        "input.type": "log",
+        "log.offset": 11834,
+        "recordedfuture.evidence_details": [
+            {
+                "Criticality": 1.0,
+                "CriticalityLabel": "Unusual",
+                "EvidenceString": "1 sighting on 1 source: Bitdefender. Detected malicious behavior from an endpoint agent via global telemetry. Last observed on Aug 13, 2021.",
+                "MitigationString": "",
+                "Name": "malwareSiteDetected",
+                "Rule": "Historically Detected Malware Distribution",
+                "Sources": [
+                    "d3Awkm"
+                ],
+                "Timestamp": "2021-08-13T00:00:00.000Z"
+            },
+            {
+                "Criticality": 1.0,
+                "CriticalityLabel": "Unusual",
+                "EvidenceString": "24 sightings on 9 sources including: Malware News - Malware Analysis, News and Indicators, microsoft.com, sociabble.com, 4-traders.com, MarketScreener.com | Stock Market News. Most recent link (Aug 13, 2021): https://www.marketscreener.com/quote/stock/MICROSOFT-CORPORATION-4835/news/Microsoft-Attackers-use-Morse-code-other-encryption-methods-in-evasive-phishing-campaign-36161110/?utm_medium=RSS&utm_content=20210813",
+                "MitigationString": "",
+                "Name": "defangedURL",
+                "Rule": "Historically Reported as a Defanged URL",
+                "Sources": [
+                    "gBDK5G",
+                    "idn:microsoft.com",
+                    "idn:sociabble.com",
+                    "KBTQ2e",
+                    "dCotni",
+                    "g9rk5F",
+                    "Z7kln5",
+                    "idn:cda.ms",
+                    "idn:thewindowsupdate.com"
+                ],
+                "Timestamp": "2021-08-13T17:03:19.000Z"
+            },
+            {
+                "Criticality": 3.0,
+                "CriticalityLabel": "Malicious",
+                "EvidenceString": "1 sighting on 1 source: Insikt Group. 1 report: Microsoft Warns of Attacks Targeting Microsoft Office 365 Users. Most recent link (Aug 12, 2021): https://app.recordedfuture.com/live/sc/4BBhpn1ApBQR",
+                "MitigationString": "",
+                "Name": "recentAnalystNote",
+                "Rule": "Recently Reported by Insikt Group",
+                "Sources": [
+                    "VKz42X"
+                ],
+                "Timestamp": "2021-08-12T00:00:00.000Z"
+            }
+        ],
+        "recordedfuture.risk_string": "3/24",
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.type": "url",
+        "threat.indicator.url.domain": "coollab.jp",
+        "threat.indicator.url.extension": "js",
+        "threat.indicator.url.original": "http://coollab.jp/dir/root/p/09908.js",
+        "threat.indicator.url.path": "/dir/root/p/09908.js",
+        "threat.indicator.url.scheme": "http"
+    },
+    {
+        "event.category": "threat",
+        "event.dataset": "threatintel.recordedfuture",
+        "event.kind": "enrichment",
+        "event.module": "threatintel",
+        "event.risk_score": 75.0,
+        "event.type": "indicator",
+        "fileset.name": "recordedfuture",
+        "input.type": "log",
+        "log.offset": 13621,
+        "recordedfuture.evidence_details": [
+            {
+                "Criticality": 1.0,
+                "CriticalityLabel": "Unusual",
+                "EvidenceString": "1 sighting on 1 source: Bitdefender. Detected malicious behavior from an endpoint agent via global telemetry. Last observed on May 30, 2021.",
+                "MitigationString": "",
+                "Name": "phishingSiteDetected",
+                "Rule": "Historically Detected Phishing Techniques",
+                "Sources": [
+                    "d3Awkm"
+                ],
+                "Timestamp": "2021-05-30T00:00:00.000Z"
+            },
+            {
+                "Criticality": 1.0,
+                "CriticalityLabel": "Unusual",
+                "EvidenceString": "23 sightings on 9 sources including: The Official Google Blog, eccouncil.org, frsecure.com, SoyaCincau, PasteBin. Most recent tweet: Actor controlled sites and accounts Research Blog https://blog.br0vvnn[.]io. Most recent link (Jan 27, 2021): https://twitter.com/techn0m4nc3r/statuses/1354296736357953539",
+                "MitigationString": "",
+                "Name": "defangedURL",
+                "Rule": "Historically Reported as a Defanged URL",
+                "Sources": [
+                    "Gzt",
+                    "idn:eccouncil.org",
+                    "idn:frsecure.com",
+                    "J-8-Nr",
+                    "Jv_xrR",
+                    "g9rk5F",
+                    "cUg0pv",
+                    "K5LKj8",
+                    "fVAueu"
+                ],
+                "Timestamp": "2021-01-27T05:14:38.000Z"
+            },
+            {
+                "Criticality": 3.0,
+                "CriticalityLabel": "Malicious",
+                "EvidenceString": "1 sighting on 1 source: Insikt Group. 1 report: Google Warns of Ongoing Attacks Targeting Security Researchers. Most recent link (Jan 25, 2021): https://app.recordedfuture.com/live/sc/5QCqZ2ZH4lwc",
+                "MitigationString": "",
+                "Name": "recentAnalystNote",
+                "Rule": "Recently Reported by Insikt Group",
+                "Sources": [
+                    "VKz42X"
+                ],
+                "Timestamp": "2021-01-25T00:00:00.000Z"
+            }
+        ],
+        "recordedfuture.risk_string": "3/24",
+        "service.type": "threatintel",
+        "tags": [
+            "forwarded",
+            "threatintel-recordedfuture"
+        ],
+        "threat.feed.dashboard_id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+        "threat.feed.name": "[Filebeat] RecordedFuture",
+        "threat.indicator.type": "url",
+        "threat.indicator.url.domain": "blog.br0vvnn.io",
+        "threat.indicator.url.original": "https://blog.br0vvnn.io",
+        "threat.indicator.url.path": "",
+        "threat.indicator.url.scheme": "https"
+    }
+]
