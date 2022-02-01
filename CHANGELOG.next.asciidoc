@@ -27,7 +27,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove `auto` from the available options of `setup.ilm.enabled` and set the default value to `true`. {pull}28671[28671]
 - Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
 - Remove options `logging.files.suffix` and default to datetime endings. {pull}28927[28927]
-- Remove Journalbeat. Use `journald` input of Filebeat instead. {pull}29131[29131]
 - `include_matches` option of `journald` input no longer accepts a list of string. {pull}29294[29294]
 - `add_fields` processor is now able to set metadata in events {pull}30092[30092]
 
@@ -47,7 +46,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Heartbeat*
 
-- Update size of ICMP packets to adhere to standard min size. {pull}29948[29948]
 - Add fonts to support more different types of characters for multiple languages. {pull}29606[29861]
 
 *Metricbeat*
@@ -131,7 +129,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Support custom analyzers in fields.yml. {issue}28540[28540] {pull}28926[28926]
 - Support self signed certificates on outputs {pull}29229[29229]
 - Add FIPS configuration option for all AWS API calls. {pull}[28899]
-- Add `default_region` config to AWS common module. {pull}29415[29415]
 - Warn users when connecting to older versions of Elasticsearch instances. {pull}29723[29723]
 
 *Auditbeat*
