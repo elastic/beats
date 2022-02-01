@@ -34,7 +34,7 @@ func (o *once) Start() error {
 		return ErrNoConfiguration
 	}
 
-	return readfiles(ocntext.Background(), files, o.loader, o.emitter)
+	return readfiles(context.Background(), files, o.loader, o.emitter)
 }
 
 func (o *once) Stop() error {
