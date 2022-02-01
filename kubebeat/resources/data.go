@@ -5,10 +5,11 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
-	"k8s.io/client-go/kubernetes"
+	k8sclient "k8s.io/client-go/kubernetes"
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -34,7 +35,7 @@ type registeredFetcher struct {
 }
 
 // NewData returns a new Data instance with the given interval.
-func NewData(ctx context.Context, interval time.Duration, client kubernetes.Interface) (*Data, error) {
+func NewData(ctx context.Context, interval time.Duration, client k8sclient.Interface) (*Data, error) {
 	li, err := NewLeaseInfo(ctx, client)
 	if err != nil {
 		return nil, err
@@ -194,4 +195,12 @@ func init() {
 	gob.Register(FetcherResult{})
 	gob.Register(ProcessResource{})
 	gob.Register(FileSystemResource{})
+
+	gob.Register(kubernetes.Pod{})
+	gob.Register(kubernetes.Secret{})
+	gob.Register(kubernetes.Role{})
+	gob.Register(kubernetes.RoleBinding{})
+	gob.Register(kubernetes.ClusterRole{})
+	gob.Register(kubernetes.ClusterRoleBinding{})
+	gob.Register(kubernetes.NetworkPolicy{})
 }
