@@ -372,7 +372,7 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 				"id":   info.ClusterID,
 			},
 		}
-		fmt.Printf("event: %v\n", event)
+
 		event.MetricSetFields, err = schema.Apply(node)
 		if err != nil {
 			errs = append(errs, errors.Wrap(err, "failure to apply node schema"))
