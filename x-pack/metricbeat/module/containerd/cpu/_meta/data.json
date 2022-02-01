@@ -4,23 +4,17 @@
         "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
     },
     "containerd": {
-        "namespace": "k8s.io",
         "cpu": {
             "usage": {
-                "user": {
-                    "ns": 22526620000000,
-                    "pct": 0.2496932948025663
+                "cpu": {
+                    "4": {
+                        "ns": 105731762224
+                    }
                 },
-                "total": {
-                    "pct": 0.24969398913655017,
-                    "ns": 22554111128186
-                },
-                "kernel": {
-                    "ns": 16740000000,
-                    "pct": 0
-                }
+                "percpu": {}
             }
-        }
+        },
+        "namespace": "k8s.io"
     },
     "event": {
         "dataset": "containerd.cpu",
