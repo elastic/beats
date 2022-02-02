@@ -6,6 +6,9 @@ package application
 
 import (
 	"context"
+	"path/filepath"
+
+	"go.elastic.co/apm"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
@@ -65,6 +68,7 @@ func newLocal(
 	statusCtrl status.Controller,
 	uc upgraderControl,
 	agentInfo *info.AgentInfo,
+	tracer *apm.Tracer,
 ) (*Local, error) {
 	caps, err := capabilities.Load(paths.AgentCapabilitiesPath(), log, statusCtrl)
 	if err != nil {
@@ -91,7 +95,7 @@ func newLocal(
 	}
 
 	localApplication.bgContext, localApplication.cancelCtxFn = context.WithCancel(ctx)
-	localApplication.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{})
+	localApplication.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{}, tracer)
 	if err != nil {
 		return nil, errors.New(err, "initialize GRPC listener")
 	}
@@ -114,7 +118,7 @@ func newLocal(
 		return nil, errors.New(err, "failed to initialize composable controller")
 	}
 
-	discover := discoverer(pathConfigFile, cfg.Settings.Path)
+	discover := discoverer(pathConfigFile, cfg.Settings.Path, externalConfigsGlob())
 	emit, err := emitter.New(
 		localApplication.bgContext,
 		log,
@@ -132,13 +136,15 @@ func newLocal(
 		return nil, err
 	}
 
+	loader := config.NewLoader(log, externalConfigsGlob())
+
 	var cfgSource source
 	if !cfg.Settings.Reload.Enabled {
 		log.Debug("Reloading of configuration is off")
-		cfgSource = newOnce(log, discover, emit)
+		cfgSource = newOnce(log, discover, loader, emit)
 	} else {
 		log.Debugf("Reloading of configuration is on, frequency is set to %s", cfg.Settings.Reload.Period)
-		cfgSource = newPeriodic(log, cfg.Settings.Reload.Period, discover, emit)
+		cfgSource = newPeriodic(log, cfg.Settings.Reload.Period, discover, loader, emit)
 	}
 
 	localApplication.source = cfgSource
@@ -156,6 +162,10 @@ func newLocal(
 	uc.SetUpgrader(upgrader)
 
 	return localApplication, nil
+}
+
+func externalConfigsGlob() string {
+	return filepath.Join(paths.Config(), configuration.ExternalInputsPattern)
 }
 
 // Routes returns a list of routes handled by agent.

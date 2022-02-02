@@ -5,6 +5,7 @@
 package router
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -38,7 +39,7 @@ func (r *router) Routes() *sorted.Set {
 	return r.routes
 }
 
-func (r *router) Route(id string, grpProg map[pipeline.RoutingKey][]program.Program) error {
+func (r *router) Route(ctx context.Context, id string, grpProg map[pipeline.RoutingKey][]program.Program) error {
 	s := sorted.NewSet()
 
 	// Make sure that starting and updating is always done in the same order.
@@ -77,7 +78,7 @@ func (r *router) Route(id string, grpProg map[pipeline.RoutingKey][]program.Prog
 			strings.Join(req.ProgramNames(), ", "),
 		)
 
-		err = p.(pipeline.Stream).Execute(req)
+		err = p.(pipeline.Stream).Execute(ctx, req)
 		if err != nil {
 			return err
 		}
