@@ -118,7 +118,7 @@ func newLocal(
 		return nil, errors.New(err, "failed to initialize composable controller")
 	}
 
-	discover := discoverer(pathConfigFile, cfg.Settings.Path, configuration.ExternalInputsPattern)
+	discover := discoverer(pathConfigFile, cfg.Settings.Path, externalConfigsGlob())
 	emit, err := emitter.New(
 		localApplication.bgContext,
 		log,
