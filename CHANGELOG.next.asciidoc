@@ -46,6 +46,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `while_pattern` type to multiline reader. {pull}19662[19662]
 - auditd dataset: Use process.args to store program arguments instead of auditd.log.aNNN fields. {pull}29601[29601]
 - Remove deprecated old awscloudwatch input name. {pull}29844[29844]
+- Azure SigninLogs: Added parsing of `service_principle_name` into `user.name`
 
 *Heartbeat*
 
