@@ -1,5 +1,5 @@
 # Module: stan
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-stan.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.1/metricbeat-module-stan.html
 
 - module: stan
   metricsets: ["stats", "subscriptions", "channels"]

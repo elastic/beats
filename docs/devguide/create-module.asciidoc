@@ -134,7 +134,7 @@ This will enable the module and rename file `metricbeat/modules.d/mysql.yml.disa
 $ cat modules.d/mysql.yml
 
 # Module: mysql
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-mysql.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.1/metricbeat-module-mysql.html
 
 - module: mysql
   metricsets:

@@ -1,4 +1,4 @@
-[![Build Status](https://beats-ci.elastic.co/job/Beats/job/beats/job/master/badge/icon)](https://beats-ci.elastic.co/job/Beats/job/beats/job/master/)
+[![Build Status](https://beats-ci.elastic.co/job/Beats/job/beats/job/8.1/badge/icon)](https://beats-ci.elastic.co/job/Beats/job/beats/job/8.1/)
 [![GoReportCard](http://goreportcard.com/badge/elastic/beats)](http://goreportcard.com/report/elastic/beats)
 [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
@@ -14,25 +14,25 @@ By "lightweight", we mean that Beats have a small installation footprint, use
 limited system resources, and have no runtime dependencies.
 
 This repository contains
-[libbeat](https://github.com/elastic/beats/tree/master/libbeat), our Go
+[libbeat](https://github.com/elastic/beats/tree/8.1/libbeat), our Go
 framework for creating Beats, and all the officially supported Beats:
 
 Beat  | Description
 --- | ---
-[Auditbeat](https://github.com/elastic/beats/tree/master/auditbeat) | Collect your Linux audit framework data and monitor the integrity of your files.
-[Filebeat](https://github.com/elastic/beats/tree/master/filebeat) | Tails and ships log files
-[Functionbeat](https://github.com/elastic/beats/tree/master/x-pack/functionbeat) | Read and ships events from serverless infrastructure.
-[Heartbeat](https://github.com/elastic/beats/tree/master/heartbeat) | Ping remote services for availability
-[Metricbeat](https://github.com/elastic/beats/tree/master/metricbeat) | Fetches sets of metrics from the operating system and services
-[Packetbeat](https://github.com/elastic/beats/tree/master/packetbeat) | Monitors the network and applications by sniffing packets
-[Winlogbeat](https://github.com/elastic/beats/tree/master/winlogbeat) | Fetches and ships Windows Event logs
-[Osquerybeat](https://github.com/elastic/beats/tree/master/x-pack/osquerybeat) | Runs Osquery and manages interraction with it.
+[Auditbeat](https://github.com/elastic/beats/tree/8.1/auditbeat) | Collect your Linux audit framework data and monitor the integrity of your files.
+[Filebeat](https://github.com/elastic/beats/tree/8.1/filebeat) | Tails and ships log files
+[Functionbeat](https://github.com/elastic/beats/tree/8.1/x-pack/functionbeat) | Read and ships events from serverless infrastructure.
+[Heartbeat](https://github.com/elastic/beats/tree/8.1/heartbeat) | Ping remote services for availability
+[Metricbeat](https://github.com/elastic/beats/tree/8.1/metricbeat) | Fetches sets of metrics from the operating system and services
+[Packetbeat](https://github.com/elastic/beats/tree/8.1/packetbeat) | Monitors the network and applications by sniffing packets
+[Winlogbeat](https://github.com/elastic/beats/tree/8.1/winlogbeat) | Fetches and ships Windows Event logs
+[Osquerybeat](https://github.com/elastic/beats/tree/8.1/x-pack/osquerybeat) | Runs Osquery and manages interraction with it.
 
 In addition to the above Beats, which are officially supported by
 [Elastic](https://elastic.co), the community has created a set of other Beats
 that make use of libbeat but live outside of this Github repository. We maintain
 a list of community Beats
-[here](https://www.elastic.co/guide/en/beats/libbeat/master/community-beats.html).
+[here](https://www.elastic.co/guide/en/beats/libbeat/8.1/community-beats.html).
 
 ## Documentation and Getting Started
 
