@@ -10,7 +10,8 @@
 
 // tag::notable-breaking-changes[]
 
-No breaking changes.
+The Docker base image has changed from CentOS 7 to Ubuntu 20.04. This change
+affects all {beats}.
 
 // end::notable-breaking-changes[]
 
