@@ -145,7 +145,13 @@ func (inp *journald) Run(
 		log.Error("Continue from current position. Seek failed with: %v", err)
 	}
 
-	parser := inp.Parsers.Create(&readerAdapter{r: reader, canceler: ctx.Cancelation})
+	parser := inp.Parsers.Create(
+		&readerAdapter{
+			r:                  reader,
+			converter:          journalfield.NewConverter(ctx.Logger, nil),
+			canceler:           ctx.Cancelation,
+			saveRemoteHostname: inp.SaveRemoteHostname,
+		})
 
 	for {
 		entry, err := parser.Next()
@@ -231,11 +237,15 @@ func seekBy(log *logp.Logger, cp checkpoint, seek, defaultSeek journalread.SeekM
 	return mode, cp.Position
 }
 
-// readerAdapter is an adapter so journalread.Reader can
-// behave like reader.Reader
+// readerAdapter wraps journalread.Reader and adds two functionalities:
+// - Allows it to behave like a reader.Reader
+// - Translates the fields names from the journald format to something
+//   more human friendly
 type readerAdapter struct {
-	r        *journalread.Reader
-	canceler input.Canceler
+	r                  *journalread.Reader
+	canceler           input.Canceler
+	converter          *journalfield.Converter
+	saveRemoteHostname bool
 }
 
 func (r *readerAdapter) Close() error {
@@ -251,9 +261,17 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 	content := []byte(data.Fields["MESSAGE"])
 	delete(data.Fields, "MESSAGE")
 
-	fields := make(map[string]interface{}, len(data.Fields))
-	for k, v := range data.Fields {
-		fields[k] = v
+	fields := r.converter.Convert(data.Fields)
+	fields.Put("event.kind", "event")
+	fields.Put("event.created", data.RealtimeTimestamp)
+
+	// if entry is coming from a remote journal, add_host_metadata overwrites
+	// the source hostname, so it has to be copied to a different field
+	if r.saveRemoteHostname {
+		remoteHostname, err := fields.GetValue("host.hostname")
+		if err == nil {
+			fields.Put("log.source.address", remoteHostname)
+		}
 	}
 
 	m := reader.Message{
