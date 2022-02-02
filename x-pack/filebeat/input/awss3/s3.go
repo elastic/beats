@@ -219,7 +219,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 			p.states.DeleteListing(listingID.String())
 			lock.Unlock()
 		} else {
-			listingInfo := &listingInfo{mu: new(sync.Mutex), totObjects: totProcessableObjects}
+			listingInfo := &listingInfo{totObjects: totProcessableObjects}
 			p.states.AddListing(listingID.String(), listingInfo)
 
 			// Metrics

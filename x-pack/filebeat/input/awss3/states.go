@@ -21,8 +21,9 @@ const (
 )
 
 type listingInfo struct {
-	mu            *sync.Mutex
-	totObjects    int
+	totObjects int
+
+	mu            sync.Mutex
 	storedObjects int
 	errorObjects  int
 	finalCheck    bool
@@ -157,8 +158,9 @@ func (s *states) Update(newState state, listingID string) {
 	// here we increase the number of stored object
 	info, _ := s.listingInfo.Load(listingID)
 	listingInfo := info.(*listingInfo)
+
 	listingInfo.mu.Lock()
-	defer listingInfo.mu.Unlock()
+
 	if newState.Stored {
 		listingInfo.storedObjects++
 	}
@@ -166,6 +168,8 @@ func (s *states) Update(newState state, listingID string) {
 	if newState.Error {
 		listingInfo.errorObjects++
 	}
+
+	listingInfo.mu.Unlock()
 
 	if _, ok := s.statesByListingID[listingID]; !ok {
 		s.statesByListingID[listingID] = make([]state, 0)
