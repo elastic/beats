@@ -67,6 +67,8 @@ ifndef::kubernetes_default_indexers[]
       #  - fields:
       #      lookup_fields: ["metricset.host"]
 endif::kubernetes_default_indexers[]
+      #labels.dedot: true
+      #annotations.dedot: true
 -------------------------------------------------------------------------------
 
 The configuration below enables the processor on a Beat running as a process on
@@ -89,6 +91,7 @@ ifndef::kubernetes_default_indexers[]
       #      lookup_fields: ["metricset.host"]
 endif::kubernetes_default_indexers[]
       #labels.dedot: true
+      #annotations.dedot: true
 -------------------------------------------------------------------------------
 
 The configuration below has the default indexers and matchers disabled and
@@ -110,6 +113,7 @@ processors:
         - fields:
             lookup_fields: ["metricset.host"]
       #labels.dedot: true
+      #annotations.dedot: true
 -------------------------------------------------------------------------------
 
 The `add_kubernetes_metadata` processor has the following configuration settings:
@@ -135,10 +139,12 @@ Example:
         namespace:
           include_labels: ["namespacelabel1"]
           #labels.dedot: true
+          #annotations.dedot: true
         node:
           include_labels: ["nodelabel2"]
           include_annotations: ["nodeannotation1"]
           #labels.dedot: true
+          #annotations.dedot: true
 -------------------------------------------------------------------------------------
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
 client. It defaults to `KUBECONFIG` environment variable if present.
@@ -149,3 +155,5 @@ running configuration for a container. This is `60s` by default.
 `default_matchers.enabled`:: (Optional) Enable or disable default pod matchers when you want to specify your own.
 `labels.dedot`:: (Optional) Default to be true. If set to true, replace dots in
  labels with `_`.
+ `annotations.dedot`:: (Optional) Default to be true. If set to true, replace dots in
+ annotations with `_`.
