@@ -185,7 +185,7 @@ func getProcName(pid int) (string, error) {
 }
 
 // getProcStatus returns the status of a process.
-func getPidStatus(pid int) (string, error) {
+func getPidStatus(pid int) (PidState, error) {
 	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess, false, uint32(pid))
 	if err != nil {
 		return Unknown, errors.Wrapf(err, "OpenProcess failed for pid=%v", pid)
