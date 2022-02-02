@@ -1,6 +1,7 @@
 package resources
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -17,7 +18,7 @@ func newNumberFetcher(num int) Fetcher {
 	return &numberFetcher{num, false}
 }
 
-func (f *numberFetcher) Fetch() ([]FetcherResult, error) {
+func (f *numberFetcher) Fetch(ctx context.Context) ([]FetcherResult, error) {
 	return fetchValue(f.num), nil
 }
 
@@ -122,7 +123,7 @@ func (s *RegistryTestSuite) TestRunNotRegistered() {
 	err := s.registry.Register("some-key", f)
 	s.NoError(err)
 
-	arr, err := s.registry.Run("unknown")
+	arr, err := s.registry.Run(context.TODO(), "unknown")
 	s.Error(err)
 	s.Empty(arr)
 }
@@ -156,7 +157,7 @@ func (s *RegistryTestSuite) TestRunRegistered() {
 	}
 
 	for _, test := range tests {
-		arr, err := s.registry.Run(test.key)
+		arr, err := s.registry.Run(context.TODO(), test.key)
 		s.NoError(err)
 		s.Equal(1, len(arr))
 		s.Equal(test.value, arr[0].Resource)

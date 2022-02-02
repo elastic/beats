@@ -1,10 +1,14 @@
 package resources
 
-import "github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/proc"
+import (
+	"context"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/proc"
+)
 
 // Fetcher represents a data fetcher.
 type Fetcher interface {
-	Fetch() ([]FetcherResult, error)
+	Fetch(context.Context) ([]FetcherResult, error)
 	Stop()
 }
 

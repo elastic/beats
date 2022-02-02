@@ -17,8 +17,6 @@ type Data struct {
 	interval time.Duration
 	output   chan Map
 
-	ctx      context.Context
-	cancel   context.CancelFunc
 	state    Map
 	fetchers FetchersRegistry
 	wg       *sync.WaitGroup
@@ -27,13 +25,12 @@ type Data struct {
 type Map map[string][]FetcherResult
 
 // NewData returns a new Data instance with the given interval.
-func NewData(ctx context.Context, interval time.Duration, fetchers FetchersRegistry) (*Data, error) {
-	ctx, cancel := context.WithCancel(ctx)
+func NewData(interval time.Duration, fetchers FetchersRegistry) (*Data, error) {
+
 	return &Data{
 		interval: interval,
 		output:   make(chan Map),
-		ctx:      ctx,
-		cancel:   cancel,
+
 		state:    make(Map),
 		fetchers: fetchers,
 	}, nil
@@ -45,7 +42,7 @@ func (d *Data) Output() <-chan Map {
 }
 
 // Run updates the cache using Fetcher implementations.
-func (d *Data) Run() error {
+func (d *Data) Run(ctx context.Context) error {
 	updates := make(chan update)
 
 	var wg sync.WaitGroup
@@ -55,14 +52,14 @@ func (d *Data) Run() error {
 		wg.Add(1)
 		go func(k string) {
 			defer wg.Done()
-			d.fetchWorker(updates, k)
+			d.fetchWorker(ctx, updates, k)
 		}(key)
 	}
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		d.fetchManager(updates)
+		d.fetchManager(ctx, updates)
 	}()
 
 	return nil
@@ -74,17 +71,17 @@ type update struct {
 	val []FetcherResult
 }
 
-func (d *Data) fetchWorker(updates chan update, k string) {
+func (d *Data) fetchWorker(ctx context.Context, updates chan update, k string) {
 	for {
 		select {
-		case <-d.ctx.Done():
+		case <-ctx.Done():
 			return
 		default:
 			if !d.fetchers.ShouldRun(k) {
 				break
 			}
 
-			val, err := d.fetchers.Run(k)
+			val, err := d.fetchers.Run(ctx, k)
 			if err != nil {
 				logp.L().Errorf("error running fetcher for key %q: %v", k, err)
 			}
@@ -96,7 +93,7 @@ func (d *Data) fetchWorker(updates chan update, k string) {
 	}
 }
 
-func (d *Data) fetchManager(updates chan update) {
+func (d *Data) fetchManager(ctx context.Context, updates chan update) {
 	ticker := time.NewTicker(d.interval)
 
 	for {
@@ -115,17 +112,20 @@ func (d *Data) fetchManager(updates chan update) {
 		case u := <-updates:
 			d.state[u.key] = u.val
 
-		case <-d.ctx.Done():
+		case <-ctx.Done():
 			return
 		}
 	}
 }
 
 // Stop cleans up Data resources gracefully.
-func (d *Data) Stop() {
-	d.cancel()
-	d.fetchers.Stop()
+func (d *Data) Stop(ctx context.Context, cancel context.CancelFunc) {
+	cancel()
+
+	d.fetchers.Stop(ctx)
 	d.wg.Wait()
+
+	close(d.output)
 }
 
 // copyState makes a copyState of the given map.
