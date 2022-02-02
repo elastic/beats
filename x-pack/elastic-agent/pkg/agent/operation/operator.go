@@ -233,7 +233,6 @@ func (o *Operator) Shutdown() {
 			wg.Done()
 			o.logger.Debugf("took %s to shutdown %s",
 				time.Now().Sub(started), a.Name())
-
 		}(a)
 	}
 	wg.Wait()

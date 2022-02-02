@@ -73,7 +73,6 @@ func TestIsSubpath(t *testing.T) {
 }
 
 func TestExecFile_Success(t *testing.T) {
-	t.Skip("skipping failing tests")
 	pwd, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -87,8 +86,6 @@ func TestExecFile_Success(t *testing.T) {
 }
 
 func TestExecFile_StdErr(t *testing.T) {
-	t.Skip("skipping failing tests")
-
 	pwd, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -106,8 +103,6 @@ func TestExecFile_StdErr(t *testing.T) {
 }
 
 func TestExecFile_StdOut(t *testing.T) {
-	t.Skip("skipping failing tests")
-
 	pwd, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -125,8 +120,6 @@ func TestExecFile_StdOut(t *testing.T) {
 }
 
 func TestExecFile_NoOutput(t *testing.T) {
-	t.Skip("skipping failing tests")
-
 	pwd, err := os.Getwd()
 	if err != nil {
 		panic(err)
