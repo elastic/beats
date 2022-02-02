@@ -3,6 +3,11 @@ processors:
   - json:
       field: message
       target_field: elasticsearch.audit
+  - dot_expander:
+      field: event.type
+      path: elasticsearch.audit
+  - drop:
+        if: '!["rest", "transport", "ip_filter", "security_config_change"].contains(ctx.elasticsearch?.audit?.event?.type)'
   - remove:
       field: elasticsearch.audit.type
       ignore_missing: true
@@ -25,13 +30,13 @@ processors:
   - dot_expander:
       field: event.action
       path: elasticsearch.audit
+  - remove:
+      field: event.action
+      ignore_missing: true
   - rename:
       field: elasticsearch.audit.event.action
       target_field: event.action
       ignore_missing: true
-  - dot_expander:
-      field: event.type
-      path: elasticsearch.audit
   - rename:
       field: elasticsearch.audit.event.type
       target_field: elasticsearch.audit.layer
@@ -44,6 +49,9 @@ processors:
       patterns:
         - \[%{IPORHOST:source.ip}\]:%{INT:source.port:int}
         - "%{IPORHOST:source.ip}:%{INT:source.port:int}"
+      ignore_missing: true
+  - remove:
+      field: source.address
       ignore_missing: true
   - rename:
       field: elasticsearch.audit.origin.address
@@ -76,6 +84,9 @@ processors:
   - dot_expander:
       field: node.name
       path: elasticsearch.audit
+  - remove:
+      field: elasticsearch.node
+      ignore_missing: true
   - rename:
       field: elasticsearch.audit.node
       target_field: elasticsearch.node
@@ -130,6 +141,9 @@ processors:
   - dot_expander:
       field: user.name
       path: elasticsearch.audit
+  - remove:
+      field: user.name
+      ignore_missing: true
   - rename:
       field: elasticsearch.audit.user.name
       target_field: user.name
