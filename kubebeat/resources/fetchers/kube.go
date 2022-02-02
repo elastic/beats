@@ -1,6 +1,7 @@
 package fetchers
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -132,7 +133,7 @@ func (f *KubeFetcher) initWatchers() error {
 	return nil
 }
 
-func (f *KubeFetcher) Fetch() ([]resources.FetcherResult, error) {
+func (f *KubeFetcher) Fetch(ctx context.Context) ([]resources.FetcherResult, error) {
 	var err error
 	watcherlock.Do(func() {
 		err = f.initWatchers()

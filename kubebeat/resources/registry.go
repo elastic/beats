@@ -1,8 +1,8 @@
 package resources
 
 import (
+	"context"
 	"fmt"
-	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -11,13 +11,12 @@ type FetchersRegistry interface {
 	Register(key string, f Fetcher, c ...FetcherCondition) error
 	Keys() []string
 	ShouldRun(key string) bool
-	Run(key string) ([]FetcherResult, error)
-	Stop()
+	Run(ctx context.Context, key string) ([]FetcherResult, error)
+	Stop(ctx context.Context)
 }
 
 type fetchersRegistry struct {
-	reg  map[string]registeredFetcher
-	lock sync.RWMutex
+	reg map[string]registeredFetcher
 }
 
 type registeredFetcher struct {
@@ -25,7 +24,7 @@ type registeredFetcher struct {
 	c []FetcherCondition
 }
 
-func NewFetcherRegistry() *fetchersRegistry {
+func NewFetcherRegistry() FetchersRegistry {
 	return &fetchersRegistry{
 		reg: make(map[string]registeredFetcher),
 	}
@@ -70,16 +69,16 @@ func (r *fetchersRegistry) ShouldRun(key string) bool {
 	return true
 }
 
-func (r *fetchersRegistry) Run(key string) ([]FetcherResult, error) {
+func (r *fetchersRegistry) Run(ctx context.Context, key string) ([]FetcherResult, error) {
 	registered, ok := r.reg[key]
 	if !ok {
 		return nil, fmt.Errorf("fetcher %v not found", key)
 	}
 
-	return registered.f.Fetch()
+	return registered.f.Fetch(ctx)
 }
 
-func (r *fetchersRegistry) Stop() {
+func (r *fetchersRegistry) Stop(ctx context.Context) {
 	for key, rfetcher := range r.reg {
 		rfetcher.f.Stop()
 		logp.L().Infof("Fetcher for key %q stopped", key)

@@ -23,9 +23,9 @@ func NewEKSFetcher(cfg aws.Config, clusterName string) (resources.Fetcher, error
 	}, nil
 }
 
-func (f EKSFetcher) Fetch() ([]resources.FetcherResult, error) {
+func (f EKSFetcher) Fetch(ctx context.Context) ([]resources.FetcherResult, error) {
 	results := make([]resources.FetcherResult, 0)
-	ctx := context.Background()
+
 	result, err := f.eksProvider.DescribeCluster(ctx, f.clusterName)
 	results = append(results, resources.FetcherResult{
 		Type:     EKSType,

@@ -24,16 +24,19 @@ func TestDataRun(t *testing.T) {
 
 	reg := NewFetcherRegistry()
 	registerNFetchers(t, reg, fetcherCount)
-	d, err := NewData(context.Background(), duration, reg)
+	d, err := NewData(duration, reg)
 	if err != nil {
 		t.Error(err)
 	}
 
-	err = d.Run()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = d.Run(ctx)
 	if err != nil {
 		return
 	}
-	defer d.Stop()
+	defer d.Stop(ctx, cancel)
 
 	o := d.Output()
 	state := <-o

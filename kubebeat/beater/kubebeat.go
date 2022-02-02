@@ -17,12 +17,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
+
 	"github.com/gofrs/uuid"
 )
 
 // kubebeat configuration.
 type kubebeat struct {
-	done         chan struct{}
+	ctx    context.Context
+	cancel context.CancelFunc
+
 	config       config.Config
 	client       beat.Client
 	data         *resources.Data
@@ -40,7 +43,7 @@ const (
 
 // New creates an instance of kubebeat.
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
 
 	c := config.DefaultConfig
 	if err := cfg.Unpack(&c); err != nil {
@@ -54,13 +57,13 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	data, err := resources.NewData(ctx, c.Period, fetchersRegistry)
+	data, err := resources.NewData(c.Period, fetchersRegistry)
 	if err != nil {
 		return nil, err
 	}
 
 	scheduler := NewSynchronousScheduler()
-	evaluator, err := opa.NewEvaluator()
+	evaluator, err := opa.NewEvaluator(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +76,8 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	}
 
 	bt := &kubebeat{
-		done:         make(chan struct{}),
+		ctx:          ctx,
+		cancel:       cancel,
 		config:       c,
 		eval:         evaluator,
 		data:         data,
@@ -87,10 +91,9 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 func (bt *kubebeat) Run(b *beat.Beat) error {
 	logp.Info("kubebeat is running! Hit CTRL-C to stop it.")
 
-	if err := bt.data.Run(); err != nil {
+	if err := bt.data.Run(bt.ctx); err != nil {
 		return err
 	}
-	defer bt.data.Stop()
 
 	procs, err := bt.configureProcessors(bt.config.Processors)
 	if err != nil {
@@ -110,7 +113,7 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 
 	for {
 		select {
-		case <-bt.done:
+		case <-bt.ctx.Done():
 			return nil
 		case o := <-output:
 			cycleId, _ := uuid.NewV4()
@@ -118,7 +121,7 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 			bt.updateCycleStatus(cycleId, cycleStatusStart)
 
 			resourceCallback := func(resource interface{}) {
-				bt.resourceIteration(resource, cycleId)
+				bt.resourceIteration(bt.ctx, resource, cycleId)
 			}
 
 			bt.scheduler.ScheduleResources(o, resourceCallback)
@@ -157,8 +160,8 @@ func InitRegistry(ctx context.Context, c config.Config) (resources.FetchersRegis
 	return registry, nil
 }
 
-func (bt *kubebeat) resourceIteration(resource interface{}, cycleId uuid.UUID) {
-	result, err := bt.eval.Decision(resource)
+func (bt *kubebeat) resourceIteration(ctx context.Context, resource interface{}, cycleId uuid.UUID) {
+	result, err := bt.eval.Decision(ctx, resource)
 	if err != nil {
 		logp.Error(fmt.Errorf("error running the policy: %w", err))
 		return
@@ -175,10 +178,10 @@ func (bt *kubebeat) resourceIteration(resource interface{}, cycleId uuid.UUID) {
 
 // Stop stops kubebeat.
 func (bt *kubebeat) Stop() {
-	bt.client.Close()
-	bt.eval.Stop()
+	bt.data.Stop(bt.ctx, bt.cancel)
+	bt.eval.Stop(bt.ctx)
 
-	close(bt.done)
+	bt.client.Close()
 }
 
 // updateCycleStatus updates beat status in metadata ES index.

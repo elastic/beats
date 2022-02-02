@@ -17,7 +17,7 @@ type Evaluator struct {
 	opa          *sdk.OPA
 }
 
-func NewEvaluator() (*Evaluator, error) {
+func NewEvaluator(ctx context.Context) (*Evaluator, error) {
 	server, err := bundle.StartServer()
 	if err != nil {
 		return nil, err
@@ -30,7 +30,7 @@ func NewEvaluator() (*Evaluator, error) {
 
 	// create an instance of the OPA object
 	opaLogger := newEvaluatorLogger()
-	opa, err := sdk.New(context.Background(), sdk.Options{
+	opa, err := sdk.New(ctx, sdk.Options{
 		Config: bytes.NewReader(config),
 		Logger: opaLogger,
 	})
@@ -44,9 +44,9 @@ func NewEvaluator() (*Evaluator, error) {
 	}, nil
 }
 
-func (e *Evaluator) Decision(input interface{}) (interface{}, error) {
+func (e *Evaluator) Decision(ctx context.Context, input interface{}) (interface{}, error) {
 	// get the named policy decision for the specified input
-	result, err := e.opa.Decision(context.Background(), sdk.DecisionOptions{
+	result, err := e.opa.Decision(ctx, sdk.DecisionOptions{
 		Path:  "main",
 		Input: input,
 	})
@@ -57,8 +57,7 @@ func (e *Evaluator) Decision(input interface{}) (interface{}, error) {
 	return result.Result, nil
 }
 
-func (e *Evaluator) Stop() {
-	ctx := context.Background()
+func (e *Evaluator) Stop(ctx context.Context) {
 	e.opa.Stop(ctx)
 	e.bundleServer.Shutdown(ctx)
 }
