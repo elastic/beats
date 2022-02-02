@@ -1,11 +1,12 @@
-package resources
+package conditions
 
 import (
 	"context"
 	"fmt"
-	"k8s.io/client-go/kubernetes"
 	"os"
 	"strings"
+
+	"k8s.io/client-go/kubernetes"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -15,16 +16,16 @@ const (
 	DefaultLeaderLeaseName = "elastic-agent-cluster-leader"
 )
 
-type LeaseInfo struct {
+type leaseProvider struct {
 	ctx    context.Context
 	client kubernetes.Interface
 }
 
-func NewLeaseInfo(ctx context.Context, client kubernetes.Interface) (*LeaseInfo, error) {
-	return &LeaseInfo{ctx, client}, nil
+func NewLeaderLeaseProvider(ctx context.Context, client kubernetes.Interface) LeaderLeaseProvider {
+	return &leaseProvider{ctx, client}
 }
 
-func (l *LeaseInfo) IsLeader() (bool, error) {
+func (l *leaseProvider) IsLeader() (bool, error) {
 	leases, err := l.client.CoordinationV1().Leases("kube-system").List(l.ctx, v1.ListOptions{})
 	if err != nil {
 		return false, err
@@ -45,7 +46,7 @@ func (l *LeaseInfo) IsLeader() (bool, error) {
 	return false, fmt.Errorf("could not find lease %v in Kube leases", DefaultLeaderLeaseName)
 }
 
-func (l *LeaseInfo) currentPodID() string {
+func (l *leaseProvider) currentPodID() string {
 	pod := os.Getenv(PodNameEnvar)
 
 	return lastPart(pod)

@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/beats/v7/kubebeat/opa"
 	_ "github.com/elastic/beats/v7/kubebeat/processor" // Add kubebeat default processors.
 	"github.com/elastic/beats/v7/kubebeat/resources"
+	"github.com/elastic/beats/v7/kubebeat/resources/conditions"
 	"github.com/elastic/beats/v7/kubebeat/resources/fetchers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	libevents "github.com/elastic/beats/v7/libbeat/beat/events"
@@ -48,12 +49,12 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 
 	logp.Info("Config initiated.")
 
-	client, err := kubernetes.GetKubernetesClient("", kubernetes.KubeClientOptions{})
+	fetchersRegistry, err := InitRegistry(ctx, c)
 	if err != nil {
 		return nil, err
 	}
 
-	data, err := resources.NewData(ctx, c.Period, client)
+	data, err := resources.NewData(ctx, c.Period, fetchersRegistry)
 	if err != nil {
 		return nil, err
 	}
@@ -68,21 +69,6 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	resultsIndex := config.Datastream("", config.ResultsDatastreamIndexPrefix)
 	eventParser, err := opa.NewEvaluationResultParser(resultsIndex)
 	if err != nil {
-		return nil, err
-	}
-
-	kubef, err := fetchers.NewKubeFetcher(c.KubeConfig, c.Period)
-	if err != nil {
-		return nil, err
-	}
-
-	if err = data.RegisterFetcher("kube_api", kubef, true); err != nil {
-		return nil, err
-	}
-	if err = data.RegisterFetcher("processes", fetchers.NewProcessesFetcher(processesDir), false); err != nil {
-		return nil, err
-	}
-	if err = data.RegisterFetcher("file_system", fetchers.NewFileFetcher(c.Files), false); err != nil {
 		return nil, err
 	}
 
@@ -141,6 +127,34 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 			bt.updateCycleStatus(cycleId, cycleStatusEnd)
 		}
 	}
+}
+
+func InitRegistry(ctx context.Context, c config.Config) (resources.FetchersRegistry, error) {
+	registry := resources.NewFetcherRegistry()
+	kubef, err := fetchers.NewKubeFetcher(c.KubeConfig, c.Period)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := kubernetes.GetKubernetesClient("", kubernetes.KubeClientOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	leaseProvider := conditions.NewLeaderLeaseProvider(ctx, client)
+	condition := conditions.NewLeaseFetcherCondition(leaseProvider)
+
+	if err = registry.Register("kube_api", kubef, condition); err != nil {
+		return nil, err
+	}
+	if err = registry.Register("processes", fetchers.NewProcessesFetcher(processesDir)); err != nil {
+		return nil, err
+	}
+	if err = registry.Register("file_system", fetchers.NewFileFetcher(c.Files)); err != nil {
+		return nil, err
+	}
+
+	return registry, nil
 }
 
 func (bt *kubebeat) resourceIteration(resource interface{}, cycleId uuid.UUID) {

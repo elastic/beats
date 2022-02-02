@@ -8,6 +8,11 @@ type Fetcher interface {
 	Stop()
 }
 
+type FetcherCondition interface {
+	Condition() bool
+	Name() string
+}
+
 type FetcherResult struct {
 	Type     string      `json:"type"`
 	Resource interface{} `json:"resource"`
