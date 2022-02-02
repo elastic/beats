@@ -23,7 +23,7 @@ package diskio
 import (
 	"testing"
 
-	"github.com/shirou/gopsutil/disk"
+	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/stretchr/testify/assert"
 
 	sigar "github.com/elastic/gosigar"

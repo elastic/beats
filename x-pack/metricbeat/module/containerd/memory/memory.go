@@ -29,6 +29,7 @@ var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
+		PathConfigKey: "metrics_path",
 	}.Build()
 
 	// Mapping of state metrics
