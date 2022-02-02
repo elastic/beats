@@ -212,6 +212,12 @@ processors:
       value: '{{{azure.signinlogs.properties.id}}}'
       ignore_empty_value: true
   - grok:
+      field: azure.signinlogs.properties.service_principal_name
+      patterns:
+        - '%{GREEDYDATA:user.name}'
+      ignore_missing: true
+      ignore_failure: true
+  - grok:
       field: azure.signinlogs.properties.user_principal_name
       patterns:
         - '%{USERNAME:user.name}@%{HOSTNAME:user.domain}'
