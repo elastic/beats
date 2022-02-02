@@ -23,7 +23,6 @@ package metrics
 import (
 	"os"
 	"runtime"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
@@ -32,8 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/metric/system/process"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
-
-	sigar "github.com/elastic/gosigar"
 )
 
 var (
@@ -127,20 +124,6 @@ func getRSSSize() (uint64, error) {
 	return state.Memory.Rss.Bytes.ValueOr(0), nil
 }
 
-// GetOwnResourceUsageTimeInMillis return the user and system CPU usage time in milliseconds
-func getOwnResourceUsageTimeInMillis() (int64, int64, error) {
-	r := sigar.Rusage{}
-	err := r.Get(0)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	uTime := int64(r.Utime / time.Millisecond)
-	sTime := int64(r.Stime / time.Millisecond)
-
-	return uTime, sTime, nil
-}
-
 func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
 	V.OnRegistryStart()
 	defer V.OnRegistryFinished()
@@ -151,29 +134,23 @@ func reportBeatCPU(_ monitoring.Mode, V monitoring.Visitor) {
 		return
 	}
 
-	userTime, systemTime, err := getOwnResourceUsageTimeInMillis()
-	if err != nil {
-		logp.Err("Error retrieving CPU usage time: %v", err)
-		return
-	}
-
 	monitoring.ReportNamespace(V, "user", func() {
 		monitoring.ReportInt(V, "ticks", int64(state.CPU.User.Ticks.ValueOr(0)))
 		monitoring.ReportNamespace(V, "time", func() {
-			monitoring.ReportInt(V, "ms", userTime)
+			monitoring.ReportInt(V, "ms", int64(state.CPU.User.Ticks.ValueOr(0)))
 		})
 	})
 	monitoring.ReportNamespace(V, "system", func() {
 		monitoring.ReportInt(V, "ticks", int64(state.CPU.System.Ticks.ValueOr(0)))
 		monitoring.ReportNamespace(V, "time", func() {
-			monitoring.ReportInt(V, "ms", systemTime)
+			monitoring.ReportInt(V, "ms", int64(state.CPU.System.Ticks.ValueOr(0)))
 		})
 	})
 	monitoring.ReportNamespace(V, "total", func() {
 		monitoring.ReportFloat(V, "value", state.CPU.Total.Value.ValueOr(0))
 		monitoring.ReportInt(V, "ticks", int64(state.CPU.Total.Ticks.ValueOr(0)))
 		monitoring.ReportNamespace(V, "time", func() {
-			monitoring.ReportInt(V, "ms", userTime+systemTime)
+			monitoring.ReportInt(V, "ms", int64(state.CPU.Total.Ticks.ValueOr(0)))
 		})
 	})
 }

@@ -28,12 +28,12 @@ import (
 // ProcState is the main struct for process information and metrics.
 type ProcState struct {
 	// Basic Process data
-	Name     string  `struct:"name,omitempty"`
-	State    string  `struct:"state,omitempty"`
-	Username string  `struct:"username,omitempty"`
-	Pid      opt.Int `struct:"pid,omitempty"`
-	Ppid     opt.Int `struct:"ppid,omitempty"`
-	Pgid     opt.Int `struct:"pgid,omitempty"`
+	Name     string   `struct:"name,omitempty"`
+	State    PidState `struct:"state,omitempty"`
+	Username string   `struct:"username,omitempty"`
+	Pid      opt.Int  `struct:"pid,omitempty"`
+	Ppid     opt.Int  `struct:"ppid,omitempty"`
+	Pgid     opt.Int  `struct:"pgid,omitempty"`
 
 	// Extended Process Data
 	Args    []string      `struct:"args,omitempty"`
@@ -158,7 +158,7 @@ type ProcStateRootEvent struct {
 // ProcessRoot wraps the process metrics for the root ECS fields
 type ProcessRoot struct {
 	Cmdline string        `struct:"command_line,omitempty"`
-	State   string        `struct:"state,omitempty"`
+	State   PidState      `struct:"state,omitempty"`
 	CPU     RootCPUFields `struct:"cpu,omitempty"`
 	Memory  opt.PctOpt    `struct:"memory,omitempty"`
 	Cwd     string        `struct:"working_directory,omitempty"`

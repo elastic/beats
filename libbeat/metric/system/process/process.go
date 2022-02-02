@@ -76,6 +76,17 @@ type Stats struct {
 	host        types.Host
 }
 
+type PidState string
+
+var (
+	Running  PidState = "running"
+	Sleeping PidState = "sleeping"
+	Idle     PidState = "idle"
+	Stopped  PidState = "stopped"
+	Zombie   PidState = "zombie"
+	Unknown  PidState = "unknown"
+)
+
 // Init initializes a Stats instance. It returns errors if the provided process regexes
 // cannot be compiled.
 func (procStats *Stats) Init() error {
@@ -272,10 +283,7 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	} // end cgroups processor
 
 	if ok {
-		cpuTotalPctNorm, cpuTotalPct, cpuTotalValue := GetProcCPUPercentage(last, status)
-		status.CPU.Total.Norm.Pct = opt.FloatWith(cpuTotalPctNorm)
-		status.CPU.Total.Pct = opt.FloatWith(cpuTotalPct)
-		status.CPU.Total.Value = opt.FloatWith(cpuTotalValue)
+		status = GetProcCPUPercentage(last, status)
 	}
 
 	return status, true, nil

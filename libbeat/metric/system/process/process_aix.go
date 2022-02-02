@@ -77,17 +77,17 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 
 	switch info.pi_state {
 	case C.SACTIVE:
-		state.State = "running"
+		state.State = Running
 	case C.SIDL:
-		state.State = "idle"
+		state.State = Idle
 	case C.SSTOP:
-		state.State = "stopped"
+		state.State = Stopped
 	case C.SZOMB:
-		state.State = "zombie"
+		state.State = Zombie
 	case C.SSWAP:
-		state.State = "sleeping"
+		state.State = Sleeping
 	default:
-		state.State = "unknown"
+		state.State = Unknown
 	}
 
 	// Get process username. Fallback to UID if username is not available.

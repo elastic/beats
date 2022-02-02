@@ -258,10 +258,8 @@ func getEnvData(hostfs resolve.Resolver, pid int, filter func(string) bool) (com
 		}
 
 		if filter == nil || filter(key) {
-
 			env[key] = string(bytes.TrimSpace(parts[1]))
 		}
-
 	}
 	return env, nil
 }
@@ -319,12 +317,11 @@ func getCPUTime(hostfs resolve.Resolver, pid int) (ProcCPUInfo, error) {
 		return state, errors.Wrapf(err, "error feting boot time for pid %d", pid)
 	}
 
-	// convert to millis
+	// convert to milliseconds from USER_HZ
+	// This effectively means our definition of "ticks" throughout the process code is a millisecond
 	state.User.Ticks = opt.UintWith(user * (1000 / ticks))
 	state.System.Ticks = opt.UintWith(sys * (1000 / ticks))
 	state.Total.Ticks = opt.UintWith(opt.SumOptUint(state.User.Ticks, state.System.Ticks))
-
-	// convert to millis
 
 	startTime, err := strconv.ParseUint(fields[21], 10, 64)
 	if err != nil {
@@ -370,9 +367,7 @@ func getFDStats(hostfs resolve.Resolver, pid int) (ProcFDInfo, error) {
 		return state, errors.Wrapf(err, "error opening file %s", path)
 	}
 
-	statVals := strings.Split(string(data), "\n")
-
-	for _, line := range statVals {
+	for _, line := range strings.Split(string(data), "\n") {
 		if strings.HasPrefix(line, "Max open files") {
 			fields := strings.Fields(line)
 			if len(fields) == 6 {
@@ -448,18 +443,18 @@ func getProcStatus(hostfs resolve.Resolver, pid int) (map[string]string, error) 
 	return status, err
 }
 
-func getProcState(b byte) string {
+func getProcState(b byte) PidState {
 	switch b {
 	case 'S':
-		return "sleeping"
+		return Sleeping
 	case 'R':
-		return "running"
+		return Running
 	case 'D':
-		return "idle"
+		return Idle
 	case 'T':
-		return "stopped"
+		return Stopped
 	case 'Z':
-		return "zombie"
+		return Zombie
 	}
-	return "unknown"
+	return Unknown
 }

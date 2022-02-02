@@ -188,20 +188,20 @@ func getProcName(pid int) (string, error) {
 func getPidStatus(pid int) (string, error) {
 	handle, err := syscall.OpenProcess(processQueryLimitedInfoAccess, false, uint32(pid))
 	if err != nil {
-		return "unknown", errors.Wrapf(err, "OpenProcess failed for pid=%v", pid)
+		return Unknown, errors.Wrapf(err, "OpenProcess failed for pid=%v", pid)
 	}
 	defer syscall.CloseHandle(handle)
 
 	var exitCode uint32
 	err = syscall.GetExitCodeProcess(handle, &exitCode)
 	if err != nil {
-		return "unknown", errors.Wrapf(err, "GetExitCodeProcess failed for pid=%v", pid)
+		return Unknown, errors.Wrapf(err, "GetExitCodeProcess failed for pid=%v", pid)
 	}
 
 	if exitCode == 259 { //still active
-		return "running", nil
+		return Running, nil
 	}
-	return "sleeping", nil
+	return Sleeping, nil
 }
 
 // getParentPid returns the parent process ID of a process.

@@ -72,10 +72,10 @@ func isProcessInSlice(processes []ProcState, proc *ProcState) bool {
 // time multiplied by the number of cores as the total amount of CPU time
 // available between samples. This could result in incorrect percentages if the
 // wall-clock is adjusted (prior to Go 1.9) or the machine is suspended.
-func GetProcCPUPercentage(s0, s1 ProcState) (float64, float64, float64) {
+func GetProcCPUPercentage(s0, s1 ProcState) ProcState {
 	// Skip if we're missing the total ticks
 	if s0.CPU.Total.Ticks.IsZero() || s1.CPU.Total.Ticks.IsZero() {
-		return 0, 0, 0
+		return s1
 	}
 
 	timeDelta := s1.SampleTime.Sub(s0.SampleTime)
@@ -84,8 +84,11 @@ func GetProcCPUPercentage(s0, s1 ProcState) (float64, float64, float64) {
 
 	pct := float64(totalCPUDeltaMillis) / float64(timeDeltaMillis)
 	normalizedPct := pct / float64(numcpu.NumCPU())
-	return common.Round(normalizedPct, common.DefaultDecimalPlacesCount),
-		common.Round(pct, common.DefaultDecimalPlacesCount),
-		common.Round(float64(s1.CPU.Total.Ticks.ValueOr(0)), common.DefaultDecimalPlacesCount)
+
+	s1.CPU.Total.Norm.Pct = opt.FloatWith(common.Round(normalizedPct, common.DefaultDecimalPlacesCount))
+	s1.CPU.Total.Pct = opt.FloatWith(common.Round(pct, common.DefaultDecimalPlacesCount))
+	s1.CPU.Total.Value = opt.FloatWith(common.Round(float64(s1.CPU.Total.Ticks.ValueOr(0)), common.DefaultDecimalPlacesCount))
+
+	return s1
 
 }

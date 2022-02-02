@@ -96,17 +96,17 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 
 	switch info.pbsd.pbi_status {
 	case C.SIDL:
-		status.State = "idle"
+		status.State = Idle
 	case C.SRUN:
-		status.State = "running"
+		status.State = Running
 	case C.SSLEEP:
-		status.State = "sleeping"
+		status.State = Sleeping
 	case C.SSTOP:
-		status.State = "stopped"
+		status.State = Stopped
 	case C.SZOMB:
-		status.State = "zombie"
+		status.State = Zombie
 	default:
-		status.State = "unknown"
+		status.State = Unknown
 	}
 
 	status.Ppid = opt.IntWith(int(info.pbsd.pbi_ppid))
@@ -233,7 +233,7 @@ func taskInfo(pid int, info *C.struct_proc_taskallinfo) error {
 
 	n := C.proc_pidinfo(C.int(pid), C.PROC_PIDTASKALLINFO, 0, ptr, size)
 	if n != size {
-		return fmt.Errorf("Could not read process info for pid %d", pid)
+		return fmt.Errorf("could not read process info for pid %d", pid)
 	}
 
 	return nil
