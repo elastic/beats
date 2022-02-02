@@ -58,9 +58,6 @@ func CustomizePackaging() {
 			case devtools.Deb, devtools.RPM:
 				args.Spec.Files["/usr/share/{{.BeatName}}/"+moduleTarget] = module
 				args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
-			case devtools.DMG:
-				args.Spec.Files["/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/"+moduleTarget] = module
-				args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
 			default:
 				panic(errors.Errorf("unhandled package type: %v", pkgType))
 			}
