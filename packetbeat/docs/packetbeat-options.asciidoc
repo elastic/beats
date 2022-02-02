@@ -1235,8 +1235,7 @@ Packetbeat intercepts the initial handshake in a TLS connection and extracts
 useful information that helps operators diagnose problems and
 strengthen the security of their network and systems. It does not
 decrypt any information from the encapsulated protocol, nor does it reveal any
-sensitive information such as cryptographic keys. TLS versions 1.0 to 1.3 and
-SSL 3.0 are supported.
+sensitive information such as cryptographic keys. TLS versions 1.0 to 1.3 are supported.
 
 It works by intercepting the client and server "hello" messages, which contain
 the negotiated parameters for the connection such as cryptographic ciphers and

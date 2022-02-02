@@ -39,3 +39,17 @@ If you are sure you found a bug or have a feature request, open an issue on
 
 We love contributions from our community! Please read the
 [CONTRIBUTING.md](../CONTRIBUTING.md) file.
+
+## LICENSE NOTICE for Windows users of Packetbeat
+
+The default distribution of Packetbeat for Windows comes bundled with the Npcap
+library. This is not available in the OSS-only distribution of Packetbeat.
+
+**Restrictions on Distribution**
+
+Insecure.Com LLC (“The Nmap Project”) has granted Elasticsearch BV and its
+affiliates the right to include Npcap with this distribution of Packetbeat.
+You may not distribute this version of Packetbeat or any other package from
+Elastic that includes Npcap. If you wish to distribute Npcap, or any package
+that includes Npcap, you should reach out to The Nmap Project to obtain a
+distribution license. See https://nmap.org/npcap/ for more details.

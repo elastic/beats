@@ -5,7 +5,6 @@ import unittest
 import glob
 import subprocess
 
-from elasticsearch import Elasticsearch
 import json
 import logging
 from parameterized import parameterized
@@ -108,7 +107,7 @@ def load_fileset_test_cases():
                 continue
 
             test_files = glob.glob(os.path.join(modules_dir, module,
-                                                fileset, "test", "*.log"))
+                                                fileset, "test", os.getenv("TESTING_FILEBEAT_FILEPATTERN", "*.log")))
             for test_file in test_files:
                 test_cases.append([module, fileset, test_file])
 
@@ -118,9 +117,7 @@ def load_fileset_test_cases():
 class Test(BaseTest):
 
     def init(self):
-        self.elasticsearch_url = self.get_elasticsearch_url()
-        print("Using elasticsearch: {}".format(self.elasticsearch_url))
-        self.es = Elasticsearch([self.elasticsearch_url])
+        self.es = self.get_elasticsearch_instance(user='admin')
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
@@ -146,7 +143,7 @@ class Test(BaseTest):
             template_name="filebeat_modules",
             output=cfgfile,
             index_name=self.index_name,
-            elasticsearch_url=self.elasticsearch_url,
+            elasticsearch=self.get_elasticsearch_template_config(user='admin')
         )
 
         self.run_on_file(
@@ -181,6 +178,9 @@ class Test(BaseTest):
                 module=module, fileset=fileset, test_file=test_file),
             "-M", "*.*.input.close_eof=true",
         ]
+        # allow connecting older versions of Elasticsearch
+        if os.getenv("TESTING_FILEBEAT_ALLOW_OLDER"):
+            cmd.extend(["-E", "output.elasticsearch.allow_older_versions=true"])
 
         # Based on the convention that if a name contains -json the json format is needed. Currently used for LS.
         if "-json" in test_file:
@@ -216,7 +216,8 @@ class Test(BaseTest):
             error_line)
 
         # Make sure index exists
-        self.wait_until(lambda: self.es.indices.exists(self.index_name))
+        self.wait_until(lambda: self.es.indices.exists(self.index_name),
+                        name="indices present for {}".format(test_file))
 
         self.es.indices.refresh(index=self.index_name)
         # Loads the first 100 events to be checked
