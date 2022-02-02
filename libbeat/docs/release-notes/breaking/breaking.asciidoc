@@ -14,4 +14,3 @@ See the following topics for a description of breaking changes:
 * <<breaking-changes-8.0>>
 
 include::breaking-8.0.asciidoc[]
-
