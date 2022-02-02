@@ -39,10 +39,7 @@
                 regex: '6\.[89]'
                 case-sensitive: true
             - regex-name:
-                regex: '7\.[x789]'
-                case-sensitive: true
-            - regex-name:
-                regex: '7\.1\d'
+                regex: '7\.1[6789]'
                 case-sensitive: true
             - regex-name:
                 regex: '8\.\d+'

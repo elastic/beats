@@ -37,12 +37,35 @@ output:
     {% endfor -%}
   {%- endif %}
 
-  {% if elasticsearch -%}
+{% if elasticsearch -%}
+output:
   elasticsearch:
-    {% for k, v in elasticsearch.items() -%}
-    {{ k }}: {{ v }}
-    {% endfor -%}
+    hosts: ["{{ elasticsearch.host }}"]
+    username: {{ elasticsearch.user }}
+    password: {{ elasticsearch.pass }}
+  {% if elasticsearch.pipeline %}
+    pipeline: {{elasticsearch.pipeline}}
+  {% endif %}
+  {% if elasticsearch.index %}
+    index: {{elasticsearch.index}}
+  {% endif %}
+  {% if elasticsearch.ilm %}
+    ilm.enabled: {{elasticsearch.ilm}}
+  {% endif %}
+  {% if elasticsearch.timeout %}
+    timeout: {{elasticsearch.timeout}}
+  {% endif %}
+  {% if elasticsearch.ssl_certificate_authorities %}
+    ssl.certificate_authorities: {{elasticsearch.ssl_certificate_authorities}}
+  {% endif %}
+  {% if elasticsearch.ssl_ca_sha256 %}
+    ssl.ca_sha256: {{ elasticsearch.ssl_ca_sha256 }}
+  {% endif %}
+
+    # older versions have to be allowed because mockbeat is on v9.9.9
+    allow_older_versions: true
   {%- endif %}
+
 
   # Redis as output
   # Options:

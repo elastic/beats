@@ -48,6 +48,7 @@ stages:
       mage: >-                 ## Run module integration tests under previous minor of ES to ensure ingest pipeline compatibility.
         STACK_ENVIRONMENT=prev-minor
         TESTING_FILEBEAT_SKIP_DIFF=1
+        TESTING_FILEBEAT_ALLOW_OLDER=1
         PYTEST_ADDOPTS='-k test_xpack_modules'
         mage pythonIntegTest
       withModule: true

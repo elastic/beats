@@ -18,7 +18,7 @@
         discover-pr-forks-trust: 'permission'
         discover-pr-origin: 'merge-current'
         discover-tags: true
-        head-filter-regex: '(main|7\.[x789]|7\.1\d|8\.\d+|PR-.*|v\d+\.\d+\.\d+)'
+        head-filter-regex: '(main|7\.1[6789]|8\.\d+|PR-.*|v\d+\.\d+\.\d+)'
         disable-pr-notifications: true
         notification-context: 'apm-beats-update'
         repo: 'beats'
@@ -36,10 +36,7 @@
                 name: 'main'
                 case-sensitive: true
             - regex-name:
-                regex: '7\.[x789]'
-                case-sensitive: true
-            - regex-name:
-                regex: '7\.1\d'
+                regex: '7\.1[6789]'
                 case-sensitive: true
             - regex-name:
                 regex: '8\.\d+'

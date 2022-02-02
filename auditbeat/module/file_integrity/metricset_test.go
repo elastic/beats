@@ -988,7 +988,7 @@ func getConfig(path ...string) map[string]interface{} {
 }
 
 func skipOnCIForDarwinAMD64(t testing.TB) {
-	if os.Getenv("BUILD_ID") != "" && runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
+	if os.Getenv("CI") == "true" && runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
 		t.Skip("Skip test on CI for darwin/amd64")
 	}
 }

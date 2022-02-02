@@ -385,8 +385,5 @@ func (p *pipeline) toFieldsYml(noDoc bool) ([]byte, error) {
 	}
 
 	f := generateFields(fs, noDoc)
-	var d []byte
-	d, err = yaml.Marshal(&f)
-
-	return d, nil
+	return yaml.Marshal(&f)
 }
