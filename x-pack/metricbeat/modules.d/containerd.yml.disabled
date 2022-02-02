@@ -1,5 +1,5 @@
 # Module: containerd
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.1/metricbeat-module-containerd.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-containerd.html
 
 - module: containerd
   metricsets: ["cpu", "memory", "blkio"]

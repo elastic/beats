@@ -1,5 +1,5 @@
 # Module: traefik
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.1/metricbeat-module-traefik.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-traefik.html
 
 - module: traefik
   metricsets: ["health"]

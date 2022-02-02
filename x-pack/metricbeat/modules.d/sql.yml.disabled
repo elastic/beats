@@ -1,5 +1,5 @@
 # Module: sql
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.1/metricbeat-module-sql.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-sql.html
 
 - module: sql
   metricsets:

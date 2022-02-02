@@ -1,5 +1,5 @@
 # Module: barracuda
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.1/filebeat-module-barracuda.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-barracuda.html
 
 - module: barracuda
   waf:

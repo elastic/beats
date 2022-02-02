@@ -1,5 +1,5 @@
 # Module: misp
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.1/filebeat-module-misp.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-misp.html
 
 # Deprecated in 7.14.0: Recommended to migrate to the Threat Intel module.
 

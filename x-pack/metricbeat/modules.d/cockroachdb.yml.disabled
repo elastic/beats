@@ -1,5 +1,5 @@
 # Module: cockroachdb
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.1/metricbeat-module-cockroachdb.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-cockroachdb.html
 
 - module: cockroachdb
   metricsets: ['status']

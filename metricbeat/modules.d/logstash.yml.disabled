@@ -1,5 +1,5 @@
 # Module: logstash
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.1/metricbeat-module-logstash.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-logstash.html
 
 - module: logstash
   #metricsets:
