@@ -42,6 +42,7 @@ class Test(metricbeat.BaseTest):
         self.assertCountEqual(self.de_dot(
             ["name", "out", "in"]), network.keys())
 
+    @unittest.skipUnless(re.match("(?i)|linux|darwin|freebsd", sys.platform), "os")
     def test_dropfields_with_condition(self):
         """
         Check drop_fields action works when a condition is associated.
@@ -76,6 +77,7 @@ class Test(metricbeat.BaseTest):
         else:
             assert "system.process.memory.size" in output
 
+    @unittest.skipUnless(re.match("(?i)|linux|darwin|freebsd", sys.platform), "os")
     def test_dropevent_with_condition(self):
         """
         Check drop_event action works when a condition is associated.
@@ -134,6 +136,7 @@ class Test(metricbeat.BaseTest):
         )
         assert len(output) >= 1
 
+    @unittest.skipUnless(re.match("(?i)|linux|darwin|freebsd", sys.platform), "os")
     def test_include_fields(self):
         """
         Check include_fields filtering action
@@ -177,6 +180,7 @@ class Test(metricbeat.BaseTest):
         ]:
             assert key not in output
 
+    @unittest.skipUnless(re.match("(?i)|linux|darwin|freebsd", sys.platform), "os")
     def test_multiple_actions(self):
         """
         Check the result when configuring two actions: include_fields
