@@ -91,7 +91,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix a logging bug when `ssl.verification_mode` was set to `full` or `certificate`, the command `test output` incorrectly logged that TLS was disabled.
 - Fix field names with `add_network_direction` processor. {issue}29747[29747] {pull}29751[29751]
 
-
 *Auditbeat*
 
 - libbeat/processors/add_process_metadata: Fix memory leak in process cache. {issue}24890[24890] {pull}29717[29717]
