@@ -202,7 +202,9 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 
 	var flags win.EvtSubscribeFlag
 	if bookmark > 0 {
-		flags = win.EvtSubscribeStartAfterBookmark
+		// Use EvtSubscribeStrict to detect when the bookmark is missing and be able to
+		// subscribe again from the beginning.
+		flags = win.EvtSubscribeStartAfterBookmark | win.EvtSubscribeStrict
 	} else {
 		flags = win.EvtSubscribeStartAtOldestRecord
 	}
@@ -215,6 +217,12 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 		l.query,  // Query - nil means all events
 		bookmark, // Bookmark - for resuming from a specific event
 		flags)
+
+	if err == win.ERROR_NOT_FOUND {
+		// The bookmarked event was not found, we retry the subscription from the start.
+		subscriptionHandle, err = win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
+	}
+
 	if err != nil {
 		return err
 	}
