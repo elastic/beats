@@ -7,12 +7,14 @@ package httpjson
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
-	"regexp"
+	"strings"
 
+	"github.com/PaesslerAG/jsonpath"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -89,7 +91,7 @@ type requestFactory struct {
 	password   string
 	log        *logp.Logger
 	encoder    encoderFunc
-	replace    *regexp.Regexp
+	replace    string
 	split      *split
 }
 
@@ -112,7 +114,6 @@ func newRequestFactory(config config, log *logp.Logger) []*requestFactory {
 	}
 	rfs = append(rfs, rf)
 	for _, ch := range config.Chain {
-		reg, _ := regexp.Compile(ch.Step.Replace)
 		// chain calls requestFactory object
 		split, _ := newSplitResponse(ch.Step.Response.Split, log)
 		rf := &requestFactory{
@@ -122,7 +123,7 @@ func newRequestFactory(config config, log *logp.Logger) []*requestFactory {
 			transforms: ts,
 			log:        log,
 			encoder:    registeredEncoders[config.Request.EncodeAs],
-			replace:    reg,
+			replace:    ch.Step.Replace,
 			split:      split,
 		}
 		rfs = append(rfs, rf)
@@ -186,7 +187,7 @@ func newRequester(
 }
 
 // collectResponse returns response from provided request
-func (rf *requestFactory) collectResponse(stdCtx context.Context, trCtx *transformContext, r *requester, publisher inputcursor.Publisher) (*http.Response, error) {
+func (rf *requestFactory) collectResponse(stdCtx context.Context, trCtx *transformContext, r *requester) (*http.Response, error) {
 	req, err := rf.newHTTPRequest(stdCtx, trCtx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create http request: %w", err)
@@ -199,8 +200,8 @@ func (rf *requestFactory) collectResponse(stdCtx context.Context, trCtx *transfo
 }
 
 // generateNewUrl returns new url value using replacement from oldUrl with ids
-func generateNewUrl(replacement *regexp.Regexp, oldUrl, ids string) (url.URL, error) {
-	newUrl, err := url.Parse(replacement.ReplaceAllString(oldUrl, ids))
+func generateNewUrl(replacement, oldUrl, id string) (url.URL, error) {
+	newUrl, err := url.Parse(strings.Replace(oldUrl, replacement, id, 1))
 	if err != nil {
 		return url.URL{}, fmt.Errorf("failed to replace value in url: %w", err)
 	}
@@ -224,7 +225,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		// iterate over collected ids from last response
 		if i == 0 {
 			// perform and store regular call responses
-			httpResp, err = rf.collectResponse(stdCtx, trCtx, r, publisher)
+			httpResp, err = rf.collectResponse(stdCtx, trCtx, r)
 			if err != nil {
 				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
@@ -261,7 +262,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				}
 
 				// collect data from new urls
-				httpResp, err = rf.collectResponse(stdCtx, trCtx, r, publisher)
+				httpResp, err = rf.collectResponse(stdCtx, trCtx, r)
 				if err != nil {
 					return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 				}
@@ -302,25 +303,36 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 }
 
 // getIdsFromResponses returns ids from responses
-func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, replace *regexp.Regexp) ([]string, error) {
+func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, replace string) ([]string, error) {
 	var b []byte
 	var ids []string
 	var err error
 	// collect ids from all responses
 	for _, resp := range intermediateResps {
-		resp := resp
 		if resp.Body != nil {
 			b, err = io.ReadAll(resp.Body)
-			resp.Body.Close()
 			if err != nil {
 				return nil, fmt.Errorf("error while reading response body: %w", err)
 			}
 		}
 
 		// get replace values from collected json
-		ids, err = getKeyedArrayValue(b, replace.String())
+		var v interface{}
+		json.Unmarshal(b, &v)
+		values, err := jsonpath.Get(replace, v)
 		if err != nil {
 			return nil, fmt.Errorf("error while getting keys: %w", err)
+		}
+
+		switch tresp := values.(type) {
+		case []interface{}:
+			for _, value := range tresp {
+				ids = append(ids, fmt.Sprintf("%v", value))
+			}
+		case map[string]interface{}:
+			ids = append(ids, fmt.Sprintf("%v", tresp))
+		default:
+			r.log.Debugf("not able to collect ")
 		}
 	}
 	return ids, nil
