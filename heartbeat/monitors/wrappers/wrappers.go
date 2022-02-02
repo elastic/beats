@@ -50,8 +50,10 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []j
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
+			addMonitorTimespan(stdMonFields),
+			addServiceName(stdMonFields),
 			addMonitorMeta(stdMonFields, len(js) > 1),
-			addMonitorStatus(stdMonFields.Type, false),
+			addMonitorStatus(false),
 			addMonitorDuration,
 		),
 		func() jobs.JobWrapper {
@@ -65,64 +67,75 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []j
 func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
 	return jobs.WrapAll(
 		js,
-		addMonitorMeta(stdMonFields, len(js) > 1),
-		addMonitorStatus(stdMonFields.Type, true),
+		addMonitorTimespan(stdMonFields),
+		addServiceName(stdMonFields),
+		addMonitorStatus(true),
 	)
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
-func addMonitorMeta(stdMonFields stdfields.StdMonitorFields, isMulti bool) jobs.JobWrapper {
+func addMonitorMeta(sf stdfields.StdMonitorFields, isMulti bool) jobs.JobWrapper {
 	return func(job jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
-			cont, e := job(event)
-			addMonitorMetaFields(event, time.Now(), stdMonFields, isMulti)
-			return cont, e
+			cont, err := job(event)
+
+			id := sf.ID
+			name := sf.Name
+			// If multiple jobs are listed for this monitor, we can't have a single ID, so we hash the
+			// unique URLs to create unique suffixes for the monitor.
+			if isMulti {
+				url, err := event.GetValue("url.full")
+				if err != nil {
+					logp.Error(errors.Wrap(err, "Mandatory url.full key missing!"))
+					url = "n/a"
+				}
+				urlHash, _ := hashstructure.Hash(url, nil)
+				id = fmt.Sprintf("%s-%x", sf.ID, urlHash)
+			}
+
+			eventext.MergeEventFields(event, common.MapStr{
+				"monitor": common.MapStr{
+					"id":   id,
+					"name": name,
+					"type": sf.Type,
+				},
+			})
+			return cont, err
 		}
 	}
 }
 
-func addMonitorMetaFields(event *beat.Event, started time.Time, sf stdfields.StdMonitorFields, isMulti bool) {
-	id := sf.ID
-	name := sf.Name
+func addMonitorTimespan(sf stdfields.StdMonitorFields) jobs.JobWrapper {
+	return func(origJob jobs.Job) jobs.Job {
+		return func(event *beat.Event) ([]jobs.Job, error) {
+			cont, err := origJob(event)
 
-	// If multiple jobs are listed for this monitor, we can't have a single ID, so we hash the
-	// unique URLs to create unique suffixes for the monitor.
-	if isMulti {
-		url, err := event.GetValue("url.full")
-		if err != nil {
-			logp.Error(errors.Wrap(err, "Mandatory url.full key missing!"))
-			url = "n/a"
-		}
-		urlHash, _ := hashstructure.Hash(url, nil)
-		id = fmt.Sprintf("%s-%x", sf.ID, urlHash)
-	}
-
-	// Allow jobs to override the ID, useful for browser suites
-	// which do this logic on their own
-	if v, _ := event.GetValue("monitor.id"); v != nil {
-		id = fmt.Sprintf("%s-%s", sf.ID, v.(string))
-	}
-	if v, _ := event.GetValue("monitor.name"); v != nil {
-		name = fmt.Sprintf("%s - %s", sf.Name, v.(string))
-	}
-
-	fieldsToMerge := common.MapStr{
-		"monitor": common.MapStr{
-			"id":       id,
-			"name":     name,
-			"type":     sf.Type,
-			"timespan": timespan(started, sf.Schedule, sf.Timeout),
-		},
-	}
-
-	// Add service.name for APM interop
-	if sf.Service.Name != "" {
-		fieldsToMerge["service"] = common.MapStr{
-			"name": sf.Service.Name,
+			eventext.MergeEventFields(event, common.MapStr{
+				"monitor": common.MapStr{
+					"timespan": timespan(time.Now(), sf.Schedule, sf.Timeout),
+				},
+			})
+			return cont, err
 		}
 	}
+}
 
-	eventext.MergeEventFields(event, fieldsToMerge)
+// Add service.name to monitors for APM interop
+func addServiceName(sf stdfields.StdMonitorFields) jobs.JobWrapper {
+	return func(origJob jobs.Job) jobs.Job {
+		return func(event *beat.Event) ([]jobs.Job, error) {
+			cont, err := origJob(event)
+
+			if sf.Service.Name != "" {
+				eventext.MergeEventFields(event, common.MapStr{
+					"service": common.MapStr{
+						"name": sf.Service.Name,
+					},
+				})
+			}
+			return cont, err
+		}
+	}
 }
 
 func timespan(started time.Time, sched *schedule.Schedule, timeout time.Duration) common.MapStr {
@@ -142,7 +155,7 @@ func timespan(started time.Time, sched *schedule.Schedule, timeout time.Duration
 // by the original Job will be set as a field. The original error will not be
 // passed through as a return value. Errors may still be present but only if there
 // is an actual error wrapping the error.
-func addMonitorStatus(monitorType string, summaryOnly bool) jobs.JobWrapper {
+func addMonitorStatus(summaryOnly bool) jobs.JobWrapper {
 	return func(origJob jobs.Job) jobs.Job {
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, err := origJob(event)

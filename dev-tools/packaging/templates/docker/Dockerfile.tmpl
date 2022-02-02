@@ -59,7 +59,9 @@ RUN apt-get update -y && \
         libcairo2\
         libasound2\
         libatspi2.0-0\
-        libxshmfence1 && \
+        libxshmfence1 \
+        fonts-noto \
+        fonts-noto-cjk && \
         apt-get clean all && \
         exit_code=0 && break || exit_code=$? && echo "apt-get error: retry $iter in 10s" && sleep 10; \
     done; \

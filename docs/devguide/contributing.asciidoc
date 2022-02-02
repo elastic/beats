@@ -83,7 +83,7 @@ and documentation. The primary command used for this is:
 --------------------------------------------------------------------------------
 make update
 --------------------------------------------------------------------------------
-Each Beat has its own `update` target, as well as a master `update` in the repository root. 
+Each Beat has its own `update` target, as well as a master `update` in the repository root.
 If a PR adds or removes a dependency, run `make update` in the root `beats` directory.
 
 Another command properly formats go source files and adds a copyright header:
