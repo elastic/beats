@@ -73,19 +73,19 @@ func NewReplaceString(c *common.Config) (processors.Processor, error) {
 }
 
 func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
-	var backup common.MapStr
+	var backup *beat.Event
 	// Creates a copy of the event to revert in case of failure
 	if f.config.FailOnError {
-		backup = event.Fields.Clone()
+		backup = event.Clone()
 	}
 
 	for _, field := range f.config.Fields {
-		err := f.replaceField(field.Field, field.Pattern, field.Replacement, event.Fields)
+		err := f.replaceField(field.Field, field.Pattern, field.Replacement, event)
 		if err != nil {
 			errMsg := fmt.Errorf("Failed to replace fields in processor: %s", err)
 			logp.Debug("replace", errMsg.Error())
 			if f.config.FailOnError {
-				event.Fields = backup
+				event = backup
 				event.PutValue("error.message", errMsg.Error())
 				return event, err
 			}
@@ -95,8 +95,8 @@ func (f *replaceString) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (f *replaceString) replaceField(field string, pattern *regexp.Regexp, replacement string, fields common.MapStr) error {
-	currentValue, err := fields.GetValue(field)
+func (f *replaceString) replaceField(field string, pattern *regexp.Regexp, replacement string, event *beat.Event) error {
+	currentValue, err := event.GetValue(field)
 	if err != nil {
 		// Ignore ErrKeyNotFound errors
 		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
@@ -106,7 +106,7 @@ func (f *replaceString) replaceField(field string, pattern *regexp.Regexp, repla
 	}
 
 	updatedString := pattern.ReplaceAllString(currentValue.(string), replacement)
-	_, err = fields.Put(field, updatedString)
+	_, err = event.PutValue(field, updatedString)
 	if err != nil {
 		return fmt.Errorf("could not put value: %s: %v, %v", replacement, currentValue, err)
 	}

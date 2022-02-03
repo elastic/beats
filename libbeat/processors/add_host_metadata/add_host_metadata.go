@@ -80,6 +80,8 @@ func New(cfg *common.Config) (processors.Processor, error) {
 }
 
 // Run enriches the given event with the host meta data
+// This processor does not access or modify `Meta` of the event and
+// sets only pre-defined field names
 func (p *addHostMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	// check replace_host_fields field
 	if !p.config.ReplaceFields && skipAddingHostMetadata(event) {

@@ -358,7 +358,7 @@ func TestRenameField(t *testing.T) {
 				},
 			}
 
-			err := f.renameField(test.From, test.To, test.Input)
+			err := f.renameField(test.From, test.To, &beat.Event{Fields: test.Input})
 			if err != nil {
 				assert.Equal(t, test.error, true)
 			}

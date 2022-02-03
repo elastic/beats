@@ -73,9 +73,9 @@ func NewMatchers(configs PluginConfig) *Matchers {
 }
 
 // MetadataIndex returns the index string for the first matcher from the Registry returning one
-func (m *Matchers) MetadataIndex(event common.MapStr) string {
+func (m *Matchers) MetadataIndex(eventFields common.MapStr) string {
 	for _, matcher := range m.matchers {
-		index := matcher.MetadataIndex(event)
+		index := matcher.MetadataIndex(eventFields)
 		if index != "" {
 			return index
 		}

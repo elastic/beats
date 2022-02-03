@@ -237,7 +237,7 @@ func TestReplaceField(t *testing.T) {
 				},
 			}
 
-			err := f.replaceField(test.Field, test.Pattern, test.Replacement, test.Input)
+			err := f.replaceField(test.Field, test.Pattern, test.Replacement, &beat.Event{Fields: test.Input})
 			if err != nil {
 				assert.Equal(t, test.error, true)
 			}

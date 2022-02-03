@@ -90,8 +90,8 @@ func isKubernetesAvailableWithRetry(client k8sclient.Interface) bool {
 }
 
 // kubernetesMetadataExist checks whether an event is already enriched with kubernetes metadata
-func kubernetesMetadataExist(event *beat.Event) bool {
-	if _, err := event.GetValue("kubernetes"); err != nil {
+func kubernetesMetadataExist(eventFields common.MapStr) bool {
+	if _, err := eventFields.GetValue("kubernetes"); err != nil {
 		return false
 	}
 	return true
@@ -254,11 +254,14 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 	})
 }
 
+// Run runs the processor that adds a field `kubernetes` to the event fields that
+// contains a map with various Kubernetes metadata.
+// This processor does not access or modify the `Meta` of the event.
 func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	if !k.kubernetesAvailable {
 		return event, nil
 	}
-	if kubernetesMetadataExist(event) {
+	if kubernetesMetadataExist(event.Fields) {
 		k.log.Debug("Skipping add_kubernetes_metadata processor as kubernetes metadata already exist")
 		return event, nil
 	}
