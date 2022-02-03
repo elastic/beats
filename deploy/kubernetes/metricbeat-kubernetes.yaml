@@ -41,6 +41,10 @@ data:
                     - state_resourcequota
                     - state_statefulset
                     - state_service
+                  # If `https` is used to access `kube-state-metrics`, uncomment following settings:
+                  # bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+                  # ssl.certificate_authorities:
+                  #   - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
                 - module: kubernetes
                   metricsets:
                     - apiserver
@@ -177,8 +181,6 @@ spec:
               fieldPath: spec.nodeName
         securityContext:
           runAsUser: 0
-          # If using Red Hat OpenShift uncomment this:
-          #privileged: true
         resources:
           limits:
             memory: 200Mi

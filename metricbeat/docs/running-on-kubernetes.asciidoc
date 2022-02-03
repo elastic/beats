@@ -136,6 +136,15 @@ Data
 ca-bundle.crt:
 -----
 
+. If `https` is used to access `kube-state-metrics`, add the following settings to the `metricbeat-daemonset-config` ConfigMap under the kubernetes autodiscover configuration for the `state_*` metricsets:
++
+[source,yaml]
+-----
+  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  ssl.certificate_authorities:
+    - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+-----
+
 . Grant the `metricbeat` service account access to the privileged SCC:
 +
 [source,shell]
