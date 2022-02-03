@@ -1,0 +1,7 @@
+variants:
+  - ZOOKEEPER_VARIANT: zookeeper
+    ZOOKEEPER_VERSION: 3.5.5
+  - ZOOKEEPER_VARIANT: zookeeper
+    ZOOKEEPER_VERSION: 3.6.3
+  - ZOOKEEPER_VARIANT: zookeeper
+    ZOOKEEPER_VERSION: 3.7.0

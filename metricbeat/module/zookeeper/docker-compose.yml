@@ -9,3 +9,5 @@ services:
         ZOOKEEPER_VERSION: ${ZOOKEEPER_VERSION:-3.5.5}
     ports:
       - 2181
+    environment:
+      - ZOO_4LW_COMMANDS_WHITELIST="stat, ruok, conf, isro, cons, mntr"
