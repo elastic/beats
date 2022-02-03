@@ -57,7 +57,7 @@ def main():
                         help="Assume yes. Warning: discards local changes.")
     parser.add_argument("--continue", action="store_true",
                         help="Continue after fixing merging errors.")
-    parser.add_argument("--from_branch", default="main",
+    parser.add_argument("--from_branch", default="master",
                         help="From branch")
     parser.add_argument("--create_pr", action="store_true",
                         help="Create a PR using the Github API " +

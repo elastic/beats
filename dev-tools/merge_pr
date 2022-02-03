@@ -10,7 +10,7 @@ def main():
     parser.add_argument("from_branch",
                         help="From branch (e.g 1.1)")
     parser.add_argument("to_branch",
-                        help="To branch (e.g main)")
+                        help="To branch (e.g master)")
     parser.add_argument("--yes", action="store_true",
                         help="Assume yes. Warning: discards local changes.")
     parser.add_argument("--continue", action="store_true",

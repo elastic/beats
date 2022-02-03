@@ -3,16 +3,16 @@ queue_rules:
     conditions:
       - check-success=beats-ci/pr-merge
 pull_request_rules:
-  - name: forward-port patches to main branch
+  - name: forward-port patches to master branch
     conditions:
       - merged
-      - label=forwardport-main
+      - label=forwardport-master
     actions:
       backport:
         assignees:
           - "{{ author }}"
         branches:
-          - "main"
+          - "master"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
@@ -135,7 +135,7 @@ pull_request_rules:
   - name: notify the backport policy
     conditions:
       - -label~=^backport
-      - base=main
+      - base=master
       - -merged
       - -closed
     actions:

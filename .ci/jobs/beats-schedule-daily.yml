@@ -8,7 +8,7 @@
     parameters:
       - string:
           name: branch_specifier
-          default: main
+          default: master
           description: the Git branch specifier to build
     pipeline-scm:
       script-path: .ci/schedule-daily.groovy

@@ -8,7 +8,7 @@
     parameters:
       - string:
           name: BRANCH_REFERENCE
-          default: main
+          default: master
           description: the Git branch specifier
     pipeline-scm:
       script-path: .ci/build-docker-images.groovy

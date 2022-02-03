@@ -81,7 +81,7 @@ pipeline {
           when {
             beforeAgent true
             anyOf {
-              branch 'main'
+              branch 'master'
               branch "\\d+\\.\\d+"
               branch "v\\d?"
               tag "v\\d+\\.\\d+\\.\\d+*"

@@ -20,7 +20,7 @@ pipeline {
   stages {
     stage('Weekly beats builds') {
       steps {
-        runBuilds(quietPeriodFactor: 1000, branches: ['main', '8.<minor>', '7.<minor>', '7.<next-minor>'])
+        runBuilds(quietPeriodFactor: 1000, branches: ['master', '8.<minor>', '7.<minor>', '7.<next-minor>'])
       }
     }
   }
