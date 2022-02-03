@@ -10,6 +10,7 @@ import urllib.parse
 import urllib.request
 
 
+@metricbeat.parameterized_with_supported_versions
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['logstash']
