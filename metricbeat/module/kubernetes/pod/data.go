@@ -147,3 +147,22 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 	}
 	return events, nil
 }
+
+// ecsfields maps pod events fields to container ecs fields
+func ecsfields(podEvent common.MapStr) common.MapStr {
+	ecsfields := common.MapStr{}
+
+	egressBytes, err := podEvent.GetValue("network.tx.bytes")
+	if err == nil {
+		ecsfields.Put("network.egress.bytes", egressBytes)
+
+	}
+
+	ingressBytes, err := podEvent.GetValue("network.rx.bytes")
+	if err == nil {
+		ecsfields.Put("network.ingress.bytes", ingressBytes)
+
+	}
+
+	return ecsfields
+}

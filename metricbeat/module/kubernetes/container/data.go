@@ -145,3 +145,28 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 
 	return events, nil
 }
+
+// ecsfields maps container events fields to container ecs fields
+func ecsfields(containerEvent common.MapStr) common.MapStr {
+	ecsfields := common.MapStr{}
+
+	name, err := containerEvent.GetValue("name")
+	if err == nil {
+		ecsfields.Put("name", name)
+
+	}
+
+	cpuUsage, err := containerEvent.GetValue("cpu.usage.node.pct")
+	if err == nil {
+		ecsfields.Put("cpu.usage", cpuUsage)
+
+	}
+
+	memUsage, err := containerEvent.GetValue("memory.usage.node.pct")
+	if err == nil {
+		ecsfields.Put("memory.usage", memUsage)
+
+	}
+
+	return ecsfields
+}

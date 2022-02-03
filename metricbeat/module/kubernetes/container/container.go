@@ -20,6 +20,7 @@ package container
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -109,6 +110,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		e, err := util.CreateEvent(event, "kubernetes.container")
 		if err != nil {
 			m.Logger().Error(err)
+		}
+		// Enrich event with container ECS fields
+		containerEcsFields := ecsfields(event)
+		if len(containerEcsFields) != 0 {
+			e.RootFields = common.MapStr{
+				"container": containerEcsFields,
+			}
 		}
 
 		if reported := reporter.Event(e); !reported {
