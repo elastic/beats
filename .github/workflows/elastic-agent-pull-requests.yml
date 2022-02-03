@@ -12,10 +12,9 @@ jobs:
       - uses: octokit/graphql-action@v2.x
         id: add_to_project
         with:
-          headers: '{"GraphQL-Features": "projects_next_graphql"}'
           query: |
             mutation add_to_project($projectid:String!,$contentid:String!) {
-               updatePullRequest(input: {id:$contentid, projectIds:$projectid}) {
+               updatePullRequest(input: {pullRequestId:$contentid, projectIds:$projectid}) {
                 clientMutationId
               }
              }
@@ -32,10 +31,9 @@ jobs:
       - uses: octokit/graphql-action@v2.x
         id: add_to_project
         with:
-          headers: '{"GraphQL-Features": "projects_next_graphql"}'
           query: |
              mutation add_to_project($projectid:String!,$contentid:String!) {
-               updatePullRequest(input: {id:$contentid, projectIds:$projectid}) {
+               updatePullRequest(input: {pullRequestId:$contentid, projectIds:$projectid}) {
                 clientMutationId
               }
              }
