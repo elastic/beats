@@ -109,6 +109,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 - Extract correct index property in kibana.stats metricset {pull}29622[29622]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {pull}29711[29711]
+- Fixed GCP GKE Overview dashboard {pull}29913[29913]
+- Enhance metricbeat on openshift documentation {pull}30054[30054]
 
 *Packetbeat*
 
