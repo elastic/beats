@@ -114,6 +114,12 @@ func (s *states) IsListingFullyStored(listingID string) bool {
 	}
 
 	listingInfo.finalCheck = (listingInfo.storedObjects + listingInfo.errorObjects) == listingInfo.totObjects
+
+	if (listingInfo.storedObjects + listingInfo.errorObjects) > listingInfo.totObjects {
+		s.log.Warnf("unexepected mixmatch between storedObjects (%d), errorObjects (%d) and totObjects (%d)",
+			listingInfo.storedObjects, listingInfo.errorObjects, listingInfo.totObjects)
+	}
+
 	return listingInfo.finalCheck
 }
 
