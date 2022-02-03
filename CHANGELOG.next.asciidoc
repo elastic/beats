@@ -80,6 +80,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Improve ECS field mappings in Sysmon module. `rule.name` is populated for all events when present. {issue}18364[18364]
 - Remove top level `hash` property from sysmon events {pull}20653[20653]
 - Move module processing from local Javascript processor to ingest node {issue}29184[29184] {pull}29435[29435]
+- Fix run loop when reading from evtx file {pull}30006[30006]
 
 *Functionbeat*
 
