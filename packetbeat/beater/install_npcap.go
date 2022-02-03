@@ -32,17 +32,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/npcap"
 )
 
-type npcapConfig struct {
-	NeverInstall       bool          `config:"npcap.never_install"`
-	ForceReinstall     bool          `config:"npcap.force_reinstall"`
-	InstallTimeout     time.Duration `config:"npcap.install_timeout"`
-	InstallDestination string        `config:"npcal.install_destination"`
-}
-
-func (c *npcapConfig) Init() {
-	// Set defaults.
-	c.InstallTimeout = 120 * time.Second
-}
+const installTimeout = 120 * time.Second
 
 func installNpcap(b *beat.Beat) error {
 	if !b.Info.ElasticLicensed {
@@ -62,25 +52,12 @@ func installNpcap(b *beat.Beat) error {
 		}
 	}()
 
-	var cfg npcapConfig
-	err := b.BeatConfig.Unpack(&cfg)
-	if err != nil {
-		return fmt.Errorf("failed to unpack npcap config: %w", err)
-	}
-	if cfg.NeverInstall {
-		return nil
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), cfg.InstallTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), installTimeout)
 	defer cancel()
 
 	log := logp.NewLogger("npcap_install")
 
 	if npcap.Installer == nil {
-		return nil
-	}
-	if !cfg.ForceReinstall && !npcap.Upgradeable() {
-		npcap.Installer = nil
 		return nil
 	}
 	tmp, err := os.MkdirTemp("", "")
@@ -100,5 +77,5 @@ func installNpcap(b *beat.Beat) error {
 	if err != nil {
 		return fmt.Errorf("could not create installation temporary file: %w", err)
 	}
-	return npcap.Install(ctx, log, installerPath, cfg.InstallDestination, false)
+	return npcap.Install(ctx, log, installerPath, "", false)
 }

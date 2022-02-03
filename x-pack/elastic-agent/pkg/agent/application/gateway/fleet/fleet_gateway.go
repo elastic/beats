@@ -176,7 +176,7 @@ func (f *fleetGateway) worker() {
 			}
 
 			var errMsg string
-			if err := f.dispatcher.Dispatch(f.acker, actions...); err != nil {
+			if err := f.dispatcher.Dispatch(context.Background(), f.acker, actions...); err != nil {
 				errMsg = fmt.Sprintf("failed to dispatch actions, error: %s", err)
 				f.log.Error(errMsg)
 				f.statusReporter.Update(state.Failed, errMsg, nil)

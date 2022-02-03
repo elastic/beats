@@ -4,7 +4,7 @@
 :pull: https://github.com/elastic/beats/pull/
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD diff]
 
 ==== Breaking changes
 
@@ -25,14 +25,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove several ILM options (`rollover_alias` and `pattern`) as data streams does not require index aliases. {pull}28450[28450]
 - Index template's default_fields setting is only populated with ECS fields. {pull}28596[28596] {issue}28215[28215]
 - Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
-- Remove options `logging.files.suffix` and default to datetime endings. {pull}28927[28927]
+- Remove options `logging.files.suffix` and default to datetime endings in log file names. The format of the new name is `{beatname}-{date}(-n)?.ndjson`. Exmaple log files names from oldest to newest: `filebeat-20200101.ndjson`, `filebeat-20200101-1.ndjson`, `filebeat-20200101-2.ndjson`. {pull}28927[28927]
 - Remove Journalbeat. Use `journald` input of Filebeat instead. {pull}29131[29131]
 - `include_matches` option of `journald` input no longer accepts a list of string. {pull}29294[29294]
-- Add job.name in pods controlled by Jobs {pull}28954[28954]
-- Change Docker base image from CentOS 7 to Ubuntu 20.04 {pull}29681[29681]
-- Enrich kubernetes metadata with node annotations. {pull}29605[29605]
 - Allign kubernetes configuration settings. {pull}29908[29908]
+- The extension of the log files of Beats and Elastic Agent is changed to `.ndjson`. If you are collecting the logs, you must change the path configuration to `/path/to/logs/{beatname}*.ndjson` to avoid any issues. {pull}28927[28927]
 - Remove legacy support for SSLv3. {pull}30071[30071]
+- `add_fields` processor is now able to set metadata in events {pull}30092[30092]
 
 *Auditbeat*
 
@@ -49,10 +48,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated old awscloudwatch input name. {pull}29844[29844]
 
 *Heartbeat*
-- Fix broken macOS ICMP python e2e test. {pull}29900[29900]
-- Only add monitor.status to browser events when summary. {pull}29460[29460]
-- Also add summary to journeys for which the synthetics runner crashes. {pull}29606[29606]
-- Update size of ICMP packets to adhere to standard min size. {pull}29948[29948]
+
 - Add fonts to support more different types of characters for multiple languages. {pull}29606[29861]
 
 *Metricbeat*
@@ -66,9 +62,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated config option perfmon.counters from windows/perfmon metricset. {pull}28282[28282]
 - Remove deprecated fields in Redis module. {issue}11835[11835] {pull}28246[28246]
 - system/process metricset: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
-- Remove overriding of index pattern on the Kubernetes overview dashboard. {pull}29676[29676]
 
-*Packetbeat*
+ *Packetbeat*
 
 - Redis: fix incorrectly handle with two-words redis command. {issue}14872[14872] {pull}14873[14873]
 - `event.category` no longer contains the value `network_traffic` because this is not a valid ECS event category value. {pull}20556[20556]
@@ -85,6 +80,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve ECS field mappings in Sysmon module. `rule.name` is populated for all events when present. {issue}18364[18364]
 - Remove top level `hash` property from sysmon events {pull}20653[20653]
 - Move module processing from local Javascript processor to ingest node {issue}29184[29184] {pull}29435[29435]
+- Fix run loop when reading from evtx file {pull}30006[30006]
 
 *Functionbeat*
 
@@ -93,44 +89,25 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Fix field names with `add_network_direction` processor. {issue}29747[29747] {pull}29751[29751]
 
 *Auditbeat*
 
-- system/package: Fix parsing of Installed-Size field of DEB packages. {issue}16661[16661] {pull}17188[17188]
-- system module: Fix panic during initialisation when /proc/stat can't be read. {pull}17569[17569]
-- system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
-- system/socket: Fix bugs leading to wrong process being attributed to flows. {pull}29166[29166] {issue}17165[17165]
-- system/socket: Fix process name and arg truncation for long names, paths and args lists. {issue}24667[24667] {pull}29410[29410]
-- system/socket: Fix startup errors on newer 5.x kernels due to missing _do_fork function. {issue}29607[29607] {pull}29744[29744]
 - libbeat/processors/add_process_metadata: Fix memory leak in process cache. {issue}24890[24890] {pull}29717[29717]
 - auditd: Add error.message to events when processing fails. {pull}30009[30009]
 
 *Filebeat*
 
-- aws-s3: Stop trying to increase SQS message visibility after ReceiptHandleIsInvalid errors. {pull}29480[29480]
-- Fix handling of IPv6 addresses in netflow flow events. {issue}19210[19210] {pull}29383[29383]
-- Fix `sophos` KV splitting and syslog header handling {issue}24237[24237] {pull}29331[29331]
-- Undo deletion of endpoint config from cloudtrail fileset in {pull}29415[29415]. {pull}29450[29450]
-- Make Cisco ASA and FTD modules conform to the ECS definition for event.outcome and event.type. {issue}29581[29581] {pull}29698[29698]
-- ibmmq: Fixed `@timestamp` not being populated with correct values. {pull}29773[29773]
 - Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
-- aws-s3: Improve gzip detection to avoid false negatives. {issue}29968[29968]
-- decode_cef: Fix panic when recovering from invalid CEF extensions that contain escape characters. {issue}30010[30010]
 
 *Heartbeat*
 
-- Fix race condition in http monitors using `mode:all` that can cause crashes. {pull}29697[pull]
-- Fix broken ICMP availability check that prevented heartbeat from starting in rare cases. {pull}29413[pull]
+- Add fonts to support more different types of characters for multiple languages. {pull}29861[29861]
 
 *Metricbeat*
 
-- Use xpack.enabled on SM modules to write into .monitoring indices when using Metricbeat standalone {pull}28365[28365]
-- Fix in rename processor to ingest metrics for `write.iops` to proper field instead of `write_iops` in rds metricset. {pull}28960[28960]
-- Enhance filter check in kubernetes event metricset. {pull}29470[29470]
-- Fix gcp metrics metricset apply aligner to all metric_types {pull}29514[29513]
 - Extract correct index property in kibana.stats metricset {pull}29622[29622]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {pull}29711[29711]
-- Fixed GCP GKE Overview dashboard {pull}29913[29913]
 
 *Packetbeat*
 
@@ -159,11 +136,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Support self signed certificates on outputs {pull}29229[29229]
 - Update k8s library {pull}29394[29394]
 - Add FIPS configuration option for all AWS API calls. {pull}28899[28899]
-- Add `default_region` config to AWS common module. {pull}29415[29415]
 - Add support for latest k8s versions v1.23 and v1.22 {pull}29575[29575]
 - Add `script` processor to all beats {issue}29269[29269] {pull}29752[29752]
 - Only connect to Elasticsearch instances with the same version or newer. {pull}29683[29683]
 - Move umask from code to service files. {pull}29708[29708]
+- Add FIPS configuration option for all AWS API calls. {pull}[28899]
+- Warn users when connecting to older versions of Elasticsearch instances. {pull}29723[29723]
 
 *Auditbeat*
 
@@ -179,10 +157,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
 - Add support for filtering in journald input with `unit`, `kernel`, `identifiers` and `include_matches`. {pull}29294[29294]
 - Add new `userAgent` and `beatInfo` template functions for httpjson input {pull}29528[29528]
+- threatintel module: Add new Recorded Future integration. {pull}30030[30030]
 
 *Heartbeat*
 
-- More errors are now visible in ES with new logic failing monitors later to ease debugging. {pull}29413[pull]
 
 
 *Metricbeat*
@@ -198,17 +176,18 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `elasticsearch.cluster.id` field to Logstash module. {pull}29625[29625]
 - Add `xpack.enabled` support for Enterprise Search module. {pull}29871[29871]
 - Add gcp firestore metricset. {pull}29918[29918] 
+- Remove strict parsing on RabbitMQ module {pull}30090[30090]
 
 *Packetbeat*
 
 - Add automated OEM Npcap installation handling. {pull}29112[29112]
+- Add support for capturing TLS random number and OCSP status request details. {issue}29962[29962] {pull}30102[30102]
 
 *Functionbeat*
 
 
 *Winlogbeat*
 
-- Add support for custom XML queries {issue}1054[1054] {pull}29330[29330]
 - Add support for sysmon event ID 26; FileDeleteDetected. {issue}26280[26280] {pull}29957[29957]
 
 *Elastic Log Driver*

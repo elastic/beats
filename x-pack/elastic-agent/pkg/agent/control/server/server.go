@@ -16,6 +16,8 @@ import (
 	"sync"
 	"time"
 
+	"go.elastic.co/apm"
+	"go.elastic.co/apm/module/apmgrpc"
 	"google.golang.org/grpc"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
@@ -45,6 +47,7 @@ type Server struct {
 	monitoringCfg *monitoringCfg.MonitoringConfig
 	listener      net.Listener
 	server        *grpc.Server
+	tracer        *apm.Tracer
 	lock          sync.RWMutex
 }
 
@@ -59,11 +62,12 @@ type specInfo struct {
 }
 
 // New creates a new control protocol server.
-func New(log *logger.Logger, rex reexec.ExecManager, statusCtrl status.Controller, up *upgrade.Upgrader) *Server {
+func New(log *logger.Logger, rex reexec.ExecManager, statusCtrl status.Controller, up *upgrade.Upgrader, tracer *apm.Tracer) *Server {
 	return &Server{
 		logger:     log,
 		rex:        rex,
 		statusCtrl: statusCtrl,
+		tracer:     tracer,
 		up:         up,
 	}
 }
@@ -103,7 +107,12 @@ func (s *Server) Start() error {
 		return err
 	}
 	s.listener = lis
-	s.server = grpc.NewServer()
+	if s.tracer != nil {
+		apmInterceptor := apmgrpc.NewUnaryServerInterceptor(apmgrpc.WithRecovery(), apmgrpc.WithTracer(s.tracer))
+		s.server = grpc.NewServer(grpc.UnaryInterceptor(apmInterceptor))
+	} else {
+		s.server = grpc.NewServer()
+	}
 	proto.RegisterElasticAgentControlServer(s.server, s)
 
 	// start serving GRPC connections
