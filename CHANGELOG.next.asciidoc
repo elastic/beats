@@ -25,13 +25,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
-- Add support to Sysmon file delete events (event ID 23). {issue}18094[18094]
-- Improve ECS field mappings in Sysmon module. `related.hash`, `related.ip`, and `related.user` are now populated. {issue}18364[18364]
-- Improve ECS field mappings in Sysmon module. Hashes are now also populated to the corresponding `process.hash`, `process.pe.imphash`, `file.hash`, or `file.pe.imphash`. {issue}18364[18364]
-- Improve ECS field mappings in Sysmon module. `file.name`, `file.directory`, and `file.extension` are now populated. {issue}18364[18364]
-- Improve ECS field mappings in Sysmon module. `rule.name` is populated for all events when present. {issue}18364[18364]
-- Remove top level `hash` property from sysmon events {pull}20653[20653]
-- Move module processing from local Javascript processor to ingest node {issue}29184[29184] {pull}29435[29435]
 - Fix run loop when reading from evtx file {pull}30006[30006]
 
 *Functionbeat*
