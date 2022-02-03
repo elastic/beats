@@ -29,8 +29,10 @@ import (
 // EventLog. Each implementation is free to support additional configuration
 // options.
 type ConfigCommon struct {
-	API  string `config:"api"`  // Name of the API to use. Optional.
-	Name string `config:"name"` // Name of the event log or channel or file.
+	API      string `config:"api"`       // Name of the API to use. Optional.
+	Name     string `config:"name"`      // Name of the event log or channel or file.
+	ID       string `config:"id"`        // Identifier for the event log.
+	XMLQuery string `config:"xml_query"` // Custom query XML. Must not be used with the keys from eventlog.query.
 }
 
 type validator interface {

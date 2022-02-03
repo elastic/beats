@@ -12,8 +12,10 @@ filebeat.registry:
   {% endif %}
 {%endif%}
 
-output.elasticsearch.hosts: ["{{ elasticsearch_url }}"]
+output.elasticsearch.hosts: ["{{ elasticsearch.host }}"]
 output.elasticsearch.index: {{ index_name }}
+output.elasticsearch.username: {{ elasticsearch.user }}
+output.elasticsearch.password: {{ elasticsearch.pass }}
 
 setup.template.name: {{ index_name }}
 setup.template.pattern: {{ index_name }}*

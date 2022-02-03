@@ -21,6 +21,11 @@ type configFetcher interface {
 // - spec is configured to support restart on change
 // - output changes in between configs
 func IsRestartNeeded(log *logger.Logger, spec program.Spec, cfgFetch configFetcher, newCfg map[string]interface{}) bool {
+	if !spec.RestartOnOutputChange {
+		// early exit if restart is not needed anyway
+		return false
+	}
+
 	// compare outputs
 	curCfgStr := cfgFetch.Config()
 	if curCfgStr == "" {
@@ -40,8 +45,8 @@ func IsRestartNeeded(log *logger.Logger, spec program.Spec, cfgFetch configFetch
 		return false
 	}
 
-	// restart needed only if specified and output changed
-	return spec.RestartOnOutputChange && currentOutput != newOutput
+	// restart needed only if output changed
+	return currentOutput != newOutput
 }
 
 func getOutputConfigFromString(cfgString string) (string, error) {

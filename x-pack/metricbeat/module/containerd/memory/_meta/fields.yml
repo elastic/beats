@@ -1,0 +1,109 @@
+- name: memory
+  type: group
+  release: beta
+  description: >
+    memory
+  fields:
+    - name: workingset.pct
+      type: scaled_float
+      format: percent
+      description: >
+        Memory working set percentage.
+    - name: rss
+      type: long
+      format: bytes
+      description: >
+        Total memory resident set size.
+    - name: activeFiles
+      type: long
+      format: bytes
+      description: >
+        Total active file bytes.
+    - name: cache
+      type: long
+      format: bytes
+      description: >
+        Total cache bytes.
+    - name: inactiveFiles
+      type: long
+      format: bytes
+      description: >
+        Total inactive file bytes.
+    - name: usage
+      type: group
+      description: >
+        Usage memory stats.
+      fields:
+        - name: max
+          type: long
+          format: bytes
+          description: >
+            Max memory usage.
+        - name: pct
+          type: scaled_float
+          format: percent
+          description: >
+            Total allocated memory percentage.
+        - name: total
+          type: long
+          format: bytes
+          description: >
+            Total memory usage.
+        - name: fail.count
+          type: scaled_float
+          description: >
+            Fail counter.
+        - name: limit
+          type: long
+          format: bytes
+          description: >
+            Memory usage limit.
+    - name: kernel
+      type: group
+      description: >
+        Kernel memory stats.
+      fields:
+        - name: max
+          type: long
+          format: bytes
+          description: >
+            Kernel max memory usage.
+        - name: total
+          type: long
+          format: bytes
+          description: >
+            Kernel total memory usage.
+        - name: fail.count
+          type: scaled_float
+          description: >
+            Kernel fail counter.
+        - name: limit
+          type: long
+          format: bytes
+          description: >
+            Kernel memory limit.
+    - name: swap
+      type: group
+      description: >
+        Swap memory stats.
+      fields:
+        - name: max
+          type: long
+          format: bytes
+          description: >
+            Swap max memory usage.
+        - name: total
+          type: long
+          format: bytes
+          description: >
+            Swap total memory usage.
+        - name: fail.count
+          type: scaled_float
+          description: >
+            Swap fail counter.
+        - name: limit
+          type: long
+          format: bytes
+          description: >
+            Swap memory limit.
+
