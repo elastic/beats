@@ -60,16 +60,16 @@ setup.template.settings:
 # This requires a Kibana endpoint configuration.
 setup.kibana:
 
-# Kibana Host
-# Scheme and port can be left out and will be set to the default (http and 5601)
-# In case you specify and additional path, the scheme is required: http://localhost:5601/path
-# IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
-#host: "localhost:5601"
+  # Kibana Host
+  # Scheme and port can be left out and will be set to the default (http and 5601)
+  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
+  #host: "localhost:5601"
 
-# Kibana Space ID
-# ID of the Kibana Space into which the dashboards should be loaded. By default,
-# the Default Space will be used.
-#space.id:
+  # Kibana Space ID
+  # ID of the Kibana Space into which the dashboards should be loaded. By default,
+  # the Default Space will be used.
+  #space.id:
 
 # =============================== Elastic Cloud ================================
 
@@ -186,3 +186,4 @@ processors:
 
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: true
+
