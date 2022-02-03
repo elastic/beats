@@ -20,7 +20,7 @@ jobs:
               }
              }
           projectid: ${{ env.PROJECT_ID }}
-          contentid: ${{ github.event.issue.node_id }}
+          contentid: ${{ github.event.pull_request.node_id }}
         env:
           PROJECT_ID: "PRO_kwDOAGc3Zs4AzG8z"
           GITHUB_TOKEN: ${{ secrets.ELASTIC_AGENT_PROJECT_BOARD_TOKEN }}
@@ -40,7 +40,7 @@ jobs:
               }
              }
           projectid: ${{ env.PROJECT_ID }}
-          contentid: ${{ github.event.issue.node_id }}
+          contentid: ${{ github.event.pull_request.node_id }}
         env:
           PROJECT_ID: "PRO_kwDOAGc3Zs4AzG9E"
           GITHUB_TOKEN: ${{ secrets.ELASTIC_AGENT_PROJECT_BOARD_TOKEN }}
