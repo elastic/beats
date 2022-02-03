@@ -50,9 +50,9 @@ pipeline {
             setEnvVar('VERSION', sh(script: "grep ':stack-version:' ${BASE_DIR}/libbeat/docs/version.asciidoc | cut -d' ' -f2", returnStdout: true).trim())
           }
         }
-        stage('Build main') {
+        stage('Build master') {
           options { skipDefaultCheckout() }
-          when { branch 'main' }
+          when { branch 'master' }
           steps {
             runBeatsTesterJob(version: "${env.VERSION}-SNAPSHOT")
           }
@@ -78,7 +78,7 @@ pipeline {
           when {
             not {
               anyOf {
-                branch comparator: 'REGEXP', pattern: '(main|.*x)'
+                branch comparator: 'REGEXP', pattern: '(master|.*x)'
                 changeRequest()
               }
             }
