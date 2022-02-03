@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"go.elastic.co/apm/module/apmhttp"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
@@ -123,6 +124,8 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 				return nil, errors.Wrap(err, "fail to create transport client")
 			}
 		}
+
+		transport = apmhttp.WrapRoundTripper(transport)
 
 		httpClient := http.Client{
 			Transport: transport,
