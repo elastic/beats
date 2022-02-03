@@ -7,7 +7,9 @@ processors:
       field: event.type
       path: elasticsearch.audit
   - drop:
-      if: '!["rest", "transport", "ip_filter", "security_config_change"].contains(ctx.elasticsearch?.audit?.event?.type)'
+      if: 'ctx.elasticsearch.audit.containsKey('type') && ctx.elasticsearch.audit.type != 'audit'
+  - drop:
+      if: '!ctx.elasticsearch.audit.containsKey('type') && !["rest", "transport", "ip_filter", "security_config_change"].contains(ctx.elasticsearch?.audit?.event?.type)'
   - remove:
       field: elasticsearch.audit.type
       ignore_missing: true
