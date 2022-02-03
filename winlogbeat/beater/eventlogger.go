@@ -130,7 +130,7 @@ func (e *eventLogger) run(
 	}()
 
 runLoop:
-	for {
+	for stop := false; !stop; {
 		err = api.Open(state)
 		if eventlog.IsRecoverable(err) {
 			e.log.Warnw("Open() encountered recoverable error. Trying again...", "error", err)
@@ -142,7 +142,7 @@ runLoop:
 		}
 		e.log.Debug("Opened successfully.")
 
-		for stop := false; !stop; {
+		for !stop {
 			select {
 			case <-done:
 				return
@@ -171,6 +171,9 @@ runLoop:
 			e.log.Debugf("Read() returned %d records.", len(records))
 			if len(records) == 0 {
 				time.Sleep(time.Second)
+				if stop {
+					return
+				}
 				continue
 			}
 
