@@ -1,12 +1,12 @@
 ---
 - job:
-    name: Beats/beats-tester
-    display-name: Beats Tester orchestrator
-    description: Orchestrate the beats-tester when packaging finished successfully
+    name: Beats/packaging
+    display-name: Beats Packaging
+    description: Make the packages for beats and publish them on a GCS bucket.
     view: Beats
     disabled: false
     project-type: multibranch
-    script-path: .ci/beats-tester.groovy
+    script-path: .ci/packaging.groovy
     scm:
       - github:
           branch-discovery: 'no-pr'
@@ -14,13 +14,9 @@
           discover-pr-forks-trust: 'permission'
           discover-pr-origin: 'merge-current'
           discover-tags: true
-<<<<<<< HEAD
-          head-filter-regex: '(master|7\.([x9]|1\d+)|8\.\d+|PR-.*|v\d+\.\d+\.\d+)'
-=======
           head-filter-regex: '(main|7\.1[6789]|8\.\d+|PR-.*|v\d+\.\d+\.\d+)'
->>>>>>> 237937085a (use main default branch (#29710))
           disable-pr-notifications: true
-          notification-context: 'beats-tester'
+          notification-context: 'beats-packaging'
           repo: 'beats'
           repo-owner: 'elastic'
           credentials-id: github-app-beats-ci
@@ -36,7 +32,7 @@
                   name: 'main'
                   case-sensitive: true
               - regex-name:
-                  regex: '7\.([x9]|1\d+)'
+                  regex: '7\.1[6789]'
                   case-sensitive: true
               - regex-name:
                   regex: '8\.\d+'
@@ -48,7 +44,7 @@
               before: true
           prune: true
           shallow-clone: true
-          depth: 3
+          depth: 10
           do-not-fetch-tags: true
           submodule:
               disable: false

@@ -12,6 +12,15 @@ other Beats should be migrated.
 
 Note: This changelog was only started after the 6.3 release.
 
+<<<<<<< HEAD
+=======
+=== Beats version 8.0.0
+https://github.com/elastic/beats/compare/7.x..main[Check the HEAD diff]
+
+==== Breaking changes
+ - Replace custom Pins type for a slice of string for defining the `ca_sha256` values.
+
+>>>>>>> 237937085a (use main default branch (#29710))
 === Beats version 7.5.1
 https://github.com/elastic/beats/compare/v7.5.0..v7.5.1[Check the HEAD diff]
 

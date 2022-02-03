@@ -1,14 +1,22 @@
 pull_request_rules:
+<<<<<<< HEAD
   - name: backport patches to 7.x branch
     conditions:
       - merged
       - base=master
       - label=backport-v7.14.0
+=======
+  - name: forward-port patches to main branch
+    conditions:
+      - merged
+      - label=forwardport-main
+>>>>>>> 237937085a (use main default branch (#29710))
     actions:
       backport:
         assignees:
           - "{{ author }}"
         branches:
+<<<<<<< HEAD
           - "7.x"
         labels:
           - "backport"
@@ -49,6 +57,9 @@ pull_request_rules:
           - "{{ author }}"
         branches:
           - "7.11"
+=======
+          - "main"
+>>>>>>> 237937085a (use main default branch (#29710))
         labels:
           - "backport"
   - name: ask to resolve conflict
@@ -96,3 +107,156 @@ pull_request_rules:
         - files~=^.go-version$
     actions:
       delete_head_branch:
+<<<<<<< HEAD
+=======
+  - name: automatic approval for mergify pull requests with changes in bump-rules
+    conditions:
+      - author=mergify[bot]
+      - check-success=beats-ci/pr-merge
+      - label=automation
+      - files~=^\.mergify\.yml$
+      - head~=^add-backport-next.*
+    actions:
+      review:
+        type: APPROVE
+        message: Automatically approving mergify
+  - name: automatic squash and merge with success checks and the files matching the regex ^.mergify.yml is modified.
+    conditions:
+      - check-success=beats-ci/pr-merge
+      - label=automation
+      - files~=^\.mergify\.yml$
+      - head~=^add-backport-next.*
+      - "#approved-reviews-by>=1"
+    actions:
+      queue:
+        method: squash
+        name: default
+  - name: delete upstream branch with changes on ^.mergify.yml that has been merged or closed
+    conditions:
+      - or:
+        - merged
+        - closed
+      - and:
+        - label=automation
+        - head~=^add-backport-next.*
+        - files~=^\.mergify\.yml$
+    actions:
+      delete_head_branch:
+  - name: notify the backport has not been merged yet
+    conditions:
+      - -merged
+      - -closed
+      - author=mergify[bot]
+      - "#check-success>0"
+      - schedule=Mon-Mon 06:00-10:00[Europe/Paris]
+      - "#assignee>=1"
+    actions:
+      comment:
+        message: |
+          This pull request has not been merged yet. Could you please review and merge it @{{ assignee | join(', @') }}? 🙏
+  - name: notify the backport policy
+    conditions:
+      - -label~=^backport
+      - base=main
+      - -merged
+      - -closed
+    actions:
+      comment:
+        message: |
+          This pull request does not have a backport label. Could you fix it @{{author}}? 🙏
+          To fixup this pull request, you need to add the backport labels for the needed
+          branches, such as:
+          * `backport-v./d./d./d` is the label to automatically backport to the `7./d` branch. `/d` is the digit
+
+          **NOTE**: `backport-skip` has been added to this pull request.
+      label:
+        add:
+          - backport-skip
+  - name: remove-backport label
+    conditions:
+      - label~=backport-v
+      - -merged
+      - -closed
+    actions:
+      label:
+        remove:
+          - backport-skip
+  - name: backport patches to 7.14 branch
+    conditions:
+      - merged
+      - label=backport-v7.14.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.14"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 7.15 branch
+    conditions:
+      - merged
+      - label=backport-v7.15.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.15"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 7.16 branch
+    conditions:
+      - merged
+      - label=backport-v7.16.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.16"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 7.17 branch
+    conditions:
+      - merged
+      - label=backport-v7.17.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.17"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.0 branch
+    conditions:
+      - merged
+      - label=backport-v8.0.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.0"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.1 branch
+    conditions:
+      - merged
+      - label=backport-v8.1.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.1"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+>>>>>>> 237937085a (use main default branch (#29710))

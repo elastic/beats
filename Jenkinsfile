@@ -228,7 +228,7 @@ def runBuildAndTest(Map args = [:]) {
 
 
 /**
-* There are only two supported branches, master and 7.x
+* Only supported the main branch
 */
 def getFlakyBranch() {
   if(isPR()) {
@@ -239,17 +239,10 @@ def getFlakyBranch() {
 }
 
 /**
-* There are only two supported branches, master and 7.x
+* Only supported the main branch
 */
 def getBranchIndice(String compare) {
-  if (compare?.equals('master') || compare.equals('7.x')) {
-    return compare
-  } else {
-    if (compare.startsWith('7.')) {
-      return '7.x'
-    }
-  }
-  return 'master'
+  return 'main'
 }
 
 /**
