@@ -87,7 +87,8 @@ class Test(metricbeat.BaseTest):
                 "name": "system",
                 "metricsets": ["process"],
                 "period": "1s",
-                "processes": ["(?i)metricbeat.test"]
+                "processes": ["(?i)metricbeat.test"],
+                "process.include_top_n": {"enabled": True, "by_cpu": 1}
             }],
             processors=[{
                 "drop_event": {
@@ -190,7 +191,8 @@ class Test(metricbeat.BaseTest):
                 "name": "system",
                 "metricsets": ["process"],
                 "period": "1s",
-                "processes": ["(?i)metricbeat.test"]
+                "processes": ["(?i)metricbeat.test"],
+                "process.include_top_n": {"enabled": True, "by_cpu": 1}
             }],
             processors=[{
                 "include_fields": {"fields": ["system.process", "process"]},
