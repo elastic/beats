@@ -181,6 +181,16 @@ RUN mkdir /app
 RUN chown {{ .user }} /app
 {{- end }}
 {{- end }}
+
+{{- if .unpack_beats }}
+RUN mkdir -p {{ $beatHome }}/data/{{.BeatName}}-{{ commit_short }}/{{ .beats_install_path }} && \
+    for beatPath in {{ $beatHome }}/data/{{.BeatName}}-{{ commit_short }}/downloads/*.tar.gz; do \
+    tar xf $beatPath -C {{ $beatHome }}/data/{{.BeatName}}-{{ commit_short }}/{{ .beats_install_path }} && \
+    rm $beatPath; \
+    done && \
+    setcap cap_net_raw,cap_setuid+p {{ $beatHome }}/data/{{.BeatName}}-{{ commit_short }}/{{ .beats_install_path }}/heartbeat-*/heartbeat
+{{- end }}
+
 USER {{ .user }}
 
 {{- if (and (contains .image_name "-complete") (not (contains .from "ubi-minimal")))  }}
