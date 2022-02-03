@@ -42,7 +42,7 @@ class Test(metricbeat.BaseTest):
         self.assertCountEqual(self.de_dot(
             ["name", "out", "in"]), network.keys())
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
+    # @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_dropfields_with_condition(self):
         """
         Check drop_fields action works when a condition is associated.
@@ -52,7 +52,7 @@ class Test(metricbeat.BaseTest):
                 "name": "system",
                 "metricsets": ["process"],
                 "period": "1s",
-                "processes": [".*pytest.*"]
+                "processes": ["(?i)metricbeat.test"]
             }],
             processors=[{
                 "drop_fields": {
@@ -77,7 +77,7 @@ class Test(metricbeat.BaseTest):
         else:
             assert "system.process.memory.size" in output
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
+    # @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_dropevent_with_condition(self):
         """
         Check drop_event action works when a condition is associated.
@@ -87,7 +87,7 @@ class Test(metricbeat.BaseTest):
                 "name": "system",
                 "metricsets": ["process"],
                 "period": "1s",
-                "processes": [".*pytest.*"]
+                "processes": ["(?i)metricbeat.test"]
             }],
             processors=[{
                 "drop_event": {
@@ -136,7 +136,7 @@ class Test(metricbeat.BaseTest):
         )
         assert len(output) >= 1
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
+    # @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_include_fields(self):
         """
         Check include_fields filtering action
@@ -147,7 +147,7 @@ class Test(metricbeat.BaseTest):
                 "metricsets": ["process"],
                 "period": "1s",
                 # filter down to one process, since this test suite doesn't have a way to specify X iterations of the metricbeat fetcher
-                "processes": [".*pytest.*"]
+                "processes": ["(?i)metricbeat.test"]
             }],
             processors=[{
                 "include_fields": {"fields": ["system.process.cpu", "system.process.memory"]},
@@ -190,7 +190,7 @@ class Test(metricbeat.BaseTest):
                 "name": "system",
                 "metricsets": ["process"],
                 "period": "1s",
-                "processes": [".*pytest.*"]
+                "processes": ["(?i)metricbeat.test"]
             }],
             processors=[{
                 "include_fields": {"fields": ["system.process", "process"]},
