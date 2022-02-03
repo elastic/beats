@@ -90,14 +90,12 @@ func TestJourneyEnricher(t *testing.T) {
 			"suite.name":   stdFields.Name,
 			"monitor.id":   fmt.Sprintf("%s-%s", stdFields.Id, journey.Id),
 			"monitor.name": fmt.Sprintf("%s - %s", stdFields.Name, journey.Name),
-			"monitor.type": stdFields.Type,
 		})
 	}
 	inlineValidator := func() validator.Validator {
 		return lookslike.MustCompile(common.MapStr{
 			"monitor.id":   stdFields.Id,
 			"monitor.name": stdFields.Name,
-			"monitor.type": stdFields.Type,
 		})
 	}
 	commonValidator := func(se *SynthEvent) validator.Validator {
