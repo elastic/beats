@@ -258,12 +258,14 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 		return reader.Message{}, err
 	}
 
+	created := time.Now()
+
 	content := []byte(data.Fields["MESSAGE"])
 	delete(data.Fields, "MESSAGE")
 
 	fields := r.converter.Convert(data.Fields)
 	fields.Put("event.kind", "event")
-	fields.Put("event.created", data.RealtimeTimestamp)
+	fields.Put("event.created", created)
 
 	// if entry is coming from a remote journal, add_host_metadata overwrites
 	// the source hostname, so it has to be copied to a different field

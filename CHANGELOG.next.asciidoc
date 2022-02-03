@@ -98,7 +98,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
-- Fix journald event format
 
 *Heartbeat*
 
