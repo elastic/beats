@@ -8,15 +8,12 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"syscall"
 
 	"github.com/spf13/cobra"
-	"go.elastic.co/apm"
-	apmtransport "go.elastic.co/apm/transport"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/api"
@@ -46,10 +43,6 @@ import (
 const (
 	agentName = "elastic-agent"
 )
-
-func init() {
-	apm.DefaultTracer.Close()
-}
 
 type cfgOverrider func(cfg *configuration.Configuration)
 
@@ -142,25 +135,14 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 
 	statusCtrl := status.NewController(logger)
 
-	tracer, err := initTracer(agentName, release.Version(), cfg.Settings.MonitoringConfig)
-	if err != nil {
-		return err
-	}
-	if tracer != nil {
-		defer func() {
-			tracer.Flush(nil)
-			tracer.Close()
-		}()
-	}
-
-	control := server.New(logger.Named("control"), rex, statusCtrl, nil, tracer)
 	// start the control listener
+	control := server.New(logger.Named("control"), rex, statusCtrl, nil)
 	if err := control.Start(); err != nil {
 		return err
 	}
 	defer control.Stop()
 
-	app, err := application.New(logger, rex, statusCtrl, control, agentInfo, tracer)
+	app, err := application.New(logger, rex, statusCtrl, control, agentInfo)
 	if err != nil {
 		return err
 	}
@@ -168,7 +150,7 @@ func run(streams *cli.IOStreams, override cfgOverrider) error {
 	control.SetRouteFn(app.Routes)
 	control.SetMonitoringCfg(cfg.Settings.MonitoringConfig)
 
-	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS(), cfg.Settings.MonitoringConfig, app, tracer)
+	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS(), cfg.Settings.MonitoringConfig, app)
 	if err != nil {
 		return err
 	}
@@ -314,14 +296,7 @@ func defaultLogLevel(cfg *configuration.Configuration) string {
 	return defaultLogLevel
 }
 
-func setupMetrics(
-	agentInfo *info.AgentInfo,
-	logger *logger.Logger,
-	operatingSystem string,
-	cfg *monitoringCfg.MonitoringConfig,
-	app application.Application,
-	tracer *apm.Tracer,
-) (func() error, error) {
+func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSystem string, cfg *monitoringCfg.MonitoringConfig, app application.Application) (func() error, error) {
 	// use libbeat to setup metrics
 	if err := metrics.SetupMetrics(agentName); err != nil {
 		return nil, err
@@ -333,7 +308,7 @@ func setupMetrics(
 		Host:    beats.AgentMonitoringEndpoint(operatingSystem, cfg.HTTP),
 	}
 
-	s, err := monitoringServer.New(logger, endpointConfig, monitoring.GetNamespace, app.Routes, isProcessStatsEnabled(cfg.HTTP), tracer)
+	s, err := monitoringServer.New(logger, endpointConfig, monitoring.GetNamespace, app.Routes, isProcessStatsEnabled(cfg.HTTP))
 	if err != nil {
 		return nil, errors.New(err, "could not start the HTTP server for the API")
 	}
@@ -398,62 +373,4 @@ func tryDelayEnroll(ctx context.Context, logger *logger.Logger, cfg *configurati
 	}
 	logger.Info("Successfully performed delayed enrollment of this Elastic Agent.")
 	return loadConfig(override)
-}
-
-func initTracer(agentName, version string, mcfg *monitoringCfg.MonitoringConfig) (*apm.Tracer, error) {
-	if !mcfg.Enabled || !mcfg.MonitorTraces {
-		return nil, nil
-	}
-
-	cfg := mcfg.APM
-
-	// TODO(stn): Ideally, we'd use apmtransport.NewHTTPTransportOptions()
-	// but it doesn't exist today. Update this code once we have something
-	// available via the APM Go agent.
-	const (
-		envVerifyServerCert = "ELASTIC_APM_VERIFY_SERVER_CERT"
-		envServerCert       = "ELASTIC_APM_SERVER_CERT"
-		envCACert           = "ELASTIC_APM_SERVER_CA_CERT_FILE"
-	)
-	if cfg.TLS.SkipVerify {
-		os.Setenv(envVerifyServerCert, "false")
-		defer os.Unsetenv(envVerifyServerCert)
-	}
-	if cfg.TLS.ServerCertificate != "" {
-		os.Setenv(envServerCert, cfg.TLS.ServerCertificate)
-		defer os.Unsetenv(envServerCert)
-	}
-	if cfg.TLS.ServerCA != "" {
-		os.Setenv(envCACert, cfg.TLS.ServerCA)
-		defer os.Unsetenv(envCACert)
-	}
-
-	ts, err := apmtransport.NewHTTPTransport()
-	if err != nil {
-		return nil, err
-	}
-
-	if len(cfg.Hosts) > 0 {
-		hosts := make([]*url.URL, 0, len(cfg.Hosts))
-		for _, host := range cfg.Hosts {
-			u, err := url.Parse(host)
-			if err != nil {
-				return nil, fmt.Errorf("failed parsing %s: %w", host, err)
-			}
-			hosts = append(hosts, u)
-		}
-		ts.SetServerURL(hosts...)
-	}
-	if cfg.APIKey != "" {
-		ts.SetAPIKey(cfg.APIKey)
-	} else {
-		ts.SetSecretToken(cfg.SecretToken)
-	}
-
-	return apm.NewTracerOptions(apm.TracerOptions{
-		ServiceName:        agentName,
-		ServiceVersion:     version,
-		ServiceEnvironment: cfg.Environment,
-		Transport:          ts,
-	})
 }
