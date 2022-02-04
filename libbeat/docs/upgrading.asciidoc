@@ -74,7 +74,7 @@ https://www.elastic.co/blog/beats-6-7-0-released[Beats 6.7.0 release blog].
 NOTE: {beats} central management has been removed starting in version 7.14.0.
 Looking for a replacement? Refer to the
 {fleet-guide}/index.html[Fleet and Elastic Agent Guide] to learn how to deploy
-and centrally manage a single {agent} to monitor and secure each host. 
+and centrally manage a single {agent} to monitor and secure each host.
 
 ==== Upgrade {beats} binaries to 7.0
 
@@ -417,7 +417,7 @@ set as the default search fields, then specify the list of fields in the
 For example, here's a snippet that shows how to add default search fields to a
 Metricbeat 6.6 index. This example is truncated. Full examples for Metricbeat
 and Filebeat are available in
-https://github.com/elastic/beats/blob/master/libbeat/docs/troubleshooting/default_field.md[this file].
+https://github.com/elastic/beats/blob/main/libbeat/docs/troubleshooting/default_field.md[this file].
 
 [source,js]
 --------------------------------------------------

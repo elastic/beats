@@ -29,7 +29,7 @@ pipeline {
   }
   parameters {
     booleanParam(name: "RELEASE_TEST_IMAGES", defaultValue: "true", description: "If it's needed to build & push Beats' test images")
-    string(name: 'BRANCH_REFERENCE', defaultValue: "master", description: "Git branch/tag to use")
+    string(name: 'BRANCH_REFERENCE', defaultValue: "main", description: "Git branch/tag to use")
   }
   stages {
     stage('Checkout') {

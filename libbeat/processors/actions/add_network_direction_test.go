@@ -77,4 +77,30 @@ func TestNetworkDirection(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("supports metadata as a target", func(t *testing.T) {
+		evt := beat.Event{
+			Meta: common.MapStr{},
+			Fields: common.MapStr{
+				"source":      "1.1.1.1",
+				"destination": "8.8.8.8",
+			},
+		}
+		p, err := NewAddNetworkDirection(common.MustNewConfigFrom(map[string]interface{}{
+			"source":            "source",
+			"destination":       "destination",
+			"target":            "@metadata.direction",
+			"internal_networks": "private",
+		}))
+		require.NoError(t, err)
+
+		expectedMeta := common.MapStr{
+			"direction": "external",
+		}
+
+		observed, err := p.Run(&evt)
+		require.NoError(t, err)
+		require.Equal(t, expectedMeta, observed.Meta)
+		require.Equal(t, evt.Fields, observed.Fields)
+	})
 }
