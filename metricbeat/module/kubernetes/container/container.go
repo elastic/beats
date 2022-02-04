@@ -114,8 +114,14 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 		// Enrich event with container ECS fields
 		containerEcsFields := ecsfields(event)
 		if len(containerEcsFields) != 0 {
-			e.RootFields = common.MapStr{
-				"container": containerEcsFields,
+			if e.RootFields != nil {
+				e.RootFields.DeepUpdate(common.MapStr{
+					"container": containerEcsFields,
+				})
+			} else {
+				e.RootFields = common.MapStr{
+					"container": containerEcsFields,
+				}
 			}
 		}
 
