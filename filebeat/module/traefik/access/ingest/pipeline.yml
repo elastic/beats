@@ -23,9 +23,9 @@ processors:
 - uri_parts:
     field: temp.url_orig
     ignore_failure: true
-- set:
-    copy_from: '@timestamp'
-    field: event.created
+- rename:
+    field: '@timestamp'
+    target_field: event.created
 - date:
     field: traefik.access.time
     target_field: '@timestamp'

@@ -782,6 +782,13 @@ specs:
         <<: *apache_license_for_binaries
         name: '{{.BeatName}}-oss'
 
+    - os: darwin
+      types: [dmg]
+      spec:
+        <<: *macos_beat_pkg_spec
+        <<: *apache_license_for_macos_pkg
+        name: '{{.BeatName}}-oss'
+
     - os: linux
       types: [tgz]
       spec:
@@ -827,6 +834,12 @@ specs:
       spec:
         <<: *binary_spec
         <<: *elastic_license_for_binaries
+
+    - os: darwin
+      types: [dmg]
+      spec:
+        <<: *macos_beat_pkg_spec
+        <<: *elastic_license_for_macos_pkg
 
     - os: linux
       types: [tgz]
@@ -932,6 +945,16 @@ specs:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./{{.XPackDir}}/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
+    - os: darwin
+      types: [dmg]
+      spec:
+        <<: *macos_beat_pkg_spec
+        <<: *elastic_license_for_macos_pkg
+        files:
+          /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/bin/{{.BeatName}}{{.BinaryExt}}:
+            mode: 0755
+            source: ../x-pack/{{.BeatName}}/build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
     - os: linux
       types: [tgz]
       spec:
@@ -1029,6 +1052,17 @@ specs:
             source: data/{{.BeatName}}-{{ commit_short }}/{{.BeatName}}{{.BinaryExt}}
             symlink: true
             mode: 0755
+
+    - os: darwin
+      types: [dmg]
+      spec:
+        <<: *macos_agent_pkg_spec
+        <<: *elastic_license_for_macos_pkg
+        files:
+          /Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/bin/{{.BeatName}}{{.BinaryExt}}:
+            mode: 0755
+            source: /etc/{{.BeatName}}/data/{{.BeatName}}-{{ commit_short }}/{{.BeatName}}{{.BinaryExt}}
+            symlink: true
 
     - os: linux
       types: [tgz]

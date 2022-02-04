@@ -1,11 +1,11 @@
 description: Pipeline for parsing Recorded Future threat intel.
 processors:
-#
-# Set basic ECS fields.
-#
+  #
+  # Set basic ECS fields.
+  #
   - set:
       field: event.ingested
-      value: "{{{ _ingest.timestamp }}}"
+      value: "{{_ingest.timestamp}}"
   - set:
       field: ecs.version
       value: "1.12"
@@ -18,6 +18,15 @@ processors:
   - set:
       field: event.type
       value: indicator
+
+  - rename:
+      field: message
+      target_field: event.original
+      ignore_missing: true
+  - json:
+      field: event.original
+      target_field: json
+
   - set:
       field: threat.feed.name
       value: "[Filebeat] RecordedFuture"
@@ -25,185 +34,238 @@ processors:
       field: threat.feed.dashboard_id
       value: "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f"
 
-  - rename:
-      field: message
-      target_field: event.original
-      ignore_missing: true
-
-#
-# Decode event.original as JSON if it starts with the "{" character.
-# This is the common case when events are ingested from the API, as httpjson
-# transforms the CSV to a JSON message.
-#
-  - json:
-      field: event.original
-      target_field: json
-      if: 'ctx.event?.original != null && ctx.event.original.startsWith("{")'
+  #
+  # Map itype field to STIX 2.0 Cyber Observable values (threat.indicator.type).
+  #
+  - script:
+      lang: painless
+      if: "ctx.json.entity?.type != null"
+      description: >
+        Map entity.type field to STIX 2.0 Cyber Observable values (threat.indicator.type).
+      params:
+        IpAddress: ipv4-addr
+        InternetDomainName: domain-name
+        Hash: file
+        URL: url
+      source: >
+        String mapping = params[ctx.json.entity.type];
+        if (mapping != null) {
+           ctx["threat_indicator_type"] = mapping;
+        }
       on_failure:
-        - fail:
-            message: "Failed decoding message field as JSON: {{{ _ingest.on_failure_message }}}"
-
-#
-# Decode event.original as CSV when the above processor didn't execute.
-# This is used when ingesting CSV lines from a file.
-#
-  - pipeline:
-      name: '{< IngestPipeline "decode_csv" >}'
-      if: 'ctx.json == null'
-      on_failure:
-        - fail:
-            message: "Failed decoding message field as CSV: {{{ _ingest.on_failure_message }}}"
-
-#
-# Decode EvidenceDetails column as JSON.
-#
-  - json:
-      field: json.EvidenceDetails
-      target_field: _temp_.EvidenceDetails
-      ignore_failure: true
+        - append:
+            field: error.message
+            value: 'Unable to determine indicator type from "{{{ json.entity.type }}}": {{{ _ingest.on_failure_message }}}'
 
   - rename:
-      field: _temp_.EvidenceDetails.EvidenceDetails
-      target_field: json.evidence_details
+      field: threat_indicator_type
+      target_field: threat.indicator.type
       ignore_missing: true
 
-#
-# Hash indicators (threat.indicator.type=file)
-# As risklist indicators don't have a "type" field, it's necessary
-# to detect the kind of indicator in the Name field.
-#
-# An indicator is of type `hash` when the Algorithm field is present.
-#
+  #
+  # Detect ipv6 for ipv4-addr types.
+  #
   - set:
       field: threat.indicator.type
-      value: file
-      if: 'ctx.json.Algorithm != null'
+      value: ipv6-addr
+      if: 'ctx.threat?.indicator?.type == "ipv4-addr" && ctx.json.entity.name != null && ctx.json.entity.name.contains(":")'
+
+  #
+  # Map first and last seen dates.
+  #
+  - date:
+      field: json.timestamps.firstSeen
+      target_field: threat.indicator.first_seen
+      formats:
+        - ISO8601
+      if: "ctx.json.timestamps?.firstSeen != null"
+      on_failure:
+        - append:
+            field: error.message
+            value: 'Error parsing firstSeen field value "{{{ json.timestamps.firstSeen }}}": {{{ _ingest.on_failure_message }}}'
+  - date:
+      field: json.timestamps.lastSeen
+      target_field: threat.indicator.last_seen
+      formats:
+        - ISO8601
+      if: "ctx.json.timestamps?.lastSeen != null"
+      on_failure:
+        - append:
+            field: error.message
+            value: 'Error parsing lastSeen field value "{{{ json.timestamps.lastSeen }}}": {{{ _ingest.on_failure_message }}}'
+
+  #
+  # Map location fields.
+  #
+  - rename:
+      field: json.location.location.city
+      target_field: threat.indicator.geo.city_name
+      ignore_missing: true
+  - rename:
+      field: json.location.location.continent
+      target_field: threat.indicator.geo.continent_name
+      ignore_missing: true
+  - rename:
+      field: json.location.location.country
+      target_field: threat.indicator.geo.country_name
+      ignore_missing: true
+  - grok:
+      field: json.location.asn
+      patterns:
+        - "^(?:[Aa][Ss])?%{NUMBER:threat.indicator.as.number:long}$"
+      ignore_missing: true
+      on_failure:
+        - append:
+            field: error.message
+            value: "Cannot parse asn field `{{{ json.location.asn }}}`: {{{ _ingest.on_failure_message }}}"
+  - rename:
+      field: json.location.organization
+      target_field: threat.indicator.as.organization.name
+      ignore_missing: true
+  - set:
+      field: threat.indicator.reference
+      value: "{{{ json.intelCard }}}"
+      ignore_empty_value: true
+  - set:
+      field: json.ip_range
+      value: "{{{json.entity.name}}}"
+      if: 'ctx.json.entity?.type == "IpAddress" && ctx.json.entity.name != null && ctx.json.entity.name.contains("/")'
+  - set:
+      field: json.ip_range
+      value: "{{{ json.entity.name }}}/32"
+      if: 'ctx.threat?.indicator?.type == "ipv4-addr" && ctx.json.entity.name != null && !ctx.json.entity.name.contains("/")'
+  - set:
+      field: json.ip_range
+      value: "{{{ json.entity.name }}}/128"
+      if: 'ctx.threat?.indicator?.type == "ipv6-addr" && ctx.json.entity.name != null && !ctx.json.entity.name.contains("/")'
+  - set:
+      field: json.ip_range
+      value: "{{{json.entity.name}}}"
+      if: 'ctx.json.entity?.type == "IpAddress" && ctx.json.entity.name != null && ctx.json.entity.name.contains("/")'
+  - rename:
+      field: json.entity.name
+      target_field: threat.indicator.ip
+      if: 'ctx.json.entity?.type == "IpAddress" && ctx.json.entity.name != null && !ctx.json.entity.name.contains("/")'
+  - rename:
+      field: json.entity.name
+      target_field: threat.indicator.url.domain
+      ignore_missing: true
+      if: 'ctx.threat?.indicator?.type == "domain-name" && ctx.threat?.indicator?.url?.domain == null'
+  - uri_parts:
+      field: json.entity.name
+      target_field: threat.indicator.url
+      keep_original: true
+      remove_if_successful: true
+      if: 'ctx.threat?.indicator?.type == "url"'
+      on_failure:
+        - append:
+            field: error.message
+            value: "Cannot parse url field `{{{ json.entity.name }}}`: {{{ _ingest.on_failure_message }}}"
+
+  # At this point fileHashes may exist if "fileHashes" field is requested.
+  - append:
+      field: json.fileHashes
+      value: "{{{ json.entity.name }}}"
+      allow_duplicates: false
+      if: 'ctx.threat?.indicator?.type == "file"'
+  - remove:
+      field: json.entity.name
+      if: 'ctx.threat?.indicator?.type == "file"'
   - script:
       lang: painless
       description: >
         Map file hashes.
-      if: "ctx.json.Algorithm != null"
+      if: "ctx.json.fileHashes != null"
       params:
-        MD5: md5
-        SHA-1: sha1
-        SHA-256: sha256
-        SHA-384: sha384
-        SHA-512: sha512
-      source: >-
-        def key = params[ctx.json.Algorithm];
-        if (key == null) {
-          throw new Exception("Unsupported hash algorithm '" + ctx.json.Algorithm + "'");
+        "4": crc32
+        "32": md5
+        "40": sha1
+        "64": sha256
+        "128": sha512
+      source: >
+        def hashes = new HashMap();
+        for (def hash : ctx.json.fileHashes) {
+          def algo = params[String.valueOf(hash.length())];
+          if (algo != null) {
+            hashes[algo] = hash;
+          }
         }
-        def hashes = [key:ctx.json.Name];
         ctx["_hashes"] = hashes;
       on_failure:
         - append:
             field: error.message
-            value: "Failed to map fileHashes field: {{{ _ingest.on_failure_message }}}"
+            value: "Failed to map fileHashes field: {{ _ingest.on_failure_message }}"
   - rename:
       field: _hashes
       target_field: threat.indicator.file.hash
       ignore_missing: true
 
-#
-# IP indicators (threat.indicator.type=ipvN-addr)
-#
-# An indicator is of type `ip` if Name is a valid IP address.
-#
+  #
+  # Map risk.score to event.risk_score.
+  #
   - convert:
-      field: json.Name
-      target_field: threat.indicator.ip
-      type: ip
-      ignore_failure: true
-      if: 'ctx.threat?.indicator?.type == null'
-  - set:
-      field: threat.indicator.type
-      value: ipv4-addr
-      if: 'ctx.threat?.indicator?.ip != null && !ctx.threat.indicator.ip.contains(":")'
-  - set:
-      field: threat.indicator.type
-      value: ipv6-addr
-      if: 'ctx.threat?.indicator?.ip != null && ctx.threat.indicator.ip.contains(":")'
-
-#
-# URL indicators (threat.indicator.type=url)
-# An indicator is of type `url` if Name contains a slash character.
-#
-  - set:
-      field: threat.indicator.type
-      value: url
-      if: 'ctx.threat?.indicator?.type == null && ctx.json.Name.contains("/")'
-  - uri_parts:
-      field: json.Name
-      target_field: threat.indicator.url
-      keep_original: true
-      if: 'ctx.threat?.indicator?.type == "url"'
-#
-# Domain indicators (threat.indicator.type=domain)
-# This is a catch-all type.
-#
-  - set:
-      field: threat.indicator.type
-      value: domain-name
-      if: 'ctx.threat?.indicator?.type == null'
-  - set:
-      field: threat.indicator.url.domain
-      value: '{{{ json.Name }}}'
-      ignore_empty_value: true
-      if: 'ctx.threat?.indicator?.type == "domain-name" && ctx.threat?.indicator?.url?.domain == null'
-
-#
-# Normalize Risk
-#
-  - convert:
-      field: json.Risk
+      field: json.risk.score
       target_field: event.risk_score
       ignore_missing: true
       type: float
       on_failure:
         - append:
             field: error.message
-            value: "Risk score `{{{ json.Risk }}}` cannot be converted to float: {{{ _ingest.on_failure_message }}}"
-
-#
-# Fingerprint event: _id = hash(dataset + indicator type + indicator value)
-#
-  - fingerprint:
-      fields:
-        - event.dataset
-        - threat.indicator.type
-        - json.Name
-      target_field: "_id"
+            value: "Risk score `{{{ json.risk.score }}}` cannot be converted to float: {{ _ingest.on_failure_message }}"
+  #
+  # Remove fields converted to an ECS field.
+  #
+  - remove:
+      field:
+        - json.timestamps
+        - json.location
+        - json.fileHashes
+        - message
       ignore_missing: true
-
-#
-# Save fields without an ECS mapping under `recordedfuture`.
-#
-  - rename:
-      field: json.RiskString
-      target_field: json.risk_string
-      ignore_missing: true
+  #
+  # Save fields without an ECS mapping under `recordedfuture`.
+  #
   - rename:
       field: json
       target_field: recordedfuture
 
-#
-# Cleanup
-#
+  ######################
+  # Cleanup processors #
+  ######################
   - remove:
       field: event.original
       if: "ctx?.tags == null || !(ctx.tags.contains('preserve_original_event'))"
       ignore_failure: true
       ignore_missing: true
-  - remove:
-      field:
-        - recordedfuture.Algorithm
-        - recordedfuture.EvidenceDetails
-        - recordedfuture.Name
-        - recordedfuture.Risk
-        - _temp_
-      ignore_missing: true
+  - set:
+      field: threat.indicator.type
+      value: unknown
+      if: ctx.threat?.indicator?.type == null
+  - script:
+      lang: painless
+      if: ctx.recordedfuture != null
+      source: |
+        void handleMap(Map map) {
+          for (def x : map.values()) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+          }
+        map.values().removeIf(v -> v == null);
+        }
+        void handleList(List list) {
+          for (def x : list) {
+              if (x instanceof Map) {
+                  handleMap(x);
+              } else if (x instanceof List) {
+                  handleList(x);
+              }
+          }
+        }
+        handleMap(ctx);
 on_failure:
   - append:
       field: error.message
-      value: "{{{ _ingest.on_failure_message }}}"
+      value: "{{ _ingest.on_failure_message }}"

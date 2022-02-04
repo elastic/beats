@@ -19402,31 +19402,11 @@ type: boolean
 
 --
 
-*`tls.detailed.ocsp_response`*::
-+
---
-The result of an OCSP request.
-
-
-type: keyword
-
---
-
 
 *`tls.detailed.client_hello.version`*::
 +
 --
 The version of the TLS protocol by which the client wishes to communicate during this session.
-
-
-type: keyword
-
---
-
-*`tls.detailed.client_hello.random`*::
-+
---
-Random data used by the TLS protocol to generate the encryption key.
 
 
 type: keyword
@@ -19528,39 +19508,6 @@ type: keyword
 
 --
 
-[float]
-=== status_request
-
-Status request made to the server.
-
-
-*`tls.detailed.client_hello.extensions.status_request.type`*::
-+
---
-The type of the status request. Always "ocsp" if present.
-
-type: keyword
-
---
-
-*`tls.detailed.client_hello.extensions.status_request.responder_id_list_length`*::
-+
---
-The length of the list of trusted responders.
-
-type: short
-
---
-
-*`tls.detailed.client_hello.extensions.status_request.request_extensions`*::
-+
---
-The number of certificate extensions for the request.
-
-type: short
-
---
-
 *`tls.detailed.client_hello.extensions._unparsed_`*::
 +
 --
@@ -19576,16 +19523,6 @@ type: keyword
 +
 --
 The version of the TLS protocol that is used for this session. It is the highest version supported by the server not exceeding the version requested in the client hello.
-
-
-type: keyword
-
---
-
-*`tls.detailed.server_hello.random`*::
-+
---
-Random data used by the TLS protocol to generate the encryption key.
 
 
 type: keyword
@@ -19654,21 +19591,6 @@ List of Elliptic Curve (EC) point formats. Indicates the set of point formats th
 
 
 type: keyword
-
---
-
-[float]
-=== status_request
-
-Status request made to the server.
-
-
-*`tls.detailed.server_hello.extensions.status_request.response`*::
-+
---
-Whether a certificate status request response was made.
-
-type: boolean
 
 --
 

@@ -18,7 +18,7 @@ func TestExecMultiplexer(t *testing.T) {
 	var testJourneys []*Journey
 	var testEvents []*SynthEvent
 	time := float64(0)
-	for jIdx := 0; jIdx < 3; jIdx++ {
+	for jIdx := 0; jIdx < 4; jIdx++ {
 		time++ // fake time to make events seem spaced out
 		journey := &Journey{
 			Name: fmt.Sprintf("J%d", jIdx),
@@ -44,11 +44,21 @@ func TestExecMultiplexer(t *testing.T) {
 				TimestampEpochMicros: time,
 			})
 		}
-		testEvents = append(testEvents, &SynthEvent{
-			Journey:              journey,
-			Type:                 "journey/end",
-			TimestampEpochMicros: time,
-		})
+
+		// We want one of the test journeys to end with a cmd/status indicating it failed
+		if jIdx != 4 {
+			testEvents = append(testEvents, &SynthEvent{
+				Journey:              journey,
+				Type:                 "journey/end",
+				TimestampEpochMicros: time,
+			})
+		} else {
+			testEvents = append(testEvents, &SynthEvent{
+				Journey:              journey,
+				Type:                 "cmd/status",
+				TimestampEpochMicros: time,
+			})
+		}
 	}
 
 	// Write the test events in another go routine since writes block
@@ -76,7 +86,7 @@ Loop:
 	i := 0 // counter for index, resets on journey change
 	for _, se := range results {
 		require.Equal(t, i, se.index)
-		if se.Type == "journey/end" {
+		if se.Type == "journey/end" || se.Type == "cmd/status" {
 			i = 0
 		} else {
 			i++

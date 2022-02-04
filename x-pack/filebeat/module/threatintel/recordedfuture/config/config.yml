@@ -10,18 +10,22 @@ request.ssl: {{ .ssl | tojson }}
 {{ if .proxy_url }}
 request.proxy_url: {{ .proxy_url }}
 {{ end }}
-{{ if .custom_url }}
-request.url: "{{ .custom_url }}"
-{{ else }}
-request.url: "{{ .endpoint }}/{{ .entity }}/risklist?format=csv/splunk&gzip=false&list={{ .list }}"
-{{ end }}
+request.url: "{{ .url }}&orderby=lastseen&direction=asc"
 request.transforms:
 {{ if .api_token }}
 - set:
     target: header.X-RFToken
     value: {{ .api_token }}
-{{ end }}
-response.decode_as: text/csv
+- set:
+    target: url.params.lastSeen
+    value: '[[ .cursor.timestamp ]]'
+    default: '([[ formatDate (now (parseDuration "-{{ .first_interval }}")) "2006-01-02T15:04:05.000Z" ]],]'
+  {{ end }}
+response.split:
+  target: body.data.results
+cursor:
+  timestamp:
+    value: '([[ .first_event.timestamps.lastSeen ]],]'
 
 {{ else if eq .input "file" }}
 

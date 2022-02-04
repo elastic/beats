@@ -158,4 +158,3 @@
 - Add --fleet-server-es-ca-trusted-fingerprint flag to allow agent/fleet-server to work with elasticsearch clusters using self signed certs. {pull}29128[29128]
 - Discover changes in Kubernetes nodes metadata as soon as they happen. {pull}23139[23139]
 - Add results of inspect output command into archive produced by diagnostics collect. {pull}29902[29902]
-- Add support for loading input configuration from external configuration files in standalone mode. You can load inputs from YAML configuration files under the folder `{path.config}/inputs.d`. {pull}30087[30087]

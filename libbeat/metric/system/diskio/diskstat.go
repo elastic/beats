@@ -21,7 +21,7 @@
 package diskio
 
 import (
-	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/disk"
 
 	sigar "github.com/elastic/gosigar"
 )

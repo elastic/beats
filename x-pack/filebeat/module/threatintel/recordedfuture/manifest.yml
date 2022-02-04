@@ -3,13 +3,12 @@ module_version: 1.0
 var:
   - name: input
     default: httpjson
+  - name: first_interval
+    default: 168h
   - name: interval
     default: 1m
-  - name: endpoint
-    default: "https://api.recordedfuture.com/v2"
-  - name: entity
-  - name: list
-  - name: custom_url
+  - name: url
+    default: "https://api.recordedfuture.com/v2/ip/search?limit=200&fields=entity,timestamps,risk,intelCard,location&metadata=false"
   - name: ssl
   - name: tags
     default: [threatintel-recordedfuture, forwarded]
@@ -19,5 +18,4 @@ var:
     default: false
 ingest_pipeline:
   - ingest/pipeline.yml
-  - ingest/decode_csv.yml
 input: config/config.yml

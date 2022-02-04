@@ -4,10 +4,6 @@
   description: >
     Block I/O metrics.
   fields:
-    - name: device
-      type: keyword
-      description: >
-        Name of block device
     - name: read
       type: group
       description: >

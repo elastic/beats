@@ -3,9 +3,9 @@ processors:
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
-- set:
-    copy_from: '@timestamp'
-    field: event.created
+- rename:
+    field: '@timestamp'
+    target_field: event.created
 - pipeline:
     name: '{< IngestPipeline "pipeline-json" >}'
 - set:

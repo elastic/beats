@@ -5,8 +5,6 @@
 package configuration
 
 import (
-	"path/filepath"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	monitoringCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
@@ -14,9 +12,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 )
-
-// ExternalInputsPattern is a glob that matches the paths of external configuration files.
-var ExternalInputsPattern = filepath.Join("inputs.d", "*.yml")
 
 // SettingsConfig is an collection of agent settings configuration.
 type SettingsConfig struct {

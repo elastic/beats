@@ -19,8 +19,6 @@ include::./pull-request-guidelines.asciidoc[]
 
 include::./contributing.asciidoc[]
 
-include::./testing.asciidoc[]
-
 include::{libbeat-dir}/communitybeats.asciidoc[]
 
 include::./fields-yml.asciidoc[]
@@ -38,3 +36,5 @@ include::./metricbeat-devguide.asciidoc[]
 include::./modules-dev-guide.asciidoc[]
 
 include::./migrate-dashboards.asciidoc[]
+
+

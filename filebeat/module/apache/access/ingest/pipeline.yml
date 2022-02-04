@@ -54,9 +54,9 @@ processors:
     ignore_missing: true
     patterns:
     - ^(%{IP:source.ip}|%{HOSTNAME:source.domain})$
-- set:
-    copy_from: '@timestamp'
-    field: event.created
+- rename:
+    field: '@timestamp'
+    target_field: event.created
 - date:
     field: apache.access.time
     target_field: '@timestamp'

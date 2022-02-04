@@ -26,9 +26,9 @@ processors:
       GREEDYMULTILINE: |-
         (.|
         )+
-- set:
-    copy_from: '@timestamp'
-    field: event.created
+- rename:
+    field: '@timestamp'
+    target_field: event.created
 - date:
     if: ctx._tmp?.local_timestamp != null && ctx.event?.timezone == null
     field: _tmp.local_timestamp

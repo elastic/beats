@@ -70,11 +70,6 @@
                 Whether the server has requested the client to authenticate itself
                 using a client certificate.
 
-            - name: ocsp_response
-              type: keyword
-              description: >
-                The result of an OCSP request.
-
             - name: client_hello
               type: group
               fields:
@@ -83,11 +78,6 @@
                   description: >
                     The version of the TLS protocol by which the client wishes to
                     communicate during this session.
-
-                - name: random
-                  type: keyword
-                  description: >
-                    Random data used by the TLS protocol to generate the encryption key.
 
                 - name: session_id
                   type: keyword
@@ -143,22 +133,6 @@
                         List of Elliptic Curve (EC) point formats. Indicates the
                         set of point formats that the client can parse.
 
-                    - name: status_request
-                      type: group
-                      description: Status request made to the server.
-                      fields:
-                        - name: type
-                          type: keyword
-                          description: The type of the status request. Always "ocsp" if present.
-
-                        - name: responder_id_list_length
-                          type: short
-                          description: The length of the list of trusted responders.
-
-                        - name: request_extensions
-                          type: short
-                          description: The number of certificate extensions for the request.
-
                     - name: _unparsed_
                       type: keyword
                       description: >
@@ -173,11 +147,6 @@
                     The version of the TLS protocol that is used for this session.
                     It is the highest version supported by the server not exceeding
                     the version requested in the client hello.
-
-                - name: random
-                  type: keyword
-                  description: >
-                    Random data used by the TLS protocol to generate the encryption key.
 
                 - name: selected_compression_method
                   type: keyword
@@ -215,14 +184,6 @@
                       description: >
                         List of Elliptic Curve (EC) point formats. Indicates the
                         set of point formats that the server can parse.
-
-                    - name: status_request
-                      type: group
-                      description: Status request made to the server.
-                      fields:
-                        - name: response
-                          type: boolean
-                          description: Whether a certificate status request response was made.
 
                     - name: _unparsed_
                       type: keyword

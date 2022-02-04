@@ -5,7 +5,7 @@ The following topics describe how to add a new protocol to Packetbeat:
 
 * <<getting-ready-new-protocol>>
 * <<protocol-modules>>
-* <<protocol-testing>>
+* <<testing>>
 
 [[getting-ready-new-protocol]]
 === Getting Ready
@@ -95,7 +95,7 @@ We are working on updating this section. While you're waiting for updates, you
 might want to try out the TCP protocol generator at
 https://github.com/elastic/beats/tree/master/packetbeat/scripts/tcp-protocol.
 
-[[protocol-testing]]
+[[testing]]
 === Testing
 
-We are working on updating this section.
+We are working on updating this section. 

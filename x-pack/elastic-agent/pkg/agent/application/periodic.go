@@ -5,13 +5,11 @@
 package application
 
 import (
-	"context"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/filewatcher"
 )
@@ -21,7 +19,6 @@ type periodic struct {
 	period   time.Duration
 	done     chan struct{}
 	watcher  *filewatcher.Watch
-	loader   *config.Loader
 	emitter  pipeline.EmitterFunc
 	discover discoverFunc
 }
@@ -92,7 +89,7 @@ func (p *periodic) work() error {
 			p.log.Debugf("Unchanged %d files: %s", len(s.Unchanged), strings.Join(s.Updated, ", "))
 		}
 
-		err := readfiles(context.Background(), files, p.loader, p.emitter)
+		err := readfiles(files, p.emitter)
 		if err != nil {
 			// assume something when really wrong and invalidate any cache
 			// so we get a full new config on next tick.
@@ -114,7 +111,6 @@ func newPeriodic(
 	log *logger.Logger,
 	period time.Duration,
 	discover discoverFunc,
-	loader *config.Loader,
 	emitter pipeline.EmitterFunc,
 ) *periodic {
 	w, err := filewatcher.New(log, filewatcher.DefaultComparer)
@@ -130,7 +126,6 @@ func newPeriodic(
 		done:     make(chan struct{}),
 		watcher:  w,
 		discover: discover,
-		loader:   loader,
 		emitter:  emitter,
 	}
 }

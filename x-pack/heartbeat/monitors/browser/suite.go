@@ -66,16 +66,6 @@ func (s *Suite) FilterJourneys() synthexec.FilterJourneyConfig {
 	return s.suiteCfg.FilterJourneys
 }
 
-func (s *Suite) Fields() synthexec.StdSuiteFields {
-	_, isInline := s.InlineSource()
-	return synthexec.StdSuiteFields{
-		Name:     s.suiteCfg.Name,
-		Id:       s.suiteCfg.Id,
-		IsInline: isInline,
-		Type:     "browser",
-	}
-}
-
 func (s *Suite) Close() error {
 	if s.suiteCfg.Source.ActiveMemo != nil {
 		s.suiteCfg.Source.ActiveMemo.Close()
@@ -112,14 +102,14 @@ func (s *Suite) extraArgs() []string {
 func (s *Suite) jobs() []jobs.Job {
 	var j jobs.Job
 	if src, ok := s.InlineSource(); ok {
-		j = synthexec.InlineJourneyJob(context.TODO(), src, s.Params(), s.Fields(), s.extraArgs()...)
+		j = synthexec.InlineJourneyJob(context.TODO(), src, s.Params(), s.extraArgs()...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
 			err := s.Fetch()
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for suite job: %w", err)
 			}
-			sj, err := synthexec.SuiteJob(context.TODO(), s.Workdir(), s.Params(), s.FilterJourneys(), s.Fields(), s.extraArgs()...)
+			sj, err := synthexec.SuiteJob(context.TODO(), s.Workdir(), s.Params(), s.FilterJourneys(), s.extraArgs()...)
 			if err != nil {
 				return nil, err
 			}

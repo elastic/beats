@@ -151920,33 +151920,156 @@ Fields for Recorded Future Threat Intel
 
 
 
-*`recordedfuture.evidence_details`*::
+[float]
+=== entity
+
+Entity that represents a threat.
+
+
+
+*`recordedfuture.entity.id`*::
 +
 --
-List of sightings used as evidence for this indicator.
+Entity ID.
+
+
+type: keyword
+
+example: ip:192.0.2.13
+
+--
+
+*`recordedfuture.entity.name`*::
++
+--
+Entity name. Value for the entity.
+
+
+type: keyword
+
+example: 192.0.2.13
+
+--
+
+*`recordedfuture.entity.type`*::
++
+--
+Entity type.
+
+
+type: keyword
+
+example: IpAddress
+
+--
+
+*`recordedfuture.intelCard`*::
++
+--
+Link to the Recorded Future Intelligence Card for to this indicator.
+
+
+type: keyword
+
+--
+
+*`recordedfuture.ip_range`*::
++
+--
+Range of IPs for this indicator.
+
+
+type: ip_range
+
+example: 192.0.2.0/16
+
+--
+
+[float]
+=== risk
+
+Risk fields.
+
+
+
+*`recordedfuture.risk.criticality`*::
++
+--
+Risk criticality (0-4).
+
+
+type: byte
+
+--
+
+*`recordedfuture.risk.criticalityLabel`*::
++
+--
+Risk criticality label. One of None, Unusual, Suspicious, Malicious, Very Malicious.
+
+
+type: keyword
+
+--
+
+*`recordedfuture.risk.evidenceDetails`*::
++
+--
+Risk's evidence details.
 
 
 type: flattened
 
 --
 
-*`recordedfuture.name`*::
+*`recordedfuture.risk.score`*::
 +
 --
-Indicator value.
+Risk score (0-99).
+
+
+type: short
+
+--
+
+*`recordedfuture.risk.riskString`*::
++
+--
+Number of Risk Rules observed as a factor of total number of rules.
 
 
 type: keyword
 
+example: 1/54
+
 --
 
-*`recordedfuture.risk_string`*::
+*`recordedfuture.risk.riskSummary`*::
 +
 --
-Details of risk rules observed.
+Risk summary.
 
 
 type: keyword
+
+example: 1 of 54 Risk Rules currently observed.
+
+--
+
+*`recordedfuture.risk.riskSummary.text`*::
++
+--
+type: text
+
+--
+
+*`recordedfuture.risk.rules`*::
++
+--
+Number of rules observed.
+
+
+type: long
 
 --
 

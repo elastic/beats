@@ -57,6 +57,8 @@ var testMonFields = stdfields.StdMonitorFields{
 }
 
 var testBrowserMonFields = stdfields.StdMonitorFields{
+	ID:       "myid",
+	Name:     "myname",
 	Type:     "browser",
 	Schedule: schedule.MustParse("@every 1s"),
 	Timeout:  1,
@@ -394,18 +396,6 @@ func TestTimespan(t *testing.T) {
 	}
 }
 
-type BrowserMonitor struct {
-	id         string
-	name       string
-	checkGroup string
-}
-
-var inlineMonitorValues = BrowserMonitor{
-	id:         "inline",
-	name:       "inline",
-	checkGroup: "inline-check-group",
-}
-
 func makeInlineBrowserJob(t *testing.T, u string) jobs.Job {
 	parsed, err := url.Parse(u)
 	require.NoError(t, err)
@@ -413,18 +403,16 @@ func makeInlineBrowserJob(t *testing.T, u string) jobs.Job {
 		eventext.MergeEventFields(event, common.MapStr{
 			"url": URLFields(parsed),
 			"monitor": common.MapStr{
-				"type":        "browser",
-				"id":          inlineMonitorValues.id,
-				"name":        inlineMonitorValues.name,
-				"check_group": inlineMonitorValues.checkGroup,
+				"check_group": "inline-check-group",
 			},
 		})
 		return nil, nil
 	}
 }
 
-// Browser inline jobs monitor information should not be altered
-// by the wrappers as they are handled separately in synth enricher
+// Inline browser jobs function very similarly to lightweight jobs
+// in that they don't override the ID.
+// They do not, however, get a summary field added, nor duration.
 func TestInlineBrowserJob(t *testing.T) {
 	fields := testBrowserMonFields
 	testCommonWrap(t, testDef{
@@ -437,10 +425,10 @@ func TestInlineBrowserJob(t *testing.T) {
 					urlValidator(t, "http://foo.com"),
 					lookslike.MustCompile(map[string]interface{}{
 						"monitor": map[string]interface{}{
-							"type":        "browser",
-							"id":          inlineMonitorValues.id,
-							"name":        inlineMonitorValues.name,
-							"check_group": inlineMonitorValues.checkGroup,
+							"id":          testMonFields.ID,
+							"name":        testMonFields.Name,
+							"type":        fields.Type,
+							"check_group": "inline-check-group",
 						},
 					}),
 					hbtestllext.MonitorTimespanValidator,
@@ -451,9 +439,13 @@ func TestInlineBrowserJob(t *testing.T) {
 	})
 }
 
-var suiteMonitorValues = BrowserMonitor{
-	id:         "suite-journey_1",
-	name:       "suite-Journey 1",
+var suiteBrowserJobValues = struct {
+	id         string
+	name       string
+	checkGroup string
+}{
+	id:         "journey_1",
+	name:       "Journey 1",
 	checkGroup: "journey-1-check-group",
 }
 
@@ -464,10 +456,9 @@ func makeSuiteBrowserJob(t *testing.T, u string, summary bool, suiteErr error) j
 		eventext.MergeEventFields(event, common.MapStr{
 			"url": URLFields(parsed),
 			"monitor": common.MapStr{
-				"type":        "browser",
-				"id":          suiteMonitorValues.id,
-				"name":        suiteMonitorValues.name,
-				"check_group": suiteMonitorValues.checkGroup,
+				"id":          suiteBrowserJobValues.id,
+				"name":        suiteBrowserJobValues.name,
+				"check_group": suiteBrowserJobValues.checkGroup,
 			},
 		})
 		if summary {
@@ -491,10 +482,10 @@ func TestSuiteBrowserJob(t *testing.T) {
 	urlU, _ := url.Parse(urlStr)
 	expectedMonFields := lookslike.MustCompile(map[string]interface{}{
 		"monitor": map[string]interface{}{
-			"type":        "browser",
-			"id":          suiteMonitorValues.id,
-			"name":        suiteMonitorValues.name,
-			"check_group": suiteMonitorValues.checkGroup,
+			"id":          fmt.Sprintf("%s-%s", testMonFields.ID, suiteBrowserJobValues.id),
+			"name":        fmt.Sprintf("%s - %s", testMonFields.Name, suiteBrowserJobValues.name),
+			"type":        fields.Type,
+			"check_group": suiteBrowserJobValues.checkGroup,
 			"timespan": common.MapStr{
 				"gte": hbtestllext.IsTime,
 				"lt":  hbtestllext.IsTime,

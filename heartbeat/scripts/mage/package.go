@@ -52,7 +52,7 @@ func CustomizePackaging() {
 			args.Spec.Files[monitorsDTarget] = monitorsD
 		case devtools.TarGz, devtools.Zip:
 			args.Spec.Files[monitorsDTarget] = monitorsD
-		case devtools.Deb, devtools.RPM:
+		case devtools.Deb, devtools.RPM, devtools.DMG:
 			args.Spec.Files[unixMonitorsDir] = monitorsD
 		}
 	}

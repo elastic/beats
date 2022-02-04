@@ -58,6 +58,7 @@
         "tls.detailed.client_hello.extensions._unparsed_": [
             "23",
             "renegotiation_info",
+            "status_request",
             "51",
             "45",
             "28",
@@ -86,9 +87,6 @@
             "ecdsa_sha1",
             "rsa_pkcs1_sha1"
         ],
-        "tls.detailed.client_hello.extensions.status_request.request_extensions": 0,
-        "tls.detailed.client_hello.extensions.status_request.responder_id_list_length": 0,
-        "tls.detailed.client_hello.extensions.status_request.type": "ocsp",
         "tls.detailed.client_hello.extensions.supported_groups": [
             "x25519",
             "secp256r1",
@@ -103,7 +101,6 @@
             "TLS 1.1",
             "TLS 1.0"
         ],
-        "tls.detailed.client_hello.random": "03ce74e1536e0272c1d55b0c8cdf324e82f80a276e478645572324ce25910c00",
         "tls.detailed.client_hello.session_id": "5d2b9f80d34143b5764ba6b23e1d4f9d1f172148b6fd83c81f42663459eaf6f6",
         "tls.detailed.client_hello.supported_compression_methods": [
             "NULL"
@@ -115,7 +112,6 @@
             "51"
         ],
         "tls.detailed.server_hello.extensions.supported_versions": "TLS 1.3",
-        "tls.detailed.server_hello.random": "ebd86864767a7782922db6712f487c22c6cb65e54a895fefd3f60bc851591f19",
         "tls.detailed.server_hello.selected_compression_method": "NULL",
         "tls.detailed.server_hello.session_id": "5d2b9f80d34143b5764ba6b23e1d4f9d1f172148b6fd83c81f42663459eaf6f6",
         "tls.detailed.server_hello.version": "3.3",

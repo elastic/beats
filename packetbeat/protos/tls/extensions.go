@@ -57,7 +57,7 @@ var extensionMap = map[uint16]extension{
 	2:      {"client_certificate_url", expectEmpty, false},
 	3:      {"trusted_ca_keys", ignoreContent, false},
 	4:      {"truncated_hmac", expectEmpty, false},
-	5:      {"status_request", parseStatusReq, false},
+	5:      {"status_request", ignoreContent, false},
 	6:      {"user_mapping", ignoreContent, false},
 	7:      {"client_authz", ignoreContent, false},
 	8:      {"server_authz", ignoreContent, false},
@@ -163,26 +163,6 @@ func parseMaxFragmentLen(buffer bufferView) interface{} {
 
 func ignoreContent(_ bufferView) interface{} {
 	return nil
-}
-
-func parseStatusReq(buffer bufferView) interface{} {
-	if buffer.length() == 0 {
-		// Initial server response.
-		return common.MapStr{"response": true}
-	}
-	// Client query.
-	var (
-		code       uint8
-		list, exts uint16
-	)
-	if !buffer.read8(0, &code) || !buffer.read16Net(1, &list) || !buffer.read16Net(1, &exts) {
-		return nil
-	}
-	typ := "ocsp"
-	if code != 1 {
-		typ = fmt.Sprint(code)
-	}
-	return common.MapStr{"type": typ, "responder_id_list_length": list, "request_extensions": exts}
 }
 
 func expectEmpty(buffer bufferView) interface{} {

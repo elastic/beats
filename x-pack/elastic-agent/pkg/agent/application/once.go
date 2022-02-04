@@ -5,8 +5,6 @@
 package application
 
 import (
-	"context"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -16,12 +14,11 @@ import (
 type once struct {
 	log      *logger.Logger
 	discover discoverFunc
-	loader   *config.Loader
 	emitter  pipeline.EmitterFunc
 }
 
-func newOnce(log *logger.Logger, discover discoverFunc, loader *config.Loader, emitter pipeline.EmitterFunc) *once {
-	return &once{log: log, discover: discover, loader: loader, emitter: emitter}
+func newOnce(log *logger.Logger, discover discoverFunc, emitter pipeline.EmitterFunc) *once {
+	return &once{log: log, discover: discover, emitter: emitter}
 }
 
 func (o *once) Start() error {
@@ -34,15 +31,15 @@ func (o *once) Start() error {
 		return ErrNoConfiguration
 	}
 
-	return readfiles(context.Background(), files, o.loader, o.emitter)
+	return readfiles(files, o.emitter)
 }
 
 func (o *once) Stop() error {
 	return nil
 }
 
-func readfiles(ctx context.Context, files []string, loader *config.Loader, emitter pipeline.EmitterFunc) error {
-	c, err := loader.Load(files)
+func readfiles(files []string, emitter pipeline.EmitterFunc) error {
+	c, err := config.LoadFiles(files...)
 	if err != nil {
 		return errors.New(err, "could not load or merge configuration", errors.TypeConfig)
 	}

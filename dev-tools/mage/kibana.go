@@ -79,6 +79,8 @@ func PackageKibanaDashboardsFromBuildDir() {
 				pkgArgs.Spec.ReplaceFile("kibana", kibanaDashboards)
 			case Deb, RPM:
 				pkgArgs.Spec.ReplaceFile("/usr/share/{{.BeatName}}/kibana", kibanaDashboards)
+			case DMG:
+				pkgArgs.Spec.ReplaceFile("/Library/Application Support/{{.BeatVendor}}/{{.BeatName}}/kibana", kibanaDashboards)
 			default:
 				panic(errors.Errorf("unhandled package type: %v", pkgType))
 			}

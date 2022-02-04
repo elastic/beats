@@ -21,7 +21,7 @@
 package socket_summary
 
 import (
-	"github.com/shirou/gopsutil/v3/net"
+	"github.com/shirou/gopsutil/net"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"

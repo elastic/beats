@@ -90,7 +90,7 @@ func CustomizePackaging(pkgFlavor PackagingFlavor) {
 			case devtools.TarGz, devtools.Zip:
 				args.Spec.ReplaceFile("{{.BeatName}}.yml", shortConfig)
 				args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfig)
-			case devtools.Deb, devtools.RPM:
+			case devtools.Deb, devtools.RPM, devtools.DMG:
 				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", shortConfig)
 				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfig)
 				sampleRulesTarget = "/etc/{{.BeatName}}/" + defaultSampleRulesTarget
