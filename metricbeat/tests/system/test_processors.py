@@ -42,7 +42,7 @@ class Test(metricbeat.BaseTest):
         self.assertCountEqual(self.de_dot(
             ["name", "out", "in"]), network.keys())
 
-    # @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_dropfields_with_condition(self):
         """
         Check drop_fields action works when a condition is associated.
@@ -57,7 +57,6 @@ class Test(metricbeat.BaseTest):
             processors=[{
                 "drop_fields": {
                     "fields": ["system.process.memory"],
-                    "when": "range.system.process.cpu.total.pct.lt: 0.5",
                 },
             }]
         )
@@ -77,7 +76,7 @@ class Test(metricbeat.BaseTest):
         else:
             assert "system.process.memory.size" in output
 
-    # @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_dropevent_with_condition(self):
         """
         Check drop_event action works when a condition is associated.
@@ -87,8 +86,7 @@ class Test(metricbeat.BaseTest):
                 "name": "system",
                 "metricsets": ["process"],
                 "period": "1s",
-                "processes": ["(?i)metricbeat.test"],
-                "process.include_top_n": {"enabled": True, "by_cpu": 1}
+                "processes": ["(?i)metricbeat.test"]
             }],
             processors=[{
                 "drop_event": {
@@ -137,7 +135,7 @@ class Test(metricbeat.BaseTest):
         )
         assert len(output) >= 1
 
-    # @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_include_fields(self):
         """
         Check include_fields filtering action
