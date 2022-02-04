@@ -54,7 +54,7 @@ var (
 	}
 	schemaLeader = s.Schema{
 		"learners":         c.Int("zk_learners", s.Optional),
-		"followers":        c.Int("zk_followers", s.Optional), // Not present anymore in ZooKeeper 3.7 mntr responses
+		"followers":        c.Int("zk_followers", s.Optional), // Not present anymore in ZooKeeper >= 3.6 mntr responses
 		"synced_followers": c.Int("zk_synced_followers"),
 		"pending_syncs":    c.Int("zk_pending_syncs"),
 	}
@@ -87,7 +87,7 @@ func eventMapping(serverId string, response io.Reader, r mb.ReporterV2, logger *
 	}
 
 	// only exposed by the Leader
-	if _, ok := fullEvent["zk_followers"]; ok {
+	if hasFollowers, hasLearners := fullEvent["zk_followers"], fullEvent["zk_learners"]; hasFollowers != nil || hasLearners != nil {
 		schemaLeader.ApplyTo(event, fullEvent)
 	}
 
