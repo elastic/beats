@@ -25,8 +25,6 @@ https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
 
 *Heartbeat*
 
-- Add fonts to support more different types of characters for multiple languages. {pull}29861[29861]
-
 *Metricbeat*
 
 - Remove network and diskio metrics from ec2 metricset. {pull}28316[28316]
