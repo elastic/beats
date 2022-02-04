@@ -145,7 +145,6 @@ func TestJourneyEnricher(t *testing.T) {
 	tests := []struct {
 		name     string
 		isInline bool
-		se       []*SynthEvent
 	}{
 		{
 			name:     "suite monitor",
@@ -403,6 +402,100 @@ func TestNoSummaryOnAfterHook(t *testing.T) {
 					testslike.Test(t, v, e.Fields)
 				})
 			}
+		})
+	}
+}
+
+func TestCreateSummaryEvent(t *testing.T) {
+	tests := []struct {
+		name     string
+		je       *journeyEnricher
+		expected common.MapStr
+		wantErr  bool
+	}{{
+		name: "completed without errors",
+		je: &journeyEnricher{
+			journey:         &Journey{},
+			start:           time.Now(),
+			end:             time.Now().Add(10 * time.Microsecond),
+			journeyComplete: true,
+		},
+		expected: common.MapStr{
+			"monitor.duration.us": int64(10),
+			"summary": common.MapStr{
+				"down": 0,
+				"up":   1,
+			},
+		},
+		wantErr: false,
+	}, {
+		name: "completed with error",
+		je: &journeyEnricher{
+			journey:         &Journey{},
+			start:           time.Now(),
+			end:             time.Now().Add(10 * time.Microsecond),
+			journeyComplete: true,
+			errorCount:      1,
+			firstError:      fmt.Errorf("journey errored"),
+		},
+		expected: common.MapStr{
+			"monitor.duration.us": int64(10),
+			"summary": common.MapStr{
+				"down": 1,
+				"up":   0,
+			},
+		},
+		wantErr: true,
+	}, {
+		name: "started, but exited without running steps",
+		je: &journeyEnricher{
+			journey:         &Journey{},
+			start:           time.Now(),
+			end:             time.Now().Add(10 * time.Microsecond),
+			journeyComplete: false,
+		},
+		expected: common.MapStr{
+			"monitor.duration.us": int64(10),
+			"summary": common.MapStr{
+				"down": 0,
+				"up":   1,
+			},
+		},
+		wantErr: true,
+	}, {
+		name: "syntax error - exited without starting",
+		je: &journeyEnricher{
+			journey:         &Journey{},
+			end:             time.Now().Add(10 * time.Microsecond),
+			journeyComplete: false,
+			errorCount:      1,
+		},
+		expected: common.MapStr{
+			"monitor.duration.us": int64(0),
+			"summary": common.MapStr{
+				"down": 1,
+				"up":   0,
+			},
+		},
+		wantErr: true,
+	}}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := &beat.Event{}
+			err := tt.je.createSummary(e)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			common.MergeFields(tt.expected, common.MapStr{
+				"url":                common.MapStr{},
+				"event.type":         "heartbeat/summary",
+				"synthetics.type":    "heartbeat/summary",
+				"synthetics.journey": Journey{},
+			}, true)
+			testslike.Test(t, lookslike.Strict(lookslike.MustCompile(tt.expected)), e.Fields)
 		})
 	}
 }
