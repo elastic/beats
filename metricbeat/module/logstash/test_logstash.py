@@ -11,13 +11,13 @@ import urllib.request
 
 
 @metricbeat.parameterized_with_supported_versions
+@unittest.skip("Unsure which fields can be deleted")
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['logstash']
     FIELDS = ['logstash']
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    @unittest.skip("Unsure which fields can be deleted")
     def test_node(self):
         """
         logstash node metricset test
