@@ -63,6 +63,7 @@ https://github.com/elastic/beats/compare/v7.16.3...v7.17.0[View commits]
 
 - SASL/SCRAM in the Kafka output is no longer beta. {pull}29126[29126]
 - Add job.name in pods controlled by Jobs {pull}28954[28954]
+- `add_process_metadata` processor: add `process.parent.pid` to reflect `process.ppid`. {issue}30070[30070] {pull}30077[30077]
 
 *Heartbeat*
 
