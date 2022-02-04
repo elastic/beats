@@ -31,7 +31,7 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
 
-        self.wait_until(lambda: self.log_contains("Started listening for TCP connection"))
+        self.wait_until(lambda: self.log_contains("Start accepting connections"))
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP
         sock.connect((host, port))
@@ -73,7 +73,7 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
 
-        self.wait_until(lambda: self.log_contains("Started listening for TCP connection"))
+        self.wait_until(lambda: self.log_contains("Start accepting connections"))
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP
         sock.connect((host, port))
@@ -173,7 +173,10 @@ class Test(BaseTest):
 
             filebeat = self.start_beat()
 
-            self.wait_until(lambda: self.log_contains("Started listening for UNIX connection"))
+            if socket_type == "stream":
+                self.wait_until(lambda: self.log_contains("Start accepting connections"))
+            else:
+                self.wait_until(lambda: self.log_contains("Started listening"))
 
             sock = send_over_socket(path,
                                     "<13>Oct 11 22:14:15 wopr.mymachine.co postfix/smtpd[2000]:"
@@ -233,7 +236,10 @@ class Test(BaseTest):
 
             filebeat = self.start_beat()
 
-            self.wait_until(lambda: self.log_contains("Started listening for UNIX connection"))
+            if socket_type == "stream":
+                self.wait_until(lambda: self.log_contains("Start accepting connections"))
+            else:
+                self.wait_until(lambda: self.log_contains("Started listening"))
 
             sock = send_over_socket(path, "invalid\n")
 
