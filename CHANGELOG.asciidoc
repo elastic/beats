@@ -3,6 +3,165 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.0.0]]
+=== Beats version 8.0.0
+https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- `include_matches` option of `journald` input no longer accepts a list of string. {pull}29294[29294]
+- `add_fields` processor is now able to set metadata in events {pull}30092[30092]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Add `while_pattern` type to multiline reader. {pull}19662[19662]
+- auditd dataset: Use process.args to store program arguments instead of auditd.log.aNNN fields. {pull}29601[29601]
+- Remove deprecated old awscloudwatch input name. {pull}29844[29844]
+
+*Heartbeat*
+
+- Add fonts to support more different types of characters for multiple languages. {pull}29606[29861]
+
+*Metricbeat*
+
+- Remove network and diskio metrics from ec2 metricset. {pull}28316[28316]
+- Rename read/write_io.ops_per_sec to read/write.iops in rds metricset. {pull}28350[28350]
+- system/process metricset: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
+
+*Packetbeat*
+
+- Redis: fix incorrectly handle with two-words redis command. {issue}14872[14872] {pull}14873[14873]
+- `event.category` no longer contains the value `network_traffic` because this is not a valid ECS event category value. {pull}20556[20556]
+- Remove deprecated TLS fields in favor of tls.server.x509 and tls.client.x509 ECS fields. {pull}28487[28487]
+- HTTP: The field `http.request.method` will maintain its original case. {pull}28620[28620]
+- Unify gopacket dependencies. {pull}29167[29167]
+
+*Winlogbeat*
+
+- Remove top level `hash` property from sysmon events {pull}20653[20653]
+- Move module processing from local Javascript processor to ingest node {issue}29184[29184] {pull}29435[29435]
+- Fix run loop when reading from evtx file {pull}30006[30006]
+
+*Functionbeat*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+- libbeat/processors/add_process_metadata: Fix memory leak in process cache. {issue}24890[24890] {pull}29717[29717]
+
+*Filebeat*
+
+- Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
+
+*Heartbeat*
+
+- Add fonts to support more different types of characters for multiple languages. {pull}29861[29861]
+
+*Journalbeat*
+
+
+*Metricbeat*
+
+- Extract correct index property in kibana.stats metricset {pull}29622[29622]
+- Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {pull}29711[29711]
+
+*Packetbeat*
+
+- Prevent incorrect use of AMQP protocol parsing from causing silent failure. {pull}29017[29017]
+- Fix error handling in MongoDB protocol parsing. {pull}29017[29017]
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Add config option `rotate_on_startup` to file output {issue}19150[19150] {pull}19347[19347]
+- Update to ECS 8.0 fields. {pull}28620[28620]
+- Support custom analyzers in fields.yml. {issue}28540[28540] {pull}28926[28926]
+- Support self signed certificates on outputs {pull}29229[29229]
+- Add FIPS configuration option for all AWS API calls. {pull}[28899]
+- Warn users when connecting to older versions of Elasticsearch instances. {pull}29723[29723]
+
+*Auditbeat*
+
+- system/process: Prevent hashing files in other mnt namespaces. {issue}25777[25777] {issue}29678[29678] {pull}29786[29786]
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+- Preliminary AIX support {pull}27954[27954]
+- Add option to skip older k8s events {pull}29396[29396]
+- Add `elasticsearch.cluster.id` field to Beat and Kibana modules. {pull}29577[29577]
+- Add `elasticsearch.cluster.id` field to Logstash module. {pull}29625[29625]
+
+*Packetbeat*
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+- Add support for sysmon event ID 26; FileDeleteDetected. {issue}26280[26280] {pull}29957[29957]
+
+*Elastic Log Driver*
+
+- Fixed docs for hosts {pull}23644[23644]
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+*Journalbeat*
+
+
+
+
+
+
+
+
+
 [[release-notes-8.0.0-rc2]]
 === Beats version 8.0.0-rc2
 
