@@ -63,8 +63,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- add_process_metadata processor: add `process.parent.pid` to reflect `process.ppid`. {issue}30070[30070] {pull}30077[30077]
-
 *Auditbeat*
 
 *Filebeat*
