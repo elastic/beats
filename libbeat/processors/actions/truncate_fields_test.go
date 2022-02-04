@@ -178,4 +178,39 @@ func TestTruncateFields(t *testing.T) {
 			assert.Equal(t, test.Output, newEvent.Fields)
 		})
 	}
+
+	t.Run("supports metadata as a target", func(t *testing.T) {
+		p := truncateFields{
+			config: truncateFieldsConfig{
+				Fields:      []string{"@metadata.message"},
+				MaxBytes:    3,
+				FailOnError: true,
+			},
+			truncate: (*truncateFields).truncateBytes,
+			logger:   log,
+		}
+
+		event := &beat.Event{
+			Meta: common.MapStr{
+				"message": "too long line",
+			},
+			Fields: common.MapStr{},
+		}
+
+		expFields := common.MapStr{
+			"log": common.MapStr{
+				"flags": []string{"truncated"},
+			},
+		}
+
+		expMeta := common.MapStr{
+			"message": "too",
+		}
+
+		newEvent, err := p.Run(event)
+		assert.NoError(t, err)
+
+		assert.Equal(t, expFields, newEvent.Fields)
+		assert.Equal(t, expMeta, newEvent.Meta)
+	})
 }
