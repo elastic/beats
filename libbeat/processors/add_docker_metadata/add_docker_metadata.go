@@ -132,8 +132,6 @@ func lazyCgroupCacheInit(d *addDockerMetadata) {
 	}
 }
 
-// Run runs the processor that adds container-related fields to the event
-// This processor does not modify any `Meta` fields in the event, it accesses and modifies `event.Fields` directly
 func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	if !d.dockerAvailable {
 		return event, nil
@@ -151,7 +149,7 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 				return event, nil
 			}
 
-			if v, err := event.Fields.GetValue(dockerContainerIDKey); err == nil {
+			if v, err := event.GetValue(dockerContainerIDKey); err == nil {
 				cid, _ = v.(string)
 			}
 		}
@@ -165,14 +163,14 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		}
 		if id != "" {
 			cid = id
-			event.Fields.Put(dockerContainerIDKey, cid)
+			event.PutValue(dockerContainerIDKey, cid)
 		}
 	}
 
 	// Lookup CID from the user defined field names.
 	if cid == "" && len(d.fields) > 0 {
 		for _, field := range d.fields {
-			value, err := event.Fields.GetValue(field)
+			value, err := event.GetValue(field)
 			if err != nil {
 				continue
 			}

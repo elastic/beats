@@ -89,7 +89,7 @@ func New(c *common.Config) (processors.Processor, error) {
 func (l addLocale) Run(event *beat.Event) (*beat.Event, error) {
 	zone, offset := time.Now().Zone()
 	format := l.Format(zone, offset)
-	event.Fields.Put("event.timezone", format)
+	event.PutValue("event.timezone", format)
 	return event, nil
 }
 
