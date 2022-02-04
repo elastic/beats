@@ -3,5 +3,5 @@
   enabled: true
   period: 10s
   hosts: ["http://localhost:3002"]
-  username: elastic
-  password: changeme
+  #username: "user"
+  #password: "secret"

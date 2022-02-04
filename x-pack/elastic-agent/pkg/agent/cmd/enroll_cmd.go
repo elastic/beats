@@ -15,6 +15,7 @@ import (
 	"os/exec"
 	"time"
 
+	"go.elastic.co/apm"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
@@ -184,8 +185,16 @@ func newEnrollCmdWithStore(
 func (c *enrollCmd) Execute(ctx context.Context, streams *cli.IOStreams) error {
 	var err error
 	defer c.stopAgent() // ensure its stopped no matter what
+	span, ctx := apm.StartSpan(ctx, "enroll", "app.internal")
+	defer func() {
+		if err != nil {
+			apm.CaptureError(ctx, err).Send()
+		}
+		span.End()
+	}()
 
-	persistentConfig, err := getPersistentConfig(c.configPath)
+	var persistentConfig map[string]interface{}
+	persistentConfig, err = getPersistentConfig(c.configPath)
 	if err != nil {
 		return err
 	}
@@ -195,7 +204,8 @@ func (c *enrollCmd) Execute(ctx context.Context, streams *cli.IOStreams) error {
 	// Connection setup should disable proxies in that case.
 	localFleetServer := c.options.FleetServer.ConnStr != ""
 	if localFleetServer && !c.options.DelayEnroll {
-		token, err := c.fleetServerBootstrap(ctx, persistentConfig)
+		var token string
+		token, err = c.fleetServerBootstrap(ctx, persistentConfig)
 		if err != nil {
 			return err
 		}
@@ -206,10 +216,11 @@ func (c *enrollCmd) Execute(ctx context.Context, streams *cli.IOStreams) error {
 
 	c.remoteConfig, err = c.options.remoteConfig()
 	if err != nil {
-		return errors.New(
+		err = errors.New(
 			err, "Error",
 			errors.TypeConfig,
 			errors.M(errors.MetaKeyURI, c.options.URL))
+		return err
 	}
 	if localFleetServer {
 		// Ensure that the agent does not use a proxy configuration
@@ -219,28 +230,32 @@ func (c *enrollCmd) Execute(ctx context.Context, streams *cli.IOStreams) error {
 
 	c.client, err = fleetclient.NewWithConfig(c.log, c.remoteConfig)
 	if err != nil {
-		return errors.New(
+		err = errors.New(
 			err, "Error",
 			errors.TypeNetwork,
 			errors.M(errors.MetaKeyURI, c.options.URL))
+		return err
 	}
 
 	if c.options.DelayEnroll {
 		if c.options.FleetServer.Host != "" {
-			return errors.New("--delay-enroll cannot be used with --fleet-server-es", errors.TypeConfig)
+			err = errors.New("--delay-enroll cannot be used with --fleet-server-es", errors.TypeConfig)
+			return err
 		}
 		return c.writeDelayEnroll(streams)
 	}
 
 	err = c.enrollWithBackoff(ctx, persistentConfig)
 	if err != nil {
-		return errors.New(err, "fail to enroll")
+		err = errors.New(err, "fail to enroll")
+		return err
 	}
 
 	if c.options.FixPermissions {
 		err = install.FixPermissions()
 		if err != nil {
-			return errors.New(err, "failed to fix permissions")
+			err = errors.New(err, "failed to fix permissions")
+			return err
 		}
 	}
 

@@ -109,6 +109,7 @@
             "secp256r1",
             "secp384r1"
         ],
+        "tls.detailed.client_hello.random": "d7c809b4ac3a60b62f53c9d9366ca89a703d25491ff2a246a89f32f945f7b42b",
         "tls.detailed.client_hello.supported_compression_methods": [
             "NULL"
         ],
@@ -125,6 +126,7 @@
             "ansiX962_compressed_prime",
             "ansiX962_compressed_char2"
         ],
+        "tls.detailed.server_hello.random": "d1fd553a5a270f08e09eda6690fb3c8f9884e9a9fe7949e9444f574e47524401",
         "tls.detailed.server_hello.selected_compression_method": "NULL",
         "tls.detailed.server_hello.session_id": "23bb2aed5d215e1228220b0a51d7aa220785e9e4b83b4f430229117971e9913f",
         "tls.detailed.server_hello.version": "3.3",

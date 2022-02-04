@@ -1,0 +1,105 @@
+[
+    {
+        "@timestamp": "2022-01-27T13:16:25.271Z",
+        "elasticsearch.audit.action": "indices:admin/create",
+        "elasticsearch.audit.authentication.type": "REALM",
+        "elasticsearch.audit.indices": [
+            "test_1"
+        ],
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.opaque_id": "myApp1",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "yEUG-8deS2y8ZxGgeyeUnw",
+        "elasticsearch.audit.request.name": "CreateIndexRequest",
+        "elasticsearch.audit.user.realm": "reserved",
+        "elasticsearch.audit.user.roles": [
+            "superuser"
+        ],
+        "elasticsearch.node.id": "O8SFUsk8QpGG16JVJcNgUw",
+        "event.action": "access_granted",
+        "event.category": "database",
+        "event.dataset": "elasticsearch.audit",
+        "event.kind": "event",
+        "event.module": "elasticsearch",
+        "event.outcome": "success",
+        "fileset.name": "audit",
+        "host.id": "O8SFUsk8QpGG16JVJcNgUw",
+        "http.request.id": "yEUG-8deS2y8ZxGgeyeUnw",
+        "input.type": "log",
+        "log.offset": 0,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2022-01-27T14:16:25,271+0100\", \"node.id\":\"O8SFUsk8QpGG16JVJcNgUw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"authentication.type\":\"REALM\", \"user.name\":\"elastic\", \"user.realm\":\"reserved\", \"user.roles\":[\"superuser\"], \"origin.type\":\"rest\", \"origin.address\":\"[::1]:64583\", \"request.id\":\"yEUG-8deS2y8ZxGgeyeUnw\", \"action\":\"indices:admin/create\", \"request.name\":\"CreateIndexRequest\", \"indices\":[\"test_1\"], \"opaque_id\":\"myApp1\", \"trace.id\":\"0af7651916cd43dd8448eb211c80319c\"}",
+        "related.user": [
+            "elastic"
+        ],
+        "service.type": "elasticsearch",
+        "source.address": "[::1]:64583",
+        "source.ip": "::1",
+        "source.port": 64583,
+        "trace.id": "0af7651916cd43dd8448eb211c80319c",
+        "user.name": "elastic"
+    },
+    {
+        "@timestamp": "2022-01-27T13:16:28.601Z",
+        "elasticsearch.audit.action": "indices:admin/create",
+        "elasticsearch.audit.authentication.type": "REALM",
+        "elasticsearch.audit.indices": [
+            "test_2"
+        ],
+        "elasticsearch.audit.layer": "transport",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "qo04VI2qRzKrE1dlrsjYgw",
+        "elasticsearch.audit.request.name": "CreateIndexRequest",
+        "elasticsearch.audit.user.realm": "reserved",
+        "elasticsearch.audit.user.roles": [
+            "superuser"
+        ],
+        "elasticsearch.node.id": "O8SFUsk8QpGG16JVJcNgUw",
+        "event.action": "access_granted",
+        "event.category": "database",
+        "event.dataset": "elasticsearch.audit",
+        "event.kind": "event",
+        "event.module": "elasticsearch",
+        "event.outcome": "success",
+        "fileset.name": "audit",
+        "host.id": "O8SFUsk8QpGG16JVJcNgUw",
+        "http.request.id": "qo04VI2qRzKrE1dlrsjYgw",
+        "input.type": "log",
+        "log.offset": 517,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2022-01-27T14:16:28,601+0100\", \"node.id\":\"O8SFUsk8QpGG16JVJcNgUw\", \"event.type\":\"transport\", \"event.action\":\"access_granted\", \"authentication.type\":\"REALM\", \"user.name\":\"elastic\", \"user.realm\":\"reserved\", \"user.roles\":[\"superuser\"], \"origin.type\":\"rest\", \"origin.address\":\"[::1]:64583\", \"request.id\":\"qo04VI2qRzKrE1dlrsjYgw\", \"action\":\"indices:admin/create\", \"request.name\":\"CreateIndexRequest\", \"indices\":[\"test_2\"]}",
+        "related.user": [
+            "elastic"
+        ],
+        "service.type": "elasticsearch",
+        "source.address": "[::1]:64583",
+        "source.ip": "::1",
+        "source.port": 64583,
+        "user.name": "elastic"
+    },
+    {
+        "@timestamp": "2022-01-27T13:16:30.950Z",
+        "elasticsearch.audit.layer": "rest",
+        "elasticsearch.audit.opaque_id": "myApp1",
+        "elasticsearch.audit.origin.type": "rest",
+        "elasticsearch.audit.request.id": "0ybRdKGYRAekov1eKI6nIw",
+        "elasticsearch.node.id": "O8SFUsk8QpGG16JVJcNgUw",
+        "event.action": "anonymous_access_denied",
+        "event.category": "database",
+        "event.dataset": "elasticsearch.audit",
+        "event.kind": "event",
+        "event.module": "elasticsearch",
+        "event.outcome": "failure",
+        "fileset.name": "audit",
+        "host.id": "O8SFUsk8QpGG16JVJcNgUw",
+        "http.request.id": "0ybRdKGYRAekov1eKI6nIw",
+        "http.request.method": "PUT",
+        "input.type": "log",
+        "log.offset": 965,
+        "message": "{\"type\":\"audit\", \"timestamp\":\"2022-01-27T14:16:30,950+0100\", \"node.id\":\"O8SFUsk8QpGG16JVJcNgUw\", \"event.type\":\"rest\", \"event.action\":\"anonymous_access_denied\", \"origin.type\":\"rest\", \"origin.address\":\"[::1]:64583\", \"url.path\":\"/test_3\", \"request.method\":\"PUT\", \"request.id\":\"0ybRdKGYRAekov1eKI6nIw\", \"opaque_id\":\"myApp1\", \"trace.id\":\"0af7651916cd43dd8448eb211c80319c\"}",
+        "service.type": "elasticsearch",
+        "source.address": "[::1]:64583",
+        "source.ip": "::1",
+        "source.port": 64583,
+        "trace.id": "0af7651916cd43dd8448eb211c80319c",
+        "url.original": "/test_3"
+    }
+]
