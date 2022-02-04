@@ -1,5 +1,5 @@
 # Module: google_workspace
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.16/filebeat-module-google_workspace.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.17/filebeat-module-google_workspace.html
 
 - module: google_workspace
   saml:

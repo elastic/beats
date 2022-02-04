@@ -1,5 +1,5 @@
 # Module: cyberark
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.16/filebeat-module-cyberark.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.17/filebeat-module-cyberark.html
 
 # The cyberark module is deprecated and will be removed in future releases.
 # Please use the Cyberark Privileged Account Security (cyberarkpas) module instead.

@@ -1,5 +1,5 @@
 # Module: haproxy
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.16/filebeat-module-haproxy.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.17/filebeat-module-haproxy.html
 
 - module: haproxy
   # All logs

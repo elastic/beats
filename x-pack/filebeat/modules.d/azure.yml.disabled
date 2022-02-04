@@ -1,5 +1,5 @@
 # Module: azure
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.16/filebeat-module-azure.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/7.17/filebeat-module-azure.html
 
 - module: azure
   # All logs
