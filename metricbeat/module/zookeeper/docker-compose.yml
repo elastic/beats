@@ -10,4 +10,4 @@ services:
     ports:
       - 2181
     environment:
-      - ZOO_4LW_COMMANDS_WHITELIST="stat, ruok, conf, isro, cons, mntr"
+      - ZOO_4LW_COMMANDS_WHITELIST=stat, ruok, conf, isro, cons, mntr
