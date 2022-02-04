@@ -1,26 +1,34 @@
 {
     "attributes": {
-        "description": "Recorded Future risk summary for indicators ingested by the threat intel Filebeat module.",
+        "description": "Recorded Future evidence timestamp, ingested threat intel Filebeat module.",
         "state": {
             "datasourceStates": {
                 "indexpattern": {
                     "layers": {
-                        "41f41086-8875-4d18-8844-b51b9c9cb8bc": {
+                        "189f5cd8-f47f-4a4b-8b06-1417ddf545f8": {
                             "columnOrder": [
-                                "642d5400-4a72-4116-b752-58df5138392a",
-                                "9afb1b09-0f20-488c-9242-a94f7d11800b"
+                                "d5b0eba3-5cb3-40fe-adb6-8f1a1de50e57",
+                                "b5aa0466-7f5c-4c82-a134-f4d56ed3e9db"
                             ],
                             "columns": {
-                                "642d5400-4a72-4116-b752-58df5138392a": {
+                                "b5aa0466-7f5c-4c82-a134-f4d56ed3e9db": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Count of records",
+                                    "operationType": "count",
+                                    "scale": "ratio",
+                                    "sourceField": "Records"
+                                },
+                                "d5b0eba3-5cb3-40fe-adb6-8f1a1de50e57": {
                                     "customLabel": true,
                                     "dataType": "string",
                                     "isBucketed": true,
-                                    "label": "Recorded Future Risk Summary",
+                                    "label": "Recorded Future Evidence Timestamp",
                                     "operationType": "terms",
                                     "params": {
                                         "missingBucket": false,
                                         "orderBy": {
-                                            "columnId": "9afb1b09-0f20-488c-9242-a94f7d11800b",
+                                            "columnId": "b5aa0466-7f5c-4c82-a134-f4d56ed3e9db",
                                             "type": "column"
                                         },
                                         "orderDirection": "desc",
@@ -28,15 +36,7 @@
                                         "size": 10
                                     },
                                     "scale": "ordinal",
-                                    "sourceField": "recordedfuture.risk_string"
-                                },
-                                "9afb1b09-0f20-488c-9242-a94f7d11800b": {
-                                    "dataType": "number",
-                                    "isBucketed": false,
-                                    "label": "Count of records",
-                                    "operationType": "count",
-                                    "scale": "ratio",
-                                    "sourceField": "Records"
+                                    "sourceField": "recordedfuture.evidence_details.Timestamp"
                                 }
                             },
                             "incompleteColumns": {}
@@ -47,28 +47,28 @@
             "filters": [],
             "query": {
                 "language": "kuery",
-                "query": "event.dataset:\"threatintel.recordedfuture\""
+                "query": ""
             },
             "visualization": {
                 "columns": [
                     {
-                        "columnId": "642d5400-4a72-4116-b752-58df5138392a",
+                        "columnId": "d5b0eba3-5cb3-40fe-adb6-8f1a1de50e57",
                         "isTransposed": false
                     },
                     {
-                        "columnId": "9afb1b09-0f20-488c-9242-a94f7d11800b",
+                        "columnId": "b5aa0466-7f5c-4c82-a134-f4d56ed3e9db",
                         "isTransposed": false
                     }
                 ],
-                "layerId": "41f41086-8875-4d18-8844-b51b9c9cb8bc",
+                "layerId": "189f5cd8-f47f-4a4b-8b06-1417ddf545f8",
                 "layerType": "data"
             }
         },
-        "title": "Recorded Future Risk Summary [Filebeat Threat Intel]",
+        "title": "Recorded Future Evidence Timestamp [Filebeat Threat Intel]",
         "visualizationType": "lnsDatatable"
     },
     "coreMigrationVersion": "8.1.0",
-    "id": "949bc180-df52-11eb-8f2b-753caedf727d",
+    "id": "739274d0-8479-11ec-8aa9-11bf914a1ef2",
     "migrationVersion": {
         "lens": "8.1.0"
     },
@@ -80,7 +80,7 @@
         },
         {
             "id": "filebeat-*",
-            "name": "indexpattern-datasource-layer-41f41086-8875-4d18-8844-b51b9c9cb8bc",
+            "name": "indexpattern-datasource-layer-189f5cd8-f47f-4a4b-8b06-1417ddf545f8",
             "type": "index-pattern"
         },
         {
@@ -90,6 +90,6 @@
         }
     ],
     "type": "lens",
-    "updated_at": "2022-02-02T22:19:12.496Z",
-    "version": "WzE4MDEsMV0="
+    "updated_at": "2022-02-02T22:45:05.207Z",
+    "version": "WzIzMTksMV0="
 }
