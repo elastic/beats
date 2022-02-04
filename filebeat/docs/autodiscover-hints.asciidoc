@@ -91,6 +91,16 @@ co.elastic.logs/processors.dissect.tokenizer: "%{key2} %{key1}"
 In the above sample the processor definition tagged with `1` would be executed first.
 
 [float]
+===== `co.elastic.logs/pipeline`
+
+Define an ingest pipeline ID to be added to the {beatname_uc} input/module configuration.
+
+[source,yaml]
+-----
+co.elastic.logs/pipeline: custom-pipeline
+-----
+
+[float]
 ==== Kubernetes
 
 Kubernetes autodiscover provider supports hints in Pod annotations. To enable it just set `hints.enabled`:
