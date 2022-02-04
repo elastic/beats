@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - The extension of the log files of Beats and Elastic Agent is changed to `.ndjson`. If you are collecting the logs, you must change the path configuration to `/path/to/logs/{beatname}*.ndjson` to avoid any issues. {pull}28927[28927]
 - Remove legacy support for SSLv3. {pull}30071[30071]
 - `add_fields` processor is now able to set metadata in events {pull}30092[30092]
+- Add metadata change support for some processors {pull}30183[30183]
 
 *Auditbeat*
 

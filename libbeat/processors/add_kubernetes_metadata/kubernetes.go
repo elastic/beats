@@ -258,6 +258,9 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 	})
 }
 
+// Run runs the processor that adds a field `kubernetes` to the event fields that
+// contains a map with various Kubernetes metadata.
+// This processor does not access or modify the `Meta` of the event.
 func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	if !k.kubernetesAvailable {
 		return event, nil
