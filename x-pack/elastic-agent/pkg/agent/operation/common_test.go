@@ -12,8 +12,6 @@ import (
 	"testing"
 	"time"
 
-	"go.elastic.co/apm"
-
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
@@ -65,8 +63,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 	if err != nil {
 		t.Fatal(err)
 	}
-	tracer := apm.DefaultTracer
-	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{}, tracer)
+	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{})
 	if err != nil {
 		t.Fatal(err)
 	}
