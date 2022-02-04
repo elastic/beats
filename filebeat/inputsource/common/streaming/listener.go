@@ -64,7 +64,7 @@ var (
 		"rfc6587":   FramingRFC6587,
 	}
 
-	framingTypeNames []string
+	availableFramingTypesErrFormat string
 )
 
 func init() {
@@ -72,6 +72,9 @@ func init() {
 	for t := range framingTypes {
 		framingTypeNames = append(framingTypeNames, t)
 	}
+
+	availableFramingTypesErrFormat = fmt.Sprintf("invalid framing type %%q, "+
+		"the supported types are [%v]", strings.Join(framingTypeNames, ", "))
 }
 
 // Unpack unpacks the FramingType string value.
@@ -80,7 +83,7 @@ func (f *FramingType) Unpack(value string) error {
 
 	ft, ok := framingTypes[value]
 	if !ok {
-		return fmt.Errorf("invalid framing type %q, the supported types are [%v]", value, strings.Join(framingTypeNames, ", "))
+		return fmt.Errorf(availableFramingTypesErrFormat, value)
 	}
 
 	*f = ft
@@ -229,6 +232,6 @@ func SplitFunc(framing FramingType, lineDelimiter []byte) (bufio.SplitFunc, erro
 	case FramingRFC6587:
 		return FactoryRFC6587Framing(lineDelimiter), nil
 	default:
-		return nil, fmt.Errorf("unknown SplitFunc for framing %d and line delimiter %q", framing, string(lineDelimiter))
+		return nil, fmt.Errorf("unknown SplitFunc for framing %d and line delimiter %q", framing, lineDelimiter)
 	}
 }
