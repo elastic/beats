@@ -5,10 +5,6 @@
 package stream
 
 import (
-	"context"
-
-	"go.elastic.co/apm"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -48,16 +44,8 @@ func (b *operatorStream) Specs() map[string]program.Spec {
 	return nil
 }
 
-func (b *operatorStream) Execute(ctx context.Context, cfg configrequest.Request) (err error) {
-	span, ctx := apm.StartSpan(ctx, "route", "app.internal")
-	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
-		span.End()
-	}()
-	err = b.configHandler.HandleConfig(ctx, cfg)
-	return
+func (b *operatorStream) Execute(cfg configrequest.Request) error {
+	return b.configHandler.HandleConfig(cfg)
 }
 
 func (b *operatorStream) Shutdown() {
