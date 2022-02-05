@@ -10,6 +10,29 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
+- Remove deprecated/undocumented IncludeCreatorMetadata setting from kubernetes metadata config options {pull}28006[28006]
+- Remove deprecated fields from kubernetes module {pull}28046[28046]
+- Remove deprecated config option aws_partition. {pull}28120[28120]
+- Improve stats API {pull}27963[27963]
+- Libbeat: logp package forces ECS compliant logs. Logs are JSON formatted. Options to enable ECS/JSON have been removed. {issue}15544[15544] {pull}28573[28573]
+- Update docker client. {pull}28716[28716]
+- Remove `auto` from the available options of `setup.ilm.enabled` and set the default value to `true`. {pull}28671[28671]
+- add_process_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
+- add_docker_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
+- Use data streams instead of indices for storing events from Beats. {pull}28450[28450]
+- Remove option `setup.template.type` and always load composable template with data streams. {pull}28450[28450]
+- Remove several ILM options (`rollover_alias` and `pattern`) as data streams does not require index aliases. {pull}28450[28450]
+- Index template's default_fields setting is only populated with ECS fields. {pull}28596[28596] {issue}28215[28215]
+- Remove `auto` from the available options of `setup.ilm.enabled` and set the default value to `true`. {pull}28671[28671]
+- Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
+- Remove options `logging.files.suffix` and default to datetime endings in log file names. The format of the new name is `{beatname}-{date}(-n)?.ndjson`. Exmaple log files names from oldest to newest: `filebeat-20200101.ndjson`, `filebeat-20200101-1.ndjson`, `filebeat-20200101-2.ndjson`. {pull}28927[28927]
+- Remove Journalbeat. Use `journald` input of Filebeat instead. {pull}29131[29131]
+- `include_matches` option of `journald` input no longer accepts a list of string. {pull}29294[29294]
+- Allign kubernetes configuration settings. {pull}29908[29908]
+- The extension of the log files of Beats and Elastic Agent is changed to `.ndjson`. If you are collecting the logs, you must change the path configuration to `/path/to/logs/{beatname}*.ndjson` to avoid any issues. {pull}28927[28927]
+- Remove legacy support for SSLv3. {pull}30071[30071]
+- `add_fields` processor is now able to set metadata in events {pull}30092[30092]
 
 *Auditbeat*
 
