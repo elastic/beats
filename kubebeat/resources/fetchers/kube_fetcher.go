@@ -16,9 +16,8 @@ import (
 )
 
 const (
-	KubeAPIType         = "kube-api"
-	kubeSystemNamespace = "kube-system"
-	allNamespaces       = "" // The Kube API treats this as "all namespaces"
+	KubeAPIType   = "kube-api"
+	allNamespaces = "" // The Kube API treats this as "all namespaces"
 )
 
 var (
@@ -30,7 +29,6 @@ var (
 			allNamespaces,
 		},
 		{
-
 			&kubernetes.Secret{},
 			allNamespaces,
 		},
@@ -87,7 +85,7 @@ func NewKubeFetcher(kubeconfig string, interval time.Duration) (resources.Fetche
 }
 
 func (f *KubeFetcher) initWatcher(client k8s.Interface, r requiredResource) error {
-	w, err := kubernetes.NewWatcher(client, r.resource, kubernetes.WatchOptions{
+	watcher, err := kubernetes.NewWatcher(client, r.resource, kubernetes.WatchOptions{
 		SyncTimeout: f.interval,
 		Namespace:   r.namespace,
 	}, nil)
@@ -102,11 +100,11 @@ func (f *KubeFetcher) initWatcher(client k8s.Interface, r requiredResource) erro
 	// When such a failure happens, kubebeat won't shut down gracefuly, i.e. Stop will not work. This
 	// happens due to a context.TODO present in the libbeat dependency. It needs to accept context
 	// from the caller instead.
-	if err := w.Start(); err != nil {
+	if err := watcher.Start(); err != nil {
 		return fmt.Errorf("could not start watcher: %w", err)
 	}
 
-	f.watchers = append(f.watchers, w)
+	f.watchers = append(f.watchers, watcher)
 
 	return nil
 }
@@ -144,53 +142,31 @@ func (f *KubeFetcher) Fetch(ctx context.Context) ([]resources.FetcherResult, err
 		return nil, fmt.Errorf("could not initate Kubernetes watchers: %w", err)
 	}
 
-	ret := make([]resources.FetcherResult, 0)
-
-	for _, w := range f.watchers {
-		rs := w.Store().List()
-
-		for _, r := range rs {
-			o, ok := r.(runtime.Object)
-
-			if !ok {
-				logp.L().Errorf("Bad resource: %#v does not implement runtime.Object", r)
-				continue
-			}
-
-			addTypeInformationToObject(o) // See https://github.com/kubernetes/kubernetes/issues/3030
-
-			ret = append(ret, resources.FetcherResult{
-				Type:     KubeAPIType,
-				Resource: o,
-			})
-		}
-	}
-
-	return ret, nil
+	return GetKubeData(f.watchers), nil
 }
 
 func (f *KubeFetcher) Stop() {
-	for _, w := range f.watchers {
-		w.Stop()
+	for _, watcher := range f.watchers {
+		watcher.Stop()
 	}
 }
 
-// addTypeInformationToObject adds TypeMeta information to a runtime.Object based upon the loaded scheme.Scheme
+// addTypeInformationToKubeResource adds TypeMeta information to a kubernetes.Resource based upon the loaded scheme.Scheme
 // inspired by: https://github.com/kubernetes/cli-runtime/blob/v0.19.2/pkg/printers/typesetter.go#L41
-func addTypeInformationToObject(obj runtime.Object) error {
-	gvks, _, err := scheme.Scheme.ObjectKinds(obj)
+func addTypeInformationToKubeResource(resource kubernetes.Resource) error {
+	groupVersionKinds, _, err := scheme.Scheme.ObjectKinds(resource)
 	if err != nil {
 		return fmt.Errorf("missing apiVersion or kind and cannot assign it; %w", err)
 	}
 
-	for _, gvk := range gvks {
-		if len(gvk.Kind) == 0 {
+	for _, groupVersionKind := range groupVersionKinds {
+		if len(groupVersionKind.Kind) == 0 {
 			continue
 		}
-		if len(gvk.Version) == 0 || gvk.Version == runtime.APIVersionInternal {
+		if len(groupVersionKind.Version) == 0 || groupVersionKind.Version == runtime.APIVersionInternal {
 			continue
 		}
-		obj.GetObjectKind().SetGroupVersionKind(gvk)
+		resource.GetObjectKind().SetGroupVersionKind(groupVersionKind)
 		break
 	}
 
