@@ -69,16 +69,21 @@ type requiredResource struct {
 }
 
 type KubeFetcher struct {
-	kubeconfig string
-	interval   time.Duration
-	watchers   []kubernetes.Watcher
+	cfg KubeApiFetcherConfig
+
+	watchers []kubernetes.Watcher
 }
 
-func NewKubeFetcher(kubeconfig string, interval time.Duration) (resources.Fetcher, error) {
+type KubeApiFetcherConfig struct {
+	resources.BaseFetcherConfig
+	Interval   time.Duration `config:"interval"`
+	Kubeconfig string        `config:"kubeconfig"`
+}
+
+func NewKubeFetcher(cfg KubeApiFetcherConfig) (resources.Fetcher, error) {
 	f := &KubeFetcher{
-		kubeconfig: kubeconfig,
-		interval:   interval,
-		watchers:   make([]kubernetes.Watcher, 0),
+		cfg:      cfg,
+		watchers: make([]kubernetes.Watcher, 0),
 	}
 
 	return f, nil
@@ -86,7 +91,7 @@ func NewKubeFetcher(kubeconfig string, interval time.Duration) (resources.Fetche
 
 func (f *KubeFetcher) initWatcher(client k8s.Interface, r requiredResource) error {
 	watcher, err := kubernetes.NewWatcher(client, r.resource, kubernetes.WatchOptions{
-		SyncTimeout: f.interval,
+		SyncTimeout: f.cfg.Interval,
 		Namespace:   r.namespace,
 	}, nil)
 	if err != nil {
@@ -110,7 +115,7 @@ func (f *KubeFetcher) initWatcher(client k8s.Interface, r requiredResource) erro
 }
 
 func (f *KubeFetcher) initWatchers() error {
-	client, err := kubernetes.GetKubernetesClient(f.kubeconfig, kubernetes.KubeClientOptions{})
+	client, err := kubernetes.GetKubernetesClient(f.cfg.Kubeconfig, kubernetes.KubeClientOptions{})
 	if err != nil {
 		return fmt.Errorf("could not get k8s client: %w", err)
 	}

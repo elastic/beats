@@ -134,7 +134,12 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 
 func InitRegistry(ctx context.Context, c config.Config) (resources.FetchersRegistry, error) {
 	registry := resources.NewFetcherRegistry()
-	kubef, err := fetchers.NewKubeFetcher(c.KubeConfig, c.Period)
+
+	kubeCfg := fetchers.KubeApiFetcherConfig{
+		Kubeconfig: c.KubeConfig,
+		Interval:   c.Period,
+	}
+	kubef, err := fetchers.NewKubeFetcher(kubeCfg)
 	if err != nil {
 		return nil, err
 	}
@@ -150,10 +155,22 @@ func InitRegistry(ctx context.Context, c config.Config) (resources.FetchersRegis
 	if err = registry.Register("kube_api", kubef, condition); err != nil {
 		return nil, err
 	}
-	if err = registry.Register("processes", fetchers.NewProcessesFetcher(processesDir)); err != nil {
+
+	procCfg := fetchers.ProcessFetcherConfig{
+		Directory: processesDir,
+	}
+	procf := fetchers.NewProcessesFetcher(procCfg)
+
+	if err = registry.Register("processes", procf); err != nil {
 		return nil, err
 	}
-	if err = registry.Register("file_system", fetchers.NewFileFetcher(c.Files)); err != nil {
+
+	fileCfg := fetchers.FileFetcherConfig{
+		Patterns: c.Files,
+	}
+	filef := fetchers.NewFileFetcher(fileCfg)
+
+	if err = registry.Register("file_system", filef); err != nil {
 		return nil, err
 	}
 

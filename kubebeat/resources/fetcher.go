@@ -35,3 +35,7 @@ type ProcessResource struct {
 	Cmd  string        `json:"command"`
 	Stat proc.ProcStat `json:"stat"`
 }
+
+type BaseFetcherConfig struct {
+	Fetcher string `config:"fetcher"`
+}

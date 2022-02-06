@@ -10,23 +10,28 @@ import (
 const ELBType = "aws-elb"
 
 type ELBFetcher struct {
+	cfg         ELBFetcherConfig
 	elbProvider *ELBProvider
-	lbNames     []string
 }
 
-func NewELBFetcher(cfg aws.Config, loadBalancersNames []string) (resources.Fetcher, error) {
-	elb := NewELBProvider(cfg)
+type ELBFetcherConfig struct {
+	resources.BaseFetcherConfig
+	LoadBalancerNames []string `config:"loadBalancers"`
+}
+
+func NewELBFetcher(awsCfg aws.Config, cfg ELBFetcherConfig) (resources.Fetcher, error) {
+	elb := NewELBProvider(awsCfg)
 
 	return &ELBFetcher{
 		elbProvider: elb,
-		lbNames:     loadBalancersNames,
+		cfg:         cfg,
 	}, nil
 }
 
 func (f ELBFetcher) Fetch(ctx context.Context) ([]resources.FetcherResult, error) {
 	results := make([]resources.FetcherResult, 0)
 
-	result, err := f.elbProvider.DescribeLoadBalancer(ctx, f.lbNames)
+	result, err := f.elbProvider.DescribeLoadBalancer(ctx, f.cfg.LoadBalancerNames)
 	results = append(results, resources.FetcherResult{
 		Type:     ELBType,
 		Resource: result,

@@ -12,17 +12,22 @@ const (
 )
 
 type ProcessesFetcher struct {
-	directory string // parent directory of target procfs
+	cfg ProcessFetcherConfig
 }
 
-func NewProcessesFetcher(dir string) resources.Fetcher {
+type ProcessFetcherConfig struct {
+	resources.BaseFetcherConfig
+	Directory string `config:"directory"` // parent directory of target procfs
+}
+
+func NewProcessesFetcher(cfg ProcessFetcherConfig) resources.Fetcher {
 	return &ProcessesFetcher{
-		directory: dir,
+		cfg: cfg,
 	}
 }
 
 func (f *ProcessesFetcher) Fetch(ctx context.Context) ([]resources.FetcherResult, error) {
-	pids, err := proc.List(f.directory)
+	pids, err := proc.List(f.cfg.Directory)
 	if err != nil {
 		return nil, err
 	}
@@ -32,12 +37,12 @@ func (f *ProcessesFetcher) Fetch(ctx context.Context) ([]resources.FetcherResult
 	// If errors occur during read, then return what we have till now
 	// without reporting errors.
 	for _, p := range pids {
-		cmd, err := proc.ReadCmdLine(f.directory, p)
+		cmd, err := proc.ReadCmdLine(f.cfg.Directory, p)
 		if err != nil {
 			return ret, nil
 		}
 
-		stat, err := proc.ReadStat(f.directory, p)
+		stat, err := proc.ReadStat(f.cfg.Directory, p)
 		if err != nil {
 			return ret, nil
 		}

@@ -10,23 +10,28 @@ import (
 const EKSType = "aws-eks"
 
 type EKSFetcher struct {
+	cfg         EKSFetcherConfig
 	eksProvider *EKSProvider
-	clusterName string
 }
 
-func NewEKSFetcher(cfg aws.Config, clusterName string) (resources.Fetcher, error) {
-	eks := NewEksProvider(cfg)
+type EKSFetcherConfig struct {
+	resources.BaseFetcherConfig
+	ClusterName string `config:"clusterName"`
+}
+
+func NewEKSFetcher(awsCfg aws.Config, cfg EKSFetcherConfig) (resources.Fetcher, error) {
+	eks := NewEksProvider(awsCfg)
 
 	return &EKSFetcher{
+		cfg:         cfg,
 		eksProvider: eks,
-		clusterName: clusterName,
 	}, nil
 }
 
 func (f EKSFetcher) Fetch(ctx context.Context) ([]resources.FetcherResult, error) {
 	results := make([]resources.FetcherResult, 0)
 
-	result, err := f.eksProvider.DescribeCluster(ctx, f.clusterName)
+	result, err := f.eksProvider.DescribeCluster(ctx, f.cfg.ClusterName)
 	results = append(results, resources.FetcherResult{
 		Type:     EKSType,
 		Resource: result,
