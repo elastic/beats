@@ -18,6 +18,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/elastic/beats/v7/libbeat/cmd"
@@ -27,6 +28,7 @@ import (
 var RootCmd = cmd.GenRootCmdWithSettings(mock.New, mock.Settings)
 
 func main() {
+	fmt.Println("DO NOT MERGE THIS.")
 	if err := RootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
