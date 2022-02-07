@@ -148,6 +148,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Auditbeat*
 
 - system/process: Prevent hashing files in other mnt namespaces. {issue}25777[25777] {issue}29678[29678] {pull}29786[29786]
+- system/socket: Add process.entity_id capture for socket events. {issue}30230[30230] {pull}30231[30231]
 
 *Filebeat*
 
