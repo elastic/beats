@@ -1,0 +1,38 @@
+name: Cloudbeat
+cmd: cloudbeat
+args: [
+  "-E", "setup.ilm.enabled=false",
+  "-E", "setup.template.enabled=false",
+  "-E", "management.enabled=true",
+  "-E", "logging.level=debug"
+]
+restart_on_output_change: true
+artifact: beats/cloudbeat
+action_input_types:
+- cloudbeat
+
+rules:
+- fix_stream: {}
+- inject_index:
+    type: logs
+
+- inject_stream_processor:
+    on_conflict: insert_after
+    type: logs
+
+- filter_values:
+    selector: inputs
+    key: type
+    values:
+    - cloudbeat
+
+- inject_agent_info: {}
+
+- filter:
+    selectors:
+    - inputs
+    - output
+
+when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
+
+# TODO cloudbeat needs to be filled up relevant Needs to  be filled according to cloudbeat config

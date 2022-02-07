@@ -58,12 +58,12 @@ jobs:
             make mage
 
       - name: Build Opabeat Bin
-        working-directory: ./kubebeat
+        working-directory: ./cloudbeat
         run: |
             GOOS=linux go build -v && docker build -t opabeat .
 
       - name: Unit Test Opabeat
-        working-directory: ./kubebeat
+        working-directory: ./cloudbeat
         run: |
             GOOS=linux go test
 

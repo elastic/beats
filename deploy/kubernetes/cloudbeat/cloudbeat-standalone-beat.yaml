@@ -1,0 +1,254 @@
+# Deploy a cloudbeat instance per node for cis policy
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cloudbeat
+  namespace: kube-system
+  labels:
+    k8s-app: cloudbeat
+spec:
+  selector:
+    matchLabels:
+      k8s-app: cloudbeat
+  template:
+    metadata:
+      labels:
+        k8s-app: cloudbeat
+    spec:
+      serviceAccountName: cloudbeat
+      terminationGracePeriodSeconds: 30
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: cloudbeat
+        image: cloudbeat
+        # args: [
+        #   "-e",
+        #   "-d", 
+        #   "'*'"
+        #   ]
+        env:
+        - name: ELASTICSEARCH_HOST
+          value: elasticsearch
+        - name: ELASTICSEARCH_PORT
+          value: "9200"
+        - name: ELASTICSEARCH_USERNAME
+          value: elastic
+        - name: ELASTICSEARCH_PASSWORD
+          value: changeme
+        - name: ELASTIC_CLOUD_ID
+          value:
+        - name: ELASTIC_CLOUD_AUTH
+          value:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        securityContext:
+          runAsUser: 0
+          # If using Red Hat OpenShift uncomment this:
+          #privileged: true
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - name: config
+          mountPath: /etc/cloudbeat.yml
+          readOnly: true
+          subPath: cloudbeat.yml
+        - name: proc
+          mountPath: /hostfs/proc
+          readOnly: true
+        - name: cgroup
+          mountPath: /hostfs/sys/fs/cgroup
+          readOnly: true
+      volumes:
+      - name: proc
+        hostPath:
+          path: /proc
+      - name: cgroup
+        hostPath:
+          path: /sys/fs/cgroup
+      - name: config
+        configMap:
+          defaultMode: 0640
+          name: cloudbeat-daemonset-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudbeat-daemonset-config
+  namespace: kube-system
+  labels:
+    k8s-app: cloudbeat
+data:
+  cloudbeat.yml: |-
+    cloudbeat:
+      # Defines how often an event is sent to the output
+      period: 5s
+
+    # =================================== Kibana ===================================
+    setup.kibana:
+
+      # Kibana Host
+      host: "http://host.minikube.internal:5601"
+    # =============================== Elastic Cloud ================================
+
+    # These settings simplify using Cloudbeat with the Elastic Cloud (https://cloud.elastic.co/).
+
+    # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
+    # `setup.kibana.host` options.
+    # You can find the `cloud.id` in the Elastic Cloud web UI.
+    #cloud.id:
+
+    # The cloud.auth setting overwrites the `output.elasticsearch.username` and
+    # `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
+    #cloud.auth:
+
+    # ---------------------------- Elasticsearch Output ----------------------------
+    output.elasticsearch:
+      # Array of hosts to connect to.
+      hosts: ["host.minikube.internal:9200"]
+
+      # Protocol - either `http` (default) or `https`.
+      #protocol: "https"
+
+      # Authentication credentials - either API key or username/password.
+      #api_key: "id:api_key"
+      username: "elastic"
+      password: "changeme"
+
+    # ================================= Processors =================================
+    processors:
+      - add_host_metadata: ~
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cloudbeat
+  namespace: kube-system
+  labels:
+    k8s-app: cloudbeat
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cloudbeat
+  labels:
+    k8s-app: cloudbeat
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - namespaces
+  - events
+  - pods
+  - services
+  verbs: ["get", "list", "watch"]
+# Enable this rule only if planing to use Kubernetes keystore
+#- apiGroups: [""]
+#  resources:
+#  - secrets
+#  verbs: ["get"]
+- apiGroups: ["extensions"]
+  resources:
+  - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources:
+  - statefulsets
+  - deployments
+  - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["batch"]
+  resources:
+  - jobs
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - ""
+  resources:
+  - nodes/stats
+  verbs:
+  - get
+- nonResourceURLs:
+  - "/metrics"
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cloudbeat
+  # should be the namespace where cloudbeat is running
+  namespace: kube-system
+  labels:
+    k8s-app: cloudbeat
+rules:
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs: ["get", "create", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cloudbeat-kubeadm-config
+  namespace: kube-system
+  labels:
+    k8s-app: cloudbeat
+rules:
+  - apiGroups: [""]
+    resources:
+      - configmaps
+    resourceNames:
+      - kubeadm-config
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cloudbeat
+subjects:
+- kind: ServiceAccount
+  name: cloudbeat
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: cloudbeat
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cloudbeat
+  namespace: kube-system
+subjects:
+  - kind: ServiceAccount
+    name: cloudbeat
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: cloudbeat
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cloudbeat-kubeadm-config
+  namespace: kube-system
+subjects:
+  - kind: ServiceAccount
+    name: cloudbeat
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: cloudbeat-kubeadm-config
+  apiGroup: rbac.authorization.k8s.io
+---

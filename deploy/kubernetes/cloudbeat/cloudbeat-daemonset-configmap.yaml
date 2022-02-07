@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudbeat-daemonset-config
+  namespace: kube-system
+  labels:
+    k8s-app: cloudbeat
+data:
+  cloudbeat.yml: |-
+    cloudbeat:
+      # Defines how often an event is sent to the output
+      period: 5s
+
+    # =================================== Kibana ===================================
+    setup.kibana:
+
+      # Kibana Host
+      host: "http://host.minikube.internal:5601"
+    # =============================== Elastic Cloud ================================
+
+    # These settings simplify using Cloudbeat with the Elastic Cloud (https://cloud.elastic.co/).
+
+    # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
+    # `setup.kibana.host` options.
+    # You can find the `cloud.id` in the Elastic Cloud web UI.
+    #cloud.id:
+
+    # The cloud.auth setting overwrites the `output.elasticsearch.username` and
+    # `output.elasticsearch.password` settings. The format is `<user>:<pass>`.
+    #cloud.auth:
+
+    # ---------------------------- Elasticsearch Output ----------------------------
+    output.elasticsearch:
+      # Array of hosts to connect to.
+      hosts: ["host.minikube.internal:9200"]
+
+      # Protocol - either `http` (default) or `https`.
+      #protocol: "https"
+
+      # Authentication credentials - either API key or username/password.
+      #api_key: "id:api_key"
+      username: "elastic"
+      password: "changeme"
+
+    # ================================= Processors =================================
+    processors:
+      - add_host_metadata: ~
+      - add_cloud_metadata: ~
+      - add_docker_metadata: ~

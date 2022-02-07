@@ -1,0 +1,10 @@
+/.idea
+/build
+
+.DS_Store
+/cloudbeat
+/cloudbeat.test
+*.pyc
+*local.yaml
+*local.yml
+tmpBundles/

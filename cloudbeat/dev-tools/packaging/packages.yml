@@ -1,0 +1,81 @@
+---
+
+# This file contains the package specifications for cloudbeat.
+
+shared:
+  - &common
+    name: '{{.BeatName}}'
+    service_name: '{{.BeatServiceName}}'
+    os: '{{.GOOS}}'
+    arch: '{{.PackageArch}}'
+    vendor: '{{.BeatVendor}}'
+    version: '{{ beat_version }}'
+    license: '{{.BeatLicense}}'
+    url: '{{.BeatURL}}'
+    description: '{{.BeatDescription}}'
+
+  - &binary_files
+    '{{.BeatName}}{{.BinaryExt}}':
+      source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+      mode: 0755
+    fields.yml:
+      source: fields.yml
+      mode: 0644
+    LICENSE.txt:
+      source: '{{ repo.RootDir }}/LICENSE.txt'
+      mode: 0644
+    NOTICE.txt:
+      source: '{{ repo.RootDir }}/NOTICE.txt'
+      mode: 0644
+    README.md:
+      template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/common/README.md.tmpl'
+      mode: 0644
+    .build_hash.txt:
+      content: >
+        {{ commit }}
+      mode: 0644
+    '{{.BeatName}}.reference.yml':
+      source: '{{.BeatName}}.reference.yml'
+      mode: 0644
+    '{{.BeatName}}.yml':
+      source: '{{.BeatName}}.yml'
+      mode: 0600
+      config: true
+
+  # Binary package spec (tar.gz for linux/darwin)
+  - &unix_binary_spec
+    <<: *common
+    files:
+      <<: *binary_files
+
+  #
+  # License modifiers for the Elastic License
+  #
+  - &elastic_license_for_binaries
+    license: "Elastic License"
+    files:
+      LICENSE.txt:
+        source: '{{ repo.RootDir }}/licenses/ELASTIC-LICENSE.txt'
+        mode: 0644
+
+# specs is a list of named packaging "flavors".
+specs:
+  cloudbeat:
+    ###
+    # Elastic Licensed Packages
+    ###
+    - os: darwin
+      types: [tgz]
+      spec:
+        <<: *unix_binary_spec
+        <<: *elastic_license_for_binaries
+
+    - os: linux
+      arch: amd64
+      types: [tgz]
+      spec:
+        <<: *unix_binary_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}

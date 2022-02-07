@@ -22,7 +22,7 @@ func init() {
 	// spec/filebeat.yml
 	// spec/fleet-server.yml
 	// spec/heartbeat.yml
-	// spec/kubebeat.yml
+	// spec/cloudbeat.yml
 	// spec/metricbeat.yml
 	// spec/osquerybeat.yml
 	// spec/packetbeat.yml

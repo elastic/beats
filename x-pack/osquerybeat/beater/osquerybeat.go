@@ -370,4 +370,4 @@ func (bt *osquerybeat) unregisterActionHandler(b *beat.Beat, ah *actionHandler) 
 	}
 }
 
-// ToDo Copy regsiterAction Handler to kubebeat
+// ToDo Copy regsiterAction Handler to cloudbeat
