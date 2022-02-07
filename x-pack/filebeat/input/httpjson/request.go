@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -37,8 +37,17 @@ func (c *httpClient) do(stdCtx context.Context, trCtx *transformContext, req *ht
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute http client.Do: %w", err)
 	}
+	defer resp.Body.Close()
+
+	// Read the whole resp.Body so we can release the conneciton.
+	// This implementaion is inspired by httputil.DumpResponse
+	resp.Body, err = drainBody(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %w", err)
+	}
+
 	if resp.StatusCode > 399 {
-		body, _ := ioutil.ReadAll(resp.Body)
+		body, _ := io.ReadAll(resp.Body)
 		resp.Body.Close()
 		return nil, fmt.Errorf("server responded with status code %d: %s", resp.StatusCode, string(body))
 	}
@@ -210,4 +219,28 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 	r.log.Infof("request finished: %d events published", n)
 
 	return nil
+}
+
+// drainBody reads all of b to memory and then returns a equivalent
+// ReadCloser yielding the same bytes.
+//
+// It returns an error if the initial slurp of all bytes fails. It does not attempt
+// to make the returned ReadCloser have identical error-matching behavior.
+//
+// This function is a modified version of drainBody from the http/httputil package.
+func drainBody(b io.ReadCloser) (r1 io.ReadCloser, err error) {
+	if b == nil || b == http.NoBody {
+		// No copying needed. Preserve the magic sentinel meaning of NoBody.
+		return http.NoBody, nil
+	}
+
+	var buf bytes.Buffer
+	if _, err = buf.ReadFrom(b); err != nil {
+		return b, err
+	}
+	if err = b.Close(); err != nil {
+		return b, err
+	}
+
+	return io.NopCloser(&buf), nil
 }
