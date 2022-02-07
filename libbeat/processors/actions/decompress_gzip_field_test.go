@@ -188,4 +188,38 @@ func TestDecompressGzip(t *testing.T) {
 			assert.Equal(t, test.output, newEvent.Fields)
 		})
 	}
+
+	t.Run("supports metadata as a target", func(t *testing.T) {
+		t.Parallel()
+
+		event := &beat.Event{
+			Fields: common.MapStr{
+				"field1": []byte{31, 139, 8, 0, 0, 0, 0, 0, 0, 255, 74, 73, 77, 206, 207, 45, 40, 74, 45, 46, 78, 77, 81, 72, 73, 44, 73, 4, 4, 0, 0, 255, 255, 108, 158, 105, 19, 17, 0, 0, 0},
+			},
+			Meta: common.MapStr{},
+		}
+
+		expectedMeta := common.MapStr{
+			"field": "decompressed data",
+		}
+
+		config := decompressGzipFieldConfig{
+			Field: fromTo{
+				From: "field1", To: "@metadata.field",
+			},
+			IgnoreMissing: false,
+			FailOnError:   true,
+		}
+
+		f := &decompressGzipField{
+			log:    logp.NewLogger("decompress_gzip_field"),
+			config: config,
+		}
+
+		newEvent, err := f.Run(event)
+		assert.NoError(t, err)
+
+		assert.Equal(t, expectedMeta, newEvent.Meta)
+		assert.Equal(t, event.Fields, newEvent.Fields)
+	})
 }

@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - The extension of the log files of Beats and Elastic Agent is changed to `.ndjson`. If you are collecting the logs, you must change the path configuration to `/path/to/logs/{beatname}*.ndjson` to avoid any issues. {pull}28927[28927]
 - Remove legacy support for SSLv3. {pull}30071[30071]
 - `add_fields` processor is now able to set metadata in events {pull}30092[30092]
+- Add metadata change support for some processors {pull}30183[30183]
 
 *Auditbeat*
 
@@ -98,6 +99,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Filebeat*
 
+- tcp/unix input: Stop accepting connections after socket is closed. {pull}29712[29712]
 - Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
 
 *Heartbeat*
@@ -108,6 +110,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 - Extract correct index property in kibana.stats metricset {pull}29622[29622]
 - Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {pull}29711[29711]
+- Enhance metricbeat on openshift documentation {pull}30054[30054]
 
 *Packetbeat*
 
@@ -119,6 +122,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add provider names to Security pipeline conditional check in routing pipeline. {issue}27288[27288] {pull}29781[29781]
 
 *Functionbeat*
+
+- Pass AWS region configuration correctly. {issue}28520[28520] {pull}30238[30238] 
 
 
 *Elastic Logging Plugin*
@@ -158,6 +163,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add support for filtering in journald input with `unit`, `kernel`, `identifiers` and `include_matches`. {pull}29294[29294]
 - Add new `userAgent` and `beatInfo` template functions for httpjson input {pull}29528[29528]
 - threatintel module: Add new Recorded Future integration. {pull}30030[30030]
+- Add pipeline in FB's supported hints. {pull}30212[30212]
 
 *Heartbeat*
 
@@ -175,7 +181,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add `elasticsearch.cluster.id` field to Beat and Kibana modules. {pull}29577[29577]
 - Add `elasticsearch.cluster.id` field to Logstash module. {pull}29625[29625]
 - Add `xpack.enabled` support for Enterprise Search module. {pull}29871[29871]
-- Add gcp firestore metricset. {pull}29918[29918] 
+- Add gcp firestore metricset. {pull}29918[29918]
 - Remove strict parsing on RabbitMQ module {pull}30090[30090]
 
 *Packetbeat*
