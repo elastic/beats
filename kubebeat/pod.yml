@@ -3,15 +3,15 @@ apiVersion: v1
 kind: Pod
 metadata:
   labels:
-    run: kubebeat-demo
-  name: kubebeat-demo
+    run: cloudbeat-demo
+  name: cloudbeat-demo
 spec:
   tolerations:
     - key: node-role.kubernetes.io/master
       effect: NoSchedule
   containers:
-    - image: kubebeat
-      name: kubebeat-demo
+    - image: cloudbeat
+      name: cloudbeat-demo
       imagePullPolicy: Always
       volumeMounts:
         - name: proc

@@ -1,40 +1,40 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kubebeat
+  name: cloudbeat
 subjects:
 - kind: ServiceAccount
-  name: kubebeat
+  name: cloudbeat
   namespace: kube-system
 roleRef:
   kind: ClusterRole
-  name: kubebeat
+  name: cloudbeat
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: kubebeat
+  name: cloudbeat
   namespace: kube-system
 subjects:
   - kind: ServiceAccount
-    name: kubebeat
+    name: cloudbeat
     namespace: kube-system
 roleRef:
   kind: Role
-  name: kubebeat
+  name: cloudbeat
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: kubebeat-kubeadm-config
+  name: cloudbeat-kubeadm-config
   namespace: kube-system
 subjects:
   - kind: ServiceAccount
-    name: kubebeat
+    name: cloudbeat
     namespace: kube-system
 roleRef:
   kind: Role
-  name: kubebeat-kubeadm-config
+  name: cloudbeat-kubeadm-config
   apiGroup: rbac.authorization.k8s.io

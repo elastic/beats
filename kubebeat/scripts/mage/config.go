@@ -22,12 +22,12 @@ import (
 )
 
 // ConfigFileParams returns the default ConfigFileParams for generating
-// kubebeat*.yml files.
+// cloudbeat*.yml files.
 func XPackConfigFileParams() devtools.ConfigFileParams {
 	p := devtools.DefaultConfigFileParams()
 	p.Templates = append(p.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"))
 	//	p.ExtraVars = map[string]interface{}{}
 	//  used to include extra vars not in _meta/config/*.tmpl
 	return p
-	// Todo kubebeat fill out according to kubebeats required config.
+	// Todo cloudbeat fill out according to cloudbeats required config.
 }

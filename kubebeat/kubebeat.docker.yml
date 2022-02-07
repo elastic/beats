@@ -1,4 +1,4 @@
-kubebeat:
+cloudbeat:
   period: 1s
 
 processors:

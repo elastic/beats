@@ -2,7 +2,7 @@
 
 ############################# {Beat} ######################################
 
-kubebeat:
+cloudbeat:
   # Defines how often an event is sent to the output
   period: 30s
   files: [
@@ -65,7 +65,7 @@ setup.kibana:
 
 # =============================== Elastic Cloud ================================
 
-# These settings simplify using Kubebeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using Cloudbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
@@ -131,7 +131,7 @@ processors:
 #logging.selectors: ["*"]
 
 # ============================= X-Pack Monitoring ==============================
-# Kubebeat can export internal metrics to a central Elasticsearch monitoring
+# Cloudbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 
@@ -139,7 +139,7 @@ processors:
 #monitoring.enabled: false
 
 # Sets the UUID of the Elasticsearch cluster under which monitoring data for this
-# Kubebeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# Cloudbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
 # is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
 #monitoring.cluster_uuid:
 
@@ -154,12 +154,12 @@ processors:
 
 # ============================== Instrumentation ===============================
 
-# Instrumentation support for the kubebeat.
+# Instrumentation support for the cloudbeat.
 #instrumentation:
-    # Set to true to enable instrumentation of kubebeat.
+    # Set to true to enable instrumentation of cloudbeat.
     #enabled: false
 
-    # Environment in which kubebeat is running on (eg: staging, production, etc.)
+    # Environment in which cloudbeat is running on (eg: staging, production, etc.)
     #environment: ""
 
     # APM Server hosts to report instrumentation results to.

@@ -1,5 +1,5 @@
-name: Kubebeat
-cmd: kubebeat
+name: Cloudbeat
+cmd: cloudbeat
 args: [
   "-E", "setup.ilm.enabled=false",
   "-E", "setup.template.enabled=false",
@@ -7,9 +7,9 @@ args: [
   "-E", "logging.level=debug"
 ]
 restart_on_output_change: true
-artifact: beats/kubebeat
+artifact: beats/cloudbeat
 action_input_types:
-- kubebeat
+- cloudbeat
 
 rules:
 - fix_stream: {}
@@ -24,7 +24,7 @@ rules:
     selector: inputs
     key: type
     values:
-    - kubebeat
+    - cloudbeat
 
 - inject_agent_info: {}
 
@@ -35,4 +35,4 @@ rules:
 
 when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
 
-# TODO kubebeat needs to be filled up relevant Needs to  be filled according to kubebeat config
+# TODO cloudbeat needs to be filled up relevant Needs to  be filled according to cloudbeat config

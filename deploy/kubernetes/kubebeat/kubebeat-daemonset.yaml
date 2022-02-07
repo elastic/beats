@@ -1,27 +1,27 @@
-# Deploy a kubebeat instance per node for node metrics retrieval
+# Deploy a cloudbeat instance per node for node metrics retrieval
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: kubebeat
+  name: cloudbeat
   namespace: kube-system
   labels:
-    k8s-app: kubebeat
+    k8s-app: cloudbeat
 spec:
   selector:
     matchLabels:
-      k8s-app: kubebeat
+      k8s-app: cloudbeat
   template:
     metadata:
       labels:
-        k8s-app: kubebeat
+        k8s-app: cloudbeat
     spec:
-      serviceAccountName: kubebeat
+      serviceAccountName: cloudbeat
       terminationGracePeriodSeconds: 30
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       containers:
-      - name: kubebeat
-        image: docker.elastic.co/beats/kubebeat:%VERSION%
+      - name: cloudbeat
+        image: docker.elastic.co/beats/cloudbeat:%VERSION%
         # args: [
         #   "-e",
         #   "-d", 
@@ -56,9 +56,9 @@ spec:
             memory: 100Mi
         volumeMounts:
         - name: config
-          mountPath: /etc/kubebeat.yml
+          mountPath: /etc/cloudbeat.yml
           readOnly: true
-          subPath: kubebeat.yml
+          subPath: cloudbeat.yml
         - name: proc
           mountPath: /hostfs/proc
           readOnly: true
@@ -75,4 +75,4 @@ spec:
       - name: config
         configMap:
           defaultMode: 0640
-          name: kubebeat-daemonset-config
+          name: cloudbeat-daemonset-config

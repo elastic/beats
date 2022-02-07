@@ -3,7 +3,7 @@ package fetchers
 import (
 	"context"
 
-	"github.com/elastic/beats/v7/kubebeat/resources"
+	"github.com/elastic/beats/v7/cloudbeat/resources"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/ext/osquery-extension/pkg/proc"
 )
 

@@ -4,8 +4,8 @@ I generated this repo using the [beats development guide](https://www.elastic.co
 The kube-api call is based on the [k8s go-client example](https://github.com/kubernetes/client-go/tree/master/examples/in-cluster-client-configuration).
 
 The interesting files are:
-* `beater/kubebeat.go` - the beats logic
-* `kubebeat.yml` - the beats config
+* `beater/cloudbeat.go` - the beats logic
+* `cloudbeat.yml` - the beats config
 * `Dockerfile` - runs the beat dockerized with debug flags
 * `JUSTFILE` - just commander file
 
@@ -14,7 +14,7 @@ The interesting files are:
 - [POC Documentation](#poc-documentation)
   - [Table of contents](#table-of-contents)
   - [Prerequisites](#prerequisites)
-  - [Running Kubebeat (without the agent)](#running-kubebeat-without-the-agent)
+  - [Running Cloudbeat (without the agent)](#running-cloudbeat-without-the-agent)
     - [Clean up](#clean-up)
     - [Remote Debugging](#remote-debugging)
 - [{Beat}](#beat)
@@ -28,50 +28,50 @@ The interesting files are:
     - [Cleanup](#cleanup)
     - [Clone](#clone)
   - [Packaging](#packaging)
-  - [Build Elastic-Agent Docker with pre-packaged kubebeat](#build-elastic-agent-docker-with-pre-packaged-kubebeat)
+  - [Build Elastic-Agent Docker with pre-packaged cloudbeat](#build-elastic-agent-docker-with-pre-packaged-cloudbeat)
 
 
 ## Prerequisites
-**Please make sure that you run the following instructions within the `kubebeat` directory.**
+**Please make sure that you run the following instructions within the `cloudbeat` directory.**
 1. [Just command runner](https://github.com/casey/just)
 2. Elasticsearch with the default username & password (`elastic` & `changeme`) running on the default port (`http://localhost:9200`)
 3. Kibana with running on the default port (`http://localhost:5601`)
 4. Setup the local env:
 
 ```zsh
-cd kubebeat & just setup-env
+cd cloudbeat & just setup-env
 ```
 
-## Running Kubebeat (without the agent)
+## Running Cloudbeat (without the agent)
 
-Build & deploy kubebeat:
+Build & deploy cloudbeat:
 
 ```zsh
-just build-deploy-kubebeat
+just build-deploy-cloudbeat
 ```
 
 To validate check the logs:
 
 ```zsh
-kubectl logs -f --selector="k8s-app=kubebeat"  -n kube-system
+kubectl logs -f --selector="k8s-app=cloudbeat"  -n kube-system
 ```
 
 Now go and check out the data on your Kibana! Make sure to add a kibana dataview `logs-k8s_cis.result-*`
 
-note: when changing the fields kibana will reject events dent from the kubebeat for not matching the existing scheme. make sure to delete the index when changing the event fields in your code.
+note: when changing the fields kibana will reject events dent from the cloudbeat for not matching the existing scheme. make sure to delete the index when changing the event fields in your code.
 
 ### Clean up
 
 To stop this example and clean up the pod, run:
 ```zsh
-kubectl delete -f deploy/k8s/kubebeat-ds.yaml -n kube-system
+kubectl delete -f deploy/k8s/cloudbeat-ds.yaml -n kube-system
 ```
 ### Remote Debugging
 
 Build & Deploy remote debug docker:
 
 ```zsh
-just build-deploy-kubebeat-debug
+just build-deploy-cloudbeat-debug
 ```
 
 After running the pod, expose the relevant ports:
@@ -82,7 +82,7 @@ kubectl port-forward ${pod-name} -n kube-system 40000:40000 8080:8080
 The app will wait for the debugger to connect before starting
 
 ```zsh
-just logs-kubebeat
+just logs-cloudbeat
 ```
 
 Use your favorite IDE to connect to the debugger on `localhost:40000` (for example [Goland](https://www.jetbrains.com/help/go/attach-to-running-go-processes-with-debugger.html#step-3-create-the-remote-run-debug-configuration-on-the-client-computer))
@@ -92,7 +92,7 @@ Use your favorite IDE to connect to the debugger on `localhost:40000` (for examp
 Welcome to {Beat}.
 
 Ensure that this folder is at the following location:
-`${GOPATH}/src/github.com/elastic/beats/v7/kubebeat`
+`${GOPATH}/src/github.com/elastic/beats/v7/cloudbeat`
 
 ## Getting Started with {Beat}
 
@@ -113,7 +113,7 @@ It will create a clean git history for each major step. Note that you can always
 To push {Beat} in the git repository, run the following commands:
 
 ```
-git remote set-url origin https://github.com/elastic/beats/v7/kubebeat
+git remote set-url origin https://github.com/elastic/beats/v7/cloudbeat
 git push origin master
 ```
 
@@ -122,7 +122,7 @@ For further development, check out the [beat developer guide](https://www.elasti
 ### Build
 
 To build the binary for {Beat} run the command below. This will generate a binary
-in the same directory with the name kubebeat.
+in the same directory with the name cloudbeat.
 
 ```
 make
@@ -134,7 +134,7 @@ make
 To run {Beat} with debugging output enabled, run:
 
 ```
-./kubebeat -c kubebeat.yml -e -d "*"
+./cloudbeat -c cloudbeat.yml -e -d "*"
 ```
 
 ### Test
@@ -185,8 +185,8 @@ make clean
 To clone {Beat} from the git repository, run the following commands:
 
 ```
-mkdir -p ${GOPATH}/src/github.com/elastic/beats/v7/kubebeat
-git clone https://github.com/elastic/beats/v7/kubebeat ${GOPATH}/src/github.com/elastic/beats/v7/kubebeat
+mkdir -p ${GOPATH}/src/github.com/elastic/beats/v7/cloudbeat
+git clone https://github.com/elastic/beats/v7/cloudbeat ${GOPATH}/src/github.com/elastic/beats/v7/cloudbeat
 ```
 
 
@@ -203,7 +203,7 @@ make release
 
 This will fetch and create all images required for the build process. The whole process to finish can take several minutes.
 
-## Build Elastic-Agent Docker with pre-packaged kubebeat
+## Build Elastic-Agent Docker with pre-packaged cloudbeat
 
 
 **1.Build Elastic-Agent Docker**

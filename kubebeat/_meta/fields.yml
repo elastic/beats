@@ -1,5 +1,5 @@
-- key: kubebeat
-  title: kubebeat
+- key: cloudbeat
+  title: cloudbeat
   description:
   fields:
     - name: counter

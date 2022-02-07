@@ -9,8 +9,8 @@ import (
 
 	"github.com/magefile/mage/mg"
 
+	cloudbeat "github.com/elastic/beats/v7/cloudbeat/scripts/mage"
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	kubebeat "github.com/elastic/beats/v7/kubebeat/scripts/mage"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
 	// mage:import
@@ -41,7 +41,7 @@ func init() {
 func Build() error {
 	params := devtools.DefaultBuildArgs()
 
-	// Building kubebeat
+	// Building cloudbeat
 	err := devtools.Build(params)
 	if err != nil {
 		return err
@@ -56,7 +56,8 @@ func Build() error {
 	return nil
 
 }
-// Todo write mage build & package functions for kubebeat
+
+// Todo write mage build & package functions for cloudbeat
 
 // Clean cleans all generated files and build artifacts.
 func Clean() error {
@@ -78,7 +79,7 @@ func BuildGoDaemon() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	//building kubebeat
+	//building cloudbeat
 	err := devtools.CrossBuild()
 	if err != nil {
 		return err
@@ -95,9 +96,9 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	devtools.MustUsePackaging("kubebeat", "kubebeat/dev-tools/packaging/packages.yml")
+	devtools.MustUsePackaging("cloudbeat", "cloudbeat/dev-tools/packaging/packages.yml")
 
-	// ToDo decide whenther kubebeat should move to x-pack dir & adjust accordingly
+	// ToDo decide whenther cloudbeat should move to x-pack dir & adjust accordingly
 
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
@@ -109,10 +110,10 @@ func TestPackages() error {
 	return devtools.TestPackages()
 }
 
-func Update() { mg.Deps(kubebeat.Update.All) }
+func Update() { mg.Deps(cloudbeat.Update.All) }
 
 // Fields generates a fields.yml for the Beat.
-func Fields() { mg.Deps(kubebeat.Update.Fields) }
+func Fields() { mg.Deps(cloudbeat.Update.Fields) }
 
 // Config generates both the short/reference/docker configs.
-func Config() { mg.Deps(kubebeat.Update.Config) }
+func Config() { mg.Deps(cloudbeat.Update.Config) }

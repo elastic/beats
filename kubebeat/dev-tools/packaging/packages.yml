@@ -1,6 +1,6 @@
 ---
 
-# This file contains the package specifications for kubebeat.
+# This file contains the package specifications for cloudbeat.
 
 shared:
   - &common
@@ -60,7 +60,7 @@ shared:
 
 # specs is a list of named packaging "flavors".
 specs:
-  kubebeat:
+  cloudbeat:
     ###
     # Elastic Licensed Packages
     ###

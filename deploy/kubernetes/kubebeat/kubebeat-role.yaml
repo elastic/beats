@@ -1,9 +1,9 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: kubebeat
+  name: cloudbeat
   labels:
-    k8s-app: kubebeat
+    k8s-app: cloudbeat
 rules:
 - apiGroups: [""]
   resources:
@@ -46,11 +46,11 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: kubebeat
-  # should be the namespace where kubebeat is running
+  name: cloudbeat
+  # should be the namespace where cloudbeat is running
   namespace: kube-system
   labels:
-    k8s-app: kubebeat
+    k8s-app: cloudbeat
 rules:
   - apiGroups:
       - coordination.k8s.io
@@ -61,10 +61,10 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: kubebeat-kubeadm-config
+  name: cloudbeat-kubeadm-config
   namespace: kube-system
   labels:
-    k8s-app: kubebeat
+    k8s-app: cloudbeat
 rules:
   - apiGroups: [""]
     resources:

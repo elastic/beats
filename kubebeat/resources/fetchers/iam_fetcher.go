@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/elastic/beats/v7/kubebeat/resources"
+	"github.com/elastic/beats/v7/cloudbeat/resources"
 )
 
 const IAMType = "aws-iam"

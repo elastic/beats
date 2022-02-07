@@ -7,13 +7,13 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/elastic/beats/v7/kubebeat/resources"
+	"github.com/elastic/beats/v7/cloudbeat/resources"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // FileSystemFetcher implement the resources.Fetcher interface
 // The FileSystemFetcher meant to fetch file/directories from the file system and ship it
-// to the Kubebeat
+// to the Cloudbeat
 type FileSystemFetcher struct {
 	cfg FileFetcherConfig
 }

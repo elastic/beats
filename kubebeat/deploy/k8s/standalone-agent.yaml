@@ -17,10 +17,10 @@ data:
         password: ${ES_PASSWORD}
     output_permissions:
       default:
-        kubebeat-test:
+        cloudbeat-test:
           indices:
             - names:
-                - logs-kubebeat.result-default
+                - logs-cloudbeat.result-default
               privileges:
                 - auto_configure
                 - create_doc
@@ -28,13 +28,13 @@ data:
           cluster:
             - monitor    
     inputs:
-      - name: kubebeat-test
+      - name: cloudbeat-test
         revision: 1
-        type: kubebeat
+        type: cloudbeat
         use_output: default
         meta:
           package:
-            name: kubebeat
+            name: cloudbeat
             version: 0.5.3
         data_stream:
           namespace: default

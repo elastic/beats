@@ -1,11 +1,11 @@
-# Kubebeat
+# Cloudbeat
 
 ## Ship metrics from Kubernetes to Elasticsearch
 
 ### Kubernetes DaemonSet
 
-By deploying kubebeat as a [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/)
-we ensure we get a running kubebeat daemon on each node of the cluster.
+By deploying cloudbeat as a [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/)
+we ensure we get a running cloudbeat daemon on each node of the cluster.
 
 Everything is deployed under `kube-system` namespace, you can change that by
 updating YAML manifests under this folder.
@@ -14,10 +14,10 @@ updating YAML manifests under this folder.
 
 We use official [Beats Docker images](https://github.com/elastic/beats-docker),
 as they allow external files configuration, a [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/)
-is used for kubernetes specific settings. Check [kubebeat-daemonset-configmap.yaml](kubebeat-daemonset-configmap.yaml)
+is used for kubernetes specific settings. Check [cloudbeat-daemonset-configmap.yaml](cloudbeat-daemonset-configmap.yaml)
 for details.
 
-Also, [kubebeat-daemonset.yaml](kubebeat-daemonset.yaml) uses a set of environment
+Also, [cloudbeat-daemonset.yaml](cloudbeat-daemonset.yaml) uses a set of environment
 variables to configure Elasticsearch output:
 
 Variable | Default | Description

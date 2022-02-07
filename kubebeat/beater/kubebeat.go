@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/kubebeat/config"
-	"github.com/elastic/beats/v7/kubebeat/opa"
-	_ "github.com/elastic/beats/v7/kubebeat/processor" // Add kubebeat default processors.
-	"github.com/elastic/beats/v7/kubebeat/resources"
-	"github.com/elastic/beats/v7/kubebeat/resources/conditions"
-	"github.com/elastic/beats/v7/kubebeat/resources/fetchers"
+	"github.com/elastic/beats/v7/cloudbeat/config"
+	"github.com/elastic/beats/v7/cloudbeat/opa"
+	_ "github.com/elastic/beats/v7/cloudbeat/processor" // Add cloudbeat default processors.
+	"github.com/elastic/beats/v7/cloudbeat/resources"
+	"github.com/elastic/beats/v7/cloudbeat/resources/conditions"
+	"github.com/elastic/beats/v7/cloudbeat/resources/fetchers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	libevents "github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -21,8 +21,8 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-// kubebeat configuration.
-type kubebeat struct {
+// cloudbeat configuration.
+type cloudbeat struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 
@@ -41,7 +41,7 @@ const (
 	cycleStatusFail  = "fail"
 )
 
-// New creates an instance of kubebeat.
+// New creates an instance of cloudbeat.
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -75,7 +75,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	bt := &kubebeat{
+	bt := &cloudbeat{
 		ctx:          ctx,
 		cancel:       cancel,
 		config:       c,
@@ -87,9 +87,9 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	return bt, nil
 }
 
-// Run starts kubebeat.
-func (bt *kubebeat) Run(b *beat.Beat) error {
-	logp.Info("kubebeat is running! Hit CTRL-C to stop it.")
+// Run starts cloudbeat.
+func (bt *cloudbeat) Run(b *beat.Beat) error {
+	logp.Info("cloudbeat is running! Hit CTRL-C to stop it.")
 
 	if err := bt.data.Run(bt.ctx); err != nil {
 		return err
@@ -177,7 +177,7 @@ func InitRegistry(ctx context.Context, c config.Config) (resources.FetchersRegis
 	return registry, nil
 }
 
-func (bt *kubebeat) resourceIteration(ctx context.Context, resource interface{}, cycleId uuid.UUID) {
+func (bt *cloudbeat) resourceIteration(ctx context.Context, resource interface{}, cycleId uuid.UUID) {
 	result, err := bt.eval.Decision(ctx, resource)
 	if err != nil {
 		logp.Error(fmt.Errorf("error running the policy: %w", err))
@@ -193,8 +193,8 @@ func (bt *kubebeat) resourceIteration(ctx context.Context, resource interface{},
 	bt.client.PublishAll(events)
 }
 
-// Stop stops kubebeat.
-func (bt *kubebeat) Stop() {
+// Stop stops cloudbeat.
+func (bt *cloudbeat) Stop() {
 	bt.data.Stop(bt.ctx, bt.cancel)
 	bt.eval.Stop(bt.ctx)
 
@@ -202,7 +202,7 @@ func (bt *kubebeat) Stop() {
 }
 
 // updateCycleStatus updates beat status in metadata ES index.
-func (bt *kubebeat) updateCycleStatus(cycleId uuid.UUID, status string) {
+func (bt *cloudbeat) updateCycleStatus(cycleId uuid.UUID, status string) {
 	metadataIndex := config.Datastream("", config.MetadataDatastreamIndexPrefix)
 	cycleEndedEvent := beat.Event{
 		Timestamp: time.Now(),
@@ -216,6 +216,6 @@ func (bt *kubebeat) updateCycleStatus(cycleId uuid.UUID, status string) {
 }
 
 // configureProcessors configure processors to be used by the beat
-func (bt *kubebeat) configureProcessors(processorsList processors.PluginConfig) (procs *processors.Processors, err error) {
+func (bt *cloudbeat) configureProcessors(processorsList processors.PluginConfig) (procs *processors.Processors, err error) {
 	return processors.New(processorsList)
 }

@@ -47,4 +47,4 @@ package mage
 // 	}
 // }
 
-// // Todo kubebeat write mage script to package beat with agent
+// // Todo cloudbeat write mage script to package beat with agent

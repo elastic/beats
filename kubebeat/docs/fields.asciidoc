@@ -9,7 +9,7 @@ This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 [partintro]
 
 --
-This document describes the fields that are exported by Kubebeat. They are
+This document describes the fields that are exported by Cloudbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-beat-common>>
@@ -18,7 +18,7 @@ grouped in the following categories:
 * <<exported-fields-ecs>>
 * <<exported-fields-host-processor>>
 * <<exported-fields-jolokia-autodiscover>>
-* <<exported-fields-kubebeat>>
+* <<exported-fields-cloudbeat>>
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-process>>
 
@@ -14513,8 +14513,8 @@ type: boolean
 
 --
 
-[[exported-fields-kubebeat]]
-== kubebeat fields
+[[exported-fields-cloudbeat]]
+== cloudbeat fields
 
 None
 

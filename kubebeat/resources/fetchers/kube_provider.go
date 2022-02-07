@@ -1,7 +1,7 @@
 package fetchers
 
 import (
-	"github.com/elastic/beats/v7/kubebeat/resources"
+	"github.com/elastic/beats/v7/cloudbeat/resources"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )

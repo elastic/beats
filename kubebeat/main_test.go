@@ -1,12 +1,12 @@
 package main
 
-// This file is mandatory as otherwise the kubebeat.test binary is not generated correctly.
+// This file is mandatory as otherwise the cloudbeat.test binary is not generated correctly.
 
 import (
 	"flag"
 	"testing"
 
-	"github.com/elastic/beats/v7/kubebeat/cmd"
+	"github.com/elastic/beats/v7/cloudbeat/cmd"
 )
 
 var systemTest *bool

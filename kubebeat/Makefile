@@ -1,5 +1,5 @@
-BEAT_NAME=kubebeat
-BEAT_PATH=github.com/elastic/beats/v7/kubebeat
+BEAT_NAME=cloudbeat
+BEAT_PATH=github.com/elastic/beats/v7/cloudbeat
 BEAT_GOPATH=$(firstword $(subst :, ,${GOPATH}))
 SYSTEM_TESTS=false
 TEST_ENVIRONMENT=false
@@ -20,22 +20,22 @@ copy-vendor:
 	mage vendorUpdate
 
 delete-pod:
-	kubectl delete pod kubebeat-demo
+	kubectl delete pod cloudbeat-demo
 
 build-docker:
-	GOOS=linux go build && docker build -t kubebeat .
+	GOOS=linux go build && docker build -t cloudbeat .
 
 docker-image-load-minikube: build-docker
-	minikube image load kubebeat:latest
+	minikube image load cloudbeat:latest
 
 docker-image-load-kind: build-docker
 	kind load docker-image docker.elastic.co/beats/elastic-agent:8.1.0-SNAPSHOT --name single-host
 
-deploy-kubebeat:
-	kubectl apply -f deploy/k8s/kubebeat-ds.yaml -n kube-system
+deploy-cloudbeat:
+	kubectl apply -f deploy/k8s/cloudbeat-ds.yaml -n kube-system
 
 deploy-pod: delete-pod build-docker docker-image-load-minikube
 	kubectl apply -f pod.yml
 
-build-deploy-docker: build-docker docker-image-load-kind deploy-kubebeat
+build-deploy-docker: build-docker docker-image-load-kind deploy-cloudbeat
 

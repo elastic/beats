@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/kubebeat/resources"
+	"github.com/elastic/beats/v7/cloudbeat/resources"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
@@ -102,7 +102,7 @@ func (f *KubeFetcher) initWatcher(client k8s.Interface, r requiredResource) erro
 	// if the configured Client's Role does not have the necessary permissions to list the Resource
 	// being watched. This needs to be handled.
 	//
-	// When such a failure happens, kubebeat won't shut down gracefuly, i.e. Stop will not work. This
+	// When such a failure happens, cloudbeat won't shut down gracefuly, i.e. Stop will not work. This
 	// happens due to a context.TODO present in the libbeat dependency. It needs to accept context
 	// from the caller instead.
 	if err := watcher.Start(); err != nil {

@@ -5,7 +5,7 @@ RUN apt-get update
 RUN apt-get install -y ca-certificates
 EXPOSE 40000
 EXPOSE 8080
-COPY ./kubebeat /kubebeat
-COPY ./kubebeat.yml /kubebeat.yml
-ENTRYPOINT ["/go/bin/dlv", "--listen=:40000", "--headless=true", "--api-version=2", "--wd=/", "exec", "/kubebeat"]
+COPY ./cloudbeat /cloudbeat
+COPY ./cloudbeat.yml /cloudbeat.yml
+ENTRYPOINT ["/go/bin/dlv", "--listen=:40000", "--headless=true", "--api-version=2", "--wd=/", "exec", "/cloudbeat"]
 CMD ["--", "-e", "-d", "'*'"]

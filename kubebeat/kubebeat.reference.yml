@@ -2,7 +2,7 @@
 
 ############################# {Beat} ######################################
 
-kubebeat:
+cloudbeat:
   # Defines how often an event is sent to the output
   period: 30s
   files: [
@@ -327,7 +327,7 @@ kubebeat:
 
 # =============================== Elastic Cloud ================================
 
-# These settings simplify using Kubebeat with the Elastic Cloud (https://cloud.elastic.co/).
+# These settings simplify using Cloudbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
 # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
 # `setup.kibana.host` options.
@@ -375,10 +375,10 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional index name. The default is "kubebeat" plus date
-  # and generates [kubebeat-]YYYY.MM.DD keys.
+  # Optional index name. The default is "cloudbeat" plus date
+  # and generates [cloudbeat-]YYYY.MM.DD keys.
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "kubebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+  #index: "cloudbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
   # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
@@ -543,9 +543,9 @@ output.elasticsearch:
   # Logstash after a network error. The default is 60s.
   #backoff.max: 60s
 
-  # Optional index name. The default index name is set to kubebeat
+  # Optional index name. The default index name is set to cloudbeat
   # in all lowercase.
-  #index: 'kubebeat'
+  #index: 'cloudbeat'
 
   # SOCKS5 proxy server URL
   #proxy_url: socks5://user:password@socks5-server:2233
@@ -660,7 +660,7 @@ output.elasticsearch:
   # Defaults to PLAIN when `username` and `password` are configured.
   #sasl.mechanism: ''
 
-  # Kafka version Kubebeat is assumed to run against. Defaults to the "1.0.0".
+  # Kafka version Cloudbeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
 
   # Configure JSON encoding
@@ -857,8 +857,8 @@ output.elasticsearch:
   #hosts: ["localhost:6379"]
 
   # The name of the Redis list or channel the events are published to. The
-  # default is kubebeat.
-  #key: kubebeat
+  # default is cloudbeat.
+  #key: cloudbeat
 
   # The password to authenticate to Redis with. The default is no authentication.
   #password:
@@ -987,14 +987,14 @@ output.elasticsearch:
 
   # Path to the directory where to save the generated files. The option is
   # mandatory.
-  #path: "/tmp/kubebeat"
+  #path: "/tmp/cloudbeat"
 
-  # Name of the generated files. The default is `kubebeat` and it generates
-  # files: `kubebeat`, `kubebeat.1`, `kubebeat.2`, etc.
-  #filename: kubebeat
+  # Name of the generated files. The default is `cloudbeat` and it generates
+  # files: `cloudbeat`, `cloudbeat.1`, `cloudbeat.2`, etc.
+  #filename: cloudbeat
 
   # Maximum size in kilobytes of each file. When this size is reached, and on
-  # every Kubebeat restart, the files are rotated. The default value is 10240
+  # every Cloudbeat restart, the files are rotated. The default value is 10240
   # kB.
   #rotate_every_kb: 10000
 
@@ -1023,26 +1023,26 @@ output.elasticsearch:
 
 # =================================== Paths ====================================
 
-# The home path for the Kubebeat installation. This is the default base path
+# The home path for the Cloudbeat installation. This is the default base path
 # for all other path settings and for miscellaneous files that come with the
 # distribution (for example, the sample dashboards).
 # If not set by a CLI flag or in the configuration file, the default for the
 # home path is the location of the binary.
 #path.home:
 
-# The configuration path for the Kubebeat installation. This is the default
+# The configuration path for the Cloudbeat installation. This is the default
 # base path for configuration files, including the main YAML configuration file
 # and the Elasticsearch template file. If not set by a CLI flag or in the
 # configuration file, the default for the configuration path is the home path.
 #path.config: ${path.home}
 
-# The data path for the Kubebeat installation. This is the default base path
-# for all the files in which Kubebeat needs to store its data. If not set by a
+# The data path for the Cloudbeat installation. This is the default base path
+# for all the files in which Cloudbeat needs to store its data. If not set by a
 # CLI flag or in the configuration file, the default for the data path is a data
 # subdirectory inside the home path.
 #path.data: ${path.home}/data
 
-# The logs path for a Kubebeat installation. This is the default location for
+# The logs path for a Cloudbeat installation. This is the default location for
 # the Beat's log files. If not set by a CLI flag or in the configuration file,
 # the default for the logs path is a logs subdirectory inside the home path.
 #path.logs: ${path.home}/logs
@@ -1074,7 +1074,7 @@ output.elasticsearch:
 # In case the archive contains the dashboards from multiple Beats, this lets you
 # select which one to load. You can load all the dashboards in the archive by
 # setting this to the empty string.
-#setup.dashboards.beat: kubebeat
+#setup.dashboards.beat: cloudbeat
 
 # The name of the Kibana index to use for setting the configuration. Default is ".kibana"
 #setup.dashboards.kibana_index: .kibana
@@ -1108,17 +1108,17 @@ output.elasticsearch:
 
 # Select the kind of index template. From Elasticsearch 7.8, it is possible to
 # use component templates. Available options: legacy, component, index.
-# By default kubebeat uses the legacy index templates.
+# By default cloudbeat uses the legacy index templates.
 #setup.template.type: legacy
 
-# Template name. By default the template name is "kubebeat-%{[agent.version]}"
+# Template name. By default the template name is "cloudbeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.name: "kubebeat-%{[agent.version]}"
+#setup.template.name: "cloudbeat-%{[agent.version]}"
 
 # Template pattern. By default the template pattern is "-%{[agent.version]}-*" to apply to the default index settings.
 # The first part is the version of the beat and then -* is used to match all daily indices.
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
-#setup.template.pattern: "kubebeat-%{[agent.version]}-*"
+#setup.template.pattern: "cloudbeat-%{[agent.version]}-*"
 
 # Path to fields.yml file to generate the template
 #setup.template.fields: "${path.config}/fields.yml"
@@ -1139,7 +1139,7 @@ output.elasticsearch:
 #setup.template.json.name: ""
 
 # Overwrite existing template
-# Do not enable this option for more than one instance of kubebeat as it might
+# Do not enable this option for more than one instance of cloudbeat as it might
 # overload your Elasticsearch with too many update requests.
 #setup.template.overwrite: false
 
@@ -1171,8 +1171,8 @@ setup.template.settings:
 #setup.ilm.enabled: auto
 
 # Set the prefix used in the index lifecycle write alias name. The default alias
-# name is 'kubebeat-%{[agent.version]}'.
-#setup.ilm.rollover_alias: 'kubebeat'
+# name is 'cloudbeat-%{[agent.version]}'.
+#setup.ilm.rollover_alias: 'cloudbeat'
 
 # Set the rollover index pattern. The default is "%{now/d}-000001".
 #setup.ilm.pattern: "{now/d}-000001"
@@ -1297,7 +1297,7 @@ setup.kibana:
 # Send all logging output to Windows Event Logs. The default is false.
 #logging.to_eventlog: false
 
-# If enabled, Kubebeat periodically logs its internal metrics that have changed
+# If enabled, Cloudbeat periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
 # the beginning of the period is logged. Also, the total values for
 # all non-zero internal metrics are logged on shutdown. The default is true.
@@ -1317,10 +1317,10 @@ logging.to_files: true
 logging.files:
   # Configure the path where the logs are written. The default is the logs directory
   # under the home path (the binary location).
-  #path: /var/log/kubebeat
+  #path: /var/log/cloudbeat
 
   # The name of the files where the logs are written to.
-  #name: kubebeat
+  #name: cloudbeat
 
   # Configure log file size limit. If limit is reached, log file will be
   # automatically rotated
@@ -1344,7 +1344,7 @@ logging.files:
   # file. Defaults to true.
   # rotateonstartup: true
 
-  # Rotated files are either suffixed with a number e.g. kubebeat.1 when
+  # Rotated files are either suffixed with a number e.g. cloudbeat.1 when
   # renamed during rotation. Or when set to date, the date is added to
   # the end of the file. On rotation a new file is created, older files are untouched.
   #suffix: count
@@ -1358,7 +1358,7 @@ logging.files:
 #logging.ecs: false
 
 # ============================= X-Pack Monitoring ==============================
-# Kubebeat can export internal metrics to a central Elasticsearch monitoring
+# Cloudbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
 # reporting is disabled by default.
 
@@ -1366,7 +1366,7 @@ logging.files:
 #monitoring.enabled: false
 
 # Sets the UUID of the Elasticsearch cluster under which monitoring data for this
-# Kubebeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
+# Cloudbeat instance will appear in the Stack Monitoring UI. If output.elasticsearch
 # is enabled, the UUID is derived from the Elasticsearch cluster referenced by output.elasticsearch.
 #monitoring.cluster_uuid:
 
@@ -1548,12 +1548,12 @@ logging.files:
 
 # ============================== Instrumentation ===============================
 
-# Instrumentation support for the kubebeat.
+# Instrumentation support for the cloudbeat.
 #instrumentation:
-    # Set to true to enable instrumentation of kubebeat.
+    # Set to true to enable instrumentation of cloudbeat.
     #enabled: false
 
-    # Environment in which kubebeat is running on (eg: staging, production, etc.)
+    # Environment in which cloudbeat is running on (eg: staging, production, etc.)
     #environment: ""
 
     # APM Server hosts to report instrumentation results to.

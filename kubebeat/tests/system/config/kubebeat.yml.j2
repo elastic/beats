@@ -17,9 +17,9 @@ output:
     path: {{ output_file_path|default(beat.working_dir + "/output") }}
 
 
-    # Name of the generated files. The default is `kubebeat` and it generates
-    # files: `kubebeat`, `kubebeat.1`, `kubebeat.2`, etc.
-    filename: {{ output_file_filename|default("kubebeat") }}
+    # Name of the generated files. The default is `cloudbeat` and it generates
+    # files: `cloudbeat`, `cloudbeat.1`, `cloudbeat.2`, etc.
+    filename: {{ output_file_filename|default("cloudbeat") }}
 
     # Maximum size in kilobytes of each file. When this size is reached, the files are
     # rotated. The default value is 10 MB.
@@ -65,10 +65,10 @@ output:
 
   #files:
     # The directory where the log files will written to.
-    #path: /var/log/kubebeat
+    #path: /var/log/cloudbeat
 
     # The name of the files where the logs are written to.
-    #name: kubebeat
+    #name: cloudbeat
 
     # Configure log file size limit. If limit is reached, log file will be
     # automatically rotated

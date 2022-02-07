@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: kubebeat-daemonset-config
+  name: cloudbeat-daemonset-config
   namespace: kube-system
   labels:
-    k8s-app: kubebeat
+    k8s-app: cloudbeat
 data:
-  kubebeat.yml: |-
-    kubebeat:
+  cloudbeat.yml: |-
+    cloudbeat:
       # Defines how often an event is sent to the output
       period: 5s
 
@@ -19,7 +19,7 @@ data:
       host: "http://host.minikube.internal:5601"
     # =============================== Elastic Cloud ================================
 
-    # These settings simplify using Kubebeat with the Elastic Cloud (https://cloud.elastic.co/).
+    # These settings simplify using Cloudbeat with the Elastic Cloud (https://cloud.elastic.co/).
 
     # The cloud.id setting overwrites the `output.elasticsearch.hosts` and
     # `setup.kibana.host` options.

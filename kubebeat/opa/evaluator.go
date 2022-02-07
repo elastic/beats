@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/elastic/beats/v7/kubebeat/beater/bundle"
+	"github.com/elastic/beats/v7/cloudbeat/beater/bundle"
 	"github.com/open-policy-agent/opa/logging"
 	"github.com/open-policy-agent/opa/sdk"
 	"github.com/sirupsen/logrus"

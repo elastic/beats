@@ -1,6 +1,6 @@
 package beater
 
-import "github.com/elastic/beats/v7/kubebeat/resources"
+import "github.com/elastic/beats/v7/cloudbeat/resources"
 
 type ResourceScheduler interface {
 	ScheduleResources(rmap resources.Map, resourceFunc func(interface{}))
