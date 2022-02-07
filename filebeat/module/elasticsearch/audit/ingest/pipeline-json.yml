@@ -143,9 +143,6 @@ processors:
   - dot_expander:
       field: user.name
       path: elasticsearch.audit
-  - remove:
-      field: user.name
-      ignore_missing: true
   - rename:
       field: elasticsearch.audit.user.name
       target_field: user.name
