@@ -123,6 +123,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Functionbeat*
 
+- Pass AWS region configuration correctly. {issue}28520[28520] {pull}30238[30238] 
+
 
 *Elastic Logging Plugin*
 
