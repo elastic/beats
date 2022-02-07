@@ -46,17 +46,6 @@ var bootTime uint64 = 0
 // system tick multiplier, see C.sysconf(C._SC_CLK_TCK)
 const ticks = 100
 
-// GetSelfPid returns the PID for this process
-func GetSelfPid(hostfs resolve.Resolver) (int, error) {
-	pid, err := os.Readlink(hostfs.Join("proc", "self"))
-
-	if err != nil {
-		return 0, err
-	}
-
-	return strconv.Atoi(pid)
-}
-
 // FetchPids is the linux implementation of FetchPids
 func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 	dir, err := os.Open(procStats.Hostfs.ResolveHostFS("proc"))

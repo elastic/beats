@@ -101,13 +101,6 @@ func TestGetProcess(t *testing.T) {
 	}
 }
 
-// See https://github.com/elastic/beats/issues/6620
-func TestGetSelfPid(t *testing.T) {
-	pid, err := GetSelfPid(resolve.NewTestResolver("/"))
-	assert.NoError(t, err)
-	assert.Equal(t, os.Getpid(), pid)
-}
-
 func TestMatchProcs(t *testing.T) {
 	var procStats = Stats{}
 
