@@ -41,10 +41,10 @@ var (
 // Should only be initialized once in main function
 func CreateJobObject() (pj Job, err error) {
 	if pj, err = NewJob(); err != nil {
-		return
+		return pj, err
 	}
 	JobObject = pj
-	return
+	return pj, nil
 }
 
 // NewJob creates a instance of the JobObject
@@ -54,6 +54,13 @@ func NewJob() (Job, error) {
 		return 0, err
 	}
 
+	// From https://docs.microsoft.com/en-us/windows/win32/procthread/job-objects
+	// ... if the job has the JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE flag specified,
+	// closing the last job object handle terminates all associated processes
+	// and then destroys the job object itself.
+	// If a nested job has the JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE flag specified,
+	// closing the last job object handle terminates all processes associated
+	// with the job and its child jobs in the hierarchy.
 	info := windows.JOBOBJECT_EXTENDED_LIMIT_INFORMATION{
 		BasicLimitInformation: windows.JOBOBJECT_BASIC_LIMIT_INFORMATION{
 			LimitFlags: windows.JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE,
