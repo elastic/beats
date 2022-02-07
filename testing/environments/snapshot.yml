@@ -3,7 +3,7 @@
 version: '2.3'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.1.0-aa69d697-SNAPSHOT
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.1.0-815726c3-SNAPSHOT
     # When extend is used it merges healthcheck.tests, see:
     # https://github.com/docker/compose/issues/8962
     # healthcheck:
@@ -42,7 +42,7 @@ services:
       - ./docker/logstash/pki:/etc/pki:ro
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.1.0-aa69d697-SNAPSHOT
+    image: docker.elastic.co/kibana/kibana:8.1.0-815726c3-SNAPSHOT
     environment:
     - "ELASTICSEARCH_USERNAME=kibana_system_user"
     - "ELASTICSEARCH_PASSWORD=testing"
