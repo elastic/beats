@@ -101,18 +101,13 @@ func newModuleRegistry(modulesPath string,
 				return nil, fmt.Errorf("error reading fileset %s/%s: %v", mcfg.Module, filesetName, err)
 			}
 			module.filesets = append(module.filesets, *fileset)
-			// registry[mcfg.Module][filesetName] = fileset
 		}
 		reg.registry = append(reg.registry, module)
 	}
 
 	reg.log.Infof("Enabled modules/filesets: %s", reg.InfoString())
 	for _, mod := range reg.registry {
-		filesets, err := reg.ModuleConfiguredFilesets(mod)
-		if err != nil {
-			reg.log.Errorf("Failed listing filesets for module %s", mod)
-			continue
-		}
+		filesets := reg.ModuleConfiguredFilesets(mod)
 		if len(filesets) == 0 {
 			return nil, errors.Errorf("module %s is configured but has no enabled filesets", mod.config.Module)
 		}
@@ -442,9 +437,9 @@ func (reg *ModuleRegistry) ModuleAvailableFilesets(module string) ([]string, err
 
 // ModuleConfiguredFilesets return the list of configured filesets for the given module
 // it returns an empty list if the module doesn't exist
-func (reg *ModuleRegistry) ModuleConfiguredFilesets(module Module) (list []string, err error) {
+func (reg *ModuleRegistry) ModuleConfiguredFilesets(module Module) (list []string) {
 	for _, fileset := range module.filesets {
 		list = append(list, fileset.name)
 	}
-	return list, nil
+	return list
 }
