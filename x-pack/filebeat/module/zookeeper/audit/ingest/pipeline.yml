@@ -13,9 +13,9 @@ processors:
       - '%{TIMESTAMP_ISO8601:zookeeper.audit.timestamp}%{SPACE}%{LOGLEVEL:log.level}%{SPACE}%{CALLER_CLASS:log.logger}:%{SPACE}%{GREEDYDATA:message}'
     pattern_definitions:
       CALLER_CLASS: (%{JAVACLASS}|%{NOTSPACE})
-- rename:
-    field: '@timestamp'
-    target_field: event.created
+- set:
+    copy_from: '@timestamp'
+    field: event.created
     if: ctx?.zookeeper?.audit?.timestamp != null
 - date:
     if: ctx?.zookeeper?.audit?.timestamp != null && ctx.event.timezone == null

@@ -83,7 +83,7 @@ func customizePackaging() {
 			switch pkgType {
 			case devtools.TarGz, devtools.Zip, devtools.Docker:
 				args.Spec.Files["module"] = moduleDir
-			case devtools.Deb, devtools.RPM, devtools.DMG:
+			case devtools.Deb, devtools.RPM:
 				args.Spec.Files["/etc/{{.BeatName}}/module"] = moduleDir
 			default:
 				panic(errors.Errorf("unhandled package type: %v", pkgType))

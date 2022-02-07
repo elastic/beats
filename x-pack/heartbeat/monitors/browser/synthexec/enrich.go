@@ -107,6 +107,7 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent, fields StdS
 		"monitor": common.MapStr{
 			"id":   id,
 			"name": name,
+			"type": fields.Type,
 		},
 	})
 
