@@ -48,7 +48,6 @@ func (c *httpClient) do(stdCtx context.Context, trCtx *transformContext, req *ht
 
 	if resp.StatusCode > 399 {
 		body, _ := io.ReadAll(resp.Body)
-		resp.Body.Close()
 		return nil, fmt.Errorf("server responded with status code %d: %s", resp.StatusCode, string(body))
 	}
 	return resp, nil
