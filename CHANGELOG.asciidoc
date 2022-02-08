@@ -15,7 +15,7 @@ https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
 - Remove deprecated/undocumented IncludeCreatorMetadata setting from kubernetes metadata config options {pull}28006[28006]
 - Remove deprecated fields from kubernetes module {pull}28046[28046]
 - Remove deprecated config option aws_partition. {pull}28120[28120]
-- Improve stats API {pull}27963[27963]
+- Improve stats API by adding host metadata. {pull}27963[27963]
 - Libbeat: logp package forces ECS compliant logs. Logs are JSON formatted. Options to enable ECS/JSON have been removed. {issue}15544[15544] {pull}28573[28573]
 - Remove `auto` from the available options of `setup.ilm.enabled` and set the default value to `true`. {pull}28671[28671]
 - add_process_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
@@ -27,11 +27,9 @@ https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
 - Remove `auto` from the available options of `setup.ilm.enabled` and set the default value to `true`. {pull}28671[28671]
 - Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
 - Remove options `logging.files.suffix` and default to datetime endings in log file names. The format of the new name is `{beatname}-{date}(-n)?.ndjson`. Exmaple log files names from oldest to newest: `filebeat-20200101.ndjson`, `filebeat-20200101-1.ndjson`, `filebeat-20200101-2.ndjson`. {pull}28927[28927]
-- Remove Journalbeat. Use `journald` input of Filebeat instead. {pull}29131[29131]
 - Allign kubernetes configuration settings. {pull}29908[29908]
 - The extension of the log files of Beats and Elastic Agent is changed to `.ndjson`. If you are collecting the logs, you must change the path configuration to `/path/to/logs/{beatname}*.ndjson` to avoid any issues. {pull}28927[28927]
 - Remove legacy support for SSLv3. {pull}30071[30071]
-- `add_fields` processor is now able to set metadata in events {pull}30092[30092]
 
 *Auditbeat*
 
@@ -52,11 +50,9 @@ https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
 
 *Packetbeat*
 
-- Redis: fix incorrectly handle with two-words redis command. {issue}14872[14872] {pull}14873[14873]
 - `event.category` no longer contains the value `network_traffic` because this is not a valid ECS event category value. {pull}20556[20556]
 - Remove deprecated TLS fields in favor of tls.server.x509 and tls.client.x509 ECS fields. {pull}28487[28487]
 - HTTP: The field `http.request.method` will maintain its original case. {pull}28620[28620]
-- Unify gopacket dependencies. {pull}29167[29167]
 
 *Winlogbeat*
 
@@ -92,6 +88,8 @@ https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
 
 - Prevent incorrect use of AMQP protocol parsing from causing silent failure. {pull}29017[29017]
 - Fix error handling in MongoDB protocol parsing. {pull}29017[29017]
+- Redis: fix incorrectly handle with two-words redis command. {issue}14872[14872] {pull}14873[14873]
+- Unify gopacket dependencies. {pull}29167[29167]
 
 *Winlogbeat*
 
@@ -112,6 +110,7 @@ https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
 - Support self signed certificates on outputs {pull}29229[29229]
 - Add FIPS configuration option for all AWS API calls. {pull}[28899]
 - Warn users when connecting to older versions of Elasticsearch instances. {pull}29723[29723]
+- `add_fields` processor is now able to set metadata in events {pull}30092[30092]
 
 *Auditbeat*
 
