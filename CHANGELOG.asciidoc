@@ -31,16 +31,11 @@ https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
 - The extension of the log files of Beats and Elastic Agent is changed to `.ndjson`. If you are collecting the logs, you must change the path configuration to `/path/to/logs/{beatname}*.ndjson` to avoid any issues. {pull}28927[28927]
 - Remove legacy support for SSLv3. {pull}30071[30071]
 
-*Auditbeat*
-
-
 *Filebeat*
 
 - Add `while_pattern` type to multiline reader. {pull}19662[19662]
 - auditd dataset: Use process.args to store program arguments instead of auditd.log.aNNN fields. {pull}29601[29601]
 - Remove deprecated old awscloudwatch input name. {pull}29844[29844]
-
-*Heartbeat*
 
 *Metricbeat*
 
@@ -59,13 +54,7 @@ https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
 - Remove top level `hash` property from sysmon events {pull}20653[20653]
 - Move module processing from local Javascript processor to ingest node {issue}29184[29184] {pull}29435[29435]
 
-*Functionbeat*
-
-
 ==== Bugfixes
-
-*Affecting all Beats*
-
 
 *Auditbeat*
 
@@ -91,15 +80,6 @@ https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
 - Redis: fix incorrectly handle with two-words redis command. {issue}14872[14872] {pull}14873[14873]
 - Unify gopacket dependencies. {pull}29167[29167]
 
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
 ==== Added
 
 *Affecting all Beats*
@@ -116,24 +96,12 @@ https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
 
 - system/process: Prevent hashing files in other mnt namespaces. {issue}25777[25777] {issue}29678[29678] {pull}29786[29786]
 
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
 *Metricbeat*
 
 - Preliminary AIX support {pull}27954[27954]
 - Add option to skip older k8s events {pull}29396[29396]
 - Add `elasticsearch.cluster.id` field to Beat and Kibana modules. {pull}29577[29577]
 - Add `elasticsearch.cluster.id` field to Logstash module. {pull}29625[29625]
-
-*Packetbeat*
-
-*Functionbeat*
-
 
 *Winlogbeat*
 
@@ -142,29 +110,6 @@ https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
 *Elastic Log Driver*
 
 - Fixed docs for hosts {pull}23644[23644]
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-
 
 [[release-notes-7.17.0]]
 === Beats version 7.17.0
