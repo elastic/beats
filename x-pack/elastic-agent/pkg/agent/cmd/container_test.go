@@ -91,7 +91,7 @@ func TestFindPolicyByName(t *testing.T) {
 	require.Equal(t, &defaultAgentPolicy, policy)
 }
 
-func TestFindPolicyByIdAndName(t *testing.T) {
+func TestFindPolicyByIdOverName(t *testing.T) {
 	cfg := setupConfig{
 		Fleet: fleetConfig{
 			TokenPolicyName: "Default policy",
@@ -105,6 +105,31 @@ func TestFindPolicyByIdAndName(t *testing.T) {
 	policy, err := findPolicy(cfg, policies.Items, &PackagePolicies)
 	require.NoError(t, err)
 	require.Equal(t, &nondefaultFleetPolicy, policy)
+}
+
+func TestFindPolicyByIdMiss(t *testing.T) {
+	cfg := setupConfig{
+		FleetServer: fleetServerConfig{
+			Enable:   true,
+			PolicyID: "invalid id",
+		},
+	}
+
+	policy, err := findPolicy(cfg, policies.Items, &PackagePolicies)
+	require.Error(t, err)
+	require.Nil(t, policy)
+}
+
+func TestFindPolicyByNameMiss(t *testing.T) {
+	cfg := setupConfig{
+		Fleet: fleetConfig{
+			TokenPolicyName: "invalid name",
+		},
+	}
+
+	policy, err := findPolicy(cfg, policies.Items, &PackagePolicies)
+	require.Error(t, err)
+	require.Nil(t, policy)
 }
 
 func TestFindPolicyDefaultFleet(t *testing.T) {

@@ -573,7 +573,6 @@ func findPolicy(cfg setupConfig, policies []kibanaPolicy, packagePolicies *packa
 	if cfg.FleetServer.Enable {
 		policyID = cfg.FleetServer.PolicyID
 	}
-	var fallbackPolicy *kibanaPolicy
 	for _, policy := range policies {
 		if policyID != "" {
 			if policyID == policy.ID {
@@ -584,21 +583,14 @@ func findPolicy(cfg setupConfig, policies []kibanaPolicy, packagePolicies *packa
 				return &policy, nil
 			}
 		} else if cfg.FleetServer.Enable {
-			if _, ok := packagePolicies.Fleet[policy.ID]; ok && fallbackPolicy == nil {
-				// copy the current policy over
-				fallbackPolicy = &kibanaPolicy{}
-				*fallbackPolicy = policy
+			if _, ok := packagePolicies.Fleet[policy.ID]; ok {
+				return &policy, nil
 			}
 		} else {
-			if _, ok := packagePolicies.NonFleet[policy.ID]; ok && fallbackPolicy == nil {
-				// copy the current policy over
-				fallbackPolicy = &kibanaPolicy{}
-				*fallbackPolicy = policy
+			if _, ok := packagePolicies.NonFleet[policy.ID]; ok {
+				return &policy, nil
 			}
 		}
-	}
-	if fallbackPolicy != nil {
-		return fallbackPolicy, nil
 	}
 	return nil, fmt.Errorf(`unable to find policy named "%s"`, policyName)
 }
