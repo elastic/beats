@@ -48,7 +48,7 @@ const (
 	defaultRequestRetrySleep      = "1s"                             // sleep 1 sec between retries for HTTP requests
 	defaultMaxRequestRetries      = "30"                             // maximum number of retries for HTTP requests
 	defaultStateDirectory         = "/usr/share/elastic-agent/state" // directory that will hold the state data
-	defaultFleetPackagePolicyName = "default-fleet-server-agent-policy"
+	defaultFleetPackagePolicyName = "fleet-server-policy"
 )
 
 var (
@@ -516,12 +516,24 @@ func kibanaFetchPackagePolicies(cfg setupConfig, client *kibana.Client, streams 
 }
 
 func separatePackagePolicies(packagePolicies *kibanaPackagePolicies) *packagePolicyResponse {
-	result := packagePolicyResponse{}
+	result := packagePolicyResponse{
+		Fleet:    make(map[string]struct{}),
+		NonFleet: make(map[string]struct{}),
+	}
 	for _, packagePolicy := range packagePolicies.Items {
+		policyID := packagePolicy.PolicyID
 		if packagePolicy.Package.Name == "fleet_server" {
-			result.Fleet[packagePolicy.PolicyID] = struct{}{}
+			// if we have previously marked a policy as unmanaged, clear that marking
+			if _, ok := result.NonFleet[policyID]; ok {
+				delete(result.NonFleet, policyID)
+			}
+
+			result.Fleet[policyID] = struct{}{}
 		} else {
-			result.NonFleet[packagePolicy.PolicyID] = struct{}{}
+			// only mark new policies as unmanaged
+			if _, ok := result.Fleet[policyID]; !ok {
+				result.NonFleet[policyID] = struct{}{}
+			}
 		}
 	}
 	return &result
@@ -573,6 +585,7 @@ func findPolicy(cfg setupConfig, policies []kibanaPolicy, packagePolicies *packa
 	if cfg.FleetServer.Enable {
 		policyID = cfg.FleetServer.PolicyID
 	}
+	var fallbackPolicy *kibanaPolicy
 	for _, policy := range policies {
 		if policyID != "" {
 			if policyID == policy.ID {
@@ -583,7 +596,11 @@ func findPolicy(cfg setupConfig, policies []kibanaPolicy, packagePolicies *packa
 				return &policy, nil
 			}
 		} else if cfg.FleetServer.Enable {
-			if _, ok := packagePolicies.Fleet[policy.ID]; ok {
+			if _, ok := packagePolicies.Fleet[policy.ID]; ok && fallbackPolicy == nil {
+				fallbackPolicy = &kibanaPolicy{}
+				*fallbackPolicy = policy
+			}
+			if policy.ID == defaultFleetPackagePolicyName {
 				return &policy, nil
 			}
 		} else {
@@ -591,6 +608,10 @@ func findPolicy(cfg setupConfig, policies []kibanaPolicy, packagePolicies *packa
 				return &policy, nil
 			}
 		}
+	}
+
+	if fallbackPolicy != nil {
+		return fallbackPolicy, nil
 	}
 	return nil, fmt.Errorf(`unable to find policy named "%s"`, policyName)
 }
@@ -934,7 +955,6 @@ type packagePolicyResponse struct {
 }
 
 type kibanaPackagePolicy struct {
-	ID       string        `json:"id"`
 	PolicyID string        `json:"policy_id"`
 	Package  kibanaPackage `json:"package"`
 }

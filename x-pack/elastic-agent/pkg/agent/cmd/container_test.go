@@ -12,7 +12,7 @@ import (
 
 var (
 	defaultFleetPolicy = kibanaPolicy{
-		ID:     "499b5aa7-d214-5b5d-838b-3cd76469844e",
+		ID:     "fleet-server-policy",
 		Name:   "Default Fleet Server policy",
 		Status: "active",
 		PackagePolicies: []string{
@@ -58,13 +58,15 @@ var policies kibanaPolicies = kibanaPolicies{
 var PackagePolicies = packagePolicyResponse{
 	Fleet: map[string]struct{}{
 		"7b0093d2-7eab-4862-86c8-63b3dd1db001": {},
-		"499b5aa7-d214-5b5d-838b-3cd76469844e": {},
+		"fleet-server-policy":                  {},
 	},
 	NonFleet: map[string]struct{}{
 		"bc634ea6-8460-4925-babd-7540c3e7df24": {},
 		"2016d7cc-135e-5583-9758-3ba01f5a06e5": {},
 	},
 }
+
+// Finding policies
 
 func TestFindPolicyById(t *testing.T) {
 	cfg := setupConfig{
@@ -139,7 +141,14 @@ func TestFindPolicyDefaultFleet(t *testing.T) {
 		},
 	}
 
-	policy, err := findPolicy(cfg, policies.Items, &PackagePolicies)
+	items := []kibanaPolicy{
+		defaultAgentPolicy,
+		nondefaultAgentPolicy,
+		nondefaultFleetPolicy,
+		defaultFleetPolicy,
+	}
+
+	policy, err := findPolicy(cfg, items, &PackagePolicies)
 	require.NoError(t, err)
 	require.Equal(t, &defaultFleetPolicy, policy)
 }
@@ -175,7 +184,80 @@ func TestFindPolicyNoMatchFleet(t *testing.T) {
 		},
 	}
 
-	policy, err := findPolicy(cfg, policies.Items, &packagePolicyResponse{NonFleet: PackagePolicies.NonFleet})
+	items := []kibanaPolicy{
+		defaultAgentPolicy,
+		nondefaultAgentPolicy,
+		nondefaultFleetPolicy,
+	}
+	policy, err := findPolicy(cfg, items, &packagePolicyResponse{NonFleet: PackagePolicies.NonFleet})
 	require.Error(t, err)
 	require.Nil(t, policy)
+}
+
+// Separating policies by package
+var (
+	fleetPackage = kibanaPackage{
+		Name: "fleet_server",
+	}
+
+	nonfleetPackage = kibanaPackage{
+		Name: "some_other_package",
+	}
+)
+
+func generatePackagePolicies(fleetedPolicyIDs []string, nonfleetedPolicyIDs []string) *kibanaPackagePolicies {
+	items := []kibanaPackagePolicy{}
+	for _, ID := range fleetedPolicyIDs {
+		items = append(items, kibanaPackagePolicy{
+			PolicyID: ID,
+			Package:  fleetPackage,
+		})
+	}
+	for _, ID := range nonfleetedPolicyIDs {
+		items = append(items, kibanaPackagePolicy{
+			PolicyID: ID,
+			Package:  nonfleetPackage,
+		})
+	}
+	return &kibanaPackagePolicies{
+		Items: items,
+	}
+}
+
+func reverse(policies *kibanaPackagePolicies) {
+	for i, j := 0, len(policies.Items)-1; i < j; i, j = i+1, j-1 {
+		policies.Items[i], policies.Items[j] = policies.Items[j], policies.Items[i]
+	}
+}
+
+func TestSeparatePackagePolicies(t *testing.T) {
+	policies := generatePackagePolicies([]string{"fleeted-id"}, []string{"nonfleeted-id"})
+	response := separatePackagePolicies(policies)
+	require.Contains(t, response.Fleet, "fleeted-id")
+	require.Contains(t, response.NonFleet, "nonfleeted-id")
+}
+
+func TestSeparatePackagePoliciesFleetPrecedence(t *testing.T) {
+	policies := generatePackagePolicies([]string{"fleeted-id", "multipackage"}, []string{"multipackage"})
+	response := separatePackagePolicies(policies)
+	require.Contains(t, response.Fleet, "fleeted-id")
+	require.Contains(t, response.Fleet, "multipackage")
+	require.NotContains(t, response.NonFleet, "multipackage")
+}
+
+func TestSeparatePackagePoliciesConflictingNonFleetPackagesFirst(t *testing.T) {
+	policies := generatePackagePolicies([]string{"fleeted-id", "multipackage"}, []string{"multipackage"})
+	reverse(policies)
+	response := separatePackagePolicies(policies)
+	require.Contains(t, response.Fleet, "fleeted-id")
+	require.Contains(t, response.Fleet, "multipackage")
+	require.NotContains(t, response.NonFleet, "multipackage")
+}
+
+func TestSeparatePackagePoliciesNonFleetPackagesFirst(t *testing.T) {
+	policies := generatePackagePolicies([]string{"fleeted-id"}, []string{"nonfleeted-id"})
+	reverse(policies)
+	response := separatePackagePolicies(policies)
+	require.Contains(t, response.Fleet, "fleeted-id")
+	require.Contains(t, response.NonFleet, "nonfleeted-id")
 }
