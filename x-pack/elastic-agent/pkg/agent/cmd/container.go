@@ -43,11 +43,12 @@ import (
 )
 
 const (
-	requestRetrySleepEnv     = "KIBANA_REQUEST_RETRY_SLEEP"
-	maxRequestRetriesEnv     = "KIBANA_REQUEST_RETRY_COUNT"
-	defaultRequestRetrySleep = "1s"                             // sleep 1 sec between retries for HTTP requests
-	defaultMaxRequestRetries = "30"                             // maximum number of retries for HTTP requests
-	defaultStateDirectory    = "/usr/share/elastic-agent/state" // directory that will hold the state data
+	requestRetrySleepEnv          = "KIBANA_REQUEST_RETRY_SLEEP"
+	maxRequestRetriesEnv          = "KIBANA_REQUEST_RETRY_COUNT"
+	defaultRequestRetrySleep      = "1s"                             // sleep 1 sec between retries for HTTP requests
+	defaultMaxRequestRetries      = "30"                             // maximum number of retries for HTTP requests
+	defaultStateDirectory         = "/usr/share/elastic-agent/state" // directory that will hold the state data
+	defaultFleetPackagePolicyName = "default-fleet-server-agent-policy"
 )
 
 var (
@@ -498,7 +499,32 @@ func kibanaFetchPolicy(cfg setupConfig, client *kibana.Client, streams *cli.IOSt
 	if err != nil {
 		return nil, err
 	}
-	return findPolicy(cfg, policies.Items)
+	packagePolicies, err := kibanaFetchPackagePolicies(cfg, client, streams)
+	if err != nil {
+		return nil, err
+	}
+	return findPolicy(cfg, policies.Items, packagePolicies)
+}
+
+func kibanaFetchPackagePolicies(cfg setupConfig, client *kibana.Client, streams *cli.IOStreams) (*packagePolicyResponse, error) {
+	var packagePolicies kibanaPackagePolicies
+	err := performGET(cfg, client, "/api/fleet/package_policies", &packagePolicies, streams.Err, "Kibana fetch package policies")
+	if err != nil {
+		return nil, err
+	}
+	return separatePackagePolicies(&packagePolicies), nil
+}
+
+func separatePackagePolicies(packagePolicies *kibanaPackagePolicies) *packagePolicyResponse {
+	result := packagePolicyResponse{}
+	for _, packagePolicy := range packagePolicies.Items {
+		if packagePolicy.Package.Name == "fleet_server" {
+			result.Fleet[packagePolicy.PolicyID] = struct{}{}
+		} else {
+			result.NonFleet[packagePolicy.PolicyID] = struct{}{}
+		}
+	}
+	return &result
 }
 
 func kibanaFetchToken(cfg setupConfig, client *kibana.Client, policy *kibanaPolicy, streams *cli.IOStreams, tokenName string) (string, error) {
@@ -541,12 +567,13 @@ func kibanaClient(cfg kibanaConfig, headers map[string]string) (*kibana.Client, 
 	}, 0, "Elastic-Agent")
 }
 
-func findPolicy(cfg setupConfig, policies []kibanaPolicy) (*kibanaPolicy, error) {
+func findPolicy(cfg setupConfig, policies []kibanaPolicy, packagePolicies *packagePolicyResponse) (*kibanaPolicy, error) {
 	policyID := ""
 	policyName := cfg.Fleet.TokenPolicyName
 	if cfg.FleetServer.Enable {
 		policyID = cfg.FleetServer.PolicyID
 	}
+	var fallbackPolicy *kibanaPolicy
 	for _, policy := range policies {
 		if policyID != "" {
 			if policyID == policy.ID {
@@ -557,14 +584,21 @@ func findPolicy(cfg setupConfig, policies []kibanaPolicy) (*kibanaPolicy, error)
 				return &policy, nil
 			}
 		} else if cfg.FleetServer.Enable {
-			if policy.IsDefaultFleetServer {
-				return &policy, nil
+			if _, ok := packagePolicies.Fleet[policy.ID]; ok && fallbackPolicy == nil {
+				// copy the current policy over
+				fallbackPolicy = &kibanaPolicy{}
+				*fallbackPolicy = policy
 			}
 		} else {
-			if policy.IsDefault {
-				return &policy, nil
+			if _, ok := packagePolicies.NonFleet[policy.ID]; ok && fallbackPolicy == nil {
+				// copy the current policy over
+				fallbackPolicy = &kibanaPolicy{}
+				*fallbackPolicy = policy
 			}
 		}
+	}
+	if fallbackPolicy != nil {
+		return fallbackPolicy, nil
 	}
 	return nil, fmt.Errorf(`unable to find policy named "%s"`, policyName)
 }
@@ -898,12 +932,30 @@ func copyFile(destPath string, srcPath string, mode os.FileMode) error {
 	return err
 }
 
+type kibanaPackage struct {
+	Name string `json:"name"`
+}
+
+type packagePolicyResponse struct {
+	Fleet    map[string]struct{}
+	NonFleet map[string]struct{}
+}
+
+type kibanaPackagePolicy struct {
+	ID       string        `json:"id"`
+	PolicyID string        `json:"policy_id"`
+	Package  kibanaPackage `json:"package"`
+}
+
+type kibanaPackagePolicies struct {
+	Items []kibanaPackagePolicy `json:"items"`
+}
+
 type kibanaPolicy struct {
-	ID                   string `json:"id"`
-	Name                 string `json:"name"`
-	Status               string `json:"status"`
-	IsDefault            bool   `json:"is_default"`
-	IsDefaultFleetServer bool   `json:"is_default_fleet_server"`
+	ID              string   `json:"id"`
+	Name            string   `json:"name"`
+	Status          string   `json:"status"`
+	PackagePolicies []string `json:"package_policies"`
 }
 
 type kibanaPolicies struct {
