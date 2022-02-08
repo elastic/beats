@@ -218,8 +218,11 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 		bookmark, // Bookmark - for resuming from a specific event
 		flags)
 
-	if err == win.ERROR_NOT_FOUND {
+	switch err {
+	case win.ERROR_NOT_FOUND, win.ERROR_EVT_QUERY_RESULT_STALE,
+		win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION:
 		// The bookmarked event was not found, we retry the subscription from the start.
+		incrementMetric(readErrors, err)
 		subscriptionHandle, err = win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
 	}
 

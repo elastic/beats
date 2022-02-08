@@ -31,14 +31,18 @@ var _ unsafe.Pointer
 // Do the interface allocations only once for common
 // Errno values.
 const (
-	errnoERROR_IO_PENDING = 997
-	errnoERROR_NOT_FOUND  = 1168
+	errnoERROR_IO_PENDING                        = 997
+	errnoERROR_NOT_FOUND                         = 1168
+	errnoERROR_EVT_QUERY_RESULT_STALE            = 15011
+	errnoERROR_EVT_QUERY_RESULT_INVALID_POSITION = 15012
 )
 
 var (
-	ERROR_IO_PENDING error = syscall.Errno(errnoERROR_IO_PENDING)
-	ERROR_NOT_FOUND  error = syscall.Errno(errnoERROR_NOT_FOUND)
-	ERROR_EINVAL     error = syscall.EINVAL
+	ERROR_IO_PENDING                        error = syscall.Errno(errnoERROR_IO_PENDING)
+	ERROR_NOT_FOUND                         error = syscall.Errno(errnoERROR_NOT_FOUND)
+	ERROR_EVT_QUERY_RESULT_STALE            error = syscall.Errno(errnoERROR_EVT_QUERY_RESULT_STALE)
+	ERROR_EVT_QUERY_RESULT_INVALID_POSITION error = syscall.Errno(errnoERROR_EVT_QUERY_RESULT_INVALID_POSITION)
+	ERROR_EINVAL                            error = syscall.EINVAL
 )
 
 // errnoErr returns common boxed Errno values, to prevent
@@ -51,6 +55,10 @@ func errnoErr(e syscall.Errno) error {
 		return ERROR_IO_PENDING
 	case errnoERROR_NOT_FOUND:
 		return ERROR_NOT_FOUND
+	case errnoERROR_EVT_QUERY_RESULT_STALE:
+		return ERROR_EVT_QUERY_RESULT_STALE
+	case ERROR_EVT_QUERY_RESULT_INVALID_POSITION:
+		return ERROR_EVT_QUERY_RESULT_INVALID_POSITION
 	}
 	// TODO: add more here, after collecting data on the common
 	// error values see on Windows. (perhaps when running

@@ -122,8 +122,10 @@ func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, erro
 	switch err {
 	case nil:
 		return h, nil
-	case win.ERROR_NOT_FOUND:
+	case win.ERROR_NOT_FOUND, win.ERROR_EVT_QUERY_RESULT_STALE,
+		win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION:
 		// The bookmarked event was not found, we retry the subscription from the start.
+		incrementMetric(readErrors, err)
 		return win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
 	default:
 		return 0, err
