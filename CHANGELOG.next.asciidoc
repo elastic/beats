@@ -10,78 +10,24 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
-- Remove deprecated/undocumented IncludeCreatorMetadata setting from kubernetes metadata config options {pull}28006[28006]
-- Remove deprecated fields from kubernetes module {pull}28046[28046]
-- Remove deprecated config option aws_partition. {pull}28120[28120]
-- Improve stats API {pull}27963[27963]
-- Libbeat: logp package forces ECS compliant logs. Logs are JSON formatted. Options to enable ECS/JSON have been removed. {issue}15544[15544] {pull}28573[28573]
-- Update docker client. {pull}28716[28716]
-- Remove `auto` from the available options of `setup.ilm.enabled` and set the default value to `true`. {pull}28671[28671]
-- add_process_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
-- add_docker_metadata processor: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
-- Use data streams instead of indices for storing events from Beats. {pull}28450[28450]
-- Remove option `setup.template.type` and always load composable template with data streams. {pull}28450[28450]
-- Remove several ILM options (`rollover_alias` and `pattern`) as data streams does not require index aliases. {pull}28450[28450]
-- Index template's default_fields setting is only populated with ECS fields. {pull}28596[28596] {issue}28215[28215]
-- Remove `auto` from the available options of `setup.ilm.enabled` and set the default value to `true`. {pull}28671[28671]
-- Remove deprecated `--template` and `--ilm-policy` flags. Use `--index-management` instead. {pull}28870[28870]
-- Remove options `logging.files.suffix` and default to datetime endings in log file names. The format of the new name is `{beatname}-{date}(-n)?.ndjson`. Exmaple log files names from oldest to newest: `filebeat-20200101.ndjson`, `filebeat-20200101-1.ndjson`, `filebeat-20200101-2.ndjson`. {pull}28927[28927]
-- Remove Journalbeat. Use `journald` input of Filebeat instead. {pull}29131[29131]
-- `include_matches` option of `journald` input no longer accepts a list of string. {pull}29294[29294]
-- Allign kubernetes configuration settings. {pull}29908[29908]
-- The extension of the log files of Beats and Elastic Agent is changed to `.ndjson`. If you are collecting the logs, you must change the path configuration to `/path/to/logs/{beatname}*.ndjson` to avoid any issues. {pull}28927[28927]
-- Remove legacy support for SSLv3. {pull}30071[30071]
-- `add_fields` processor is now able to set metadata in events {pull}30092[30092]
 
 *Auditbeat*
 
-- File integrity dataset (macOS): Replace unnecessary `file.origin.raw` (type keyword) with `file.origin.text` (type `text`). {issue}12423[12423] {pull}15630[15630]
-- Change event.kind=error to event.kind=event to comply with ECS. {issue}18870[18870] {pull}20685[20685]
 
 *Filebeat*
 
-- Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
-- With the default configuration the cloud modules (aws, azure, googlecloud, o365, okta)
-- With the default configuration the cef and panw modules will no longer send the `host`
-- Add `while_pattern` type to multiline reader. {pull}19662[19662]
-- auditd dataset: Use process.args to store program arguments instead of auditd.log.aNNN fields. {pull}29601[29601]
-- Remove deprecated old awscloudwatch input name. {pull}29844[29844]
 
 *Heartbeat*
 
-- Add fonts to support more different types of characters for multiple languages. {pull}29606[29861]
 
 *Metricbeat*
 
-- Remove deprecated fields in Docker module. {issue}11835[11835] {pull}27933[27933]
-- Remove deprecated fields in Kafka module. {pull}27938[27938]
-- Remove deprecated config option default_region from aws module. {pull}28120[28120]
-- Remove network and diskio metrics from ec2 metricset. {pull}28316[28316]
-- Rename read/write_io.ops_per_sec to read/write.iops in rds metricset. {pull}28350[28350]
-- Remove linux-only metrics from diskio, memory {pull}28292[28292]
-- Remove deprecated config option perfmon.counters from windows/perfmon metricset. {pull}28282[28282]
-- Remove deprecated fields in Redis module. {issue}11835[11835] {pull}28246[28246]
-- system/process metricset: Replace usage of deprecated `process.ppid` field with `process.parent.pid`. {pull}28620[28620]
 
- *Packetbeat*
+*Packetbeat*
 
-- Redis: fix incorrectly handle with two-words redis command. {issue}14872[14872] {pull}14873[14873]
-- `event.category` no longer contains the value `network_traffic` because this is not a valid ECS event category value. {pull}20556[20556]
-- Remove deprecated TLS fields in favor of tls.server.x509 and tls.client.x509 ECS fields. {pull}28487[28487]
-- HTTP: The field `http.request.method` will maintain its original case. {pull}28620[28620]
-- Unify gopacket dependencies. {pull}29167[29167]
 
 *Winlogbeat*
 
-- Add support to Sysmon file delete events (event ID 23). {issue}18094[18094]
-- Improve ECS field mappings in Sysmon module. `related.hash`, `related.ip`, and `related.user` are now populated. {issue}18364[18364]
-- Improve ECS field mappings in Sysmon module. Hashes are now also populated to the corresponding `process.hash`, `process.pe.imphash`, `file.hash`, or `file.pe.imphash`. {issue}18364[18364]
-- Improve ECS field mappings in Sysmon module. `file.name`, `file.directory`, and `file.extension` are now populated. {issue}18364[18364]
-- Improve ECS field mappings in Sysmon module. `rule.name` is populated for all events when present. {issue}18364[18364]
-- Remove top level `hash` property from sysmon events {pull}20653[20653]
-- Move module processing from local Javascript processor to ingest node {issue}29184[29184] {pull}29435[29435]
-- Fix run loop when reading from evtx file {pull}30006[30006]
 
 *Functionbeat*
 
@@ -93,31 +39,22 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 
-- libbeat/processors/add_process_metadata: Fix memory leak in process cache. {issue}24890[24890] {pull}29717[29717]
 
 *Filebeat*
 
-- Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
 
 *Heartbeat*
-
-- Add fonts to support more different types of characters for multiple languages. {pull}29861[29861]
-
-*Journalbeat*
 
 
 *Metricbeat*
 
-- Extract correct index property in kibana.stats metricset {pull}29622[29622]
-- Fixed bug with `elasticsearch/cluster_stats` metricset not recording license expiration date correctly. {pull}29711[29711]
 
 *Packetbeat*
 
-- Prevent incorrect use of AMQP protocol parsing from causing silent failure. {pull}29017[29017]
-- Fix error handling in MongoDB protocol parsing. {pull}29017[29017]
 
 *Winlogbeat*
 
+- Fix run loop when reading from evtx file {pull}30006[30006]
 
 *Functionbeat*
 
@@ -129,23 +66,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Add config option `rotate_on_startup` to file output {issue}19150[19150] {pull}19347[19347]
-- Update to ECS 8.0 fields. {pull}28620[28620]
-- Support custom analyzers in fields.yml. {issue}28540[28540] {pull}28926[28926]
-- Support self signed certificates on outputs {pull}29229[29229]
-- Add FIPS configuration option for all AWS API calls. {pull}[28899]
-- Warn users when connecting to older versions of Elasticsearch instances. {pull}29723[29723]
 
 *Auditbeat*
 
-- system/process: Prevent hashing files in other mnt namespaces. {issue}25777[25777] {issue}29678[29678] {pull}29786[29786]
 
 *Filebeat*
 
-- Add `text/csv` decoder to `httpjson` input {pull}28564[28564]
-- Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
-- Add support for parsers on journald input {pull}29070[29070]
-- Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
 
 *Heartbeat*
 
@@ -153,10 +79,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
-- Preliminary AIX support {pull}27954[27954]
-- Add option to skip older k8s events {pull}29396[29396]
-- Add `elasticsearch.cluster.id` field to Beat and Kibana modules. {pull}29577[29577]
-- Add `elasticsearch.cluster.id` field to Logstash module. {pull}29625[29625]
 
 *Packetbeat*
 
@@ -165,11 +87,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
-- Add support for sysmon event ID 26; FileDeleteDetected. {issue}26280[26280] {pull}29957[29957]
 
 *Elastic Log Driver*
 
-- Fixed docs for hosts {pull}23644[23644]
 
 ==== Deprecated
 
@@ -191,11 +111,4 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
-
-*Journalbeat*
-
-
-
-
-
 
