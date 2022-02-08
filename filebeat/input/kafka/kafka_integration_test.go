@@ -113,6 +113,13 @@ func TestInput(t *testing.T) {
 			assert.Equal(t, text, msg.message)
 
 			checkMatchingHeaders(t, event, msg.headers)
+
+			// emulating the pipeline (kafkaInput.Run)
+			meta, ok := event.Private.(eventMeta)
+			if !ok {
+				t.Fatal("could not get eventMeta and ack the message")
+			}
+			meta.ackHandler()
 		case <-timeout:
 			t.Fatal("timeout waiting for incoming events")
 		}
@@ -132,6 +139,8 @@ func TestInput(t *testing.T) {
 		t.Fatal("timeout waiting for beat to shut down")
 	case <-didClose:
 	}
+
+	assertEmpty(t, config, 5*time.Second)
 }
 
 func TestInputWithMultipleEvents(t *testing.T) {
@@ -418,6 +427,26 @@ func getTestKafkaHost() string {
 		getenv("KAFKA_HOST", kafkaDefaultHost),
 		getenv("KAFKA_PORT", kafkaDefaultPort),
 	)
+}
+
+func assertEmpty(t *testing.T, config *common.Config, timeout time.Duration) {
+	client := beattest.NewChanClient(1)
+	defer client.Close()
+	events := client.Channel
+	_, cancel := run(t, config, client)
+	defer cancel()
+
+	timeoutCh := time.After(timeout)
+	select {
+	case event := <-events:
+		if event.Fields == nil && event.Meta == nil && event.Private == nil {
+			// empty event on a close channel
+			return
+		}
+		t.Fatal("topic must be empty, previous messages were not acknowledged")
+	case <-timeoutCh:
+		return
+	}
 }
 
 func writeToKafkaTopic(
