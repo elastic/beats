@@ -53,6 +53,8 @@ TEST_BOXES = [
   {:name => "amazon2", :box => "bento/amazonlinux-2", :platform => "centos"},
 
   # Unsupported platforms
+  {:name => "opensuse153", :box => "bento/opensuse-leap-15.3", :platform => "opensuse"},
+  {:name => "sles12", :box => "elastic/sles-12-x86_64", :platform => "sles"},
   {:name => "solaris", :box => "https://s3.amazonaws.com/beats-files/vagrant/beats-solaris-11.2-virtualbox-2016-11-02_1603.box", :platform => "unix"},
   {:name => "freebsd", :box => "bento/freebsd-13", :platform => "freebsd", :extras => "pkg install -y -q bash && chsh -s bash vagrant"},
   {:name => "openbsd", :box => "generic/openbsd6", :platform => "openbsd", :extras => "sudo pkg_add go"},
@@ -103,14 +105,14 @@ Vagrant.configure("2") do |config|
         end
       end
 
-      # Freebsd 
+      # Freebsd
       if node[:platform] == "freebsd"
         nodeconfig.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 freebsd #{GO_VERSION}", privileged: false
         nodeconfig.vm.provision "shell", inline: "sudo mount -t linprocfs /dev/null /proc", privileged: false
       end
 
       # gvm install
-      if node[:platform] == "centos" or node[:platform] == "ubuntu" or node[:platform] == "debian" or node[:platorm] == "archlinux"
+      if node[:platform] == "centos" or node[:platform] == "ubuntu" or node[:platform] == "debian" or node[:platform] == "archlinux" or node[:platform] == "opensuse" or node[:platform] == "sles"
         nodeconfig.vm.provision "shell", type: "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
       end
 
