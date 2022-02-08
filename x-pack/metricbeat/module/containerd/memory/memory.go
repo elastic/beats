@@ -153,6 +153,8 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 
 				memoryUsagePct := usageTotal.(float64) / mLfloat
 				event.Put("usage.pct", memoryUsagePct)
+				// Update container.memory.usage ECS field
+				containerFields.Put("memory.usage", memoryUsagePct)
 				m.Logger().Debugf("memoryUsagePct for %+v is %+v", cID, memoryUsagePct)
 			}
 		}
