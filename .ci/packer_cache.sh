@@ -74,10 +74,16 @@ if [ -x "$(command -v docker)" ]; then
 
   ## GitHub api returns up to 100 entries.
   ## Probably we need a different approach to search the latest minor.
-  latestMinor=$(curl -s https://api.github.com/repos/elastic/beats/branches\?per_page=100 | jq -r '.[].name' | grep "^7." | tail -1)
+  latest7Minor=$(curl -s https://api.github.com/repos/elastic/beats/branches\?per_page=100 | jq -r '.[].name' | grep "^7." | tail -1)
+  latest8Minor=$(curl -s https://api.github.com/repos/elastic/beats/branches\?per_page=100 | jq -r '.[].name' | grep "^8." | tail -1)
 
+<<<<<<< HEAD
   for branch in master 7.x $latestMinor ; do
     if [ "$branch" != "master" ] ; then
+=======
+  for branch in main $latest7Minor $latest8Minor; do
+    if [ "$branch" != "main" ] ; then
+>>>>>>> d7eaf2fda4 (main: apm-server update pipeline and support for 8.minor in the packer-cache.sh (#30237))
       echo "Checkout the branch $branch"
       git checkout "$branch"
     fi
