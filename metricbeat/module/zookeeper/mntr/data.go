@@ -89,6 +89,14 @@ func eventMapping(serverId string, response io.Reader, r mb.ReporterV2, logger *
 	// only exposed by the Leader
 	if hasFollowers, hasLearners := fullEvent["zk_followers"], fullEvent["zk_learners"]; hasFollowers != nil || hasLearners != nil {
 		schemaLeader.ApplyTo(event, fullEvent)
+
+		if learners, ok := event["learners"]; ok {
+			// If ZK >= 3.6, keep a legacy view of the "learners" field
+			event.Put("followers", learners)
+		} else if followers, ok := event["followers"]; ok {
+			// If ZK < 3.6, keep a migration to recent versions view of the "followers" field
+			event.Put("learners", followers)
+		}
 	}
 
 	// only available on Unix platforms
