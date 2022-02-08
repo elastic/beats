@@ -22,19 +22,26 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: elastic-agent
-          image: docker.elastic.co/beats/elastic-agent:8.1.0-SNAPSHOT
+          image: 704479110758.dkr.ecr.eu-west-1.amazonaws.com/elastic-agent:csp-latest 
           imagePullPolicy: IfNotPresent
-          args: [
-            "-c", "/etc/agent.yml",
-            "-e",
-          ]
           env:
-            - name: ES_USERNAME
+            - name: FLEET_ENROLL
+              value: "1"
+            # Set to true in case of insecure or unverified HTTP
+            - name: FLEET_INSECURE
+              value: "true"
+              # The ip:port pair of fleet server
+            - name: FLEET_URL
+              value: "http://host.docker.internal:8220"
+              # If left empty KIBANA_HOST, KIBANA_FLEET_USERNAME, KIBANA_FLEET_PASSWORD are needed
+            - name: FLEET_ENROLLMENT_TOKEN
+              value: ""
+            - name: KIBANA_HOST
+              value: "http://kibana:5601"
+            - name: KIBANA_FLEET_USERNAME
               value: "elastic"
-            - name: ES_PASSWORD
-              value: "<Insert_here>"
-            - name: ES_HOST
-              value: "<insert_here>"
+            - name: KIBANA_FLEET_PASSWORD
+              value: "changeme"
             - name: NODE_NAME
               valueFrom:
                 fieldRef:
@@ -46,16 +53,13 @@ spec:
           securityContext:
             runAsUser: 0
           resources:
-            limits:
-              memory: 500Mi
+            # limits:
+            #   memory: 500Mi
+            # Todo remove comment out after performance issues validated
             requests:
               cpu: 100m
               memory: 200Mi
           volumeMounts:
-            - name: datastreams
-              mountPath: /etc/agent.yml
-              readOnly: true
-              subPath: agent.yml
             - name: proc
               mountPath: /hostfs/proc
               readOnly: true
@@ -68,11 +72,22 @@ spec:
             - name: varlog
               mountPath: /var/log
               readOnly: true
+# Todo CSP specfic volume added will need to update deploy/ manifests
+            - name: etc-kubernetes
+              mountPath: /hostfs/etc/kubernetes
+            - name: var-lib
+              mountPath: /hostfs/var/lib
+              readOnly: true
+            - name: passwd
+              mountPath: /hostfs/etc/passwd
+              readOnly: true
+            - name: group
+              mountPath: /hostfs/etc/group
+              readOnly: true
+            - name: etcsysmd
+              mountPath: /hostfs/etc/systemd
+              readOnly: true
       volumes:
-        - name: datastreams
-          configMap:
-            defaultMode: 0640
-            name: agent-node-datastreams
         - name: proc
           hostPath:
             path: /proc
@@ -85,6 +100,22 @@ spec:
         - name: varlog
           hostPath:
             path: /var/log
+# Todo CSP specfic volumes added will need to update deploy/ manifests
+        - name: etc-kubernetes
+          hostPath:
+            path: /etc/kubernetes
+        - name: var-lib
+          hostPath:
+            path: /var/lib
+        - name: passwd
+          hostPath:
+            path: /etc/passwd
+        - name: group
+          hostPath:
+            path: /etc/group
+        - name: etcsysmd
+          hostPath:
+            path: /etc/systemd
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
