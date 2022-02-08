@@ -3,6 +3,15 @@ queue_rules:
     conditions:
       - check-success=beats-ci/pr-merge
 pull_request_rules:
+  - name: self-assign PRs
+    conditions:
+      - -merged
+      - -closed
+      - "#assignee=0"
+    actions:
+      assign:
+        add_users:
+          - "{{ author }}"
   - name: forward-port patches to main branch
     conditions:
       - merged
