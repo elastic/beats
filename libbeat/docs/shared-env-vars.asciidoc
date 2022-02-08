@@ -45,7 +45,7 @@ To specify custom error text, use:
 Where `error_text` is custom text that will be prepended to the error
 message if the environment variable cannot be expanded.
 
-If you need to use a special character in your configuration file, you can use `$` to escape the expansion. For example, you can escape `${` or `}` with `$${` or `$}`.
+If you need to use a special character in your configuration file, use `$` to escape the expansion. For example, you can escape `${` or `}` with `$${` or `$}`.
 
 After changing the value of an environment variable, you need to restart
 {beatname_uc} to pick up the new value.
