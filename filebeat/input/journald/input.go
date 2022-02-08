@@ -135,6 +135,17 @@ func (inp *journald) Run(
 		log.Error("Continue from current position. Seek failed with: %v", err)
 	}
 
+<<<<<<< HEAD
+=======
+	parser := inp.Parsers.Create(
+		&readerAdapter{
+			r:                  reader,
+			converter:          journalfield.NewConverter(ctx.Logger, nil),
+			canceler:           ctx.Cancelation,
+			saveRemoteHostname: inp.SaveRemoteHostname,
+		})
+
+>>>>>>> cc634f1ecb (filebeat/input/journald: fix field name translation (#30167))
 	for {
 		entry, err := reader.Next(ctx.Cancelation)
 		if err != nil {
@@ -204,3 +215,61 @@ func seekBy(log *logp.Logger, cp checkpoint, seek, defaultSeek journalread.SeekM
 	}
 	return mode, cp.Position
 }
+<<<<<<< HEAD
+=======
+
+// readerAdapter wraps journalread.Reader and adds two functionalities:
+// - Allows it to behave like a reader.Reader
+// - Translates the fields names from the journald format to something
+//   more human friendly
+type readerAdapter struct {
+	r                  *journalread.Reader
+	canceler           input.Canceler
+	converter          *journalfield.Converter
+	saveRemoteHostname bool
+}
+
+func (r *readerAdapter) Close() error {
+	return r.r.Close()
+}
+
+func (r *readerAdapter) Next() (reader.Message, error) {
+	data, err := r.r.Next(r.canceler)
+	if err != nil {
+		return reader.Message{}, err
+	}
+
+	created := time.Now()
+
+	content := []byte(data.Fields["MESSAGE"])
+	delete(data.Fields, "MESSAGE")
+
+	fields := r.converter.Convert(data.Fields)
+	fields.Put("event.kind", "event")
+	fields.Put("event.created", created)
+
+	// if entry is coming from a remote journal, add_host_metadata overwrites
+	// the source hostname, so it has to be copied to a different field
+	if r.saveRemoteHostname {
+		remoteHostname, err := fields.GetValue("host.hostname")
+		if err == nil {
+			fields.Put("log.source.address", remoteHostname)
+		}
+	}
+
+	m := reader.Message{
+		Ts:      time.UnixMicro(int64(data.RealtimeTimestamp)),
+		Content: content,
+		Bytes:   len(content),
+		Fields:  fields,
+		Private: checkpoint{
+			Version:            cursorVersion,
+			RealtimeTimestamp:  data.RealtimeTimestamp,
+			MonotonicTimestamp: data.MonotonicTimestamp,
+			Position:           data.Cursor,
+		},
+	}
+
+	return m, nil
+}
+>>>>>>> cc634f1ecb (filebeat/input/journald: fix field name translation (#30167))
