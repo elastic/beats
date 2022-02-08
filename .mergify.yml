@@ -2,11 +2,7 @@ pull_request_rules:
   - name: forward-port patches to main branch
     conditions:
       - merged
-<<<<<<< HEAD
-      - label=backport-v8.0.0
-=======
       - label=forwardport-main
->>>>>>> 237937085 (use main default branch (#29710))
     actions:
       backport:
         assignees:
@@ -108,13 +104,9 @@ pull_request_rules:
   - name: notify the backport policy
     conditions:
       - -label~=^backport
-<<<<<<< HEAD
-      - base=master
-=======
       - base=main
       - -merged
       - -closed
->>>>>>> 237937085 (use main default branch (#29710))
     actions:
       comment:
         message: |

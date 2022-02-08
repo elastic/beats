@@ -18,11 +18,7 @@
         discover-pr-forks-trust: 'permission'
         discover-pr-origin: 'merge-current'
         discover-tags: true
-<<<<<<< HEAD
-        head-filter-regex: '(master|7\.[x789]|7\.1\d|8\.\d+|PR-.*|v\d+\.\d+\.\d+)'
-=======
         head-filter-regex: '(main|7\.1[6789]|8\.\d+|PR-.*|v\d+\.\d+\.\d+)'
->>>>>>> 237937085 (use main default branch (#29710))
         disable-pr-notifications: true
         notification-context: 'apm-beats-update'
         repo: 'beats'

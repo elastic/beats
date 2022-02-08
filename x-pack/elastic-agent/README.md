@@ -3,16 +3,12 @@
 The source files for the general Elastic Agent documentation are currently stored
 in the [observability-docs](https://github.com/elastic/observability-docs) repo. The following docs are only focused on getting developers started building code for Elastic Agent.
 
-<<<<<<< HEAD
-## Testing docker container
-=======
 ## Testing
 
 Prerequisites:
 - installed [mage](https://github.com/magefile/mage)
 
 ### Testing docker container
->>>>>>> 237937085 (use main default branch (#29710))
 
 Running Elastic Agent in a docker container is a common use case. To build the Elastic Agent and create a docker image run the following command:
 
@@ -28,9 +24,6 @@ elastic-package stack up --version=7.13.0-SNAPSHOT -v
 
 Please note that the docker container is built in both standard and 'complete' variants.
 The 'complete' variant contains extra files, like the chromium browser, that are too large
-<<<<<<< HEAD
-for the standard variant.
-=======
 for the standard variant.
 
 ### Testing Elastic Agent on Kubernetes
@@ -89,4 +82,3 @@ kubectl apply -f elastic-agent-${ELASTIC_AGENT_MODE}-kubernetes.yaml
 ```
 kubectl -n kube-system get pods -l app=elastic-agent
 ```
->>>>>>> 237937085 (use main default branch (#29710))
