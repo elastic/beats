@@ -85,7 +85,7 @@ func CustomizePackaging() {
 				args.Spec.ReplaceFile("{{.BeatName}}.yml", configYml)
 				args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfigYml)
 				args.Spec.ReplaceFile("NOTICE.txt", npcapNoticeTxt)
-			case devtools.Deb, devtools.RPM, devtools.DMG:
+			case devtools.Deb, devtools.RPM:
 				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", configYml)
 				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfigYml)
 			case devtools.Docker:

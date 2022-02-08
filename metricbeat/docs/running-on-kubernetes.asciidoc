@@ -88,16 +88,7 @@ spec:
 ===== Red Hat OpenShift configuration
 
 If you are using Red Hat OpenShift, you need to specify additional settings in
-the manifest file and enable the container to run as privileged.
-
-. Modify the `DaemonSet` container spec in the manifest file:
-+
-[source,yaml]
------
-  securityContext:
-    runAsUser: 0
-    privileged: true
------
+the manifest file and grant the `metricbeat` service account access to the privileged SCC:
 
 . In the manifest file, edit the `metricbeat-daemonset-modules` ConfigMap, and
 specify the following settings under `kubernetes.yml` in the `data` section:
@@ -118,6 +109,12 @@ specify the following settings under `kubernetes.yml` in the `data` section:
       bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
       ssl.certificate_authorities:
         - /path/to/kubelet-service-ca.crt
+    - module: kubernetes
+      metricsets:
+        - proxy
+      period: 10s
+      host: ${NODE_NAME}
+      hosts: ["localhost:29101"]
 -----
 NOTE: `kubelet-service-ca.crt` can be any CA bundle that contains the issuer of the certificate used in the Kubelet API.
 According to each specific installation of Openshift this can be found either in `secrets` or in `configmaps`.
@@ -139,12 +136,13 @@ Data
 ca-bundle.crt:
 -----
 
-. Under the `metricbeat` ClusterRole, add the following resources:
+. If `https` is used to access `kube-state-metrics`, add the following settings to the `metricbeat-daemonset-config` ConfigMap under the kubernetes autodiscover configuration for the `state_*` metricsets:
 +
 [source,yaml]
 -----
-  - nodes/metrics
-  - nodes/stats
+  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  ssl.certificate_authorities:
+    - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 -----
 
 . Grant the `metricbeat` service account access to the privileged SCC:
@@ -157,8 +155,9 @@ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:metri
 This command enables the container to be privileged as an administrator for
 OpenShift.
 
-. Override the default node selector for the `kube-system` namespace (or your
-custom namespace) to allow for scheduling on any node:
+. If the namespace where elastic-agent is running has the `"openshift.io/node-selector"` annotation set, elastic-agent
+might not run on all nodes. In this case consider overriding the node selector for the namespace to allow scheduling
+on any node:
 +
 [source,shell]
 ----
@@ -168,6 +167,14 @@ oc patch namespace kube-system -p \
 +
 This command sets the node selector for the project to an empty string. If you
 don't run this command, the default node selector will skip master nodes.
+
+NOTE: for openshift versions prior to the version 4.x additionally you need to modify the `DaemonSet` container spec in the manifest file to enable the container to run as privileged:
+[source,yaml]
+-----
+  securityContext:
+    runAsUser: 0
+    privileged: true
+-----
 
 [float]
 ==== Load {kib} dashboards

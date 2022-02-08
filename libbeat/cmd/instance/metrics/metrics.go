@@ -281,11 +281,9 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 	V.OnRegistryStart()
 	defer V.OnRegistryFinished()
 
-	pid, err := process.GetSelfPid()
-	if err != nil {
-		logp.Err("error getting PID for self process: %v", err)
-		return
-	}
+	// PID shouldn't use hostfs, at least for now.
+	// containerization schemes should provide their own /proc/ that will serve containerized processess
+	pid := os.Getpid()
 
 	cgroups, err := cgroup.NewReaderOptions(cgroup.ReaderOptions{
 		RootfsMountpoint:         resolve.NewTestResolver("/"),
@@ -294,16 +292,16 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 	})
 	if err != nil {
 		if err == cgroup.ErrCgroupsMissing {
-			logp.Warn("cgroup data collection disabled: %v", err)
+			logp.Warn("cgroup data collection disabled in internal monitoring: %v", err)
 		} else {
-			logp.Err("cgroup data collection disabled: %v", err)
+			logp.Err("cgroup data collection disabled in internal monitoring: %v", err)
 		}
 		return
 	}
 
 	cgv, err := cgroups.CgroupsVersion(pid)
 	if err != nil {
-		logp.Err("error determining cgroups version: %v", err)
+		logp.Err("error determining cgroups version for internal monitoring: %v", err)
 		return
 	}
 
@@ -318,7 +316,7 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 func reportMetricsCGV1(pid int, cgroups *cgroup.Reader, V monitoring.Visitor) {
 	selfStats, err := cgroups.GetV1StatsForProcess(pid)
 	if err != nil {
-		logp.Err("error getting cgroup stats: %v", err)
+		logp.Err("error getting cgroup stats for V1: %v", err)
 	}
 	// GetStatsForProcess returns a nil selfStats and no error when there's no stats
 	if selfStats == nil {
@@ -379,9 +377,10 @@ func reportMetricsCGV1(pid int, cgroups *cgroup.Reader, V monitoring.Visitor) {
 func reportMetricsCGV2(pid int, cgroups *cgroup.Reader, V monitoring.Visitor) {
 	selfStats, err := cgroups.GetV2StatsForProcess(pid)
 	if err != nil {
-		logp.Err("error getting cgroup stats: %v", err)
+		logp.Err("error getting cgroup stats for V2: %v", err)
 		return
 	}
+
 	if cpu := selfStats.CPU; cpu != nil {
 		monitoring.ReportNamespace(V, "cpu", func() {
 			if cpu.ID != "" {
