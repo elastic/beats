@@ -6,6 +6,9 @@ import unittest
 
 @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
 class Test(metricbeat.BaseTest):
+    """
+    Test is the implementation of unit tests for processessors
+    """
 
     def test_drop_fields(self):
 
@@ -42,7 +45,6 @@ class Test(metricbeat.BaseTest):
         self.assertCountEqual(self.de_dot(
             ["name", "out", "in"]), network.keys())
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_dropfields_with_condition(self):
         """
         Check drop_fields action works when a condition is associated.
@@ -69,14 +71,17 @@ class Test(metricbeat.BaseTest):
 
         output = self.read_output(
             required_fields=["@timestamp"],
-        )[1]
+        )
+        good_event = {}
+        for evt in output:
+            if "system.process.cpu.total.pct" in evt:
+                good_event = evt
 
-        if float(output["system.process.cpu.total.pct"]) < 0.5:
-            assert "system.process.memory.size" not in output
+        if float(good_event["system.process.cpu.total.pct"]) < 0.5:
+            assert "system.process.memory.size" not in good_event
         else:
-            assert "system.process.memory.size" in output
+            assert "system.process.memory.size" in good_event
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_dropevent_with_condition(self):
         """
         Check drop_event action works when a condition is associated.
@@ -103,9 +108,14 @@ class Test(metricbeat.BaseTest):
 
         output = self.read_output(
             required_fields=["@timestamp"],
-        )[1]
+        )
+        good_event = {}
+        for evt in output:
+            if "system.process.cpu.total.pct" in evt:
+                good_event = evt
+
         print(output)
-        assert float(output["system.process.cpu.total.pct"]) >= 0.001
+        assert float(good_event["system.process.cpu.total.pct"]) >= 0.001
 
     def test_dropevent_with_complex_condition(self):
         """
@@ -135,7 +145,6 @@ class Test(metricbeat.BaseTest):
         )
         assert len(output) >= 1
 
-    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_include_fields(self):
         """
         Check include_fields filtering action
@@ -154,14 +163,19 @@ class Test(metricbeat.BaseTest):
         )
         metricbeat = self.start_beat()
         self.wait_until(
-            lambda: self.output_count(lambda x: x >= 2),
+            lambda: self.output_count(lambda x: x >= 4),
             max_timeout=15)
 
         metricbeat.kill_and_wait()
 
         output = self.read_output(
             required_fields=["@timestamp"],
-        )[1]
+        )
+        good_event = {}
+        # depending on threading, or whatever is happening, try to search for a fully formatted event
+        for evt in output:
+            if "system.process.cpu.total.pct" in evt:
+                good_event = evt
         print(output)
 
         for key in [
@@ -171,13 +185,13 @@ class Test(metricbeat.BaseTest):
             "system.process.memory.rss.bytes",
             "system.process.memory.rss.pct"
         ]:
-            assert key in output
+            assert key in good_event
 
         for key in [
             "system.process.name",
             "system.process.pid",
         ]:
-            assert key not in output
+            assert key not in good_event
 
     def test_multiple_actions(self):
         """
