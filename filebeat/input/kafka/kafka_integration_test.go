@@ -62,6 +62,7 @@ func recordHeader(key, value string) sarama.RecordHeader {
 
 func TestInput(t *testing.T) {
 	testTopic := createTestTopicName()
+	groupID := "filebeat"
 
 	// Send test messages to the topic for the input to read.
 	messages := []testMessage{
@@ -88,7 +89,7 @@ func TestInput(t *testing.T) {
 	config := common.MustNewConfigFrom(common.MapStr{
 		"hosts":      getTestKafkaHost(),
 		"topics":     []string{testTopic},
-		"group_id":   "filebeat",
+		"group_id":   groupID,
 		"wait_close": 0,
 	})
 
@@ -140,7 +141,7 @@ func TestInput(t *testing.T) {
 	case <-didClose:
 	}
 
-	assertEmpty(t, config, 5*time.Second)
+	assertOffset(t, groupID, testTopic, int64(len(messages)))
 }
 
 func TestInputWithMultipleEvents(t *testing.T) {
@@ -429,24 +430,17 @@ func getTestKafkaHost() string {
 	)
 }
 
-func assertEmpty(t *testing.T, config *common.Config, timeout time.Duration) {
-	client := beattest.NewChanClient(1)
+func assertOffset(t *testing.T, groupID, topic string, expected int64) {
+	client, err := sarama.NewClient([]string{getTestKafkaHost()}, nil)
+	assert.NoError(t, err)
 	defer client.Close()
-	events := client.Channel
-	_, cancel := run(t, config, client)
-	defer cancel()
+	ofm, err := sarama.NewOffsetManagerFromClient(groupID, client)
+	assert.NoError(t, err)
+	pom, err := ofm.ManagePartition(topic, 0)
+	assert.NoError(t, err)
+	offset, _ := pom.NextOffset()
 
-	timeoutCh := time.After(timeout)
-	select {
-	case event := <-events:
-		if event.Fields == nil && event.Meta == nil && event.Private == nil {
-			// empty event on a close channel
-			return
-		}
-		t.Fatal("topic must be empty, previous messages were not acknowledged")
-	case <-timeoutCh:
-		return
-	}
+	assert.Equal(t, expected, offset)
 }
 
 func writeToKafkaTopic(
