@@ -28,11 +28,11 @@ import (
 	"github.com/elastic/go-ucfg/yaml"
 )
 
-// Config object to store hierarchical configurations into.
+// C object to store hierarchical configurations into.
 // See https://godoc.org/github.com/elastic/go-ucfg#Config
 type C ucfg.Config
 
-// ConfigNamespace storing at most one configuration section by name and sub-section.
+// Namespace stores at most one configuration section by name and sub-section.
 type Namespace struct {
 	name   string
 	config *C
@@ -101,6 +101,9 @@ func MustNewConfigFrom(from interface{}) *C {
 	return cfg
 }
 
+// MergeConfigs merges the configs together. If there are
+// different values for the same key, the last one always overwrites
+// the previous values.
 func MergeConfigs(cfgs ...*C) (*C, error) {
 	config := NewConfig()
 	for _, c := range cfgs {
@@ -111,6 +114,9 @@ func MergeConfigs(cfgs ...*C) (*C, error) {
 	return config, nil
 }
 
+// MergeConfigs merges the configs together based on the provided opts.
+// If there are different values for the same key, the last one always overwrites
+// the previous values.
 func MergeConfigsWithOptions(cfgs []*C, options ...ucfg.Option) (*C, error) {
 	config := NewConfig()
 	for _, c := range cfgs {
@@ -121,6 +127,7 @@ func MergeConfigsWithOptions(cfgs []*C, options ...ucfg.Option) (*C, error) {
 	return config, nil
 }
 
+// NewConfigWithYAML reads a YAML configuration.
 func NewConfigWithYAML(in []byte, source string) (*C, error) {
 	opts := append(
 		[]ucfg.Option{
@@ -137,10 +144,12 @@ func OverwriteConfigOpts(options []ucfg.Option) {
 	configOpts = options
 }
 
+// Merge merges the parameter into the C object.
 func (c *C) Merge(from interface{}) error {
 	return c.access().Merge(from, configOpts...)
 }
 
+// Merge merges the parameter into the C object based on the provided options.
 func (c *C) MergeWithOpts(from interface{}, opts ...ucfg.Option) error {
 	o := configOpts
 	if opts != nil {
@@ -255,6 +264,7 @@ func (c *C) access() *ucfg.Config {
 	return (*ucfg.Config)(c)
 }
 
+// GetFields returns the list of fields in the configuration.
 func (c *C) GetFields() []string {
 	return c.access().GetFields()
 }
