@@ -1,0 +1,95 @@
+{
+    "attributes": {
+        "description": "Recorded Future evidence timestamp, ingested threat intel Filebeat module.",
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "189f5cd8-f47f-4a4b-8b06-1417ddf545f8": {
+                            "columnOrder": [
+                                "d5b0eba3-5cb3-40fe-adb6-8f1a1de50e57",
+                                "b5aa0466-7f5c-4c82-a134-f4d56ed3e9db"
+                            ],
+                            "columns": {
+                                "b5aa0466-7f5c-4c82-a134-f4d56ed3e9db": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Count of records",
+                                    "operationType": "count",
+                                    "scale": "ratio",
+                                    "sourceField": "Records"
+                                },
+                                "d5b0eba3-5cb3-40fe-adb6-8f1a1de50e57": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Recorded Future Evidence Timestamp",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "b5aa0466-7f5c-4c82-a134-f4d56ed3e9db",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "recordedfuture.evidence_details.Timestamp"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "columnId": "d5b0eba3-5cb3-40fe-adb6-8f1a1de50e57",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "b5aa0466-7f5c-4c82-a134-f4d56ed3e9db",
+                        "isTransposed": false
+                    }
+                ],
+                "layerId": "189f5cd8-f47f-4a4b-8b06-1417ddf545f8",
+                "layerType": "data"
+            }
+        },
+        "title": "Recorded Future Evidence Timestamp [Filebeat Threat Intel]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "8.1.0",
+    "id": "739274d0-8479-11ec-8aa9-11bf914a1ef2",
+    "migrationVersion": {
+        "lens": "8.1.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-189f5cd8-f47f-4a4b-8b06-1417ddf545f8",
+            "type": "index-pattern"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-ref-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-02-02T22:45:05.207Z",
+    "version": "WzIzMTksMV0="
+}

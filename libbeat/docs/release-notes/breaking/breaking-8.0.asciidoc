@@ -5,14 +5,11 @@
 <titleabbrev>8.0</titleabbrev>
 ++++
 
-This section discusses the main changes that you should be aware of if you
-upgrade the Beats to version 8.0.
-
-{see-relnotes}
-
 //NOTE: The notable-breaking-changes tagged regions are re-used in the
 //Installation and Upgrade Guide
 
 //tag::notable-breaking-changes[]
+
+Changes will be described in the GA release.
 
 // end::notable-breaking-changes[]

@@ -20,7 +20,7 @@ import (
 )
 
 type dispatcher interface {
-	Dispatch(context.Context, FleetAcker, ...action) error
+	Dispatch(acker FleetAcker, actions ...action) error
 }
 
 type store interface {
@@ -319,7 +319,6 @@ func (a *StateStoreActionAcker) Commit(ctx context.Context) error {
 
 // ReplayActions replays list of actions.
 func ReplayActions(
-	ctx context.Context,
 	log *logger.Logger,
 	dispatcher dispatcher,
 	acker FleetAcker,
@@ -327,7 +326,7 @@ func ReplayActions(
 ) error {
 	log.Info("restoring current policy from disk")
 
-	if err := dispatcher.Dispatch(ctx, acker, actions...); err != nil {
+	if err := dispatcher.Dispatch(acker, actions...); err != nil {
 		return err
 	}
 
