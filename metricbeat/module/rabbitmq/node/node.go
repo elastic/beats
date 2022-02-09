@@ -105,10 +105,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "error in fetch")
 	}
 
-	evt, err := eventMapping(content)
-	if err != nil {
-		return errors.Wrap(err, "error in mapping")
-	}
+	evt := eventMapping(content)
 	r.Event(evt)
 	return nil
 }
@@ -120,5 +117,5 @@ func (m *ClusterMetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "error in fetch")
 	}
 
-	return eventsMapping(r, content, m)
+	return eventsMapping(r, content)
 }

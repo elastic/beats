@@ -1,0 +1,109 @@
+description: Pipeline for parsing the Elasticsearch 8.0 server log file in JSON format.
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'
+processors:
+- dot_expander:
+    field: event.dataset
+    path: elasticsearch.server
+- drop:
+    if: ctx.elasticsearch.server.event.dataset != 'elasticsearch.server'
+- set:
+    value: '{{ elasticsearch.server.event.dataset }}'
+    field: event.dataset
+    ignore_empty_value: true
+- remove:
+    field: elasticsearch.server.event.dataset
+- dot_expander:
+    field: ecs.version
+    path: elasticsearch.server
+- set:
+    value: '{{ elasticsearch.server.ecs.version }}'
+    field: ecs.version
+    ignore_empty_value: true
+- remove:
+    field: elasticsearch.server.ecs.version
+- dot_expander:
+    field: service.name
+    path: elasticsearch.server
+- rename:
+    field: elasticsearch.server.service.name
+    target_field: service.name
+    ignore_missing: true
+- dot_expander:
+    field: elasticsearch.cluster.name
+    path: elasticsearch.server
+- rename:
+    field: elasticsearch.server.elasticsearch.cluster.name
+    target_field: elasticsearch.cluster.name
+- dot_expander:
+    field: elasticsearch.node.name
+    path: elasticsearch.server
+- rename:
+    field: elasticsearch.server.elasticsearch.node.name
+    target_field: elasticsearch.node.name
+- dot_expander:
+    field: elasticsearch.cluster.uuid
+    path: elasticsearch.server
+- rename:
+    field: elasticsearch.server.elasticsearch.cluster.uuid
+    target_field: elasticsearch.cluster.uuid
+    ignore_missing: true
+- dot_expander:
+    field: elasticsearch.node.id
+    path: elasticsearch.server
+- rename:
+    field: elasticsearch.server.elasticsearch.node.id
+    target_field: elasticsearch.node.id
+    ignore_missing: true
+- dot_expander:
+    field: log.level
+    path: elasticsearch.server
+- rename:
+    field: elasticsearch.server.log.level
+    target_field: log.level
+    ignore_missing: true
+- dot_expander:
+    field: log.logger
+    path: elasticsearch.server
+- rename:
+    field: elasticsearch.server.log.logger
+    target_field: log.logger
+    ignore_missing: true
+- dot_expander:
+    field: process.thread.name
+    path: elasticsearch.server
+- rename:
+    field: elasticsearch.server.process.thread.name
+    target_field: process.thread.name
+    ignore_missing: true
+- grok:
+    field: elasticsearch.server.message
+    pattern_definitions:
+      GREEDYMULTILINE: |-
+        (.|
+        )*
+      INDEXNAME: '[a-zA-Z0-9_.-]*'
+      GC_ALL: \[gc\]\[%{NUMBER:elasticsearch.server.gc.overhead_seq}\] overhead, spent
+        \[%{NUMBER:elasticsearch.server.gc.collection_duration.time:float}%{DATA:elasticsearch.server.gc.collection_duration.unit}\]
+        collecting in the last \[%{NUMBER:elasticsearch.server.gc.observation_duration.time:float}%{DATA:elasticsearch.server.gc.observation_duration.unit}\]
+      GC_YOUNG: \[gc\]\[young\]\[%{NUMBER:elasticsearch.server.gc.young.one}\]\[%{NUMBER:elasticsearch.server.gc.young.two}\]%{SPACE}%{GREEDYMULTILINE:message}
+    patterns:
+    - '%{GC_ALL}'
+    - '%{GC_YOUNG}'
+    - ((\[%{INDEXNAME:elasticsearch.index.name}\]|\[%{INDEXNAME:elasticsearch.index.name}\/%{DATA:elasticsearch.index.id}\]))?%{SPACE}%{GREEDYMULTILINE:message}
+- remove:
+    field: elasticsearch.server.message
+- set:
+    field: '@timestamp'
+    value: '{{ elasticsearch.server.@timestamp }}'
+    ignore_empty_value: true
+- remove:
+    field: elasticsearch.server.@timestamp
+- date:
+    field: '@timestamp'
+    target_field: '@timestamp'
+    formats:
+    - ISO8601
+    ignore_failure: true

@@ -1,51 +1,56 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
-    },
-    "metricset":{
-        "host":"localhost",
-        "module":"containerd",
-        "name":"memory",
-        "rtt":44269
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "container": {
+        "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
     },
     "containerd": {
-        "namespace": "k8s.io",
         "memory": {
-            "activeFiles": 0,
-            "workingset": {
-                "pct": 0.07224264705882352
-            },
-            "swap": {
-                "limit": 9223372036854772000,
-                "total": 49373184,
-                "max": 49848320,
-                "fail": {
-                    "count": 0
-                }
-            },
+            "activeFiles": 1216512,
+            "cache": 140980224,
+            "inactiveFiles": 139284480,
             "kernel": {
-                "limit": 9223372036854772000,
                 "fail": {
                     "count": 0
                 },
-                "max": 843776,
-                "total": 827392
+                "limit": 9223372036854772000,
+                "max": 6496256,
+                "total": 6459392
             },
-            "rss": 13651968,
-            "cache": 33792000,
+            "rss": 43794432,
+            "swap": {
+                "fail": {
+                    "count": 0
+                },
+                "limit": 9223372036854772000,
+                "max": 209727488,
+                "total": 191959040
+            },
             "usage": {
                 "fail": {
                     "count": 0
                 },
-                "limit": 178257920,
-                "total": 49373184,
-                "pct": 0.27697610294117647,
-                "max": 49848320
+                "limit": 209715200,
+                "max": 209608704,
+                "pct": 0.9148046875,
+                "total": 191848448
             },
-            "inactiveFiles": 36495360
-        }
+            "workingset": {
+                "pct": 0.25064453125
+            }
+        },
+        "namespace": "k8s.io"
     },
-    "type":"metricsets"
+    "event": {
+        "dataset": "containerd.memory",
+        "duration": 115000,
+        "module": "containerd"
+    },
+    "metricset": {
+        "name": "memory",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "containerd"
+    }
 }

@@ -215,5 +215,4 @@ func TestInputIncludeMatches(t *testing.T) {
 			}
 		})
 	}
-
 }

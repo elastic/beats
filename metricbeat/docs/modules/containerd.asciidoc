@@ -69,6 +69,7 @@ metricbeat.modules:
   # if set to true, cpu and memory usage percentages will be calculated. Default is true
   calcpct.cpu: true
   calcpct.memory: true
+  #metrics_path: "v1/metrics"
 
 ----
 
