@@ -4,13 +4,14 @@
 == Breaking changes
 
 As a general rule, we strive to keep backwards compatibility between minor
-versions (e.g.  7.x to 7.y) so you can upgrade without any configuration file
-changes, but there are breaking changes between major versions (e.g. 6.x to
-7.y). Migrating directly between non consecutive major versions (e.g. 5.x to
-7.x) is not recommended.
+versions (e.g.  8.x to 8.y) so you can upgrade without any configuration file
+changes, but there are breaking changes between major versions (e.g. 7.x to
+8.y). Migrating directly between non consecutive major versions (e.g. 6.x to
+8.x) is not recommended.
 
 See the following topics for a description of breaking changes:
 
+<<<<<<< HEAD
 * <<breaking-changes-7.16>>
 
 * <<breaking-changes-7.15>>
@@ -78,4 +79,8 @@ include::breaking-7.2.asciidoc[]
 include::breaking-7.1.asciidoc[]
 
 include::breaking-7.0.asciidoc[]
+=======
+* <<breaking-changes-8.0>>
+>>>>>>> 0bb2cfe2c9 (Update release docs for 8.0.0-rc1 (#30122))
 
+include::breaking-8.0.asciidoc[]
