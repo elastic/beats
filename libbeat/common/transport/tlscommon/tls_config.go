@@ -131,13 +131,20 @@ func (c *TLSConfig) BuildModuleClientConfig(host string) *tls.Config {
 		}
 	}
 
-	config := c.ToConfig()
-	// config.ServerName does not verify IP addresses
-	config.ServerName = host
+	// Make a copy of c, because we're gonna mutate it after
+	// calling ToConfig. ToConfig calls a function that creates
+	// a closure that needs to access cc. A shallow copy is enough
+	// because all slice/pointer fields won't be modified.
+	cc := *c
 
 	// Keep a copy of the host (wheather an IP or hostname)
 	// for later validation. It is used by makeVerifyConnection
-	c.ServerName = host
+	cc.ServerName = host
+	config := cc.ToConfig()
+
+	// config.ServerName does not verify IP addresses
+	config.ServerName = host
+
 	return config
 }
 
