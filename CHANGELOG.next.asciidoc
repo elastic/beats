@@ -49,18 +49,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - tcp/unix input: Stop accepting connections after socket is closed. {pull}29712[29712]
 - Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
 - aws-s3: fix race condition in states used by s3-poller. {issue}30123[30123] {pull}30131[30131]
-
-*Heartbeat*
-
-
-*Filebeat*
-
-- aws-s3: Improve gzip detection to avoid false negatives. {issue}29968[29968]
 - cisco module: Fix change the broke ASA and FTD configs that used `var.input: syslog`. {pull}30072[30072]
-- decode_cef: Fix panic when recovering from invalid CEF extensions that contain escape characters. {issue}30010[30010]
 
 *Heartbeat*
-
 
 *Metricbeat*
 
