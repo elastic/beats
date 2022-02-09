@@ -5,8 +5,6 @@
 package pipeline
 
 import (
-	"context"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
@@ -20,7 +18,7 @@ import (
 
 // ConfigHandler is capable of handling configrequest.
 type ConfigHandler interface {
-	HandleConfig(context.Context, configrequest.Request) error
+	HandleConfig(configrequest.Request) error
 	Close() error
 	Shutdown()
 }
@@ -34,7 +32,7 @@ type RoutingKey = string
 // Router is an interface routing programs to the corresponding stream.
 type Router interface {
 	Routes() *sorted.Set
-	Route(ctx context.Context, id string, grpProg map[RoutingKey][]program.Program) error
+	Route(id string, grpProg map[RoutingKey][]program.Program) error
 	Shutdown()
 }
 
@@ -43,13 +41,13 @@ type StreamFunc func(*logger.Logger, RoutingKey) (Stream, error)
 
 // Stream is capable of executing configrequest change.
 type Stream interface {
-	Execute(context.Context, configrequest.Request) error
+	Execute(configrequest.Request) error
 	Close() error
 	Shutdown()
 }
 
 // EmitterFunc emits configuration for processing.
-type EmitterFunc func(context.Context, *config.Config) error
+type EmitterFunc func(*config.Config) error
 
 // DecoratorFunc is a func for decorating a retrieved configuration before processing.
 type DecoratorFunc = func(*info.AgentInfo, string, *transpiler.AST, []program.Program) ([]program.Program, error)
@@ -65,5 +63,5 @@ type ConfigModifiers struct {
 
 // Dispatcher processes actions coming from fleet api.
 type Dispatcher interface {
-	Dispatch(context.Context, store.FleetAcker, ...fleetapi.Action) error
+	Dispatch(acker store.FleetAcker, actions ...fleetapi.Action) error
 }

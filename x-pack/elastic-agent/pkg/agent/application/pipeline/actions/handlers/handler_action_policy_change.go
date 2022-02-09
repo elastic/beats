@@ -89,7 +89,7 @@ func (h *PolicyChange) Handle(ctx context.Context, a fleetapi.Action, acker stor
 	if err != nil {
 		return err
 	}
-	if err := h.emitter(ctx, c); err != nil {
+	if err := h.emitter(c); err != nil {
 		return err
 	}
 

@@ -5,10 +5,7 @@
 package emitter
 
 import (
-	"context"
 	"sync"
-
-	"go.elastic.co/apm"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
@@ -68,51 +65,38 @@ func NewController(
 }
 
 // Update applies config change and performes all steps necessary to apply it.
-func (e *Controller) Update(ctx context.Context, c *config.Config) (rErr error) {
-	span, ctx := apm.StartSpan(ctx, "update", "app.internal")
-	defer func() {
-		if rErr != nil {
-			apm.CaptureError(ctx, rErr).Send()
-		}
-		span.End()
-	}()
-
-	if rErr = info.InjectAgentConfig(c); rErr != nil {
-		return
+func (e *Controller) Update(c *config.Config) error {
+	if err := info.InjectAgentConfig(c); err != nil {
+		return err
 	}
 
 	// perform and verify ast translation
 	m, err := c.ToMapStr()
 	if err != nil {
-		rErr = errors.New(err, "could not create the AST from the configuration", errors.TypeConfig)
-		return
+		return errors.New(err, "could not create the AST from the configuration", errors.TypeConfig)
 	}
 
 	rawAst, err := transpiler.NewAST(m)
 	if err != nil {
-		rErr = errors.New(err, "could not create the AST from the configuration", errors.TypeConfig)
-		return
+		return errors.New(err, "could not create the AST from the configuration", errors.TypeConfig)
 	}
 
 	if e.caps != nil {
 		var ok bool
 		updatedAst, err := e.caps.Apply(rawAst)
 		if err != nil {
-			rErr = errors.New(err, "failed to apply capabilities")
-			return
+			return errors.New(err, "failed to apply capabilities")
 		}
 
 		rawAst, ok = updatedAst.(*transpiler.AST)
 		if !ok {
-			rErr = errors.New("failed to transform object returned from capabilities to AST", errors.TypeConfig)
-			return
+			return errors.New("failed to transform object returned from capabilities to AST", errors.TypeConfig)
 		}
 	}
 
 	for _, filter := range e.modifiers.Filters {
 		if err := filter(e.logger, rawAst); err != nil {
-			rErr = errors.New(err, "failed to filter configuration", errors.TypeConfig)
-			return
+			return errors.New(err, "failed to filter configuration", errors.TypeConfig)
 		}
 	}
 
@@ -121,41 +105,25 @@ func (e *Controller) Update(ctx context.Context, c *config.Config) (rErr error) 
 	e.ast = rawAst
 	e.lock.Unlock()
 
-	rErr = e.update(ctx)
-	return
+	return e.update()
 }
 
 // Set sets the transpiler vars for dynamic inputs resolution.
-func (e *Controller) Set(ctx context.Context, vars []*transpiler.Vars) {
-	var err error
-	span, ctx := apm.StartSpan(ctx, "Set", "app.internal")
-	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
-		span.End()
-	}()
+func (e *Controller) Set(vars []*transpiler.Vars) {
 	e.lock.Lock()
 	ast := e.ast
 	e.vars = vars
 	e.lock.Unlock()
 
 	if ast != nil {
-		err = e.update(ctx)
+		err := e.update()
 		if err != nil {
 			e.logger.Errorf("Failed to render configuration with latest context from composable controller: %s", err)
 		}
 	}
 }
 
-func (e *Controller) update(ctx context.Context) (err error) {
-	span, ctx := apm.StartSpan(ctx, "update", "app.internal")
-	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
-		span.End()
-	}()
+func (e *Controller) update() error {
 	// locking whole update because it can be called concurrently via Set and Update method
 	e.updateLock.Lock()
 	defer e.updateLock.Unlock()
@@ -169,21 +137,19 @@ func (e *Controller) update(ctx context.Context) (err error) {
 	ast := rawAst.Clone()
 	inputs, ok := transpiler.Lookup(ast, "inputs")
 	if ok {
-		var renderedInputs transpiler.Node
-		renderedInputs, err = transpiler.RenderInputs(inputs, varsArray)
+		renderedInputs, err := transpiler.RenderInputs(inputs, varsArray)
 		if err != nil {
 			return err
 		}
 		err = transpiler.Insert(ast, renderedInputs, "inputs")
 		if err != nil {
-			return err
+			return errors.New(err, "inserting rendered inputs failed")
 		}
 	}
 
 	e.logger.Debug("Converting single configuration into specific programs configuration")
 
-	programsToRun := make(map[string][]program.Program)
-	programsToRun, err = program.Programs(e.agentInfo, ast)
+	programsToRun, err := program.Programs(e.agentInfo, ast)
 	if err != nil {
 		return err
 	}
@@ -198,11 +164,10 @@ func (e *Controller) update(ctx context.Context) (err error) {
 	}
 
 	for _, r := range e.reloadables {
-		if err = r.Reload(cfg); err != nil {
+		if err := r.Reload(cfg); err != nil {
 			return err
 		}
 	}
 
-	err = e.router.Route(ctx, ast.HashStr(), programsToRun)
-	return err
+	return e.router.Route(ast.HashStr(), programsToRun)
 }
