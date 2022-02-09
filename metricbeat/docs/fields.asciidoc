@@ -44256,7 +44256,17 @@ type: integer
 *`kubernetes.container.status.reason`*::
 +
 --
-Waiting (ContainerCreating, CrashLoopBackoff, ErrImagePull, ImagePullBackoff) or termination (Completed, ContainerCannotRun, Error, OOMKilled) reason.
+The reason the container is currently in waiting (ContainerCreating, CrashLoopBackoff, ErrImagePull, ImagePullBackoff) or terminated (Completed, ContainerCannotRun, Error, OOMKilled) state.
+
+
+type: keyword
+
+--
+
+*`kubernetes.container.status.last.reason`*::
++
+--
+The last reason the container was in terminated state (Completed, ContainerCannotRun, Error or OOMKilled).
 
 
 type: keyword
