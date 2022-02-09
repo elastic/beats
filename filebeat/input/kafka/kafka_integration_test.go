@@ -434,13 +434,27 @@ func assertOffset(t *testing.T, groupID, topic string, expected int64) {
 	client, err := sarama.NewClient([]string{getTestKafkaHost()}, nil)
 	assert.NoError(t, err)
 	defer client.Close()
+
 	ofm, err := sarama.NewOffsetManagerFromClient(groupID, client)
 	assert.NoError(t, err)
-	pom, err := ofm.ManagePartition(topic, 0)
-	assert.NoError(t, err)
-	offset, _ := pom.NextOffset()
+	defer ofm.Close()
 
-	assert.Equal(t, expected, offset)
+	partitions, err := client.Partitions(topic)
+	assert.NoError(t, err)
+
+	var offsetSum int64
+
+	for _, partitionID := range partitions {
+		pom, err := ofm.ManagePartition(topic, partitionID)
+		assert.NoError(t, err)
+
+		offset, _ := pom.NextOffset()
+		offsetSum += offset
+
+		pom.Close()
+	}
+
+	assert.Equal(t, expected, offsetSum, "offset does not match, perhaps messages were not acknowledged")
 }
 
 func writeToKafkaTopic(
