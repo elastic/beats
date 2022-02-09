@@ -38,6 +38,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
+- Fix a logging bug when `ssl.verification_mode` was set to `full` or `certificate`, the command `test output` incorrectly logged that TLS was disabled.
 - Fix field names with `add_network_direction` processor. {issue}29747[29747] {pull}29751[29751]
 
 *Auditbeat*
@@ -50,6 +51,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
 - aws-s3: fix race condition in states used by s3-poller. {issue}30123[30123] {pull}30131[30131]
 - cisco module: Fix change the broke ASA and FTD configs that used `var.input: syslog`. {pull}30072[30072]
+- Fix broken Kafka input {issue}29746[29746] {pull}30277[30277]
+
 
 *Heartbeat*
 
