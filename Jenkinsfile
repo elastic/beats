@@ -301,9 +301,9 @@ def k8sTest(Map args = [:]) {
   versions.each{ v ->
     withNode(labels: args.label, forceWorkspace: true){
       stage("${args.context} ${v}"){
-        withKindEnv(k8sVersion: "${v}", kindVersion: "v0.11.1"){
-          withGithubNotify(context: "${args.context} ${v}") {
-            withBeatsEnv(archive: false, withModule: false) {
+        withGithubNotify(context: "${args.context} ${v}") {
+          withBeatsEnv(archive: false, withModule: false) {
+            withKindEnv(k8sVersion: "${v}", kindVersion: "v0.11.1"){
               sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
               sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
             }
