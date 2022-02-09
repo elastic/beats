@@ -43,11 +43,11 @@ import (
 )
 
 const (
-	requestRetrySleepEnv          = "KIBANA_REQUEST_RETRY_SLEEP"
-	maxRequestRetriesEnv          = "KIBANA_REQUEST_RETRY_COUNT"
-	defaultRequestRetrySleep      = "1s"                             // sleep 1 sec between retries for HTTP requests
-	defaultMaxRequestRetries      = "30"                             // maximum number of retries for HTTP requests
-	defaultStateDirectory         = "/usr/share/elastic-agent/state" // directory that will hold the state data
+	requestRetrySleepEnv     = "KIBANA_REQUEST_RETRY_SLEEP"
+	maxRequestRetriesEnv     = "KIBANA_REQUEST_RETRY_COUNT"
+	defaultRequestRetrySleep = "1s"                             // sleep 1 sec between retries for HTTP requests
+	defaultMaxRequestRetries = "30"                             // maximum number of retries for HTTP requests
+	defaultStateDirectory    = "/usr/share/elastic-agent/state" // directory that will hold the state data
 )
 
 var (
