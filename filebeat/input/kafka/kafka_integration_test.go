@@ -126,6 +126,9 @@ func TestInput(t *testing.T) {
 		}
 	}
 
+	// wait until the embedded kafka client flushes the last acknowledged messages
+	<-time.After(time.Second)
+
 	// Close the done channel and make sure the beat shuts down in a reasonable
 	// amount of time.
 	cancel()
