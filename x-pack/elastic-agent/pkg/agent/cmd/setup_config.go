@@ -34,7 +34,7 @@ type fleetServerConfig struct {
 	Host            string              `config:"host"`
 	InsecureHTTP    bool                `config:"insecure_http"`
 	PolicyID        string              `config:"policy_id"`
-	DefaultPolicyID string              `config:"default_policy_id`
+	DefaultPolicyID string              `config:"default_policy_id"`
 	Port            string              `config:"port"`
 	Headers         map[string]string   `config:"headers"`
 	Timeout         time.Duration       `config:"timeout"`
