@@ -32,6 +32,7 @@ type Message struct {
 	Bytes   int           // total number of bytes read to generate the message
 	Fields  common.MapStr // optional fields that can be added by reader
 	Meta    common.MapStr
+	Private interface{}
 }
 
 // IsEmpty returns true in case the message is empty
