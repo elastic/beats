@@ -50,6 +50,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - tcp/unix input: Stop accepting connections after socket is closed. {pull}29712[29712]
 - Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
 - aws-s3: fix race condition in states used by s3-poller. {issue}30123[30123] {pull}30131[30131]
+- Fix broken Kafka input {issue}29746[29746] {pull}30277[30277]
 
 *Heartbeat*
 

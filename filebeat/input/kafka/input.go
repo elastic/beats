@@ -318,6 +318,7 @@ func (h *groupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim s
 			Timestamp: message.Ts,
 			Meta:      message.Meta,
 			Fields:    message.Fields,
+			Private:   message.Private,
 		})
 	}
 	return nil
@@ -458,8 +459,8 @@ func composeMessage(timestamp time.Time, content []byte, kafkaFields common.MapS
 			"kafka":   kafkaFields,
 			"message": string(content),
 		},
-		Meta: common.MapStr{
-			"ackHandler": ackHandler,
+		Private: eventMeta{
+			ackHandler: ackHandler,
 		},
 	}
 }
