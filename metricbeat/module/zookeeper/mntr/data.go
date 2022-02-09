@@ -86,16 +86,21 @@ func eventMapping(serverId string, response io.Reader, r mb.ReporterV2, logger *
 		delete(event, "version")
 	}
 
+	_, hasFollowers := fullEvent["zk_followers"]
+	_, hasLearners := fullEvent["zk_learners"]
+
 	// only exposed by the Leader
-	if hasFollowers, hasLearners := fullEvent["zk_followers"], fullEvent["zk_learners"]; hasFollowers != nil || hasLearners != nil {
+	if hasLearners || hasFollowers {
 		schemaLeader.ApplyTo(event, fullEvent)
 
-		if learners, ok := event["learners"]; ok {
-			// If ZK >= 3.6, keep a legacy view of the "learners" field
-			event.Put("followers", learners)
-		} else if followers, ok := event["followers"]; ok {
-			// If ZK < 3.6, keep a migration to recent versions view of the "followers" field
+		// If ZK < 3.6, keep a migration to recent versions view of the "followers" field
+		if followers, ok := event["followers"]; ok {
 			event.Put("learners", followers)
+		}
+
+		// If ZK >= 3.6, keep a legacy view of the "learners" field
+		if learners, ok := event["learners"]; ok {
+			event.Put("followers", learners)
 		}
 	}
 
