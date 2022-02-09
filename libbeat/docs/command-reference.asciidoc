@@ -364,6 +364,7 @@ endif::export_pipeline[]
 
 *FLAGS*
 
+ifdef::export_pipeline[]
 *`--es.version VERSION`*::
 
 When used with <<template-subcommand,`template`>>, exports an index
@@ -372,6 +373,17 @@ with <<ilm-policy-subcommand,`ilm-policy`>>, exports the ILM policy if
 the specified ES version is enabled for ILM.  When used with
 <<pipeline-subcommand, `pipeline`>>, exports versions of the pipeline
 that is compatible with the specified version.
+endif::export_pipeline[]
+
+ifndef::export_pipeline[]
+*`--es.version VERSION`*::
+
+When used with <<template-subcommand,`template`>>, exports an index
+template that is compatible with the specified version.  When used
+with <<ilm-policy-subcommand,`ilm-policy`>>, exports the ILM policy if
+the specified ES version is enabled for ILM.
+endif::export_pipeline[]
+
 
 *`-h, --help`*::
 Shows help for the `export` command.
