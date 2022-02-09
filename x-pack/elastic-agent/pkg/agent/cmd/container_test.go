@@ -137,7 +137,8 @@ func TestFindPolicyByNameMiss(t *testing.T) {
 func TestFindPolicyDefaultFleet(t *testing.T) {
 	cfg := setupConfig{
 		FleetServer: fleetServerConfig{
-			Enable: true,
+			Enable:          true,
+			DefaultPolicyID: "fleet-server-policy",
 		},
 	}
 
@@ -151,6 +152,25 @@ func TestFindPolicyDefaultFleet(t *testing.T) {
 	policy, err := findPolicy(cfg, items, &PackagePolicies)
 	require.NoError(t, err)
 	require.Equal(t, &defaultFleetPolicy, policy)
+}
+
+func TestFindPolicyNoDefaultFleet(t *testing.T) {
+	cfg := setupConfig{
+		FleetServer: fleetServerConfig{
+			Enable: true,
+		},
+	}
+
+	items := []kibanaPolicy{
+		defaultAgentPolicy,
+		nondefaultAgentPolicy,
+		nondefaultFleetPolicy,
+		defaultFleetPolicy,
+	}
+
+	policy, err := findPolicy(cfg, items, &PackagePolicies)
+	require.NoError(t, err)
+	require.Equal(t, &nondefaultFleetPolicy, policy)
 }
 
 func TestFindPolicyDefaultNonFleet(t *testing.T) {

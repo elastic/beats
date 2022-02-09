@@ -48,7 +48,6 @@ const (
 	defaultRequestRetrySleep      = "1s"                             // sleep 1 sec between retries for HTTP requests
 	defaultMaxRequestRetries      = "30"                             // maximum number of retries for HTTP requests
 	defaultStateDirectory         = "/usr/share/elastic-agent/state" // directory that will hold the state data
-	defaultFleetPackagePolicyName = "fleet-server-policy"
 )
 
 var (
@@ -600,7 +599,7 @@ func findPolicy(cfg setupConfig, policies []kibanaPolicy, packagePolicies *packa
 				fallbackPolicy = &kibanaPolicy{}
 				*fallbackPolicy = policy
 			}
-			if policy.ID == defaultFleetPackagePolicyName {
+			if policy.ID == cfg.FleetServer.DefaultPolicyID {
 				return &policy, nil
 			}
 		} else {

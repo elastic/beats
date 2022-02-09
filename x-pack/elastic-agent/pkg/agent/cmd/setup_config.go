@@ -27,16 +27,17 @@ type fleetConfig struct {
 }
 
 type fleetServerConfig struct {
-	Cert          string              `config:"cert"`
-	CertKey       string              `config:"cert_key"`
-	Elasticsearch elasticsearchConfig `config:"elasticsearch"`
-	Enable        bool                `config:"enable"`
-	Host          string              `config:"host"`
-	InsecureHTTP  bool                `config:"insecure_http"`
-	PolicyID      string              `config:"policy_id"`
-	Port          string              `config:"port"`
-	Headers       map[string]string   `config:"headers"`
-	Timeout       time.Duration       `config:"timeout"`
+	Cert            string              `config:"cert"`
+	CertKey         string              `config:"cert_key"`
+	Elasticsearch   elasticsearchConfig `config:"elasticsearch"`
+	Enable          bool                `config:"enable"`
+	Host            string              `config:"host"`
+	InsecureHTTP    bool                `config:"insecure_http"`
+	PolicyID        string              `config:"policy_id"`
+	DefaultPolicyID string              `config:"default_policy_id`
+	Port            string              `config:"port"`
+	Headers         map[string]string   `config:"headers"`
+	Timeout         time.Duration       `config:"timeout"`
 }
 
 type elasticsearchConfig struct {
@@ -96,13 +97,14 @@ func defaultAccessConfig() (setupConfig, error) {
 				CATrustedFingerprint: envWithDefault("", "FLEET_SERVER_ELASTICSEARCH_CA_TRUSTED_FINGERPRINT"),
 				Insecure:             envBool("FLEET_SERVER_ELASTICSEARCH_INSECURE"),
 			},
-			Enable:       envBool("FLEET_SERVER_ENABLE"),
-			Host:         envWithDefault("", "FLEET_SERVER_HOST"),
-			InsecureHTTP: envBool("FLEET_SERVER_INSECURE_HTTP"),
-			PolicyID:     envWithDefault("", "FLEET_SERVER_POLICY_ID", "FLEET_SERVER_POLICY"),
-			Port:         envWithDefault("", "FLEET_SERVER_PORT"),
-			Headers:      envMap("FLEET_HEADER"),
-			Timeout:      envTimeout("FLEET_SERVER_TIMEOUT"),
+			Enable:          envBool("FLEET_SERVER_ENABLE"),
+			Host:            envWithDefault("", "FLEET_SERVER_HOST"),
+			InsecureHTTP:    envBool("FLEET_SERVER_INSECURE_HTTP"),
+			PolicyID:        envWithDefault("", "FLEET_SERVER_POLICY_ID", "FLEET_SERVER_POLICY"),
+			Port:            envWithDefault("", "FLEET_SERVER_PORT"),
+			Headers:         envMap("FLEET_HEADER"),
+			Timeout:         envTimeout("FLEET_SERVER_TIMEOUT"),
+			DefaultPolicyID: envWithDefault("fleet-server-policy", "DEFAULT_FLEET_SERVER_POLICY_ID", "DEFAULT_FLEET_SERVER_POLICY"),
 		},
 		Kibana: kibanaConfig{
 			Fleet: kibanaFleetConfig{

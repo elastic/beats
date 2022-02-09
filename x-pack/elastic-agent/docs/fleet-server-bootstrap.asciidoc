@@ -64,6 +64,10 @@ paths based on the operating system then starts the Elastic Agent service. The
 When the `container` command is executed it first copies the `data/downloads` directory
 into a state path (`STATE_PATH`) then it executes the `enroll` command.
 
+When using the `container` command, a policy ID for the agent should be supplied via the
+`FLEET_SERVER_POLICY` environment variable. If this value is omitted, the agent will attempt
+to use the deafult policy ID, which can be configured via `DEFALUT_FLEET_SERVER_POLICY`
+
 ==== Enroll Command
 
 This is where all the actual work of bootstrapping is performed.
