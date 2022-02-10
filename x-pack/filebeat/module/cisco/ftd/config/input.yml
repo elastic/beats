@@ -7,6 +7,10 @@ paths:
 {{ end }}
 exclude_files: [".gz$"]
 
+{{ else if eq .input "syslog" }}
+type: udp
+host: "{{.syslog_host}}:{{.syslog_port}}"
+
 {{ else }}
 
 type: {{.input}}
