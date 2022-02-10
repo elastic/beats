@@ -180,7 +180,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add `xpack.enabled` support for Enterprise Search module. {pull}29871[29871]
 - Add gcp firestore metricset. {pull}29918[29918]
 - Remove strict parsing on RabbitMQ module {pull}30090[30090]
-- Add `kubernetes.container.status.last.reason` metric {pull}30306|[30306]
+- Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
 
 *Packetbeat*
 
