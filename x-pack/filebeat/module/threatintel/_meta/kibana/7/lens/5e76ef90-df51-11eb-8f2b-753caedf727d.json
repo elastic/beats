@@ -17,7 +17,7 @@
                                     "label": "Count of records",
                                     "operationType": "count",
                                     "scale": "ratio",
-                                    "sourceField": "Records"
+                                    "sourceField": "___records___"
                                 },
                                 "ebb0878f-715a-4987-85f1-87420428c88f": {
                                     "customLabel": true,
