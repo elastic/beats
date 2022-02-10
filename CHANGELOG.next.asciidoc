@@ -38,7 +38,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 *Filebeat*
+
 - Fix broken Kafka input {issue}29746[29746] {pull}30277[30277]
+- cisco module: Fix change the broke ASA and FTD configs that used `var.input: syslog`. {pull}30072[30072]
 
 *Heartbeat*
 
@@ -66,37 +68,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Auditbeat*
 
 *Filebeat*
-
-- `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
-- Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
-- move create-[module,fileset,fields] to mage and enable in x-pack/filebeat {pull}15836[15836]
-- Work on e2e ACK's for the azure-eventhub input {issue}15671[15671] {pull}16215[16215]
-- Add a TLS test and more debug output to httpjson input {pull}16315[16315]
-- Add an SSL config example in config.yml for filebeat MISP module. {pull}16320[16320]
-- Update filebeat httpjson input to support pagination via Header and Okta module. {pull}16354[16354]
-- Add a TLS test and more debug output to httpjson input {pull}16315[16315]
-- Add an SSL config example in config.yml for filebeat MISP module. {pull}16320[16320]
-- Added documentation for running Filebeat in Cloud Foundry. {pull}17275[17275]
-- Release Google Cloud module as GA. {pull}17511[17511]
-- Improve ECS categorization field mappings for nats module. {issue}16173[16173] {pull}17550[17550]
-- Enhance `elasticsearch/slowlog` fileset to handle ECS-compatible logs emitted by Elasticsearch. {issue}17715[17715] {pull}17729[17729]
-- Added documentation for running Filebeat in Cloud Foundry. {pull}17275[17275]
-- Release Google Cloud module as GA. {pull}17511[17511]
-- Update filebeat httpjson input to support pagination via Header and Okta module. {pull}16354[16354]
-- Change the `json.*` input settings implementation to merge parsed json objects with existing objects in the event instead of fully replacing them. {pull}17958[17958]
-- Add support for array parsing in azure-eventhub input. {pull}18585[18585]
-- Add support for array parsing in azure-eventhub input. {pull}18585[18585]
-- Improved performance of PANW sample dashboards. {issue}19031[19031] {pull}19032[19032]
-- Add event.ingested for CrowdStrike module {pull}20138[20138]
-- Add support for additional fields and FirewallMatchEvent type events in CrowdStrike module {pull}20138[20138]
-- Azure signinlogs - Add support for ManagedIdentitySignInLogs, NonInteractiveUserSignInLogs, and ServicePrincipalSignInLogs. {issue}23653[23653]
-- Add `text/csv` decoder to `httpjson` input {pull}28564[28564]
-- Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
-- Add support for '/var/log/pods/' path for add_kubernetes_metadata processor with `resource_type: pod`. {pull}28868[28868]
-- Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
-- Add support for parsers on journald input {pull}29070[29070]
-- Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
-- Update Cisco module to enable TCP input. {issue}26118[26118] {issue}28821[28821] {pull}26159[26159]
 
 *Heartbeat*
 
