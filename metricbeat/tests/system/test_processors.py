@@ -91,7 +91,8 @@ class Test(metricbeat.BaseTest):
                 "name": "system",
                 "metricsets": ["process"],
                 "period": "1s",
-                "processes": ["(?i)metricbeat.test"]
+                "processes": ["(?i)metricbeat.test"],
+                "process.include_top_n": {"enabled": True, "by_cpu": 1}
             }],
             processors=[{
                 "drop_event": {
@@ -102,7 +103,7 @@ class Test(metricbeat.BaseTest):
         metricbeat = self.start_beat()
         self.wait_until(
             lambda: self.output_count(lambda x: x >= 4),
-            max_timeout=15)
+            max_timeout=20)
 
         metricbeat.kill_and_wait()
 
@@ -220,7 +221,13 @@ class Test(metricbeat.BaseTest):
 
         output = self.read_output(
             required_fields=["@timestamp"],
-        )[1]
+        )
+        good_event = {}
+
+        for evt in output:
+            if "system.process.cpu.total.pct" in evt:
+                good_event = evt
+        print(output)
 
         for key in [
             "system.process.cpu.start_time",
@@ -228,14 +235,14 @@ class Test(metricbeat.BaseTest):
             "process.name",
             "process.pid",
         ]:
-            assert key in output, "'%s' not found" % key
+            assert key in good_event, "'%s' not found" % key
 
         for key in [
             "system.process.memory.size",
             "system.process.memory.rss.bytes",
             "system.process.memory.rss.pct"
         ]:
-            assert key not in output, "'%s' not expected but found" % key
+            assert key not in good_event, "'%s' not expected but found" % key
 
     def test_contradictory_multiple_actions(self):
         """
