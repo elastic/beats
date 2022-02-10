@@ -63,19 +63,6 @@ pipeline {
           }
         }
         stages {
-          stage('build'){
-            steps {
-              withGithubNotify(context: "Build-${GO_VERSION}-${PLATFORM}") {
-                deleteDir()
-                unstash 'source'
-                dir("${BASE_DIR}"){
-                  withGoEnv(){
-                    cmd(label: 'Go build', script: 'go build')
-                  }
-                }
-              }
-            }
-          }
           stage('Test') {
             steps {
               withGithubNotify(context: "Test-${GO_VERSION}-${PLATFORM}") {
