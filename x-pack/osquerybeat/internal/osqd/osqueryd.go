@@ -21,7 +21,9 @@ import (
 	"github.com/dolmen-go/contextio"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common/proc"
 	"github.com/elastic/beats/v7/libbeat/logp"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
 )
 
@@ -180,6 +182,13 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 	err = cmd.Start()
 	if err != nil {
 		return err
+	}
+
+	// Assign osqueryd process to the JobObject on windows
+	// in order to assure no orphan process is left behind
+	// after osquerybeat process is killed.
+	if err := proc.JobObject.Assign(cmd.Process); err != nil {
+		q.log.Errorf("osqueryd process failed job assign: %v", err)
 	}
 
 	var (
