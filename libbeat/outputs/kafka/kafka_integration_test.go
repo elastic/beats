@@ -388,9 +388,7 @@ func makeConfig(t *testing.T, in map[string]interface{}) *common.Config {
 
 func newTestConsumer(t *testing.T) sarama.Consumer {
 	hosts := []string{getTestKafkaHost()}
-	cfg := sarama.NewConfig()
-	cfg.Version = sarama.V1_0_0_0
-	consumer, err := sarama.NewConsumer(hosts, cfg)
+	consumer, err := sarama.NewConsumer(hosts, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
