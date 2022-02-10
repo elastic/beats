@@ -629,20 +629,21 @@ func TestEventMapping(t *testing.T) {
 	logger := logp.NewLogger("mntr_test")
 
 	for i, sample := range mntrSamples {
-		versionMsg := fmt.Sprintf("With ZooKeeper [%s]", sample.Version)
+		t.Run(sample.Version, func(t *testing.T) {
 
-		reporter := &mbtest.CapturingReporterV2{}
+			reporter := &mbtest.CapturingReporterV2{}
 
-		eventMapping(fmt.Sprint(i), bytes.NewReader([]byte(sample.MntrSample)), reporter, logger)
+			eventMapping(fmt.Sprint(i), bytes.NewReader([]byte(sample.MntrSample)), reporter, logger)
 
-		assert.Empty(t, reporter.GetErrors(), versionMsg)
+			assert.Empty(t, reporter.GetErrors())
 
-		events := reporter.GetEvents()
-		assert.Len(t, events, 1, versionMsg)
+			events := reporter.GetEvents()
+			assert.Len(t, events, 1)
 
-		event := events[len(events)-1]
+			event := events[len(events)-1]
 
-		assertExpectations(t, sample.ExpectedValues, event.MetricSetFields, versionMsg)
+			assertExpectations(t, sample.ExpectedValues, event.MetricSetFields)
+		})
 	}
 
 }
