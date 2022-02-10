@@ -28,7 +28,7 @@
           description: >
             The reason the container is currently in waiting (ContainerCreating, CrashLoopBackoff, ErrImagePull,
             ImagePullBackoff) or terminated (Completed, ContainerCannotRun, Error, OOMKilled) state.
-        - name: last.reason
+        - name: last_terminated_reason
           type: keyword
           description: >
             The last reason the container was in terminated state (Completed, ContainerCannotRun, Error or OOMKilled).

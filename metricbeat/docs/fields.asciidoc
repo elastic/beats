@@ -44263,7 +44263,7 @@ type: keyword
 
 --
 
-*`kubernetes.container.status.last.reason`*::
+*`kubernetes.container.status.last_terminated_reason`*::
 +
 --
 The last reason the container was in terminated state (Completed, ContainerCannotRun, Error or OOMKilled).

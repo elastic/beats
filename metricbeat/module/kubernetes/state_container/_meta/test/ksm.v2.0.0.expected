@@ -35,9 +35,7 @@
 			},
 			"name": "coredns",
 			"status": {
-				"last": {
-					"reason": "Unknown"
-				},
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 4
@@ -121,9 +119,7 @@
 			"id": "containerd://f2926bdf120aa838838aa55640b5511291e7279eb07ee8c17e01bf23a8695c2c",
 			"name": "kube-proxy",
 			"status": {
-				"last": {
-					"reason": "Unknown"
-				},
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 4
@@ -163,9 +159,7 @@
 			"id": "containerd://8af6de6644ef1e5bb36b9d1f87d65e9b893096ae2c0f3e57061fad70f094d1be",
 			"name": "kube-proxy",
 			"status": {
-				"last": {
-					"reason": "Unknown"
-				},
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 4
@@ -205,9 +199,7 @@
 			"id": "containerd://02b0705f60dc6131a6b5d4e9a48e2510463f89a0f77e7e1bafa6b5f45cc595e8",
 			"name": "hello-python",
 			"status": {
-				"last": {
-					"reason": "Unknown"
-				},
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 18
@@ -263,9 +255,7 @@
 			},
 			"name": "kindnet-cni",
 			"status": {
-				"last": {
-					"reason": "Unknown"
-				},
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 4
@@ -310,9 +300,7 @@
 			"id": "containerd://cd368e1731c278b039642fab2fe90902e2cfa470fd70a7ccfd5c2549a552cea5",
 			"name": "kube-scheduler",
 			"status": {
-				"last": {
-					"reason": "Unknown"
-				},
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 4
@@ -352,9 +340,7 @@
 			"id": "containerd://1a223dbb8b51a7404836789fd049701a9e4df7bb69878fb893ab10419ff4eb29",
 			"name": "local-path-provisioner",
 			"status": {
-				"last": {
-					"reason": "Error"
-				},
+				"last_terminated_reason": "Error",
 				"phase": "running",
 				"ready": true,
 				"restarts": 8
@@ -407,9 +393,7 @@
 			},
 			"name": "metricbeat",
 			"status": {
-				"last": {
-					"reason": "Unknown"
-				},
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 1
@@ -462,9 +446,7 @@
 			},
 			"name": "coredns",
 			"status": {
-				"last": {
-					"reason": "Unknown"
-				},
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 4
@@ -512,9 +494,7 @@
 			"id": "containerd://fae8ef6fa6ea716f5ce0a65a1b2407d1e4839b04452d6013cdb6d5be8db8ada0",
 			"name": "redis",
 			"status": {
-				"last": {
-					"reason": "Unknown"
-				},
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 1
@@ -570,9 +550,7 @@
 			},
 			"name": "kindnet-cni",
 			"status": {
-				"last": {
-					"reason": "Unknown"
-				},
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 4
@@ -612,9 +590,7 @@
 			"id": "containerd://ae513b826459c9382984bea986eb3546aa45fd0e650051cb9591ab7a8efed6ea",
 			"name": "kube-state-metrics",
 			"status": {
-				"last": {
-					"reason": "Error"
-				},
+				"last_terminated_reason": "Error",
 				"phase": "running",
 				"ready": true,
 				"restarts": 2
@@ -667,9 +643,7 @@
 			},
 			"name": "metricbeat",
 			"status": {
-				"last": {
-					"reason": "Unknown"
-				},
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 1
@@ -749,9 +723,7 @@
 			"id": "containerd://a55ee307ef431d293c02a7eb96417963d7b81b298a8ebfac2f77fe4ca58e1461",
 			"name": "kube-proxy",
 			"status": {
-				"last": {
-					"reason": "Unknown"
-				},
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 4
@@ -846,9 +818,7 @@
 			},
 			"name": "kindnet-cni",
 			"status": {
-				"last": {
-					"reason": "Unknown"
-				},
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 4
@@ -893,9 +863,7 @@
 			"id": "containerd://1c1919c3b07bf3369b5e1a4bf187762f2724b3bc7eb113239af3919f12202337",
 			"name": "kube-controller-manager",
 			"status": {
-				"last": {
-					"reason": "Unknown"
-				},
+				"last_terminated_reason": "Unknown",
 				"phase": "running",
 				"ready": true,
 				"restarts": 4
