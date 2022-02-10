@@ -23,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"runtime/debug"
 	"strings"
 	"syscall"
 	"testing"
@@ -313,7 +314,7 @@ func TestRaces(t *testing.T) {
 func readTimeout(t testing.TB, events <-chan Event) Event {
 	select {
 	case <-time.After(time.Second):
-		t.Fatalf("%+v", errors.Errorf("timed-out waiting for event"))
+		t.Fatalf("timed-out waiting for event:\n%s", debug.Stack())
 	case e, ok := <-events:
 		if !ok {
 			t.Fatal("failed reading from event channel")

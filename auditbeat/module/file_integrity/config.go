@@ -114,10 +114,12 @@ nextHash:
 	}
 
 	c.MaxFileSizeBytes, err = humanize.ParseBytes(c.MaxFileSize)
-	if err != nil || c.MaxFileSizeBytes > MaxValidFileSizeLimit {
-		errs = append(errs, errors.Wrap(err, "invalid max_file_size value"))
+	if err != nil {
+		errs = append(errs, fmt.Errorf("invalid max_file_size value: %w", err))
+	} else if c.MaxFileSizeBytes > MaxValidFileSizeLimit {
+		errs = append(errs, fmt.Errorf("invalid max_file_size value: %s is too large (max=%s)", c.MaxFileSize, humanize.Bytes(MaxValidFileSizeLimit)))
 	} else if c.MaxFileSizeBytes <= 0 {
-		errs = append(errs, errors.Errorf("max_file_size value (%v) must be positive", c.MaxFileSize))
+		errs = append(errs, fmt.Errorf("max_file_size value (%v) must be positive", c.MaxFileSize))
 	}
 
 	c.ScanRateBytesPerSec, err = humanize.ParseBytes(c.ScanRatePerSec)

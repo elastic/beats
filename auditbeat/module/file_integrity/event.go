@@ -213,11 +213,14 @@ func NewEvent(
 	hashTypes []HashType,
 ) Event {
 	info, err := os.Lstat(path)
-	if err != nil && os.IsNotExist(err) {
-		// deleted file is signaled by info == nil
-		err = nil
+	if err != nil {
+		if os.IsNotExist(err) {
+			// deleted file is signaled by info == nil
+			err = nil
+		} else {
+			err = fmt.Errorf("failed to lstat: %w", err)
+		}
 	}
-	err = errors.Wrap(err, "failed to lstat")
 	return NewEventFromFileInfo(path, info, err, action, source, maxFileSize, hashTypes)
 }
 

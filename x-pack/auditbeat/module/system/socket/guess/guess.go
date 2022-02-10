@@ -236,7 +236,10 @@ func guessOnce(guesser Guesser, installer helper.ProbeInstaller, ctx Context) (r
 			}
 
 		case <-perfchan.LostC():
-			return nil, errors.Wrap(err, "event loss in perf channel")
+			if err != nil {
+				return nil, fmt.Errorf("event loss in perf channel: %w", err)
+			}
+			return nil, errors.New("event loss in perf channel")
 		}
 	}
 }

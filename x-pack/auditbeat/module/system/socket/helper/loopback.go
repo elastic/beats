@@ -112,7 +112,10 @@ func (lo *IPv6Loopback) AddRandomAddress() (addr net.IP, err error) {
 		}
 		time.Sleep(time.Millisecond * time.Duration(i))
 	}
-	return addr, errors.Wrap(err, "bind failed")
+	if err != nil {
+		err = fmt.Errorf("bind failed: %w", err)
+	}
+	return addr, err
 }
 
 // Cleanup removes the addresses registered to this loopback.

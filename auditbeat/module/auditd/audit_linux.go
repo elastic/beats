@@ -306,7 +306,10 @@ func (ms *MetricSet) initClient() error {
 		// required to ensure that auditing is enabled if the process is only
 		// given CAP_AUDIT_READ.
 		err := ms.client.SetEnabled(true, libaudit.NoWait)
-		return errors.Wrap(err, "failed to enable auditing in the kernel")
+		if err != nil {
+			return fmt.Errorf("failed to enable auditing in the kernel: %w", err)
+		}
+		return nil
 	}
 
 	// Unicast client initialization (requires CAP_AUDIT_CONTROL and that the
