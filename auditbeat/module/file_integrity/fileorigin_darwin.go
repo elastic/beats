@@ -27,10 +27,11 @@ package file_integrity
 import "C"
 
 import (
+	"errors"
+	"fmt"
 	"syscall"
 	"unsafe"
 
-	"github.com/pkg/errors"
 	"howett.net/plist"
 )
 
@@ -93,8 +94,8 @@ func GetFileOrigin(path string) ([]string, error) {
 
 	// Decode plist format. A list of strings is expected
 	var urls []string
-	if _, err = plist.Unmarshal(data, &urls); err != nil {
-		return nil, errors.Wrap(err, "plist unmarshal failed")
+	if _, err := plist.Unmarshal(data, &urls); err != nil {
+		return nil, fmt.Errorf("plist unmarshal failed: %w", err)
 	}
 
 	// The returned list seems to be padded with empty strings when some of

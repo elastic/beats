@@ -28,7 +28,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -73,7 +72,7 @@ func TestEventReader(t *testing.T) {
 
 	// Create a new file.
 	txt1 := filepath.Join(dir, "test1.txt")
-	var fileMode os.FileMode = 0640
+	var fileMode os.FileMode = 0o640
 	mustRun(t, "created", func(t *testing.T) {
 		if err = ioutil.WriteFile(txt1, []byte("hello"), fileMode); err != nil {
 			t.Fatal(err)
@@ -129,14 +128,14 @@ func TestEventReader(t *testing.T) {
 			t.Skip()
 		}
 
-		if err = os.Chmod(txt2, 0644); err != nil {
+		if err = os.Chmod(txt2, 0o644); err != nil {
 			t.Fatal(err)
 		}
 
 		event := readTimeout(t, events)
 		assertSameFile(t, txt2, event.Path)
 		assert.EqualValues(t, AttributesModified, AttributesModified&event.Action)
-		assert.EqualValues(t, 0644, event.Info.Mode)
+		assert.EqualValues(t, 0o644, event.Info.Mode)
 	})
 
 	// Append data to the file.
@@ -153,7 +152,7 @@ func TestEventReader(t *testing.T) {
 		assertSameFile(t, txt2, event.Path)
 		assert.EqualValues(t, Updated, Updated&event.Action)
 		if runtime.GOOS != "windows" {
-			assert.EqualValues(t, 0644, event.Info.Mode)
+			assert.EqualValues(t, 0o644, event.Info.Mode)
 		}
 	})
 
@@ -182,7 +181,7 @@ func TestEventReader(t *testing.T) {
 	// Create a sub-directory.
 	subDir := filepath.Join(dir, "subdir")
 	mustRun(t, "dir created", func(t *testing.T) {
-		if err = os.Mkdir(subDir, 0755); err != nil {
+		if err = os.Mkdir(subDir, 0o755); err != nil {
 			t.Fatal(err)
 		}
 
@@ -243,7 +242,7 @@ func TestEventReader(t *testing.T) {
 func TestRaces(t *testing.T) {
 	t.Skip("Flaky test: about 1/20 of builds fails https://github.com/elastic/beats/issues/21303")
 	const (
-		fileMode os.FileMode = 0640
+		fileMode os.FileMode = 0o640
 		N                    = 100
 	)
 

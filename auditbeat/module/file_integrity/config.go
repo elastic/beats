@@ -18,6 +18,7 @@
 package file_integrity
 
 import (
+	"fmt"
 	"math"
 	"path/filepath"
 	"sort"
@@ -25,7 +26,6 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 )
@@ -110,7 +110,7 @@ nextHash:
 				continue nextHash
 			}
 		}
-		errs = append(errs, errors.Errorf("invalid hash_types value '%v'", ht))
+		errs = append(errs, fmt.Errorf("invalid hash_types value '%v'", ht))
 	}
 
 	c.MaxFileSizeBytes, err = humanize.ParseBytes(c.MaxFileSize)
@@ -122,7 +122,7 @@ nextHash:
 
 	c.ScanRateBytesPerSec, err = humanize.ParseBytes(c.ScanRatePerSec)
 	if err != nil {
-		errs = append(errs, errors.Wrap(err, "invalid scan_rate_per_sec value"))
+		errs = append(errs, fmt.Errorf("invalid scan_rate_per_sec value: %w", err))
 	}
 	return errs.Err()
 }
