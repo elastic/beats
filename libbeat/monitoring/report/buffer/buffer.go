@@ -21,13 +21,13 @@ import "sync"
 
 // ringBuffer is a buffer with a fixed number of items that can be tracked.
 //
-// we assume that the size of the buffer is greater than one.
+// We assume that the size of the buffer is greater than one.
 // the buffer should be thread-safe.
 type ringBuffer struct {
+	mu      sync.Mutex
 	entries []interface{}
 	i       int
 	full    bool
-	mu      sync.Mutex
 }
 
 // newBuffer returns a reference to a new ringBuffer with set size.

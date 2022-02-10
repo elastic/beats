@@ -18,6 +18,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -76,11 +77,11 @@ func (s *Server) Stop() error {
 func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			switch r.(type) {
+			switch r := r.(type) {
 			case error:
-				err = r.(error)
+				err = r
 			case string:
-				err = fmt.Errorf(r.(string))
+				err = errors.New(r)
 			default:
 				err = fmt.Errorf("handle attempted to panic with %v", r)
 			}

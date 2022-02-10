@@ -75,7 +75,6 @@ func MakeReporter(beat beat.Info, cfg *common.Config) (*reporter, error) {
 func (r *reporter) Stop() {
 	close(r.done)
 	r.wg.Wait()
-	// Clear entries?
 }
 
 // snapshotLoop will collect a snapshot for each monitored registry for the configured period and store them in the correct buffer.
