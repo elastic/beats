@@ -102,7 +102,7 @@ class Test(metricbeat.BaseTest):
         )
         metricbeat = self.start_beat()
         self.wait_until(
-            lambda: self.output_count(lambda x: x >= 4),
+            lambda: self.output_count(lambda x: x >= 2),
             max_timeout=20)
 
         metricbeat.kill_and_wait()
