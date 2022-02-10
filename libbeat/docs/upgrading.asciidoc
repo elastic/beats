@@ -1,6 +1,9 @@
 [[upgrading]]
 == Upgrade
 
+coming[8.0.0]
+
+/////
 This section gives general recommendations for upgrading {beats} shippers:
 
 * <<upgrading-minor-versions>>
@@ -441,3 +444,5 @@ PUT /metricbeat-6.6.2-2019.04.09/_settings
 }
 --------------------------------------------------
 // CONSOLE
+
+/////
