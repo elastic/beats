@@ -87,9 +87,9 @@ func TestInput(t *testing.T) {
 
 	// Setup the input config
 	config := common.MustNewConfigFrom(common.MapStr{
-		"hosts":      getTestKafkaHost(),
-		"topics":     []string{testTopic},
-		"group_id":   groupID,
+		"hosts":    getTestKafkaHost(),
+		"topics":   []string{testTopic},
+		"group_id": groupID,
 	})
 
 	client := beattest.NewChanClient(100)
