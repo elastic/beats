@@ -115,8 +115,9 @@ func newFleetServerBootstrap(
 		return nil, err
 	}
 
+	loader := config.NewLoader(log, "")
 	discover := discoverer(pathConfigFile, cfg.Settings.Path)
-	bootstrapApp.source = newOnce(log, discover, emit)
+	bootstrapApp.source = newOnce(log, discover, loader, emit)
 	return bootstrapApp, nil
 }
 

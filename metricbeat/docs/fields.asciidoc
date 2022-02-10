@@ -10299,6 +10299,16 @@ Block I/O metrics.
 
 
 
+*`containerd.blkio.device`*::
++
+--
+Name of block device
+
+
+type: keyword
+
+--
+
 [float]
 === read
 
@@ -34842,6 +34852,210 @@ type: long
 +
 --
 Elapsed time since the VM was started, in seconds. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
+
+type: long
+
+--
+
+[float]
+=== dataproc
+
+Google Cloud Dataproc metrics
+
+
+*`gcp.dataproc.batch.spark.executors.count`*::
++
+--
+Indicates the number of Batch Spark executors.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.hdfs.datanodes.count`*::
++
+--
+Indicates the number of HDFS DataNodes that are running inside a cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.hdfs.storage_capacity.value`*::
++
+--
+Indicates capacity of HDFS system running on cluster in GB.
+
+type: double
+
+--
+
+*`gcp.dataproc.cluster.hdfs.storage_utilization.value`*::
++
+--
+The percentage of HDFS storage currently used.
+
+type: double
+
+--
+
+*`gcp.dataproc.cluster.hdfs.unhealthy_blocks.count`*::
++
+--
+Indicates the number of unhealthy blocks inside the cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.job.completion_time.value`*::
++
+--
+The time jobs took to complete from the time the user submits a job to the time Dataproc reports it is completed.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.job.duration.value`*::
++
+--
+The time jobs have spent in a given state.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.job.failed.count`*::
++
+--
+Indicates the number of jobs that have failed on a cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.job.running.count`*::
++
+--
+Indicates the number of jobs that are running on a cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.job.submitted.count`*::
++
+--
+Indicates the number of jobs that have been submitted to a cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.operation.completion_time.value`*::
++
+--
+The time operations took to complete from the time the user submits a operation to the time Dataproc reports it is completed.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.operation.duration.value`*::
++
+--
+The time operations have spent in a given state.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.operation.failed.count`*::
++
+--
+Indicates the number of operations that have failed on a cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.operation.running.count`*::
++
+--
+Indicates the number of operations that are running on a cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.operation.submitted.count`*::
++
+--
+Indicates the number of operations that have been submitted to a cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.yarn.allocated_memory_percentage.value`*::
++
+--
+The percentage of YARN memory is allocated.
+
+type: double
+
+--
+
+*`gcp.dataproc.cluster.yarn.apps.count`*::
++
+--
+Indicates the number of active YARN applications.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.yarn.containers.count`*::
++
+--
+Indicates the number of YARN containers.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.yarn.memory_size.value`*::
++
+--
+Indicates the YARN memory size in GB.
+
+type: double
+
+--
+
+*`gcp.dataproc.cluster.yarn.nodemanagers.count`*::
++
+--
+Indicates the number of YARN NodeManagers running inside cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.yarn.pending_memory_size.value`*::
++
+--
+The current memory request, in GB, that is pending to be fulfilled by the scheduler.
+
+type: double
+
+--
+
+*`gcp.dataproc.cluster.yarn.virtual_cores.count`*::
++
+--
+Indicates the number of virtual cores in YARN.
 
 type: long
 

@@ -36,7 +36,7 @@
                                     "label": "Count of records",
                                     "operationType": "count",
                                     "scale": "ratio",
-                                    "sourceField": "Records"
+                                    "sourceField": "___records___"
                                 }
                             },
                             "incompleteColumns": {}
@@ -59,6 +59,7 @@
                             "7b2420d3-1149-4f18-a114-e984e3c701f3"
                         ],
                         "layerId": "41f41086-8875-4d18-8844-b51b9c9cb8bc",
+                        "layerType": "data",
                         "legendDisplay": "default",
                         "metric": "9afb1b09-0f20-488c-9242-a94f7d11800b",
                         "nestedLegend": false,
@@ -71,10 +72,10 @@
         "title": "Recorded Future Indicator Type [Filebeat Threat Intel]",
         "visualizationType": "lnsPie"
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "8.1.0",
     "id": "037e2af0-df50-11eb-8f2b-753caedf727d",
     "migrationVersion": {
-        "lens": "7.13.1"
+        "lens": "8.1.0"
     },
     "references": [
         {
@@ -94,6 +95,6 @@
         }
     ],
     "type": "lens",
-    "updated_at": "2021-08-04T16:34:33.127Z",
-    "version": "WzQ2NjIsMV0="
+    "updated_at": "2022-02-01T15:45:07.866Z",
+    "version": "WzExMTAsMV0="
 }

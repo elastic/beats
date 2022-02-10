@@ -193,18 +193,12 @@ const (
 	radiotapLicense = `Dependency : ieee80211_radiotap.h Header File`
 )
 
-var (
-	// These reflect the order that the licenses and notices appear in the relevant files.
-	npcapConfigPattern = regexp.MustCompile(
-		"(?s)" + npcapSettings +
-			".*" + npcapGrant,
-	)
-	npcapLicensePattern = regexp.MustCompile(
-		"(?s)" + npcapLicense +
-			".*" + libpcapLicense +
-			".*" + winpcapLicense +
-			".*" + radiotapLicense,
-	)
+// This reflects the order that the licenses and notices appear in the relevant files.
+var npcapLicensePattern = regexp.MustCompile(
+	"(?s)" + npcapLicense +
+		".*" + libpcapLicense +
+		".*" + winpcapLicense +
+		".*" + radiotapLicense,
 )
 
 func checkNpcapNotices(pkg, file string, contents io.Reader) error {
@@ -222,13 +216,6 @@ func checkNpcapNotices(pkg, file string, contents io.Reader) error {
 		return err
 	}
 	switch file {
-	case "packetbeat.yml", "packetbeat.reference.yml":
-		if npcapConfigPattern.MatchReader(bufio.NewReader(contents)) != wantNotices {
-			if wantNotices {
-				return fmt.Errorf("Npcap config section not found in config file %s in %s", file, pkg)
-			}
-			return fmt.Errorf("unexpected Npcap config section found in config file %s in %s", file, pkg)
-		}
 	case "NOTICE.txt":
 		if npcapLicensePattern.MatchReader(bufio.NewReader(contents)) != wantNotices {
 			if wantNotices {
