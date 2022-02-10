@@ -453,7 +453,11 @@ func assertOffset(t *testing.T, groupID, topic string, expected int64) {
 		assert.NoError(t, err)
 
 		offset, _ := pom.NextOffset()
-		offsetSum += offset
+		// if the partition was not written to before
+		// it might return -1 which would affect the sum
+		if offset > 0 {
+			offsetSum += offset
+		}
 
 		pom.Close()
 	}
