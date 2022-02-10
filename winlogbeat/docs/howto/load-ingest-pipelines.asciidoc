@@ -52,5 +52,5 @@ PS> .{backslash}{beatname_lc}.exe export pipelines --es.version=7.16.0
 ----
 
 Once the pipelines have been exported you can load them into {es} with
-the `ingest\pipeline` REST API call.  The user making the REST API
+the `_ingest/pipeline` REST API call.  The user making the REST API
 call will need to have the `ingest_admin` role assigned to them.
