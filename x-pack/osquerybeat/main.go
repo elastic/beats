@@ -10,7 +10,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/cmd"
 
-	"github.com/elastic/beats/v7/libbeat/common/proc"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/proc"
 
 	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/include"
 )
