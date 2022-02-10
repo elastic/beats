@@ -87,8 +87,6 @@ tar xzvf packetbeat-{version}-darwin-x86_64.tar.gz
 
 endif::[]
 
-include::{libbeat-dir}/shared-brew-install.asciidoc[]
-
 [[linux]]
 *linux:*
 
@@ -309,8 +307,6 @@ sudo ./packetbeat -e
 configuration file, or run Packetbeat with `--strict.perms=false` specified. See
 {beats-ref}/config-file-permissions.html[Config File Ownership and Permissions]in
 the _Beats Platform Reference_.
-
-include::{libbeat-dir}/shared-brew-run.asciidoc[]
 
 *win:*
 
