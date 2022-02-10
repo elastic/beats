@@ -18,6 +18,7 @@
 package hasher
 
 import (
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -87,20 +88,5 @@ func TestHasherLimits(t *testing.T) {
 	hashes, err := hasher.HashFile(file)
 	assert.Empty(t, hashes)
 	assert.Error(t, err)
-	assert.IsType(t, FileTooLargeError{}, cause(err))
-}
-
-func cause(err error) error {
-	type unwrapper interface {
-		Unwrap() error
-	}
-
-	for err != nil {
-		w, ok := err.(unwrapper)
-		if !ok {
-			break
-		}
-		err = w.Unwrap()
-	}
-	return err
+	assert.True(t, errors.As(err, &FileTooLargeError{}))
 }
