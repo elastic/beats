@@ -41,7 +41,7 @@ pipeline {
                 go mod tidy && git diff --exit-code
                 gofmt -l . | read && echo "Code differs from gofmt's style. Run 'gofmt -w .'" 1>&2 && exit 1 || true
               ''')
-              sh(label: 'Go vet', script: 'go vet')
+              sh(label: 'Go vet', script: 'go vet ./...')
             }
           }
         }
