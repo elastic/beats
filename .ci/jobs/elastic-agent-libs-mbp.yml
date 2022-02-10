@@ -1,6 +1,6 @@
 ---
 - job:
-    name: "elastic-agent-libs-mbp"
+    name: "Ingest-manager/elastic-agent-libs-mbp"
     display-name: elastic-agent-libs
     description: elastic-agent-libs
     project-type: multibranch
