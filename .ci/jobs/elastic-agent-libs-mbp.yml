@@ -13,6 +13,7 @@
           discover-pr-origin: merge-current
           discover-tags: true
           notification-context: 'beats-ci'
+          head-filter-regex: '(main|\.\d+\.\d+|PR-.*|v\d+\.\d+\.\d+)'
           repo: elastic-agent-libs
           repo-owner: elastic
           credentials-id: 2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken
