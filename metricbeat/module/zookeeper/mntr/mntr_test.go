@@ -79,7 +79,7 @@ zk_pending_syncs	0
 zk_leader_uptime	648
 zk_local_sessions	0
 zk_uptime	749
-zk_max_latency	29
+zk_max_latency	8
 zk_outstanding_tls_handshake	0
 zk_learners	1
 zk_min_client_response_size	16
@@ -574,14 +574,57 @@ zk_p95_10_learner_handler_qp_time_ms	1
 zk_p99_10_learner_handler_qp_time_ms	1
 zk_p999_10_learner_handler_qp_time_ms	1`
 
+func assertExpectations(t *testing.T, expectations common.MapStr, report common.MapStr, message ...string) {
+	for key, expectation := range expectations {
+		assert.Contains(t, report, key, message)
+		switch expectation := expectation.(type) {
+		case common.MapStr:
+			nestedReport, _ := report.GetValue(key)
+			assert.IsType(t, nestedReport, report, message)
+			assertExpectations(t, expectation, nestedReport.(common.MapStr), message...)
+		default:
+			reportValue, _ := report.GetValue(key)
+			assert.Equal(t, expectation, reportValue, message)
+		}
+	}
+}
+
 func TestEventMapping(t *testing.T) {
 
 	type TestCase struct {
-		Version    string
-		MntrSample string
+		Version        string
+		MntrSample     string
+		ExpectedValues common.MapStr
 	}
 
-	mntrSamples := []TestCase{{"3.5.3", mntrTestInputZooKeeper35}, {"3.7.0", mntrTestInputZooKeeper37}}
+	mntrSamples := []TestCase{
+		{
+			"3.5.3",
+			mntrTestInputZooKeeper35,
+			common.MapStr{
+				"learners":  int64(1),
+				"followers": int64(1),
+				"latency": common.MapStr{
+					"max": float64(29),
+					"avg": float64(0),
+					"min": float64(0),
+				},
+			},
+		},
+		{
+			"3.7.0",
+			mntrTestInputZooKeeper37,
+			common.MapStr{
+				"learners":  int64(1),
+				"followers": int64(1),
+				"latency": common.MapStr{
+					"max": float64(8),
+					"avg": float64(0.5714),
+					"min": float64(0),
+				},
+			},
+		},
+	}
 
 	logger := logp.NewLogger("mntr_test")
 
@@ -599,18 +642,7 @@ func TestEventMapping(t *testing.T) {
 
 		event := events[len(events)-1]
 
-		// Check leader fields
-		assert.Equal(t, event.MetricSetFields["learners"], event.MetricSetFields["followers"], versionMsg)
-		assert.Equal(t, int64(1), event.MetricSetFields["learners"], versionMsg)
-
-		// Check latency fields
-		latencyFields := event.MetricSetFields["latency"].(common.MapStr)
-		assert.Equal(t, float64(29), latencyFields["max"], versionMsg)
-		if sample.Version != "3.5.3" {
-			// Float precission is only provided from ZK 3.6
-			assert.Equal(t, float64(0.5714), latencyFields["avg"], versionMsg)
-		}
-		assert.Equal(t, float64(0), latencyFields["min"], versionMsg)
+		assertExpectations(t, sample.ExpectedValues, event.MetricSetFields, versionMsg)
 	}
 
 }
