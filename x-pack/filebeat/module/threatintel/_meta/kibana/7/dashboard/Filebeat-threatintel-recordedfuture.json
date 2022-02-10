@@ -335,7 +335,7 @@
                                                     "label": "Count of records",
                                                     "operationType": "count",
                                                     "scale": "ratio",
-                                                    "sourceField": "Records"
+                                                    "sourceField": "___records___"
                                                 },
                                                 "dac2417a-0b3b-430a-bd24-23abfcea4a4c": {
                                                     "dataType": "string",
