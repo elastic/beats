@@ -94,6 +94,7 @@
 - Allow HTTP metrics to run in bootstrap mode. Add ability to adjust timeouts for Fleet Server. {pull}28260[28260]
 - Fix agent configuration overwritten by default fleet config. {pull}29297[29297]
 - Allow agent containers to use basic auth to create a service token. {pull}29651[29651]
+- Fix issue where a failing artifact verification does not remove the bad artifact. {pull}30281[30281]
 
 ==== New features
 
