@@ -90,7 +90,6 @@ func TestInput(t *testing.T) {
 		"hosts":      getTestKafkaHost(),
 		"topics":     []string{testTopic},
 		"group_id":   groupID,
-		"wait_close": 0,
 	})
 
 	client := beattest.NewChanClient(100)
