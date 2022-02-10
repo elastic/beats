@@ -51,6 +51,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - aws-s3: fix race condition in states used by s3-poller. {issue}30123[30123] {pull}30131[30131]
 
 *Heartbeat*
+- Fix missing mapping for `service.name`. {pull}30324[30324]
 
 
 *Filebeat*
