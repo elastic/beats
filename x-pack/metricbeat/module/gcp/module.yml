@@ -5,6 +5,11 @@ metricsets:
   - loadbalancing
   - storage
   - gke
+<<<<<<< HEAD
+=======
+  - firestore
+  - dataproc
+>>>>>>> e61173f979 ([Metricbeat] gcp: add dataproc metricset (#30008))
 dashboards:
   - id: Metricbeat-gcp-gke-overview
     file: 1ae960c0-f9f8-11eb-bc38-79936db7c106.json

@@ -22,6 +22,11 @@ const (
 	ServiceLoadBalancing  = "loadbalancing"
 	ServicePubsub         = "pubsub"
 	ServiceStorage        = "storage"
+<<<<<<< HEAD
+=======
+	ServiceFirestore      = "firestore"
+	ServiceDataproc       = "dataproc"
+>>>>>>> e61173f979 ([Metricbeat] gcp: add dataproc metricset (#30008))
 )
 
 //Paths within the GCP monitoring.TimeSeries response, if converted to JSON, where you can find each ECS field required for the output event

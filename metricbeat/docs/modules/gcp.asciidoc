@@ -275,6 +275,11 @@ metricbeat.modules:
   metricsets:
     - pubsub
     - loadbalancing
+<<<<<<< HEAD
+=======
+    - firestore
+    - dataproc
+>>>>>>> e61173f979 ([Metricbeat] gcp: add dataproc metricset (#30008))
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -339,6 +344,13 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-gcp-compute,compute>>
 
+<<<<<<< HEAD
+=======
+* <<metricbeat-metricset-gcp-dataproc,dataproc>>
+
+* <<metricbeat-metricset-gcp-firestore,firestore>>
+
+>>>>>>> e61173f979 ([Metricbeat] gcp: add dataproc metricset (#30008))
 * <<metricbeat-metricset-gcp-gke,gke>>
 
 * <<metricbeat-metricset-gcp-loadbalancing,loadbalancing>>
@@ -353,6 +365,13 @@ include::gcp/billing.asciidoc[]
 
 include::gcp/compute.asciidoc[]
 
+<<<<<<< HEAD
+=======
+include::gcp/dataproc.asciidoc[]
+
+include::gcp/firestore.asciidoc[]
+
+>>>>>>> e61173f979 ([Metricbeat] gcp: add dataproc metricset (#30008))
 include::gcp/gke.asciidoc[]
 
 include::gcp/loadbalancing.asciidoc[]

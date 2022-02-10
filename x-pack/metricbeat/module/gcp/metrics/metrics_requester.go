@@ -124,7 +124,11 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) (f string) 
 			}
 			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, zone)
 		}
+<<<<<<< HEAD
 	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions:
+=======
+	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions, gcp.ServiceFirestore, gcp.ServiceDataproc:
+>>>>>>> e61173f979 ([Metricbeat] gcp: add dataproc metricset (#30008))
 		return
 	case gcp.ServiceStorage:
 		if r.config.Region == "" {

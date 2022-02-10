@@ -539,6 +539,11 @@ metricbeat.modules:
   metricsets:
     - pubsub
     - loadbalancing
+<<<<<<< HEAD
+=======
+    - firestore
+    - dataproc
+>>>>>>> e61173f979 ([Metricbeat] gcp: add dataproc metricset (#30008))
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
