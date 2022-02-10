@@ -64,7 +64,7 @@ class Test(metricbeat.BaseTest):
         )
         metricbeat = self.start_beat()
         self.wait_until(
-            lambda: self.output_count(lambda x: x >= 2),
+            lambda: self.output_count(lambda x: x >= 4),
             max_timeout=15)
 
         metricbeat.kill_and_wait()
@@ -101,7 +101,7 @@ class Test(metricbeat.BaseTest):
         )
         metricbeat = self.start_beat()
         self.wait_until(
-            lambda: self.output_count(lambda x: x >= 2),
+            lambda: self.output_count(lambda x: x >= 4),
             max_timeout=15)
 
         metricbeat.kill_and_wait()
@@ -204,7 +204,6 @@ class Test(metricbeat.BaseTest):
                 "metricsets": ["process"],
                 "period": "1s",
                 "processes": ["(?i)metricbeat.test"],
-                "process.include_top_n": {"enabled": True, "by_cpu": 1}
             }],
             processors=[{
                 "include_fields": {"fields": ["system.process", "process"]},
@@ -214,7 +213,7 @@ class Test(metricbeat.BaseTest):
         )
         metricbeat = self.start_beat()
         self.wait_until(
-            lambda: self.output_count(lambda x: x >= 2),
+            lambda: self.output_count(lambda x: x >= 4),
             max_timeout=15)
 
         metricbeat.kill_and_wait()
