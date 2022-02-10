@@ -215,6 +215,19 @@ func TestKafkaPublish(t *testing.T) {
 				"message": id,
 			}),
 		},
+		{
+			"publish message with kafka headers to test topic",
+			map[string]interface{}{
+				"headers": map[string]string{
+					"app":  "test-app",
+					"host": "test-host",
+				},
+			},
+			testTopic,
+			randMulti(5, 100, common.MapStr{
+				"host": "test-host",
+			}),
+		},
 	}
 
 	defaultConfig := map[string]interface{}{
@@ -279,6 +292,10 @@ func TestKafkaPublish(t *testing.T) {
 
 			seenMsgs := map[string]struct{}{}
 			for _, s := range stored {
+				if headers, exists := test.config["headers"]; exists {
+					assert.Equal(t, len(headers.(map[string]string)), len(s.Headers))
+				}
+
 				msg := validate(t, s.Value, expected)
 				seenMsgs[msg] = struct{}{}
 			}
@@ -371,7 +388,9 @@ func makeConfig(t *testing.T, in map[string]interface{}) *common.Config {
 
 func newTestConsumer(t *testing.T) sarama.Consumer {
 	hosts := []string{getTestKafkaHost()}
-	consumer, err := sarama.NewConsumer(hosts, nil)
+	cfg := sarama.NewConfig()
+	cfg.Version = sarama.V1_0_0_0
+	consumer, err := sarama.NewConsumer(hosts, cfg)
 	if err != nil {
 		t.Fatal(err)
 	}

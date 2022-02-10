@@ -79,7 +79,7 @@ func newKafkaClient(
 	key *fmtstr.EventFormatString,
 	topic outil.Selector,
 	headers map[string]string,
-    writer codec.Codec,
+	writer codec.Codec,
 	cfg *sarama.Config,
 ) (*client, error) {
 	c := &client{
@@ -106,7 +106,7 @@ func newKafkaClient(
 		}
 		c.recordHeaders = recordHeaders
 	}
-	
+
 	return c, nil
 }
 
