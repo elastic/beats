@@ -90,7 +90,7 @@ func TestInput(t *testing.T) {
 		"hosts":      getTestKafkaHost(),
 		"topics":     []string{testTopic},
 		"group_id":   groupID,
-		"wait_close": 5,
+		"wait_close": 0,
 	})
 
 	client := beattest.NewChanClient(100)
@@ -125,6 +125,10 @@ func TestInput(t *testing.T) {
 			t.Fatal("timeout waiting for incoming events")
 		}
 	}
+
+	// sarama commits every second, we need to make sure
+	// all message acks are committed before the rest of the checks
+	<-time.After(2 * time.Second)
 
 	// Close the done channel and make sure the beat shuts down in a reasonable
 	// amount of time.
