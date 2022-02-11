@@ -51,7 +51,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
 - Fix multiple instances of the same module configured within `filebeat.modules` in filebeat.yml. {issue}29649[29649] {pull}29952[29952]
 - aws-s3: fix race condition in states used by s3-poller. {issue}30123[30123] {pull}30131[30131]
-- Fix splitting array of strings & array of arrays in httpjson input {issue}30345[30345] {pull}[]
+- Fix splitting array of strings & array of arrays in httpjson input {issue}30345[30345] {pull}30368[30368]
 
 *Filebeat*
 - Fix broken Kafka input {issue}29746[29746] {pull}30277[30277]
@@ -74,7 +74,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Functionbeat*
 
-- Pass AWS region configuration correctly. {issue}28520[28520] {pull}30238[30238] 
+- Pass AWS region configuration correctly. {issue}28520[28520] {pull}30238[30238]
 
 
 *Elastic Logging Plugin*
