@@ -52,6 +52,9 @@ pipeline {
       matrix {
         agent {label "${PLATFORM}"}
         options { skipDefaultCheckout() }
+        environment {
+          HOME = "${env.WORKSPACE}"
+        }
         axes {
           axis {
             name 'PLATFORM'
