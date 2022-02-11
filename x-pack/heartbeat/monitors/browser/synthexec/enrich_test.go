@@ -471,7 +471,6 @@ func TestCreateSummaryEvent(t *testing.T) {
 			errorCount:      1,
 		},
 		expected: common.MapStr{
-			"monitor.duration.us": int64(0),
 			"summary": common.MapStr{
 				"down": 1,
 				"up":   0,

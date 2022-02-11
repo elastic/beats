@@ -181,14 +181,16 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 	}
 
 	// Incase of syntax errors or incorrect runner options, the Synthetics
-	// runner would exit immediately with exitCode 1 andwe set the duration
-	// to 0 as to inform the journey never ran and there were no `journey/start`
-	// event fired from the agent.
-	var durationUs int64
-	if je.start.IsZero() {
-		durationUs = 0
-	} else {
-		durationUs = int64(je.end.Sub(je.start) / time.Microsecond)
+	// runner would exit immediately with exitCode 1 and we do not set the duration
+	// to inform the journey never ran
+	if !je.start.IsZero() {
+		eventext.MergeEventFields(event, common.MapStr{
+			"monitor": common.MapStr{
+				"duration": common.MapStr{
+					"us": int64(je.end.Sub(je.start) / time.Microsecond),
+				},
+			},
+		})
 	}
 	eventext.MergeEventFields(event, common.MapStr{
 		"url": je.urlFields,
@@ -198,11 +200,6 @@ func (je *journeyEnricher) createSummary(event *beat.Event) error {
 		"synthetics": common.MapStr{
 			"type":    "heartbeat/summary",
 			"journey": je.journey,
-		},
-		"monitor": common.MapStr{
-			"duration": common.MapStr{
-				"us": durationUs,
-			},
 		},
 		"summary": common.MapStr{
 			"up":   up,
