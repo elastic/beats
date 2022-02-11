@@ -95,7 +95,7 @@ func newKafkaClient(
 	}
 
 	if len(headers) != 0 {
-		recordHeaders := make([]sarama.RecordHeader, 0)
+		recordHeaders := make([]sarama.RecordHeader, 0, len(headers))
 		for k, v := range headers {
 			recordHeader := sarama.RecordHeader{
 				Key:   []byte(k),
