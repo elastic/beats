@@ -20,7 +20,7 @@ metricbeat setup --{option}
 
 ["source","sh",subs="attributes"]
 ----
-docker run docker.elastic.co/beats/metricbeat:7.0.0 setup --{option}
+docker run docker.elastic.co/beats/metricbeat:{version} setup --{option}
 ----
 
 *win:*
@@ -51,7 +51,7 @@ metricbeat setup --{option} -E output.logstash.enabled=false -E 'output.elastics
 
 ["source","sh",subs="attributes"]
 ----
-docker run docker.elastic.co/beats/metricbeat:7.0.0 setup --{option} -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+docker run docker.elastic.co/beats/metricbeat:{version} setup --{option} -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ----
 
 *win:*
