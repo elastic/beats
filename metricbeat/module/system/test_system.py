@@ -89,6 +89,9 @@ SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state"]
 
 
 class Test(metricbeat.BaseTest):
+    """
+    Test Impliments the BaseTest class for the system module
+    """
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_cpu(self):
@@ -315,7 +318,16 @@ class Test(metricbeat.BaseTest):
         self.render_config_template(modules=[{
             "name": "system",
             "metricsets": ["filesystem"],
-            "period": "5s"
+            "period": "5s",
+            # prevent permissions issues on systems with docker
+            "extras": {
+                "filesystem.ignore_types": ["nsfs",
+                                            "sysfs", "tmpfs", "bdev", "proc", "cgroup", "cgroup2", "cpuset",
+                                            "devtmpfs", "configfs", "debugfs", "tracefs", "securityfs", "sockfs",
+                                            "bpf", "pipefs", "ramfs", "hugetlbfs", "devpts", "autofs", "efivarfs",
+                                            "mqueue", "selinuxfs", "binder", "pstore", "fuse", "fusectl", "rpc_pipefs",
+                                            "overlay", "binfmt_misc"],
+            }
         }])
         proc = self.start_beat()
         self.wait_until(lambda: self.output_lines() > 0)
@@ -326,6 +338,7 @@ class Test(metricbeat.BaseTest):
         self.assertGreater(len(output), 0)
 
         for evt in output:
+            print(evt)
             self.assert_fields_are_documented(evt)
             filesystem = evt["system"]["filesystem"]
             if sys.platform.startswith("win"):
