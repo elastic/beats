@@ -44460,7 +44460,17 @@ type: integer
 *`kubernetes.container.status.reason`*::
 +
 --
-Waiting (ContainerCreating, CrashLoopBackoff, ErrImagePull, ImagePullBackoff) or termination (Completed, ContainerCannotRun, Error, OOMKilled) reason.
+The reason the container is currently in waiting (ContainerCreating, CrashLoopBackoff, ErrImagePull, ImagePullBackoff) or terminated (Completed, ContainerCannotRun, Error, OOMKilled) state.
+
+
+type: keyword
+
+--
+
+*`kubernetes.container.status.last_terminated_reason`*::
++
+--
+The last reason the container was in terminated state (Completed, ContainerCannotRun, Error or OOMKilled).
 
 
 type: keyword
@@ -63974,7 +63984,7 @@ type: long
 *`zookeeper.mntr.followers`*::
 +
 --
-Number of followers seen by the current host.
+Number of followers seen by the current host (Up to ZooKeeper 3.5.9).
 
 
 type: long
@@ -64117,6 +64127,16 @@ type: long
 +
 --
 Number of znodes reported by the local ZooKeeper process.
+
+
+type: long
+
+--
+
+*`zookeeper.mntr.learners`*::
++
+--
+Number of learners (either followers or observers) seen by the current host (From ZooKeeper 3.6.0)
 
 
 type: long
