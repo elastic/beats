@@ -776,7 +776,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             # Range keys as used in 'date_range' etc will not have docs of course
             isRangeKey = key.split('.')[-1] in ['gte', 'gt', 'lte', 'lt']
             if not(is_documented(key, expected_fields) or metaKey or isRangeKey):
-                raise Exception("Key '{}' found in event is not documented!".format(key))
+                raise Exception("Key '{}' found in event ({}) is not documented!".format(key, str(evt)))
             if is_documented(key, aliases):
                 raise Exception("Key '{}' found in event is documented as an alias!".format(key))
 

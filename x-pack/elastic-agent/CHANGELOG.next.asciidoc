@@ -94,6 +94,7 @@
 - Allow HTTP metrics to run in bootstrap mode. Add ability to adjust timeouts for Fleet Server. {pull}28260[28260]
 - Fix agent configuration overwritten by default fleet config. {pull}29297[29297]
 - Allow agent containers to use basic auth to create a service token. {pull}29651[29651]
+- Fix issue where a failing artifact verification does not remove the bad artifact. {pull}30281[30281]
 - Reduce Elastic Agent shut down by stopping processes in parallel {pull}29650[29650]
 
 ==== New features
@@ -159,3 +160,4 @@
 - Add --fleet-server-es-ca-trusted-fingerprint flag to allow agent/fleet-server to work with elasticsearch clusters using self signed certs. {pull}29128[29128]
 - Discover changes in Kubernetes nodes metadata as soon as they happen. {pull}23139[23139]
 - Add results of inspect output command into archive produced by diagnostics collect. {pull}29902[29902]
+- Add support for loading input configuration from external configuration files in standalone mode. You can load inputs from YAML configuration files under the folder `{path.config}/inputs.d`. {pull}30087[30087]

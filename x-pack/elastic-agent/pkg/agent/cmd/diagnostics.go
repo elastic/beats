@@ -209,7 +209,7 @@ func diagnosticsCollectCmd(streams *cli.IOStreams, fileName, outputFormat string
 		return fmt.Errorf("unable to gather config data: %w", err)
 	}
 
-	var pprofData map[string][]client.ProcPProf = nil
+	var pprofData map[string][]client.ProcPProf
 	if pprof {
 		pprofData, err = getAllPprof(innerCtx, pprofDur)
 		if err != nil {

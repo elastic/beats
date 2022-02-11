@@ -56,11 +56,6 @@ func Package() error {
 					continue
 				}
 
-				if pkgType == DMG && runtime.GOOS != "darwin" {
-					log.Printf("Skipping DMG package type because build host isn't darwin")
-					continue
-				}
-
 				if target.Name == "linux/arm64" && pkgType == Docker && runtime.GOARCH != "arm64" {
 					log.Printf("Skipping Docker package type because build host isn't arm")
 					continue
