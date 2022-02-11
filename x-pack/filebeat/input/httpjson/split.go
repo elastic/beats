@@ -211,7 +211,7 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 func (s *split) sendMessage(ctx *transformContext, root common.MapStr, key string, v interface{}, ch chan<- maybeMsg) error {
 	obj, ok := toMapStr(v)
 	if !ok {
-		return errExpectedSplitObj
+		obj = common.MapStr{}
 	}
 
 	clone := root.Clone()
@@ -255,6 +255,10 @@ func toMapStr(v interface{}) (common.MapStr, bool) {
 		return t, true
 	case map[string]interface{}:
 		return common.MapStr(t), true
+	case string, []interface{}:
+		temp := make(map[string]interface{})
+		temp["data"] = t
+		return common.MapStr(temp), true
 	}
 	return common.MapStr{}, false
 }
