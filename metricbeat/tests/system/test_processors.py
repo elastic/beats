@@ -91,32 +91,31 @@ class Test(metricbeat.BaseTest):
                 "name": "system",
                 "metricsets": ["process"],
                 "period": "1s",
-                "processes": ["(?i)metricbeat.test"],
-                "process.include_top_n": {"enabled": True, "by_cpu": 1}
+                "extras": {
+                    "process.include_top_n": {"enabled": True, "by_cpu": 4},
+                    "process.include_cpu_ticks": True
+                }
+
             }],
             processors=[{
                 "drop_event": {
-                    "when": "range.system.process.cpu.total.pct.lt: 0.001",
+                    "when": "range.system.process.cpu.total.ticks.lt: 100",
                 },
             }]
         )
         metricbeat = self.start_beat()
         self.wait_until(
-            lambda: self.output_count(lambda x: x >= 2),
+            lambda: self.output_count(lambda x: x >= 1),
             max_timeout=20)
 
         metricbeat.kill_and_wait()
 
         output = self.read_output(
             required_fields=["@timestamp"],
-        )
-        good_event = {}
-        for evt in output:
-            if "system.process.cpu.total.pct" in evt:
-                good_event = evt
+        )[0]
 
         print(output)
-        assert float(good_event["system.process.cpu.total.pct"]) >= 0.001
+        assert float(output["system.process.cpu.total.ticks"]) >= 100
 
     def test_dropevent_with_complex_condition(self):
         """
