@@ -39,7 +39,8 @@ class Test(metricbeat.BaseTest):
         ]), evt.keys())
         network = evt["system"]["network"]
         print(list(network.keys()))
-        self.assertCountEqual(self.de_dot(["name", "out", "in"]), network.keys())
+        self.assertCountEqual(self.de_dot(
+            ["name", "out", "in"]), network.keys())
 
     def test_dropfields_with_condition(self):
         """
@@ -148,7 +149,7 @@ class Test(metricbeat.BaseTest):
         )
         metricbeat = self.start_beat()
         self.wait_until(
-            lambda: self.output_count(lambda x: x >= 1),
+            lambda: self.output_has_key("system.process.cpu.total.pct"),
             max_timeout=15)
 
         metricbeat.kill_and_wait()

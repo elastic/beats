@@ -46,6 +46,86 @@ def json_raise_on_duplicates(ordered_pairs):
     return key_dict
 
 
+def get_elasticsearch_url():
+    """
+    Returns a string with the Elasticsearch URL
+    """
+    return "http://{host}:{port}".format(
+        host=os.getenv("ES_HOST", "localhost"),
+        port=os.getenv("ES_PORT", "9200"),
+    )
+
+
+def get_elasticsearch_url_ssl():
+    """
+    Returns a string with the Elasticsearch URL
+    """
+    return "https://{host}:{port}".format(
+        host=os.getenv("ES_HOST_SSL", "localhost"),
+        port=os.getenv("ES_PORT_SSL", "9205"),
+    )
+
+
+def get_kibana_url():
+    """
+    Returns kibana host URL
+    """
+    return "http://{host}:{port}".format(
+        host=os.getenv("KIBANA_HOST", "localhost"),
+        port=os.getenv("KIBANA_PORT", "5601"),
+    )
+
+
+def get_elasticsearch_instance(security=True, ssl=False, url=None, user=None):
+    """
+    Returns an elasticsearch.Elasticsearch instance built from the
+    env variables like the integration tests.
+    """
+    if url is None:
+        if ssl:
+            url = get_elasticsearch_url_ssl()
+        else:
+            url = get_elasticsearch_url()
+
+    if security:
+        username = user or os.getenv("ES_USER", "")
+        password = os.getenv("ES_PASS", "")
+        es_instance = Elasticsearch([url], http_auth=(username, password))
+    else:
+        es_instance = Elasticsearch([url])
+    return es_instance
+
+
+def get_kibana_template_config(security=True, user=None):
+    """
+    Returns a Kibana template suitable for a Beat
+    """
+    template = {
+        "host": get_kibana_url()
+    }
+
+    if security:
+        template["user"] = user or os.getenv("ES_USER", "")
+        template["pass"] = os.getenv("ES_PASS", "")
+
+    return template
+
+
+def get_elasticsearch_template_config(self, security=True, user=None):
+    """
+    Returns a template suitable for a Beats config
+    """
+    template = {
+        "host": get_elasticsearch_url(),
+    }
+
+    if security:
+        template["user"] = user or os.getenv("ES_USER", "")
+        template["pass"] = os.getenv("ES_PASS", "")
+
+    return template
+
+
 class WaitTimeoutError(Exception):
     """
     WaitTimeoutError is raised by the wait_until function if the `until` logic passes its timeout.
@@ -315,6 +395,12 @@ class TestCase(unittest.TestCase, ComposeMixin):
             os.chmod(output_path, 0o600)
             f.write(output_str.encode('utf_8'))
 
+    def default_output_file(self):
+        """
+        default_output_file returns the default path and name of the beat metrics file output
+        """
+        return "output/" + self.beat_name + "-" + self.today + ".ndjson"
+
     def read_output(self,
                     output_file=None,
                     required_fields=None):
@@ -324,11 +410,11 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
+            output_file = self.default_output_file()
 
         jsons = []
-        with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
-            for line in f:
+        with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as beat_output:
+            for line in beat_output:
                 if len(line) == 0 or line[len(line) - 1] != "\n":
                     # hit EOF
                     break
@@ -350,7 +436,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
+            output_file = self.default_output_file()
 
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
@@ -515,11 +601,11 @@ class TestCase(unittest.TestCase, ComposeMixin):
     def output_lines(self, output_file=None):
         """ Count number of lines in a file."""
         if output_file is None:
-            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
+            output_file = self.default_output_file()
 
         try:
-            with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
-                return sum([1 for line in f])
+            with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as beat_output:
+                return sum([1 for line in beat_output])
         except IOError:
             return 0
 
@@ -530,13 +616,27 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
-
+            output_file = self.default_output_file()
         try:
-            with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as f:
-                return len([1 for line in f]) == lines
+            with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as beat_output:
+                return len([1 for line in beat_output]) == lines
         except IOError:
             return False
+
+    def output_has_key(self, key: str, output_file=None):
+        """
+        output_has_key returns true if the given key is found in the list of events
+        """
+        try:
+            lines = self.read_output(
+                output_file=output_file, required_fields=["@timestamp"])
+        except IOError:
+            return False
+
+        for line in lines:
+            if key in line:
+                return True
+        return False
 
     def output_is_empty(self, output_file=None):
         """
@@ -545,7 +645,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
+            output_file = self.default_output_file()
 
         try:
             with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as f:
@@ -681,7 +781,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
     def flatten_object(self, obj, dict_fields, prefix=""):
         """
-        flatten_object flatten an object, turning nested keys into *.* notation
+        flatten_object will flatten a beat event, turning nested keys into *.* notation
         """
         result = {}
         for key, value in obj.items():
@@ -714,87 +814,13 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
+            output_file = self.default_output_file()
 
         try:
-            with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
-                return pred(len([1 for line in f]))
+            with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as beat_out:
+                return pred(len([1 for line in beat_out]))
         except IOError:
             return False
-
-    def get_elasticsearch_url(self):
-        """
-        Returns a string with the Elasticsearch URL
-        """
-        return "http://{host}:{port}".format(
-            host=os.getenv("ES_HOST", "localhost"),
-            port=os.getenv("ES_PORT", "9200"),
-        )
-
-    def get_elasticsearch_url_ssl(self):
-        """
-        Returns a string with the Elasticsearch URL
-        """
-        return "https://{host}:{port}".format(
-            host=os.getenv("ES_HOST_SSL", "localhost"),
-            port=os.getenv("ES_PORT_SSL", "9205"),
-        )
-
-    def get_elasticsearch_template_config(self, security=True, user=None):
-        """
-        Returns a template suitable for a Beats config
-        """
-        template = {
-            "host": self.get_elasticsearch_url(),
-        }
-
-        if security:
-            template["user"] = user or os.getenv("ES_USER", "")
-            template["pass"] = os.getenv("ES_PASS", "")
-
-        return template
-
-    def get_elasticsearch_instance(self, security=True, ssl=False, url=None, user=None):
-        """
-        Returns an elasticsearch.Elasticsearch instance built from the
-        env variables like the integration tests.
-        """
-        if url is None:
-            if ssl:
-                url = self.get_elasticsearch_url_ssl()
-            else:
-                url = self.get_elasticsearch_url()
-
-        if security:
-            username = user or os.getenv("ES_USER", "")
-            password = os.getenv("ES_PASS", "")
-            es_instance = Elasticsearch([url], http_auth=(username, password))
-        else:
-            es_instance = Elasticsearch([url])
-        return es_instance
-
-    def get_kibana_url(self):
-        """
-        Returns kibana host URL
-        """
-        return "http://{host}:{port}".format(
-            host=os.getenv("KIBANA_HOST", "localhost"),
-            port=os.getenv("KIBANA_PORT", "5601"),
-        )
-
-    def get_kibana_template_config(self, security=True, user=None):
-        """
-        Returns a Kibana template suitable for a Beat
-        """
-        template = {
-            "host": self.get_kibana_url()
-        }
-
-        if security:
-            template["user"] = user or os.getenv("ES_USER", "")
-            template["pass"] = os.getenv("ES_PASS", "")
-
-        return template
 
     def assert_fields_are_documented(self, evt):
         """
@@ -825,15 +851,15 @@ class TestCase(unittest.TestCase, ComposeMixin):
             return False
 
         for key in flat.keys():
-            metaKey = key.startswith('@metadata.')
+            meta_key = key.startswith('@metadata.')
             # Range keys as used in 'date_range' etc will not have docs of course
-            isRangeKey = key.split('.')[-1] in ['gte', 'gt', 'lte', 'lt']
-            if not(is_documented(key, expected_fields) or metaKey or isRangeKey):
+            is_range_key = key.split('.')[-1] in ['gte', 'gt', 'lte', 'lt']
+            if not(is_documented(key, expected_fields) or meta_key or is_range_key):
                 raise Exception(
-                    "Key '{}' found in event ({}) is not documented!".format(key, str(evt)))
+                    f"Key '{key}' found in event ({str(evt)}) is not documented!")
             if is_documented(key, aliases):
                 raise Exception(
-                    "Key '{}' found in event is documented as an alias!".format(key))
+                    "Key '{key}' found in event is documented as an alias!")
 
     def get_beat_version(self):
         """
@@ -865,14 +891,14 @@ class TestCase(unittest.TestCase, ComposeMixin):
         def is_ecs_version_set(path):
             # parsing the yml file would be better but go templates in
             # the file make that difficult
-            with open(path) as fhandle:
+            with open(path, encoding="utf-8") as fhandle:
                 for line in fhandle:
                     if re.search(r"ecs\.version", line):
                         return True
             return False
 
-        for cfg_path in get_config_paths(self.modules_path, module, fileset):
+        for cfg_path in get_config_paths(self.modules_path, module, fileset):  # pylint: disable=no-member
             if is_ecs_version_set(cfg_path):
                 return
         raise Exception(
-            "{}/{} ecs.version not explicitly set in config or pipeline".format(module, fileset))
+            f"{module}/{fileset} ecs.version not explicitly set in config or pipeline")
