@@ -130,7 +130,7 @@ func (c *crawler) startInput(
 
 	runner, err := c.inputsFactory.Create(pipeline, config)
 	if err != nil {
-		return fmt.Errorf("error while initializing input: %+v", err)
+		return fmt.Errorf("error while initializing input: %v", err)
 	}
 	if inputRunner, ok := runner.(*input.Runner); ok {
 		inputRunner.Once = c.once
