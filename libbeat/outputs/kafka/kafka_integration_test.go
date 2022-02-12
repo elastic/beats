@@ -218,9 +218,19 @@ func TestKafkaPublish(t *testing.T) {
 		{
 			"publish message with kafka headers to test topic",
 			map[string]interface{}{
-				"headers": map[string]string{
-					"app":  "test-app",
-					"host": "test-host",
+				"headers": []map[string]string{
+					{
+						"key":   "app",
+						"value": "test-app",
+					},
+					{
+						"key":   "app",
+						"value": "test-app2",
+					},
+					{
+						"key":   "host",
+						"value": "test-host",
+					},
 				},
 			},
 			testTopic,
@@ -290,10 +300,21 @@ func TestKafkaPublish(t *testing.T) {
 				validate = makeValidateFmtStr(fmt.(string))
 			}
 
+			cfgHeaders, headersSet := test.config["headers"]
+
 			seenMsgs := map[string]struct{}{}
 			for _, s := range stored {
-				if headers, exists := test.config["headers"]; exists {
-					assert.Equal(t, len(headers.(map[string]string)), len(s.Headers))
+				if headersSet {
+					expectedHeaders, ok := cfgHeaders.([]map[string]string)
+					assert.True(t, ok)
+					assert.Len(t, s.Headers, len(expectedHeaders))
+					for i, h := range s.Headers {
+						expectedHeader := expectedHeaders[i]
+						key := string(h.Key)
+						value := string(h.Value)
+						assert.Equal(t, expectedHeader["key"], key)
+						assert.Equal(t, expectedHeader["value"], value)
+					}
 				}
 
 				msg := validate(t, s.Value, expected)

@@ -44,6 +44,11 @@ type backoffConfig struct {
 	Max  time.Duration `config:"max"`
 }
 
+type header struct {
+	Key   string `config:"key"`
+	Value string `config:"value"`
+}
+
 type kafkaConfig struct {
 	Hosts              []string                  `config:"hosts"               validate:"required"`
 	TLS                *tlscommon.Config         `config:"ssl"`
@@ -62,7 +67,7 @@ type kafkaConfig struct {
 	BulkMaxSize        int                       `config:"bulk_max_size"`
 	BulkFlushFrequency time.Duration             `config:"bulk_flush_frequency"`
 	MaxRetries         int                       `config:"max_retries"         validate:"min=-1,nonzero"`
-	Headers            map[string]string         `config:"headers"`
+	Headers            []header                  `config:"headers"`
 	Backoff            backoffConfig             `config:"backoff"`
 	ClientID           string                    `config:"client_id"`
 	ChanBufferSize     int                       `config:"channel_buffer_size" validate:"min=1"`
