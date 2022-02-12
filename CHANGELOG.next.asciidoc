@@ -91,6 +91,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add `script` processor to all beats {issue}29269[29269] {pull}29752[29752]
 - Only connect to Elasticsearch instances with the same version or newer. {pull}29683[29683]
 - Move umask from code to service files. {pull}29708[29708]
+- Add support for kafka message headers. {pull}29940[29940]
 - Add FIPS configuration option for all AWS API calls. {pull}[28899]
 - Add metadata change support for some processors {pull}30183[30183]
 
