@@ -48,6 +48,8 @@ const (
 	defaultRequestRetrySleep = "1s"                             // sleep 1 sec between retries for HTTP requests
 	defaultMaxRequestRetries = "30"                             // maximum number of retries for HTTP requests
 	defaultStateDirectory    = "/usr/share/elastic-agent/state" // directory that will hold the state data
+	// Kibana route paths
+	packagePolicyRoute = "/api/fleet/package_policies"
 )
 
 var (
@@ -507,11 +509,15 @@ func kibanaFetchPolicy(cfg setupConfig, client *kibana.Client, streams *cli.IOSt
 
 func kibanaFetchPackagePolicies(cfg setupConfig, client *kibana.Client, streams *cli.IOStreams) (*packagePolicyResponse, error) {
 	var packagePolicies kibanaPackagePolicies
-	err := performGET(cfg, client, "/api/fleet/package_policies", &packagePolicies, streams.Err, "Kibana fetch package policies")
+	err := performGET(cfg, client, packagePolicyRoute, &packagePolicies, streams.Err, "Kibana fetch package policies")
 	if err != nil {
 		return nil, err
 	}
 	return separatePackagePolicies(&packagePolicies), nil
+}
+
+func IsFleetServerIntegration(packageName string) bool {
+	return packageName == "fleet_server"
 }
 
 func separatePackagePolicies(packagePolicies *kibanaPackagePolicies) *packagePolicyResponse {
@@ -521,7 +527,7 @@ func separatePackagePolicies(packagePolicies *kibanaPackagePolicies) *packagePol
 	}
 	for _, packagePolicy := range packagePolicies.Items {
 		policyID := packagePolicy.PolicyID
-		if packagePolicy.Package.Name == "fleet_server" {
+		if IsFleetServerIntegration(packagePolicy.Package.Name) {
 			// if we have previously marked a policy as unmanaged, clear that marking
 			if _, ok := result.NonFleet[policyID]; ok {
 				delete(result.NonFleet, policyID)
