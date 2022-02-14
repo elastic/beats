@@ -13932,11 +13932,11 @@ Contents of probable licence file $GOMODCACHE/github.com/prometheus/common@v0.29
 
 --------------------------------------------------------------------------------
 Dependency : github.com/prometheus/procfs
-Version: v0.6.0
+Version: v0.7.3
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/prometheus/procfs@v0.6.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/prometheus/procfs@v0.7.3/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -15483,11 +15483,11 @@ Contents of probable licence file $GOMODCACHE/github.com/xdg/scram@v1.0.3/LICENS
 
 --------------------------------------------------------------------------------
 Dependency : go.elastic.co/apm
-Version: v1.14.0
+Version: v1.15.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.elastic.co/apm@v1.14.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.elastic.co/apm@v1.15.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -17300,11 +17300,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sys
-Version: v0.0.0-20211102192858-4dd72447c267
+Version: v0.0.0-20220209214540-3681064d5158
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.0.0-20211102192858-4dd72447c267/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.0.0-20220209214540-3681064d5158/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -17411,11 +17411,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/tools
-Version: v0.1.7
+Version: v0.1.9
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/tools@v0.1.7/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/tools@v0.1.9/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -18676,11 +18676,11 @@ Contents of probable licence file $GOMODCACHE/gotest.tools/gotestsum@v0.6.0/LICE
 
 --------------------------------------------------------------------------------
 Dependency : howett.net/plist
-Version: v0.0.0-20181124034731-591f970eefbb
+Version: v1.0.0
 Licence type (autodetected): BSD-2-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/howett.net/plist@v0.0.0-20181124034731-591f970eefbb/LICENSE:
+Contents of probable licence file $GOMODCACHE/howett.net/plist@v1.0.0/LICENSE:
 
 Copyright (c) 2013, Dustin L. Howett. All rights reserved.
 
@@ -29847,11 +29847,11 @@ limitations under the License.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/jcchavezs/porto
-Version: v0.1.0
+Version: v0.4.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/jcchavezs/porto@v0.1.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/jcchavezs/porto@v0.4.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
