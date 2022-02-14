@@ -78,7 +78,7 @@ func newKafkaClient(
 	index string,
 	key *fmtstr.EventFormatString,
 	topic outil.Selector,
-	headers map[string]string,
+	headers []header,
 	writer codec.Codec,
 	cfg *sarama.Config,
 ) (*client, error) {
@@ -96,10 +96,13 @@ func newKafkaClient(
 
 	if len(headers) != 0 {
 		recordHeaders := make([]sarama.RecordHeader, 0, len(headers))
-		for k, v := range headers {
+		for _, h := range headers {
+			if h.Key == "" {
+				continue
+			}
 			recordHeader := sarama.RecordHeader{
-				Key:   []byte(k),
-				Value: []byte(v),
+				Key:   []byte(h.Key),
+				Value: []byte(h.Value),
 			}
 
 			recordHeaders = append(recordHeaders, recordHeader)
