@@ -155,8 +155,6 @@ require (
 	github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7 // indirect
 	go.elastic.co/apm v1.14.0
 	go.elastic.co/apm/module/apmelasticsearch v1.7.2
-	go.elastic.co/apm/module/apmgorilla v1.14.0
-	go.elastic.co/apm/module/apmgrpc v1.14.0
 	go.elastic.co/apm/module/apmhttp v1.14.0
 	go.elastic.co/ecszap v0.3.0
 	go.elastic.co/go-licence-detector v0.4.0
@@ -275,7 +273,6 @@ require (
 	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/grpc/examples v0.0.0-20211115174500-b2317c762757 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	k8s.io/klog/v2 v2.30.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20211115234752-e816edb12b65 // indirect
