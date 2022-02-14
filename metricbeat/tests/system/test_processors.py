@@ -1,7 +1,7 @@
 import re
 import sys
-import metricbeat
 import unittest
+import metricbeat
 
 
 @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")

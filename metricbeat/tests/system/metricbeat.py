@@ -1,3 +1,6 @@
+"""
+Main python for metricbeat tests
+"""
 import logging
 import os
 import re
@@ -16,24 +19,28 @@ logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 
 class BaseTest(TestCase):
+    """
+    BaseTest implements the individual test class for metricbeat
+    """
 
     @classmethod
-    def setUpClass(self):
-        if not hasattr(self, 'beat_name'):
-            self.beat_name = "metricbeat"
+    def setUpClass(cls):  # pylint: disable=invalid-name
+        """
+        initializes the Test class
+        """
+        if not hasattr(cls, 'beat_name'):
+            cls.beat_name = "metricbeat"
 
-        if not hasattr(self, 'beat_path'):
-            self.beat_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+        if not hasattr(cls, 'beat_path'):
+            cls.beat_path = os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "../../"))
 
-        super(BaseTest, self).setUpClass()
-
-    def setUp(self):
-        super(BaseTest, self).setUp()
-
-    def tearDown(self):
-        super(BaseTest, self).tearDown()
+        super().setUpClass()
 
     def de_dot(self, existing_fields):
+        """
+        de_dot strips the dot notation from events
+        """
         fields = {}
 
         # Dedot first level of dots
@@ -66,7 +73,8 @@ class BaseTest(TestCase):
 
         # Jenkins runs as a Windows service and when Jenkins executes these
         # tests the Beat is confused since it thinks it is running as a service.
-        pattern = self.build_log_regex("The service process could not connect to the service controller.")
+        pattern = self.build_log_regex(
+            "The service process could not connect to the service controller.")
         log = pattern.sub("", log)
 
         if replace:
@@ -132,7 +140,8 @@ def parameterized_with_supported_versions(base_class):
     Decorates a class so instead of the base class, multiple copies
     of it are registered, one for each supported version.
     """
-    class_dir = os.path.abspath(os.path.dirname(sys.modules[base_class.__module__].__file__))
+    class_dir = os.path.abspath(os.path.dirname(
+        sys.modules[base_class.__module__].__file__))
     versions_path = os.path.join(class_dir, '_meta', 'supported-versions.yml')
     variants = supported_versions(versions_path)
     decorator = parameterized_class(['COMPOSE_ENV'], variants)

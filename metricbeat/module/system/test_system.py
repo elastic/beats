@@ -1,10 +1,13 @@
+"""
+Metricbeat system module tests
+"""
 import getpass
-import metricbeat
 import os
 import re
-import six
 import sys
 import unittest
+import six
+import metricbeat
 
 
 SYSTEM_CPU_FIELDS_LINUX = ["cores", "idle.pct", "iowait.pct", "irq.pct", "nice.pct",
