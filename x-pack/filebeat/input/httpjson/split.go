@@ -255,7 +255,7 @@ func toMapStr(v interface{}) (common.MapStr, bool) {
 		return t, true
 	case map[string]interface{}:
 		return common.MapStr(t), true
-	case string, []interface{}:
+	case string, []bool, []int, []string, []interface{}:
 		temp := make(map[string]interface{})
 		temp["data"] = t
 		return common.MapStr(temp), true

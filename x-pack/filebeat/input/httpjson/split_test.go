@@ -652,38 +652,49 @@ func TestSplit(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
-		// {
-		// 	name: "Array of Arrays with keep_parent",
-		// 	config: &splitConfig{
-		// 		Target:     "body.alerts",
-		// 		Type:       "array",
-		// 		KeepParent: true,
-		// 	},
-		// 	ctx: emptyTransformContext(),
-		// 	resp: transformable{
-		// 		"body": common.MapStr{
-		// 			"this":   "is kept",
-		// 			"alerts": [][]interface{}{{1, 2, 3}, {4, 5, 6}},
-		// 		},
-		// 	},
-		// 	expectedMessages: []common.MapStr{
-		// 		{
-		// 			"this": "is kept",
-		// 			"alerts.data": []string{
-		// 				"test1-1",
-		// 				"test1-2",
-		// 			},
-		// 		},
-		// 		{
-		// 			"this": "is kept",
-		// 			"alerts.data": []string{
-		// 				"test2-1",
-		// 				"test2-2",
-		// 			},
-		// 		},
-		// 	},
-		// 	expectedErr: nil,
-		// },
+		{
+			name: "Array of Arrays with keep_parent",
+			config: &splitConfig{
+				Target:     "body.alerts",
+				Type:       "array",
+				KeepParent: true,
+			},
+			ctx: emptyTransformContext(),
+			resp: transformable{
+				"body": common.MapStr{
+					"this": "is kept",
+					"alerts": []interface{}{
+						[]interface{}{"test1-1", "test1-2"},
+						[]string{"test2-1", "test2-2"},
+						[]int{1, 2},
+					},
+				},
+			},
+			expectedMessages: []common.MapStr{
+				{
+					"this": "is kept",
+					"alerts.data": []interface{}{
+						"test1-1",
+						"test1-2",
+					},
+				},
+				{
+					"this": "is kept",
+					"alerts.data": []string{
+						"test2-1",
+						"test2-2",
+					},
+				},
+				{
+					"this": "is kept",
+					"alerts.data": []int{
+						1,
+						2,
+					},
+				},
+			},
+			expectedErr: nil,
+		},
 	}
 
 	for _, tc := range cases {
