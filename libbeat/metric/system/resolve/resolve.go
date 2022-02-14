@@ -30,6 +30,8 @@ type Resolver interface {
 	ResolveHostFS(string) string
 	// IsSet returns true if the user has set an alternate filesystem root
 	IsSet() bool
+	// Join emulates the behavior of filepath.join
+	Join(...string) string
 }
 
 // TestingResolver is a bare implementation of the resolver, for system tests that need a Resolver object or a test path for input files.
@@ -49,6 +51,12 @@ func NewTestResolver(path string) TestingResolver {
 
 func (t TestingResolver) ResolveHostFS(path string) string {
 	return filepath.Join(t.path, path)
+}
+
+func (t TestingResolver) Join(path ...string) string {
+	fullpath := append([]string{t.path}, path...)
+	return filepath.Join(fullpath...)
+
 }
 
 func (t TestingResolver) IsSet() bool {
