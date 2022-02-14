@@ -6,6 +6,9 @@ import metricbeat
 
 @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
 class Test(metricbeat.BaseTest):
+    """
+    Test is the implementation of unit tests for processessors
+    """
 
     def test_drop_fields(self):
 
@@ -50,18 +53,18 @@ class Test(metricbeat.BaseTest):
             modules=[{
                 "name": "system",
                 "metricsets": ["process"],
-                "period": "1s"
+                "period": "1s",
+                "processes": ["(?i)metricbeat.test"]
             }],
             processors=[{
                 "drop_fields": {
                     "fields": ["system.process.memory"],
-                    "when": "range.system.process.cpu.total.pct.lt: 0.5",
                 },
             }]
         )
         metricbeat = self.start_beat()
         self.wait_until(
-            lambda: self.output_count(lambda x: x >= 1),
+            lambda: self.output_count(lambda x: x >= 4),
             max_timeout=15)
 
         metricbeat.kill_and_wait()
@@ -69,12 +72,15 @@ class Test(metricbeat.BaseTest):
         output = self.read_output(
             required_fields=["@timestamp"],
         )
+        good_event = {}
+        for evt in output:
+            if "system.process.cpu.total.pct" in evt:
+                good_event = evt
 
-        for event in output:
-            if float(event["system.process.cpu.total.pct"]) < 0.5:
-                assert "system.process.memory.size" not in event
-            else:
-                assert "system.process.memory.size" in event
+        if float(good_event["system.process.cpu.total.pct"]) < 0.5:
+            assert "system.process.memory.size" not in good_event
+        else:
+            assert "system.process.memory.size" in good_event
 
     def test_dropevent_with_condition(self):
         """
@@ -84,26 +90,32 @@ class Test(metricbeat.BaseTest):
             modules=[{
                 "name": "system",
                 "metricsets": ["process"],
-                "period": "1s"
+                "period": "1s",
+                "extras": {
+                    "process.include_top_n": {"enabled": True, "by_cpu": 4},
+                    "process.include_cpu_ticks": True
+                }
+
             }],
             processors=[{
                 "drop_event": {
-                    "when": "range.system.process.cpu.total.pct.lt: 0.001",
+                    "when": "range.system.process.cpu.total.ticks.lt: 100",
                 },
             }]
         )
         metricbeat = self.start_beat()
         self.wait_until(
             lambda: self.output_count(lambda x: x >= 1),
-            max_timeout=15)
+            max_timeout=20)
 
         metricbeat.kill_and_wait()
 
         output = self.read_output(
             required_fields=["@timestamp"],
-        )
-        for event in output:
-            assert float(event["system.process.cpu.total.pct"]) >= 0.001
+        )[0]
+
+        print(output)
+        assert float(output["system.process.cpu.total.ticks"]) >= 100
 
     def test_dropevent_with_complex_condition(self):
         """
@@ -141,7 +153,9 @@ class Test(metricbeat.BaseTest):
             modules=[{
                 "name": "system",
                 "metricsets": ["process"],
-                "period": "1s"
+                "period": "1s",
+                # filter down to one process, since this test suite doesn't have a way to specify X iterations of the metricbeat fetcher
+                "processes": ["(?i)metricbeat.test"]
             }],
             processors=[{
                 "include_fields": {"fields": ["system.process.cpu", "system.process.memory"]},
@@ -156,7 +170,12 @@ class Test(metricbeat.BaseTest):
 
         output = self.read_output(
             required_fields=["@timestamp"],
-        )[0]
+        )
+        good_event = {}
+        # depending on threading, or whatever is happening, try to search for a fully formatted event
+        for evt in output:
+            if "system.process.cpu.total.pct" in evt:
+                good_event = evt
         print(output)
 
         for key in [
@@ -166,13 +185,13 @@ class Test(metricbeat.BaseTest):
             "system.process.memory.rss.bytes",
             "system.process.memory.rss.pct"
         ]:
-            assert key in output
+            assert key in good_event
 
         for key in [
             "system.process.name",
             "system.process.pid",
         ]:
-            assert key not in output
+            assert key not in good_event
 
     def test_multiple_actions(self):
         """
@@ -183,7 +202,8 @@ class Test(metricbeat.BaseTest):
             modules=[{
                 "name": "system",
                 "metricsets": ["process"],
-                "period": "1s"
+                "period": "1s",
+                "processes": ["(?i)metricbeat.test"],
             }],
             processors=[{
                 "include_fields": {"fields": ["system.process", "process"]},
@@ -193,14 +213,20 @@ class Test(metricbeat.BaseTest):
         )
         metricbeat = self.start_beat()
         self.wait_until(
-            lambda: self.output_count(lambda x: x >= 1),
+            lambda: self.output_count(lambda x: x >= 4),
             max_timeout=15)
 
         metricbeat.kill_and_wait()
 
         output = self.read_output(
             required_fields=["@timestamp"],
-        )[0]
+        )
+        good_event = {}
+
+        for evt in output:
+            if "system.process.cpu.total.pct" in evt:
+                good_event = evt
+        print(output)
 
         for key in [
             "system.process.cpu.start_time",
@@ -208,14 +234,14 @@ class Test(metricbeat.BaseTest):
             "process.name",
             "process.pid",
         ]:
-            assert key in output, "'%s' not found" % key
+            assert key in good_event, "'%s' not found" % key
 
         for key in [
             "system.process.memory.size",
             "system.process.memory.rss.bytes",
             "system.process.memory.rss.pct"
         ]:
-            assert key not in output, "'%s' not expected but found" % key
+            assert key not in good_event, "'%s' not expected but found" % key
 
     def test_contradictory_multiple_actions(self):
         """
