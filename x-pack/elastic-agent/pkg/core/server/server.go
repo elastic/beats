@@ -162,7 +162,7 @@ func (s *Server) Start() error {
 			grpc.Creds(creds),
 		)
 	} else {
-		s.server = grpc.NewServer()
+		s.server = grpc.NewServer(grpc.Creds(creds))
 	}
 	proto.RegisterElasticAgentServer(s.server, s)
 
