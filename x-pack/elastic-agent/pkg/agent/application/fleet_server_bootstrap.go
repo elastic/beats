@@ -7,8 +7,6 @@ package application
 import (
 	"context"
 
-	"go.elastic.co/apm"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
@@ -53,7 +51,6 @@ func newFleetServerBootstrap(
 	rawConfig *config.Config,
 	statusCtrl status.Controller,
 	agentInfo *info.AgentInfo,
-	tracer *apm.Tracer,
 ) (*FleetServerBootstrap, error) {
 	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
@@ -82,7 +79,7 @@ func newFleetServerBootstrap(
 	}
 
 	bootstrapApp.bgContext, bootstrapApp.cancelCtxFn = context.WithCancel(ctx)
-	bootstrapApp.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{}, tracer)
+	bootstrapApp.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{})
 	if err != nil {
 		return nil, errors.New(err, "initialize GRPC listener")
 	}
@@ -178,8 +175,8 @@ func bootstrapEmitter(ctx context.Context, log *logger.Logger, agentInfo transpi
 	}()
 
 	return func(ctx context.Context, c *config.Config) error {
-		span, _ := apm.StartSpan(ctx, "emit", "app.internal")
-		defer span.End()
+		// span, _ := apm.StartSpan(ctx, "emit", "app.internal")
+		// defer span.End()
 		ch <- c
 		return nil
 	}, nil

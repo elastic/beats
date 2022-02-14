@@ -14,8 +14,6 @@ import (
 	"net/url"
 	"os"
 
-	"go.elastic.co/apm/module/apmhttp"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
@@ -38,7 +36,8 @@ type Sender interface {
 
 var baseRoundTrippers = func(rt http.RoundTripper) (http.RoundTripper, error) {
 	rt = NewFleetUserAgentRoundTripper(rt, release.Version())
-	return apmhttp.WrapRoundTripper(rt), nil
+	return rt, nil
+	// return apmhttp.WrapRoundTripper(rt), nil
 }
 
 func init() {

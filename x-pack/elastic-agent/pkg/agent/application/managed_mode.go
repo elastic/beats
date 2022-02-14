@@ -8,8 +8,6 @@ import (
 	"context"
 	"fmt"
 
-	"go.elastic.co/apm"
-
 	"github.com/elastic/go-sysinfo"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
@@ -80,7 +78,6 @@ func newManaged(
 	reexec reexecManager,
 	statusCtrl status.Controller,
 	agentInfo *info.AgentInfo,
-	tracer *apm.Tracer,
 ) (*Managed, error) {
 	caps, err := capabilities.Load(paths.AgentCapabilitiesPath(), log, statusCtrl)
 	if err != nil {
@@ -108,7 +105,7 @@ func newManaged(
 	}
 
 	managedApplication.bgContext, managedApplication.cancelCtxFn = context.WithCancel(ctx)
-	managedApplication.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{}, tracer)
+	managedApplication.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{})
 	if err != nil {
 		return nil, errors.New(err, "initialize GRPC listener", errors.TypeNetwork)
 	}

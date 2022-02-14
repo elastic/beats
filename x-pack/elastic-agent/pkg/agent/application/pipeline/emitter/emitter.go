@@ -8,8 +8,6 @@ import (
 	"context"
 	"strings"
 
-	"go.elastic.co/apm"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -33,13 +31,13 @@ func New(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, con
 		return nil, errors.New(err, "failed to start composable controller")
 	}
 	return func(ctx context.Context, c *config.Config) (err error) {
-		span, ctx := apm.StartSpan(ctx, "update", "app.internal")
-		defer func() {
-			if err != nil {
-				apm.CaptureError(ctx, err).Send()
-			}
-			span.End()
-		}()
+		// span, ctx := apm.StartSpan(ctx, "update", "app.internal")
+		// defer func() {
+		// 	if err != nil {
+		// 		apm.CaptureError(ctx, err).Send()
+		// 	}
+		// 	span.End()
+		// }()
 		err = ctrl.Update(ctx, c)
 		return err
 	}, nil

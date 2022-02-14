@@ -7,8 +7,6 @@ package lazy
 import (
 	"context"
 
-	"go.elastic.co/apm"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
@@ -39,13 +37,13 @@ func NewAcker(baseAcker batchAcker, log *logger.Logger) *Acker {
 
 // Ack acknowledges action.
 func (f *Acker) Ack(ctx context.Context, action fleetapi.Action) (err error) {
-	span, ctx := apm.StartSpan(ctx, "ack", "app.internal")
-	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
-		span.End()
-	}()
+	// span, ctx := apm.StartSpan(ctx, "ack", "app.internal")
+	// defer func() {
+	// 	if err != nil {
+	// 		apm.CaptureError(ctx, err).Send()
+	// 	}
+	// 	span.End()
+	// }()
 	f.enqueue(action)
 
 	if _, isAckForced := action.(ackForcer); isAckForced {
@@ -58,13 +56,13 @@ func (f *Acker) Ack(ctx context.Context, action fleetapi.Action) (err error) {
 
 // Commit commits ack actions.
 func (f *Acker) Commit(ctx context.Context) (err error) {
-	span, ctx := apm.StartSpan(ctx, "commit", "app.internal")
-	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
-		span.End()
-	}()
+	// span, ctx := apm.StartSpan(ctx, "commit", "app.internal")
+	// defer func() {
+	// 	if err != nil {
+	// 		apm.CaptureError(ctx, err).Send()
+	// 	}
+	// 	span.End()
+	// }()
 	err = f.acker.AckBatch(ctx, f.queue)
 	if err != nil {
 		// do not cleanup on error

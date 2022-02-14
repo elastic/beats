@@ -8,8 +8,6 @@ import (
 	"context"
 	"path/filepath"
 
-	"go.elastic.co/apm"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -68,7 +66,6 @@ func newLocal(
 	statusCtrl status.Controller,
 	uc upgraderControl,
 	agentInfo *info.AgentInfo,
-	tracer *apm.Tracer,
 ) (*Local, error) {
 	caps, err := capabilities.Load(paths.AgentCapabilitiesPath(), log, statusCtrl)
 	if err != nil {
@@ -95,7 +92,7 @@ func newLocal(
 	}
 
 	localApplication.bgContext, localApplication.cancelCtxFn = context.WithCancel(ctx)
-	localApplication.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{}, tracer)
+	localApplication.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{})
 	if err != nil {
 		return nil, errors.New(err, "initialize GRPC listener")
 	}

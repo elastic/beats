@@ -8,8 +8,6 @@ import (
 	"context"
 	"sync"
 
-	"go.elastic.co/apm"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -69,13 +67,13 @@ func NewController(
 
 // Update applies config change and performes all steps necessary to apply it.
 func (e *Controller) Update(ctx context.Context, c *config.Config) (rErr error) {
-	span, ctx := apm.StartSpan(ctx, "update", "app.internal")
-	defer func() {
-		if rErr != nil {
-			apm.CaptureError(ctx, rErr).Send()
-		}
-		span.End()
-	}()
+	// span, ctx := apm.StartSpan(ctx, "update", "app.internal")
+	// defer func() {
+	// 	if rErr != nil {
+	// 		apm.CaptureError(ctx, rErr).Send()
+	// 	}
+	// 	span.End()
+	// }()
 
 	if rErr = info.InjectAgentConfig(c); rErr != nil {
 		return
@@ -128,13 +126,13 @@ func (e *Controller) Update(ctx context.Context, c *config.Config) (rErr error) 
 // Set sets the transpiler vars for dynamic inputs resolution.
 func (e *Controller) Set(ctx context.Context, vars []*transpiler.Vars) {
 	var err error
-	span, ctx := apm.StartSpan(ctx, "Set", "app.internal")
-	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
-		span.End()
-	}()
+	// span, ctx := apm.StartSpan(ctx, "Set", "app.internal")
+	// defer func() {
+	// 	if err != nil {
+	// 		apm.CaptureError(ctx, err).Send()
+	// 	}
+	// 	span.End()
+	// }()
 	e.lock.Lock()
 	ast := e.ast
 	e.vars = vars
@@ -149,13 +147,13 @@ func (e *Controller) Set(ctx context.Context, vars []*transpiler.Vars) {
 }
 
 func (e *Controller) update(ctx context.Context) (err error) {
-	span, ctx := apm.StartSpan(ctx, "update", "app.internal")
-	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
-		span.End()
-	}()
+	// span, ctx := apm.StartSpan(ctx, "update", "app.internal")
+	// defer func() {
+	// 	if err != nil {
+	// 		apm.CaptureError(ctx, err).Send()
+	// 	}
+	// 	span.End()
+	// }()
 	// locking whole update because it can be called concurrently via Set and Update method
 	e.updateLock.Lock()
 	defer e.updateLock.Unlock()

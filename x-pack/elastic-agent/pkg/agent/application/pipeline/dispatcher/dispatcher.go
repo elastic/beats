@@ -10,8 +10,6 @@ import (
 	"reflect"
 	"strings"
 
-	"go.elastic.co/apm"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/actions"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
@@ -77,13 +75,13 @@ func (ad *ActionDispatcher) key(a fleetapi.Action) string {
 
 // Dispatch dispatches an action using pre-registered set of handlers.
 func (ad *ActionDispatcher) Dispatch(ctx context.Context, acker store.FleetAcker, actions ...fleetapi.Action) (err error) {
-	span, ctx := apm.StartSpan(ctx, "dispatch", "app.internal")
-	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
-		span.End()
-	}()
+	// span, ctx := apm.StartSpan(ctx, "dispatch", "app.internal")
+	// defer func() {
+	// 	if err != nil {
+	// 		apm.CaptureError(ctx, err).Send()
+	// 	}
+	// 	span.End()
+	// }()
 
 	if len(actions) == 0 {
 		ad.log.Debug("No action to dispatch")

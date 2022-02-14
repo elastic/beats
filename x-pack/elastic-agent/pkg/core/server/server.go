@@ -15,8 +15,6 @@ import (
 	"sync"
 	"time"
 
-	"go.elastic.co/apm"
-	"go.elastic.co/apm/module/apmgrpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -103,7 +101,7 @@ type Server struct {
 	ca         *authority.CertificateAuthority
 	listenAddr string
 	handler    Handler
-	tracer     *apm.Tracer
+	// tracer     *apm.Tracer
 
 	listener     net.Listener
 	server       *grpc.Server
@@ -118,7 +116,7 @@ type Server struct {
 }
 
 // New creates a new GRPC server for clients to connect to.
-func New(logger *logger.Logger, listenAddr string, handler Handler, tracer *apm.Tracer) (*Server, error) {
+func New(logger *logger.Logger, listenAddr string, handler Handler) (*Server, error) {
 	ca, err := authority.NewCA()
 	if err != nil {
 		return nil, err
@@ -130,7 +128,6 @@ func New(logger *logger.Logger, listenAddr string, handler Handler, tracer *apm.
 		handler:               handler,
 		watchdogCheckInterval: WatchdogCheckLoop,
 		checkInMinTimeout:     client.CheckinMinimumTimeout + CheckinMinimumTimeoutGracePeriod,
-		tracer:                tracer,
 	}, nil
 }
 
@@ -155,15 +152,15 @@ func (s *Server) Start() error {
 		ClientCAs:      certPool,
 		GetCertificate: s.getCertificate,
 	})
-	if s.tracer != nil {
-		apmInterceptor := apmgrpc.NewUnaryServerInterceptor(apmgrpc.WithRecovery(), apmgrpc.WithTracer(s.tracer))
-		s.server = grpc.NewServer(
-			grpc.UnaryInterceptor(apmInterceptor),
-			grpc.Creds(creds),
-		)
-	} else {
-		s.server = grpc.NewServer()
-	}
+	// if s.tracer != nil {
+	// 	apmInterceptor := apmgrpc.NewUnaryServerInterceptor(apmgrpc.WithRecovery(), apmgrpc.WithTracer(s.tracer))
+	// 	s.server = grpc.NewServer(
+	// 		grpc.UnaryInterceptor(apmInterceptor),
+	// 		grpc.Creds(creds),
+	// 	)
+	// } else {
+	s.server = grpc.NewServer(grpc.Creds(creds))
+	// }
 	proto.RegisterElasticAgentServer(s.server, s)
 
 	// start serving GRPC connections
