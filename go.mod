@@ -153,9 +153,10 @@ require (
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/xdg/scram v1.0.3
 	github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7 // indirect
-	go.elastic.co/apm v1.14.0
+	go.elastic.co/apm v1.15.0
 	go.elastic.co/apm/module/apmelasticsearch v1.7.2
-	go.elastic.co/apm/module/apmhttp v1.14.0
+	go.elastic.co/apm/module/apmgorilla v1.15.0
+	go.elastic.co/apm/module/apmhttp v1.15.0
 	go.elastic.co/ecszap v0.3.0
 	go.elastic.co/go-licence-detector v0.4.0
 	go.etcd.io/bbolt v1.3.6
