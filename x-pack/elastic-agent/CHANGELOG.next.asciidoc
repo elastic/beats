@@ -95,7 +95,7 @@
 - Fix agent configuration overwritten by default fleet config. {pull}29297[29297]
 - Allow agent containers to use basic auth to create a service token. {pull}29651[29651]
 - Fix issue where a failing artifact verification does not remove the bad artifact. {pull}30281[30281]
-- Reduce Elastic Agent shut down by stopping processes in parallel {pull}29650[29650]
+- Reduce Elastic Agent shut down time by stopping processes concurrently {pull}29650[29650]
 
 ==== New features
 
