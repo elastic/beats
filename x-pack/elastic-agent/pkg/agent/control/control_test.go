@@ -8,6 +8,8 @@ import (
 	"context"
 	"testing"
 
+	"go.elastic.co/apm"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 
 	"github.com/stretchr/testify/assert"
@@ -22,7 +24,8 @@ import (
 )
 
 func TestServerClient_Version(t *testing.T) {
-	srv := server.New(newErrorLogger(t), nil, nil, nil)
+	tracer := apm.DefaultTracer
+	srv := server.New(newErrorLogger(t), nil, nil, nil, tracer)
 	err := srv.Start()
 	require.NoError(t, err)
 	defer srv.Stop()
@@ -46,7 +49,8 @@ func TestServerClient_Version(t *testing.T) {
 func TestServerClient_Status(t *testing.T) {
 	l := newErrorLogger(t)
 	statusCtrl := status.NewController(l)
-	srv := server.New(l, nil, statusCtrl, nil)
+	tracer := apm.DefaultTracer
+	srv := server.New(l, nil, statusCtrl, nil, tracer)
 	err := srv.Start()
 	require.NoError(t, err)
 	defer srv.Stop()

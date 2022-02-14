@@ -47,5 +47,5 @@ func readfiles(ctx context.Context, files []string, loader *config.Loader, emitt
 		return errors.New(err, "could not load or merge configuration", errors.TypeConfig)
 	}
 
-	return emitter(c)
+	return emitter(ctx, c)
 }

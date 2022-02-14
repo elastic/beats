@@ -7,6 +7,8 @@ package server
 import (
 	"fmt"
 
+	"go.elastic.co/apm"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
@@ -25,6 +27,6 @@ func DefaultGRPCConfig() *Config {
 }
 
 // NewFromConfig creates a new GRPC server for clients to connect to.
-func NewFromConfig(logger *logger.Logger, cfg *Config, handler Handler) (*Server, error) {
-	return New(logger, fmt.Sprintf("%s:%d", cfg.Address, cfg.Port), handler)
+func NewFromConfig(logger *logger.Logger, cfg *Config, handler Handler, tracer *apm.Tracer) (*Server, error) {
+	return New(logger, fmt.Sprintf("%s:%d", cfg.Address, cfg.Port), handler, tracer)
 }

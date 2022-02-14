@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"go.elastic.co/apm/module/apmhttp"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
@@ -54,8 +55,8 @@ type Client struct {
 }
 
 // NewConfigFromURL returns a Config based on a received host.
-func NewConfigFromURL(URL string) (Config, error) {
-	u, err := url.Parse(URL)
+func NewConfigFromURL(kURL string) (Config, error) {
+	u, err := url.Parse(kURL)
 	if err != nil {
 		return Config{}, errors.Wrap(err, "could not parse url")
 	}
@@ -123,6 +124,8 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 				return nil, errors.Wrap(err, "fail to create transport client")
 			}
 		}
+
+		transport = apmhttp.WrapRoundTripper(transport)
 
 		httpClient := http.Client{
 			Transport: transport,
