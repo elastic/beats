@@ -32,7 +32,7 @@ FROM {{ .from }}
 ENV BEAT_SETUID_AS={{ .user }}
 
 {{- if contains .from "ubi-minimal" }}
-RUN for iter in {1..10}; do microdnf update -y && microdnf install -y findutils shadow-utils && microdnf clean all && exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)
+RUN for iter in {1..10}; do microdnf update -y && microdnf install -y tar gzip findutils shadow-utils && microdnf clean all && exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)
 {{- else }}
 
 RUN for iter in {1..10}; do \
@@ -185,10 +185,11 @@ RUN chown {{ .user }} /app
 {{- if .unpack_beats }}
 RUN mkdir -p {{ $beatHome }}/data/{{.BeatName}}-{{ commit_short }}/{{ .beats_install_path }} && \
     for beatPath in {{ $beatHome }}/data/{{.BeatName}}-{{ commit_short }}/downloads/*.tar.gz; do \
-    tar xf $beatPath -C {{ $beatHome }}/data/{{.BeatName}}-{{ commit_short }}/{{ .beats_install_path }} && \
-    rm $beatPath; \
+    tar xf $beatPath -C {{ $beatHome }}/data/{{.BeatName}}-{{ commit_short }}/{{ .beats_install_path }}; \
     done && \
-    chown -R {{ .user }} {{ $beatHome }}/data/{{.BeatName}}-{{ commit_short }}/{{ .beats_install_path }} && \
+    chown -R {{ .user }}:{{ .user }} {{ $beatHome }}/data/{{.BeatName}}-{{ commit_short }}/{{ .beats_install_path }} && \
+    chown -R root:root {{ $beatHome }}/data/{{.BeatName}}-{{ commit_short }}/{{ .beats_install_path }}/*/*.yml && \
+    chmod 0644 {{ $beatHome }}/data/{{.BeatName}}-{{ commit_short }}/{{ .beats_install_path }}/*/*.yml && \
     setcap cap_net_raw,cap_setuid+p {{ $beatHome }}/data/{{.BeatName}}-{{ commit_short }}/{{ .beats_install_path }}/heartbeat-*/heartbeat
 {{- end }}
 
