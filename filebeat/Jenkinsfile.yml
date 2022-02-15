@@ -48,6 +48,7 @@ stages:
       mage: >-                 ## Run module integration tests under previous minor of ES to ensure ingest pipeline compatibility.
         STACK_ENVIRONMENT=prev-minor
         TESTING_FILEBEAT_SKIP_DIFF=1
+        TESTING_FILEBEAT_ALLOW_OLDER=1
         PYTEST_ADDOPTS='-k test_modules'
         mage pythonIntegTest
       withModule: true
@@ -69,7 +70,6 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
-            #- "windows-2008-r2"  https://github.com/elastic/beats/issues/19795
         stage: mandatory
     windows-2016:
         mage: "mage build unitTest"
@@ -85,17 +85,6 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
-        stage: extended
-    #windows-7:  See https://github.com/elastic/beats/issues/22317
-    #    mage: "mage build unitTest"
-    #    platforms:             ## override default labels in this specific stage.
-    #        - "windows-7"
-    #    when:                  ## Override the top-level when.
-    #    stage: packaging
-    windows-7-32:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-7-32-bit"
         stage: extended
     packaging-linux:
         packaging-linux: "mage package"

@@ -295,6 +295,9 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	} else {
 		serverHello = emptyHello
 	}
+	if server.parser.ocspResponseIsValid {
+		detailed["ocsp_response"] = server.parser.ocspResponse.String()
+	}
 	if plugin.sendCertificates {
 		if cert, chain := plugin.getCerts(client.parser.certificates); cert != nil {
 			detailed["client_certificate"] = cert

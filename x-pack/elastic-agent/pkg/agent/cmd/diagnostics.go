@@ -22,6 +22,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
@@ -47,6 +48,7 @@ type DiagnosticsInfo struct {
 type AgentConfig struct {
 	ConfigLocal    *configuration.Configuration
 	ConfigRendered map[string]interface{}
+	AppConfig      map[string]interface{} // map of processName_rk:config
 }
 
 func newDiagnosticsCommand(s []string, streams *cli.IOStreams) *cobra.Command {
@@ -207,7 +209,7 @@ func diagnosticsCollectCmd(streams *cli.IOStreams, fileName, outputFormat string
 		return fmt.Errorf("unable to gather config data: %w", err)
 	}
 
-	var pprofData map[string][]client.ProcPProf = nil
+	var pprofData map[string][]client.ProcPProf
 	if pprof {
 		pprofData, err = getAllPprof(innerCtx, pprofDur)
 		if err != nil {
@@ -361,6 +363,35 @@ func gatherConfig() (AgentConfig, error) {
 	}
 	cfg.ConfigRendered = mapCFG
 
+	// Gather vars to render process config
+	isStandalone, err := isStandalone(renderedCFG)
+	if err != nil {
+		return AgentConfig{}, err
+	}
+
+	agentInfo, err := info.NewAgentInfo(false)
+	if err != nil {
+		return AgentConfig{}, err
+	}
+
+	log, err := newErrorLogger()
+	if err != nil {
+		return AgentConfig{}, err
+	}
+
+	// Get process config - uses same approach as inspect output command.
+	// Does not contact server process to request configs.
+	pMap, err := getProgramsFromConfig(log, agentInfo, renderedCFG, isStandalone)
+	if err != nil {
+		return AgentConfig{}, err
+	}
+	cfg.AppConfig = make(map[string]interface{}, 0)
+	for rk, programs := range pMap {
+		for _, p := range programs {
+			cfg.AppConfig[p.Identifier()+"_"+rk] = p.Configuration()
+		}
+	}
+
 	return cfg, nil
 }
 
@@ -418,6 +449,15 @@ func createZip(fileName, outputFormat string, diag DiagnosticsInfo, cfg AgentCon
 	}
 	if err := writeFile(zf, outputFormat, cfg.ConfigRendered); err != nil {
 		return closeHandlers(err, zw, f)
+	}
+	for name, appCfg := range cfg.AppConfig {
+		zf, err := zw.Create("config/" + name + "." + outputFormat)
+		if err != nil {
+			return closeHandlers(err, zw, f)
+		}
+		if err := writeFile(zf, outputFormat, appCfg); err != nil {
+			return closeHandlers(err, zw, f)
+		}
 	}
 
 	if err := zipLogs(zw); err != nil {

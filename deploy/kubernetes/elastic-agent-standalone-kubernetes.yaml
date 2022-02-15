@@ -63,6 +63,10 @@ data:
             hosts:
               - 'kube-state-metrics:8080'
             period: 10s
+            # If `https` is used to access `kube-state-metrics`, then to all `kubernetes.state_*` datasets should be added:
+            # bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            # ssl.certificate_authorities:
+            #   - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
           - data_stream:
               dataset: kubernetes.state_cronjob
               type: metrics
@@ -268,6 +272,8 @@ data:
                   target: kubernetes_audit
             paths:
               - /var/log/kubernetes/kube-apiserver-audit.log
+              # The default path of audit logs on Openshift:
+              # - /var/log/kube-apiserver/audit.log
             processors:
             - rename:
                 fields:
@@ -409,6 +415,8 @@ data:
             period: 10s
             ssl.verification_mode: none
             condition: ${kubernetes.labels.component} == 'kube-controller-manager'
+            # Openshift:
+            # condition: ${kubernetes.labels.app} == 'kube-controller-manager'
           - data_stream:
               dataset: kubernetes.scheduler
               type: metrics
@@ -420,6 +428,8 @@ data:
             period: 10s
             ssl.verification_mode: none
             condition: ${kubernetes.labels.component} == 'kube-scheduler'
+            # Openshift:
+            # condition: ${kubernetes.labels.app} == 'openshift-kube-scheduler'
           - data_stream:
               dataset: kubernetes.proxy
               type: metrics
@@ -427,6 +437,8 @@ data:
               - proxy
             hosts:
               - 'localhost:10249'
+              # Openshift:
+              # - 'localhost:29101'
             period: 10s
           - data_stream:
               dataset: kubernetes.container
@@ -439,6 +451,10 @@ data:
               - 'https://${env.NODE_NAME}:10250'
             period: 10s
             ssl.verification_mode: none
+            # On Openshift ssl configuration must be replaced:
+            # bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            # ssl.certificate_authorities:
+            #   - /path/to/ca-bundle.crt
           - data_stream:
               dataset: kubernetes.node
               type: metrics
@@ -450,6 +466,10 @@ data:
               - 'https://${env.NODE_NAME}:10250'
             period: 10s
             ssl.verification_mode: none
+            # On Openshift ssl configuration must be replaced:
+            # bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            # ssl.certificate_authorities:
+            #   - /path/to/ca-bundle.crt
           - data_stream:
               dataset: kubernetes.pod
               type: metrics
@@ -461,6 +481,10 @@ data:
               - 'https://${env.NODE_NAME}:10250'
             period: 10s
             ssl.verification_mode: none
+            # On Openshift ssl configuration must be replaced:
+            # bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            # ssl.certificate_authorities:
+            #   - /path/to/ca-bundle.crt
           - data_stream:
               dataset: kubernetes.system
               type: metrics
@@ -472,6 +496,10 @@ data:
               - 'https://${env.NODE_NAME}:10250'
             period: 10s
             ssl.verification_mode: none
+            # On Openshift ssl configuration must be replaced:
+            # bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            # ssl.certificate_authorities:
+            #   - /path/to/ca-bundle.crt
           - data_stream:
               dataset: kubernetes.volume
               type: metrics
@@ -483,6 +511,10 @@ data:
               - 'https://${env.NODE_NAME}:10250'
             period: 10s
             ssl.verification_mode: none
+            # On Openshift ssl configuration must be replaced:
+            # bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            # ssl.certificate_authorities:
+            #   - /path/to/ca-bundle.crt
       # Add extra input blocks here, based on conditions
       # so as to automatically identify targeted Pods and start monitoring them
       # using a predefined integration. For instance:
@@ -533,7 +565,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: elastic-agent
-          image: docker.elastic.co/beats/elastic-agent:8.0.0
+          image: docker.elastic.co/beats/elastic-agent:8.2.0
           args: [
             "-c", "/etc/agent.yml",
             "-e",
@@ -557,10 +589,10 @@ spec:
             runAsUser: 0
           resources:
             limits:
-              memory: 500Mi
+              memory: 700Mi
             requests:
               cpu: 100m
-              memory: 200Mi
+              memory: 400Mi
           volumeMounts:
             - name: datastreams
               mountPath: /etc/agent.yml
@@ -671,6 +703,8 @@ rules:
   - apiGroups: ["batch"]
     resources:
       - jobs
+      # Uncomment if need metadata for cronjob objects in versions >= v1.21
+      #- cronjobs
     verbs: ["get", "list", "watch"]
   - apiGroups:
       - ""

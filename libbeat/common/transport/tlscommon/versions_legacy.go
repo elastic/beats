@@ -23,13 +23,12 @@ package tlscommon
 import "crypto/tls"
 
 const (
-	TLSVersionSSL30 TLSVersion = tls.VersionSSL30
-	TLSVersion10    TLSVersion = tls.VersionTLS10
-	TLSVersion11    TLSVersion = tls.VersionTLS11
-	TLSVersion12    TLSVersion = tls.VersionTLS12
+	TLSVersion10 TLSVersion = tls.VersionTLS10
+	TLSVersion11 TLSVersion = tls.VersionTLS11
+	TLSVersion12 TLSVersion = tls.VersionTLS12
 
 	// TLSVersionMin is the min TLS version supported.
-	TLSVersionMin = TLSVersionSSL30
+	TLSVersionMin = TLSVersion10
 
 	// TLSVersionMax is the max TLS version supported.
 	TLSVersionMax = TLSVersion12
@@ -51,8 +50,6 @@ var TLSDefaultVersions = []TLSVersion{
 }
 
 var tlsProtocolVersions = map[string]TLSVersion{
-	"SSLv3":   TLSVersionSSL30,
-	"SSLv3.0": TLSVersionSSL30,
 	"TLSv1":   TLSVersion10,
 	"TLSv1.0": TLSVersion10,
 	"TLSv1.1": TLSVersion11,
@@ -60,8 +57,7 @@ var tlsProtocolVersions = map[string]TLSVersion{
 }
 
 var tlsProtocolVersionsInverse = map[TLSVersion]string{
-	TLSVersionSSL30: "SSLv3",
-	TLSVersion10:    "TLSv1.0",
-	TLSVersion11:    "TLSv1.1",
-	TLSVersion12:    "TLSv1.2",
+	TLSVersion10: "TLSv1.0",
+	TLSVersion11: "TLSv1.1",
+	TLSVersion12: "TLSv1.2",
 }

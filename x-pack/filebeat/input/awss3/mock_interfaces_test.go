@@ -18,6 +18,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 
 	logp "github.com/elastic/beats/v7/libbeat/logp"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 // MockSQSAPI is a mock of sqsAPI interface.
@@ -451,7 +452,7 @@ func (m *MockS3ObjectHandlerFactory) EXPECT() *MockS3ObjectHandlerFactoryMockRec
 }
 
 // Create mocks base method.
-func (m *MockS3ObjectHandlerFactory) Create(ctx context.Context, log *logp.Logger, acker *eventACKTracker, obj s3EventV2) s3ObjectHandler {
+func (m *MockS3ObjectHandlerFactory) Create(ctx context.Context, log *logp.Logger, acker *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", ctx, log, acker, obj)
 	ret0, _ := ret[0].(s3ObjectHandler)

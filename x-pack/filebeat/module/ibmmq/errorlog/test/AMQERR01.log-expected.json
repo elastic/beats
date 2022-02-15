@@ -66,7 +66,7 @@
         "user.name": "felix"
     },
     {
-        "@timestamp": "2018-10-11T10:46:25.000Z",
+        "@timestamp": "2018-10-11T08:46:25.924Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -99,7 +99,7 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-11T10:46:26.000Z",
+        "@timestamp": "2018-10-11T08:46:26.343Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -132,7 +132,7 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-11T10:46:26.000Z",
+        "@timestamp": "2018-10-11T08:46:26.346Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -264,7 +264,7 @@
         "user.name": "felix"
     },
     {
-        "@timestamp": "2018-10-28T15:12:07.000Z",
+        "@timestamp": "2018-10-28T14:12:07.685Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -297,7 +297,7 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-28T15:12:07.000Z",
+        "@timestamp": "2018-10-28T14:12:07.789Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -330,7 +330,7 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-28T15:12:08.000Z",
+        "@timestamp": "2018-10-28T14:12:08.663Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -363,7 +363,7 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-28T15:12:08.000Z",
+        "@timestamp": "2018-10-28T14:12:08.665Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -396,7 +396,7 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-29T16:48:52.000Z",
+        "@timestamp": "2018-10-29T15:48:52.594Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -429,7 +429,7 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-29T16:48:52.000Z",
+        "@timestamp": "2018-10-29T15:48:52.663Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -462,7 +462,7 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-29T16:48:53.000Z",
+        "@timestamp": "2018-10-29T15:48:53.368Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -495,7 +495,7 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-29T16:48:53.000Z",
+        "@timestamp": "2018-10-29T15:48:53.369Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -528,7 +528,7 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-29T16:49:35.000Z",
+        "@timestamp": "2018-10-29T15:49:35.477Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -561,7 +561,7 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-29T16:49:35.000Z",
+        "@timestamp": "2018-10-29T15:49:35.553Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -594,7 +594,7 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-29T16:49:36.000Z",
+        "@timestamp": "2018-10-29T15:49:36.447Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",
@@ -627,7 +627,7 @@
         "user.name": "MUSR_MQADMIN"
     },
     {
-        "@timestamp": "2018-10-29T16:49:36.000Z",
+        "@timestamp": "2018-10-29T15:49:36.448Z",
         "event.dataset": "ibmmq.errorlog",
         "event.kind": "event",
         "event.module": "ibmmq",

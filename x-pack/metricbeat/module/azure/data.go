@@ -79,31 +79,32 @@ func EventsMapping(metrics []Metric, client *Client, report mb.ReporterV2) error
 						groupByDimensions[dimKey] = append(groupByDimensions[dimKey], dimGroupValue)
 					}
 					for _, groupDimValues := range groupByDimensions {
-						event, metricList = createEvent(timestamp, defaultMetric, resource, groupDimValues)
-						if client.Config.AddCloudMetadata {
-							vm = client.GetVMForMetaData(&resource, groupDimValues)
-							addCloudVMMetadata(&event, vm, resource.Subscription)
-						}
+						manageAndReportEvent(client, report, event, metricList, vm, timestamp, defaultMetric, resource, groupDimValues)
 					}
 				}
 			} else {
-				event, metricList = createEvent(timestamp, defaultMetric, resource, groupTimeValues)
-				if client.Config.AddCloudMetadata {
-					vm = client.GetVMForMetaData(&resource, groupTimeValues)
-					addCloudVMMetadata(&event, vm, resource.Subscription)
-				}
+				manageAndReportEvent(client, report, event, metricList, vm, timestamp, defaultMetric, resource, groupTimeValues)
 			}
-			if client.Config.DefaultResourceType == "" {
-				event.ModuleFields.Put("metrics", metricList)
-			} else {
-				for key, metric := range metricList {
-					event.MetricSetFields.Put(key, metric)
-				}
-			}
-			report.Event(event)
 		}
 	}
 	return nil
+}
+
+// manageAndReportEvent function will handle event creation and report
+func manageAndReportEvent(client *Client, report mb.ReporterV2, event mb.Event, metricList common.MapStr, vm VmResource, timestamp time.Time, defaultMetric Metric, resource Resource, groupedValues []MetricValue) {
+	event, metricList = createEvent(timestamp, defaultMetric, resource, groupedValues)
+	if client.Config.AddCloudMetadata {
+		vm = client.GetVMForMetaData(&resource, groupedValues)
+		addCloudVMMetadata(&event, vm, resource.Subscription)
+	}
+	if client.Config.DefaultResourceType == "" {
+		event.ModuleFields.Put("metrics", metricList)
+	} else {
+		for key, metric := range metricList {
+			event.MetricSetFields.Put(key, metric)
+		}
+	}
+	report.Event(event)
 }
 
 // managePropertyName function will handle metric names, there are several formats the metric names are written

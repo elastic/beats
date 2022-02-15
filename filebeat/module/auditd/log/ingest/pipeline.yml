@@ -2102,6 +2102,29 @@ processors:
     ignore_failure: true
     field: auditd.log.msg
     target_field: message
+- script:
+    lang: painless
+    description: Extracts process information from execve calls
+    if: 'ctx.process?.args_count != null && ctx.auditd?.log != null'
+    source: >-
+      long argc = ctx.process.args_count;
+      List args = new ArrayList();
+      def[] fmt = new def[] {0};
+      for (long i=0; i<argc; i++) {
+        fmt[0] = i;
+        String fld = String.format("a%d", fmt);
+        def arg = ctx.auditd.log.remove(fld);
+        if (arg == null) break;
+        args.add(arg);
+      }
+      if (args.size() == 0) return;
+      ctx.process.put("args", args);
+      ctx.process.put("executable", args[0]);
+    on_failure:
+      - append:
+          field: error.message
+          value: "failed extracting process arguments: {{ _ingest.on_failure_message }}"
+
 - rename:
     ignore_failure: true
     field: auditd.log.res
@@ -2160,6 +2183,6 @@ processors:
     ignore_failure: true
     ignore_missing: true
 on_failure:
-- set:
+- append:
     field: error.message
     value: "{{ _ingest.on_failure_message }}"

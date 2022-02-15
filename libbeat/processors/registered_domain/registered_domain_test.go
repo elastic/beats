@@ -93,4 +93,30 @@ func TestProcessorRun(t *testing.T) {
 			assert.Equal(t, tc.ETLD, etld)
 		}
 	}
+
+	t.Run("support metadata as a target", func(t *testing.T) {
+		c := defaultConfig()
+		c.Field = "@metadata.domain"
+		c.TargetField = "@metadata.registered_domain"
+		c.TargetSubdomainField = "@metadata.subdomain"
+		c.TargetETLDField = "@metadata.etld"
+		p, err := newRegisteredDomain(c)
+
+		evt := &beat.Event{
+			Meta: common.MapStr{
+				"domain": "www.google.com",
+			},
+		}
+		expMeta := common.MapStr{
+			"domain":            "www.google.com",
+			"registered_domain": "google.com",
+			"subdomain":         "www",
+			"etld":              "com",
+		}
+
+		newEvt, err := p.Run(evt)
+		assert.NoError(t, err)
+		assert.Equal(t, expMeta, newEvt.Meta)
+		assert.Equal(t, evt.Fields, newEvt.Fields)
+	})
 }

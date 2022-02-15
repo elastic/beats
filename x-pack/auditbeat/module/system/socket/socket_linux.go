@@ -9,6 +9,7 @@ package socket
 
 import (
 	"context"
+	"encoding/binary"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -187,6 +188,15 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 	} else {
 		for _, p := range procs {
 			if i, err := p.Info(); err == nil {
+				if len(i.Name) == 16 && len(i.Args) != 0 {
+					// github.com/prometheus/procfs uses /proc/<pid>/stat for
+					// the process name which is truncated to 16 bytes, so get
+					// the name from the cmdline data if it might be truncated.
+					// The guard for length of i.Args is for cases where there
+					// is no command line reported by proc fs; this should never
+					// happen, but does.
+					i.Name = filepath.Base(i.Args[0])
+				}
 				process := &process{
 					name:        i.Name,
 					pid:         uint32(i.PID),
@@ -208,6 +218,10 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 				}
 
 				st.CreateProcess(process)
+
+				if m.HostID() != "" && !process.createdTime.IsZero() {
+					process.entityID = entityID(m.HostID(), process)
+				}
 			}
 		}
 		m.log.Info("Bootstrapped process table using /proc")
@@ -253,6 +267,15 @@ func (m *MetricSet) Run(r mb.PushReporterV2) {
 			}
 		}
 	}
+}
+
+// entityID creates an ID that uniquely identifies this process across machines.
+func entityID(hostID string, p *process) string {
+	h := system.NewEntityHash()
+	h.Write([]byte(hostID))
+	binary.Write(h, binary.LittleEndian, int64(p.pid))
+	binary.Write(h, binary.LittleEndian, int64(p.createdTime.Nanosecond()))
+	return h.Sum()
 }
 
 // Setup performs all the initialisations required for KProbes monitoring.

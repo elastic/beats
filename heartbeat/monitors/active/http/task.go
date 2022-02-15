@@ -45,6 +45,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
+type requestFactory func() (*http.Request, error)
+
 func newHTTPMonitorHostJob(
 	addr string,
 	config *Config,
@@ -54,10 +56,7 @@ func newHTTPMonitorHostJob(
 	validator multiValidator,
 ) (jobs.Job, error) {
 
-	request, err := buildRequest(addr, config, enc)
-	if err != nil {
-		return nil, err
-	}
+	var reqFactory requestFactory = func() (*http.Request, error) { return buildRequest(addr, config, enc) }
 
 	return jobs.MakeSimpleJob(func(event *beat.Event) error {
 		var redirects []string
@@ -67,7 +66,13 @@ func newHTTPMonitorHostJob(
 			Transport:     transport,
 			Timeout:       config.Transport.Timeout,
 		}
-		_, _, err := execPing(event, client, request, body, config.Transport.Timeout, validator, config.Response)
+
+		req, err := reqFactory()
+		if err != nil {
+			return fmt.Errorf("could not make http request: %w", err)
+		}
+
+		_, _, err = execPing(event, client, req, body, config.Transport.Timeout, validator, config.Response)
 		if len(redirects) > 0 {
 			event.PutValue("http.response.redirects", redirects)
 		}
@@ -84,17 +89,14 @@ func newHTTPMonitorIPsJob(
 	validator multiValidator,
 ) (jobs.Job, error) {
 
-	req, err := buildRequest(addr, config, enc)
+	var reqFactory requestFactory = func() (*http.Request, error) { return buildRequest(addr, config, enc) }
+
+	hostname, port, err := splitHostnamePort(addr)
 	if err != nil {
 		return nil, err
 	}
 
-	hostname, port, err := splitHostnamePort(req)
-	if err != nil {
-		return nil, err
-	}
-
-	pingFactory := createPingFactory(config, port, tls, req, body, validator)
+	pingFactory := createPingFactory(config, port, tls, reqFactory, body, validator)
 	job, err := monitors.MakeByHostJob(hostname, config.Mode, monitors.NewStdResolver(), pingFactory)
 
 	return job, err
@@ -104,14 +106,19 @@ func createPingFactory(
 	config *Config,
 	port uint16,
 	tls *tlscommon.TLSConfig,
-	request *http.Request,
+	reqFactory requestFactory,
 	body []byte,
 	validator multiValidator,
 ) func(*net.IPAddr) jobs.Job {
 	timeout := config.Transport.Timeout
-	isTLS := request.URL.Scheme == "https"
 
 	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
+		req, err := reqFactory()
+		if err != nil {
+			return fmt.Errorf("could not create http request: %w", err)
+		}
+		isTLS := req.URL.Scheme == "https"
+
 		addr := net.JoinHostPort(ip.String(), strconv.Itoa(int(port)))
 		d := &dialchain.DialerChain{
 			Net: dialchain.MakeConstAddrDialer(addr, dialchain.TCPDialer(timeout)),
@@ -163,7 +170,7 @@ func createPingFactory(
 			Transport:     httpcommon.HeaderRoundTripper(transport, map[string]string{"User-Agent": userAgent}),
 		}
 
-		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response)
+		_, end, err := execPing(event, client, req, body, timeout, validator, config.Response)
 		cbMutex.Lock()
 		defer cbMutex.Unlock()
 
@@ -313,11 +320,15 @@ func execRequest(client *http.Client, req *http.Request) (start time.Time, resp 
 	return start, resp, nil
 }
 
-func splitHostnamePort(requ *http.Request) (string, uint16, error) {
-	host := requ.URL.Host
+func splitHostnamePort(addr string) (string, uint16, error) {
+	u, err := url.Parse(addr)
+	if err != nil {
+		return "", 0, err
+	}
+	host := u.Host
 	// Try to add a default port if needed
 	if strings.LastIndex(host, ":") == -1 {
-		switch requ.URL.Scheme {
+		switch u.Scheme {
 		case urlSchemaHTTP:
 			host += ":80"
 		case urlSchemaHTTPS:
@@ -330,7 +341,7 @@ func splitHostnamePort(requ *http.Request) (string, uint16, error) {
 	}
 	p, err := strconv.ParseUint(port, 10, 16)
 	if err != nil {
-		return "", 0, fmt.Errorf("'%v' is no valid port number in '%v'", port, requ.URL.Host)
+		return "", 0, fmt.Errorf("'%v' is no valid port number in '%v'", port, u.Host)
 	}
 	return host, uint16(p), nil
 }

@@ -219,7 +219,9 @@ func NewCLI(
 	if err != nil {
 		return nil, fmt.Errorf("failed to get aws credentials, please check AWS credential in config: %+v", err)
 	}
-	awsCfg.Region = config.Region
+	if config.Region != "" {
+		awsCfg.Region = config.Region
+	}
 
 	builder, err := provider.TemplateBuilder()
 	if err != nil {

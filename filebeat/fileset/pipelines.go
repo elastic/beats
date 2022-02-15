@@ -60,35 +60,35 @@ func (m MultiplePipelineUnsupportedError) Error() string {
 
 // LoadPipelines loads the pipelines for each configured fileset.
 func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool) error {
-	for module, filesets := range reg.registry {
-		for name, fileset := range filesets {
+	for _, module := range reg.registry {
+		for _, fileset := range module.filesets {
 			// check that all the required Ingest Node plugins are available
 			requiredProcessors := fileset.GetRequiredProcessors()
 			reg.log.Debugf("Required processors: %s", requiredProcessors)
 			if len(requiredProcessors) > 0 {
 				err := checkAvailableProcessors(esClient, requiredProcessors)
 				if err != nil {
-					return fmt.Errorf("error loading pipeline for fileset %s/%s: %v", module, name, err)
+					return fmt.Errorf("error loading pipeline for fileset %s/%s: %v", module.config.Module, fileset.name, err)
 				}
 			}
 
 			pipelines, err := fileset.GetPipelines(esClient.GetVersion())
 			if err != nil {
-				return fmt.Errorf("error getting pipeline for fileset %s/%s: %v", module, name, err)
+				return fmt.Errorf("error getting pipeline for fileset %s/%s: %v", module.config.Module, fileset.name, err)
 			}
 
 			// Filesets with multiple pipelines can only be supported by Elasticsearch >= 6.5.0
 			esVersion := esClient.GetVersion()
 			minESVersionRequired := common.MustNewVersion("6.5.0")
 			if len(pipelines) > 1 && esVersion.LessThan(minESVersionRequired) {
-				return MultiplePipelineUnsupportedError{module, name, esVersion, *minESVersionRequired}
+				return MultiplePipelineUnsupportedError{module.config.Module, fileset.name, esVersion, *minESVersionRequired}
 			}
 
 			var pipelineIDsLoaded []string
 			for _, pipeline := range pipelines {
-				err = loadPipeline(esClient, pipeline.id, pipeline.contents, overwrite, reg.log.With("pipeline", pipeline.id))
+				err = LoadPipeline(esClient, pipeline.id, pipeline.contents, overwrite, reg.log.With("pipeline", pipeline.id))
 				if err != nil {
-					err = fmt.Errorf("error loading pipeline for fileset %s/%s: %v", module, name, err)
+					err = fmt.Errorf("error loading pipeline for fileset %s/%s: %v", module.config.Module, fileset.name, err)
 					break
 				}
 				pipelineIDsLoaded = append(pipelineIDsLoaded, pipeline.id)
@@ -100,7 +100,7 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 				// error, validate all pipelines before loading any of them. This requires https://github.com/elastic/elasticsearch/issues/35495.
 				errs := multierror.Errors{err}
 				for _, pipelineID := range pipelineIDsLoaded {
-					err = deletePipeline(esClient, pipelineID)
+					err = DeletePipeline(esClient, pipelineID)
 					if err != nil {
 						errs = append(errs, err)
 					}
@@ -112,7 +112,7 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 	return nil
 }
 
-func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string]interface{}, overwrite bool, log *logp.Logger) error {
+func LoadPipeline(esClient PipelineLoader, pipelineID string, content map[string]interface{}, overwrite bool, log *logp.Logger) error {
 	path := makeIngestPipelinePath(pipelineID)
 	if !overwrite {
 		status, _, _ := esClient.Request("GET", path, "", nil, nil)
@@ -122,7 +122,7 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 		}
 	}
 
-	if err := adaptPipelineForCompatibility(esClient.GetVersion(), pipelineID, content, log); err != nil {
+	if err := AdaptPipelineForCompatibility(esClient.GetVersion(), pipelineID, content, log); err != nil {
 		return fmt.Errorf("failed to adapt pipeline with backwards compatibility changes: %w", err)
 	}
 
@@ -134,7 +134,7 @@ func loadPipeline(esClient PipelineLoader, pipelineID string, content map[string
 	return nil
 }
 
-func deletePipeline(esClient PipelineLoader, pipelineID string) error {
+func DeletePipeline(esClient PipelineLoader, pipelineID string) error {
 	path := makeIngestPipelinePath(pipelineID)
 	_, _, err := esClient.Request("DELETE", path, "", nil, nil)
 	return err

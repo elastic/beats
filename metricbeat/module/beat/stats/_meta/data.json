@@ -2,6 +2,11 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
         "id": "c4c9bc08-e990-4529-8bf5-715c00fa6615",
+        "elasticsearch": {
+            "cluster": {
+                "id": "foobar"
+            }
+        },
         "stats": {
             "beat": {
                 "host": "2963d991095f",
@@ -48,7 +53,8 @@
                 "config": {
                     "running": 3,
                     "starts": 3,
-                    "stops": 0
+                    "stops": 0,
+                    "reloads": 1
                 },
                 "output": {
                     "events": {
