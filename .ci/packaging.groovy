@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+@Library('apm@feature/docker-tag-push-step') _
 
 import groovy.transform.Field
 
@@ -268,21 +268,35 @@ pipeline {
 def pushCIDockerImages(Map args = [:]) {
   def arch = args.get('arch', 'amd64')
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
+    def defaultVariants = [
+                            '' : 'beats',
+                            '-oss' : 'beats',
+                            '-ubi8' : 'beats'
+                          ]
     if (env?.BEATS_FOLDER?.endsWith('auditbeat')) {
-      tagAndPush(beatName: 'auditbeat', arch: arch)
+      project = [ name: 'auditbeat', variants: defaultVariants ]
     } else if (env?.BEATS_FOLDER?.endsWith('filebeat')) {
-      tagAndPush(beatName: 'filebeat', arch: arch)
+      project = [ name: 'filebeat', variants: defaultVariants ]
     } else if (env?.BEATS_FOLDER?.endsWith('heartbeat')) {
-      tagAndPush(beatName: 'heartbeat', arch: arch)
+      project = [ name: 'heartbeat', variants: defaultVariants ]
     } else if (env?.BEATS_FOLDER?.endsWith('metricbeat')) {
-      tagAndPush(beatName: 'metricbeat', arch: arch)
+      project = [ name: 'metricbeat', variants: defaultVariants ]
     } else if (env?.BEATS_FOLDER?.endsWith('osquerybeat')) {
-      tagAndPush(beatName: 'osquerybeat', arch: arch)
+      project = [ name: 'osquerybeat', variants: defaultVariants ]
     } else if ("${env.BEATS_FOLDER}" == "packetbeat"){
-      tagAndPush(beatName: 'packetbeat', arch: arch)
+      project = [ name: 'packetbeat', variants: defaultVariants ]
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
-      tagAndPush(beatName: 'elastic-agent', arch: arch)
+      project = [ name: 'elastic-agent',
+                  variants: [
+                    '' : 'beats',
+                    '-oss' : 'beats',
+                    '-ubi8' : 'beats',
+                    '-complete' : 'beats',
+                    '-cloud' : 'beats-ci'
+                  ]
+                ]
     }
+    tagAndPush(arch: arch, project: project)
   }
 }
 
@@ -291,77 +305,15 @@ def pushCIDockerImages(Map args = [:]) {
 * @param arch what architecture
 */
 def tagAndPush(Map args = [:]) {
-  def beatName = args.beatName
-  def arch = args.get('arch', 'amd64')
-  def libbetaVer = env.BEAT_VERSION
-  def aliasVersion = ""
-  if("${env.SNAPSHOT}" == "true"){
-    aliasVersion = libbetaVer.substring(0, libbetaVer.lastIndexOf(".")) // remove third number in version
-
-    libbetaVer += "-SNAPSHOT"
-    aliasVersion += "-SNAPSHOT"
-  }
-
-  def tagName = "${libbetaVer}"
-  if (isPR()) {
-    tagName = "pr-${env.CHANGE_ID}"
-  }
-
-  // supported tags
-  def tags = [tagName, "${env.GIT_BASE_COMMIT}"]
-  if (!isPR() && aliasVersion != "") {
-    tags << aliasVersion
-  }
-  // supported image flavours
-  def variants = ["", "-oss", "-ubi8"]
-
-  if(beatName == 'elastic-agent'){
-      variants.add("-complete")
-      variants.add("-cloud")
-  }
-
-  variants.each { variant ->
-    // cloud docker images are stored in the private docker namespace.
-    def sourceNamespace = variant.equals('-cloud') ? 'beats-ci' : 'beats'
-    tags.each { tag ->
-      // TODO:
-      // For backward compatibility let's ensure we tag only for amd64, then E2E can benefit from until
-      // they support the versioning with the architecture
-      if ("${arch}" == "amd64") {
-        doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}", sourceNamespace: sourceNamespace)
-      }
-      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}", sourceNamespace: sourceNamespace)
-    }
-  }
-}
-
-/**
-* @param beatName name of the Beat
-* @param variant name of the variant used to build the docker image name
-* @param sourceNamespace namespace to be used as source for the docker tag command
-* @param sourceTag tag to be used as source for the docker tag command, usually under the 'beats' namespace
-* @param targetTag tag to be used as target for the docker tag command, usually under the 'observability-ci' namespace
-*/
-def doTagAndPush(Map args = [:]) {
-  def beatName = args.beatName
-  def variant = args.variant
-  def sourceTag = args.sourceTag
-  def targetTag = args.targetTag
-  def sourceNamespace = args.sourceNamespace
-  def sourceName = "${DOCKER_REGISTRY}/${sourceNamespace}/${beatName}${variant}:${sourceTag}"
-  def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
-  def iterations = 0
-  retryWithSleep(retries: 3, seconds: 5, backoff: true) {
-    iterations++
-    def status = sh(label: "Change tag and push ${targetName}",
-                    script: ".ci/scripts/docker-tag-push.sh ${sourceName} ${targetName}",
-                    returnStatus: true)
-    if ( status > 0 && iterations < 3) {
-      error("tag and push failed for ${beatName}, retry")
-    } else if ( status > 0 ) {
-      log(level: 'WARN', text: "${beatName} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
-    }
-  }
+  pushDockerImages(
+    secret: env.DOCKERELASTIC_SECRET,
+    registry: env.DOCKER_REGISTRY,
+    arch: args.arch,
+    version: env.BEAT_VERSION,
+    snapshot: env.SNAPSHOT,
+    project: args.project,
+    targetNamespace: 'observability-ci'
+  )
 }
 
 def prepareE2ETestForPackage(String beat){
