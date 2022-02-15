@@ -97,7 +97,8 @@ The following actions are possible and grouped based on the actions.
   FLEET_SERVER_ELASTICSEARCH_CA_TRUSTED_FINGERPRINT - The sha-256 fingerprint value of the certificate authority to trust
   FLEET_SERVER_ELASTICSEARCH_INSECURE - disables cert validation for communication with Elasticsearch
   FLEET_SERVER_SERVICE_TOKEN - service token to use for communication with elasticsearch
-  FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself ("Default Fleet Server policy" used when undefined)
+  FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself ($DEFAULT_FLEET_SERVER_POLICY_ID used when undefined)
+  DEFAULT_FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself when none is specified. (defaults to "fleet-server-policy")
   FLEET_SERVER_HOST - binding host for Fleet Server HTTP (overrides the policy). By default this is 0.0.0.0.
   FLEET_SERVER_PORT - binding port for Fleet Server HTTP (overrides the policy)
   FLEET_SERVER_CERT - path to certificate to use for HTTPS endpoint
@@ -146,6 +147,11 @@ occurs on every start of the container set FLEET_FORCE to 1.
 
 func logError(streams *cli.IOStreams, err error) {
 	fmt.Fprintf(streams.Err, "Error: %v\n%s\n", err, troubleshootMessage())
+}
+
+func logWarn(streams *cli.IOStreams, a ...interface{}) {
+	a = append([]interface{}{"WARNING: "}, a...)
+	fmt.Fprintln(streams.Out, a...)
 }
 
 func logInfo(streams *cli.IOStreams, a ...interface{}) {
@@ -500,48 +506,10 @@ func kibanaFetchPolicy(cfg setupConfig, client *kibana.Client, streams *cli.IOSt
 	if err != nil {
 		return nil, err
 	}
-	packagePolicies, err := kibanaFetchPackagePolicies(cfg, client, streams)
 	if err != nil {
 		return nil, err
 	}
-	return findPolicy(cfg, policies.Items, packagePolicies)
-}
-
-func kibanaFetchPackagePolicies(cfg setupConfig, client *kibana.Client, streams *cli.IOStreams) (*packagePolicyResponse, error) {
-	var packagePolicies kibanaPackagePolicies
-	err := performGET(cfg, client, packagePolicyRoute, &packagePolicies, streams.Err, "Kibana fetch package policies")
-	if err != nil {
-		return nil, err
-	}
-	return separatePackagePolicies(&packagePolicies), nil
-}
-
-func IsFleetServerIntegration(packageName string) bool {
-	return packageName == "fleet_server"
-}
-
-func separatePackagePolicies(packagePolicies *kibanaPackagePolicies) *packagePolicyResponse {
-	result := packagePolicyResponse{
-		Fleet:    make(map[string]struct{}),
-		NonFleet: make(map[string]struct{}),
-	}
-	for _, packagePolicy := range packagePolicies.Items {
-		policyID := packagePolicy.PolicyID
-		if IsFleetServerIntegration(packagePolicy.Package.Name) {
-			// if we have previously marked a policy as unmanaged, clear that marking
-			if _, ok := result.NonFleet[policyID]; ok {
-				delete(result.NonFleet, policyID)
-			}
-
-			result.Fleet[policyID] = struct{}{}
-		} else {
-			// only mark new policies as unmanaged
-			if _, ok := result.Fleet[policyID]; !ok {
-				result.NonFleet[policyID] = struct{}{}
-			}
-		}
-	}
-	return &result
+	return findPolicy(cfg, policies.Items, streams)
 }
 
 func kibanaFetchToken(cfg setupConfig, client *kibana.Client, policy *kibanaPolicy, streams *cli.IOStreams, tokenName string) (string, error) {
@@ -584,40 +552,31 @@ func kibanaClient(cfg kibanaConfig, headers map[string]string) (*kibana.Client, 
 	}, 0, "Elastic-Agent")
 }
 
-func findPolicy(cfg setupConfig, policies []kibanaPolicy, packagePolicies *packagePolicyResponse) (*kibanaPolicy, error) {
+func findPolicy(cfg setupConfig, policies []kibanaPolicy, streams *cli.IOStreams) (*kibanaPolicy, error) {
 	policyID := ""
 	policyName := cfg.Fleet.TokenPolicyName
 	if cfg.FleetServer.Enable {
 		policyID = cfg.FleetServer.PolicyID
 	}
-	var fallbackPolicy *kibanaPolicy
 	for _, policy := range policies {
 		if policyID != "" {
 			if policyID == policy.ID {
+				logInfo(streams, "using policy with id", policyID)
 				return &policy, nil
 			}
 		} else if policyName != "" {
 			if policyName == policy.Name {
+				logInfo(streams, "using policy named", policyName)
 				return &policy, nil
 			}
 		} else if cfg.FleetServer.Enable {
-			if _, ok := packagePolicies.Fleet[policy.ID]; ok && fallbackPolicy == nil {
-				fallbackPolicy = &kibanaPolicy{}
-				*fallbackPolicy = policy
-			}
 			if policy.ID == cfg.FleetServer.DefaultPolicyID {
-				return &policy, nil
-			}
-		} else {
-			if _, ok := packagePolicies.NonFleet[policy.ID]; ok {
+				logWarn(streams, "using default fleet policy.")
 				return &policy, nil
 			}
 		}
 	}
 
-	if fallbackPolicy != nil {
-		return fallbackPolicy, nil
-	}
 	return nil, fmt.Errorf(`unable to find policy named "%s"`, policyName)
 }
 
@@ -948,24 +907,6 @@ func copyFile(destPath string, srcPath string, mode os.FileMode) error {
 	defer dest.Close()
 	_, err = io.Copy(dest, src)
 	return err
-}
-
-type kibanaPackage struct {
-	Name string `json:"name"`
-}
-
-type packagePolicyResponse struct {
-	Fleet    map[string]struct{}
-	NonFleet map[string]struct{}
-}
-
-type kibanaPackagePolicy struct {
-	PolicyID string        `json:"policy_id"`
-	Package  kibanaPackage `json:"package"`
-}
-
-type kibanaPackagePolicies struct {
-	Items []kibanaPackagePolicy `json:"items"`
 }
 
 type kibanaPolicy struct {

@@ -7,6 +7,8 @@ package cmd
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -46,23 +48,14 @@ var (
 	}
 )
 
+var streams *cli.IOStreams = cli.NewIOStreams()
+
 var policies kibanaPolicies = kibanaPolicies{
 	Items: []kibanaPolicy{
 		defaultFleetPolicy,
 		defaultAgentPolicy,
 		nondefaultAgentPolicy,
 		nondefaultFleetPolicy,
-	},
-}
-
-var PackagePolicies = packagePolicyResponse{
-	Fleet: map[string]struct{}{
-		"7b0093d2-7eab-4862-86c8-63b3dd1db001": {},
-		"fleet-server-policy":                  {},
-	},
-	NonFleet: map[string]struct{}{
-		"bc634ea6-8460-4925-babd-7540c3e7df24": {},
-		"2016d7cc-135e-5583-9758-3ba01f5a06e5": {},
 	},
 }
 
@@ -76,7 +69,7 @@ func TestFindPolicyById(t *testing.T) {
 		},
 	}
 
-	policy, err := findPolicy(cfg, policies.Items, &PackagePolicies)
+	policy, err := findPolicy(cfg, policies.Items, streams)
 	require.NoError(t, err)
 	require.Equal(t, &nondefaultFleetPolicy, policy)
 }
@@ -88,7 +81,7 @@ func TestFindPolicyByName(t *testing.T) {
 		},
 	}
 
-	policy, err := findPolicy(cfg, policies.Items, &PackagePolicies)
+	policy, err := findPolicy(cfg, policies.Items, streams)
 	require.NoError(t, err)
 	require.Equal(t, &defaultAgentPolicy, policy)
 }
@@ -104,7 +97,7 @@ func TestFindPolicyByIdOverName(t *testing.T) {
 		},
 	}
 
-	policy, err := findPolicy(cfg, policies.Items, &PackagePolicies)
+	policy, err := findPolicy(cfg, policies.Items, streams)
 	require.NoError(t, err)
 	require.Equal(t, &nondefaultFleetPolicy, policy)
 }
@@ -117,7 +110,7 @@ func TestFindPolicyByIdMiss(t *testing.T) {
 		},
 	}
 
-	policy, err := findPolicy(cfg, policies.Items, &PackagePolicies)
+	policy, err := findPolicy(cfg, policies.Items, streams)
 	require.Error(t, err)
 	require.Nil(t, policy)
 }
@@ -129,7 +122,7 @@ func TestFindPolicyByNameMiss(t *testing.T) {
 		},
 	}
 
-	policy, err := findPolicy(cfg, policies.Items, &PackagePolicies)
+	policy, err := findPolicy(cfg, policies.Items, streams)
 	require.Error(t, err)
 	require.Nil(t, policy)
 }
@@ -149,12 +142,12 @@ func TestFindPolicyDefaultFleet(t *testing.T) {
 		defaultFleetPolicy,
 	}
 
-	policy, err := findPolicy(cfg, items, &PackagePolicies)
+	policy, err := findPolicy(cfg, items, streams)
 	require.NoError(t, err)
 	require.Equal(t, &defaultFleetPolicy, policy)
 }
 
-func TestFindPolicyNoDefaultFleet(t *testing.T) {
+func TestFindPolicyAmbiguousNoDefaultFleet(t *testing.T) {
 	cfg := setupConfig{
 		FleetServer: fleetServerConfig{
 			Enable: true,
@@ -168,22 +161,23 @@ func TestFindPolicyNoDefaultFleet(t *testing.T) {
 		defaultFleetPolicy,
 	}
 
-	policy, err := findPolicy(cfg, items, &PackagePolicies)
-	require.NoError(t, err)
-	require.Equal(t, &nondefaultFleetPolicy, policy)
+	policy, err := findPolicy(cfg, items, streams)
+	require.Error(t, err)
+	require.Nil(t, policy)
 }
 
-func TestFindPolicyDefaultNonFleet(t *testing.T) {
-	cfg := setupConfig{
-		FleetServer: fleetServerConfig{
-			Enable: false,
-		},
-	}
-
-	policy, err := findPolicy(cfg, policies.Items, &PackagePolicies)
-	require.NoError(t, err)
-	require.Equal(t, &defaultAgentPolicy, policy)
-}
+// TODO: add support for default agent policy
+//func TestFindPolicyDefaultNonFleet(t *testing.T) {
+//	cfg := setupConfig{
+//		FleetServer: fleetServerConfig{
+//			Enable: false,
+//		},
+//	}
+//
+//	policy, err := findPolicy(cfg, policies.Items, streams)
+//	require.NoError(t, err)
+//	require.Equal(t, &defaultAgentPolicy, policy)
+//}
 
 func TestFindPolicyNoMatchNonFleet(t *testing.T) {
 	cfg := setupConfig{
@@ -192,7 +186,7 @@ func TestFindPolicyNoMatchNonFleet(t *testing.T) {
 		},
 	}
 
-	policy, err := findPolicy(cfg, policies.Items, &packagePolicyResponse{Fleet: PackagePolicies.Fleet})
+	policy, err := findPolicy(cfg, policies.Items, streams)
 	require.Error(t, err)
 	require.Nil(t, policy)
 }
@@ -209,75 +203,7 @@ func TestFindPolicyNoMatchFleet(t *testing.T) {
 		nondefaultAgentPolicy,
 		nondefaultFleetPolicy,
 	}
-	policy, err := findPolicy(cfg, items, &packagePolicyResponse{NonFleet: PackagePolicies.NonFleet})
+	policy, err := findPolicy(cfg, items, streams)
 	require.Error(t, err)
 	require.Nil(t, policy)
-}
-
-// Separating policies by package
-var (
-	fleetPackage = kibanaPackage{
-		Name: "fleet_server",
-	}
-
-	nonfleetPackage = kibanaPackage{
-		Name: "some_other_package",
-	}
-)
-
-func generatePackagePolicies(fleetedPolicyIDs []string, nonfleetedPolicyIDs []string) *kibanaPackagePolicies {
-	items := []kibanaPackagePolicy{}
-	for _, ID := range fleetedPolicyIDs {
-		items = append(items, kibanaPackagePolicy{
-			PolicyID: ID,
-			Package:  fleetPackage,
-		})
-	}
-	for _, ID := range nonfleetedPolicyIDs {
-		items = append(items, kibanaPackagePolicy{
-			PolicyID: ID,
-			Package:  nonfleetPackage,
-		})
-	}
-	return &kibanaPackagePolicies{
-		Items: items,
-	}
-}
-
-func reverse(policies *kibanaPackagePolicies) {
-	for i, j := 0, len(policies.Items)-1; i < j; i, j = i+1, j-1 {
-		policies.Items[i], policies.Items[j] = policies.Items[j], policies.Items[i]
-	}
-}
-
-func TestSeparatePackagePolicies(t *testing.T) {
-	policies := generatePackagePolicies([]string{"fleeted-id"}, []string{"nonfleeted-id"})
-	response := separatePackagePolicies(policies)
-	require.Contains(t, response.Fleet, "fleeted-id")
-	require.Contains(t, response.NonFleet, "nonfleeted-id")
-}
-
-func TestSeparatePackagePoliciesFleetPrecedence(t *testing.T) {
-	policies := generatePackagePolicies([]string{"fleeted-id", "multipackage"}, []string{"multipackage"})
-	response := separatePackagePolicies(policies)
-	require.Contains(t, response.Fleet, "fleeted-id")
-	require.Contains(t, response.Fleet, "multipackage")
-	require.NotContains(t, response.NonFleet, "multipackage")
-}
-
-func TestSeparatePackagePoliciesConflictingNonFleetPackagesFirst(t *testing.T) {
-	policies := generatePackagePolicies([]string{"fleeted-id", "multipackage"}, []string{"multipackage"})
-	reverse(policies)
-	response := separatePackagePolicies(policies)
-	require.Contains(t, response.Fleet, "fleeted-id")
-	require.Contains(t, response.Fleet, "multipackage")
-	require.NotContains(t, response.NonFleet, "multipackage")
-}
-
-func TestSeparatePackagePoliciesNonFleetPackagesFirst(t *testing.T) {
-	policies := generatePackagePolicies([]string{"fleeted-id"}, []string{"nonfleeted-id"})
-	reverse(policies)
-	response := separatePackagePolicies(policies)
-	require.Contains(t, response.Fleet, "fleeted-id")
-	require.Contains(t, response.NonFleet, "nonfleeted-id")
 }
