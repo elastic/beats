@@ -24,6 +24,7 @@ grouped in the following categories:
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-process>>
 * <<exported-fields-resolve>>
+* <<exported-fields-service>>
 * <<exported-fields-socks5>>
 * <<exported-fields-summary>>
 * <<exported-fields-synthetics>>
@@ -15078,6 +15079,21 @@ Duration required to resolve an IP from hostname.
 Duration in microseconds
 
 type: long
+
+--
+
+[[exported-fields-service]]
+== APM Service fields
+
+None
+
+
+*`name`*::
++
+--
+APM service name this monitor is linked to
+
+type: keyword
 
 --
 
