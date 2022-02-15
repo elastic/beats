@@ -62,6 +62,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/metric/system/host"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
+	"github.com/elastic/beats/v7/libbeat/monitoring/report/buffer"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
@@ -105,6 +106,7 @@ type beatConfig struct {
 	// beat internal components configurations
 	HTTP            *common.Config         `config:"http"`
 	HTTPPprof       *common.Config         `config:"http.pprof"`
+	BufferConfig    *common.Config         `config:"http.buffer"`
 	Path            paths.Path             `config:"path"`
 	Logging         *common.Config         `config:"logging"`
 	MetricLogging   *common.Config         `config:"logging.metrics"`
@@ -437,8 +439,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Start the API Server before the Seccomp lock down, we do this so we can create the unix socket
 	// set the appropriate permission on the unix domain file without having to whitelist anything
 	// that would be set at runtime.
+	var s *api.Server // buffer reporter may need to attach to the server.
 	if b.Config.HTTP.Enabled() {
-		s, err := api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
+		s, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
 		if err != nil {
 			return errw.Wrap(err, "could not start the HTTP server for the API")
 		}
@@ -472,6 +475,19 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 			return err
 		}
 		defer reporter.Stop()
+	}
+
+	// only collect into a ring buffer if HTTP, and the ring buffer are explicitly enabled
+	if b.Config.HTTP.Enabled() && monitoring.IsBufferEnabled(b.Config.BufferConfig) {
+		buffReporter, err := buffer.MakeReporter(b.Info, b.Config.BufferConfig)
+		if err != nil {
+			return err
+		}
+		defer buffReporter.Stop()
+
+		if err := s.AttachHandler("/buffer", buffReporter); err != nil {
+			return err
+		}
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
