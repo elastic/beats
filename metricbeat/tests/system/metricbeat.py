@@ -6,9 +6,8 @@ import os
 import re
 import sys
 import yaml
-from beat.beat import TestCase
-from beat.tags import tag
-from parameterized import parameterized_class
+from beat.beat import TestCase  # pylint: disable=import-error
+from parameterized import parameterized_class  # pylint: disable=import-error
 
 COMMON_FIELDS = ["@timestamp", "agent", "metricset.name", "metricset.host",
                  "metricset.module", "metricset.rtt", "host.name", "service.name", "event", "ecs"]
@@ -16,6 +15,11 @@ COMMON_FIELDS = ["@timestamp", "agent", "metricset.name", "metricset.host",
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 logging.getLogger("urllib3").setLevel(logging.WARNING)
+
+P_WIN = "win"
+P_LINUX = "linux"
+P_DARWIN = "darwin"
+P_DEF = "default"
 
 
 class BaseTest(TestCase):
@@ -56,11 +60,23 @@ class BaseTest(TestCase):
                 fields[parts[0]] = parts[0]
 
         # Dedot further levels recursively
-        for key in fields:
-            if isinstance(fields[key], dict):
+        for key, val in fields.items():
+            if isinstance(val, dict):
                 fields[key] = self.de_dot(fields[key])
 
         return fields
+
+    def assert_fields_for_platform(self, good_fields: object, written_fields: object):
+        """
+        Assert that the event contains a given set of fields depending on the OS
+        """
+        if sys.platform not in good_fields:
+            self.assertCountEqual(self.de_dot(
+                good_fields[P_DEF]), written_fields.keys())
+            return
+
+        self.assertCountEqual(self.de_dot(
+            good_fields[sys.platform]), written_fields.keys())
 
     def assert_no_logged_warnings(self, replace=None):
         """
@@ -68,25 +84,31 @@ class BaseTest(TestCase):
         """
         log = self.get_log()
 
-        pattern = self.build_log_regex(r"\[cfgwarn\]")
+        pattern = build_log_regex(r"\[cfgwarn\]")
         log = pattern.sub("", log)
 
         # Jenkins runs as a Windows service and when Jenkins executes these
         # tests the Beat is confused since it thinks it is running as a service.
-        pattern = self.build_log_regex(
+        pattern = build_log_regex(
             "The service process could not connect to the service controller.")
         log = pattern.sub("", log)
 
         if replace:
-            for r in replace:
-                pattern = self.build_log_regex(r)
+            for rep in replace:
+                pattern = build_log_regex(rep)
                 log = pattern.sub("", log)
         self.assertNotRegex(log, "\tERROR\t|\tWARN\t")
 
-    def build_log_regex(self, message):
-        return re.compile(r"^.*\t(?:ERROR|WARN)\t.*" + message + r".*$", re.MULTILINE)
+    def run_beat_and_stop(self):
+        """
+        starts and runs metricbeat based for a child unit test
+        """
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
 
-    def check_metricset(self, module, metricset, hosts, fields=[], extras=[]):
+    def check_metricset(self, module, metricset, hosts, fields: list = None, extras: list = None):
         """
         Method to test a metricset for its fields
         """
@@ -126,8 +148,8 @@ def supported_versions(path):
         return [[{}]]
 
     variants = []
-    with open(path) as f:
-        versions_info = yaml.safe_load(f)
+    with open(path, encoding="utf-8") as file:
+        versions_info = yaml.safe_load(file)
 
         for variant in versions_info['variants']:
             variants += [[variant]]
@@ -146,3 +168,10 @@ def parameterized_with_supported_versions(base_class):
     variants = supported_versions(versions_path)
     decorator = parameterized_class(['COMPOSE_ENV'], variants)
     decorator(base_class)
+
+
+def build_log_regex(message):
+    """
+    build_log_regex returns compiled regex for ERROR/WARN messages in logs
+    """
+    return re.compile(r"^.*\t(?:ERROR|WARN)\t.*" + message + r".*$", re.MULTILINE)

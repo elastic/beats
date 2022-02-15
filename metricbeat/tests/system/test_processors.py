@@ -1,3 +1,6 @@
+"""
+Test event processors under metricbeat
+"""
 import re
 import sys
 import unittest
@@ -11,7 +14,9 @@ class Test(metricbeat.BaseTest):
     """
 
     def test_drop_fields(self):
-
+        """
+        Check a basic drop_fields processor
+        """
         self.render_config_template(
             modules=[{
                 "name": "system",
@@ -54,7 +59,10 @@ class Test(metricbeat.BaseTest):
                 "name": "system",
                 "metricsets": ["process"],
                 "period": "1s",
-                "processes": ["(?i)metricbeat.test"]
+                "extras": {
+                    "processes": ["(?i)metricbeat.test"],
+                }
+
             }],
             processors=[{
                 "drop_fields": {
@@ -62,25 +70,22 @@ class Test(metricbeat.BaseTest):
                 },
             }]
         )
-        metricbeat = self.start_beat()
+        mb_handler = self.start_beat()
         self.wait_until(
             lambda: self.output_count(lambda x: x >= 4),
             max_timeout=15)
 
-        metricbeat.kill_and_wait()
+        mb_handler.kill_and_wait()
 
         output = self.read_output(
             required_fields=["@timestamp"],
-        )
-        good_event = {}
-        for evt in output:
-            if "system.process.cpu.total.pct" in evt:
-                good_event = evt
+            filter_key="system.process.cpu.total.pct"
+        )[0]
 
-        if float(good_event["system.process.cpu.total.pct"]) < 0.5:
-            assert "system.process.memory.size" not in good_event
+        if float(output["system.process.cpu.total.pct"]) < 0.5:
+            assert "system.process.memory.size" not in output
         else:
-            assert "system.process.memory.size" in good_event
+            assert "system.process.memory.size" in output
 
     def test_dropevent_with_condition(self):
         """
@@ -103,12 +108,12 @@ class Test(metricbeat.BaseTest):
                 },
             }]
         )
-        metricbeat = self.start_beat()
+        mb_handler = self.start_beat()
         self.wait_until(
             lambda: self.output_count(lambda x: x >= 1),
             max_timeout=20)
 
-        metricbeat.kill_and_wait()
+        mb_handler.kill_and_wait()
 
         output = self.read_output(
             required_fields=["@timestamp"],
@@ -133,12 +138,12 @@ class Test(metricbeat.BaseTest):
                 },
             }]
         )
-        metricbeat = self.start_beat()
+        mb_handler = self.start_beat()
         self.wait_until(
             lambda: self.output_count(lambda x: x >= 1),
             max_timeout=15)
 
-        metricbeat.kill_and_wait()
+        mb_handler.kill_and_wait()
 
         output = self.read_output(
             required_fields=["@timestamp"],
@@ -155,27 +160,23 @@ class Test(metricbeat.BaseTest):
                 "metricsets": ["process"],
                 "period": "1s",
                 # filter down to one process, since this test suite doesn't have a way to specify X iterations of the metricbeat fetcher
-                "processes": ["(?i)metricbeat.test"]
+                "extras": {
+                    "processes": ["(?i)metricbeat.test"],
+                }
             }],
             processors=[{
                 "include_fields": {"fields": ["system.process.cpu", "system.process.memory"]},
             }]
         )
-        metricbeat = self.start_beat()
-        self.wait_until(
-            lambda: self.output_has_key("system.process.cpu.total.pct"),
-            max_timeout=15)
+        mb_handler = self.start_beat()
+        self.wait_until_output_has_key("system.process.cpu.total.pct")
 
-        metricbeat.kill_and_wait()
+        mb_handler.kill_and_wait()
 
         output = self.read_output(
             required_fields=["@timestamp"],
-        )
-        good_event = {}
-        # depending on threading, or whatever is happening, try to search for a fully formatted event
-        for evt in output:
-            if "system.process.cpu.total.pct" in evt:
-                good_event = evt
+            filter_key="system.process.cpu.total.pct"
+        )[0]
         print(output)
 
         for key in [
@@ -185,13 +186,13 @@ class Test(metricbeat.BaseTest):
             "system.process.memory.rss.bytes",
             "system.process.memory.rss.pct"
         ]:
-            assert key in good_event
+            assert key in output
 
         for key in [
             "system.process.name",
             "system.process.pid",
         ]:
-            assert key not in good_event
+            assert key not in output
 
     def test_multiple_actions(self):
         """
@@ -203,7 +204,9 @@ class Test(metricbeat.BaseTest):
                 "name": "system",
                 "metricsets": ["process"],
                 "period": "1s",
-                "processes": ["(?i)metricbeat.test"],
+                "extras": {
+                    "processes": ["(?i)metricbeat.test"],
+                }
             }],
             processors=[{
                 "include_fields": {"fields": ["system.process", "process"]},
@@ -211,21 +214,18 @@ class Test(metricbeat.BaseTest):
                 "drop_fields": {"fields": ["system.process.memory"]},
             }]
         )
-        metricbeat = self.start_beat()
+        mb_handler = self.start_beat()
         self.wait_until(
             lambda: self.output_count(lambda x: x >= 4),
             max_timeout=15)
 
-        metricbeat.kill_and_wait()
+        mb_handler.kill_and_wait()
 
         output = self.read_output(
             required_fields=["@timestamp"],
-        )
-        good_event = {}
+            filter_key="system.process.cpu.total.pct"
+        )[0]
 
-        for evt in output:
-            if "system.process.cpu.total.pct" in evt:
-                good_event = evt
         print(output)
 
         for key in [
@@ -234,14 +234,14 @@ class Test(metricbeat.BaseTest):
             "process.name",
             "process.pid",
         ]:
-            assert key in good_event, "'%s' not found" % key
+            assert key in output, f"'{key}' not found"
 
         for key in [
             "system.process.memory.size",
             "system.process.memory.rss.bytes",
             "system.process.memory.rss.pct"
         ]:
-            assert key not in good_event, "'%s' not expected but found" % key
+            assert key not in output, f"'{key}' not expected but found"
 
     def test_contradictory_multiple_actions(self):
         """
@@ -263,11 +263,11 @@ class Test(metricbeat.BaseTest):
                 },
             }]
         )
-        metricbeat = self.start_beat()
+        mb_handler = self.start_beat()
         self.wait_until(
             lambda: self.output_count(lambda x: x >= 1),
             max_timeout=15)
-        metricbeat.kill_and_wait()
+        mb_handler.kill_and_wait()
 
         output = self.read_output(
             required_fields=["@timestamp"],
@@ -285,6 +285,9 @@ class Test(metricbeat.BaseTest):
             assert key not in output
 
     def test_rename_field(self):
+        """
+        test the rename processor
+        """
 
         self.render_config_template(
             modules=[{

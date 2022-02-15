@@ -391,9 +391,9 @@ class TestCase(unittest.TestCase, ComposeMixin):
         output_str = template.render(**kargs)
 
         output_path = os.path.join(self.working_dir, output)
-        with open(output_path, "wb") as f:
+        with open(output_path, "wb") as beat_output:
             os.chmod(output_path, 0o600)
-            f.write(output_str.encode('utf_8'))
+            beat_output.write(output_str.encode('utf_8'))
 
     def default_output_file(self):
         """
@@ -403,7 +403,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
     def read_output(self,
                     output_file=None,
-                    required_fields=None):
+                    required_fields=None,
+                    filter_key: str=""):
         """
         read_output Returns output as JSON object with flattened fields (. notation)
         """
@@ -427,7 +428,19 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     raise
 
         self.all_have_fields(jsons, required_fields or BEAT_REQUIRED_FIELDS)
+        if filter_key is not "":
+            return list(filter(lambda x: filter_key in x, jsons))
         return jsons
+
+    def read_output_filter(self, key: str, output_file=None, required_fields=None):
+        """
+        same as read_output, but filters the events down based on the availability of a key
+        this is needed with newer versions of the system module will only report fields if they contain valid data.
+        """
+        output = self.read_output(
+            output_file=output_file, required_fields=required_fields)
+
+        return list(filter(lambda x: key in x, output))
 
     def read_output_json(self, output_file=None):
         """
@@ -494,8 +507,16 @@ class TestCase(unittest.TestCase, ComposeMixin):
         while not cond():
             if datetime.now() - start > timedelta(seconds=max_timeout):
                 raise WaitTimeoutError(
-                    f"Timeout waiting for '{name}' to be true. Waited {max_timeout} seconds.")
+                    f"Timeout waiting for condition '{name}'. Waited {max_timeout} seconds.")
             time.sleep(poll_interval)
+
+    def wait_until_output_has_key(self, key: str, max_timeout=15):
+        """
+        a convenience function that will wait until we see a given key in an output event
+        """
+        self.wait_until(
+            lambda: self.output_has_key(key),
+            max_timeout=max_timeout, name=f"key '{key}' to appear in output")
 
     def get_log(self, logfile=None):
         """
@@ -627,6 +648,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
         """
         output_has_key returns true if the given key is found in the list of events
         """
+
+        # Awkward try/except here is for the "upstream" wait functions, if the file hasn't been created yet, it will handle the retry.
         try:
             lines = self.read_output(
                 output_file=output_file, required_fields=["@timestamp"])
@@ -648,8 +671,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
             output_file = self.default_output_file()
 
         try:
-            with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as f:
-                return len([1 for line in f]) == 0
+            with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as beat_file:
+                return len([1 for line in beat_file]) == 0
         except IOError:
             return True
 
