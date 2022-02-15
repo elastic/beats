@@ -16,7 +16,7 @@ INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 
-P_WIN = "win"
+P_WIN = "win32"
 P_LINUX = "linux"
 P_DARWIN = "darwin"
 P_DEF = "default"

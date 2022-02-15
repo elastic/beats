@@ -271,7 +271,7 @@ class Test(metricbeat.BaseTest):
                                             "devtmpfs", "configfs", "debugfs", "tracefs", "securityfs", "sockfs",
                                             "bpf", "pipefs", "ramfs", "hugetlbfs", "devpts", "autofs", "efivarfs",
                                             "mqueue", "selinuxfs", "binder", "pstore", "fuse", "fusectl", "rpc_pipefs",
-                                            "overlay", "binfmt_misc"],
+                                            "overlay", "binfmt_misc", "unavailable"],
             }
         }])
         self.run_beat_and_stop()
