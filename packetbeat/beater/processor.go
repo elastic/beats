@@ -113,6 +113,12 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *common.C
 		return nil, err
 	}
 
+	// Install Npcap if needed.
+	err = installNpcap(p.beat)
+	if err != nil {
+		return nil, err
+	}
+
 	publisher, err := publish.NewTransactionPublisher(
 		p.beat.Info.Name,
 		p.beat.Publisher,
