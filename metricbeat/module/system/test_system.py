@@ -85,7 +85,7 @@ SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
 SYSTEM_MEMORY = {
     metricbeat.P_DEF: ["swap", "actual.free", "free", "total", "used.bytes", "used.pct", "actual.used.bytes",
-                       "actual.used.pct", "hugepages", "page_stats"]
+                       "actual.used.pct"]
 }
 SYSTEM_MEMORY[metricbeat.P_LINUX] = SYSTEM_MEMORY[metricbeat.P_DEF] + \
     ["cached", "hugepages", "page_stats"]

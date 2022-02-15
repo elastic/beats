@@ -428,7 +428,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     raise
 
         self.all_have_fields(jsons, required_fields or BEAT_REQUIRED_FIELDS)
-        if filter_key is not "":
+        if filter_key != "":
             return list(filter(lambda x: filter_key in x, jsons))
         return jsons
 
