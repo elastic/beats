@@ -32,6 +32,8 @@ func eventMapping(r mb.ReporterV2, memoryData *MemoryData) {
 
 	//if we have windows memory data, just report windows stats
 	var fields common.MapStr
+	rootFields := memoryData.Container.ToMapStr()
+
 	if memoryData.Commit+memoryData.CommitPeak+memoryData.PrivateWorkingSet > 0 {
 		fields = common.MapStr{
 			"commit": common.MapStr{
@@ -59,10 +61,12 @@ func eventMapping(r mb.ReporterV2, memoryData *MemoryData) {
 				"max":   memoryData.MaxUsage,
 			},
 		}
+		// Add container ECS fields
+		rootFields.Put("container.memory.usage", memoryData.UsageP)
 	}
 
 	r.Event(mb.Event{
-		RootFields:      memoryData.Container.ToMapStr(),
+		RootFields:      rootFields,
 		MetricSetFields: fields,
 	})
 }

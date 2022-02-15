@@ -60,8 +60,12 @@ func eventMapping(r mb.ReporterV2, stats *CPUStats) {
 		},
 	}
 
+	rootFields := stats.Container.ToMapStr()
+	// Add container ECS fields
+	rootFields.Put("container.cpu.usage", stats.TotalUsageNormalized)
+
 	r.Event(mb.Event{
-		RootFields:      stats.Container.ToMapStr(),
+		RootFields:      rootFields,
 		MetricSetFields: fields,
 	})
 }
