@@ -89,7 +89,7 @@ https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
 - Support self-signed certificates on outputs. {pull}29229[29229]
 - Add FIPS configuration option for all AWS API calls. {pull}[28899]
 - Warn users when connecting to older versions of Elasticsearch instances. {pull}29723[29723]
-- `add_fields` processor is now able to set metadata in events {pull}30092[30092]
+- `add_fields` processor is now able to set metadata in events. {pull}30092[30092]
 
 *Auditbeat*
 
