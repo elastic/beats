@@ -228,6 +228,9 @@ type process struct {
 	// populated by state from created
 	createdTime time.Time
 
+	// populated after createdTime is adjusted.
+	entityID string
+
 	// populated by DNS enrichment.
 	resolvedDomains map[string]string
 }
@@ -1031,6 +1034,9 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 			process["executable"] = f.process.path
 			if f.process.createdTime != (time.Time{}) {
 				process["created"] = f.process.createdTime
+			}
+			if f.process.entityID != "" {
+				process["entity_id"] = f.process.entityID
 			}
 
 			if f.process.hasCreds {

@@ -41,6 +41,10 @@ data:
                     - state_resourcequota
                     - state_statefulset
                     - state_service
+                  # If `https` is used to access `kube-state-metrics`, uncomment following settings:
+                  # bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+                  # ssl.certificate_authorities:
+                  #   - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
                 - module: kubernetes
                   metricsets:
                     - apiserver
@@ -120,13 +124,14 @@ data:
       # remove ssl.verification_mode entry and use the CA, for instance:
       #ssl.certificate_authorities:
         #- /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
-    # Currently `proxy` metricset is not supported on Openshift, comment out section
     - module: kubernetes
       metricsets:
         - proxy
       period: 10s
       host: ${NODE_NAME}
       hosts: ["localhost:10249"]
+      # If using Red Hat OpenShift should be used this `hosts` setting instead:
+      # hosts: ["localhost:29101"]
 ---
 # Deploy a Metricbeat instance per node for node metrics retrieval
 apiVersion: apps/v1
@@ -151,7 +156,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
-        image: docker.elastic.co/beats/metricbeat:8.0.0
+        image: docker.elastic.co/beats/metricbeat:8.2.0
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
@@ -176,8 +181,6 @@ spec:
               fieldPath: spec.nodeName
         securityContext:
           runAsUser: 0
-          # If using Red Hat OpenShift uncomment this:
-          #privileged: true
         resources:
           limits:
             memory: 200Mi

@@ -134,6 +134,7 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 	if err != nil {
 		return err
 	}
+
 	// write connect info to stdin
 	go a.writeToStdin(a.srvState, a.state.ProcessInfo.Stdin)
 

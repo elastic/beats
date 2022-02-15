@@ -84,16 +84,6 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
         stage: extended
-    windows-7:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-7"
-        stage: extended
-    windows-7-32:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-7-32-bit"
-        stage: extended
     packaging-linux:
         packaging-linux: "mage package"
         e2e:
