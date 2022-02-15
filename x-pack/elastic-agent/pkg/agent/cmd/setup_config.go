@@ -15,15 +15,16 @@ type setupConfig struct {
 }
 
 type fleetConfig struct {
-	CA              string        `config:"ca"`
-	Enroll          bool          `config:"enroll"`
-	EnrollmentToken string        `config:"enrollment_token"`
-	Force           bool          `config:"force"`
-	Insecure        bool          `config:"insecure"`
-	TokenName       string        `config:"token_name"`
-	TokenPolicyName string        `config:"token_policy_name"`
-	URL             string        `config:"url"`
-	DaemonTimeout   time.Duration `config:"daemon_timeout"`
+	CA                     string        `config:"ca"`
+	Enroll                 bool          `config:"enroll"`
+	EnrollmentToken        string        `config:"enrollment_token"`
+	Force                  bool          `config:"force"`
+	Insecure               bool          `config:"insecure"`
+	TokenName              string        `config:"token_name"`
+	TokenPolicyName        string        `config:"token_policy_name"`
+	DefaultTokenPolicyName string        `config:"default_token_policy_name"`
+	URL                    string        `config:"url"`
+	DaemonTimeout          time.Duration `config:"daemon_timeout"`
 }
 
 type fleetServerConfig struct {
@@ -77,15 +78,16 @@ func defaultAccessConfig() (setupConfig, error) {
 
 	cfg := setupConfig{
 		Fleet: fleetConfig{
-			CA:              envWithDefault("", "FLEET_CA", "KIBANA_CA", "ELASTICSEARCH_CA"),
-			Enroll:          envBool("FLEET_ENROLL", "FLEET_SERVER_ENABLE"),
-			EnrollmentToken: envWithDefault("", "FLEET_ENROLLMENT_TOKEN"),
-			Force:           envBool("FLEET_FORCE"),
-			Insecure:        envBool("FLEET_INSECURE"),
-			TokenName:       envWithDefault("Default", "FLEET_TOKEN_NAME"),
-			TokenPolicyName: envWithDefault("", "FLEET_TOKEN_POLICY_NAME"),
-			URL:             envWithDefault("", "FLEET_URL"),
-			DaemonTimeout:   envTimeout("FLEET_DAEMON_TIMEOUT"),
+			CA:                     envWithDefault("", "FLEET_CA", "KIBANA_CA", "ELASTICSEARCH_CA"),
+			Enroll:                 envBool("FLEET_ENROLL", "FLEET_SERVER_ENABLE"),
+			EnrollmentToken:        envWithDefault("", "FLEET_ENROLLMENT_TOKEN"),
+			Force:                  envBool("FLEET_FORCE"),
+			Insecure:               envBool("FLEET_INSECURE"),
+			TokenName:              envWithDefault("Default", "FLEET_TOKEN_NAME"),
+			TokenPolicyName:        envWithDefault("", "FLEET_TOKEN_POLICY_NAME"),
+			DefaultTokenPolicyName: envWithDefault("Default policy", "DEFAULT_FLEET_TOKEN_POLICY_NAME"),
+			URL:                    envWithDefault("", "FLEET_URL"),
+			DaemonTimeout:          envTimeout("FLEET_DAEMON_TIMEOUT"),
 		},
 		FleetServer: fleetServerConfig{
 			Cert:    envWithDefault("", "FLEET_SERVER_CERT"),

@@ -154,18 +154,20 @@ func TestFindPolicyAmbiguousNoDefaultFleet(t *testing.T) {
 	require.Nil(t, policy)
 }
 
-// TODO: add support for default agent policy
-//func TestFindPolicyDefaultNonFleet(t *testing.T) {
-//	cfg := setupConfig{
-//		FleetServer: fleetServerConfig{
-//			Enable: false,
-//		},
-//	}
-//
-//	policy, err := findPolicy(cfg, policies.Items, streams)
-//	require.NoError(t, err)
-//	require.Equal(t, &defaultAgentPolicy, policy)
-//}
+func TestFindPolicyDefaultNonFleet(t *testing.T) {
+	cfg := setupConfig{
+		Fleet: fleetConfig{
+			DefaultTokenPolicyName: "Default policy",
+		},
+		FleetServer: fleetServerConfig{
+			Enable: false,
+		},
+	}
+
+	policy, err := findPolicy(cfg, policies.Items, streams)
+	require.NoError(t, err)
+	require.Equal(t, &defaultAgentPolicy, policy)
+}
 
 func TestFindPolicyNoMatchNonFleet(t *testing.T) {
 	cfg := setupConfig{

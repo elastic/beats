@@ -80,6 +80,7 @@ The following actions are possible and grouped based on the actions.
 
   KIBANA_FLEET_HOST - kibana host to enable create enrollment token on [$KIBANA_HOST]
   FLEET_TOKEN_NAME - token name to use for fetching token from Kibana. This requires Kibana configs to be set.
+  DEFAULT_FLEET_TOKEN_NAME - token name to use when [$FLEET_TOKEN_NAME] is not set. Defaults to "Default policy".
   FLEET_TOKEN_POLICY_NAME - token policy name to use for fetching token from Kibana. This requires Kibana configs to be set.
 
 * Bootstrapping Fleet Server
@@ -95,7 +96,7 @@ The following actions are possible and grouped based on the actions.
   FLEET_SERVER_ELASTICSEARCH_CA_TRUSTED_FINGERPRINT - The sha-256 fingerprint value of the certificate authority to trust
   FLEET_SERVER_ELASTICSEARCH_INSECURE - disables cert validation for communication with Elasticsearch
   FLEET_SERVER_SERVICE_TOKEN - service token to use for communication with elasticsearch
-  FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself ($DEFAULT_FLEET_SERVER_POLICY_ID used when undefined)
+  FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself ([$DEFAULT_FLEET_SERVER_POLICY_ID] used when undefined)
   DEFAULT_FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself when none is specified. (defaults to "fleet-server-policy")
   FLEET_SERVER_HOST - binding host for Fleet Server HTTP (overrides the policy). By default this is 0.0.0.0.
   FLEET_SERVER_PORT - binding port for Fleet Server HTTP (overrides the policy)
@@ -148,8 +149,7 @@ func logError(streams *cli.IOStreams, err error) {
 }
 
 func logWarn(streams *cli.IOStreams, a ...interface{}) {
-	a = append([]interface{}{"WARNING: "}, a...)
-	fmt.Fprintln(streams.Out, a...)
+	fmt.Fprintln(streams.Out, append([]interface{}{"WARN: "}, a...)...)
 }
 
 func logInfo(streams *cli.IOStreams, a ...interface{}) {
@@ -556,6 +556,7 @@ func findPolicy(cfg setupConfig, policies []kibanaPolicy, streams *cli.IOStreams
 	if cfg.FleetServer.Enable {
 		policyID = cfg.FleetServer.PolicyID
 	}
+
 	for _, policy := range policies {
 		if policyID != "" {
 			if policyID == policy.ID {
@@ -569,12 +570,26 @@ func findPolicy(cfg setupConfig, policies []kibanaPolicy, streams *cli.IOStreams
 			}
 		} else if cfg.FleetServer.Enable {
 			if policy.ID == cfg.FleetServer.DefaultPolicyID {
-				logWarn(streams, "using default fleet policy.")
+				logWarn(streams, "using default fleet policy id:", policy.ID)
+				return &policy, nil
+			}
+		} else {
+			if policy.Name == cfg.Fleet.DefaultTokenPolicyName {
+				logWarn(streams, "using default policy name:", policy.Name)
 				return &policy, nil
 			}
 		}
 	}
 
+	if cfg.FleetServer.Enable {
+		if policyID == "" {
+			logWarn(streams, "No policy id set, please set the FLEET_SERVER_POLICY_ID environment variable to the fleet server policy id.")
+		}
+	} else {
+		if policyName == "" {
+			logWarn(streams, "No policy name set, please set the FLEET_TOKEN_POLICY_NAME environment variable to the agent policy name.")
+		}
+	}
 	return nil, fmt.Errorf(`unable to find policy named "%s"`, policyName)
 }
 
