@@ -17,34 +17,22 @@ var (
 		ID:     "fleet-server-policy",
 		Name:   "Default Fleet Server policy",
 		Status: "active",
-		PackagePolicies: []string{
-			"default-fleet-server-agent-policy",
-		},
 	}
 	defaultAgentPolicy = kibanaPolicy{
 		ID:     "2016d7cc-135e-5583-9758-3ba01f5a06e5",
 		Name:   "Default policy",
 		Status: "active",
-		PackagePolicies: []string{
-			"default-system-policy",
-		},
 	}
 	nondefaultAgentPolicy = kibanaPolicy{
 		ID:     "bc634ea6-8460-4925-babd-7540c3e7df24",
 		Name:   "Another free policy",
 		Status: "active",
-		PackagePolicies: []string{
-			"3668df9e-f2a3-4b65-9e6c-58ed352f2b63",
-		},
 	}
 
 	nondefaultFleetPolicy = kibanaPolicy{
 		ID:     "7b0093d2-7eab-4862-86c8-63b3dd1db001",
 		Name:   "Some kinda dependent policy",
 		Status: "active",
-		PackagePolicies: []string{
-			"63e2f84f-ab11-439c-93fa-531ff5b53e20",
-		},
 	}
 )
 

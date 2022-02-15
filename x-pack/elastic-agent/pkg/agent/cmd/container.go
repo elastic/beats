@@ -48,8 +48,6 @@ const (
 	defaultRequestRetrySleep = "1s"                             // sleep 1 sec between retries for HTTP requests
 	defaultMaxRequestRetries = "30"                             // maximum number of retries for HTTP requests
 	defaultStateDirectory    = "/usr/share/elastic-agent/state" // directory that will hold the state data
-	// Kibana route paths
-	packagePolicyRoute = "/api/fleet/package_policies"
 )
 
 var (
@@ -910,10 +908,9 @@ func copyFile(destPath string, srcPath string, mode os.FileMode) error {
 }
 
 type kibanaPolicy struct {
-	ID              string   `json:"id"`
-	Name            string   `json:"name"`
-	Status          string   `json:"status"`
-	PackagePolicies []string `json:"package_policies"`
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	Status string `json:"status"`
 }
 
 type kibanaPolicies struct {
