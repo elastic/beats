@@ -1,6 +1,0 @@
-# a cluster with 3 control-plane nodes and 3 workers
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-name: kind-mono
-
-# Todo Enable EphemeralContainers on kind config for debug
