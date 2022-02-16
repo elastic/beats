@@ -49,7 +49,7 @@ co.elastic.monitor/processors.drop_fields.fields: "field3"
 In the above sample the processor definition tagged with `1` would be executed first.
 
 When hints are used along with templates, then hints will be evaluated only in case
-there is no template's condition that resolve to true. For example:
+there is no template's condition that resolves to true. For example:
 
 [source,yaml]
 -----

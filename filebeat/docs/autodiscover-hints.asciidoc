@@ -101,7 +101,7 @@ co.elastic.logs/pipeline: custom-pipeline
 -----
 
 When hints are used along with templates, then hints will be evaluated only in case
-there is no template's condition that resolve to true. For example:
+there is no template's condition that resolves to true. For example:
 
 [source,yaml]
 -----
