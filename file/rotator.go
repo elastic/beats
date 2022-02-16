@@ -258,9 +258,9 @@ func (r *Rotator) appendToFile() error {
 		return errors.Wrap(err, "failed to append to existing file")
 	}
 	if r.redirectStderr {
-		err = RedirectStandardError(r.file)
+		_ = RedirectStandardError(r.file)
 	}
-	return err
+	return nil
 }
 
 func (r *Rotator) openFile() error {
@@ -274,9 +274,9 @@ func (r *Rotator) openFile() error {
 		return errors.Wrap(err, fmt.Sprintf("failed to open new file '%s'", r.rot.ActiveFile()))
 	}
 	if r.redirectStderr {
-		err = RedirectStandardError(r.file)
+		_ = RedirectStandardError(r.file)
 	}
-	return err
+	return nil
 }
 
 func (r *Rotator) rotate(reason rotateReason) error {

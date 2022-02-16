@@ -28,6 +28,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestStringArrFlag(t *testing.T) {
@@ -159,7 +160,7 @@ func TestOverwriteFlag(t *testing.T) {
 	assert.Equal(t, cobraExpectedUsage, cobraUsage)
 
 	err = fs.Set("a", "overwrite")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	final, err := config.String("a", -1)
 	assert.NoError(t, err)
 	assert.Equal(t, "overwrite", final)

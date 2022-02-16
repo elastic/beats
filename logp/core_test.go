@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 )
 
@@ -47,10 +48,10 @@ func TestLogger(t *testing.T) {
 	}
 
 	err := TestingSetup()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	exerciseLogger()
 	err = TestingSetup()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	exerciseLogger()
 }
 
@@ -123,37 +124,37 @@ func TestL(t *testing.T) {
 
 func TestDebugAllStdoutEnablesDefaultGoLogger(t *testing.T) {
 	err := DevelopmentSetup(WithSelectors("*"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, _defaultGoLog, golog.Writer())
 
 	err = DevelopmentSetup(WithSelectors("stdlog"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, _defaultGoLog, golog.Writer())
 
 	err = DevelopmentSetup(WithSelectors("*", "stdlog"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, _defaultGoLog, golog.Writer())
 
 	err = DevelopmentSetup(WithSelectors("other"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, ioutil.Discard, golog.Writer())
 }
 
 func TestNotDebugAllStdoutDisablesDefaultGoLogger(t *testing.T) {
 	err := DevelopmentSetup(WithSelectors("*"), WithLevel(InfoLevel))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, ioutil.Discard, golog.Writer())
 
 	err = DevelopmentSetup(WithSelectors("stdlog"), WithLevel(InfoLevel))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, ioutil.Discard, golog.Writer())
 
 	err = DevelopmentSetup(WithSelectors("*", "stdlog"), WithLevel(InfoLevel))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, ioutil.Discard, golog.Writer())
 
 	err = DevelopmentSetup(WithSelectors("other"), WithLevel(InfoLevel))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, ioutil.Discard, golog.Writer())
 }
 
@@ -168,7 +169,7 @@ func TestLoggingECSFields(t *testing.T) {
 	}
 	ToObserverOutput()(&cfg)
 	err := Configure(cfg)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	logger := NewLogger("tester")
 

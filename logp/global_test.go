@@ -25,6 +25,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 )
 
@@ -81,7 +82,7 @@ func TestRecover(t *testing.T) {
 	const cause = "unexpected condition"
 
 	err := DevelopmentSetup(ToObserverOutput())
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	defer func() {
 		logs := ObserverLogs().TakeAll()
@@ -102,15 +103,15 @@ func TestRecover(t *testing.T) {
 
 func TestIsDebug(t *testing.T) {
 	err := DevelopmentSetup()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.True(t, IsDebug("all"))
 
 	err = DevelopmentSetup(WithSelectors("*"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.True(t, IsDebug("all"))
 
 	err = DevelopmentSetup(WithSelectors("only_this"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.False(t, IsDebug("all"))
 	assert.True(t, IsDebug("only_this"))
 }

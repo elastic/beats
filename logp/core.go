@@ -267,7 +267,6 @@ func loadLogger() *coreLogger {
 
 func storeLogger(l *coreLogger) {
 	if old := loadLogger(); old != nil {
-		// ignore the error
 		_ = old.rootLogger.Sync()
 	}
 	atomic.StorePointer(&_log, unsafe.Pointer(l))
