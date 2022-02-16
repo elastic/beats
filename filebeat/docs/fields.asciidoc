@@ -86568,7 +86568,7 @@ example: native
 [float]
 === log
 
-Kafka log lines.
+Kibana log lines.
 
 
 
