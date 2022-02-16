@@ -111,12 +111,6 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 		}
 	}()
 
-	// Install Npcap if needed.
-	err := installNpcap(b)
-	if err != nil {
-		return err
-	}
-
 	if !b.Manager.Enabled() {
 		return pb.runStatic(b, pb.factory)
 	}

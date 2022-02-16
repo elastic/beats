@@ -28,6 +28,67 @@ type OptType interface {
 	MarshalJSON() ([]byte, error)
 }
 
+// ZeroInterface is a type interface for cases where we need to cast from a void pointer
+type ZeroInterface interface {
+	IsZero() bool
+}
+
+// Int
+
+// Int is a wrapper for "optional" types, with the bool value indicating
+// if the stored int is a legitimate value.
+type Int struct {
+	exists bool
+	value  int
+}
+
+// NewUintNone returns a new OptUint wrapper
+func NewIntNone() Int {
+	return Int{
+		exists: false,
+		value:  0,
+	}
+}
+
+// UintWith returns a new OptUint wrapper with a given int
+func IntWith(i int) Int {
+	return Int{
+		exists: true,
+		value:  i,
+	}
+}
+
+// IsZero returns true if the underlying value nil
+func (opt Int) IsZero() bool {
+	return !opt.exists
+}
+
+// Exists returns true if the underlying value exists
+func (opt Int) Exists() bool {
+	return opt.exists
+}
+
+// ValueOr returns the stored value, or a given int
+// Please do not use this for populating reported data,
+// as we actually want to avoid sending zeros where values are functionally null
+func (opt Int) ValueOr(i int) int {
+	if opt.exists {
+		return opt.value
+	}
+	return i
+}
+
+// Fold implements the folder interface for OptUint
+func (in *Int) Fold(v structform.ExtVisitor) error {
+	if in.exists {
+		value := in.value
+		v.OnInt(value)
+	} else {
+		v.OnNil()
+	}
+	return nil
+}
+
 // Uint
 
 // Uint is a wrapper for "optional" types, with the bool value indicating

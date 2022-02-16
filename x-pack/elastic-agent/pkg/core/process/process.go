@@ -13,6 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/proc"
 )
 
 var (
@@ -44,7 +45,7 @@ func Start(logger *logger.Logger, path string, config *Config, uid, gid int, arg
 // - network address of child process
 // - process id
 // - error
-func StartContext(ctx context.Context, logger *logger.Logger, path string, config *Config, uid, gid int, args []string, opts ...Option) (proc *Info, err error) {
+func StartContext(ctx context.Context, logger *logger.Logger, path string, config *Config, uid, gid int, args []string, opts ...Option) (*Info, error) {
 	cmd := getCmd(ctx, logger, path, []string{}, uid, gid, args...)
 	for _, o := range opts {
 		o(cmd)
@@ -57,6 +58,14 @@ func StartContext(ctx context.Context, logger *logger.Logger, path string, confi
 	// start process
 	if err := cmd.Start(); err != nil {
 		return nil, errors.New(err, fmt.Sprintf("failed to start '%s'", path))
+	}
+
+	// Hook to JobObject on windows, noop on other platforms.
+	// This ties the application processes lifespan to the agent's.
+	// Fixes the orphaned beats processes left behind situation
+	// after the agent process gets killed.
+	if err := proc.JobObject.Assign(cmd.Process); err != nil {
+		logger.Errorf("application process failed job assign: %v", err)
 	}
 
 	return &Info{

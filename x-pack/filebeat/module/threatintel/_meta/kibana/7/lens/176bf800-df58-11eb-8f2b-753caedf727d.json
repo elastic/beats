@@ -17,7 +17,7 @@
                                     "label": "Recorded Future Indicators",
                                     "operationType": "count",
                                     "scale": "ratio",
-                                    "sourceField": "Records"
+                                    "sourceField": "___records___"
                                 }
                             },
                             "incompleteColumns": {}

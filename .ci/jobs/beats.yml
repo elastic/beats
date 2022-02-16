@@ -17,7 +17,7 @@
         discover-pr-forks-strategy: 'merge-current'
         discover-pr-forks-trust: 'permission'
         discover-pr-origin: 'merge-current'
-        head-filter-regex: '(main|6\.[89]|7\.1[6789]|8\.\d+|PR-.*|v\d+\.\d+\.\d+)'
+        head-filter-regex: '(main|7\.1[6789]|8\.\d+|PR-.*|v\d+\.\d+\.\d+)'
         discover-tags: true
         notification-context: "beats-ci"
         repo: 'beats'
