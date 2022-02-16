@@ -66,7 +66,7 @@ into a state path (`STATE_PATH`) then it executes the `enroll` command.
 
 When using the `container` command, a policy ID for the agent should be supplied via the
 `FLEET_SERVER_POLICY` environment variable. If this value is omitted, the agent will attempt
-to use the deafult policy ID, which can be configured via `DEFALUT_FLEET_SERVER_POLICY`
+to use the default policy ID, which can be configured via `DEFAULT_FLEET_SERVER_POLICY`
 
 ==== Enroll Command
 
