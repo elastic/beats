@@ -24,7 +24,8 @@ import (
 )
 
 func TestHasSelector(t *testing.T) {
-	DevelopmentSetup(WithSelectors("*", "config"))
+	err := DevelopmentSetup(WithSelectors("*", "config"))
+	assert.NoError(t, err)
 	assert.True(t, HasSelector("config"))
 	assert.False(t, HasSelector("publish"))
 }

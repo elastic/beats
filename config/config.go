@@ -60,11 +60,6 @@ var (
 	)
 )
 
-const (
-	selectorConfig             = "config"
-	selectorConfigWithPassword = "config-with-passwords"
-)
-
 func NewConfig() *C {
 	return fromConfig(ucfg.New())
 }

@@ -214,7 +214,7 @@ func (f *SettingsFlag) Get() interface{} {
 	return f.Config()
 }
 
-// String always returns an empty string. It is required to fulfil
+// String always returns an empty string. It is required to fulfill
 // the flag.Value interface.
 func (f *SettingsFlag) String() string {
 	return ""

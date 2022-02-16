@@ -37,8 +37,10 @@ func SafeFileRotate(path, tempfile string) error {
 	// filesystems, so to update the parents directory metadata to actually
 	// contain the new file being rotated in.
 	f, err := os.Open(parent)
+
+	// nolint: nilerr // ignore error
 	if err != nil {
-		return nil // ignore error
+		return nil
 	}
 	defer f.Close()
 

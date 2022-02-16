@@ -158,7 +158,8 @@ func TestOverwriteFlag(t *testing.T) {
 	cobraExpectedUsage := "  -a, --a string   message\n"
 	assert.Equal(t, cobraExpectedUsage, cobraUsage)
 
-	fs.Set("a", "overwrite")
+	err = fs.Set("a", "overwrite")
+	assert.NoError(t, err)
 	final, err := config.String("a", -1)
 	assert.NoError(t, err)
 	assert.Equal(t, "overwrite", final)

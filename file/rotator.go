@@ -258,9 +258,9 @@ func (r *Rotator) appendToFile() error {
 		return errors.Wrap(err, "failed to append to existing file")
 	}
 	if r.redirectStderr {
-		RedirectStandardError(r.file)
+		err = RedirectStandardError(r.file)
 	}
-	return nil
+	return err
 }
 
 func (r *Rotator) openFile() error {
@@ -274,16 +274,16 @@ func (r *Rotator) openFile() error {
 		return errors.Wrap(err, fmt.Sprintf("failed to open new file '%s'", r.rot.ActiveFile()))
 	}
 	if r.redirectStderr {
-		RedirectStandardError(r.file)
+		err = RedirectStandardError(r.file)
 	}
-	return nil
+	return err
 }
 
 func (r *Rotator) rotate(reason rotateReason) error {
 	return r.rotateWithTime(reason, r.clock.Now())
 }
 
-// rotateWithTime closes the actively written file, and rotates it along with exising
+// rotateWithTime closes the actively written file, and rotates it along with existing
 // rotated files if needed. When it is done, unnecessary files are removed.
 func (r *Rotator) rotateWithTime(reason rotateReason, rotationTime time.Time) error {
 	if err := r.closeFile(); err != nil {
@@ -445,7 +445,7 @@ func (d *dateRotator) Rotate(reason rotateReason, rotateTime time.Time) error {
 	newFileNamePrefix := d.filenamePrefix + rotateTime.Format(d.format)
 	files, err := filepath.Glob(newFileNamePrefix + "*" + d.extension)
 	if err != nil {
-		return fmt.Errorf("failed to get possible files: %+v", err)
+		return errors.Wrap(err, "failed to get possible files")
 	}
 
 	if len(files) == 0 {

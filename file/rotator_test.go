@@ -36,7 +36,8 @@ import (
 const logMessage = "Test file rotator.\n"
 
 func TestFileRotator(t *testing.T) {
-	logp.TestingSetup()
+	err := logp.TestingSetup()
+	assert.NoError(t, err)
 
 	dir := t.TempDir()
 	logname := "sample"

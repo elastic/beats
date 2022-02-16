@@ -207,12 +207,12 @@ func makeOptions(cfg Config) []zap.Option {
 
 func makeStderrOutput(cfg Config) (zapcore.Core, error) {
 	stderr := zapcore.Lock(os.Stderr)
-	return newCore(cfg, buildEncoder(cfg), stderr, cfg.Level.ZapLevel()), nil
+	return newCore(buildEncoder(cfg), stderr, cfg.Level.ZapLevel()), nil
 }
 
 func makeDiscardOutput(cfg Config) (zapcore.Core, error) {
 	discard := zapcore.AddSync(ioutil.Discard)
-	return newCore(cfg, buildEncoder(cfg), discard, cfg.Level.ZapLevel()), nil
+	return newCore(buildEncoder(cfg), discard, cfg.Level.ZapLevel()), nil
 }
 
 func makeSyslogOutput(cfg Config) (zapcore.Core, error) {
@@ -220,7 +220,7 @@ func makeSyslogOutput(cfg Config) (zapcore.Core, error) {
 	if err != nil {
 		return nil, err
 	}
-	return wrappedCore(cfg, core), nil
+	return wrappedCore(core), nil
 }
 
 func makeEventLogOutput(cfg Config) (zapcore.Core, error) {
@@ -228,7 +228,7 @@ func makeEventLogOutput(cfg Config) (zapcore.Core, error) {
 	if err != nil {
 		return nil, err
 	}
-	return wrappedCore(cfg, core), nil
+	return wrappedCore(core), nil
 }
 
 func makeFileOutput(cfg Config) (zapcore.Core, error) {
@@ -246,13 +246,13 @@ func makeFileOutput(cfg Config) (zapcore.Core, error) {
 		return nil, errors.Wrap(err, "failed to create file rotator")
 	}
 
-	return newCore(cfg, buildEncoder(cfg), rotator, cfg.Level.ZapLevel()), nil
+	return newCore(buildEncoder(cfg), rotator, cfg.Level.ZapLevel()), nil
 }
 
-func newCore(cfg Config, enc zapcore.Encoder, ws zapcore.WriteSyncer, enab zapcore.LevelEnabler) zapcore.Core {
-	return wrappedCore(cfg, zapcore.NewCore(enc, ws, enab))
+func newCore(enc zapcore.Encoder, ws zapcore.WriteSyncer, enab zapcore.LevelEnabler) zapcore.Core {
+	return wrappedCore(zapcore.NewCore(enc, ws, enab))
 }
-func wrappedCore(cfg Config, core zapcore.Core) zapcore.Core {
+func wrappedCore(core zapcore.Core) zapcore.Core {
 	return ecszap.WrapCore(core)
 }
 
@@ -267,7 +267,8 @@ func loadLogger() *coreLogger {
 
 func storeLogger(l *coreLogger) {
 	if old := loadLogger(); old != nil {
-		old.rootLogger.Sync()
+		// ignore the error
+		_ = old.rootLogger.Sync()
 	}
 	atomic.StorePointer(&_log, unsafe.Pointer(l))
 }

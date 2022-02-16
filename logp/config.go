@@ -41,7 +41,6 @@ type Config struct {
 	environment Environment
 	addCaller   bool // Adds package and line number info to messages.
 	development bool // Controls how DPanic behaves.
-	logsPath    string
 }
 
 // FileConfig contains the configuration options for the file output.
