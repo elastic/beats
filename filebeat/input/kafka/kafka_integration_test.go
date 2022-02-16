@@ -126,6 +126,10 @@ func TestInput(t *testing.T) {
 		}
 	}
 
+	// sarama commits every second, we need to make sure
+	// all message acks are committed before the rest of the checks
+	<-time.After(2 * time.Second)
+
 	// Close the done channel and make sure the beat shuts down in a reasonable
 	// amount of time.
 	cancel()
@@ -449,7 +453,11 @@ func assertOffset(t *testing.T, groupID, topic string, expected int64) {
 		assert.NoError(t, err)
 
 		offset, _ := pom.NextOffset()
-		offsetSum += offset
+		// if the partition was not written to before
+		// it might return -1 which would affect the sum
+		if offset > 0 {
+			offsetSum += offset
+		}
 
 		pom.Close()
 	}
