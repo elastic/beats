@@ -63,7 +63,7 @@ class Test(WriteReadTest):
             "winlog.opcode": "Info",
         })
 
-    def test_cleared_channel_starts_from_beginning(self):
+    def test_cleared_channel_restarts(self):
         """
         wineventlog - When a bookmark points to a cleared (stale) channel
         the subscription starts from the beginning
@@ -100,7 +100,7 @@ class Test(WriteReadTest):
         self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg3)
 
-    def test_restart_if_bookmark_does_not_exist(self):
+    def test_bad_bookmark_restart(self):
         """
         wineventlog - When a bookmarked event does not exist the subcription
         restarts from the beginning
