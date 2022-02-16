@@ -404,7 +404,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
     def read_output(self,
                     output_file=None,
                     required_fields=None,
-                    filter_key: str=""):
+                    filter_key: str = ""):
         """
         read_output Returns output as JSON object with flattened fields (. notation)
         """
