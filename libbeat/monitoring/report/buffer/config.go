@@ -15,14 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !linux
-// +build !linux
+package buffer
 
-package process
+import (
+	"time"
+)
 
-import "os"
+type config struct {
+	Period     time.Duration `config:"period"`
+	Size       int           `config:"size" validate:"min=2"`
+	Namespaces []string      `config:"namespaces"`
+}
 
-// GetSelfPid returns the PID for this process
-func GetSelfPid() (int, error) {
-	return os.Getpid(), nil
+// defaultConfig will gather 10m of data (every 10s) for the stats registry.
+func defaultConfig() config {
+	return config{
+		Period:     10 * time.Second,
+		Size:       60,
+		Namespaces: []string{"stats"},
+	}
 }

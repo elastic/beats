@@ -417,11 +417,23 @@ func (q *OSQueryD) isVerbose() bool {
 }
 
 func osquerydPath(dir string) string {
-	if runtime.GOOS == "darwin" {
-		return filepath.Join(dir, osqueryDarwinAppBundlePath, osquerydFilename())
+	return QsquerydPathForPlatform(runtime.GOOS, dir)
+}
+
+// QsquerydPathForPlatform returns the full path to osqueryd binary for platform
+func QsquerydPathForPlatform(platform, dir string) string {
+	if platform == "darwin" {
+		return filepath.Join(dir, osqueryDarwinAppBundlePath, osquerydFilename(platform))
 
 	}
-	return filepath.Join(dir, osquerydFilename())
+	return filepath.Join(dir, osquerydFilename(platform))
+}
+
+func osquerydFilename(platform string) string {
+	if platform == "windows" {
+		return osqueryDName + ".exe"
+	}
+	return osqueryDName
 }
 
 func osqueryExtensionPath(dir string) string {

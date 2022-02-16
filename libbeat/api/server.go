@@ -18,6 +18,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -70,6 +71,25 @@ func (s *Server) Start() {
 // Stop stops the API server and free any resource associated with the process like unix sockets.
 func (s *Server) Stop() error {
 	return s.l.Close()
+}
+
+// AttachHandler will attach a handler at the specified route and return an error instead of panicing.
+func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			switch r := r.(type) {
+			case error:
+				err = r
+			case string:
+				err = errors.New(r)
+			default:
+				err = fmt.Errorf("handle attempted to panic with %v", r)
+			}
+		}
+	}()
+	s.log.Infof("Attempting to attach %q to server.", route)
+	s.mux.Handle(route, h)
+	return
 }
 
 func parse(host string, port int) (string, string, error) {

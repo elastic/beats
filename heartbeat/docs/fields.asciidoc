@@ -13,6 +13,7 @@ This document describes the fields that are exported by Heartbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-beat-common>>
+* <<exported-fields-browser>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-docker-processor>>
@@ -94,6 +95,146 @@ alias to: agent.name
 Time series instance id
 
 type: keyword
+
+--
+
+[[exported-fields-browser]]
+== Synthetics browser metrics fields
+
+None
+
+
+[float]
+=== browser
+
+Browser metrics and traces
+
+
+[float]
+=== experience
+
+Absolute values of all user experience metrics in the browser relative to the navigation start event in microseconds
+
+
+
+[float]
+=== fcp
+
+duration of First contentful paint metric
+
+
+*`browser.experience.fcp.us`*::
++
+--
+type: integer
+
+--
+
+[float]
+=== lcp
+
+duration of Largest contentful paint metric
+
+
+*`browser.experience.lcp.us`*::
++
+--
+type: integer
+
+--
+
+[float]
+=== dcl
+
+duration of Document content loaded end event
+
+
+*`browser.experience.dcl.us`*::
++
+--
+type: integer
+
+--
+
+[float]
+=== load
+
+duration of Load end event
+
+
+*`browser.experience.load.duration`*::
++
+--
+type: integer
+
+--
+
+*`browser.experience.cls`*::
++
+--
+culumative layout shift score across all frames
+
+type: integer
+
+--
+
+[float]
+=== relative_trace
+
+trace event with timing information that are realtive to journey timings in microseconds
+
+
+
+*`browser.relative_trace.name`*::
++
+--
+name of the trace event
+
+type: keyword
+
+--
+
+*`browser.relative_trace.type`*::
++
+--
+could be one of mark or measure event types
+
+type: text
+
+--
+
+[float]
+=== start
+
+monotonically increasing trace start time in microseconds
+
+
+*`browser.relative_trace.start.us`*::
++
+--
+type: long
+
+--
+
+[float]
+=== duration
+
+duration of the trace event in microseconds.
+
+
+*`browser.relative_trace.duration.us`*::
++
+--
+type: integer
+
+--
+
+*`browser.relative_trace.score`*::
++
+--
+weighted score of the layout shift event
+
+type: integer
 
 --
 
@@ -16285,135 +16426,6 @@ Attributes representing individual screenshot blocks. Only hash is indexed since
 Hash that uniquely identifies this image by content. Corresponds to block document id.
 
 type: keyword
-
---
-
-
-[float]
-=== experience
-
-Absolute values of all user experience metrics in the browser relative to the navigation start event in microseconds
-
-
-
-[float]
-=== fcp
-
-duration of First contentful paint metric
-
-
-*`synthetics.browser.experience.fcp.us`*::
-+
---
-type: integer
-
---
-
-[float]
-=== lcp
-
-duration of Largest contentful paint metric
-
-
-*`synthetics.browser.experience.lcp.us`*::
-+
---
-type: integer
-
---
-
-[float]
-=== dcl
-
-duration of Document content loaded end event
-
-
-*`synthetics.browser.experience.dcl.us`*::
-+
---
-type: integer
-
---
-
-[float]
-=== load
-
-duration of Load end event
-
-
-*`synthetics.browser.experience.load.duration`*::
-+
---
-type: integer
-
---
-
-*`synthetics.browser.experience.cls`*::
-+
---
-culumative layout shift score across all frames
-
-type: integer
-
---
-
-[float]
-=== relative_trace
-
-trace event with timing information that are realtive to journey timings in microseconds
-
-
-
-*`synthetics.browser.relative_trace.name`*::
-+
---
-name of the trace event
-
-type: keyword
-
---
-
-*`synthetics.browser.relative_trace.type`*::
-+
---
-could be one of mark or measure event types
-
-type: text
-
---
-
-[float]
-=== start
-
-monotonically increasing trace start time in microseconds
-
-
-*`synthetics.browser.relative_trace.start.us`*::
-+
---
-type: long
-
---
-
-[float]
-=== duration
-
-duration of the trace event in microseconds.
-
-
-*`synthetics.browser.relative_trace.duration.us`*::
-+
---
-type: integer
-
---
-
-*`synthetics.browser.relative_trace.score`*::
-+
---
-weighted score of the layout shift event
-
-type: integer
 
 --
 
