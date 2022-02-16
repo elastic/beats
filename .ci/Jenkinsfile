@@ -39,10 +39,10 @@ pipeline {
             withMageEnv(){
               sh(label: 'lint', script: '''
                 go mod tidy && git diff --exit-code
-                gofmt -l . | read && echo "Code differs from gofmt's style. Run 'gofmt -w .'" 1>&2 && exit 1 || true
+								curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.44.0
+                ./bin/golangci-lint run ./...
               ''')
               sh(label: 'Mage check', script: 'mage check')
-              sh(label: 'Go vet', script: 'go vet ./...')
             }
           }
         }
