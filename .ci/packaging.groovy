@@ -302,7 +302,8 @@ def tagAndPush(Map args = [:]) {
     arch: args.arch,
     version: env.BEAT_VERSION,
     snapshot: env.SNAPSHOT,
-    project: [ name: args.beatName, variants: args.variants ],
+    imageName: args.beatName,
+    variants: args.variants,
     targetNamespace: 'observability-ci'
   )
 }
