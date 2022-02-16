@@ -296,7 +296,7 @@ func (a *Application) Shutdown() {
 
 // OnStatusChange is the handler called by the GRPC server code.
 //
-// It updates the status of the application and handles restarting the application is needed.
+// It updates the status of the application and handles restarting the application when needed.
 func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string, payload map[string]interface{}) {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
