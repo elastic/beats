@@ -46,8 +46,6 @@ def json_raise_on_duplicates(ordered_pairs):
     return key_dict
 
 
-
-
 class WaitTimeoutError(Exception):
     """
     WaitTimeoutError is raised by the wait_until function if the `until` logic passes its timeout.
@@ -857,7 +855,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
             port=os.getenv("ES_PORT", "9200"),
         )
 
-
     def get_elasticsearch_url_ssl(self):
         """
         Returns a string with the Elasticsearch URL
@@ -867,7 +864,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
             port=os.getenv("ES_PORT_SSL", "9205"),
         )
 
-
     def get_kibana_url(self):
         """
         Returns kibana host URL
@@ -876,7 +872,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
             host=os.getenv("KIBANA_HOST", "localhost"),
             port=os.getenv("KIBANA_PORT", "5601"),
         )
-
 
     def get_elasticsearch_instance(self, security=True, ssl=False, url=None, user=None):
         """
@@ -897,7 +892,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
             es_instance = Elasticsearch([url])
         return es_instance
 
-
     def get_kibana_template_config(self, security=True, user=None):
         """
         Returns a Kibana template suitable for a Beat
@@ -912,7 +906,6 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         return template
 
-
     def get_elasticsearch_template_config(self, security=True, user=None):
         """
         Returns a template suitable for a Beats config
@@ -926,6 +919,3 @@ class TestCase(unittest.TestCase, ComposeMixin):
             template["pass"] = os.getenv("ES_PASS", "")
 
         return template
-
-
-
