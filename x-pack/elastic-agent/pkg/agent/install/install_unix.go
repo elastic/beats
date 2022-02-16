@@ -8,7 +8,6 @@
 package install
 
 import (
-	"os"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -35,7 +34,7 @@ func checkPackageInstall() bool {
 	// If the package has been installed, the status starts with "install"
 	// If the package has been removed (but not pruged) status starts with "deinstall"
 	// If purged or never installed, rc is 1
-	if _, err := os.Stat("/etc/dpkg"); err == nil {
+	if _, err := exec.Command("which", "dpkg-query").Output(); err == nil {
 		out, err := exec.Command("dpkg-query", "-W", "-f", "${Status}", paths.BinaryName).Output()
 		if err != nil {
 			return false
@@ -49,7 +48,7 @@ func checkPackageInstall() bool {
 	// check rhel and sles based systems (or systems that use rpm)
 	// if package has been installed query retuns with a list of associated files.
 	// otherwise if uninstalled, or has never been installled status ends with "not installed"
-	if _, err := os.Stat("/etc/rpm"); err == nil {
+	if _, err := exec.Command("which", "rpm").Output(); err == nil {
 		out, err := exec.Command("rpm", "-q", paths.BinaryName, "--state").Output()
 		if err != nil {
 			return false
