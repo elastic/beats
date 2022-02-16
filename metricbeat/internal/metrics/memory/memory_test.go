@@ -22,8 +22,6 @@
 package memory
 
 import (
-	"bytes"
-	"encoding/json"
 	"runtime"
 	"testing"
 
@@ -31,94 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
-	"github.com/elastic/go-structform/gotype"
-	gsjson "github.com/elastic/go-structform/json"
 )
-
-func TestMarshal(t *testing.T) {
-	testStat := UsedMemStatsTest{
-		Raw:   5,
-		Iface: opt.NewFloatNone(),
-	}
-
-	jsonData, err := runJsonMarshal(testStat)
-	assert.NoError(t, err)
-	t.Logf("%s", jsonData)
-}
-
-func TestStdLibJSON(t *testing.T) {
-	testStat := SwapMetrics{
-		Total: opt.UintWith(5),
-		Free:  opt.NewUintNone(),
-		Used: UsedMemStats{
-			Pct:   opt.FloatWith(4.5),
-			Bytes: opt.UintWith(5),
-		},
-	}
-	out, err := json.Marshal(testStat)
-	assert.NoError(t, err, "Marshal")
-	t.Logf("Out: %s", string(out))
-}
-
-func TestStructform(t *testing.T) {
-	outBuf := new(bytes.Buffer)
-	visitor := gsjson.NewVisitor(outBuf)
-	folder, err := gotype.NewIterator(visitor,
-		gotype.Folders(),
-	)
-	assert.NoError(t, err, "NewIterator")
-	err = runStructformEncoder(folder)
-	assert.NoError(t, err, "runStructformEncoder")
-	t.Logf("output from structform: %s", string(outBuf.Bytes()))
-}
-
-func BenchmarkStdLibJSON(b *testing.B) {
-	testStat := UsedMemStatsTest{
-		Raw:   5,
-		Iface: opt.FloatWith(4.3),
-	}
-	wrapper := MarshalWrapper{
-		Butterfly: &testStat,
-	}
-	for i := 0; i < b.N; i++ {
-		json.Marshal(&wrapper)
-	}
-}
-
-func BenchmarkStructform(b *testing.B) {
-	testStat := SwapMetrics{
-		Total: opt.UintWith(5),
-		Free:  opt.NewUintNone(),
-		Used: UsedMemStats{
-			Pct:   opt.FloatWith(4.5),
-			Bytes: opt.UintWith(5),
-		},
-	}
-	outBuf := new(bytes.Buffer)
-	visitor := gsjson.NewVisitor(outBuf)
-	folder, err := gotype.NewIterator(visitor,
-		gotype.Folders(),
-	)
-	if err != nil {
-		b.Fatalf("err: %s", err)
-	}
-	err = runStructformEncoder(folder)
-	if err != nil {
-		b.Fatalf("err: %s", err)
-	}
-
-	for i := 0; i < b.N; i++ {
-		folder.Fold(testStat)
-	}
-}
-
-func runStructformEncoder(folder *gotype.Iterator) error {
-	testStat := UsedMemStatsTest{
-		Raw:   5,
-		Iface: opt.FloatWith(4.3),
-	}
-	return folder.Fold(testStat)
-}
 
 func TestGetMemory(t *testing.T) {
 	mem, err := Get(resolve.NewTestResolver(""))
