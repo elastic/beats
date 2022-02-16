@@ -20,7 +20,6 @@ linters:
     - deadcode # finds unused code
     - errcheck # checking for unchecked errors in go programs
     - errorlint # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
-    # - goconst # finds repeated strings that could be replaced by a constant
     - dupl # tool for code clone detection
     - forbidigo # forbids identifiers	by reg exps
     - gomoddirectives # manage the use of 'replace', 'retract', and 'excludes' directives in go.mod.
@@ -43,7 +42,6 @@ linters:
     - bodyclose # checks whether HTTP response body is closed successfully
     - durationcheck # check for two durations multiplied together
     - exportloopref # checks for pointers to enclosing loop variables
-    - forcetypeassert # finds forced type assertions
     - goimports # Goimports does everything that gofmt does. Additionally it checks unused imports
     - gosec # inspects source code for security problems
     - importas # enforces consistent import aliases
@@ -69,16 +67,6 @@ linters-settings:
     asserts: true
     # Check for plain error comparisons
     comparison: true
-
-  goconst:
-    # minimal length of string constant, 3 by default
-    min-len: 3
-    # minimal occurrences count to trigger, 3 by default
-    min-occurrences: 2
-
-  makezero:
-    # Allow only slices initialized with a length of zero. Default is false.
-    always: true
 
   dupl:
     # tokens count to trigger issue, 150 by default
@@ -112,9 +100,6 @@ linters-settings:
     max-func-lines: 0
 
   prealloc:
-    # XXX: we don't recommend using this linter before doing performance profiling.
-    # For most programs usage of prealloc will be a premature optimization.
-
     # Report preallocation suggestions only on simple loops that have no returns/breaks/continues/gotos in them.
     # True by default.
     simple: true
