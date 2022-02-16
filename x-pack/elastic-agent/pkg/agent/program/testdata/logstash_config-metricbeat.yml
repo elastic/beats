@@ -1,0 +1,89 @@
+metricbeat:
+  modules:
+  - module: docker
+    metricsets: [status]
+    index: metrics-docker.status-default
+    hosts: ["http://127.0.0.1:8080"]
+    processors:
+    - add_fields:
+        target: "data_stream"
+        fields:
+          type: metrics
+          dataset: docker.status
+          namespace: default
+    - add_fields:
+        target: "event"
+        fields:
+          dataset: docker.status
+    - add_fields:
+        target: "elastic_agent"
+        fields:
+          id: agent-id
+          version: 8.0.0
+          snapshot: false
+    - add_fields:
+        target: "agent"
+        fields:
+          id: agent-id
+  - module: docker
+    metricsets: [info]
+    index: metrics-generic-default
+    hosts: ["http://127.0.0.1:8080"]
+    processors:
+    - add_fields:
+        target: "data_stream"
+        fields:
+          type: metrics
+          dataset: generic
+          namespace: default
+    - add_fields:
+        target: "event"
+        fields:
+          dataset: generic
+    - add_fields:
+        target: "elastic_agent"
+        fields:
+          id: agent-id
+          version: 8.0.0
+          snapshot: false
+    - add_fields:
+        target: "agent"
+        fields:
+          id: agent-id
+  - module: apache
+    metricsets: [info]
+    index: metrics-generic-testing
+    hosts: ["http://apache.remote"]
+    processors:
+      - add_fields:
+          fields:
+            should_be: first
+      - add_fields:
+          target: "data_stream"
+          fields:
+            type: metrics
+            dataset: generic
+            namespace: testing
+      - add_fields:
+          target: "event"
+          fields:
+            dataset: generic
+      - add_fields:
+          target: "elastic_agent"
+          fields:
+            id: agent-id
+            version: 8.0.0
+            snapshot: false
+      - add_fields:
+          target: "agent"
+          fields:
+            id: agent-id
+output:
+  logstash:
+    ssl.certificate: abcert
+    ssl.key: abckey
+    hosts:
+      - 127.0.0.1:5044
+    ssl.certificate_authorities: 
+      - abc1
+      - abc2

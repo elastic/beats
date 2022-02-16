@@ -6,6 +6,7 @@ package program
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -392,6 +393,10 @@ func TestConfiguration(t *testing.T) {
 			programs: []string{"filebeat", "fleet-server", "heartbeat", "metricbeat", "endpoint", "packetbeat"},
 			expected: 6,
 		},
+		"logstash_config": {
+			programs: []string{"filebeat", "fleet-server", "heartbeat", "metricbeat", "packetbeat"},
+			expected: 5,
+		},
 		"single_config": {
 			programs: []string{"filebeat", "fleet-server", "heartbeat", "metricbeat", "endpoint", "packetbeat"},
 			expected: 6,
@@ -464,6 +469,11 @@ func TestConfiguration(t *testing.T) {
 
 			defPrograms, ok := programs["default"]
 			require.True(t, ok)
+			if test.expected != len(defPrograms) {
+				for _, n := range defPrograms {
+					fmt.Println(n)
+				}
+			}
 			require.Equal(t, test.expected, len(defPrograms))
 
 			for _, program := range defPrograms {

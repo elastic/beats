@@ -1,0 +1,111 @@
+name: Production Website DB Servers
+fleet:
+  enabled: true
+  access_api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
+  protocol: https
+  hosts: [ localhost:5601 ]
+  timeout: 30s
+  agent:
+    id: fleet-agent-id
+    logging.level: error
+  host:
+    id: host-agent-id
+  server:
+    output:
+      elasticsearch:
+        hosts: [ 127.0.0.1:9200, 127.0.0.1:9300 ]
+        username: fleet
+        password: fleetpassword
+
+outputs:
+  default:
+    type: logstash
+    ssl.certificate: abcert
+    ssl.key: abckey
+    hosts: [127.0.0.1:5044]
+    ssl.certificate_authorities: 
+      - abc1
+      - abc2
+
+  monitoring:
+    type: elasticsearch
+    api_key: VuaCfGcBCdbkQm-e5aOx:ui2lp2axTNmsyakw9tvNnw
+    hosts: ["monitoring:9200"]
+    ca_sha256: "7lHLiyp4J8m9kw38SJ7SURJP4bXRZv/BNxyyXkCcE/M="
+
+inputs:
+- id: fleet-server-id
+  type: fleet-server
+  use_output: default
+  data_stream:
+    type: default
+- type: docker/metrics
+  use_output: default
+  streams:
+    - metricset: status
+      processors:
+      - null
+      data_stream:
+        dataset: docker.status
+    - metricset: info
+      data_stream:
+        dataset: ""
+  hosts: ["http://127.0.0.1:8080"]
+- type: logfile
+  use_output: default
+  streams:
+    - paths:
+      - /var/log/hello1.log
+      - /var/log/hello2.log
+  vars:
+    var: value
+- type: logfile
+  data_stream:
+    type: testtype
+  use_output: default
+  streams:
+    - paths:
+      - /var/log/hello3.log
+      - /var/log/hello4.log
+  vars:
+    var: value
+- id: apache-metrics-id
+  type: apache/metrics
+  data_stream:
+    namespace: testing
+  use_output: default
+  processors:
+    - add_fields:
+        fields:
+          should_be: first
+  streams:
+    - enabled: true
+      metricset: info
+      hosts: ["http://apache.remote"]
+  hosts: ["http://apache.local"]
+- type: synthetics/http
+  id: unique-http-id
+  name: my-http
+  schedule: '*/5 * * * * * *'
+  host: "http://localhost:80/service/status"
+  timeout: 16s
+  wait: 1s
+- type: packet
+  streams:
+    - type: flow
+      timeout: 10s
+      period: 10s
+      keep_null: false
+      data_stream:
+        dataset: packet.flow
+        type: logs
+    - type: icmp
+      data_stream:
+        dataset: packet.icmp
+        type: logs
+
+agent.monitoring:
+  use_output: monitoring
+
+agent:
+  reload: 123

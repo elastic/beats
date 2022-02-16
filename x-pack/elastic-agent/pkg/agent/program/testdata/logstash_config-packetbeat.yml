@@ -1,0 +1,34 @@
+inputs:
+- type: packet
+  processors:
+    - add_fields:
+        target: 'elastic_agent'
+        fields:
+          id: agent-id
+          version: 8.0.0
+          snapshot: false
+    - add_fields:
+        target: 'agent'
+        fields:
+          id: agent-id
+  streams:
+  - type: flow
+    timeout: 10s
+    period: 10s
+    keep_null: false
+    data_stream:
+      dataset: packet.flow
+      type: logs
+  - type: icmp
+    data_stream:
+      dataset: packet.icmp
+      type: logs
+output:
+  logstash:
+    ssl.certificate: abcert
+    ssl.key: abckey
+    hosts:
+      - 127.0.0.1:5044
+    ssl.certificate_authorities: 
+      - abc1
+      - abc2

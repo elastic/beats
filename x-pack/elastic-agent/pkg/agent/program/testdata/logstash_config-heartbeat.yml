@@ -1,0 +1,29 @@
+inputs:
+- type: synthetics/http
+  id: unique-http-id
+  name: my-http
+  schedule: '*/5 * * * * * *'
+  host: "http://localhost:80/service/status"
+  timeout: 16s
+  wait: 1s
+  data_stream.namespace: default
+  processors:
+    - add_fields:
+        target: 'elastic_agent'
+        fields:
+          id: agent-id
+          version: 8.0.0
+          snapshot: false
+    - add_fields:
+        target: 'agent'
+        fields:
+          id: agent-id
+output:
+  logstash:
+    ssl.certificate: abcert
+    ssl.key: abckey
+    hosts:
+      - 127.0.0.1:5044
+    ssl.certificate_authorities: 
+      - abc1
+      - abc2

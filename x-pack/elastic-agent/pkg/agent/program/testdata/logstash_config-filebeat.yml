@@ -1,0 +1,67 @@
+filebeat:
+  inputs:
+  - type: log
+    paths:
+      - /var/log/hello1.log
+      - /var/log/hello2.log
+    index: logs-generic-default
+    vars:
+      var: value
+    processors:
+      - add_fields:
+          target: "data_stream"
+          fields:
+            type: logs
+            dataset: generic
+            namespace: default
+      - add_fields:
+          target: "event"
+          fields:
+            dataset: generic
+      - add_fields:
+          target: "elastic_agent"
+          fields:
+            id: agent-id
+            version: 8.0.0
+            snapshot: false
+      - add_fields:
+          target: "agent"
+          fields:
+            id: agent-id
+  - type: log
+    paths:
+      - /var/log/hello3.log
+      - /var/log/hello4.log
+    index: testtype-generic-default
+    vars:
+      var: value
+    processors:
+      - add_fields:
+          target: "data_stream"
+          fields:
+            type: testtype
+            dataset: generic
+            namespace: default
+      - add_fields:
+          target: "event"
+          fields:
+            dataset: generic
+      - add_fields:
+          target: "elastic_agent"
+          fields:
+            id: agent-id
+            version: 8.0.0
+            snapshot: false
+      - add_fields:
+          target: "agent"
+          fields:
+            id: agent-id
+output:
+  logstash:
+    ssl.certificate: abcert
+    ssl.key: abckey
+    hosts:
+      - 127.0.0.1:5044
+    ssl.certificate_authorities: 
+      - abc1
+      - abc2
