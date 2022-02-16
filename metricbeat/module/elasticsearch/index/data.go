@@ -114,18 +114,18 @@ type total struct {
 type shardStats struct {
 	Total     int `json:"total"`
 	Primaries int `json:"primaries"`
-	Replicas  int `json:"replicas"`
+	Replicas  int `json:"-"`
 
-	ActiveTotal     int `json:"active_total"`
-	ActivePrimaries int `json:"active_primaries"`
-	ActiveReplicas  int `json:"active_replicas"`
+	ActiveTotal     int `json:"-"`
+	ActivePrimaries int `json:"-"`
+	ActiveReplicas  int `json:"-"`
 
-	UnassignedTotal     int `json:"unassigned_total"`
-	UnassignedPrimaries int `json:"unassigned_primaries"`
-	UnassignedReplicas  int `json:"unassigned_replicas"`
+	UnassignedTotal     int `json:"-"`
+	UnassignedPrimaries int `json:"-"`
+	UnassignedReplicas  int `json:"-"`
 
-	Initializing int `json:"initializing"`
-	Relocating   int `json:"relocating"`
+	Initializing int `json:"-"`
+	Relocating   int `json:"-"`
 }
 
 type bulkStats struct {
