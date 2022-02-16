@@ -80,8 +80,8 @@ The following actions are possible and grouped based on the actions.
 
   KIBANA_FLEET_HOST - kibana host to enable create enrollment token on [$KIBANA_HOST]
   FLEET_TOKEN_NAME - token name to use for fetching token from Kibana. This requires Kibana configs to be set.
-  DEFAULT_FLEET_TOKEN_NAME - token name to use when [$FLEET_TOKEN_NAME] is not set. Defaults to "Default policy".
   FLEET_TOKEN_POLICY_NAME - token policy name to use for fetching token from Kibana. This requires Kibana configs to be set.
+  DEFAULT_FLEET_TOKEN_POLICY_NAME - token policy name to use when [$FLEET_TOKEN_POLICY_NAME] is not set. Defaults to "Default policy".
 
 * Bootstrapping Fleet Server
   This bootstraps the Fleet Server to be run by this Elastic Agent. At least one Fleet Server is required in a Fleet
