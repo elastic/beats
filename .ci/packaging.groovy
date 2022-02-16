@@ -268,41 +268,32 @@ pipeline {
 def pushCIDockerImages(Map args = [:]) {
   def arch = args.get('arch', 'amd64')
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
-    def defaultVariants = [
-                            '' : 'beats',
-                            '-oss' : 'beats',
-                            '-ubi8' : 'beats'
-                          ]
+    def defaultVariants = [ '' : 'beats', '-oss' : 'beats', '-ubi8' : 'beats' ]
+    def completeVariant = ['-complete' : 'beats']
+    // Cloud is not public available, therefore it should use the beats-ci namespace.
+    def cloudVariant = ['-cloud' : 'beats-ci']
     if (env?.BEATS_FOLDER?.endsWith('auditbeat')) {
-      project = [ name: 'auditbeat', variants: defaultVariants ]
+      tagAndPush(beatName: 'auditbeat', arch: arch, variants: defaultVariants)
     } else if (env?.BEATS_FOLDER?.endsWith('filebeat')) {
-      project = [ name: 'filebeat', variants: defaultVariants ]
+      tagAndPush(beatName: 'filebeat', arch: arch, variants: defaultVariants)
     } else if (env?.BEATS_FOLDER?.endsWith('heartbeat')) {
-      project = [ name: 'heartbeat', variants: defaultVariants ]
+      tagAndPush(beatName: 'heartbeat', arch: arch, variants: defaultVariants)
     } else if (env?.BEATS_FOLDER?.endsWith('metricbeat')) {
-      project = [ name: 'metricbeat', variants: defaultVariants ]
+      tagAndPush(beatName: 'metricbeat', arch: arch, variants: defaultVariants)
     } else if (env?.BEATS_FOLDER?.endsWith('osquerybeat')) {
-      project = [ name: 'osquerybeat', variants: defaultVariants ]
+      tagAndPush(beatName: 'osquerybeat', arch: arch, variants: defaultVariants)
     } else if ("${env.BEATS_FOLDER}" == "packetbeat"){
-      project = [ name: 'packetbeat', variants: defaultVariants ]
+      tagAndPush(beatName: 'packetbeat', arch: arch, variants: defaultVariants)
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
-      project = [ name: 'elastic-agent',
-                  variants: [
-                    '' : 'beats',
-                    '-oss' : 'beats',
-                    '-ubi8' : 'beats',
-                    '-complete' : 'beats',
-                    '-cloud' : 'beats-ci'
-                  ]
-                ]
+      tagAndPush(beatName: 'elastic-agent', arch: arch, variants: defaultVariants + completeVariant + cloudVariant)
     }
-    tagAndPush(arch: arch, project: project)
   }
 }
 
 /**
 * @param beatName name of the Beat
 * @param arch what architecture
+* @param variants list of docker variants
 */
 def tagAndPush(Map args = [:]) {
   pushDockerImages(
@@ -311,7 +302,7 @@ def tagAndPush(Map args = [:]) {
     arch: args.arch,
     version: env.BEAT_VERSION,
     snapshot: env.SNAPSHOT,
-    project: args.project,
+    project: [ name: args.beatName, variants: args.variants ],
     targetNamespace: 'observability-ci'
   )
 }
