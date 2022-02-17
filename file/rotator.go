@@ -219,7 +219,11 @@ func (r *Rotator) Write(data []byte) (int, error) {
 	}
 
 	n, err := r.file.Write(data)
-	return n, fmt.Errorf("failed to write to file: %w", err)
+	if err != nil {
+		return n, fmt.Errorf("failed to write to file: %w", err)
+	}
+
+	return n, nil
 }
 
 // openNew opens r's log file for the first time, creating it if it doesn't
@@ -380,7 +384,12 @@ func (r *Rotator) closeFile() error {
 	}
 	err := r.file.Close()
 	r.file = nil
-	return fmt.Errorf("failed to close active file: %w", err)
+
+	if err != nil {
+		return fmt.Errorf("failed to close active file: %w", err)
+	}
+
+	return nil
 }
 
 type dateRotator struct {
