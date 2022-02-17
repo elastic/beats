@@ -73,6 +73,12 @@ func InstallLinter() error {
 	if err != nil {
 		return err
 	}
+
+	err = installScript.Close() // otherwise we cannot run the script
+	if err != nil {
+		return err
+	}
+
 	return sh.Run(linterInstallFilename, linterVersion)
 }
 
