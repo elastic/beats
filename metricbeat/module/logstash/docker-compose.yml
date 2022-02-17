@@ -2,38 +2,22 @@ version: '2.3'
 
 services:
   logstash:
-<<<<<<< HEAD
-    image: docker.elastic.co/integrations-ci/beats-logstash:${LOGSTASH_VERSION:-7.15.1}-1
-    build:
-      context: ./_meta
-      args:
-        LOGSTASH_VERSION: ${LOGSTASH_VERSION:-7.15.1}
-=======
     image: docker.elastic.co/integrations-ci/beats-logstash:${LOGSTASH_VERSION:-8.1.0-aa69d697-SNAPSHOT}-1
     build:
       context: ./_meta
       args:
         LOGSTASH_VERSION: ${LOGSTASH_VERSION:-8.1.0-aa69d697-SNAPSHOT}
->>>>>>> 478a5ce973 (Add supported-versions and update docker-compose for logstash module (#29440))
     ports:
       - "9600"
     depends_on:
       - elasticsearch
 
   elasticsearch:
-<<<<<<< HEAD
-    image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-7.15.1}-1
-    build:
-      context: ../elasticsearch/_meta
-      args:
-        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-7.15.1}
-=======
     image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-8.1.0-aa69d697-SNAPSHOT}-1
     build:
       context: ../elasticsearch/_meta
       args:
         ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-8.1.0-aa69d697-SNAPSHOT}
->>>>>>> 478a5ce973 (Add supported-versions and update docker-compose for logstash module (#29440))
     environment:
       - "network.host="
       - "transport.host=127.0.0.1"
