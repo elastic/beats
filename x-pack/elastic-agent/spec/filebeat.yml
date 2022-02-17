@@ -6,7 +6,7 @@ args: [
   "-E", "management.enabled=true",
   "-E", "logging.level=debug",
   "-E", "gc_percent=${FILEBEAT_GOGC:100}",
-  "-E", "metricbeat.config.modules.enabled=false"
+  "-E", "filebeat.config.modules.enabled=false"
 ]
 artifact: beats/filebeat
 restart_on_output_change: true
