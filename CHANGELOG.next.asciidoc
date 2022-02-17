@@ -51,6 +51,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
 - Fix multiple instances of the same module configured within `filebeat.modules` in filebeat.yml. {issue}29649[29649] {pull}29952[29952]
 - aws-s3: fix race condition in states used by s3-poller. {issue}30123[30123] {pull}30131[30131]
+- Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
 
 *Filebeat*
 - Fix broken Kafka input {issue}29746[29746] {pull}30277[30277]
