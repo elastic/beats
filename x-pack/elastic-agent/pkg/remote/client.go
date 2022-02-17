@@ -55,8 +55,8 @@ type Client struct {
 }
 
 // NewConfigFromURL returns a Config based on a received host.
-func NewConfigFromURL(kURL string) (Config, error) {
-	u, err := url.Parse(kURL)
+func NewConfigFromURL(URL string) (Config, error) {
+	u, err := url.Parse(URL)
 	if err != nil {
 		return Config{}, errors.Wrap(err, "could not parse url")
 	}
