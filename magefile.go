@@ -23,15 +23,67 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 )
 
+const (
+	linterInstallFilename = "./intall-golang-ci.sh"
+	linterBinaryFilename  = "./bin/golangci-lint"
+	linterVersion         = "v1.44.0"
+)
+
+// InstallLinter installs golangci-lint (https://golangci-lint.run) to `./bin`
+// using the official installation script downloaded from GitHub.
+// If the linter binary already exists does nothing.
+func InstallLinter() error {
+	_, err := os.Stat(linterBinaryFilename)
+	if err == nil {
+		log.Println("already installed, exiting...")
+		return nil
+	}
+	if !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+
+	log.Println("preparing the installation script file...")
+	installScript, err := os.OpenFile(linterInstallFilename, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0700)
+	if err != nil {
+		return err
+	}
+	defer installScript.Close()
+
+	log.Println("downloading the linter installation script...")
+	resp, err := http.Get("https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh")
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	lr := io.LimitReader(resp.Body, 1024*100) // not more than 100 KB
+	_, err = io.Copy(installScript, lr)
+	if err != nil {
+		return err
+	}
+	return sh.Run(linterInstallFilename, linterVersion)
+}
+
+// LintAll runs the linter against the entire codebase
+func LintAll() error {
+	mg.Deps(InstallLinter)
+	return sh.Run(linterBinaryFilename, "-v", "run", "./...")
+}
+
 func Check() error {
-	mg.Deps(CheckNoBeatsDependency)
+	mg.Deps(CheckNoBeatsDependency, CheckModuleTidy, LintAll)
 	return nil
 }
 
@@ -59,5 +111,19 @@ func CheckNoBeatsDependency() error {
 	if err := scanner.Err(); err != nil {
 		return err
 	}
+	return nil
+}
+
+// CheckModuleTidy checks if `go mod tidy` was run before.
+func CheckModuleTidy() error {
+	err := sh.Run("go", "mod", "tidy")
+	if err != nil {
+		return err
+	}
+	err = sh.Run("git", "diff", "--exit-code")
+	if err != nil {
+		return fmt.Errorf("`go mod tidy` was not called before committing: %w", err)
+	}
+
 	return nil
 }
