@@ -71,11 +71,11 @@ func NewController(
 func (e *Controller) Update(ctx context.Context, c *config.Config) (err error) {
 	span, ctx := apm.StartSpan(ctx, "update", "app.internal")
 	defer func() {
-		apm.CaptureError(ctx, rErr).Send()
+		apm.CaptureError(ctx, err).Send()
 		span.End()
 	}()
 
-	if rErr = info.InjectAgentConfig(c); rErr != nil {
+	if err = info.InjectAgentConfig(c); err != nil {
 		return
 	}
 
@@ -94,21 +94,18 @@ func (e *Controller) Update(ctx context.Context, c *config.Config) (err error) {
 		var ok bool
 		updatedAst, err := e.caps.Apply(rawAst)
 		if err != nil {
-			rErr = errors.New(err, "failed to apply capabilities")
-			return
+			return errors.New(err, "failed to apply capabilities")
 		}
 
 		rawAst, ok = updatedAst.(*transpiler.AST)
 		if !ok {
-			rErr = errors.New("failed to transform object returned from capabilities to AST", errors.TypeConfig)
-			return
+			return errors.New("failed to transform object returned from capabilities to AST", errors.TypeConfig)
 		}
 	}
 
 	for _, filter := range e.modifiers.Filters {
 		if err := filter(e.logger, rawAst); err != nil {
-			rErr = errors.New(err, "failed to filter configuration", errors.TypeConfig)
-			return
+			return errors.New(err, "failed to filter configuration", errors.TypeConfig)
 		}
 	}
 
