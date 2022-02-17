@@ -10,6 +10,9 @@ processors:
 - dot_expander:
     field: '*'
     override: true
+# Drop any non-deprecation logs that show up due to mixed log output configurations
+- drop:
+    if: '!["deprecation", "deprecation.elasticsearch"].contains(ctx.event.dataset)'
 - set:
     field: event.dataset
     value: elasticsearch.deprecation
