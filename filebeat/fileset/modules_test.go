@@ -24,6 +24,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -101,6 +102,8 @@ func TestNewModuleRegistry(t *testing.T) {
 		for _, fileset := range module.filesets {
 			filesetList = append(filesetList, fileset.name)
 		}
+		sort.Strings(filesetList)
+		sort.Strings(expectedFilesets)
 		assert.Equal(t, filesetList, expectedFilesets)
 	}
 
