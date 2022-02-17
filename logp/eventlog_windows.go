@@ -18,6 +18,7 @@
 package logp
 
 import (
+	"fmt"
 	"strings"
 
 	"errors"
