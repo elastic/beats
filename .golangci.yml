@@ -47,8 +47,6 @@ linters:
     - importas # enforces consistent import aliases
     - nilerr # finds the code that returns nil even if it checks that the error is not nil.
     - noctx # noctx finds sending http request without context.Context
-    - rowserrcheck # checks whether Err of rows is checked successfully
-    - sqlclosecheck # checks that sql.Rows and sql.Stmt are closed.
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
     - godox # tool for detection of FIXME, TODO and other comment keywords
