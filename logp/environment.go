@@ -43,21 +43,30 @@ const (
 	InvalidEnvironment
 )
 
+const (
+	defaultEnvironmentString        = "default"
+	systemdEnvironmentString        = "systemd"
+	containerEnvironmentString      = "container"
+	macOSServiceEnvironmentString   = "macOS_service"
+	windowsServiceEnvironmentString = "windows_service"
+	invalidEnvironmentString        = "<invalid>"
+)
+
 // String returns the string representation the configured environment
 func (v Environment) String() string {
 	switch v {
 	case DefaultEnvironment:
-		return "default"
+		return defaultEnvironmentString
 	case SystemdEnvironment:
-		return "systemd"
+		return systemdEnvironmentString
 	case ContainerEnvironment:
-		return "container"
+		return containerEnvironmentString
 	case MacOSServiceEnvironment:
-		return "macOS_service"
+		return macOSServiceEnvironmentString
 	case WindowsServiceEnvironment:
-		return "windows_service"
+		return windowsServiceEnvironmentString
 	default:
-		return "<invalid>"
+		return invalidEnvironmentString
 	}
 }
 
@@ -66,15 +75,15 @@ func (v Environment) String() string {
 // InvalidEnvironment is returned if the environment type is unknown.
 func ParseEnvironment(in string) Environment {
 	switch strings.ToLower(in) {
-	case "default":
+	case defaultEnvironmentString:
 		return DefaultEnvironment
-	case "systemd":
+	case systemdEnvironmentString:
 		return SystemdEnvironment
-	case "container":
+	case containerEnvironmentString:
 		return ContainerEnvironment
-	case "macos_service":
+	case macOSServiceEnvironmentString:
 		return MacOSServiceEnvironment
-	case "windows_service":
+	case windowsServiceEnvironmentString:
 		return WindowsServiceEnvironment
 	default:
 		return InvalidEnvironment

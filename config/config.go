@@ -38,6 +38,8 @@ type Namespace struct {
 	config *C
 }
 
+const mask = "xxxxx"
+
 var (
 	configOpts = []ucfg.Option{
 		ucfg.PathSep("."),
@@ -364,10 +366,10 @@ func applyLoggingMask(c interface{}) {
 			if maskList.Has(strings.ToLower(k)) {
 				if arr, ok := v.([]interface{}); ok {
 					for i := range arr {
-						arr[i] = "xxxxx"
+						arr[i] = mask
 					}
 				} else {
-					cfg[k] = "xxxxx"
+					cfg[k] = mask
 				}
 			} else {
 				applyLoggingMask(v)

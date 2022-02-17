@@ -20,6 +20,7 @@ linters:
     - deadcode # finds unused code
     - errcheck # checking for unchecked errors in go programs
     - errorlint # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
+    - goconst # finds repeated strings that could be replaced by a constant
     - dupl # tool for code clone detection
     - forbidigo # forbids identifiers	by reg exps
     - gomoddirectives # manage the use of 'replace', 'retract', and 'excludes' directives in go.mod.
@@ -65,6 +66,12 @@ linters-settings:
     asserts: true
     # Check for plain error comparisons
     comparison: true
+
+  goconst:
+    # minimal length of string constant, 3 by default
+    min-len: 3
+    # minimal occurrences count to trigger, 3 by default
+    min-occurrences: 2
 
   dupl:
     # tokens count to trigger issue, 150 by default
