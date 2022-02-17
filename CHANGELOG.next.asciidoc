@@ -52,6 +52,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix multiple instances of the same module configured within `filebeat.modules` in filebeat.yml. {issue}29649[29649] {pull}29952[29952]
 - aws-s3: fix race condition in states used by s3-poller. {issue}30123[30123] {pull}30131[30131]
 - Fix broken Kafka input {issue}29746[29746] {pull}30277[30277]
+- Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
 - auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
 
 *Heartbeat*
@@ -93,6 +94,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add support for kafka message headers. {pull}29940[29940]
 - Add FIPS configuration option for all AWS API calls. {pull}[28899]
 - Add metadata change support for some processors {pull}30183[30183]
+- Add support for non-unique Kafka headers for output messages. {pull}30369[30369]
 
 *Auditbeat*
 
@@ -135,7 +137,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Packetbeat*
 
-- Add automated OEM Npcap installation handling. {pull}29112[29112]
+- Add automated OEM Npcap installation handling. {pull}29112[29112] {pull}30396[30396]
 - Add support for capturing TLS random number and OCSP status request details. {issue}29962[29962] {pull}30102[30102]
 
 *Functionbeat*
