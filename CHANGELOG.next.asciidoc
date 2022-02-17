@@ -40,6 +40,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 - Fix field names with `add_network_direction` processor. {issue}29747[29747] {pull}29751[29751]
 - Fix a logging bug when `ssl.verification_mode` was set to `full` or `certificate`, the command `test output` incorrectly logged that TLS was disabled.
+- Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
 
 *Auditbeat*
 
@@ -73,7 +74,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Functionbeat*
 
-- Pass AWS region configuration correctly. {issue}28520[28520] {pull}30238[30238] 
+- Pass AWS region configuration correctly. {issue}28520[28520] {pull}30238[30238]
 
 
 *Elastic Logging Plugin*
