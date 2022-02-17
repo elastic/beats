@@ -21,10 +21,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestHasSelector(t *testing.T) {
-	DevelopmentSetup(WithSelectors("*", "config"))
+	err := DevelopmentSetup(WithSelectors("*", "config"))
+	require.NoError(t, err)
 	assert.True(t, HasSelector("config"))
 	assert.False(t, HasSelector("publish"))
 }

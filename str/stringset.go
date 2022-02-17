@@ -49,7 +49,7 @@ func (set Set) Has(s string) (exists bool) {
 	if set != nil {
 		_, exists = set[s]
 	}
-	return
+	return exists
 }
 
 // Equals compares this StringSet with another StringSet.

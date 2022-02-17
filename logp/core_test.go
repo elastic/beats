@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 )
 
@@ -46,9 +47,11 @@ func TestLogger(t *testing.T) {
 		log.Infow("some message with struct value", "metrics", someStruct)
 	}
 
-	TestingSetup()
+	err := TestingSetup()
+	require.NoError(t, err)
 	exerciseLogger()
-	TestingSetup()
+	err = TestingSetup()
+	require.NoError(t, err)
 	exerciseLogger()
 }
 
@@ -120,30 +123,38 @@ func TestL(t *testing.T) {
 }
 
 func TestDebugAllStdoutEnablesDefaultGoLogger(t *testing.T) {
-	DevelopmentSetup(WithSelectors("*"))
+	err := DevelopmentSetup(WithSelectors("*"))
+	require.NoError(t, err)
 	assert.Equal(t, _defaultGoLog, golog.Writer())
 
-	DevelopmentSetup(WithSelectors("stdlog"))
+	err = DevelopmentSetup(WithSelectors("stdlog"))
+	require.NoError(t, err)
 	assert.Equal(t, _defaultGoLog, golog.Writer())
 
-	DevelopmentSetup(WithSelectors("*", "stdlog"))
+	err = DevelopmentSetup(WithSelectors("*", "stdlog"))
+	require.NoError(t, err)
 	assert.Equal(t, _defaultGoLog, golog.Writer())
 
-	DevelopmentSetup(WithSelectors("other"))
+	err = DevelopmentSetup(WithSelectors("other"))
+	require.NoError(t, err)
 	assert.Equal(t, ioutil.Discard, golog.Writer())
 }
 
 func TestNotDebugAllStdoutDisablesDefaultGoLogger(t *testing.T) {
-	DevelopmentSetup(WithSelectors("*"), WithLevel(InfoLevel))
+	err := DevelopmentSetup(WithSelectors("*"), WithLevel(InfoLevel))
+	require.NoError(t, err)
 	assert.Equal(t, ioutil.Discard, golog.Writer())
 
-	DevelopmentSetup(WithSelectors("stdlog"), WithLevel(InfoLevel))
+	err = DevelopmentSetup(WithSelectors("stdlog"), WithLevel(InfoLevel))
+	require.NoError(t, err)
 	assert.Equal(t, ioutil.Discard, golog.Writer())
 
-	DevelopmentSetup(WithSelectors("*", "stdlog"), WithLevel(InfoLevel))
+	err = DevelopmentSetup(WithSelectors("*", "stdlog"), WithLevel(InfoLevel))
+	require.NoError(t, err)
 	assert.Equal(t, ioutil.Discard, golog.Writer())
 
-	DevelopmentSetup(WithSelectors("other"), WithLevel(InfoLevel))
+	err = DevelopmentSetup(WithSelectors("other"), WithLevel(InfoLevel))
+	require.NoError(t, err)
 	assert.Equal(t, ioutil.Discard, golog.Writer())
 }
 
@@ -157,7 +168,8 @@ func TestLoggingECSFields(t *testing.T) {
 		},
 	}
 	ToObserverOutput()(&cfg)
-	Configure(cfg)
+	err := Configure(cfg)
+	require.NoError(t, err)
 
 	logger := NewLogger("tester")
 

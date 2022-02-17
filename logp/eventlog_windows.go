@@ -18,9 +18,10 @@
 package logp
 
 import (
+	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
+	"errors"
 	"go.uber.org/zap/zapcore"
 	"golang.org/x/sys/windows/svc/eventlog"
 )
@@ -48,13 +49,13 @@ func newEventLog(appName string, encoder zapcore.Encoder, enab zapcore.LevelEnab
 
 	if err := eventlog.InstallAsEventCreate(appName, supports); err != nil {
 		if !strings.Contains(err.Error(), alreadyExistsMsg) {
-			return nil, errors.Wrap(err, "failed to setup eventlog")
+			return nil, fmt.Errorf("failed to setup eventlog: %w", err)
 		}
 	}
 
 	log, err := eventlog.Open(appName)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to open eventlog")
+		return nil, fmt.Errorf("failed to open eventlog: %w", err)
 	}
 
 	return &eventLogCore{
@@ -80,7 +81,7 @@ func (c *eventLogCore) Check(entry zapcore.Entry, checked *zapcore.CheckedEntry)
 func (c *eventLogCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	buffer, err := c.encoder.EncodeEntry(entry, fields)
 	if err != nil {
-		return errors.Wrap(err, "failed to encode entry")
+		return fmt.Errorf("failed to encode entry: %w", err)
 	}
 
 	msg := buffer.String()
@@ -92,7 +93,7 @@ func (c *eventLogCore) Write(entry zapcore.Entry, fields []zapcore.Field) error 
 	case zapcore.ErrorLevel, zapcore.DPanicLevel, zapcore.PanicLevel, zapcore.FatalLevel:
 		return c.log.Error(eventID, msg)
 	default:
-		return errors.Errorf("unhandled log level: %v", entry.Level)
+		return fmt.Errorf("unhandled log level: %v", entry.Level)
 	}
 }
 

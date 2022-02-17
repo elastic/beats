@@ -25,6 +25,8 @@ import (
 	cfgflag "github.com/elastic/go-ucfg/flag"
 )
 
+const typeString = "string"
+
 // StringsFlag collects multiple usages of the same flag into an array of strings.
 // Duplicate values will be ignored.
 type StringsFlag struct {
@@ -157,7 +159,7 @@ func (f *StringsFlag) List() []string {
 // Type reports the type of contents (string) expected to be parsed by Set.
 // It is used to build the CLI usage string.
 func (f *StringsFlag) Type() string {
-	return "string"
+	return typeString
 }
 
 // SettingFlag defines a setting flag, name and it's usage. The return value is
@@ -214,7 +216,7 @@ func (f *SettingsFlag) Get() interface{} {
 	return f.Config()
 }
 
-// String always returns an empty string. It is required to fulfil
+// String always returns an empty string. It is required to fulfill
 // the flag.Value interface.
 func (f *SettingsFlag) String() string {
 	return ""
@@ -286,5 +288,5 @@ func (f *flagOverwrite) Get() interface{} {
 }
 
 func (f *flagOverwrite) Type() string {
-	return "string"
+	return typeString
 }

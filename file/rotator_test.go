@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -36,7 +37,8 @@ import (
 const logMessage = "Test file rotator.\n"
 
 func TestFileRotator(t *testing.T) {
-	logp.TestingSetup()
+	err := logp.TestingSetup()
+	require.NoError(t, err)
 
 	dir := t.TempDir()
 	logname := "sample"
