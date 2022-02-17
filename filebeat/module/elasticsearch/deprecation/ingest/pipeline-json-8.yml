@@ -13,6 +13,7 @@ processors:
 # Drop any non-deprecation logs that show up due to mixed log output configurations
 - drop:
     if: '!["deprecation", "deprecation.elasticsearch"].contains(ctx.event.dataset)'
+# Normalize event.dataset value for kibana queries
 - set:
     field: event.dataset
     value: elasticsearch.deprecation
