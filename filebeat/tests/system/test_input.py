@@ -633,10 +633,10 @@ class Test(BaseTest):
         with open(testfile_path, 'a') as testfile:
             testfile.write("entry2\n")
 
-        filebeat = self.start_beat(output="filebeat2.log")
+        filebeat = self.start_beat()
 
         self.wait_until(
-            lambda: self.output_has_message("entry2"),
+            lambda: self.output_has_message("entry2", output_file="output/filebeat-"+self.today+"-1.ndjson"),
             max_timeout=10,
             name="output contains 'entry2'")
 
@@ -783,7 +783,7 @@ class Test(BaseTest):
         proc = self.start_beat()
 
         # on startup output is rotated
-        self.wait_until(lambda: self.output_has(lines=1, output_file="output/filebeat.1"))
+        self.wait_until(lambda: self.output_has(lines=1, output_file="output/filebeat-" + self.today + "-1.ndjson"))
         self.wait_until(lambda: self.output_has(lines=1))
         proc.check_kill_and_wait()
 

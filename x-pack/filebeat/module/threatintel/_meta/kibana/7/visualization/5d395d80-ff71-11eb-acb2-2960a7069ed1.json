@@ -28,7 +28,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "Most Linked Adversaries",
-                        "field": "threatintel.threatq.adversaries",
+                        "field": "threatq.adversaries",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

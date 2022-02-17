@@ -48,21 +48,14 @@ const (
 func TestESClientHandler_CheckILMEnabled(t *testing.T) {
 	t.Run("no ilm if disabled", func(t *testing.T) {
 		h := newESClientHandler(t)
-		b, err := h.CheckILMEnabled(ilm.ModeDisabled)
+		b, err := h.CheckILMEnabled(false)
 		assert.NoError(t, err)
 		assert.False(t, b)
 	})
 
-	t.Run("with ilm if auto", func(t *testing.T) {
-		h := newESClientHandler(t)
-		b, err := h.CheckILMEnabled(ilm.ModeAuto)
-		assert.NoError(t, err)
-		assert.True(t, b)
-	})
-
 	t.Run("with ilm if enabled", func(t *testing.T) {
 		h := newESClientHandler(t)
-		b, err := h.CheckILMEnabled(ilm.ModeEnabled)
+		b, err := h.CheckILMEnabled(true)
 		assert.NoError(t, err)
 		assert.True(t, b)
 	})
@@ -108,100 +101,6 @@ func TestESClientHandler_ILMPolicy(t *testing.T) {
 		b, err := h.HasILMPolicy(policy.Name)
 		assert.NoError(t, err)
 		assert.True(t, b)
-	})
-}
-
-func TestESClientHandler_Alias(t *testing.T) {
-	makeAlias := func(base string) ilm.Alias {
-		return ilm.Alias{
-			Name:    makeName(base),
-			Pattern: "{now/d}-000001",
-		}
-	}
-
-	t.Run("does not exist", func(t *testing.T) {
-		name := makeName("esch-alias-no")
-		h := newESClientHandler(t)
-		b, err := h.HasAlias(name)
-		assert.NoError(t, err)
-		assert.False(t, b)
-	})
-
-	t.Run("create new", func(t *testing.T) {
-		alias := makeAlias("esch-alias-create")
-		h := newESClientHandler(t)
-		err := h.CreateAlias(alias)
-		assert.NoError(t, err)
-
-		b, err := h.HasAlias(alias.Name)
-		assert.NoError(t, err)
-		assert.True(t, b)
-	})
-
-	t.Run("create index exists", func(t *testing.T) {
-		alias := makeAlias("esch-alias-2create")
-		h := newESClientHandler(t)
-
-		err := h.CreateAlias(alias)
-		assert.NoError(t, err)
-
-		// Second time around creating the alias, ErrAliasAlreadyExists is returned:
-		// the initial index already exists and the write alias points to it.
-		err = h.CreateAlias(alias)
-		require.Error(t, err)
-		assert.Equal(t, ilm.ErrAliasAlreadyExists, ilm.ErrReason(err))
-
-		b, err := h.HasAlias(alias.Name)
-		assert.NoError(t, err)
-		assert.True(t, b)
-	})
-
-	t.Run("create alias exists", func(t *testing.T) {
-		alias := makeAlias("esch-alias-2create")
-		alias.Pattern = "000001" // no date math, so we get predictable index names
-		h := newESClientHandler(t)
-
-		err := h.CreateAlias(alias)
-		assert.NoError(t, err)
-
-		// Rollover, so write alias points at -000002.
-		es := newRawESClient(t)
-		_, _, err = es.Request("POST", "/"+alias.Name+"/_rollover", "", nil, nil)
-		require.NoError(t, err)
-
-		// Delete -000001, simulating ILM delete.
-		_, _, err = es.Request("DELETE", "/"+alias.Name+"-"+alias.Pattern, "", nil, nil)
-		require.NoError(t, err)
-
-		// Second time around creating the alias, ErrAliasAlreadyExists is returned:
-		// initial index does not exist, but the write alias exists and points to
-		// another index.
-		err = h.CreateAlias(alias)
-		require.Error(t, err)
-		assert.Equal(t, ilm.ErrAliasAlreadyExists, ilm.ErrReason(err))
-
-		b, err := h.HasAlias(alias.Name)
-		assert.NoError(t, err)
-		assert.True(t, b)
-	})
-
-	t.Run("resource exists but is not an alias", func(t *testing.T) {
-		alias := makeAlias("esch-alias-3create")
-
-		es := newRawESClient(t)
-
-		_, _, err := es.Request("PUT", "/"+alias.Name, "", nil, nil)
-		require.NoError(t, err)
-
-		h := newESClientHandler(t)
-
-		b, err := h.HasAlias(alias.Name)
-		assert.Equal(t, ilm.ErrInvalidAlias, ilm.ErrReason(err))
-		assert.False(t, b)
-
-		err = h.CreateAlias(alias)
-		require.Error(t, err)
-		assert.Equal(t, ilm.ErrInvalidAlias, ilm.ErrReason(err))
 	})
 }
 
@@ -268,38 +167,29 @@ func getEnv(name, def string) string {
 
 func TestFileClientHandler_CheckILMEnabled(t *testing.T) {
 	for name, test := range map[string]struct {
-		m       ilm.Mode
-		version string
-		enabled bool
-		err     bool
+		enabled    bool
+		version    string
+		ilmEnabled bool
+		err        bool
 	}{
 		"ilm enabled": {
-			m:       ilm.ModeEnabled,
-			enabled: true,
-		},
-		"ilm auto": {
-			m:       ilm.ModeAuto,
-			enabled: true,
+			enabled:    true,
+			ilmEnabled: true,
 		},
 		"ilm disabled": {
-			m:       ilm.ModeDisabled,
-			enabled: false,
+			enabled:    false,
+			ilmEnabled: false,
 		},
 		"ilm enabled, version too old": {
-			m:       ilm.ModeEnabled,
+			enabled: true,
 			version: "5.0.0",
 			err:     true,
-		},
-		"ilm auto, version too old": {
-			m:       ilm.ModeAuto,
-			version: "5.0.0",
-			enabled: false,
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			h := ilm.NewFileClientHandler(newMockClient(test.version))
-			b, err := h.CheckILMEnabled(test.m)
-			assert.Equal(t, test.enabled, b)
+			b, err := h.CheckILMEnabled(test.enabled)
+			assert.Equal(t, test.ilmEnabled, b)
 			if test.err {
 				assert.Error(t, err)
 			} else {

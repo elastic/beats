@@ -491,6 +491,27 @@ func TestOverwriteMetadata(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
+func TestAddErrorToEventOnUnmarshalError(t *testing.T) {
+	testConfig := common.MustNewConfigFrom(map[string]interface{}{
+		"fields":        "message",
+		"add_error_key": true,
+	})
+
+	input := common.MapStr{
+		"message": "Broken JSON [[",
+	}
+
+	actual := getActualValue(t, testConfig, input)
+
+	errObj, ok := actual["error"].(common.MapStr)
+	require.True(t, ok, "'error' field not present or of invalid type")
+	require.NotNil(t, actual["error"])
+
+	assert.Equal(t, "message", errObj["field"])
+	assert.NotNil(t, errObj["data"])
+	assert.NotNil(t, errObj["message"])
+}
+
 func getActualValue(t *testing.T, config *common.Config, input common.MapStr) common.MapStr {
 	log := logp.NewLogger("decode_json_fields_test")
 

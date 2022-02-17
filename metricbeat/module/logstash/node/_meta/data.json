@@ -1,98 +1,47 @@
 {
-    "@timestamp": "2020-10-05T10:50:11.757Z",
-    "@metadata": {
-        "beat": "metricbeat",
-        "type": "_doc",
-        "version": "8.0.0",
-        "_id": "afb1a50a-95f0-484a-b7d7-e683ddddc75a"
-    },
-    "host": {
-        "name": "mcastro"
-    },
-    "agent": {
-        "ephemeral_id": "c4b22628-7b30-4a5d-8e28-7b6de81c9974",
-        "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
-        "name": "mcastro",
-        "type": "metricbeat",
-        "version": "8.0.0"
-    },
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "event": {
-        "duration": 9740086,
         "dataset": "logstash.node",
+        "duration": 115000,
         "module": "logstash"
     },
-    "metricset": {
-        "name": "node",
-        "period": 10000
-    },
-    "service": {
-        "address": "localhost:9600",
-        "type": "logstash"
-    },
     "logstash": {
+        "cluster": {
+            "id": "VUwnkX_lTzCFP9VUoXT1IQ"
+        },
+        "elasticsearch": {
+            "cluster": {
+                "id": "VUwnkX_lTzCFP9VUoXT1IQ"
+            }
+        },
         "node": {
-            "host": "2cb47f6e0eab",
-            "version": "8.0.0",
+            "host": "7dc1b688baf4",
+            "id": "9a1f83e1-52b9-4625-a98a-6aa336f41719",
             "jvm": {
-                "version": "11.0.5"
+                "version": "11.0.10"
             },
-            "id": "4cc683ce-3ddc-46e3-bea3-aefbf37bc082",
             "state": {
                 "pipeline": {
-                    "hash": "3000c3abf87d4dfa4a57aaf6af0a1f5bee2e0fc1c48a8e8636e2a33d7d2e91dd",
-                    "ephemeral_id": "afb1a50a-95f0-484a-b7d7-e683ddddc75a",
+                    "id": "main",
+                    "hash": "5022893e09c573cc517eef12da3df428d41a45370e168b19031f5b6b0da3db22",
+                    "ephemeral_id": "0a6062d1-85e8-4e9b-b943-d80573912692",
                     "representation": {
                         "graph": {
-                            "edges": [
-                                {
-                                    "from": "1bf3a9cc73ceb7c3a9cbe885df249b23f3496c52a342a6d513153cc865d78182",
-                                    "id": "b3db599ec6ae0b9493158bd7024dcd922c8a3e76295c37fef0da440086bf3f8c",
-                                    "to": "__QUEUE__",
-                                    "type": "plain"
-                                },
-                                {
-                                    "type": "plain",
-                                    "from": "71b91bc85b66ab25c5fb16e63db4dd7111c183f96d1f18e19078051ed5fc74f7",
-                                    "id": "9db20a77b3e1eb91229a50bd33388425d59725f9093e076a37e6565f8d5a20ad",
-                                    "to": "__QUEUE__"
-                                },
-                                {
-                                    "id": "9b2bc571e978746fb9b55b83521a6603c3c940144cde0e3f4296298cea6585cf",
-                                    "to": "a339cb309b29181703c6adf321da3d639f5b60713de5a1e5519ebfea069556d8",
-                                    "type": "plain",
-                                    "from": "__QUEUE__"
-                                }
-                            ],
                             "vertices": [
                                 {
                                     "config_name": "beats",
                                     "explicit_id": false,
-                                    "id": "1bf3a9cc73ceb7c3a9cbe885df249b23f3496c52a342a6d513153cc865d78182",
+                                    "id": "293e8492626c637c237bf394279270356589b77d285ea009a555e19977779693",
                                     "meta": {
                                         "source": {
-                                            "line": 2,
-                                            "protocol": "file",
                                             "column": 3,
-                                            "id": "/usr/share/logstash/pipeline/default.conf"
+                                            "id": "/usr/share/logstash/pipeline/logstash.conf",
+                                            "line": 2,
+                                            "protocol": "file"
                                         }
                                     },
                                     "plugin_type": "input",
                                     "type": "plugin"
-                                },
-                                {
-                                    "plugin_type": "input",
-                                    "type": "plugin",
-                                    "config_name": "beats",
-                                    "explicit_id": false,
-                                    "id": "71b91bc85b66ab25c5fb16e63db4dd7111c183f96d1f18e19078051ed5fc74f7",
-                                    "meta": {
-                                        "source": {
-                                            "protocol": "file",
-                                            "column": 3,
-                                            "id": "/usr/share/logstash/pipeline/default.conf",
-                                            "line": 7
-                                        }
-                                    }
                                 },
                                 {
                                     "explicit_id": false,
@@ -103,32 +52,58 @@
                                 {
                                     "config_name": "elasticsearch",
                                     "explicit_id": false,
-                                    "id": "a339cb309b29181703c6adf321da3d639f5b60713de5a1e5519ebfea069556d8",
+                                    "id": "942f820402532e034dc5b27a680547732f49dc4b5e48df0475d280eb31382e0d",
                                     "meta": {
                                         "source": {
-                                            "id": "/usr/share/logstash/pipeline/default.conf",
-                                            "line": 17,
-                                            "protocol": "file",
-                                            "column": 3
+                                            "column": 3,
+                                            "id": "/usr/share/logstash/pipeline/logstash.conf",
+                                            "line": 8,
+                                            "protocol": "file"
                                         }
                                     },
                                     "plugin_type": "output",
                                     "type": "plugin"
                                 }
+                            ],
+                            "edges": [
+                                {
+                                    "from": "293e8492626c637c237bf394279270356589b77d285ea009a555e19977779693",
+                                    "id": "af355ece7f2645e789bd864dd4745756782431bb85e6ea2e5b3ad6d546bca889",
+                                    "to": "__QUEUE__",
+                                    "type": "plain"
+                                },
+                                {
+                                    "from": "__QUEUE__",
+                                    "id": "7eb9677f7cb798312f3dc1ac5ab2469a9f2166f6144da511fe339a31f9fd9b38",
+                                    "to": "942f820402532e034dc5b27a680547732f49dc4b5e48df0475d280eb31382e0d",
+                                    "type": "plain"
+                                }
                             ]
                         },
                         "type": "lir",
                         "version": "0.0.0",
-                        "hash": "3000c3abf87d4dfa4a57aaf6af0a1f5bee2e0fc1c48a8e8636e2a33d7d2e91dd"
+                        "hash": "5022893e09c573cc517eef12da3df428d41a45370e168b19031f5b6b0da3db22"
                     },
                     "batch_size": 125,
-                    "workers": 12,
-                    "id": "main"
+                    "workers": 12
                 }
-            }
+            },
+            "version": "7.12.0"
         }
     },
-    "ecs": {
-        "version": "1.5.0"
+    "metricset": {
+        "name": "node",
+        "period": 10000
+    },
+    "process": {
+        "pid": 1
+    },
+    "service": {
+        "address": "172.20.0.3:9600",
+        "hostname": "7dc1b688baf4",
+        "id": "9a1f83e1-52b9-4625-a98a-6aa336f41719",
+        "name": "logstash",
+        "type": "logstash",
+        "version": "7.12.0"
     }
 }

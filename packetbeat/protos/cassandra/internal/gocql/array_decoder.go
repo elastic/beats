@@ -26,10 +26,6 @@ type ByteArrayDecoder struct {
 	Data *[]byte
 }
 
-func readInt(p []byte) int32 {
-	return int32(p[0])<<24 | int32(p[1])<<16 | int32(p[2])<<8 | int32(p[3])
-}
-
 func (f ByteArrayDecoder) ReadByte() (byte, error) {
 	data := *f.Data
 	if len(data) < 1 {
@@ -167,7 +163,7 @@ func (f ByteArrayDecoder) ReadInet() (net.IP, int) {
 	size := data[0]
 	*f.Data = data[1:]
 
-	if !(size == 4 || size == 16) {
+	if size != 4 && size != 16 {
 		panic(fmt.Errorf("invalid IP size: %d", size))
 	}
 

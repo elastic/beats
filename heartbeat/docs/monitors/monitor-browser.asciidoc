@@ -4,9 +4,14 @@
 TIP: Want to get started with synthetic monitoring?
 See the {observability-guide}/synthetics-quickstart.html[quick start guide].
 
-The options described here configure {beatname_uc} to run the synthetic
+beta[] The options described here configure {beatname_uc} to run the synthetic
 monitoring test suites via Synthetic Agent on the Chromium browser.
-Additional shared options are defined in <<monitor-options>>.
+Additional shared options are defined in <<monitor-options>>. 
+
+Browser based monitors can only be run in our {beatname_uc} docker image,
+or via the `elastic-agent-complete` docker image. 
+For more information, see {observability-guide}/synthetics-quickstart.html[Synthetic monitoring using Docker].
+
 Example configuration:
 
 [source,yaml]
@@ -160,7 +165,7 @@ Example configuration:
 -------------------------------------------------------------------------------
 
 [float]
-[[monitor-browser-ignore-https-errors]]]]
+[[monitor-browser-ignore-https-errors]]
 ==== `ignore_https_errors`
 
 Set this option to `true` to disable TLS/SSL validation in the synthetics browser. This is useful for testing

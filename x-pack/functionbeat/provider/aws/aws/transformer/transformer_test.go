@@ -5,10 +5,18 @@
 package transformer
 
 import (
+	"crypto/md5"
+	"encoding/base64"
+	"fmt"
+	"math/rand"
+	"strconv"
 	"testing"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/awslabs/kinesis-aggregation/go/deaggregator"
+	aggRecProto "github.com/awslabs/kinesis-aggregation/go/records"
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -61,51 +69,204 @@ func TestCloudwatch(t *testing.T) {
 }
 
 func TestKinesis(t *testing.T) {
-	request := events.KinesisEvent{
-		Records: []events.KinesisEventRecord{
-			events.KinesisEventRecord{
-				AwsRegion:      "us-east-1",
-				EventID:        "1234",
-				EventName:      "connect",
-				EventSource:    "web",
-				EventVersion:   "1.0",
-				EventSourceArn: "arn:aws:iam::00000000:role/functionbeat",
-				Kinesis: events.KinesisRecord{
-					Data:                 []byte("hello world"),
-					PartitionKey:         "abc123",
-					SequenceNumber:       "12345",
-					KinesisSchemaVersion: "1.0",
-					EncryptionType:       "test",
+	t.Run("when kinesis event is successful", func(t *testing.T) {
+		request := events.KinesisEvent{
+			Records: []events.KinesisEventRecord{
+				events.KinesisEventRecord{
+					AwsRegion:      "us-east-1",
+					EventID:        "1234",
+					EventName:      "connect",
+					EventSource:    "web",
+					EventVersion:   "1.0",
+					EventSourceArn: "arn:aws:iam::00000000:role/functionbeat",
+					Kinesis: events.KinesisRecord{
+						Data:                 []byte("hello world"),
+						PartitionKey:         "abc123",
+						SequenceNumber:       "12345",
+						KinesisSchemaVersion: "1.0",
+						EncryptionType:       "test",
+					},
 				},
 			},
-		},
-	}
+		}
 
-	events := KinesisEvent(request)
-	assert.Equal(t, 1, len(events))
+		events, err := KinesisEvent(request)
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(events))
 
-	fields := common.MapStr{
-		"cloud": common.MapStr{
-			"provider": "aws",
-			"region":   "us-east-1",
-		},
-		"event": common.MapStr{
-			"kind": "event",
-		},
-		"event_id":                "1234",
-		"event_name":              "connect",
-		"event_source":            "web",
-		"event_source_arn":        "arn:aws:iam::00000000:role/functionbeat",
-		"event_version":           "1.0",
-		"aws_region":              "us-east-1",
-		"message":                 "hello world",
-		"kinesis_partition_key":   "abc123",
-		"kinesis_schema_version":  "1.0",
-		"kinesis_sequence_number": "12345",
-		"kinesis_encryption_type": "test",
-	}
+		fields := common.MapStr{
+			"cloud": common.MapStr{
+				"provider": "aws",
+				"region":   "us-east-1",
+			},
+			"event": common.MapStr{
+				"kind": "event",
+			},
+			"event_id":                "1234",
+			"event_name":              "connect",
+			"event_source":            "web",
+			"event_source_arn":        "arn:aws:iam::00000000:role/functionbeat",
+			"event_version":           "1.0",
+			"aws_region":              "us-east-1",
+			"message":                 "hello world",
+			"kinesis_partition_key":   "abc123",
+			"kinesis_schema_version":  "1.0",
+			"kinesis_sequence_number": "12345",
+			"kinesis_encryption_type": "test",
+		}
 
-	assert.Equal(t, fields, events[0].Fields)
+		assert.Equal(t, fields, events[0].Fields)
+	})
+
+	t.Run("when kinesis event with agg is successful", func(t *testing.T) {
+		rand.Seed(time.Now().UnixNano())
+		min, max := 2, 20
+		numRecords := rand.Intn(max-min) + min
+		aggRecBytes := generateKinesisAggregateRecord(numRecords, true)
+
+		request := events.KinesisEvent{
+			Records: []events.KinesisEventRecord{
+				events.KinesisEventRecord{
+					AwsRegion:      "us-east-1",
+					EventID:        "1234",
+					EventName:      "connect",
+					EventSource:    "web",
+					EventVersion:   "1.0",
+					EventSourceArn: "arn:aws:iam::00000000:role/functionbeat",
+					Kinesis: events.KinesisRecord{
+						Data:                 aggRecBytes,
+						PartitionKey:         "ignored",
+						SequenceNumber:       "12345",
+						KinesisSchemaVersion: "1.0",
+						EncryptionType:       "test",
+					},
+				},
+			},
+		}
+
+		events, err := KinesisEvent(request)
+		assert.NoError(t, err)
+		assert.Equal(t, numRecords, len(events))
+
+		envelopeFields := common.MapStr{
+			"cloud": common.MapStr{
+				"provider": "aws",
+				"region":   "us-east-1",
+			},
+			"event": common.MapStr{
+				"kind": "event",
+			},
+			"event_id":                "1234",
+			"event_name":              "connect",
+			"event_source":            "web",
+			"event_source_arn":        "arn:aws:iam::00000000:role/functionbeat",
+			"event_version":           "1.0",
+			"aws_region":              "us-east-1",
+			"kinesis_schema_version":  "1.0",
+			"kinesis_sequence_number": "12345",
+			"kinesis_encryption_type": "test",
+		}
+
+		var expectedInnerFields []common.MapStr
+		for i := 0; i < numRecords; i++ {
+			expectedInnerFields = append(expectedInnerFields, common.MapStr{
+				"message":               fmt.Sprintf("%s %d", "hello world", i),
+				"kinesis_partition_key": fmt.Sprintf("%s %d", "partKey", i),
+			})
+		}
+
+		for i, expectedFields := range expectedInnerFields {
+			expectedFields.Update(envelopeFields)
+			assert.Equal(t, expectedFields, events[i].Fields)
+		}
+	})
+
+	t.Run("when kinesis event with agg is not successful", func(t *testing.T) {
+		aggRecBytes := generateKinesisAggregateRecord(2, false)
+
+		request := events.KinesisEvent{
+			Records: []events.KinesisEventRecord{
+				events.KinesisEventRecord{
+					AwsRegion:      "us-east-1",
+					EventID:        "1234",
+					EventName:      "connect",
+					EventSource:    "web",
+					EventVersion:   "1.0",
+					EventSourceArn: "arn:aws:iam::00000000:role/functionbeat",
+					Kinesis: events.KinesisRecord{
+						Data:                 aggRecBytes,
+						PartitionKey:         "abc123",
+						SequenceNumber:       "12345",
+						KinesisSchemaVersion: "1.0",
+						EncryptionType:       "test",
+					},
+				},
+			},
+		}
+
+		events, err := KinesisEvent(request)
+		assert.Error(t, err)
+		assert.Nil(t, events)
+	})
+
+	t.Run("when kinesis event with real example agg payload is successful", func(t *testing.T) {
+		rand.Seed(time.Now().UnixNano())
+		numRecords := 10
+		aggRecBytes, err := base64.StdEncoding.DecodeString("84mawgoIejJKSjl6dFgaEwgAGg97ImtleSI6InZhbHVlIn0aEwgAGg9" +
+			"7ImtleSI6InZhbHVlIn0aEwgAGg97ImtleSI6InZhbHVlIn0aEwgAGg97ImtleSI6InZhbHVlIn0aEwgAGg97ImtleSI6InZhbHVlIn" +
+			"0aEwgAGg97ImtleSI6InZhbHVlIn0aEwgAGg97ImtleSI6InZhbHVlIn0aEwgAGg97ImtleSI6InZhbHVlIn0aEwgAGg97ImtleSI6I" +
+			"nZhbHVlIn0aEwgAGg97ImtleSI6InZhbHVlIn3xj2DFMGZ0aNQC7aexsnkU")
+		assert.NoError(t, err)
+
+		request := events.KinesisEvent{
+			Records: []events.KinesisEventRecord{
+				events.KinesisEventRecord{
+					AwsRegion:      "us-east-1",
+					EventID:        "1234",
+					EventName:      "connect",
+					EventSource:    "web",
+					EventVersion:   "1.0",
+					EventSourceArn: "arn:aws:iam::00000000:role/functionbeat",
+					Kinesis: events.KinesisRecord{
+						Data:                 aggRecBytes,
+						PartitionKey:         "ignored",
+						SequenceNumber:       "12345",
+						KinesisSchemaVersion: "1.0",
+						EncryptionType:       "test",
+					},
+				},
+			},
+		}
+
+		events, err := KinesisEvent(request)
+		assert.NoError(t, err)
+		assert.Equal(t, numRecords, len(events))
+
+		envelopeFields := common.MapStr{
+			"cloud": common.MapStr{
+				"provider": "aws",
+				"region":   "us-east-1",
+			},
+			"event": common.MapStr{
+				"kind": "event",
+			},
+			"event_id":                "1234",
+			"event_name":              "connect",
+			"event_source":            "web",
+			"event_source_arn":        "arn:aws:iam::00000000:role/functionbeat",
+			"event_version":           "1.0",
+			"aws_region":              "us-east-1",
+			"kinesis_schema_version":  "1.0",
+			"kinesis_sequence_number": "12345",
+			"kinesis_encryption_type": "test",
+			"kinesis_partition_key":   "z2JJ9ztX",
+			"message":                 `{"key":"value"}`,
+		}
+
+		for i := 0; i < numRecords; i++ {
+			assert.Equal(t, envelopeFields, events[i].Fields)
+		}
+	})
 }
 
 func TestCloudwatchKinesis(t *testing.T) {
@@ -202,4 +363,38 @@ ciJ9XX0=`),
 		expectedFields.Update(envelopeFields)
 		assert.Equal(t, expectedFields, events[i].Fields)
 	}
+}
+
+func generateKinesisAggregateRecord(numRecords int, valid bool) []byte {
+	// Heavily based on https://github.com/awslabs/kinesis-aggregation/blob/master/go/deaggregator/deaggregator_test.go
+	aggRec := &aggRecProto.AggregatedRecord{}
+	unquotedHeader, err := strconv.Unquote(deaggregator.KplMagicHeader)
+	if err != nil {
+		panic(err)
+	}
+	aggRecBytes := []byte(unquotedHeader)
+	partKeyTable := make([]string, 0)
+	for i := 0; i < numRecords; i++ {
+		partKey := uint64(i)
+		hashKey := uint64(i)
+		r := &aggRecProto.Record{
+			ExplicitHashKeyIndex: &hashKey,
+			Data:                 []byte(fmt.Sprintf("%s %d", "hello world", i)),
+			Tags:                 make([]*aggRecProto.Tag, 0),
+		}
+		// This seems to be the only way to trigger the deaggregation module to return an error when needed
+		if valid {
+			r.PartitionKeyIndex = &partKey
+		}
+		aggRec.Records = append(aggRec.Records, r)
+		partKeyTable = append(partKeyTable, fmt.Sprintf("%s %d", "partKey", i))
+	}
+
+	aggRec.PartitionKeyTable = partKeyTable
+	data, _ := proto.Marshal(aggRec)
+	md5Hash := md5.Sum(data)
+	aggRecBytes = append(aggRecBytes, data...)
+	aggRecBytes = append(aggRecBytes, md5Hash[:]...)
+
+	return aggRecBytes
 }

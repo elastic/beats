@@ -186,6 +186,15 @@ var sharedKProbes = []helper.ProbeDef{
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(commitCreds) }),
 	},
 
+	{
+		Probe: tracing.Probe{
+			Type:      tracing.TypeKRetProbe,
+			Name:      "clone3_ret",
+			Address:   "{{.DO_FORK}}",
+			Fetchargs: "retval={{.RET}}",
+		},
+		Decoder: helper.NewStructDecoder(func() interface{} { return new(forkRet) }),
+	},
 	/***************************************************************************
 	 * IPv4
 	 **************************************************************************/

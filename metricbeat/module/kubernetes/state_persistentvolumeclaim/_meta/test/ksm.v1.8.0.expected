@@ -5,19 +5,17 @@
 			"labels": {
 				"app": "nginx"
 			},
-			"namespace": {
-				"name": "default"
-			}
+			"namespace": "default"
 		},
 		"MetricSetFields": {
 			"access_mode": "ReadWriteOnce",
-			"name": "www-web-1",
+			"name": "www-web-0",
 			"phase": "Bound",
 			"request_storage": {
 				"bytes": 1073741824
 			},
 			"storage_class": "standard",
-			"volume_name": "pvc-539a19cf-ea44-43a4-84c5-4acca3f9b583"
+			"volume_name": "pvc-c87e31f9-f853-4b20-b5db-fc41466c8b56"
 		},
 		"Index": "",
 		"ID": "",
@@ -36,19 +34,17 @@
 			"labels": {
 				"app": "nginx"
 			},
-			"namespace": {
-				"name": "default"
-			}
+			"namespace": "default"
 		},
 		"MetricSetFields": {
 			"access_mode": "ReadWriteOnce",
-			"name": "www-web-0",
+			"name": "www-web-1",
 			"phase": "Bound",
 			"request_storage": {
 				"bytes": 1073741824
 			},
 			"storage_class": "standard",
-			"volume_name": "pvc-c87e31f9-f853-4b20-b5db-fc41466c8b56"
+			"volume_name": "pvc-539a19cf-ea44-43a4-84c5-4acca3f9b583"
 		},
 		"Index": "",
 		"ID": "",

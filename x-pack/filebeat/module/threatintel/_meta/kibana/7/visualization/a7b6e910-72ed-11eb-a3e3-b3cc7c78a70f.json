@@ -30,13 +30,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.indicator.url.scheme"
+                            "field": "threat.indicator.url.scheme"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                            "key": "threatintel.indicator.url.scheme",
+                            "key": "threat.indicator.url.scheme",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -74,7 +74,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "URL Scheme",
-                        "field": "threatintel.indicator.url.scheme",
+                        "field": "threat.indicator.url.scheme",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",
@@ -90,7 +90,7 @@
                     "enabled": true,
                     "id": "3",
                     "params": {
-                        "field": "threatintel.indicator.url.scheme",
+                        "field": "threat.indicator.url.scheme",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

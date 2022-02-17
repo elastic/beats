@@ -50,16 +50,14 @@ func TestGeneratePodData(t *testing.T) {
 	data := generatePodData(pod, &Config{}, &podMeta{}, namespaceAnnotations)
 
 	mapping := map[string]interface{}{
-		"namespace": common.MapStr{
-			"name": pod.GetNamespace(),
-			"annotations": common.MapStr{
-				"nsa": "nsb",
-			},
-		},
+		"namespace": pod.GetNamespace(),
 		"pod": common.MapStr{
 			"uid":  string(pod.GetUID()),
 			"name": pod.GetName(),
 			"ip":   pod.Status.PodIP,
+		},
+		"namespace_annotations": common.MapStr{
+			"nsa": "nsb",
 		},
 		"labels": common.MapStr{
 			"foo": "bar",
@@ -75,9 +73,7 @@ func TestGeneratePodData(t *testing.T) {
 				"name": "devcluster",
 				"url":  "8.8.8.8:9090"},
 		}, "kubernetes": common.MapStr{
-			"namespace": common.MapStr{
-				"name": "testns",
-			},
+			"namespace": "testns",
 			"labels": common.MapStr{
 				"foo": "bar",
 			},
@@ -161,12 +157,7 @@ func TestGenerateContainerPodData(t *testing.T) {
 		})
 
 	mapping := map[string]interface{}{
-		"namespace": common.MapStr{
-			"name": pod.GetNamespace(),
-			"annotations": common.MapStr{
-				"nsa": "nsb",
-			},
-		},
+		"namespace": pod.GetNamespace(),
 		"pod": common.MapStr{
 			"uid":  string(pod.GetUID()),
 			"name": pod.GetName(),
@@ -179,6 +170,9 @@ func TestGenerateContainerPodData(t *testing.T) {
 			"runtime":   "crio",
 			"port":      "80",
 			"port_name": "http",
+		},
+		"namespace_annotations": common.MapStr{
+			"nsa": "nsb",
 		},
 		"annotations": common.MapStr{
 			"app": "production",
@@ -198,9 +192,7 @@ func TestGenerateContainerPodData(t *testing.T) {
 				"name": "devcluster",
 				"url":  "8.8.8.8:9090"},
 		}, "kubernetes": common.MapStr{
-			"namespace": common.MapStr{
-				"name": "testns",
-			},
+			"namespace":   "testns",
 			"annotations": common.MapStr{"app": "production"},
 			"labels":      common.MapStr{"foo": "bar"},
 			"pod": common.MapStr{
@@ -280,12 +272,7 @@ func TestEphemeralContainers(t *testing.T) {
 		})
 
 	mapping := map[string]interface{}{
-		"namespace": common.MapStr{
-			"name": pod.GetNamespace(),
-			"annotations": common.MapStr{
-				"nsa": "nsb",
-			},
-		},
+		"namespace": pod.GetNamespace(),
 		"pod": common.MapStr{
 			"uid":  string(pod.GetUID()),
 			"name": pod.GetName(),
@@ -299,6 +286,9 @@ func TestEphemeralContainers(t *testing.T) {
 			"name":    "nginx",
 			"image":   "nginx:1.120",
 			"runtime": "crio",
+		},
+		"namespace_annotations": common.MapStr{
+			"nsa": "nsb",
 		},
 		"annotations": common.MapStr{
 			"app": "production",
@@ -315,9 +305,7 @@ func TestEphemeralContainers(t *testing.T) {
 				"name": "devcluster",
 				"url":  "8.8.8.8:9090"},
 		}, "kubernetes": common.MapStr{
-			"namespace": common.MapStr{
-				"name": "testns",
-			},
+			"namespace":   "testns",
 			"labels":      common.MapStr{"foo": "bar"},
 			"annotations": common.MapStr{"app": "production"},
 			"pod": common.MapStr{
@@ -393,9 +381,7 @@ func (p *podMeta) GenerateECS(obj kubernetes.Resource) common.MapStr {
 func (p *podMeta) GenerateK8s(obj kubernetes.Resource, opts ...metadata.FieldOptions) common.MapStr {
 	k8sPod := obj.(*kubernetes.Pod)
 	return common.MapStr{
-		"namespace": common.MapStr{
-			"name": k8sPod.GetNamespace(),
-		},
+		"namespace": k8sPod.GetNamespace(),
 		"pod": common.MapStr{
 			"uid":  string(k8sPod.GetUID()),
 			"name": k8sPod.GetName(),

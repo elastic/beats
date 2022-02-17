@@ -14,6 +14,9 @@ import (
 	"sync"
 	"time"
 
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+
+	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
@@ -53,8 +56,12 @@ func nonRetryableErrorWrap(err error) error {
 // s3EventsV2 is the notification message that Amazon S3 sends to notify of S3 changes.
 // This was derived from the version 2.2 schema.
 // https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-content-structure.html
+// If the notification message is sent from SNS to SQS, then Records will be
+// replaced by TopicArn and Message fields.
 type s3EventsV2 struct {
-	Records []s3EventV2 `json:"Records"`
+	TopicArn string      `json:"TopicArn"`
+	Message  string      `json:"Message"`
+	Records  []s3EventV2 `json:"Records"`
 }
 
 // s3EventV2 is a S3 change notification event.
@@ -82,9 +89,10 @@ type sqsS3EventProcessor struct {
 	log                  *logp.Logger
 	warnOnce             sync.Once
 	metrics              *inputMetrics
+	script               *script
 }
 
-func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, sqsVisibilityTimeout time.Duration, maxReceiveCount int, s3 s3ObjectHandlerFactory) *sqsS3EventProcessor {
+func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, script *script, sqsVisibilityTimeout time.Duration, maxReceiveCount int, s3 s3ObjectHandlerFactory) *sqsS3EventProcessor {
 	if metrics == nil {
 		metrics = newInputMetrics(monitoring.NewRegistry(), "")
 	}
@@ -95,11 +103,14 @@ func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI,
 		sqs:                  sqs,
 		log:                  log,
 		metrics:              metrics,
+		script:               script,
 	}
 }
 
 func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) error {
-	log := p.log.With("message_id", *msg.MessageId)
+	log := p.log.With(
+		"message_id", *msg.MessageId,
+		"message_receipt_time", time.Now().UTC())
 
 	keepaliveCtx, keepaliveCancel := context.WithCancel(ctx)
 	defer keepaliveCancel()
@@ -131,7 +142,7 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) 
 			if receiveCount, err := strconv.Atoi(v); err == nil && receiveCount >= p.maxReceiveCount {
 				processingErr = nonRetryableErrorWrap(fmt.Errorf(
 					"sqs ApproximateReceiveCount <%v> exceeds threshold %v: %w",
-					receiveCount, p.maxReceiveCount, err))
+					receiveCount, p.maxReceiveCount, processingErr))
 			}
 		}
 	}
@@ -174,6 +185,17 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 
 			// Renew visibility.
 			if err := p.sqs.ChangeMessageVisibility(ctx, msg, p.sqsVisibilityTimeout); err != nil {
+				var awsErr awserr.Error
+				if errors.As(err, &awsErr) {
+					switch awsErr.Code() {
+					case sqs.ErrCodeReceiptHandleIsInvalid:
+						log.Warnw("Failed to extend message visibility timeout "+
+							"because SQS receipt handle is no longer valid. "+
+							"Stopping SQS message keepalive routine.", "error", err)
+						return
+					}
+				}
+
 				log.Warnw("Failed to extend message visibility timeout.", "error", err)
 			}
 		}
@@ -181,6 +203,12 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 }
 
 func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, error) {
+	// Check if a parsing script is defined. If so, it takes precedence over
+	// format autodetection.
+	if p.script != nil {
+		return p.script.run(body)
+	}
+
 	// NOTE: If AWS introduces a V3 schema this will need updated to handle that schema.
 	var events s3EventsV2
 	dec := json.NewDecoder(strings.NewReader(body))
@@ -189,6 +217,24 @@ func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, erro
 		return nil, fmt.Errorf("failed to decode SQS message body as an S3 notification: %w", err)
 	}
 
+	// Check if the notification is from S3 -> SNS -> SQS
+	if events.TopicArn != "" {
+		dec := json.NewDecoder(strings.NewReader(events.Message))
+		if err := dec.Decode(&events); err != nil {
+			p.log.Debugw("Invalid SQS message body.", "sqs_message_body", body)
+			return nil, fmt.Errorf("failed to decode SQS message body as an S3 notification: %w", err)
+		}
+	}
+
+	if events.Records == nil {
+		p.log.Debugw("Invalid SQS message body: missing Records field", "sqs_message_body", body)
+		return nil, errors.New("the message is an invalid S3 notification: missing Records field")
+	}
+
+	return p.getS3Info(events)
+}
+
+func (p *sqsS3EventProcessor) getS3Info(events s3EventsV2) ([]s3EventV2, error) {
 	var out []s3EventV2
 	for _, record := range events.Records {
 		if !p.isObjectCreatedEvents(record) {
@@ -211,7 +257,6 @@ func (p *sqsS3EventProcessor) getS3Notifications(body string) ([]s3EventV2, erro
 
 		out = append(out, record)
 	}
-
 	return out, nil
 }
 
@@ -232,11 +277,11 @@ func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Log
 	defer log.Debug("End processing SQS S3 event notifications.")
 
 	// Wait for all events to be ACKed before proceeding.
-	acker := newEventACKTracker(ctx)
+	acker := awscommon.NewEventACKTracker(ctx)
 	defer acker.Wait()
 
 	var errs []error
-	for _, event := range s3Events {
+	for i, event := range s3Events {
 		s3Processor := p.s3ObjectHandler.Create(ctx, log, acker, event)
 		if s3Processor == nil {
 			continue
@@ -245,8 +290,8 @@ func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Log
 		// Process S3 object (download, parse, create events).
 		if err := s3Processor.ProcessS3Object(); err != nil {
 			errs = append(errs, errors.Wrapf(err,
-				"failed processing S3 event for object key %q in bucket %q",
-				event.S3.Object.Key, event.S3.Bucket.Name))
+				"failed processing S3 event for object key %q in bucket %q (object record %d of %d in SQS notification)",
+				event.S3.Object.Key, event.S3.Bucket.Name, i+1, len(s3Events)))
 		}
 	}
 

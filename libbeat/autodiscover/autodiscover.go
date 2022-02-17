@@ -64,6 +64,10 @@ type Autodiscover struct {
 	meta            *meta.Map
 	listener        bus.Listener
 	logger          *logp.Logger
+
+	// workDone is a channel used for testing purpouses, to know when the worker has
+	// done some work.
+	workDone chan struct{}
 }
 
 // NewAutodiscover instantiates and returns a new Autodiscover manager
@@ -165,6 +169,11 @@ func (a *Autodiscover) worker() {
 			// reset updated status
 			updated = false
 		}
+
+		// For testing purpouses.
+		if a.workDone != nil {
+			a.workDone <- struct{}{}
+		}
 	}
 }
 
@@ -207,6 +216,20 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 			continue
 		}
 
+		// Update meta no matter what
+		dynFields := a.meta.Store(hash, meta)
+
+		if _, ok := newCfg[hash]; ok {
+			a.logger.Debugf("Config %v duplicated in start event", common.DebugString(config, true))
+			continue
+		}
+
+		if cfg, ok := a.configs[eventID][hash]; ok {
+			a.logger.Debugf("Config %v is already running", common.DebugString(config, true))
+			newCfg[hash] = cfg
+			continue
+		}
+
 		err = a.factory.CheckConfig(config)
 		if err != nil {
 			a.logger.Error(errors.Wrap(err, fmt.Sprintf(
@@ -214,19 +237,9 @@ func (a *Autodiscover) handleStart(event bus.Event) bool {
 				common.DebugString(config, true))))
 			continue
 		}
-
-		// Update meta no matter what
-		dynFields := a.meta.Store(hash, meta)
-
-		if cfg, ok := a.configs[eventID][hash]; ok {
-			a.logger.Debugf("Config %v is already running", common.DebugString(config, true))
-			newCfg[hash] = cfg
-			continue
-		} else {
-			newCfg[hash] = &reload.ConfigWithMeta{
-				Config: config,
-				Meta:   &dynFields,
-			}
+		newCfg[hash] = &reload.ConfigWithMeta{
+			Config: config,
+			Meta:   &dynFields,
 		}
 
 		updated = true

@@ -106,8 +106,6 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	if p.namespace != nil {
 		meta := p.namespace.GenerateFromName(po.GetNamespace())
 		if meta != nil {
-			// Use this in 8.0
-			//out.Put("namespace", meta["namespace"])
 			out.DeepUpdate(meta)
 		}
 	}

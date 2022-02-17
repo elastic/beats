@@ -122,7 +122,6 @@ func TestThrift_readMessageBegin(t *testing.T) {
 
 	data, _ = hex.DecodeString("800100010000000570696e6700000001")
 	stream = thriftStream{data: data, message: new(thriftMessage)}
-	m = stream.message
 	ok, complete = thrift.readMessageBegin(&stream)
 	if !ok || complete {
 		t.Errorf("Bad result: %v %v", ok, complete)
@@ -130,7 +129,6 @@ func TestThrift_readMessageBegin(t *testing.T) {
 
 	data, _ = hex.DecodeString("800100010000000570696e6700000001")
 	stream = thriftStream{data: data, message: new(thriftMessage)}
-	m = stream.message
 	ok, complete = thrift.readMessageBegin(&stream)
 	if !ok || complete {
 		t.Errorf("Bad result: %v %v", ok, complete)
@@ -150,7 +148,6 @@ func TestThrift_readMessageBegin(t *testing.T) {
 
 	data, _ = hex.DecodeString("0000000570696e670100000000")
 	stream = thriftStream{data: data, message: new(thriftMessage)}
-	m = stream.message
 	ok, complete = thrift.readMessageBegin(&stream)
 	if !ok || complete {
 		t.Error("Bad result:", ok, complete)

@@ -1,4 +1,5 @@
-description: Pipeline for parsing Anomali Threat Intel
+---
+description: Pipeline for parsing Anomali Limo indicators
 processors:
   ####################
   # Event ECS fields #
@@ -6,6 +7,9 @@ processors:
   - set:
       field: event.ingested
       value: "{{_ingest.timestamp}}"
+  - set:
+      field: ecs.version
+      value: "1.12"
   - set:
       field: event.kind
       value: enrichment
@@ -20,16 +24,30 @@ processors:
   # General ECS fields #
   ######################
   - rename:
-      field: json
-      target_field: threatintel.anomali
+      field: message
+      target_field: event.original
+      ignore_missing: true
+  - json:
+      field: event.original
+      target_field: anomali.limo
+  - fingerprint:
+      fields:
+        - anomali.limo.id
+      target_field: "_id"
       ignore_missing: true
 
   #####################
   # Threat ECS Fields #
   #####################
+  - set:
+      field: threat.feed.name
+      value: "[Filebeat] Anomali Limo"
+  - set:
+      field: threat.feed.dashboard_id
+      value: "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f"
   ## File indicator operations
   - date:
-      field: threatintel.anomali.created
+      field: anomali.limo.created
       formats:
         - "yyyy-MM-dd'T'HH:mm:ssz"
         - "yyyy-MM-dd'T'HH:mm:ssZ"
@@ -39,68 +57,73 @@ processors:
         - "yyyy-MM-dd'T'HH:mm:ss.SSZ"
         - "yyyy-MM-dd'T'HH:mm:ss.SSSz"
         - "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-      if: "ctx?.threatintel?.anomali?.created != null"
+      if: "ctx.anomali?.limo?.created != null"
   - date:
-      field: threatintel.anomali.modified
-      target_field: threatintel.anomali.modified
+      field: anomali.limo.modified
+      target_field: anomali.limo.modified
       formats:
+        - "yyyy-MM-dd'T'HH:mm:ssz"
+        - "yyyy-MM-dd'T'HH:mm:ssZ"
         - "yyyy-MM-dd'T'HH:mm:ss.Sz"
         - "yyyy-MM-dd'T'HH:mm:ss.SZ"
         - "yyyy-MM-dd'T'HH:mm:ss.SSz"
         - "yyyy-MM-dd'T'HH:mm:ss.SSZ"
         - "yyyy-MM-dd'T'HH:mm:ss.SSSz"
         - "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-      if: "ctx?.threatintel?.anomali?.modified != null"
+      if: "ctx.anomali?.limo?.modified != null"
   - date:
-      field: threatintel.anomali.valid_from
-      target_field: threatintel.indicator.first_seen
+      field: anomali.limo.valid_from
+      target_field: threat.indicator.first_seen
       formats:
+        - "yyyy-MM-dd'T'HH:mm:ssz"
+        - "yyyy-MM-dd'T'HH:mm:ssZ"
         - "yyyy-MM-dd'T'HH:mm:ss.Sz"
         - "yyyy-MM-dd'T'HH:mm:ss.SZ"
         - "yyyy-MM-dd'T'HH:mm:ss.SSz"
         - "yyyy-MM-dd'T'HH:mm:ss.SSZ"
         - "yyyy-MM-dd'T'HH:mm:ss.SSSz"
         - "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-      if: "ctx?.threatintel?.anomali?.valid_from != null"
+      if: "ctx.anomali?.limo?.valid_from != null"
   - grok:
-      field: threatintel.anomali.pattern
+      field: anomali.limo.pattern
       patterns:
         - "^\\[%{DATA:_tmp.threattype}:value%{SPACE}=%{SPACE}'%{DATA:_tmp.threatvalue}'\\]"
+      if: ctx.anomali?.limo?.pattern != null
   - rename:
       field: _tmp.threattype
-      target_field: threatintel.indicator.type
+      target_field: threat.indicator.type
       ignore_missing: true
   - rename:
       field: _tmp.threatvalue
-      target_field: threatintel.indicator.ip
+      target_field: threat.indicator.ip
       ignore_missing: true
-      if: "['ipv4-addr', 'ipv6-addr'].contains(ctx?.threatintel?.indicator?.type)"
+      if: "['ipv4-addr', 'ipv6-addr'].contains(ctx.threat?.indicator?.type)"
   - uri_parts:
       field: _tmp.threatvalue
-      target_field: threatintel.indicator.url
+      target_field: threat.indicator.url
       keep_original: true
       remove_if_successful: true
-      if: ctx?.threatintel?.indicator?.type == 'url'
+      if: ctx.threat?.indicator?.type == 'url'
   - set:
-      field: threatintel.indicator.url.full
-      value: "{{{threatintel.indicator.url.original}}}"
+      field: threat.indicator.url.full
+      value: "{{{threat.indicator.url.original}}}"
       ignore_empty_value: true
   - rename:
       field: _tmp.threatvalue
-      target_field: threatintel.indicator.email.address
+      target_field: threat.indicator.email.address
       ignore_missing: true
-      if: ctx?.threatintel?.indicator?.type == 'email-addr'
+      if: ctx.threat?.indicator?.type == 'email-addr'
   - rename:
       field: _tmp.threatvalue
-      target_field: threatintel.indicator.url.domain
+      target_field: threat.indicator.url.domain
       ignore_missing: true
-      if: ctx?.threatintel?.indicator?.type == 'domain-name'
+      if: ctx.threat?.indicator?.type == 'domain-name'
   - set:
-      field: threatintel.indicator.type
+      field: threat.indicator.type
       value: unknown
-      if: ctx?.threatintel?.indicator?.type == null
+      if: ctx.threat?.indicator?.type == null
   - foreach:
-      field: threatintel.anomali.labels
+      field: anomali.limo.labels
       ignore_missing: true
       processor:
         append:
@@ -108,9 +131,9 @@ processors:
           value: "{{_ingest._value}}"
           allow_duplicates: false
   - grok:
-      field: threatintel.anomali.description
+      field: anomali.limo.description
       patterns:
-        - "^%{GREEDYDATA}Source: %{GREEDYDATA:threatintel.indicator.provider}"
+        - "^%{GREEDYDATA}Source: %{GREEDYDATA:threat.indicator.provider}"
       ignore_missing: true
       ignore_failure: true
   ######################
@@ -141,8 +164,13 @@ processors:
         }
         handleMap(ctx);
   - remove:
+      field: event.original
+      if: "ctx?.tags == null || !(ctx.tags.contains('preserve_original_event'))"
+      ignore_failure: true
+      ignore_missing: true
+  - remove:
       field:
-        - threatintel.anomali.created
+        - anomali.limo.created
         - message
         - _tmp
       ignore_missing: true

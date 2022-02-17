@@ -18,6 +18,7 @@
 package status
 
 import (
+	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -59,6 +60,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	http.SetHeaderDefault(productorigin.Header, productorigin.Beats)
+
 	return &MetricSet{
 		ms,
 		http,
@@ -74,5 +77,5 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	return eventMapping(r, content)
+	return eventMapping(r, content, m.XPackEnabled)
 }

@@ -325,6 +325,7 @@ func TestCompletedHandshake(t *testing.T) {
 
 	// Then a change cypher spec message
 	reqData, err = hex.DecodeString(rawChangeCipherSpec)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 0, private)
 	assert.NotNil(t, private)
@@ -393,6 +394,7 @@ func TestTLS13VersionNegotiation(t *testing.T) {
 			"9a75ab618828f1b9e418d168130100002e00330024001d002070b27700b360aa" +
 			"3941a22da86901c00e174dc3d83e13cf4159b34b3de6809372002b0002030414" +
 			"0303000101")
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 1, private)
 	assert.NotNil(t, private)
@@ -400,6 +402,7 @@ func TestTLS13VersionNegotiation(t *testing.T) {
 
 	// Then a change cypher spec from the client
 	reqData, err = hex.DecodeString(rawChangeCipherSpec)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 0, private)
 	assert.NotNil(t, private)
@@ -432,6 +435,7 @@ func TestLegacyVersionNegotiation(t *testing.T) {
 
 	// Then a server hello + change cypher spec
 	reqData, err = hex.DecodeString(rawServerHello + rawChangeCipherSpec)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 1, private)
 	assert.NotNil(t, private)
@@ -439,6 +443,7 @@ func TestLegacyVersionNegotiation(t *testing.T) {
 
 	// Then a change cypher spec from the client
 	reqData, err = hex.DecodeString(rawChangeCipherSpec)
+	assert.NoError(t, err)
 	req = protos.Packet{Payload: reqData}
 	private = tls.Parse(&req, tcpTuple, 0, private)
 	assert.NotNil(t, private)

@@ -30,7 +30,7 @@ class TestUmask(BaseTest):
         """
         Test that output file permissions respect default umask
         """
-        output_file_path = os.path.join(self.working_dir, "output", "mockbeat")
+        output_file_path = os.path.join(self.working_dir, "output", "mockbeat-" + self.today + ".ndjson")
         perms = stat.S_IMODE(os.lstat(output_file_path).st_mode)
 
         self.assertEqual(perms, self.output_file_permissions & ~TestUmask.DEFAULT_UMASK)

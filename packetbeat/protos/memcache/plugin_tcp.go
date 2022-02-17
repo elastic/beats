@@ -60,8 +60,6 @@ type messageList struct {
 	tail *message
 }
 
-const defaultTCPTransDuration uint = 200
-
 func ensureMemcacheConnection(private protos.ProtocolData) *tcpConnectionData {
 	if private == nil {
 		return &tcpConnectionData{}

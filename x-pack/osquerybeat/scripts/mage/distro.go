@@ -24,20 +24,20 @@ import (
 
 // FetchOsqueryDistros fetches Osquery official distros as a part of the build
 func FetchOsqueryDistros() error {
-	osArchs := osArchs(devtools.Platforms)
+	osArchs := OSArchs(devtools.Platforms)
 	log.Printf("Fetch Osquery distros for %v", osArchs)
 
 	for _, osarch := range osArchs {
 		spec, err := distro.GetSpec(osarch)
 		if err != nil {
 			if errors.Is(err, distro.ErrUnsupportedOS) {
-				log.Printf("The build spec %v is not supported, continue", spec)
+				log.Printf("The build spec %v is not supported, continue\n", spec)
 				continue
 			} else {
 				return err
 			}
 		}
-		log.Print("Found spec:", spec)
+		log.Println("Found spec:", spec)
 
 		fetched, err := checkCacheAndFetch(osarch, spec)
 		if err != nil {
@@ -66,7 +66,7 @@ func FetchOsqueryDistros() error {
 	return nil
 }
 
-func osArchs(platforms devtools.BuildPlatformList) []distro.OSArch {
+func OSArchs(platforms devtools.BuildPlatformList) []distro.OSArch {
 	mp := make(map[distro.OSArch]struct{})
 
 	for _, platform := range platforms {

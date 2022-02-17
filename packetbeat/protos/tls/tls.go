@@ -170,10 +170,9 @@ func (plugin *tlsPlugin) doParse(
 	tcptuple *common.TCPTuple,
 	dir uint8,
 ) *tlsConnectionData {
-
 	// Ignore further traffic after the handshake is completed (encrypted connection)
 	// TODO: request/response analysis
-	if 0 != conn.handshakeCompleted&(1<<dir) {
+	if conn.handshakeCompleted&(1<<dir) != 0 {
 		return conn
 	}
 
@@ -229,8 +228,8 @@ func newStream(tcptuple *common.TCPTuple) *stream {
 }
 
 func (plugin *tlsPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
-
+	private protos.ProtocolData,
+) protos.ProtocolData {
 	if conn := ensureTLSConnection(private); conn != nil {
 		plugin.sendEvent(conn)
 	}

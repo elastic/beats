@@ -51,16 +51,10 @@ func (c onCall) Return(values ...interface{}) onCall {
 	return c
 }
 
-func onMode() onCall { return makeOnCall("Mode") }
-func (m *mockILMSupport) Mode() ilm.Mode {
+func onEnabled() onCall { return makeOnCall("Enabled") }
+func (m *mockILMSupport) Enabled() bool {
 	args := m.Called()
-	return args.Get(0).(ilm.Mode)
-}
-
-func onAlias() onCall { return makeOnCall("Alias") }
-func (m *mockILMSupport) Alias() ilm.Alias {
-	args := m.Called()
-	return args.Get(0).(ilm.Alias)
+	return args.Get(0).(bool)
 }
 
 func onPolicy() onCall { return makeOnCall("Policy") }
@@ -82,12 +76,6 @@ func onCheckEnabled() onCall { return makeOnCall("CheckEnabled") }
 func (m *mockILMSupport) CheckEnabled() (bool, error) {
 	args := m.Called()
 	return args.Bool(0), args.Error(1)
-}
-
-func onEnsureAlias() onCall { return makeOnCall("EnsureAlias") }
-func (m *mockILMSupport) EnsureAlias() error {
-	args := m.Called()
-	return args.Error(0)
 }
 
 func onEnsurePolicy() onCall { return makeOnCall("EnsurePolicy") }

@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/dustin/go-humanize"
@@ -29,6 +28,7 @@ import (
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 const cloudtrailTestFile = "testdata/aws-cloudtrail.json.gz"
@@ -166,13 +166,13 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		conf := makeBenchmarkConfig(t)
 
 		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
-		sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, time.Minute, 5, s3EventHandlerFactory)
+		sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, s3EventHandlerFactory)
 		sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, maxMessagesInflight, sqsMessageHandler)
 
 		go func() {
 			for event := range client.Channel {
 				// Fake the ACK handling that's not implemented in pubtest.
-				event.Private.(*eventACKTracker).ACK()
+				event.Private.(*awscommon.EventACKTracker).ACK()
 			}
 		}()
 
@@ -259,7 +259,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		s3API := newConstantS3(t)
 		s3API.pagerConstant = newS3PagerConstant()
 		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
-			event.Private.(*eventACKTracker).ACK()
+			event.Private.(*awscommon.EventACKTracker).ACK()
 		})
 
 		defer close(client.Channel)

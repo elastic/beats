@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
 )
@@ -59,11 +60,11 @@ type addDockerMetadata struct {
 	fields          []string
 	sourceProcessor processors.Processor
 
-	pidFields       []string      // Field names that contain PIDs.
-	cgroups         *common.Cache // Cache of PID (int) to cgropus (map[string]string).
-	hostFS          string        // Directory where /proc is found
-	dedot           bool          // If set to true, replace dots in labels with `_`.
-	dockerAvailable bool          // If Docker exists in env, then it is set to true
+	pidFields       []string         // Field names that contain PIDs.
+	cgroups         *common.Cache    // Cache of PID (int) to cgropus (map[string]string).
+	hostFS          resolve.Resolver // Directory where /proc is found
+	dedot           bool             // If set to true, replace dots in labels with `_`.
+	dockerAvailable bool             // If Docker exists in env, then it is set to true
 }
 
 const selector = "add_docker_metadata"
@@ -114,7 +115,7 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *common.Config, watcherC
 		fields:          config.Fields,
 		sourceProcessor: sourceProcessor,
 		pidFields:       config.MatchPIDs,
-		hostFS:          config.HostFS,
+		hostFS:          resolve.NewTestResolver(config.HostFS),
 		dedot:           config.DeDot,
 		dockerAvailable: dockerAvailable,
 	}, nil

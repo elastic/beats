@@ -14,18 +14,18 @@
         "dns.question.type": "Allowed",
         "dns.response_code": "1 (A)",
         "dns.type": "query",
-        "event.action": "dns-request-8.8.8.8",
+        "event.action": "dns-request-175.16.199.1",
         "event.category": "network",
         "event.dataset": "cisco.umbrella",
         "event.module": "cisco",
-        "event.original": "\\\"2020-07-23 23:49:54\\\",\\\"elasticuser\\\",\\\"elasticuser2\\\",\\\"some other identity\\\",\\\"192.168.1.1\\\",\\\"8.8.8.8\\\",\\\"Allowed\\\",\\\"1 (A)\\\",\\\"NOERROR\\\",\\\"elastic.co.\\\",\\\"Software/Technology,Business Services,Application\\\",\\\"Test Policy Name\\\",\\\"SomeIdentityType\\\",\\\"\\\"",
+        "event.original": "\\\"2020-07-23 23:49:54\\\",\\\"elasticuser\\\",\\\"elasticuser2\\\",\\\"some other identity\\\",\\\"192.168.1.1\\\",\\\"175.16.199.1\\\",\\\"Allowed\\\",\\\"1 (A)\\\",\\\"NOERROR\\\",\\\"elastic.co.\\\",\\\"Software/Technology,Business Services,Application\\\",\\\"Test Policy Name\\\",\\\"SomeIdentityType\\\",\\\"\\\"",
         "event.type": [
             "connection"
         ],
         "fileset.name": "umbrella",
         "input.type": "log",
         "log.offset": 0,
-        "message": "\"2020-07-23 23:49:54\",\"elasticuser\",\"elasticuser2\",\"some other identity\",\"192.168.1.1\",\"8.8.8.8\",\"Allowed\",\"1 (A)\",\"NOERROR\",\"elastic.co.\",\"Software/Technology,Business Services,Application\",\"Test Policy Name\",\"SomeIdentityType\",\"\"",
+        "message": "\"2020-07-23 23:49:54\",\"elasticuser\",\"elasticuser2\",\"some other identity\",\"192.168.1.1\",\"175.16.199.1\",\"Allowed\",\"1 (A)\",\"NOERROR\",\"elastic.co.\",\"Software/Technology,Business Services,Application\",\"Test Policy Name\",\"SomeIdentityType\",\"\"",
         "observer.product": "Umbrella",
         "observer.type": "dns",
         "observer.vendor": "Cisco",
@@ -69,7 +69,7 @@
         ],
         "fileset.name": "umbrella",
         "input.type": "log",
-        "log.offset": 232,
+        "log.offset": 237,
         "message": "\"2020-07-23 23:50:25\",\"elasticuser\",\"elasticuser2\",\"some other identity\",\"192.168.1.1\",\"4.4.4.4\",\"Blocked\",\"1 (A)\",\"NOERROR\",\"elastic.co/something.\",\"Chat,Instant Messaging,Block List,Application\",\"Test Policy Name\",\"SomeIdentityType\",\"BlockedCategories\"",
         "observer.product": "Umbrella",
         "observer.type": "dns",
@@ -108,15 +108,15 @@
         "event.category": "network",
         "event.dataset": "cisco.umbrella",
         "event.module": "cisco",
-        "event.original": "\\\"2021-05-14 19:39:58\\\",\\\"elastic_machine\\\",\\\"elastic_machine,Elastic User (ElasticUser@elastic.co)\\\",\\\"1.1.1.1\\\",\\\"2.2.2.2\\\",\\\"Allowed\\\",\\\"1 (A)\\\",\\\"NOERROR\\\",\\\"elastic.co.\\\",\\\"Infrastructure\\\",\\\"Roaming Computers\\\",\\\"Roaming Computers,AD Users\\\",\\\"\\\"",
+        "event.original": "\\\"2021-05-14 19:39:58\\\",\\\"elastic_machine\\\",\\\"elastic_machine,Elastic User (ElasticUser@elastic.co)\\\",\\\"89.160.20.156\\\",\\\"2.2.2.2\\\",\\\"Allowed\\\",\\\"1 (A)\\\",\\\"NOERROR\\\",\\\"elastic.co.\\\",\\\"Infrastructure\\\",\\\"Roaming Computers\\\",\\\"Roaming Computers,AD Users\\\",\\\"\\\"",
         "event.type": [
             "allowed",
             "connection"
         ],
         "fileset.name": "umbrella",
         "input.type": "log",
-        "log.offset": 487,
-        "message": "\"2021-05-14 19:39:58\",\"elastic_machine\",\"elastic_machine,Elastic User (ElasticUser@elastic.co)\",\"1.1.1.1\",\"2.2.2.2\",\"Allowed\",\"1 (A)\",\"NOERROR\",\"elastic.co.\",\"Infrastructure\",\"Roaming Computers\",\"Roaming Computers,AD Users\",\"\"",
+        "log.offset": 492,
+        "message": "\"2021-05-14 19:39:58\",\"elastic_machine\",\"elastic_machine,Elastic User (ElasticUser@elastic.co)\",\"89.160.20.156\",\"2.2.2.2\",\"Allowed\",\"1 (A)\",\"NOERROR\",\"elastic.co.\",\"Infrastructure\",\"Roaming Computers\",\"Roaming Computers,AD Users\",\"\"",
         "observer.product": "Umbrella",
         "observer.type": "dns",
         "observer.vendor": "Cisco",
@@ -124,16 +124,16 @@
             "elastic.co."
         ],
         "related.ip": [
-            "1.1.1.1",
-            "2.2.2.2"
+            "2.2.2.2",
+            "89.160.20.156"
         ],
         "related.user": [
             "Elastic User (ElasticUser@elastic.co)",
             "elastic_machine"
         ],
         "service.type": "cisco",
-        "source.address": "1.1.1.1",
-        "source.ip": "1.1.1.1",
+        "source.address": "89.160.20.156",
+        "source.ip": "89.160.20.156",
         "source.user.name": "elastic_machine"
     }
 ]

@@ -14,7 +14,7 @@
                                 "959db113-1ce6-46fc-97c3-dbf5fd5abb9a": {
                                     "dataType": "string",
                                     "isBucketed": true,
-                                    "label": "Top values of threatintel.abusemalware.signature",
+                                    "label": "Top values of abusech.malware.signature",
                                     "operationType": "terms",
                                     "params": {
                                         "missingBucket": false,
@@ -27,7 +27,7 @@
                                         "size": 10
                                     },
                                     "scale": "ordinal",
-                                    "sourceField": "threatintel.abusemalware.signature"
+                                    "sourceField": "abusech.malware.signature"
                                 },
                                 "de396547-655b-4db2-8a21-e9850acff0b0": {
                                     "dataType": "number",
@@ -91,13 +91,13 @@
                         "store": "appState"
                     },
                     "exists": {
-                        "field": "threatintel.abusemalware.signature"
+                        "field": "abusech.malware.signature"
                     },
                     "meta": {
                         "alias": null,
                         "disabled": false,
                         "indexRefName": "filter-index-pattern-2",
-                        "key": "threatintel.abusemalware.signature",
+                        "key": "abusech.malware.signature",
                         "negate": false,
                         "type": "exists",
                         "value": "exists"

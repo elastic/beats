@@ -28,7 +28,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "Confidence",
-                        "field": "threatintel.indicator.confidence",
+                        "field": "threat.indicator.confidence",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

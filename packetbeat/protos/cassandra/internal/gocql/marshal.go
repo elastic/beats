@@ -349,8 +349,8 @@ const (
 	errUnprepared      ErrType = 0x2500
 )
 
-func (this ErrType) String() string {
-	switch this {
+func (e ErrType) String() string {
+	switch e {
 	case errUnavailable:
 		return "errUnavailable"
 	case errWriteTimeout:
@@ -680,7 +680,7 @@ func (u UUID) Bytes() []byte {
 // String returns the UUID in it's canonical form, a 32 digit hexadecimal
 // number in the form of xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.
 func (u UUID) String() string {
-	var offsets = [...]int{0, 2, 4, 6, 9, 11, 14, 16, 19, 21, 24, 26, 28, 30, 32, 34}
+	offsets := [...]int{0, 2, 4, 6, 9, 11, 14, 16, 19, 21, 24, 26, 28, 30, 32, 34}
 	const hexString = "0123456789abcdef"
 	r := make([]byte, 36)
 	for i, b := range u {

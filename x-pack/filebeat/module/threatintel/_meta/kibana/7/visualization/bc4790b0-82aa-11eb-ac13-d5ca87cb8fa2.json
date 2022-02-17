@@ -30,13 +30,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.malwarebazaar.intelligence.downloads"
+                            "field": "abusech.malwarebazaar.intelligence.downloads"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                            "key": "threatintel.malwarebazaar.intelligence.downloads",
+                            "key": "abusech.malwarebazaar.intelligence.downloads",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -76,7 +76,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "Malware Bazaar Downloads",
-                        "field": "threatintel.malwarebazaar.intelligence.downloads",
+                        "field": "abusech.malwarebazaar.intelligence.downloads",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

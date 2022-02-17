@@ -96,7 +96,11 @@ func Test_runPublishJob(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			client := &MockBeatClient{}
-			queue := runPublishJob(tc.job, client)
+			queue := runPublishJob(tc.job, &WrappedClient{
+				Publish: client.Publish,
+				Close:   client.Close,
+				wait:    func() {},
+			})
 			for {
 				if len(queue) == 0 {
 					break

@@ -15,8 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build darwin || freebsd || linux || openbsd || windows
-// +build darwin freebsd linux openbsd windows
+//go:build darwin || freebsd || linux || openbsd || windows || aix
+// +build darwin freebsd linux openbsd windows aix
 
 package memory
 
@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -40,17 +41,19 @@ func init() {
 // MetricSet for fetching system memory metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
+	mod resolve.Resolver
 }
 
 // New is a mb.MetricSetFactory that returns a memory.MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return &MetricSet{BaseMetricSet: base}, nil
+	sys := base.Module().(resolve.Resolver)
+	return &MetricSet{BaseMetricSet: base, mod: sys}, nil
 }
 
 // Fetch fetches memory metrics from the OS.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
-	eventRaw, err := metrics.Get("")
+	eventRaw, err := metrics.Get(m.mod)
 	if err != nil {
 		return errors.Wrap(err, "error fetching memory metrics")
 	}

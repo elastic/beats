@@ -63,7 +63,7 @@ func AuditbeatSettings() instance.Settings {
 	}
 }
 
-// Initialize initializes the entrypoint commands for journalbeat
+// Initialize initializes the entrypoint commands for auditbeat
 func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 	create := beater.Creator(
 		beater.WithModuleOptions(

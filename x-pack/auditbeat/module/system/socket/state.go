@@ -563,6 +563,38 @@ func (s *state) CreateProcess(p *process) error {
 	return nil
 }
 
+func (s *state) ForkProcess(parentPID, childPID uint32, ts kernelTime) error {
+	if parentPID == childPID {
+		return nil
+	}
+	s.Lock()
+	defer s.Unlock()
+	if _, found := s.processes[childPID]; found {
+		return errors.New("fork: child pid already registered to another process")
+	}
+	if parent, found := s.processes[parentPID]; found {
+		child := &process{
+			pid:         childPID,
+			name:        parent.name,
+			path:        parent.path,
+			args:        parent.args,
+			created:     ts,
+			uid:         parent.uid,
+			gid:         parent.gid,
+			euid:        parent.euid,
+			egid:        parent.egid,
+			hasCreds:    parent.hasCreds,
+			createdTime: s.kernTimestampToTime(ts),
+		}
+		child.resolvedDomains = make(map[string]string, len(parent.resolvedDomains))
+		for k, v := range parent.resolvedDomains {
+			child.resolvedDomains[k] = v
+		}
+		s.processes[childPID] = child
+	}
+	return nil
+}
+
 func (s *state) TerminateProcess(pid uint32) error {
 	if pid == 0 {
 		return errors.New("can't terminate process with PID 0")
@@ -631,8 +663,16 @@ func (s *state) CreateSocket(ref flow) error {
 	defer s.Unlock()
 	ref.createdTime = s.kernTimestampToTime(ref.created)
 	ref.lastSeenTime = s.kernTimestampToTime(ref.lastSeen)
-	// terminate existing if sock ptr is reused
 	if prev, found := s.socks[ref.sock]; found {
+		// Fetch existing flow in case of TCP negotiation
+		if initial, found := prev.flows[ref.remote.String()]; found && ref.local.String() == initial.local.String() {
+			initial.dir = ref.dir
+			initial.pid = ref.pid
+			initial.process = ref.process
+			ref.updateWith(*initial, s)
+			delete(prev.flows, ref.remote.String())
+		}
+		// terminate existing if sock ptr is reused
 		s.onSockTerminated(prev)
 	}
 	return s.createFlow(ref)
@@ -662,22 +702,21 @@ func (s *state) mutualEnrich(sock *socket, f *flow) {
 			f.dir = sock.dir
 		}
 	}
-	if sockNoPID := sock.pid == 0; sockNoPID != (f.pid == 0) {
-		if sockNoPID {
-			sock.pid = f.pid
-		} else {
-			f.pid = sock.pid
-		}
+	if sock.pid == 0 {
+		sock.pid = f.pid
+		sock.process = f.process
 	}
-	if sockNoProcess := sock.process == nil; sockNoProcess != (f.process == nil) {
-		if sockNoProcess {
-			sock.process = f.process
-		} else {
+	if sock.pid == f.pid && sock.pid != 0 {
+		if sockNoProcess := sock.process == nil; sockNoProcess != (f.process == nil) {
+			if sockNoProcess {
+				sock.process = f.process
+			} else {
+				f.process = sock.process
+			}
+		} else if sock.process == nil && sock.pid != 0 {
+			sock.process = s.getProcess(sock.pid)
 			f.process = sock.process
 		}
-	} else if sock.process == nil && sock.pid != 0 {
-		sock.process = s.getProcess(sock.pid)
-		f.process = sock.process
 	}
 	if !sock.closing {
 		sock.lastSeenTime = s.clock()
@@ -764,6 +803,11 @@ func (s *state) UpdateFlowWithCondition(ref flow, cond func(*flow) bool) error {
 	}
 	prev, found := sock.flows[ref.remote.addr.String()]
 	if !found {
+		// Sock has been already closed and it may be receiving a SYN for a different
+		// flow.
+		if sock.closing {
+			return nil
+		}
 		return s.createFlow(ref)
 	}
 	if cond != nil && !cond(prev) {
@@ -901,8 +945,16 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 	}
 
 	src, dst := local, remote
-	if f.dir == directionIngress {
+	switch f.dir {
+	case directionIngress:
 		src, dst = dst, src
+	case directionUnknown:
+		// For some flows we can miss information to determine the source (dir=unknown).
+		// As a last resort, assume that the client side uses a higher port number
+		// than the server.
+		if localAddr.Port < remoteAddr.Port {
+			src, dst = dst, src
+		}
 	}
 
 	inetType := f.inetType

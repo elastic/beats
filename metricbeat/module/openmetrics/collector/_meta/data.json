@@ -11,7 +11,7 @@
     },
     "openmetrics": {
         "labels": {
-            "device": "br-33d819d5f834",
+            "device": "br-3a285aa5e58c",
             "job": "openmetrics"
         },
         "metrics": {

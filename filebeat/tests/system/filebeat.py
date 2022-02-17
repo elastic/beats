@@ -36,7 +36,7 @@ class BaseTest(TestCase):
         return Registry(data_path, name)
 
     def log_access(self, file=None):
-        file = file if file else self.beat_name + ".log"
+        file = file if file else self.beat_name + "-" + self.today + ".ndjson"
         return LogState(os.path.join(self.working_dir, file))
 
     def has_registry(self, name=None, data_path=None):

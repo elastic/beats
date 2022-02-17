@@ -2,9 +2,7 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": {
-				"name": "default"
-			}
+			"namespace": "default"
 		},
 		"MetricSetFields": {
 			"active": {

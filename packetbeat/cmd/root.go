@@ -50,7 +50,7 @@ var RootCmd *cmd.BeatsRootCmd
 
 // PacketbeatSettings contains the default settings for packetbeat
 func PacketbeatSettings() instance.Settings {
-	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
+	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("I"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("t"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("O"))

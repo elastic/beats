@@ -194,9 +194,9 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         return doc
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    def test_template(self):
+    def test_index_management(self):
         """
-        Test that the template can be loaded with `setup --template`
+        Test that the template can be loaded with `setup --index-management`
         """
         es = Elasticsearch([self.get_elasticsearch_url()])
         self.render_config_template(
@@ -206,7 +206,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
             }],
             elasticsearch={"host": self.get_elasticsearch_url()},
         )
-        exit_code = self.run_beat(extra_args=["setup", "--template"])
+        exit_code = self.run_beat(extra_args=["setup", "--index-management"])
 
         assert exit_code == 0
         assert self.log_contains('Loaded index template')

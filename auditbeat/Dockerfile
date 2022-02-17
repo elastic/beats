@@ -1,8 +1,8 @@
-FROM golang:1.17.1
+FROM golang:1.17.6
 
 RUN \
     apt-get update \
-      && apt-get install -y --no-install-recommends \
+      && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
          python3 \
          python3-pip \
          python3-venv \

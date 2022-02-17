@@ -40,7 +40,7 @@ func TestStats(t *testing.T) {
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
-		eventsMapping(reporter, input)
+		eventsMapping(reporter, input, true)
 
 		require.True(t, len(reporter.GetEvents()) >= 1)
 		require.Equal(t, 0, len(reporter.GetErrors()))

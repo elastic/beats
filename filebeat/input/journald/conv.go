@@ -23,7 +23,7 @@ package journald
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/journalbeat/pkg/journalfield"
+	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )

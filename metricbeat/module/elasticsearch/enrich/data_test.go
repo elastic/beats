@@ -46,7 +46,7 @@ func TestEmpty(t *testing.T) {
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
-	eventsMapping(reporter, info, input)
+	eventsMapping(reporter, info, input, true)
 	require.Equal(t, 0, len(reporter.GetErrors()))
 	require.Equal(t, 0, len(reporter.GetEvents()))
 }

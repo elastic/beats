@@ -24,8 +24,9 @@ import (
 	"errors"
 	"time"
 
-	"github.com/elastic/beats/v7/journalbeat/pkg/journalfield"
-	"github.com/elastic/beats/v7/journalbeat/pkg/journalread"
+	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
+	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalread"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 )
 
 // Config stores the options of a journald input.
@@ -51,6 +52,9 @@ type config struct {
 
 	// SaveRemoteHostname defines if the original source of the entry needs to be saved.
 	SaveRemoteHostname bool `config:"save_remote_hostname"`
+
+	// Parsers configuration
+	Parsers parser.Config `config:",inline"`
 }
 
 var errInvalidSeekFallback = errors.New("invalid setting for cursor_seek_fallback")

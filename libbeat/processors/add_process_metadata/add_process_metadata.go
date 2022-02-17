@@ -30,14 +30,17 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 )
 
 const (
-	processorName      = "add_process_metadata"
-	cacheExpiration    = time.Second * 30
-	containerIDMapping = "container.id"
+	processorName       = "add_process_metadata"
+	cacheExpiration     = time.Second * 30
+	cacheCapacity       = 32 << 10 // maximum number of process cache entries.
+	cacheEvictionEffort = 10       // number of entries to sample for expiry eviction.
+	containerIDMapping  = "container.id"
 )
 
 var (
@@ -48,7 +51,7 @@ var (
 	// ErrNoProcess is returned when metadata for a process can't be collected.
 	ErrNoProcess = errors.New("process not found")
 
-	procCache = newProcessCache(cacheExpiration, gosysinfoProvider{})
+	procCache = newProcessCache(cacheExpiration, cacheCapacity, cacheEvictionEffort, gosysinfoProvider{})
 
 	processCgroupPaths = cgroup.ProcessCgroupPaths
 
@@ -111,7 +114,6 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 	}
 
 	mappings, err := config.getMappings()
-
 	if err != nil {
 		return nil, errors.Wrapf(err, "error unpacking %v.target_fields", processorName)
 	}
@@ -134,11 +136,10 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 
 			p.cgroupsCache = common.NewCacheWithRemovalListener(config.CgroupCacheExpireTime, 100, evictionListener)
 			p.cgroupsCache.StartJanitor(config.CgroupCacheExpireTime)
-			p.cidProvider = newCidProvider(config.HostPath, config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, p.cgroupsCache)
+			p.cidProvider = newCidProvider(resolve.NewTestResolver(config.HostPath), config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, p.cgroupsCache)
 		} else {
-			p.cidProvider = newCidProvider(config.HostPath, config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, nil)
+			p.cidProvider = newCidProvider(resolve.NewTestResolver(config.HostPath), config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, nil)
 		}
-
 	}
 
 	if withCache {

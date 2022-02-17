@@ -30,7 +30,6 @@ type observer interface {
 
 type pipelineObserver interface {
 	clientConnected()
-	clientClosing()
 	clientClosed()
 }
 
@@ -47,12 +46,8 @@ type queueObserver interface {
 }
 
 type outputObserver interface {
-	updateOutputGroup()
-	eventsFailed(int)
 	eventsDropped(int)
 	eventsRetry(int)
-	outBatchSend(int)
-	outBatchACKed(int)
 }
 
 // metricsObserver is used by many component in the publisher pipeline, to report
@@ -119,9 +114,6 @@ func (o *metricsObserver) cleanup() {
 // (pipeline) pipeline did finish creating a new client instance
 func (o *metricsObserver) clientConnected() { o.vars.clients.Inc() }
 
-// (client) close being called on client
-func (o *metricsObserver) clientClosing() {}
-
 // (client) client finished processing close
 func (o *metricsObserver) clientClosed() { o.vars.clients.Dec() }
 
@@ -171,12 +163,6 @@ func (o *metricsObserver) queueMaxEvents(n int) {
 // pipeline output events
 //
 
-// (controller) new output group is about to be loaded
-func (o *metricsObserver) updateOutputGroup() {}
-
-// (retryer) new failed batch has been received
-func (o *metricsObserver) eventsFailed(int) {}
-
 // (retryer) number of events dropped by retryer
 func (o *metricsObserver) eventsDropped(n int) {
 	o.vars.dropped.Add(uint64(n))
@@ -187,19 +173,12 @@ func (o *metricsObserver) eventsRetry(n int) {
 	o.vars.retry.Add(uint64(n))
 }
 
-// (output) number of events to be forwarded to the output client
-func (o *metricsObserver) outBatchSend(int) {}
-
-// (output) number of events acked by the output batch
-func (o *metricsObserver) outBatchACKed(int) {}
-
 type emptyObserver struct{}
 
 var nilObserver observer = (*emptyObserver)(nil)
 
 func (*emptyObserver) cleanup()            {}
 func (*emptyObserver) clientConnected()    {}
-func (*emptyObserver) clientClosing()      {}
 func (*emptyObserver) clientClosed()       {}
 func (*emptyObserver) newEvent()           {}
 func (*emptyObserver) filteredEvent()      {}
@@ -207,9 +186,5 @@ func (*emptyObserver) publishedEvent()     {}
 func (*emptyObserver) failedPublishEvent() {}
 func (*emptyObserver) queueACKed(n int)    {}
 func (*emptyObserver) queueMaxEvents(int)  {}
-func (*emptyObserver) updateOutputGroup()  {}
-func (*emptyObserver) eventsFailed(int)    {}
 func (*emptyObserver) eventsDropped(int)   {}
 func (*emptyObserver) eventsRetry(int)     {}
-func (*emptyObserver) outBatchSend(int)    {}
-func (*emptyObserver) outBatchACKed(int)   {}

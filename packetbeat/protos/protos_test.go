@@ -70,9 +70,7 @@ func (proto *UDPProtocol) GetPorts() []int {
 	return proto.Ports
 }
 
-func (proto *UDPProtocol) ParseUDP(pkt *Packet) {
-	return
-}
+func (proto *UDPProtocol) ParseUDP(pkt *Packet) {}
 
 type TCPUDPProtocol TestProtocol
 
@@ -99,9 +97,7 @@ func (proto *TCPUDPProtocol) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	return private, true
 }
 
-func (proto *TCPUDPProtocol) ParseUDP(pkt *Packet) {
-	return
-}
+func (proto *TCPUDPProtocol) ParseUDP(pkt *Packet) {}
 
 func (proto *TCPUDPProtocol) ConnectionTimeout() time.Duration { return 0 }
 

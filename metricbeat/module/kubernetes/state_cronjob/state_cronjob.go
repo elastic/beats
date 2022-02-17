@@ -74,7 +74,7 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			},
 			Labels: map[string]p.LabelMap{
 				"cronjob":            p.KeyLabel("name"),
-				"namespace":          p.KeyLabel(mb.ModuleDataKey + ".namespace.name"),
+				"namespace":          p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 				"schedule":           p.KeyLabel("schedule"),
 				"concurrency_policy": p.KeyLabel("concurrency"),
 			},

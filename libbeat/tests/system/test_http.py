@@ -47,3 +47,10 @@ class Test(BaseTest):
         """
         r = requests.get("http://localhost:5066/not-exist")
         assert r.status_code == 404
+
+    def test_pprof_disabled(self):
+        """
+        Test /debug/pprof/ http endpoint
+        """
+        r = requests.get("http://localhost:5066/debug/pprof/")
+        assert r.status_code == 404

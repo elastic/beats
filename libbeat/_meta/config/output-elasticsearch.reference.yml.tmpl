@@ -31,10 +31,9 @@ output.elasticsearch:
   # Number of workers per Elasticsearch host.
   #worker: 1
 
-  # Optional index name. The default is "{{.BeatIndexPrefix}}" plus date
-  # and generates [{{.BeatIndexPrefix}}-]YYYY.MM.DD keys.
+  # Optional data stream or index name. The default is "{{.BeatIndexPrefix}}-%{[agent.version]}".
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
-  #index: "{{.BeatIndexPrefix}}-%{[agent.version]}-%{+yyyy.MM.dd}"
+  #index: "{{.BeatIndexPrefix}}-%{[agent.version]}"
 
   # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""

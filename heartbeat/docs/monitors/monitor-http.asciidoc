@@ -272,7 +272,7 @@ This monitor examines match successfully only when 'foo' or 'Foo' in body AND no
 *`json`*:: A list of expressions or <<conditions,condition>> statements (now deprecated) executed against the body when parsed as JSON. Body sizes
 must be less than or equal to 100 MiB.
 
-The following configuration shows how to check the response using [gval](https://github.com/PaesslerAG/gval/blob/master/README.md) expressions when the body contains JSON:
+The following configuration shows how to check the response using https://github.com/PaesslerAG/gval/blob/master/README.md[gval] expressions when the body contains JSON:
 
 [source,yaml]
 -------------------------------------------------------------------------------
@@ -290,7 +290,7 @@ The following configuration shows how to check the response using [gval](https:/
         expression: 'foo.bar == "myValue"'
 -------------------------------------------------------------------------------
 
-Expressions can be much more complex than simple equality. They can also use [jsonpath](https://goessner.net/articles/JsonPath/) syntax. Note that strings must be double quoted with `"` rather than single quoted with `'` in the `gval` variant of jsonpath. Please note that jsonpath sub-expressions must start with `$.`, for instance `'$.nodes[?(@.name=="myname")] != []'` will check that the `nodes` map has at least one value with the name 'myname'.
+Expressions can be much more complex than simple equality. They can also use https://goessner.net/articles/JsonPath/[jsonpath] syntax. Note that strings must be double quoted with `"` rather than single quoted with `'` in the `gval` variant of jsonpath. Please note that jsonpath sub-expressions must start with `$.`, for instance `'$.nodes[?(@.name=="myname")] != []'` will check that the `nodes` map has at least one value with the name 'myname'.
 
 When working with responses that are returned in the form of a JSON array at the root rather than an object jsonpath can be used as well. As an example `$.[0].foo == "bar"` tests that the first item in the response has an attribute `foo` that has the value "bar".
 

@@ -169,11 +169,11 @@ var dup46 = lookup({
 	key: dup15,
 });
 
-var hdr1 = match("HEADER#0:0001", "message", "%{hfld1->} %{messageid}[%{process_id}]: %{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", "%{hfld1->} %{hostname->} %{messageid}[%{process_id}]: %{payload}", processor_chain([
 	setc("header_id","0001"),
 ]));
 
-var hdr2 = match("HEADER#1:0002", "message", "%{hfld1->} %{hostname->} %{messageid}[%{process_id}]: %{payload}", processor_chain([
+var hdr2 = match("HEADER#1:0002", "message", "%{hfld1->} %{messageid}[%{process_id}]: %{payload}", processor_chain([
 	setc("header_id","0002"),
 ]));
 

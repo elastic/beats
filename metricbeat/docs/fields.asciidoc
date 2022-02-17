@@ -6736,7 +6736,7 @@ alias to: beat.stats.apm_server.acm.response.errors.unauthorized
 --
 type: alias
 
-alias to: beat.stats.beat.host
+alias to: beat.stats.info.host
 
 --
 
@@ -6745,7 +6745,7 @@ alias to: beat.stats.beat.host
 --
 type: alias
 
-alias to: beat.stats.beat.name
+alias to: beat.stats.info.name
 
 --
 
@@ -6754,7 +6754,7 @@ alias to: beat.stats.beat.name
 --
 type: alias
 
-alias to: beat.stats.beat.type
+alias to: beat.stats.info.type
 
 --
 
@@ -6763,7 +6763,7 @@ alias to: beat.stats.beat.type
 --
 type: alias
 
-alias to: beat.stats.beat.uuid
+alias to: beat.stats.info.uuid
 
 --
 
@@ -6772,7 +6772,7 @@ alias to: beat.stats.beat.uuid
 --
 type: alias
 
-alias to: beat.stats.beat.version
+alias to: beat.stats.info.version
 
 --
 
@@ -7535,6 +7535,13 @@ type: keyword
 
 --
 
+*`beat.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
+
 [float]
 === state
 
@@ -8273,6 +8280,42 @@ type: long
 --
 
 
+*`beat.stats.info.name`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.info.host`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.info.type`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.info.uuid`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.info.version`*::
++
+--
+type: keyword
+
+--
+
+
 *`beat.stats.beat.name`*::
 +
 --
@@ -8665,6 +8708,13 @@ type: short
 --
 
 *`beat.stats.libbeat.config.stops`*::
++
+--
+type: short
+
+--
+
+*`beat.stats.libbeat.config.reloads`*::
 +
 --
 type: short
@@ -12825,9 +12875,12 @@ format: bytes
 *`client.domain`*::
 +
 --
-Client domain.
+The domain name of the client system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -13836,9 +13889,12 @@ format: bytes
 *`destination.domain`*::
 +
 --
-Destination domain.
+The domain name of the destination system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -20332,9 +20388,12 @@ format: bytes
 *`server.domain`*::
 +
 --
-Server domain.
+The domain name of the server system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -21075,9 +21134,12 @@ format: bytes
 *`source.domain`*::
 +
 --
-Source domain.
+The domain name of the source system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -40612,6 +40674,13 @@ alias to: service.id
 --
 
 
+*`kibana.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
+
 [float]
 === settings
 
@@ -41165,44 +41234,13 @@ type: ip
 
 --
 
-
-*`kubernetes.namespace.name`*::
+*`kubernetes.namespace`*::
 +
 --
-Kubernetes namespace name
+Kubernetes namespace
 
 
 type: keyword
-
---
-
-*`kubernetes.namespace.uuid`*::
-+
---
-Kubernetes namespace uuid
-
-
-type: keyword
-
---
-
-*`kubernetes.namespace.labels.*`*::
-+
---
-Kubernetes namespace labels map
-
-
-type: object
-
---
-
-*`kubernetes.namespace.annotations.*`*::
-+
---
-Kubernetes namespace annotations map
-
-
-type: object
 
 --
 
@@ -46274,6 +46312,13 @@ alias to: logstash.node.state.pipeline.hash
 
 --
 
+
+*`logstash.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
 
 [float]
 === node
@@ -58924,7 +58969,7 @@ type: keyword
 *`system.filesystem.type`*::
 +
 --
-The disk type. For example: `ext4`
+The disk type. For example: `ext4`. In some case for Windows OS the value will be `unavailable` as access to this information is not allowed (ex. external disks).
 
 
 type: keyword

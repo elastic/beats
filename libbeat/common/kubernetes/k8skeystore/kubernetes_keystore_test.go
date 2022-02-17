@@ -34,10 +34,10 @@ import (
 
 func TestGetKeystore(t *testing.T) {
 	kRegistry := NewKubernetesKeystoresRegistry(nil, nil)
-	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": common.MapStr{"name": "my_namespace"}}})
-	k2 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": common.MapStr{"name": "my_namespace"}}})
+	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": "my_namespace"}})
+	k2 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": "my_namespace"}})
 	assert.Equal(t, k1, k2)
-	k3 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": common.MapStr{"name": "my_namespace_2"}}})
+	k3 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": "my_namespace_2"}})
 	assert.NotEqual(t, k2, k3)
 }
 
@@ -64,7 +64,7 @@ func TestGetKeystoreAndRetrieve(t *testing.T) {
 	}
 
 	kRegistry := NewKubernetesKeystoresRegistry(nil, client)
-	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": common.MapStr{"name": ns}}})
+	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": ns}})
 	key := "kubernetes.test_namespace.testing_secret.secret_value"
 	secure, err := k1.Retrieve(key)
 	if err != nil {
@@ -100,7 +100,7 @@ func TestGetKeystoreAndRetrieveWithNonAllowedNamespace(t *testing.T) {
 	}
 
 	kRegistry := NewKubernetesKeystoresRegistry(logger, client)
-	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": common.MapStr{"name": ns}}})
+	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": ns}})
 	key := "kubernetes.test_namespace_HACK.testing_secret.secret_value"
 	_, err = k1.Retrieve(key)
 	assert.Error(t, err)
@@ -130,7 +130,7 @@ func TestGetKeystoreAndRetrieveWithWrongKeyFormat(t *testing.T) {
 	}
 
 	kRegistry := NewKubernetesKeystoresRegistry(logger, client)
-	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": common.MapStr{"name": ns}}})
+	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": ns}})
 	key := "HACK_test_namespace_HACK.testing_secret.secret_value"
 	_, err = k1.Retrieve(key)
 	assert.Error(t, err)
@@ -142,7 +142,7 @@ func TestGetKeystoreAndRetrieveWithNoSecretsExistent(t *testing.T) {
 	ns := "test_namespace"
 
 	kRegistry := NewKubernetesKeystoresRegistry(logger, client)
-	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": common.MapStr{"name": ns}}})
+	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": ns}})
 	key := "kubernetes.test_namespace.testing_secret.secret_value"
 	_, err := k1.Retrieve(key)
 	assert.Error(t, err)
@@ -172,7 +172,7 @@ func TestGetKeystoreAndRetrieveWithWrongSecretName(t *testing.T) {
 	}
 
 	kRegistry := NewKubernetesKeystoresRegistry(logger, client)
-	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": common.MapStr{"name": ns}}})
+	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": ns}})
 	key := "kubernetes.test_namespace.testing_secret_WRONG.secret_value"
 	_, err = k1.Retrieve(key)
 	assert.Error(t, err)
@@ -202,7 +202,7 @@ func TestGetKeystoreAndRetrieveWithWrongSecretValue(t *testing.T) {
 	}
 
 	kRegistry := NewKubernetesKeystoresRegistry(logger, client)
-	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": common.MapStr{"name": ns}}})
+	k1 := kRegistry.GetKeystore(bus.Event{"kubernetes": common.MapStr{"namespace": ns}})
 	key := "kubernetes.test_namespace.testing_secret.secret_value_WRONG"
 	_, err = k1.Retrieve(key)
 	assert.Error(t, err)

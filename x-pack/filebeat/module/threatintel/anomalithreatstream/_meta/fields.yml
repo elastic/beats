@@ -1,4 +1,4 @@
-- name: anomalithreatstream
+- name: anomali.threatstream
   type: group
   description: >
     Fields for Anomali ThreatStream

@@ -176,6 +176,11 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 			"arm64": "arm64",
 		},
 	},
+	"aix": map[PackageType]map[string]string{
+		TarGz: map[string]string{
+			"ppc64": "ppc64",
+		},
+	},
 }
 
 // getOSArchName returns the architecture name to use in a package.

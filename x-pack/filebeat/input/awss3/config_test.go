@@ -38,7 +38,6 @@ func TestConfig(t *testing.T) {
 			SQSWaitTime:         20 * time.Second,
 			BucketListInterval:  120 * time.Second,
 			BucketListPrefix:    "",
-			FIPSEnabled:         false,
 			PathStyle:           false,
 			MaxNumberOfMessages: 5,
 			ReaderConfig: readerConfig{
@@ -113,18 +112,17 @@ func TestConfig(t *testing.T) {
 			},
 		},
 		{
-			"error on no queueURL and s3Bucket",
+			"error on no queueURL and s3Bucket and nonAWSS3Bucket",
 			"",
 			"",
 			"",
 			common.MapStr{
-				"queue_url":  "",
-				"bucket_arn": "",
+				"queue_url":           "",
+				"bucket_arn":          "",
+				"non_aws_bucket_name": "",
 			},
-			"",
-			func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
-				return makeConfig("", "", "")
-			},
+			"neither queue_url, bucket_arn nor non_aws_bucket_name were provided",
+			nil,
 		},
 		{
 			"error on both queueURL and s3Bucket",

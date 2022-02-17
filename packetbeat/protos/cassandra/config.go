@@ -34,20 +34,18 @@ type cassandraConfig struct {
 	OPsIgnored            []gocql.FrameOp `config:"ignored_ops"`
 }
 
-var (
-	defaultConfig = cassandraConfig{
-		ProtocolCommon: config.ProtocolCommon{
-			TransactionTimeout: protos.DefaultTransactionExpiration,
-			SendRequest:        true,
-			SendResponse:       true,
-		},
-		SendRequestHeader:  true,
-		SendResponseHeader: true,
-	}
-)
+var defaultConfig = cassandraConfig{
+	ProtocolCommon: config.ProtocolCommon{
+		TransactionTimeout: protos.DefaultTransactionExpiration,
+		SendRequest:        true,
+		SendResponse:       true,
+	},
+	SendRequestHeader:  true,
+	SendResponseHeader: true,
+}
 
 func (c *cassandraConfig) Validate() error {
-	if !(c.Compressor == "" || c.Compressor == "snappy") {
+	if c.Compressor != "" && c.Compressor != "snappy" {
 		return fmt.Errorf("invalid compressor config: %s, only snappy supported", c.Compressor)
 	}
 	return nil

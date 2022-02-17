@@ -35,6 +35,7 @@ type Monitor struct {
 func NewMonitor(downloadConfig *artifact.Config, monitoringCfg *monitoringConfig.MonitoringConfig, logMetrics bool) *Monitor {
 	if monitoringCfg == nil {
 		monitoringCfg = monitoringConfig.DefaultConfig()
+		monitoringCfg.Pprof = &monitoringConfig.PprofConfig{Enabled: false}
 	}
 	monitoringCfg.LogMetrics = logMetrics
 
@@ -55,6 +56,9 @@ func (b *Monitor) Reload(rawConfig *config.Config) error {
 	if cfg == nil || cfg.Settings == nil || cfg.Settings.MonitoringConfig == nil {
 		b.config = monitoringConfig.DefaultConfig()
 	} else {
+		if cfg.Settings.MonitoringConfig.Pprof == nil {
+			cfg.Settings.MonitoringConfig.Pprof = b.config.Pprof
+		}
 		b.config = cfg.Settings.MonitoringConfig
 		logMetrics := true
 		if cfg.Settings.LoggingConfig != nil {
@@ -123,6 +127,11 @@ func (b *Monitor) EnrichArgs(spec program.Spec, pipelineID string, args []string
 			"-E", "http.enabled=true",
 			"-E", "http.host="+endpoint,
 		)
+		if b.config.Pprof != nil && b.config.Pprof.Enabled {
+			appendix = append(appendix,
+				"-E", "http.pprof.enabled=true",
+			)
+		}
 	}
 
 	loggingPath := b.generateLoggingPath(spec, pipelineID)
@@ -131,10 +140,8 @@ func (b *Monitor) EnrichArgs(spec program.Spec, pipelineID string, args []string
 		if isSidecar {
 			logFile += "_monitor"
 		}
-		logFile = fmt.Sprintf("%s-json.log", logFile)
+		logFile = fmt.Sprintf("%s", logFile)
 		appendix = append(appendix,
-			"-E", "logging.json=true",
-			"-E", "logging.ecs=true",
 			"-E", "logging.files.path="+loggingPath,
 			"-E", "logging.files.name="+logFile,
 			"-E", "logging.files.keepfiles=7",

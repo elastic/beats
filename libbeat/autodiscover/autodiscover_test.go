@@ -75,6 +75,8 @@ type mockAdapter struct {
 	mutex   sync.Mutex
 	configs []*common.Config
 	runners []*mockRunner
+
+	CheckConfigCallCount int
 }
 
 // CreateConfig generates a valid list of configs from the given event, the received event will have all keys defined by `StartFilter`
@@ -87,6 +89,8 @@ func (m *mockAdapter) CreateConfig(event bus.Event) ([]*common.Config, error) {
 
 // CheckConfig tests given config to check if it will work or not, returns errors in case it won't work
 func (m *mockAdapter) CheckConfig(c *common.Config) error {
+	m.CheckConfigCallCount++
+
 	config := struct {
 		Broken bool `config:"broken"`
 	}{}
@@ -322,6 +326,66 @@ func TestAutodiscoverHash(t *testing.T) {
 	assert.False(t, runners[0].stopped)
 	assert.True(t, runners[1].started)
 	assert.False(t, runners[1].stopped)
+}
+
+func TestAutodiscoverDuplicatedConfigConfigCheckCalledOnce(t *testing.T) {
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
+	// Register mock autodiscover provider
+	busChan := make(chan bus.Bus, 1)
+
+	Registry = NewRegistry()
+	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *common.Config, k keystore.Keystore) (Provider, error) {
+		// intercept bus to mock events
+		busChan <- b
+
+		return &mockProvider{}, nil
+	})
+
+	// Create a mock adapter that returns a duplicated config
+	runnerConfig, _ := common.NewConfigFrom(map[string]string{
+		"id": "foo",
+	})
+	adapter := mockAdapter{
+		configs: []*common.Config{runnerConfig, runnerConfig},
+	}
+
+	// and settings:
+	providerConfig, _ := common.NewConfigFrom(map[string]string{
+		"type": "mock",
+	})
+	config := Config{
+		Providers: []*common.Config{providerConfig},
+	}
+	k, _ := keystore.NewFileKeystore("test")
+	// Create autodiscover manager
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	autodiscover.workDone = make(chan struct{})
+
+	// Start it
+	autodiscover.Start()
+	defer autodiscover.Stop()
+	eventBus := <-busChan
+
+	// Publish a couple of events.
+	for i := 0; i < 2; i++ {
+		eventBus.Publish(bus.Event{
+			"id":       "foo",
+			"provider": "mock",
+			"start":    true,
+			"meta": common.MapStr{
+				"foo": "bar",
+			},
+		})
+		<-autodiscover.workDone
+		assert.Equal(t, 1, len(adapter.Runners()), "Only one runner should be started")
+		assert.Equal(t, 1, adapter.CheckConfigCallCount, "Check config should have been called only once")
+	}
 }
 
 func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {

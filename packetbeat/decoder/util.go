@@ -17,7 +17,7 @@
 
 package decoder
 
-import "github.com/tsg/gopacket"
+import "github.com/google/gopacket"
 
 // implement DecodingLayer with support of switching between multiple layers to
 // remember outter layer results

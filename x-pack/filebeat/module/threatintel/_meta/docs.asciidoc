@@ -12,7 +12,7 @@ https://www.elastic.co/guide/en/security/current/rules-ui-create.html#create-ind
 Match rules], but is also compatible with other features like
 https://www.elastic.co/guide/en/elasticsearch/reference/current/enrich-processor.html[Enrich
 Processors]. The related threat intel attribute that is meant to be used for
-matching incoming source data is stored under the `threatintel.indicator.*`
+matching incoming source data is stored under the `threat.indicator.*`
 fields.
 
 The available filesets are:
@@ -68,9 +68,9 @@ Abuse.ch URL Threat Intel is mapped to the following ECS fields.
 [options="header"]
 |==============================================================
 | URL Threat Intel Fields    | ECS Fields
-| url                        | threatintel.indicator.url.full
+| url                        | threat.indicator.url.full
 | date_added                 | @timestamp
-| host                       | threatintel.indicator.ip/domain
+| host                       | threat.indicator.ip/domain
 |==============================================================
 
 [[abusemalware]]
@@ -112,9 +112,9 @@ Abuse.ch Malware Threat Intel is mapped to the following ECS fields.
 [options="header"]
 |================================================================
 | Malware Threat IntelFields | ECS Fields
-| md5_hash                   | threatintel.indicator.file.hash.md5
-| sha256_hash                | threatintel.indicator.file.hash.sha256
-| file_size                  | threatintel.indicator.file.size
+| md5_hash                   | threat.indicator.file.hash.md5
+| sha256_hash                | threat.indicator.file.hash.sha256
+| file_size                  | threat.indicator.file.size
 |================================================================
 
 [[malwarebazaar]]
@@ -156,24 +156,25 @@ Malware Bazaar Threat Intel is mapped to the following ECS fields.
 [options="header"]
 |================================================================
 | Malware Threat IntelFields | ECS Fields
-| md5_hash                   | threatintel.indicator.file.hash.md5
-| sha256_hash                | threatintel.indicator.file.hash.sha256
-| tlsh                       | threatintel.indicator.file.hash.tlsh
-| ssdeep                     | threatintel.indicator.file.hash.ssdeep
-| imphash                    | threatintel.indicator.file.pe.imphash
-| file_size                  | threatintel.indicator.file.size
-| file_name                  | threatintel.indicator.file.name
-| file_type_mime             | threatintel.indicator.file.mime_type
-| file_type                  | threatintel.indicator.file.type
-| reporter                   | threatintel.indicator.provider
-| origin_country             | threatintel.indicator.geo.country_iso_code
-| signature                  | threatintel.indicator.signature
-| code_sign.subject_cn       | threatintel.indicator.file.x509.subject.common_name
-| code_sign.issuer_cn        | threatintel.indicator.file.x509.issuer.common_name
-| code_sign.algorithm        | threatintel.indicator.file.x509.public_key_algorithm
-| code_sign.valid_from       | threatintel.indicator.file.x509.not_before
-| code_sign.valid_to         | threatintel.indicator.file.x509.not_after
-| code_sign.serial_number    | threatintel.indicator.file.x509.serial_number
+| md5_hash                   | threat.indicator.file.hash.md5
+| sha256_hash                | threat.indicator.file.hash.sha256
+| sha384_hash                | threat.indicator.file.hash.sha384
+| tlsh                       | threat.indicator.file.hash.tlsh
+| ssdeep                     | threat.indicator.file.hash.ssdeep
+| imphash                    | threat.indicator.file.pe.imphash
+| file_size                  | threat.indicator.file.size
+| file_name                  | threat.indicator.file.name
+| file_type_mime             | threat.indicator.file.mime_type
+| file_type                  | threat.indicator.file.type
+| reporter                   | threat.indicator.provider
+| origin_country             | threat.indicator.geo.country_iso_code
+| signature                  | threat.indicator.signature
+| code_sign.subject_cn       | threat.indicator.file.x509.subject.common_name
+| code_sign.issuer_cn        | threat.indicator.file.x509.issuer.common_name
+| code_sign.algorithm        | threat.indicator.file.x509.public_key_algorithm
+| code_sign.valid_from       | threat.indicator.file.x509.not_before
+| code_sign.valid_to         | threat.indicator.file.x509.not_after
+| code_sign.serial_number    | threat.indicator.file.x509.serial_number
 |================================================================
 
 [[misp]]
@@ -250,10 +251,10 @@ MISP Threat Intel is mapped to the following ECS fields.
 [options="header"]
 |==============================================================
 | Malware Threat IntelFields | ECS Fields
-| misp.first_seen            | threatintel.indicator.first_seen
-| misp.last_seen             | threatintel.indicator.last_seen
+| misp.first_seen            | threat.indicator.first_seen
+| misp.last_seen             | threat.indicator.last_seen
 | misp.tag                   | tag
-| misp.value                 | threatintel.indicator.*
+| misp.value                 | threat.indicator.*
 |==============================================================
 
 `misp.value` is mapped to the appropriate field dependent on attribute type.
@@ -331,9 +332,9 @@ OTX Threat Intel is mapped to the following ECS fields.
 [options="header"]
 |============================================================
 | Malware Threat Intel  Fields | ECS Fields
-| otx.type                     | threatintel.indicator.type
-| otx.description              | threatintel.indicator.description
-| otx.indicator                | threatintel.indicator.*
+| otx.type                     | threat.indicator.type
+| otx.description              | threat.indicator.description
+| otx.indicator                | threat.indicator.*
 |============================================================
 
 `otx.indicator` is mapped to the appropriate field dependent on attribute type.
@@ -415,10 +416,10 @@ Anomali Threat Intel is mapped to the following ECS fields.
 [options="header"]
 |=============================================================
 | Malware Threat Intel Fields | ECS Fields
-| anomali.description         | threatintel.indicator.description
-| anomali.created             | threatintel.indicator.first_seen
-| anomali.modified            | threatintel.indicator.last_seen
-| anomali.pattern             | threatintel.indicator.*
+| anomali.description         | threat.indicator.description
+| anomali.created             | threat.indicator.first_seen
+| anomali.modified            | threat.indicator.last_seen
+| anomali.pattern             | threat.indicator.*
 | anomali.labels              | tags
 |=============================================================
 
@@ -486,24 +487,24 @@ Anomali ThreatStream fields are mapped to the following ECS fields:
 [options="header"]
 |=============================================================
 | ThreatStream fields | ECS Fields
-| asn         | threatintel.indicator.as.number
-| classification<<a,[1]>> | threatintel.indicator.marking.tlp
-| confidence<<a,[1]>> | threatintel.indicator.confidence
-| country     | threatintel.indicator.geo.country_iso_code
-| date_first  | threatintel.indicator.first_seen
-| date_last   | threatintel.indicator.last_seen
+| asn         | threat.indicator.as.number
+| classification<<a,[1]>> | threat.indicator.marking.tlp
+| confidence<<a,[1]>> | threat.indicator.confidence
+| country     | threat.indicator.geo.country_iso_code
+| date_first  | threat.indicator.first_seen
+| date_last   | threat.indicator.last_seen
 | detail      | tags
-| domain      | threatintel.indicator.url.domain
-| email       | threatintel.indicator.email.address
-| itype<<a,[1]>> | threatintel.indicator.type
-| lat         | threatintel.indicator.geo.location.lat
-| lon         | threatintel.indicator.geo.location.lon
-| md5         | threatintel.indicator.file.hash
-| org         | threatintel.indicator.as.organization.name
+| domain      | threat.indicator.url.domain
+| email       | threat.indicator.email.address
+| itype<<a,[1]>> | threat.indicator.type
+| lat         | threat.indicator.geo.location.lat
+| lon         | threat.indicator.geo.location.lon
+| md5         | threat.indicator.file.hash
+| org         | threat.indicator.as.organization.name
 | severity<<a,[1]>> | event.severity
-| source      | threatintel.indicator.provider
-| srcip       | threatintel.indicator.ip
-| url         | threatintel.indicator.url.original
+| source      | threat.indicator.provider
+| srcip       | threat.indicator.ip
+| url         | threat.indicator.url.original
 |=============================================================
 
 [[a]]
@@ -585,16 +586,16 @@ Recorded Future fields are mapped to the following ECS fields:
 [options="header"]
 |=============================================================
 | Recorded Future fields | ECS Fields
-| entity.name            | threatintel.indicator.{url,ip,domain,file.hash}
-| entity.type            | threatintel.indicator.type
-| fileHashes             | threatintel.indicator.file.hash
+| entity.name            | threat.indicator.{url,ip,domain,file.hash}
+| entity.type            | threat.indicator.type
+| fileHashes             | threat.indicator.file.hash
 | intelCard              | event.reference
-| location.asn           | threatintel.indicator.as.number
-| location.location      | threatintel.indicator.geo
-| location.organization  | threatintel.indicator.as.organization.name
+| location.asn           | threat.indicator.as.number
+| location.location      | threat.indicator.geo
+| location.organization  | threat.indicator.as.organization.name
 | risk.score             | event.risk_score
-| timestamps.firstSeen   | threatintel.indicator.first_seen
-| timestamps.lastSeen    | threatintel.indicator.last_seen
+| timestamps.firstSeen   | threat.indicator.first_seen
+| timestamps.lastSeen    | threat.indicator.last_seen
 |=============================================================
 
 :has-dashboards!:
@@ -702,11 +703,11 @@ Recorded Future fields are mapped to the following ECS fields:
 [options="header"]
 |=============================================================
 | ThreatQ fields         | ECS Fields
-| type.name              | threatintel.indicator.type
-| description            | threatintel.indicator.description
-| score                  | threatintel.indicator.confidence
-| value                  | threatintel.indicator.{url,ip,domain,file.hash}
-| sources                | threatintel.indicator.provider
+| type.name              | threat.indicator.type
+| description            | threat.indicator.description
+| score                  | threat.indicator.confidence
+| value                  | threat.indicator.{url,ip,domain,file.hash}
+| sources                | threat.indicator.provider
 |=============================================================
 
 :has-dashboards!:

@@ -62,8 +62,6 @@ type mysqlMessage struct {
 	numberOfRows   int
 	numberOfFields int
 	size           uint64
-	fields         []string
-	rows           [][]string
 	tables         string
 	isOK           bool
 	affectedRows   uint64
@@ -83,7 +81,6 @@ type mysqlMessage struct {
 
 	statementID    int
 	numberOfParams int
-	params         []string
 }
 
 type mysqlTransaction struct {
@@ -337,7 +334,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				return true, false
 			}
 
-			s.parseOffset += 4 //header
+			s.parseOffset += 4 // header
 			s.parseOffset += int(m.packetLength)
 			m.end = s.parseOffset
 			if m.isRequest {
@@ -347,7 +344,6 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				} else {
 					m.query = string(s.data[m.start+5 : m.end])
 				}
-
 			} else if m.isOK {
 				// affected rows
 				affectedRows, off, complete, err := readLinteger(s.data, m.start+5)
@@ -475,7 +471,7 @@ func mysqlMessageParser(s *mysqlStream) (bool, bool) {
 				return true, false
 			}
 
-			s.parseOffset += 4 //header
+			s.parseOffset += 4 // header
 
 			if s.data[s.parseOffset] == 0xfe {
 				logp.Debug("mysqldetailed", "Received EOF packet")
@@ -553,8 +549,8 @@ func (mysql *mysqlPlugin) ConnectionTimeout() time.Duration {
 }
 
 func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
-	dir uint8, private protos.ProtocolData) protos.ProtocolData {
-
+	dir uint8, private protos.ProtocolData,
+) protos.ProtocolData {
 	defer logp.Recover("ParseMysql exception")
 
 	priv := mysqlPrivateData{}
@@ -613,8 +609,8 @@ func (mysql *mysqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 }
 
 func (mysql *mysqlPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
-	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool) {
-
+	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
+) {
 	defer logp.Recover("GapInStream(mysql) exception")
 
 	if private == nil {
@@ -642,16 +638,16 @@ func (mysql *mysqlPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 }
 
 func (mysql *mysqlPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
-	private protos.ProtocolData) protos.ProtocolData {
-
+	private protos.ProtocolData,
+) protos.ProtocolData {
 	// TODO: check if we have data pending and either drop it to free
 	// memory or send it up the stack.
 	return private
 }
 
 func handleMysql(mysql *mysqlPlugin, m *mysqlMessage, tcptuple *common.TCPTuple,
-	dir uint8, rawMsg []byte) {
-
+	dir uint8, rawMsg []byte,
+) {
 	m.tcpTuple = *tcptuple
 	m.direction = dir
 	m.cmdlineTuple = mysql.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
@@ -689,9 +685,10 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 		trans.statementID = msg.statementID
 		stmts := mysql.getStmtsMap(msg.tcpTuple.Hashable())
 		if stmts == nil {
-			if msg.typ == mysqlCmdStmtExecute {
+			switch msg.typ {
+			case mysqlCmdStmtExecute:
 				trans.query = "Request Execute Statement"
-			} else if msg.typ == mysqlCmdStmtClose {
+			case mysqlCmdStmtClose:
 				trans.query = "Request Close Statement"
 			}
 			trans.notes = append(trans.notes, "The actual query being used is unknown")
@@ -699,7 +696,8 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 			trans.bytesIn = msg.size
 			return
 		}
-		if msg.typ == mysqlCmdStmtExecute {
+		switch msg.typ {
+		case mysqlCmdStmtExecute:
 			if value, ok := stmts[trans.statementID]; ok {
 				trans.query = value.query
 				// parse parameters
@@ -711,7 +709,7 @@ func (mysql *mysqlPlugin) receivedMysqlRequest(msg *mysqlMessage) {
 				trans.bytesIn = msg.size
 				return
 			}
-		} else if msg.typ == mysqlCmdStmtClose {
+		case mysqlCmdStmtClose:
 			delete(stmts, trans.statementID)
 			trans.query = "CmdStmtClose"
 			mysql.transactions.Delete(tuple.Hashable())
@@ -899,7 +897,7 @@ func (mysql *mysqlPlugin) parseMysqlExecuteStatement(data []byte, stmtdata *mysq
 			valueString := strconv.Itoa(int(binary.LittleEndian.Uint32(data[paramOffset:])))
 			paramString = append(paramString, valueString)
 			paramOffset += 4
-		//FIELD_TYPE_FLOAT
+		// FIELD_TYPE_FLOAT
 		case 0x04:
 			paramString = append(paramString, "TYPE_FLOAT")
 			paramOffset += 4
@@ -1012,19 +1010,19 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 		return []string{}, [][]string{}
 	}
 
-	fields := []string{}
-	rows := [][]string{}
-
 	if len(data) < 5 {
-		logp.Warn("Invalid response: data less than 4 bytes")
+		logp.Warn("Invalid response: data less than 5 bytes")
 		return []string{}, [][]string{}
 	}
 
-	if data[4] == 0x00 {
+	fields := []string{}
+	rows := [][]string{}
+	switch data[4] {
+	case 0x00:
 		// OK response
-	} else if data[4] == 0xff {
+	case 0xff:
 		// Error response
-	} else {
+	default:
 		offset := 5
 
 		logp.Debug("mysql", "Data len: %d", len(data))
@@ -1100,7 +1098,7 @@ func (mysql *mysqlPlugin) parseMysqlResponse(data []byte) ([]string, [][]string)
 
 			if data[offset+4] == 0xfe {
 				// EOF
-				offset += length + 4
+				offset += length + 4 // ineffassign
 				break
 			}
 

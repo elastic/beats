@@ -111,7 +111,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	// Create client for publishing events and receive notification of their ACKs.
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
 		CloseRef:   inputContext.Cancelation,
-		ACKHandler: newEventACKHandler(),
+		ACKHandler: awscommon.NewEventACKHandler(),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create pipeline client: %w", err)
@@ -155,13 +155,11 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 }
 
 func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsReader, error) {
-	s3ServiceName := "s3"
-	if in.config.FIPSEnabled {
-		s3ServiceName = "s3-fips"
-	}
+	s3ServiceName := awscommon.CreateServiceName("s3", in.config.AWSConfig.FIPSEnabled, in.awsConfig.Region)
+	sqsServiceName := awscommon.CreateServiceName("sqs", in.config.AWSConfig.FIPSEnabled, in.awsConfig.Region)
 
 	sqsAPI := &awsSQSAPI{
-		client:            sqs.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, "sqs", in.awsConfig.Region, in.awsConfig)),
+		client:            sqs.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, sqsServiceName, in.awsConfig.Region, in.awsConfig)),
 		queueURL:          in.config.QueueURL,
 		apiTimeout:        in.config.APITimeout,
 		visibilityTimeout: in.config.VisibilityTimeout,
@@ -186,18 +184,19 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsRe
 	if len(in.config.FileSelectors) == 0 {
 		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
 	}
+	script, err := newScriptFromConfig(log.Named("sqs_script"), in.config.SQSScript)
+	if err != nil {
+		return nil, err
+	}
 	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, fileSelectors)
-	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, s3EventHandlerFactory)
+	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, s3EventHandlerFactory)
 	sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, in.config.MaxNumberOfMessages, sqsMessageHandler)
 
 	return sqsReader, nil
 }
 
 func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, client beat.Client, persistentStore *statestore.Store, states *states) (*s3Poller, error) {
-	s3ServiceName := "s3"
-	if in.config.FIPSEnabled {
-		s3ServiceName = "s3-fips"
-	}
+	s3ServiceName := awscommon.CreateServiceName("s3", in.config.AWSConfig.FIPSEnabled, in.awsConfig.Region)
 	var bucketName string
 	var bucketID string
 	if in.config.NonAWSBucketName != "" {
@@ -318,9 +317,13 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 	}
 
 	parsedEndpoint, _ := url.Parse(endpoint)
-	domain := parsedEndpoint.Hostname()
 	for key, provider := range providers {
-		if strings.HasSuffix(domain, key) {
+		// support endpoint with and without scheme (http(s)://abc.xyz, abc.xyz)
+		constraint := parsedEndpoint.Hostname()
+		if len(parsedEndpoint.Scheme) == 0 {
+			constraint = parsedEndpoint.Path
+		}
+		if strings.HasSuffix(constraint, key) {
 			return provider
 		}
 	}

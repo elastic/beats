@@ -1,0 +1,73 @@
+name: build
+
+env:
+  GOPATH: /home/runner/work/gotest/gotest
+  GO111MODULE: off
+  REPO_PATH: src/gotest
+  MACOS_GOPATH: /Users/runner/work/gotest/gotest
+  GITHUB_TOKEN: ${{ github.token }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      id:
+        description: 'Run ID'
+        required: true
+      runner:
+        description: 'Github actions runner'
+        required: false
+        default: 'macos-latest'
+      path:
+        description: 'Directory where to run command'
+        required: false
+        default: ''
+      pr:
+        description: 'Pull request id'
+        required: false
+        default: ''
+      go_version:
+        description: 'Go version'
+        required: false
+        default: '1.17'
+      command:
+        description: 'Command to run'
+        required: true
+        default: ''
+jobs:
+  build:
+    runs-on: ${{ github.event.inputs.runner }}
+    steps:
+    - name: ${{ format('Run ID {0}', github.event.inputs.id) }}
+      run: echo Run ID ${{github.event.inputs.id}}
+    - name: Set environment for macos
+      if: ${{ contains(github.event.inputs.runner, 'macos') }}
+      run: |
+        echo Changed GOPATH to ${{ env.MACOS_GOPATH }}
+        echo "GOPATH="${{ env.MACOS_GOPATH }} >> $GITHUB_ENV
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ github.event.inputs.go_version }}
+    - name: Install dependencies
+      run:  go get -u github.com/magefile/mage
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        ref: ${{ env.GITHUB_REF }}
+        path: ${{ env.REPO_PATH }}
+    - name: Checkout and merge PR
+      if: ${{ github.event.inputs.pr }}
+      run: |
+        set -x
+        cd ${{ env.GOPATH }}/${{ env.REPO_PATH }}
+        git config --global user.email "user@example.com"
+        git config --global user.name "user"
+        git fetch origin pull/${{ github.event.inputs.pr }}/head:${{ github.event.inputs.id }}
+        git checkout ${{ github.event.inputs.id }}
+        git checkout $GITHUB_REF_NAME
+        git merge --no-ff ${{ github.event.inputs.id }}
+    - name: Run command
+      run: |
+        set -x
+        cd ${{ env.GOPATH }}/${{ env.REPO_PATH }}/${{ github.event.inputs.path }}
+        ${{ github.event.inputs.command }}

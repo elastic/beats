@@ -18,7 +18,6 @@
 package cmd
 
 import (
-	"fmt"
 
 	// include all heartbeat specific autodiscovery builders
 	_ "github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
@@ -80,10 +79,6 @@ func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 `
 	setup.ResetFlags()
 	setup.Flags().Bool(cmd.IndexManagementKey, false, "Setup all components related to Elasticsearch index management, including template, ilm policy and rollover alias")
-	setup.Flags().MarkDeprecated(cmd.TemplateKey, fmt.Sprintf("use --%s instead", cmd.IndexManagementKey))
-	setup.Flags().MarkDeprecated(cmd.ILMPolicyKey, fmt.Sprintf("use --%s instead", cmd.IndexManagementKey))
-	setup.Flags().Bool(cmd.TemplateKey, false, "Setup index template")
-	setup.Flags().Bool(cmd.ILMPolicyKey, false, "Setup ILM policy")
 
 	return rootCmd
 }

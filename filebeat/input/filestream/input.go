@@ -29,6 +29,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -244,7 +245,7 @@ func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*o
 	}
 
 	ok := false
-	f, err := os.OpenFile(path, os.O_RDONLY, os.FileMode(0))
+	f, err := file.ReadOpen(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed opening %s: %s", path, err)
 	}

@@ -119,6 +119,7 @@ class Proc(object):
 
 
 class TestCase(unittest.TestCase, ComposeMixin):
+    today = datetime.now().strftime("%Y%m%d")
 
     @classmethod
     def setUpClass(self):
@@ -207,7 +208,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             config = self.beat_name + ".yml"
 
         if output is None:
-            output = self.beat_name + ".log"
+            output = self.beat_name + "-" + self.today + ".ndjson"
 
         args = [cmd, "-systemTest"]
         if os.getenv("TEST_COVERAGE") == "true":
@@ -264,7 +265,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
@@ -288,7 +289,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
@@ -368,7 +369,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         Returns the log as a string.
         """
         if logfile is None:
-            logfile = self.beat_name + ".log"
+            logfile = self.beat_name + "-" + self.today + ".ndjson"
 
         with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
             data = f.read()
@@ -380,7 +381,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         Returns the log lines as a list of strings
         """
         if logfile is None:
-            logfile = self.beat_name + ".log"
+            logfile = self.beat_name + "-" + self.today + ".ndjson"
 
         with open(os.path.join(self.working_dir, logfile), 'r', encoding="utf_8") as f:
             data = f.readlines()
@@ -417,8 +418,9 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if logfile is None:
-            logfile = self.beat_name + ".log"
+            logfile = self.beat_name + "-" + self.today + ".ndjson"
 
+        print("logfile", logfile, self.working_dir)
         try:
             with open(os.path.join(self.working_dir, logfile), "r", encoding="utf_8") as f:
                 for line in f:
@@ -430,7 +432,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                         line = line.lower()
                     if line.find(msg) >= 0:
                         counter = counter + 1
-        except IOError:
+        except IOError as e:
+            print(e)
             counter = -1
 
         return counter
@@ -442,7 +445,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         counts = {}
 
         if logfile is None:
-            logfile = self.beat_name + ".log"
+            logfile = self.beat_name + "-" + self.today + ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, logfile), "r", encoding="utf_8") as f:
@@ -462,7 +465,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
     def output_lines(self, output_file=None):
         """ Count number of lines in a file."""
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
@@ -477,7 +480,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as f:
@@ -492,7 +495,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as f:
@@ -656,7 +659,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name
+            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
 
         try:
             with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
@@ -726,7 +729,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             # Range keys as used in 'date_range' etc will not have docs of course
             isRangeKey = key.split('.')[-1] in ['gte', 'gt', 'lte', 'lt']
             if not(is_documented(key, expected_fields) or metaKey or isRangeKey):
-                raise Exception("Key '{}' found in event is not documented!".format(key))
+                raise Exception("Key '{}' found in event ({}) is not documented!".format(key, str(evt)))
             if is_documented(key, aliases):
                 raise Exception("Key '{}' found in event is documented as an alias!".format(key))
 

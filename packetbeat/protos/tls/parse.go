@@ -54,9 +54,9 @@ type recordType uint8
 
 const (
 	recordTypeChangeCipherSpec recordType = 20
-	recordTypeAlert                       = 21
-	recordTypeHandshake                   = 22
-	recordTypeApplicationData             = 23
+	recordTypeAlert            recordType = 21
+	recordTypeHandshake        recordType = 22
+	recordTypeApplicationData  recordType = 23
 )
 
 type handshakeType uint8
@@ -169,8 +169,10 @@ func readHandshakeHeader(buf *streambuf.Buffer) (*handshakeHeader, error) {
 	if len16, err = buf.ReadNetUint16At(2); err != nil {
 		return nil, err
 	}
-	return &handshakeHeader{handshakeType(typ),
-		int(len16) | (int(len8) << 16)}, nil
+	return &handshakeHeader{
+		handshakeType(typ),
+		int(len16) | (int(len8) << 16),
+	}, nil
 }
 
 func (header *recordHeader) String() string {
@@ -215,7 +217,6 @@ func (hello *helloMessage) supportedCiphers() []string {
 }
 
 func (parser *parser) parse(buf *streambuf.Buffer) parserResult {
-
 	for buf.Avail(recordHeaderSize) {
 
 		header, err := readRecordHeader(buf)
