@@ -166,7 +166,7 @@ func (e *Controller) update(ctx context.Context) (err error) {
 		}
 		err = transpiler.Insert(ast, renderedInputs, "inputs")
 		if err != nil {
-			return err
+			return errors.New(err, "inserting rendered inputs failed")
 		}
 	}
 
