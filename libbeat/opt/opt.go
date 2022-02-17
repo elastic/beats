@@ -17,16 +17,7 @@
 
 package opt
 
-import (
-	"strconv"
-
-	"github.com/elastic/go-structform"
-)
-
-type OptType interface {
-	IsZero() bool
-	MarshalJSON() ([]byte, error)
-}
+import "github.com/elastic/go-structform"
 
 // ZeroInterface is a type interface for cases where we need to cast from a void pointer
 type ZeroInterface interface {
@@ -98,16 +89,6 @@ type Uint struct {
 	value  uint64
 }
 
-// MarshalJSON implements the marshal interface
-func (v Uint) MarshalJSON() ([]byte, error) {
-	//fmt.Printf("In custom marshaller for Uint: %#v\n", v)
-	if v.exists {
-		return []byte(strconv.Itoa(int(v.value))), nil
-	} else {
-		return []byte(strconv.Itoa(int(0))), nil
-	}
-}
-
 // NewUintNone returns a new OptUint wrapper
 func NewUintNone() Uint {
 	return Uint{
@@ -171,16 +152,6 @@ func (in *Uint) Fold(v structform.ExtVisitor) error {
 type Float struct {
 	exists bool
 	value  float64
-}
-
-// MarshalJSON implements the marshal interface
-func (v Float) MarshalJSON() ([]byte, error) {
-	//fmt.Printf("In custom marshaller for Float: %#v\n", v)
-	if v.exists {
-		return []byte(strconv.FormatFloat(v.value, 'f', 6, 64)), nil
-	} else {
-		return []byte(strconv.FormatFloat(v.value, 'f', 6, 64)), nil
-	}
 }
 
 // NewFloatNone returns a new uint wrapper
