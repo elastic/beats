@@ -35,7 +35,7 @@ func New(ctx context.Context, log *logger.Logger, agentInfo *info.AgentInfo, con
 	return func(ctx context.Context, c *config.Config) (err error) {
 		span, ctx := apm.StartSpan(ctx, "update", "app.internal")
 		defer func() {
-		apm.CaptureError(ctx, err).Send()
+			apm.CaptureError(ctx, err).Send()
 			span.End()
 		}()
 		return ctrl.Update(ctx, c)

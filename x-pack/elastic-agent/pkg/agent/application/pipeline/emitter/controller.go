@@ -143,6 +143,7 @@ func (e *Controller) Set(ctx context.Context, vars []*transpiler.Vars) {
 
 func (e *Controller) update(ctx context.Context) (err error) {
 	span, ctx := apm.StartSpan(ctx, "update", "app.internal")
+	defer func() {
 		apm.CaptureError(ctx, err).Send()
 		span.End()
 	}()
