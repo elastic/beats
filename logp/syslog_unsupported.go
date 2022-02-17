@@ -21,7 +21,7 @@
 package logp
 
 import (
-	"github.com/pkg/errors"
+	"errors"
 	"go.uber.org/zap/zapcore"
 )
 

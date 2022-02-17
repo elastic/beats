@@ -26,7 +26,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
+	"errors"
 )
 
 const (
@@ -158,10 +158,10 @@ func NewFileRotator(filename string, options ...RotatorOption) (*Rotator, error)
 		return nil, errors.New("file rotator max file size must be greater than 0")
 	}
 	if r.maxBackups > MaxBackupsLimit {
-		return nil, errors.Errorf("file rotator max backups %d is greater than the limit of %v", r.maxBackups, MaxBackupsLimit)
+		return nil, fmt.Errorf("file rotator max backups %d is greater than the limit of %v", r.maxBackups, MaxBackupsLimit)
 	}
 	if r.permissions > os.ModePerm {
-		return nil, errors.Errorf("file rotator permissions mask of %o is invalid", r.permissions)
+		return nil, fmt.Errorf("file rotator permissions mask of %o is invalid", r.permissions)
 	}
 
 	if r.interval != 0 && r.interval < time.Second {
@@ -198,28 +198,28 @@ func (r *Rotator) Write(data []byte) (int, error) {
 
 	dataLen := uint(len(data))
 	if dataLen > r.maxSizeBytes {
-		return 0, errors.Errorf("data size (%d bytes) is greater than "+
+		return 0, fmt.Errorf("data size (%d bytes) is greater than "+
 			"the max file size (%d bytes)", dataLen, r.maxSizeBytes)
 	}
 
 	if r.file == nil {
 		if err := r.openNew(); err != nil {
-			return 0, errors.Wrap(err, "failed to open new log file for writing")
+			return 0, fmt.Errorf("failed to open new log file for writing: %w", err)
 		}
 	} else {
 		if reason, t := r.isRotationTriggered(dataLen); reason != rotateReasonNoRotate {
 			if err := r.rotateWithTime(reason, t); err != nil {
-				return 0, errors.Wrapf(err, "error file rotating files reason: %s", reason)
+				return 0, fmt.Errorf("error file rotating files reason: %s: %w", reason, err)
 			}
 
 			if err := r.openFile(); err != nil {
-				return 0, errors.Wrap(err, "failed to open existing log file for writing")
+				return 0, fmt.Errorf("failed to open existing log file for writing: %w", err)
 			}
 		}
 	}
 
 	n, err := r.file.Write(data)
-	return n, errors.Wrap(err, "failed to write to file")
+	return n, fmt.Errorf("failed to write to file: %w", err)
 }
 
 // openNew opens r's log file for the first time, creating it if it doesn't
@@ -227,7 +227,7 @@ func (r *Rotator) Write(data []byte) (int, error) {
 func (r *Rotator) openNew() error {
 	err := os.MkdirAll(r.dir(), r.dirMode())
 	if err != nil {
-		return errors.Wrap(err, "failed to make directories for new file")
+		return fmt.Errorf("failed to make directories for new file: %w", err)
 	}
 
 	_, err = os.Stat(r.rot.ActiveFile())
@@ -238,10 +238,10 @@ func (r *Rotator) openNew() error {
 			return r.appendToFile()
 		}
 		if err = r.rot.Rotate(reason, t); err != nil {
-			return errors.Wrap(err, "failed to rotate backups")
+			return fmt.Errorf("failed to rotate backups: %w", err)
 		}
 		if err = r.purge(); err != nil {
-			return errors.Wrap(err, "failed to purge unnecessary rotated files")
+			return fmt.Errorf("failed to purge unnecessary rotated files: %w", err)
 		}
 	}
 
@@ -255,7 +255,7 @@ func (r *Rotator) appendToFile() error {
 	var err error
 	r.file, err = os.OpenFile(r.rot.ActiveFile(), os.O_WRONLY|os.O_APPEND, r.permissions)
 	if err != nil {
-		return errors.Wrap(err, "failed to append to existing file")
+		return fmt.Errorf("failed to append to existing file: %w", err)
 	}
 	if r.redirectStderr {
 		_ = RedirectStandardError(r.file)
@@ -266,12 +266,12 @@ func (r *Rotator) appendToFile() error {
 func (r *Rotator) openFile() error {
 	err := os.MkdirAll(r.dir(), r.dirMode())
 	if err != nil {
-		return errors.Wrap(err, "failed to make directories for new file")
+		return fmt.Errorf("failed to make directories for new file: %w", err)
 	}
 
 	r.file, err = os.OpenFile(r.rot.ActiveFile(), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, r.permissions)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("failed to open new file '%s'", r.rot.ActiveFile()))
+		return fmt.Errorf("failed to open new file '%s': %w", r.rot.ActiveFile(), err)
 	}
 	if r.redirectStderr {
 		_ = RedirectStandardError(r.file)
@@ -287,11 +287,11 @@ func (r *Rotator) rotate(reason rotateReason) error {
 // rotated files if needed. When it is done, unnecessary files are removed.
 func (r *Rotator) rotateWithTime(reason rotateReason, rotationTime time.Time) error {
 	if err := r.closeFile(); err != nil {
-		return errors.Wrap(err, "error file closing current file")
+		return fmt.Errorf("error file closing current file: %w", err)
 	}
 
 	if err := r.rot.Rotate(reason, rotationTime); err != nil {
-		return errors.Wrap(err, "failed to rotate backups")
+		return fmt.Errorf("failed to rotate backups: %w", err)
 	}
 
 	return r.purge()
@@ -311,12 +311,12 @@ func (r *Rotator) purge() error {
 		switch {
 		case err == nil:
 			if err = os.Remove(name); err != nil {
-				return errors.Wrapf(err, "failed to delete %v during rotation", name)
+				return fmt.Errorf("failed to delete %v during rotation: %w", name, err)
 			}
 		case os.IsNotExist(err):
 			return nil
 		default:
-			return errors.Wrapf(err, "failed on %v during rotation", name)
+			return fmt.Errorf("failed on %v during rotation: %w", name, err)
 		}
 	}
 
@@ -380,7 +380,7 @@ func (r *Rotator) closeFile() error {
 	}
 	err := r.file.Close()
 	r.file = nil
-	return errors.Wrap(err, "failed to close active file")
+	return fmt.Errorf("failed to close active file: %w", err)
 }
 
 type dateRotator struct {
@@ -445,7 +445,7 @@ func (d *dateRotator) Rotate(reason rotateReason, rotateTime time.Time) error {
 	newFileNamePrefix := d.filenamePrefix + rotateTime.Format(d.format)
 	files, err := filepath.Glob(newFileNamePrefix + "*" + d.extension)
 	if err != nil {
-		return errors.Wrap(err, "failed to get possible files")
+		return fmt.Errorf("failed to get possible files: %w", err)
 	}
 
 	if len(files) == 0 {

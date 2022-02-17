@@ -41,8 +41,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 )
 
 // Path tracks user-configurable path locations and directories
@@ -89,7 +87,7 @@ func (paths *Path) InitPaths(cfg *Path) error {
 	// make sure the data path exists
 	err = os.MkdirAll(paths.Data, 0750)
 	if err != nil {
-		return errors.Wrapf(err, "Failed to create data path %s", paths.Data)
+		return fmt.Errorf("failed to create data path %s: %w", paths.Data, err)
 	}
 
 	return nil

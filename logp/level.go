@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
 	"go.uber.org/zap/zapcore"
 )
 
@@ -78,7 +77,7 @@ func (l *Level) Unpack(str string) error {
 		}
 	}
 
-	return errors.Errorf("invalid level '%v'", str)
+	return fmt.Errorf("invalid level '%v'", str)
 }
 
 // MarshalYAML marshals level in a correct form
@@ -88,7 +87,7 @@ func (l Level) MarshalYAML() (interface{}, error) {
 		return s, nil
 	}
 
-	return nil, errors.Errorf("invalid level '%d'", l)
+	return nil, fmt.Errorf("invalid level '%d'", l)
 }
 
 // MarshalJSON marshals level in a correct form
@@ -98,7 +97,7 @@ func (l Level) MarshalJSON() ([]byte, error) {
 		return []byte(s), nil
 	}
 
-	return nil, errors.Errorf("invalid level '%d'", l)
+	return nil, fmt.Errorf("invalid level '%d'", l)
 }
 
 // ZapLevel returns zap alternative to logp.Level.

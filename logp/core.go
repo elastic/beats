@@ -19,6 +19,7 @@ package logp
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	golog "log"
 	"os"
@@ -29,7 +30,6 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
@@ -84,7 +84,7 @@ func ConfigureWithOutputs(cfg Config, outputs ...zapcore.Core) error {
 		sink, err = createLogOutput(cfg)
 	}
 	if err != nil {
-		return errors.Wrap(err, "failed to build log output")
+		return fmt.Errorf("failed to build log output: %w", err)
 	}
 
 	// Default logger is always discard, debug level below will
@@ -243,7 +243,7 @@ func makeFileOutput(cfg Config) (zapcore.Core, error) {
 		file.RedirectStderr(cfg.Files.RedirectStderr),
 	)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create file rotator")
+		return nil, fmt.Errorf("failed to create file rotator: %w", err)
 	}
 
 	return newCore(buildEncoder(cfg), rotator, cfg.Level.ZapLevel()), nil

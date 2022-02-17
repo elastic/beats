@@ -21,11 +21,11 @@
 package logp
 
 import (
+	"fmt"
 	"log/syslog"
 	"os"
 	"path/filepath"
 
-	"github.com/pkg/errors"
 	"go.uber.org/zap/zapcore"
 )
 
@@ -41,7 +41,7 @@ func newSyslog(encoder zapcore.Encoder, enab zapcore.LevelEnabler) (zapcore.Core
 	// Initialize a syslog writer.
 	writer, err := syslog.New(syslog.LOG_ERR|syslog.LOG_LOCAL0, filepath.Base(os.Args[0]))
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get a syslog writer")
+		return nil, fmt.Errorf("failed to get a syslog writer: %w", err)
 	}
 
 	return &syslogCore{
@@ -67,7 +67,7 @@ func (c *syslogCore) Check(entry zapcore.Entry, checked *zapcore.CheckedEntry) *
 func (c *syslogCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	buffer, err := c.encoder.EncodeEntry(entry, fields)
 	if err != nil {
-		return errors.Wrap(err, "failed to encode entry")
+		return fmt.Errorf("failed to encode entry: %w", err)
 	}
 
 	// Console encoder writes tabs which don't render nicely with syslog.
@@ -86,7 +86,7 @@ func (c *syslogCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	case zapcore.DPanicLevel, zapcore.PanicLevel, zapcore.FatalLevel:
 		return c.writer.Crit(msg)
 	default:
-		return errors.Errorf("unhandled log level: %v", entry.Level)
+		return fmt.Errorf("unhandled log level: %v", entry.Level)
 	}
 }
 
