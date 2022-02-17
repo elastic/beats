@@ -68,12 +68,10 @@ func NewController(
 }
 
 // Update applies config change and performes all steps necessary to apply it.
-func (e *Controller) Update(ctx context.Context, c *config.Config) (rErr error) {
+func (e *Controller) Update(ctx context.Context, c *config.Config) (err error) {
 	span, ctx := apm.StartSpan(ctx, "update", "app.internal")
 	defer func() {
-		if rErr != nil {
-			apm.CaptureError(ctx, rErr).Send()
-		}
+		apm.CaptureError(ctx, rErr).Send()
 		span.End()
 	}()
 
@@ -84,14 +82,12 @@ func (e *Controller) Update(ctx context.Context, c *config.Config) (rErr error) 
 	// perform and verify ast translation
 	m, err := c.ToMapStr()
 	if err != nil {
-		rErr = errors.New(err, "could not create the AST from the configuration", errors.TypeConfig)
-		return
+		return errors.New(err, "could not create the AST from the configuration", errors.TypeConfig)
 	}
 
 	rawAst, err := transpiler.NewAST(m)
 	if err != nil {
-		rErr = errors.New(err, "could not create the AST from the configuration", errors.TypeConfig)
-		return
+		return errors.New(err, "could not create the AST from the configuration", errors.TypeConfig)
 	}
 
 	if e.caps != nil {
@@ -121,8 +117,7 @@ func (e *Controller) Update(ctx context.Context, c *config.Config) (rErr error) 
 	e.ast = rawAst
 	e.lock.Unlock()
 
-	rErr = e.update(ctx)
-	return
+	return e.update(ctx)
 }
 
 // Set sets the transpiler vars for dynamic inputs resolution.
@@ -130,9 +125,7 @@ func (e *Controller) Set(ctx context.Context, vars []*transpiler.Vars) {
 	var err error
 	span, ctx := apm.StartSpan(ctx, "Set", "app.internal")
 	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
+		apm.CaptureError(ctx, err).Send()
 		span.End()
 	}()
 	e.lock.Lock()
@@ -150,10 +143,7 @@ func (e *Controller) Set(ctx context.Context, vars []*transpiler.Vars) {
 
 func (e *Controller) update(ctx context.Context) (err error) {
 	span, ctx := apm.StartSpan(ctx, "update", "app.internal")
-	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
+		apm.CaptureError(ctx, err).Send()
 		span.End()
 	}()
 	// locking whole update because it can be called concurrently via Set and Update method
@@ -203,6 +193,5 @@ func (e *Controller) update(ctx context.Context) (err error) {
 		}
 	}
 
-	err = e.router.Route(ctx, ast.HashStr(), programsToRun)
-	return err
+	return e.router.Route(ctx, ast.HashStr(), programsToRun)
 }

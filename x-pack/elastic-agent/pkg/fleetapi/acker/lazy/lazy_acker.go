@@ -41,9 +41,7 @@ func NewAcker(baseAcker batchAcker, log *logger.Logger) *Acker {
 func (f *Acker) Ack(ctx context.Context, action fleetapi.Action) (err error) {
 	span, ctx := apm.StartSpan(ctx, "ack", "app.internal")
 	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
+		apm.CaptureError(ctx, err).Send()
 		span.End()
 	}()
 	f.enqueue(action)
@@ -60,9 +58,7 @@ func (f *Acker) Ack(ctx context.Context, action fleetapi.Action) (err error) {
 func (f *Acker) Commit(ctx context.Context) (err error) {
 	span, ctx := apm.StartSpan(ctx, "commit", "app.internal")
 	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
+		apm.CaptureError(ctx, err).Send()
 		span.End()
 	}()
 	err = f.acker.AckBatch(ctx, f.queue)

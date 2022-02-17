@@ -187,9 +187,7 @@ func (c *enrollCmd) Execute(ctx context.Context, streams *cli.IOStreams) error {
 	defer c.stopAgent() // ensure its stopped no matter what
 	span, ctx := apm.StartSpan(ctx, "enroll", "app.internal")
 	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
+		apm.CaptureError(ctx, err).Send()
 		span.End()
 	}()
 

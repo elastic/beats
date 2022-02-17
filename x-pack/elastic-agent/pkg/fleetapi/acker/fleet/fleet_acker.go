@@ -53,9 +53,7 @@ func (f *Acker) SetClient(c client.Sender) {
 func (f *Acker) Ack(ctx context.Context, action fleetapi.Action) (err error) {
 	span, ctx := apm.StartSpan(ctx, "ack", "app.internal")
 	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
+		apm.CaptureError(ctx, err).Send()
 		span.End()
 	}()
 	// checkin
@@ -81,9 +79,7 @@ func (f *Acker) Ack(ctx context.Context, action fleetapi.Action) (err error) {
 func (f *Acker) AckBatch(ctx context.Context, actions []fleetapi.Action) (err error) {
 	span, ctx := apm.StartSpan(ctx, "ackBatch", "app.internal")
 	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
+		apm.CaptureError(ctx, err).Send()
 		span.End()
 	}()
 	// checkin

@@ -84,9 +84,7 @@ func (e *AckCmd) Execute(ctx context.Context, r *AckRequest) (*AckResponse, erro
 	var err error
 	span, ctx := apm.StartSpan(ctx, "execute", "app.internal")
 	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
+		apm.CaptureError(ctx, err).Send()
 		span.End()
 	}()
 	if err = r.Validate(); err != nil {

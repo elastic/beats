@@ -51,9 +51,7 @@ func (b *operatorStream) Specs() map[string]program.Spec {
 func (b *operatorStream) Execute(ctx context.Context, cfg configrequest.Request) (err error) {
 	span, ctx := apm.StartSpan(ctx, "route", "app.internal")
 	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
+		apm.CaptureError(ctx, err).Send()
 		span.End()
 	}()
 	err = b.configHandler.HandleConfig(ctx, cfg)

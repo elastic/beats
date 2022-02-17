@@ -79,9 +79,7 @@ func (ad *ActionDispatcher) key(a fleetapi.Action) string {
 func (ad *ActionDispatcher) Dispatch(ctx context.Context, acker store.FleetAcker, actions ...fleetapi.Action) (err error) {
 	span, ctx := apm.StartSpan(ctx, "dispatch", "app.internal")
 	defer func() {
-		if err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
+		apm.CaptureError(ctx, err).Send()
 		span.End()
 	}()
 
@@ -108,8 +106,7 @@ func (ad *ActionDispatcher) Dispatch(ctx context.Context, acker store.FleetAcker
 		ad.log.Debugf("Successfully dispatched action: '%+v'", action)
 	}
 
-	err = acker.Commit(ctx)
-	return err
+	return acker.Commit(ctx)
 }
 
 func (ad *ActionDispatcher) dispatchAction(a fleetapi.Action, acker store.FleetAcker) error {
