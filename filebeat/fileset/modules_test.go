@@ -24,6 +24,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -74,6 +75,12 @@ func TestNewModuleRegistry(t *testing.T) {
 			fs := filesets[fileset]
 			assert.NotNil(t, fs)
 		}
+<<<<<<< HEAD
+=======
+		sort.Strings(filesetList)
+		sort.Strings(expectedFilesets)
+		assert.Equal(t, filesetList, expectedFilesets)
+>>>>>>> 8ab92d8e7d (Fix TestNewModuleRegistry flakiness (#30453))
 	}
 
 	for module, filesets := range reg.registry {
