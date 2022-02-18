@@ -19,7 +19,6 @@ package memory
 
 import (
 	"io/ioutil"
-	"reflect"
 	"strconv"
 	"strings"
 
@@ -28,25 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
-	"github.com/elastic/go-sysinfo/types"
 )
-
-// vmstatTagToFieldIndex contains a mapping of json struct tags to struct field indices.
-var vmstatTagToFieldIndex = make(map[string]int)
-
-// A little helper so we only have to initialize the little reflection maps we use to populate VMstat data once
-func init() {
-	var vmstat types.VMStatInfo
-	val := reflect.ValueOf(vmstat)
-	typ := reflect.TypeOf(vmstat)
-
-	for i := 0; i < val.NumField(); i++ {
-		field := typ.Field(i)
-		if tag := field.Tag.Get("json"); tag != "" {
-			vmstatTagToFieldIndex[tag] = i
-		}
-	}
-}
 
 // FetchLinuxMemStats gets page_stat and huge pages data for linux
 func FetchLinuxMemStats(baseMap common.MapStr, hostfs resolve.Resolver) error {
