@@ -251,12 +251,15 @@ type channelCtx struct {
 func doneChannelContext(ctx input.Context) context.Context {
 	return channelCtx{ctx}
 }
+
 func (c channelCtx) Deadline() (deadline time.Time, ok bool) {
 	return
 }
+
 func (c channelCtx) Done() <-chan struct{} {
 	return c.ctx.Cancelation.Done()
 }
+
 func (c channelCtx) Err() error {
 	return c.ctx.Cancelation.Err()
 }

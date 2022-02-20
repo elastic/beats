@@ -37,9 +37,7 @@ const (
 	copiedFileIdx                  = 0
 )
 
-var (
-	numericSuffixRegexp = regexp.MustCompile("\\d*$")
-)
+var numericSuffixRegexp = regexp.MustCompile("\\d*$")
 
 // sorter is required for ordering rotated log files
 // The slice is ordered so the newest rotated file comes first.
@@ -261,12 +259,10 @@ func (p *copyTruncateFileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
-
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
 		if event.Op == loginp.OpCreate {
 			log.Debugf("A new file %s has been found", event.NewPath)
-
 		} else if event.Op == loginp.OpWrite {
 			log.Debugf("File %s has been updated", event.NewPath)
 		}
@@ -323,6 +319,7 @@ func (p *copyTruncateFileProspector) onFSEvent(
 		log.Error("Unkown return value %v", event.Op)
 	}
 }
+
 func (p *copyTruncateFileProspector) isRotated(event loginp.FSEvent) bool {
 	if p.rotatedSuffix.MatchString(event.NewPath) {
 		return true

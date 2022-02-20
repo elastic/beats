@@ -90,7 +90,6 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 			assert.ElementsMatch(t, testCase.expectedCleanedKeys, testStore.cleanedKeys)
 		})
 	}
-
 }
 
 func TestProspector_InitUpdateIdentifiers(t *testing.T) {
@@ -157,7 +156,6 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 			assert.EqualValues(t, testCase.expectedUpdatedKeys, testStore.updatedKeys)
 		})
 	}
-
 }
 
 func TestProspectorNewAndUpdatedFiles(t *testing.T) {
@@ -170,8 +168,8 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 	}{
 		"two new files": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/file", Info: testFileInfo{}},
-				loginp.FSEvent{Op: loginp.OpCreate, NewPath: "/path/to/other/file", Info: testFileInfo{}},
+				{Op: loginp.OpCreate, NewPath: "/path/to/file", Info: testFileInfo{}},
+				{Op: loginp.OpCreate, NewPath: "/path/to/other/file", Info: testFileInfo{}},
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file"),
@@ -181,7 +179,7 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 		},
 		"one updated file": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpWrite, NewPath: "/path/to/file", Info: testFileInfo{}},
+				{Op: loginp.OpWrite, NewPath: "/path/to/file", Info: testFileInfo{}},
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file"),
@@ -190,8 +188,8 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 		},
 		"one updated then truncated file": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpWrite, NewPath: "/path/to/file", Info: testFileInfo{}},
-				loginp.FSEvent{Op: loginp.OpTruncate, NewPath: "/path/to/file", Info: testFileInfo{}},
+				{Op: loginp.OpWrite, NewPath: "/path/to/file", Info: testFileInfo{}},
+				{Op: loginp.OpTruncate, NewPath: "/path/to/file", Info: testFileInfo{}},
 			},
 			expectedEvents: []harvesterEvent{
 				harvesterStart("path::/path/to/file"),
@@ -201,12 +199,12 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 		},
 		"old files with ignore older configured": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{
+				{
 					Op:      loginp.OpCreate,
 					NewPath: "/path/to/file",
 					Info:    testFileInfo{"/path/to/file", 5, minuteAgo, nil},
 				},
-				loginp.FSEvent{
+				{
 					Op:      loginp.OpWrite,
 					NewPath: "/path/to/other/file",
 					Info:    testFileInfo{"/path/to/other/file", 5, minuteAgo, nil},
@@ -219,12 +217,12 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 		},
 		"newer files with ignore older": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{
+				{
 					Op:      loginp.OpCreate,
 					NewPath: "/path/to/file",
 					Info:    testFileInfo{"/path/to/file", 5, minuteAgo, nil},
 				},
-				loginp.FSEvent{
+				{
 					Op:      loginp.OpWrite,
 					NewPath: "/path/to/other/file",
 					Info:    testFileInfo{"/path/to/other/file", 5, minuteAgo, nil},
@@ -265,13 +263,13 @@ func TestProspectorDeletedFile(t *testing.T) {
 	}{
 		"one deleted file without clean removed": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpDelete, OldPath: "/path/to/file", Info: testFileInfo{}},
+				{Op: loginp.OpDelete, OldPath: "/path/to/file", Info: testFileInfo{}},
 			},
 			cleanRemoved: false,
 		},
 		"one deleted file with clean removed": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpDelete, OldPath: "/path/to/file", Info: testFileInfo{}},
+				{Op: loginp.OpDelete, OldPath: "/path/to/file", Info: testFileInfo{}},
 			},
 			cleanRemoved: true,
 		},
@@ -299,7 +297,6 @@ func TestProspectorDeletedFile(t *testing.T) {
 				assert.False(t, has)
 			} else {
 				assert.True(t, has)
-
 			}
 		})
 	}
@@ -314,7 +311,7 @@ func TestProspectorRenamedFile(t *testing.T) {
 	}{
 		"one renamed file without rename tracker": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{
+				{
 					Op:      loginp.OpRename,
 					OldPath: "/old/path/to/file",
 					NewPath: "/new/path/to/file",
@@ -329,7 +326,7 @@ func TestProspectorRenamedFile(t *testing.T) {
 		},
 		"one renamed file with rename tracker": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{
+				{
 					Op:      loginp.OpRename,
 					OldPath: "/old/path/to/file",
 					NewPath: "/new/path/to/file",
@@ -343,7 +340,7 @@ func TestProspectorRenamedFile(t *testing.T) {
 		},
 		"one renamed file with rename tracker with close renamed": {
 			events: []loginp.FSEvent{
-				loginp.FSEvent{
+				{
 					Op:      loginp.OpRename,
 					OldPath: "/old/path/to/file",
 					NewPath: "/new/path/to/file",
@@ -384,7 +381,6 @@ func TestProspectorRenamedFile(t *testing.T) {
 			}
 
 			assert.Equal(t, test.expectedEvents, hg.events)
-
 		})
 	}
 }

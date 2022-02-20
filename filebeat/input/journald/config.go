@@ -33,11 +33,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 )
 
-var (
-	// includeMatchesWarnOnce allow for a config deprecation warning to be
-	// logged only once if an old config format is detected.
-	includeMatchesWarnOnce sync.Once
-)
+// includeMatchesWarnOnce allow for a config deprecation warning to be
+// logged only once if an old config format is detected.
+var includeMatchesWarnOnce sync.Once
 
 // Config stores the options of a journald input.
 type config struct {

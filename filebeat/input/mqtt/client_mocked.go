@@ -166,7 +166,7 @@ func (m *mockedClient) SubscribeMultiple(filters map[string]byte, callback libmq
 	m.onMessageHandler = callback
 
 	for _, msg := range m.messages {
-		var thatMsg = msg
+		thatMsg := msg
 		go func() {
 			m.onMessageHandler(m, &thatMsg)
 		}()

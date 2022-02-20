@@ -161,7 +161,7 @@ func (m *Migrator) updateToVersion0(regHome, migrateFile string) error {
 func initVersion0Registry(regHome string, perm os.FileMode) error {
 	if !isDir(regHome) {
 		logp.Info("No registry home found. Create: %v", regHome)
-		if err := os.MkdirAll(regHome, 0750); err != nil {
+		if err := os.MkdirAll(regHome, 0o750); err != nil {
 			return errors.Wrapf(err, "failed to create registry dir '%v'", regHome)
 		}
 	}

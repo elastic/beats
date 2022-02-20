@@ -107,7 +107,7 @@ func (e *inputTestingEnvironment) waitUntilInputStops() {
 
 func (e *inputTestingEnvironment) mustWriteLinesToFile(filename string, lines []byte) {
 	path := e.abspath(filename)
-	err := ioutil.WriteFile(path, lines, 0644)
+	err := ioutil.WriteFile(path, lines, 0o644)
 	if err != nil {
 		e.t.Fatalf("failed to write file '%s': %+v", path, err)
 	}
@@ -115,7 +115,7 @@ func (e *inputTestingEnvironment) mustWriteLinesToFile(filename string, lines []
 
 func (e *inputTestingEnvironment) mustAppendLinesToFile(filename string, lines []byte) {
 	path := e.abspath(filename)
-	f, err := os.OpenFile(path, os.O_WRONLY|os.O_APPEND, 0644)
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_APPEND, 0o644)
 	if err != nil {
 		e.t.Fatalf("failed to open file '%s': %+v", path, err)
 	}
@@ -505,7 +505,6 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	pc.clients = append(pc.clients, c)
 
 	return c, nil
-
 }
 
 func (pc *mockPipelineConnector) cancelAllClients() {
@@ -534,7 +533,6 @@ func newMockACKHandler(starter context.Context, blocking bool, config beat.Clien
 	}
 
 	return acker.Combine(blockingACKer(starter), config.ACKHandler)
-
 }
 
 func blockingACKer(starter context.Context) beat.ACKer {

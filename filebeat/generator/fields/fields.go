@@ -38,30 +38,28 @@ const (
 	hintIdx     = 2
 )
 
-var (
-	types = map[string]string{
-		"group":           "group",
-		"DATA":            "text",
-		"GREEDYDATA":      "text",
-		"GREEDYMULTILINE": "text",
-		"HOSTNAME":        "keyword",
-		"IP":              "ip",
-		"IPV4":            "ip",
-		"IPV6":            "ip",
-		"IPHOST":          "keyword",
-		"IPORHOST":        "keyword",
-		"LOGLEVEL":        "keyword",
-		"MULTILINEQUERY":  "text",
-		"NUMBER":          "long",
-		"POSINT":          "long",
-		"SYSLOGHOST":      "keyword",
-		"SYSLOGTIMESTAMP": "text",
-		"LOCALDATETIME":   "text",
-		"TIMESTAMP":       "text",
-		"USERNAME":        "keyword",
-		"WORD":            "keyword",
-	}
-)
+var types = map[string]string{
+	"group":           "group",
+	"DATA":            "text",
+	"GREEDYDATA":      "text",
+	"GREEDYMULTILINE": "text",
+	"HOSTNAME":        "keyword",
+	"IP":              "ip",
+	"IPV4":            "ip",
+	"IPV6":            "ip",
+	"IPHOST":          "keyword",
+	"IPORHOST":        "keyword",
+	"LOGLEVEL":        "keyword",
+	"MULTILINEQUERY":  "text",
+	"NUMBER":          "long",
+	"POSINT":          "long",
+	"SYSLOGHOST":      "keyword",
+	"SYSLOGTIMESTAMP": "text",
+	"LOCALDATETIME":   "text",
+	"TIMESTAMP":       "text",
+	"USERNAME":        "keyword",
+	"WORD":            "keyword",
+}
 
 type pipeline struct {
 	Description string                   `json:"description"`
@@ -121,7 +119,7 @@ func readPipeline(filesetPath string) (*pipeline, error) {
 
 func writeFieldsYml(filesetPath string, fieldsBytes []byte) error {
 	output := filepath.Join(filesetPath, "_meta/fields.yml")
-	return ioutil.WriteFile(output, fieldsBytes, 0644)
+	return ioutil.WriteFile(output, fieldsBytes, 0o644)
 }
 
 func newFieldYml(name, typeName string, noDoc bool) *fieldYml {

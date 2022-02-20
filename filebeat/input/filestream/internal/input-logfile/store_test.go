@@ -319,7 +319,6 @@ func TestStore_ResetCursor(t *testing.T) {
 		require.Equal(t, map[string]interface{}{"offset": int64(0)}, res.cursor)
 		require.Equal(t, nil, res.pendingCursorValue)
 		require.Equal(t, nil, res.pendingUpdate)
-
 	})
 }
 
@@ -330,11 +329,11 @@ type testMeta struct {
 func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 	t.Run("update identifiers when TTL is bigger than zero", func(t *testing.T) {
 		backend := createSampleStore(t, map[string]state{
-			"test::key1": state{
+			"test::key1": {
 				TTL:  60 * time.Second,
 				Meta: testMeta{IdentifierName: "method"},
 			},
-			"test::key2": state{
+			"test::key2": {
 				TTL:  0 * time.Second,
 				Meta: testMeta{IdentifierName: "method"},
 			},
@@ -351,27 +350,25 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 			}
 			if m.IdentifierName == "method" {
 				return "test::key1::updated", testMeta{IdentifierName: "something"}
-
 			}
 			return "", nil
-
 		})
 
 		var newState state
 		s.persistentStore.Get("test::key1::updated", &newState)
 
 		want := map[string]state{
-			"test::key1": state{
+			"test::key1": {
 				Updated: s.Get("test::key1").internalState.Updated,
 				TTL:     60 * time.Second,
 				Meta:    map[string]interface{}{"identifiername": "method"},
 			},
-			"test::key2": state{
+			"test::key2": {
 				Updated: s.Get("test::key2").internalState.Updated,
 				TTL:     0 * time.Second,
 				Meta:    map[string]interface{}{"identifiername": "method"},
 			},
-			"test::key1::updated": state{
+			"test::key1::updated": {
 				Updated: newState.Updated,
 				TTL:     60 * time.Second,
 				Meta:    map[string]interface{}{"identifiername": "something"},
@@ -385,10 +382,10 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 func TestSourceStore_CleanIf(t *testing.T) {
 	t.Run("entries are cleaned when funtion returns true", func(t *testing.T) {
 		backend := createSampleStore(t, map[string]state{
-			"test::key1": state{
+			"test::key1": {
 				TTL: 60 * time.Second,
 			},
-			"test::key2": state{
+			"test::key2": {
 				TTL: 0 * time.Second,
 			},
 		})
@@ -401,11 +398,11 @@ func TestSourceStore_CleanIf(t *testing.T) {
 		})
 
 		want := map[string]state{
-			"test::key1": state{
+			"test::key1": {
 				Updated: s.Get("test::key1").internalState.Updated,
 				TTL:     0 * time.Second,
 			},
-			"test::key2": state{
+			"test::key2": {
 				Updated: s.Get("test::key2").internalState.Updated,
 				TTL:     0 * time.Second,
 			},
@@ -417,10 +414,10 @@ func TestSourceStore_CleanIf(t *testing.T) {
 
 	t.Run("entries are left alone when funtion returns false", func(t *testing.T) {
 		backend := createSampleStore(t, map[string]state{
-			"test::key1": state{
+			"test::key1": {
 				TTL: 60 * time.Second,
 			},
-			"test::key2": state{
+			"test::key2": {
 				TTL: 0 * time.Second,
 			},
 		})
@@ -433,11 +430,11 @@ func TestSourceStore_CleanIf(t *testing.T) {
 		})
 
 		want := map[string]state{
-			"test::key1": state{
+			"test::key1": {
 				Updated: s.Get("test::key1").internalState.Updated,
 				TTL:     60 * time.Second,
 			},
-			"test::key2": state{
+			"test::key2": {
 				Updated: s.Get("test::key2").internalState.Updated,
 				TTL:     0 * time.Second,
 			},
@@ -506,7 +503,6 @@ func (ts testStateStore) snapshot() map[string]state {
 		states[key] = st
 		return true, nil
 	})
-
 	if err != nil {
 		panic("unexpected decode error from persistent test store")
 	}

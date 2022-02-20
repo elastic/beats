@@ -285,7 +285,6 @@ func (ts testStateStore) snapshot() map[string]state {
 		states[key] = st
 		return true, nil
 	})
-
 	if err != nil {
 		panic("unexpected decode error from persistent test store")
 	}
