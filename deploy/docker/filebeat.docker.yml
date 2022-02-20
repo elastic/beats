@@ -10,6 +10,14 @@ filebeat.autodiscover:
 
 processors:
 - add_cloud_metadata: ~
+  # We have to rename the field "source" because the indices .ds-filebeat-8.0.0-* expects an object
+  # Filebeat provides here the name of the log file as a string.
+- rename:
+    fields:
+      - from: "source"
+        to: "source_file"
+    ignore_missing: true
+    fail_on_error: false
 
 output.elasticsearch:
   hosts: '${ELASTICSEARCH_HOSTS:elasticsearch:9200}'
