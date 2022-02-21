@@ -23,8 +23,8 @@ import (
 const httpPlusPrefix = "http+"
 const defaultMonitoringNamespace = "default"
 
-// Monitor is a monitoring interface providing information about the way
-// how beat is monitored
+// Monitor implements the monitoring.Monitor interface providing information
+// about beats.
 type Monitor struct {
 	operatingSystem string
 	config          *monitoringConfig.MonitoringConfig
@@ -209,7 +209,7 @@ func (b *Monitor) Prepare(spec program.Spec, pipelineID string, uid, gid int) er
 }
 
 // LogPath describes a path where application stores logs. Empty if
-// application is not monitorable
+// application is not monitorable.
 func (b *Monitor) LogPath(spec program.Spec, pipelineID string) string {
 	if !b.WatchLogs() {
 		return ""

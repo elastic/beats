@@ -18,7 +18,8 @@
 package mage
 
 import (
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
@@ -40,7 +41,7 @@ const (
 func CustomizePackaging(pkgFlavor PackagingFlavor) {
 	var (
 		shortConfig = devtools.PackageFile{
-			Mode:   0600,
+			Mode:   0o600,
 			Source: "{{.PackageDir}}/auditbeat.yml",
 			Dep: func(spec devtools.PackageSpec) error {
 				return generateConfig(pkgFlavor, devtools.ShortConfigType, spec)
@@ -48,7 +49,7 @@ func CustomizePackaging(pkgFlavor PackagingFlavor) {
 			Config: true,
 		}
 		referenceConfig = devtools.PackageFile{
-			Mode:   0644,
+			Mode:   0o644,
 			Source: "{{.PackageDir}}/auditbeat.reference.yml",
 			Dep: func(spec devtools.PackageSpec) error {
 				return generateConfig(pkgFlavor, devtools.ReferenceConfigType, spec)
@@ -61,7 +62,7 @@ func CustomizePackaging(pkgFlavor PackagingFlavor) {
 		defaultSampleRulesTarget = "audit.rules.d/sample-rules.conf.disabled"
 	)
 	sampleRules := devtools.PackageFile{
-		Mode:   0644,
+		Mode:   0o644,
 		Source: sampleRulesSource,
 		Dep: func(spec devtools.PackageSpec) error {
 			if spec.OS != "linux" {
@@ -76,7 +77,7 @@ func CustomizePackaging(pkgFlavor PackagingFlavor) {
 			)
 
 			if err := devtools.Copy(origin, spec.MustExpand(sampleRulesSource)); err != nil {
-				return errors.Wrap(err, "failed to copy sample rules")
+				return fmt.Errorf("failed to copy sample rules: %w", err)
 			}
 			return nil
 		},
@@ -96,7 +97,7 @@ func CustomizePackaging(pkgFlavor PackagingFlavor) {
 				sampleRulesTarget = "/etc/{{.BeatName}}/" + defaultSampleRulesTarget
 			case devtools.Docker:
 			default:
-				panic(errors.Errorf("unhandled package type: %v", pkgType))
+				panic(fmt.Errorf("unhandled package type: %v", pkgType))
 			}
 
 			if args.OS == "linux" {
@@ -115,7 +116,7 @@ func generateConfig(pkgFlavor PackagingFlavor, ct devtools.ConfigFileType, spec 
 	case XPackPackaging:
 		args = XPackConfigFileParams()
 	default:
-		panic(errors.Errorf("Invalid packaging flavor (either oss or xpack): %v", pkgFlavor))
+		panic(fmt.Errorf("Invalid packaging flavor (either oss or xpack): %v", pkgFlavor))
 	}
 
 	// PackageDir isn't exported but we can grab it's value this way.

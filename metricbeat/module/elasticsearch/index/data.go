@@ -113,7 +113,7 @@ type total struct {
 
 type shardStats struct {
 	Total     int `json:"total"`
-	Primaries int `json:"-"`
+	Primaries int `json:"primaries"`
 	Replicas  int `json:"-"`
 
 	ActiveTotal     int `json:"-"`

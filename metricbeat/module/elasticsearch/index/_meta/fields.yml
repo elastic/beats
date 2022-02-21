@@ -13,6 +13,8 @@
       fields:
         - name: total
           type: long
+        - name: primaries
+          type: long
     - name: uuid
       type: keyword
     - name: status
