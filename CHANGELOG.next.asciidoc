@@ -42,8 +42,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-
-*Filebeat*
+- auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
 
 *Heartbeat*
 
