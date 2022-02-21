@@ -48,7 +48,7 @@ unit-tests: mage
 
 .PHONY: integration-tests
 integration-tests: mage
-	rm -f build/TEST-go-integration.out
+	[ -e build/TEST-go-integration.out ] && rm -f build/TEST-go-integration.out || true
 	mage goIntegTest || ( cat build/TEST-go-integration.out && false )
 
 .PHONY: system-tests
@@ -57,7 +57,7 @@ system-tests: mage
 
 .PHONY: testsuite
 testsuite: mage
-	rm -f build/TEST-go-integration.out
+	[ -e build/TEST-go-integration.out ] && rm -f build/TEST-go-integration.out || true
 	mage update build unitTest integTest || ( cat build/TEST-go-integration.out && false )
 
 .PHONY: update
