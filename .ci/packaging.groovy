@@ -34,7 +34,7 @@ pipeline {
     disableConcurrentBuilds()
   }
   triggers {
-    issueCommentTrigger('(?i)^\\/packag[ing|e]$')
+    issueCommentTrigger('(?i)^\\/packag[ing|e](?:\\W+macosx)?$')
     // disable upstream trigger on a PR basis
     upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
@@ -121,6 +121,9 @@ pipeline {
               stage('Package Linux'){
                 agent { label 'ubuntu-18 && immutable' }
                 options { skipDefaultCheckout() }
+                when {
+                  not { expression { return env.GITHUB_COMMENT?.contains('macosx') } }
+                }
                 environment {
                   HOME = "${env.WORKSPACE}"
                   PLATFORMS = [
@@ -155,12 +158,13 @@ pipeline {
                 }
               }
               stage('Package Mac OS'){
-                agent { label 'macosx-10.12' }
+                agent { label 'macosx' }
                 options { skipDefaultCheckout() }
                 when {
                   beforeAgent true
-                  expression {
-                    return params.macos
+                  anyOf {
+                    expression { return params.macos }
+                    expression { return env.GITHUB_COMMENT?.contains('macosx') }
                   }
                 }
                 environment {
@@ -189,6 +193,9 @@ pipeline {
           }
         }
         stage('Build Packages ARM'){
+          when {
+            not { expression { return env.GITHUB_COMMENT?.contains('macosx') } }
+          }
           matrix {
             axes {
               axis {
