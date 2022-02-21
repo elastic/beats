@@ -241,6 +241,9 @@ filebeat.inputs:
 #--------------------------- Filestream input ----------------------------
 - type: filestream
 
+  # Unique ID among all inputs, an ID is required.
+  id: foo
+
   # Change to true to enable this input configuration.
   enabled: false
 

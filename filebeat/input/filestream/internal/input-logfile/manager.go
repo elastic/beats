@@ -164,9 +164,16 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 		ID             string        `config:"id"`
 		CleanTimeout   time.Duration `config:"clean_timeout"`
 		HarvesterLimit uint64        `config:"harvester_limit"`
-	}{ID: "", CleanTimeout: cim.DefaultCleanTimeout, HarvesterLimit: 0}
+	}{CleanTimeout: cim.DefaultCleanTimeout}
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
+	}
+
+	if settings.ID == "" {
+		cim.Logger.Warn("not setting an ID for the filestream input may lead to " +
+			"duplicated data. Filestream input without an ID will not be supported in a future release. " +
+			"Adding an ID to an existing input will read all files from the beginning",
+		)
 	}
 
 	prospector, harvester, err := cim.Configure(config)
