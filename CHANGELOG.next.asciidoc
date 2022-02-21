@@ -40,6 +40,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 - Fix field names with `add_network_direction` processor. {issue}29747[29747] {pull}29751[29751]
 - Fix a logging bug when `ssl.verification_mode` was set to `full` or `certificate`, the command `test output` incorrectly logged that TLS was disabled.
+- Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
 
 *Auditbeat*
 
@@ -55,6 +56,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Filebeat*
 - Fix broken Kafka input {issue}29746[29746] {pull}30277[30277]
+- Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
+- auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
 
 *Heartbeat*
 - Fix missing mapping for `service.name`. {pull}30324[30324]
@@ -138,7 +141,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Packetbeat*
 
-- Add automated OEM Npcap installation handling. {pull}29112[29112] {pull}30396[30396]
+- Add automated OEM Npcap installation handling. {pull}29112[29112] {pull}30438[30438]
 - Add support for capturing TLS random number and OCSP status request details. {issue}29962[29962] {pull}30102[30102]
 
 *Functionbeat*
