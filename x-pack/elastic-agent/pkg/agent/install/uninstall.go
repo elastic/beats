@@ -114,13 +114,12 @@ func isBlockingOnSelf(err error) bool {
 
 func delayedRemoval(path string) {
 	// The installation path will still exists because we are executing from that
-	// directory. So cmd.exe is spawned that sleeps for 2 seconds (using ping, recommend way from
+	// directory. So cmd.exe is spawned that sleeps for 2 seconds (using ping, recommend way
 	// from Windows) then rmdir is performed.
 	rmdir := exec.Command(
 		filepath.Join(os.Getenv("windir"), "system32", "cmd.exe"),
 		"/C", "ping", "-n", "2", "127.0.0.1", "&&", "rmdir", "/s", "/q", path)
 	_ = rmdir.Start()
-
 }
 
 func uninstallPrograms(ctx context.Context, cfgFile string) error {

@@ -68,13 +68,14 @@ func (c *crawler) Start(
 ) error {
 	log := c.log
 
-	log.Infof("Loading Inputs: %v", len(c.inputConfigs))
+	log.Infof("Loading Inputs: %d", len(c.inputConfigs))
 
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, inputConfig := range c.inputConfigs {
+		log.Infof("starting input with config: %#v", inputConfig)
 		err := c.startInput(pipeline, inputConfig)
 		if err != nil {
-			return fmt.Errorf("starting input failed: %+v", err)
+			return fmt.Errorf("starting input failed: %v", err)
 		}
 	}
 
@@ -83,7 +84,6 @@ func (c *crawler) Start(
 		if err := c.inputReloader.Check(c.inputsFactory); err != nil {
 			return fmt.Errorf("creating input reloader failed: %+v", err)
 		}
-
 	}
 
 	if configModules.Enabled() {
@@ -91,7 +91,6 @@ func (c *crawler) Start(
 		if err := c.modulesReloader.Check(c.modulesFactory); err != nil {
 			return fmt.Errorf("creating module reloader failed: %+v", err)
 		}
-
 	}
 
 	if c.inputReloader != nil {
@@ -114,12 +113,19 @@ func (c *crawler) startInput(
 	pipeline beat.PipelineConnector,
 	config *common.Config,
 ) error {
+	// Anderson TODO:
+	// the input seems to be disabled when beats restarts. Perhaps the
+	// agent isn't setting it enable. default for boolean is False, but
+	// the Enabled config is true by default.
+	c.log.Infof("startInput, config enabled?: %v", config.Enabled())
+
 	if !config.Enabled() {
 		return nil
 	}
 
 	var h map[string]interface{}
 	config.Unpack(&h)
+	c.log.Infof("unpacked config: %#v", h)
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {
 		return fmt.Errorf("can not compute id from configuration: %v", err)
@@ -130,7 +136,7 @@ func (c *crawler) startInput(
 
 	runner, err := c.inputsFactory.Create(pipeline, config)
 	if err != nil {
-		return fmt.Errorf("Error while initializing input: %+v", err)
+		return fmt.Errorf("error while initializing input: %+v", err)
 	}
 	if inputRunner, ok := runner.(*input.Runner); ok {
 		inputRunner.Once = c.once

@@ -87,7 +87,7 @@ func (d *DiskStore) Save(in io.Reader) error {
 	return nil
 }
 
-// Load return a io.ReadCloser for the target file.
+// Load returns an io.ReadCloser for the target file.
 func (d *DiskStore) Load() (io.ReadCloser, error) {
 	fd, err := os.OpenFile(d.target, os.O_RDONLY|os.O_CREATE, perms)
 	if err != nil {

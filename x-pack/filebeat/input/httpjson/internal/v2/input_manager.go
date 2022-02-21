@@ -16,7 +16,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-// inputManager wraps one stateless input manager
+// InputManager wraps one stateless input manager
 // and one cursor input manager. It will create one or the other
 // based on the config that is passed.
 type InputManager struct {

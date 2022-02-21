@@ -120,7 +120,7 @@ func mergeConfigFiles(configFiles []string, config *Config) error {
 	return nil
 }
 
-// Fetches and merges all config files given by configDir. All are put into one config object
+// FetchConfigs fetches and merges all config files given by configDir. All are put into one config object
 func (config *Config) FetchConfigs() error {
 	configDir := config.ConfigDir
 

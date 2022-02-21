@@ -26,6 +26,8 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
@@ -49,9 +51,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/go-concert/unison"
-
-	_ "github.com/elastic/beats/v7/filebeat/include"
 
 	// Add filebeat level processors
 	_ "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
@@ -96,7 +95,7 @@ func New(plugins PluginFactory) beat.Creator {
 func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *common.Config) (beat.Beater, error) {
 	config := cfg.DefaultConfig
 	if err := rawConfig.Unpack(&config); err != nil {
-		return nil, fmt.Errorf("Error reading config file: %v", err)
+		return nil, fmt.Errorf("error reading config file: %v", err)
 	}
 
 	if err := cfgwarn.CheckRemoved6xSettings(
@@ -326,7 +325,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, fromFlag bool, kibanaConfig *com
 
 func setupMLBasedOnVersion(reg *fileset.ModuleRegistry, fromFlag bool, esClient *eslegclient.Connection, kibanaClient *kibana.Client) error {
 	if !mlimporter.IsCompatible(esClient) && fromFlag {
-		return fmt.Errorf("Machine learning jobs are not loaded because Elasticsearch version is too new. It must be 7.x for setting up ML using Beats. Use the Machine learning UI in Kibana.")
+		return fmt.Errorf("machine learning jobs are not loaded because Elasticsearch version is too new. It must be 7.x for setting up ML using Beats. Use the Machine learning UI in Kibana")
 	}
 	if isElasticsearchLoads(kibanaClient.GetVersion()) {
 		return reg.LoadML(esClient)
@@ -350,6 +349,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			return err
 		}
 	}
+
+	and := logp.NewLogger("anderson")
+	and.Info("Anderson starting filebeat")
 
 	waitFinished := newSignalWait()
 	waitEvents := newSignalWait()
@@ -403,7 +405,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	outDone := make(chan struct{}) // outDone closes down all active pipeline connections
 	pipelineConnector := channel.NewOutletFactory(outDone).Create
 
-	// Create a ES connection factory for dynamic modules pipeline loading
+	// Create an ES connection factory for dynamic modules pipeline loading
 	var pipelineLoaderFactory fileset.PipelineLoaderFactory
 	if b.Config.Output.Name() == "elasticsearch" {
 		pipelineLoaderFactory = newPipelineLoaderFactory(b.Config.Output.Config())
@@ -444,7 +446,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Start the registrar
 	err = registrar.Start()
 	if err != nil {
-		return fmt.Errorf("Could not start registrar: %v", err)
+		return fmt.Errorf("could not start registrar: %v", err)
 	}
 
 	// Stopping registrar will write last state
@@ -455,7 +457,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		// Closes first the registrar logger to make sure not more events arrive at the registrar
 		// registrarChannel must be closed first to potentially unblock (pretty unlikely) the publisher
 		registrarChannel.Close()
-		close(outDone) // finally close all active connections to publisher pipeline
+		close(outDone) // finally, close all active connections to publisher pipeline
 	}()
 
 	// Wait for all events to be processed or timeout
@@ -465,6 +467,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		logp.Debug("modules", "Existing Ingest pipelines will be updated")
 	}
 
+	// here
 	err = crawler.Start(fb.pipeline, config.ConfigInput, config.ConfigModules)
 	if err != nil {
 		crawler.Stop()

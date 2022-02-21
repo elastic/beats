@@ -34,10 +34,13 @@ func (a *Application) Configure(ctx context.Context, config map[string]interface
 		return errors.New(ErrAppNotRunning)
 	}
 
+	a.logger.Infof("Application %s, config: %#v", a.Name(), config)
 	cfgStr, err := yaml.Marshal(config)
 	if err != nil {
 		return errors.New(err, errors.TypeApplication)
 	}
+	a.logger.With("config.yaml", string(cfgStr)).Infof("sending config to %s", a.Name())
+	a.logger.Infof("%s sending config: %s", a.Name(), string(cfgStr))
 
 	isRestartNeeded := plugin.IsRestartNeeded(a.logger, a.Spec(), a.srvState, config)
 
@@ -51,7 +54,7 @@ func (a *Application) Configure(ctx context.Context, config map[string]interface
 		a.appLock.Unlock()
 		a.Stop()
 		err = a.Start(ctx, a.desc, config)
-		// lock back so it wont panic on deferred unlock
+		// lock back so it won't panic on deferred unlock
 		a.appLock.Lock()
 	}
 

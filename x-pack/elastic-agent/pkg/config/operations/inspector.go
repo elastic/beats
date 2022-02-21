@@ -80,8 +80,42 @@ func loadConfig(configPath string) (*config.Config, error) {
 			errors.M(errors.MetaKeyPath, path))
 	}
 
+	log, err := logger.New("sdh-logger", false)
+	if err != nil {
+		panic(fmt.Errorf("could not create a sdh-debug logger: %w", err))
+	}
+
+	mapstr, err := rawConfig.ToMapStr()
+	if err != nil {
+		log.Errorf("could not parse rawConfig to ToMapStr: %v", err)
+	}
+	log.With("rawConfig", fmt.Sprintf("%#v", rawConfig)).
+		Infof("[loadConfig] rawConfig")
+	log.With("mapstr", fmt.Sprintf("%#v", mapstr)).
+		Infof("[loadConfig] rawConfig map[str]")
+
+	mapstr, err = config.ToMapStr()
+	if err != nil {
+		log.Errorf("could not parse config to ToMapStr failed: %v", err)
+	}
+	log.With("config", fmt.Sprintf("%#v", config)).
+		Infof("[loadConfig] config")
+	log.With("config", fmt.Sprintf("%#v", mapstr)).
+		Infof("[loadConfig] config map[str]")
+
 	// merge local configuration and configuration persisted from fleet.
-	rawConfig.Merge(config)
+	if err = rawConfig.Merge(config); err != nil {
+		return nil, fmt.Errorf("failed merging configs: %w", err)
+	}
+
+	mapstr, err = rawConfig.ToMapStr()
+	if err != nil {
+		log.Errorf("could not parse merged rawConfig to ToMapStr: %v", err)
+	}
+	log.With("merged.rawConfig", fmt.Sprintf("%#v", rawConfig)).
+		Infof("[loadConfig] merged rawConfig")
+	log.With("merged.rawConfig", fmt.Sprintf("%#v", mapstr)).
+		Infof("[loadConfig] merged rawConfig map[str]")
 
 	if err := info.InjectAgentConfig(rawConfig); err != nil {
 		return nil, err

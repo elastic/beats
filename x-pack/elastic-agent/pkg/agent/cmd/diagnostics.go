@@ -233,6 +233,12 @@ func gatherConfig() (AgentConfig, error) {
 	if err != nil {
 		return cfg, err
 	}
+
+	for k, _ := range mapCFG {
+		if strings.Contains(k, "api_key") {
+			mapCFG[k] = "REDACTED"
+		}
+	}
 	cfg.ConfigRendered = mapCFG
 
 	return cfg, nil

@@ -106,7 +106,11 @@ func (r *Registrar) loadStates() error {
 	}
 
 	r.states.SetStates(states)
-	r.log.Infof("States Loaded from registrar: %+v", len(states))
+	for _, s := range states {
+		r.log.With("state", s.String()).
+			Infof("state %q, source: %s:", s.Id, s.Source)
+	}
+	r.log.Infof("States Loaded from registrar: %d", len(states))
 
 	return nil
 }

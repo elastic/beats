@@ -11,7 +11,7 @@ import (
 	"io"
 	"sync"
 
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
@@ -267,10 +267,17 @@ func (s *StateStore) Save() error {
 		return err
 	}
 
-	if err := s.store.Save(reader); err != nil {
+	var buf bytes.Buffer
+
+	r := io.TeeReader(reader, &buf)
+	if err := s.store.Save(r); err != nil {
 		return err
 	}
-	s.log.Debugf("save state on disk : %+v", s.state)
+
+	bs := buf.Bytes()
+	s.log.With("state.yaml", string(bs)).Infof("saved state on disk")
+
+	s.log.Debugf("saved state on disk: %+v", s.state)
 	return nil
 }
 

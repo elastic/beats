@@ -97,7 +97,7 @@ func newRetryer(
 
 func (r *retryer) close() {
 	close(r.done)
-	//Block until loop() is properly closed
+	// Block until loop() is properly closed
 	r.doneWaiter.Wait()
 }
 
@@ -214,13 +214,13 @@ func (r *retryer) checkConsumerBlock(numOutputs, numBatches int) bool {
 		if r.consumer != nil {
 			r.consumer.sigWait()
 		}
-		r.logger.Info("  done")
+		r.logger.Info("retryer: send wait signal to consumer: done")
 	} else {
 		r.logger.Info("retryer: send unwait signal to consumer")
 		if r.consumer != nil {
 			r.consumer.sigUnWait()
 		}
-		r.logger.Info("  done")
+		r.logger.Info("retryer: send unwait signal to consumer: done")
 	}
 
 	return consumerBlocked

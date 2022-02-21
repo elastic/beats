@@ -21,6 +21,7 @@ var (
 	ErrClientNotConfigurable = errors.New("client does not provide configuration")
 )
 
+// perhaps here
 // Configures running process by sending a configuration to its
 // grpc endpoint
 type operationConfig struct {

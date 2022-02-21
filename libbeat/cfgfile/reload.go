@@ -173,7 +173,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 	gw := NewGlobWatcher(rl.path)
 
-	// If reloading is disable, config files should be loaded immediately
+	// If reloading is disabled, config files should be loaded immediately
 	if !rl.config.Reload.Enabled {
 		rl.config.Reload.Period = 0
 	}
@@ -210,7 +210,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			// Load all config objects
 			configs, _ := rl.loadConfigs(files)
 
-			debugf("Number of module configs found: %v", len(configs))
+			debugf("Number of module configs found: %d", len(configs))
 
 			err = list.Reload(configs)
 			// Force reload on the next iteration if and only if this one failed.
@@ -219,7 +219,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			forceReload = err != nil
 		}
 
-		// Path loading is enabled but not reloading. Loads files only once and then stops.
+		// Path loading is enabled but not reloading. Load files only once and then stops.
 		if !rl.config.Reload.Enabled {
 			logp.Info("Loading of config files completed.")
 			select {

@@ -14,6 +14,8 @@ import (
 
 	"github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // options hold the specified options
@@ -91,6 +93,7 @@ func NewConfigFrom(from interface{}, opts ...interface{}) (*Config, error) {
 		if err != nil {
 			return nil, err
 		}
+		logp.Info("NewConfigFrom io.Reader: %s", fData)
 		err = yaml.Unmarshal(fData, &data)
 		if err != nil {
 			return nil, err
