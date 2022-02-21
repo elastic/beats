@@ -8,7 +8,7 @@
 
 package pkg
 
-import "github.com/pkg/errors"
+import "errors"
 
 func listRPMPackages() ([]*Package, error) {
 	return nil, errors.New("listing RPM packages is only supported on Linux")
