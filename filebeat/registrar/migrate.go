@@ -249,21 +249,6 @@ func (m *Migrator) updateToVersion1(regHome string) error {
 	return nil
 }
 
-func writeMeta(path string, version string, perm os.FileMode) error {
-	logp.Info("Write registry meta file with version: %v", version)
-	doc := struct{ Version string }{version}
-	body, err := json.Marshal(doc)
-	if err != nil {
-		panic(err) // must not fail
-	}
-
-	if err = safeWriteFile(path+".tmp", body, perm); err != nil {
-		return errors.Wrap(err, "failed writing registry meta.json")
-	}
-
-	return helper.SafeFileRotate(path, path+".tmp")
-}
-
 func readVersion(regHome, migrateFile string) (registryVersion, error) {
 	if isFile(migrateFile) {
 		return legacyVersion, nil

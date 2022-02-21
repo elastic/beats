@@ -167,12 +167,6 @@ func (r rotatedFilestreams) isOriginalAdded(path string) bool {
 	return ok
 }
 
-// originalSrc returns the original Source information of a given
-// original file path.
-func (r rotatedFilestreams) originalSrc(path string) loginp.Source {
-	return r.table[path].originalSrc
-}
-
 // addRotatedFile adds a new rotated file to the list and returns its index.
 // if a file is already added, the source is updated and the index is returned.
 func (r rotatedFilestreams) addRotatedFile(original, rotated string, src loginp.Source) int {
@@ -193,17 +187,6 @@ func (r rotatedFilestreams) addRotatedFile(original, rotated string, src loginp.
 	}
 
 	return -1
-}
-
-// addRotatedFile adds a new rotated file to the list and returns its index.
-// if a file is already added, the source is updated and the index is returned.
-func (r rotatedFilestreams) removeRotatedFile(original, rotated string) {
-	for idx, fi := range r.table[original].rotated {
-		if fi.path == rotated {
-			r.table[original].rotated = append(r.table[original].rotated[:idx], r.table[original].rotated[idx+1:]...)
-			return
-		}
-	}
 }
 
 type copyTruncateFileProspector struct {

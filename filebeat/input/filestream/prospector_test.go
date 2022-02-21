@@ -505,7 +505,6 @@ func (u *mockUnpackValue) UnpackCursorMeta(to interface{}) error {
 type mockProspectorCleaner struct {
 	available   map[string]loginp.Value
 	cleanedKeys []string
-	newEntries  map[string]fileMeta
 	updatedKeys map[string]string
 }
 

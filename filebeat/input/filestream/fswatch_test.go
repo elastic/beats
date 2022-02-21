@@ -241,11 +241,3 @@ func (t testFileInfo) Mode() os.FileMode  { return 0 }
 func (t testFileInfo) ModTime() time.Time { return t.time }
 func (t testFileInfo) IsDir() bool        { return false }
 func (t testFileInfo) Sys() interface{}   { return t.sys }
-
-func mustDuration(durStr string) time.Duration {
-	dur, err := time.ParseDuration(durStr)
-	if err != nil {
-		panic(err)
-	}
-	return dur
-}

@@ -279,7 +279,6 @@ type groupHandler struct {
 	// ex. in this case are the azure fielsets where the events are found under the json object "records"
 	expandEventListFromField string // TODO
 	log                      *logp.Logger
-	reader                   reader.Reader
 }
 
 func (h *groupHandler) Setup(session sarama.ConsumerGroupSession) error {

@@ -30,9 +30,6 @@ import (
 )
 
 const (
-	pipelinePath  = "%s/module/%s/%s/ingest/pipeline.json"
-	fieldsYmlPath = "%s/module/%s/%s/_meta/fields.yml"
-
 	typeIdx     = 0
 	elementsIdx = 1
 	hintIdx     = 2
