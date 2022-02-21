@@ -485,9 +485,6 @@ run.
 In order to test the filesets with the sample logs and/or generate the expected output one should run the tests
 locally for a specific module, using the following procedure under Filebeat directory:
 
-<<<<<<< HEAD
-. Run an Elasticsearch instance locally using docker: `docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:8.0.0-SNAPSHOT`
-=======
 . Start an Elasticsearch instance locally. For example, using Docker:
 +
 [source,bash]
@@ -511,7 +508,6 @@ curl -u elastic:changeme \
 ----
 . Create the testing binary: `make filebeat.test`
 . Update fields yaml: `make update`
->>>>>>> e98703caf3 (Spelling fix (#30439))
 . Create python env: `make python-env`
 . Source python env: `source ./build/python-env/bin/activate`
 . Create the testing binary: `make filebeat.test`
