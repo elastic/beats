@@ -29876,6 +29876,13 @@ type: long
 
 --
 
+*`elasticsearch.index.shards.primaries`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.index.uuid`*::
 +
 --
