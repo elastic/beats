@@ -25,7 +25,6 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -43,9 +42,6 @@ import (
 const pipelinesWarning = "Winlogbeat is unable to load the ingest pipelines" +
 	" because the Elasticsearch output is not configured/enabled. If you have" +
 	" already loaded the ingest pipelines, you can ignore this warning."
-
-// Time the application was started.
-var startTime = time.Now().UTC()
 
 // Winlogbeat is used to conform to the beat interface
 type Winlogbeat struct {
