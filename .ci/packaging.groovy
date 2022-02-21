@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@test/publish') _
+@Library('apm@current') _
 
 import groovy.transform.Field
 
