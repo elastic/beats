@@ -39,6 +39,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Affecting all Beats*
 
 - Fix field names with `add_network_direction` processor. {issue}29747[29747] {pull}29751[29751]
+- Fix a logging bug when `ssl.verification_mode` was set to `full` or `certificate`, the command `test output` incorrectly logged that TLS was disabled.
 
 *Auditbeat*
 
@@ -48,20 +49,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 - tcp/unix input: Stop accepting connections after socket is closed. {pull}29712[29712]
 - Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
+- Fix multiple instances of the same module configured within `filebeat.modules` in filebeat.yml. {issue}29649[29649] {pull}29952[29952]
 - aws-s3: fix race condition in states used by s3-poller. {issue}30123[30123] {pull}30131[30131]
 
-*Heartbeat*
-
-
 *Filebeat*
-
+- Fix broken Kafka input {issue}29746[29746] {pull}30277[30277]
 
 *Heartbeat*
-
+- Fix missing mapping for `service.name`. {pull}30324[30324]
 
 *Metricbeat*
 
 - Enhance metricbeat on openshift documentation {pull}30054[30054]
+- Fixed missing ZooKeeper metrics due compatibility issues with versions >= 3.6.0 {pull}30068[30068]
 
 *Packetbeat*
 
@@ -91,8 +91,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add `script` processor to all beats {issue}29269[29269] {pull}29752[29752]
 - Only connect to Elasticsearch instances with the same version or newer. {pull}29683[29683]
 - Move umask from code to service files. {pull}29708[29708]
+- Add support for kafka message headers. {pull}29940[29940]
 - Add FIPS configuration option for all AWS API calls. {pull}[28899]
 - Add metadata change support for some processors {pull}30183[30183]
+- Add support for non-unique Kafka headers for output messages. {pull}30369[30369]
 
 *Auditbeat*
 
@@ -131,10 +133,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add `xpack.enabled` support for Enterprise Search module. {pull}29871[29871]
 - Add gcp firestore metricset. {pull}29918[29918]
 - Remove strict parsing on RabbitMQ module {pull}30090[30090]
+- Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
 
 *Packetbeat*
 
-- Add automated OEM Npcap installation handling. {pull}29112[29112]
+- Add automated OEM Npcap installation handling. {pull}29112[29112] {pull}30396[30396]
 - Add support for capturing TLS random number and OCSP status request details. {issue}29962[29962] {pull}30102[30102]
 
 *Functionbeat*

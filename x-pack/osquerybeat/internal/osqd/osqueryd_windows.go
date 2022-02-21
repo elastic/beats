@@ -45,7 +45,3 @@ func killProcessGroup(cmd *exec.Cmd) error {
 	exec.Command("taskkill", "/F", "/T", "/PID", fmt.Sprint(cmd.Process.Pid)).Run()
 	return nil
 }
-
-func osquerydFilename() string {
-	return osqueryDName + ".exe"
-}
