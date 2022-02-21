@@ -46,6 +46,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 	return func(module mb.Module, host string) (mb.HostData, error) {
 		conf := map[string]interface{}{}
 		err := module.UnpackConfig(conf)
+		var QueryParams string
 		if err != nil {
 			return mb.HostData{}, err
 		}
@@ -57,7 +58,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 				return mb.HostData{}, errors.Errorf("'query' config for module %v is not a map", module.Name())
 			}
 
-			b.QueryParams = mb.QueryParams(queryMap).String()
+			QueryParams = mb.QueryParams(queryMap).String()
 		}
 
 		var user, pass, path, basePath string
@@ -104,7 +105,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		// Combine paths and normalize
 		fullPath := strings.Trim(p.Join(basePath, path), "/")
 
-		return ParseURL(host, b.DefaultScheme, user, pass, fullPath, b.QueryParams)
+		return ParseURL(host, b.DefaultScheme, user, pass, fullPath, QueryParams)
 	}
 }
 
