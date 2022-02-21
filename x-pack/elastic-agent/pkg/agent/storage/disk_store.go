@@ -5,6 +5,7 @@
 package storage
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 // NewDiskStore creates an unencrypted disk store.
@@ -43,6 +45,9 @@ func (d *DiskStore) Delete() error {
 func (d *DiskStore) Save(in io.Reader) error {
 	tmpFile := d.target + ".tmp"
 
+	tmp := in
+	buf := bytes.Buffer{}
+	in = io.TeeReader(tmp, &buf)
 	fd, err := os.OpenFile(tmpFile, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, perms)
 	if err != nil {
 		return errors.New(err,
@@ -83,6 +88,12 @@ func (d *DiskStore) Save(in io.Reader) error {
 			errors.TypeFilesystem,
 			errors.M(errors.MetaKeyPath, d.target))
 	}
+
+	log, err := logger.New("sdh-logger", false)
+	if err != nil {
+		panic("could not create an sdh-logger: " + err.Error())
+	}
+	log.With(d.target, string(buf.Bytes())).Infof("DiskStore saved %s", d.target)
 
 	return nil
 }

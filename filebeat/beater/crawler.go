@@ -125,7 +125,7 @@ func (c *crawler) startInput(
 
 	var h map[string]interface{}
 	config.Unpack(&h)
-	c.log.Infof("unpacked config: %#v", h)
+	c.log.With("unpacked.config", fmt.Sprintf("%#v", h)).Infof("unpacked config")
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {
 		return fmt.Errorf("can not compute id from configuration: %v", err)
