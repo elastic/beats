@@ -3,6 +3,129 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.0.1]]
+=== Beats version 8.0.1
+https://github.com/elastic/beats/compare/v8.0.0...v8.0.1[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- tcp/unix input: Stop accepting connections after socket is closed. {pull}29712[29712]
+- Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
+- Fix multiple instances of the same module configured within `filebeat.modules` in filebeat.yml. {issue}29649[29649] {pull}29952[29952]
+- aws-s3: fix race condition in states used by s3-poller. {issue}30123[30123] {pull}30131[30131]
+
+*Filebeat*
+- Fix broken Kafka input {issue}29746[29746] {pull}30277[30277]
+- cisco module: Fix change the broke ASA and FTD configs that used `var.input: syslog`. {pull}30072[30072]
+- aws-s3: fix race condition in states used by s3-poller. {issue}30123[30123] {pull}30131[30131]
+- auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
+
+*Heartbeat*
+- Fix missing mapping for `service.name`. {pull}30324[30324]
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+- Fix run loop when reading from evtx file {pull}30006[30006]
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+
+
+
 [[release-notes-8.0.0]]
 === Beats version 8.0.0
 https://github.com/elastic/beats/compare/v7.17.0...v8.0.0[View commits]
