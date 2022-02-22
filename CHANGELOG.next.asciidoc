@@ -143,6 +143,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Winlogbeat*
 
+- Improve the error message when the registry file content is invalid. {pull}30543[30543]
+
 
 *Elastic Log Driver*
 
