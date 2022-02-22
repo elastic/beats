@@ -304,7 +304,7 @@ def k8sTest(Map args = [:]) {
         withGithubNotify(context: "${args.context} ${v}") {
           withBeatsEnv(archive: false, withModule: false) {
             withKindEnv(k8sVersion: "${v}", kindVersion: "v0.11.1"){
-              sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
+              sh(label: "Integration tests", script: "MAGEFILE_VERBOSE=true MODULE=kubernetes make -C metricbeat integration-tests")
               sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
             }
           }
