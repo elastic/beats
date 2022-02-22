@@ -57,7 +57,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 *Heartbeat*
-- Fix missing mapping for `service.name`. {pull}30324[30324]
 
 *Metricbeat*
 
@@ -170,3 +169,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
+
+
+
