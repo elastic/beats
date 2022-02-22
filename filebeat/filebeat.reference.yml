@@ -708,12 +708,12 @@ filebeat.inputs:
     #- ndjson:
       # Decode JSON options. Enable this if your logs are structured in JSON.
       # JSON key on which to apply the line filtering and multiline settings. This key
-      # must be top level and its value must be string, otherwise it is ignored. If
+      # must be top level and its value must be a string, otherwise it is ignored. If
       # no text key is defined, the line filtering and multiline features cannot be used.
       #message_key:
 
       # By default, the decoded JSON is placed under a "json" key in the output document.
-      # If you enable this setting, the keys are copied top level in the output document.
+      # If you enable this setting, the keys are copied to the top level of the output document.
       #keys_under_root: false
 
       # If keys_under_root and this setting are enabled, then the values from the decoded
@@ -726,7 +726,7 @@ filebeat.inputs:
       # For example, `{"a.b.c": 123}` would be expanded into `{"a":{"b":{"c":123}}}`.
       #expand_keys: false
 
-      # If this setting is enabled, Filebeat adds a "error.message" and "error.key: json" key in case of JSON
+      # If this setting is enabled, Filebeat adds an "error.message" and "error.key: json" key in case of JSON
       # unmarshaling errors or when a text key is defined in the configuration but cannot
       # be used.
       #add_error_key: false
@@ -742,20 +742,20 @@ filebeat.inputs:
       # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
       #pattern: ^\[
 
-      # Defines if the pattern set under pattern should be negated or not. Default is false.
+      # Defines if the pattern set under the pattern setting should be negated or not. Default is false.
       #negate: false
 
       # Match can be set to "after" or "before". It is used to define if lines should be append to a pattern
       # that was (not) matched before or after or as long as a pattern is not matched based on negate.
-      # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
+      # Note: After is the equivalent to previous and before is the equivalent to next in Logstash
       #match: after
 
       # The maximum number of lines that are combined to one event.
-      # In case there are more the max_lines the additional lines are discarded.
+      # In case there are more than max_lines the additional lines are discarded.
       # Default is 500
       #max_lines: 500
 
-      # After the defined timeout, an multiline event is sent even if no new pattern was found to start a new event
+      # After the defined timeout, a multiline event is sent even if no new pattern was found to start a new event
       # Default is 5s.
       #timeout: 5s
 
@@ -772,7 +772,7 @@ filebeat.inputs:
       #count_lines: 3
 
       # The maximum number of lines that are combined to one event.
-      # In case there are more the max_lines the additional lines are discarded.
+      # In case there are more than max_lines the additional lines are discarded.
       # Default is 500
       #max_lines: 500
 
