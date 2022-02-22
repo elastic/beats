@@ -33,28 +33,19 @@
         m.setPID(data[tok:p])
     }
 
-    action err_priority_part {
-        err = ErrPriorityPart
-        fhold;
-        fgoto fail;
-    }
-
     action err_priority {
         err = ErrPriority
         fhold;
-        fgoto fail;
     }
 
     action err_timestamp {
         err = ErrTimestamp
         fhold;
-        fgoto fail;
     }
 
     action err_hostname {
         err = ErrHostname
         fhold;
-        fgoto fail;
     }
 
     sp = ' ';  # space
@@ -76,7 +67,7 @@
 
     # Priority
     pri_range = ('1' ('9' ('0' | '1')? | '0'..'8' ('0'..'9')?)?) | ('2'..'9' ('0'..'9')?) | '0';
-    pri       = ('<' pri_range >tok %from(set_priority) $err(err_priority) '>') @err(err_priority_part);
+    pri       = ('<' pri_range >tok %set_priority '>') @err(err_priority);
 
     # Timestamp
     timestamp_rfc3339 = (ts_yyyymmdd 'T' ts_hhmmss ('.' digit{1,6})? ts_offset) >tok %set_timestamp_rfc3339 $err(err_timestamp);
@@ -84,6 +75,4 @@
 
     # Hostname
     hostname_range    = graph{1,255};
-
-    fail := (any - [\n\r])* @err{ fgoto main; };
 }%%

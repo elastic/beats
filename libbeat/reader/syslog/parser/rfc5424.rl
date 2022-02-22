@@ -41,7 +41,6 @@
         if _, ok := m.structuredData[s.sdID]; ok {
             err = ErrSDIDDuplicated
             fhold;
-            fgoto fail;
         } else {
             m.structuredData[s.sdID] = map[string]string{}
         }
@@ -54,43 +53,36 @@
     action err_version {
         err = ErrVersion
         fhold;
-        fgoto fail;
     }
 
     action err_app_name {
         err = ErrAppName
         fhold;
-        fgoto fail;
     }
 
     action err_proc_id {
         err = ErrProcID
         fhold;
-        fgoto fail;
     }
 
     action err_msg_id {
         err = ErrMsgID
         fhold;
-        fgoto fail;
     }
 
     action err_structured_data {
         err = ErrStructuredData
         fhold;
-        fgoto fail;
     }
 
     action err_sd_id {
         err = ErrSDID
         fhold;
-        fgoto fail;
     }
 
     action err_sd_param {
         err = ErrSDParam
         fhold;
-        fgoto fail;
     }
 
     nil_value = '-';

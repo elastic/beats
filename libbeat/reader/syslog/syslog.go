@@ -32,11 +32,10 @@ import (
 //go:generate ragel -Z -G2 -o rfc5424_gen.go parser/parser_rfc5424.rl
 
 var (
-	ErrPriorityPart   = errors.New("message has invalid or missing priority part")
-	ErrPriority       = errors.New("invalid priority value, expected an integer between 0 and 191")
+	ErrPriority       = errors.New("message has invalid or missing priority")
 	ErrTimestamp      = errors.New("message has invalid or missing timestamp")
 	ErrHostname       = errors.New("message has invalid or missing hostname")
-	ErrVersion        = errors.New("invalid version value, expected an integer between 1 and 999")
+	ErrVersion        = errors.New("message has invalid or missing version")
 	ErrAppName        = errors.New("message has invalid or missing app name")
 	ErrProcID         = errors.New("message has invalid or missing proc ID")
 	ErrMsgID          = errors.New("message has invalid or missing msg ID")

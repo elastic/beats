@@ -90,7 +90,7 @@ var parseRFC3164Cases = map[string]struct {
 	},
 	"err-pri-missing-brackets": {
 		In:      "13 Oct 11 22:14:15 test-host this is the message",
-		WantErr: ErrPriorityPart,
+		WantErr: ErrPriority,
 	},
 	"err-ts-invalid-missing": {
 		In:      "<13> test-host this is the message",

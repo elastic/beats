@@ -24,7 +24,6 @@ const rfc5424_start int = 1
 const rfc5424_first_final int = 589
 const rfc5424_error int = 0
 
-const rfc5424_en_fail int = 593
 const rfc5424_en_main int = 1
 
 //line parser/parser_rfc5424.rl:8
@@ -45,12 +44,12 @@ func parseRFC5424(data string) (message, error) {
 	pe := len(data)
 	eof := len(data)
 
-//line rfc5424_gen.go:37
+//line rfc5424_gen.go:36
 	{
 		cs = rfc5424_start
 	}
 
-//line rfc5424_gen.go:42
+//line rfc5424_gen.go:41
 	{
 		if p == pe {
 			goto _test_eof
@@ -1242,8 +1241,6 @@ func parseRFC5424(data string) (message, error) {
 			goto st_case_587
 		case 588:
 			goto st_case_588
-		case 593:
-			goto st_case_593
 		}
 		goto st_out
 	st_case_1:
@@ -1254,152 +1251,84 @@ func parseRFC5424(data string) (message, error) {
 	tr0:
 //line parser/common.rl:36
 
-		err = ErrPriorityPart
-		p--
-
-		{
-			goto st593
-		}
-
-		goto st0
-	tr2:
-//line parser/common.rl:42
-
 		err = ErrPriority
 		p--
 
-		{
-			goto st593
-		}
-
-//line parser/common.rl:36
-
-		err = ErrPriorityPart
-		p--
-
-		{
-			goto st593
-		}
-
 		goto st0
-	tr7:
-//line parser/rfc5424.rl:54
+	tr6:
+//line parser/rfc5424.rl:53
 
 		err = ErrVersion
 		p--
 
-		{
-			goto st593
-		}
-
 		goto st0
-	tr12:
-//line parser/common.rl:48
+	tr11:
+//line parser/common.rl:41
 
 		err = ErrTimestamp
 		p--
 
-		{
-			goto st593
-		}
-
 		goto st0
-	tr16:
-//line parser/common.rl:54
+	tr15:
+//line parser/common.rl:46
 
 		err = ErrHostname
 		p--
 
-		{
-			goto st593
-		}
-
 		goto st0
-	tr20:
-//line parser/rfc5424.rl:60
+	tr19:
+//line parser/rfc5424.rl:58
 
 		err = ErrAppName
 		p--
 
-		{
-			goto st593
-		}
-
 		goto st0
-	tr24:
-//line parser/rfc5424.rl:66
+	tr23:
+//line parser/rfc5424.rl:63
 
 		err = ErrProcID
 		p--
 
-		{
-			goto st593
-		}
-
 		goto st0
-	tr28:
-//line parser/rfc5424.rl:72
+	tr27:
+//line parser/rfc5424.rl:68
 
 		err = ErrMsgID
 		p--
 
-		{
-			goto st593
-		}
-
 		goto st0
-	tr32:
-//line parser/rfc5424.rl:78
+	tr31:
+//line parser/rfc5424.rl:73
 
 		err = ErrStructuredData
 		p--
 
-		{
-			goto st593
-		}
-
 		goto st0
-	tr35:
-//line parser/rfc5424.rl:84
+	tr34:
+//line parser/rfc5424.rl:78
 
 		err = ErrSDID
 		p--
 
-		{
-			goto st593
-		}
-
-//line parser/rfc5424.rl:78
+//line parser/rfc5424.rl:73
 
 		err = ErrStructuredData
 		p--
 
-		{
-			goto st593
-		}
-
 		goto st0
-	tr79:
-//line parser/rfc5424.rl:90
+	tr78:
+//line parser/rfc5424.rl:83
 
 		err = ErrSDParam
 		p--
 
-		{
-			goto st593
-		}
-
-//line parser/rfc5424.rl:78
+//line parser/rfc5424.rl:73
 
 		err = ErrStructuredData
 		p--
 
-		{
-			goto st593
-		}
-
 		goto st0
-//line rfc5424_gen.go:1363
+//line rfc5424_gen.go:1332
 	st_case_0:
 	st0:
 		cs = 0
@@ -1411,15 +1340,15 @@ func parseRFC5424(data string) (message, error) {
 	st_case_2:
 		switch data[p] {
 		case 48:
-			goto tr3
+			goto tr2
 		case 49:
-			goto tr4
+			goto tr3
 		}
 		if 50 <= data[p] && data[p] <= 57 {
-			goto tr5
+			goto tr4
 		}
-		goto tr2
-	tr3:
+		goto tr0
+	tr2:
 //line parser/common.rl:4
 
 		tok = p
@@ -1430,25 +1359,28 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof3
 		}
 	st_case_3:
+//line rfc5424_gen.go:1363
+		if data[p] == 62 {
+			goto tr5
+		}
+		goto tr0
+	tr5:
 //line parser/common.rl:8
 
 		m.setPriority(data[tok:p])
 
-//line rfc5424_gen.go:1398
-		if data[p] == 62 {
-			goto st4
-		}
-		goto tr2
+		goto st4
 	st4:
 		if p++; p == pe {
 			goto _test_eof4
 		}
 	st_case_4:
+//line rfc5424_gen.go:1379
 		if 49 <= data[p] && data[p] <= 57 {
-			goto tr8
+			goto tr7
 		}
-		goto tr7
-	tr8:
+		goto tr6
+	tr7:
 //line parser/common.rl:4
 
 		tok = p
@@ -1459,15 +1391,15 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof5
 		}
 	st_case_5:
-//line rfc5424_gen.go:1423
+//line rfc5424_gen.go:1395
 		if data[p] == 32 {
-			goto tr9
+			goto tr8
 		}
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st584
 		}
 		goto st0
-	tr9:
+	tr8:
 //line parser/rfc5424.rl:19
 
 		m.setVersion(data[tok:p])
@@ -1478,14 +1410,14 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof6
 		}
 	st_case_6:
-//line rfc5424_gen.go:1442
+//line rfc5424_gen.go:1414
 		if data[p] == 45 {
 			goto st7
 		}
 		if 48 <= data[p] && data[p] <= 57 {
-			goto tr14
+			goto tr13
 		}
-		goto tr12
+		goto tr11
 	st7:
 		if p++; p == pe {
 			goto _test_eof7
@@ -1495,7 +1427,7 @@ func parseRFC5424(data string) (message, error) {
 			goto st8
 		}
 		goto st0
-	tr597:
+	tr596:
 //line parser/common.rl:12
 
 		m.setTimestampRFC3339(data[tok:p])
@@ -1506,12 +1438,12 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof8
 		}
 	st_case_8:
-//line rfc5424_gen.go:1470
+//line rfc5424_gen.go:1442
 		if 33 <= data[p] && data[p] <= 126 {
-			goto tr17
+			goto tr16
 		}
-		goto tr16
-	tr17:
+		goto tr15
+	tr16:
 //line parser/common.rl:4
 
 		tok = p
@@ -1522,15 +1454,15 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof9
 		}
 	st_case_9:
-//line rfc5424_gen.go:1486
+//line rfc5424_gen.go:1458
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st293
 		}
-		goto tr16
-	tr18:
+		goto tr15
+	tr17:
 //line parser/common.rl:20
 
 		m.setHostname(data[tok:p])
@@ -1541,12 +1473,12 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof10
 		}
 	st_case_10:
-//line rfc5424_gen.go:1505
+//line rfc5424_gen.go:1477
 		if 33 <= data[p] && data[p] <= 126 {
-			goto tr21
+			goto tr20
 		}
-		goto tr20
-	tr21:
+		goto tr19
+	tr20:
 //line parser/common.rl:4
 
 		tok = p
@@ -1557,15 +1489,15 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof11
 		}
 	st_case_11:
-//line rfc5424_gen.go:1521
+//line rfc5424_gen.go:1493
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st246
 		}
-		goto tr20
-	tr22:
+		goto tr19
+	tr21:
 //line parser/rfc5424.rl:11
 
 		m.setAppName(data[tok:p])
@@ -1576,12 +1508,12 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof12
 		}
 	st_case_12:
-//line rfc5424_gen.go:1540
+//line rfc5424_gen.go:1512
 		if 33 <= data[p] && data[p] <= 126 {
-			goto tr25
+			goto tr24
 		}
-		goto tr24
-	tr25:
+		goto tr23
+	tr24:
 //line parser/common.rl:4
 
 		tok = p
@@ -1592,15 +1524,15 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof13
 		}
 	st_case_13:
-//line rfc5424_gen.go:1556
+//line rfc5424_gen.go:1528
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st119
 		}
-		goto tr24
-	tr26:
+		goto tr23
+	tr25:
 //line parser/rfc5424.rl:7
 
 		m.setProcID(data[tok:p])
@@ -1611,12 +1543,12 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof14
 		}
 	st_case_14:
-//line rfc5424_gen.go:1575
+//line rfc5424_gen.go:1547
 		if 33 <= data[p] && data[p] <= 126 {
-			goto tr29
+			goto tr28
 		}
-		goto tr28
-	tr29:
+		goto tr27
+	tr28:
 //line parser/common.rl:4
 
 		tok = p
@@ -1627,15 +1559,15 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof15
 		}
 	st_case_15:
-//line rfc5424_gen.go:1591
+//line rfc5424_gen.go:1563
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st88
 		}
-		goto tr28
-	tr30:
+		goto tr27
+	tr29:
 //line parser/rfc5424.rl:15
 
 		m.setMsgID(data[tok:p])
@@ -1646,14 +1578,14 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof16
 		}
 	st_case_16:
-//line rfc5424_gen.go:1610
+//line rfc5424_gen.go:1582
 		switch data[p] {
 		case 45:
 			goto st589
 		case 91:
-			goto tr34
+			goto tr33
 		}
-		goto tr32
+		goto tr31
 	st589:
 		if p++; p == pe {
 			goto _test_eof589
@@ -1668,8 +1600,8 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof590
 		}
 	st_case_590:
-		goto tr609
-	tr609:
+		goto tr608
+	tr608:
 //line parser/common.rl:4
 
 		tok = p
@@ -1680,9 +1612,9 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof591
 		}
 	st_case_591:
-//line rfc5424_gen.go:1644
+//line rfc5424_gen.go:1616
 		goto st591
-	tr34:
+	tr33:
 //line parser/rfc5424.rl:23
 
 		m.structuredData = map[string]map[string]string{}
@@ -1693,24 +1625,24 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof17
 		}
 	st_case_17:
-//line rfc5424_gen.go:1657
+//line rfc5424_gen.go:1629
 		if data[p] == 33 {
-			goto tr36
+			goto tr35
 		}
 		switch {
 		case data[p] < 62:
 			if 35 <= data[p] && data[p] <= 60 {
-				goto tr36
+				goto tr35
 			}
 		case data[p] > 92:
 			if 94 <= data[p] && data[p] <= 126 {
-				goto tr36
+				goto tr35
 			}
 		default:
-			goto tr36
+			goto tr35
 		}
-		goto tr35
-	tr36:
+		goto tr34
+	tr35:
 //line parser/common.rl:4
 
 		tok = p
@@ -1721,14 +1653,14 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof18
 		}
 	st_case_18:
-//line rfc5424_gen.go:1685
+//line rfc5424_gen.go:1657
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st57
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -1738,8 +1670,8 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st57
 		}
-		goto tr35
-	tr37:
+		goto tr34
+	tr36:
 //line parser/rfc5424.rl:39
 
 		s.sdID = data[tok:p]
@@ -1747,9 +1679,6 @@ func parseRFC5424(data string) (message, error) {
 			err = ErrSDIDDuplicated
 			p--
 
-			{
-				goto st593
-			}
 		} else {
 			m.structuredData[s.sdID] = map[string]string{}
 		}
@@ -1760,24 +1689,24 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof19
 		}
 	st_case_19:
-//line rfc5424_gen.go:1722
+//line rfc5424_gen.go:1693
 		if data[p] == 33 {
-			goto tr40
+			goto tr39
 		}
 		switch {
 		case data[p] < 62:
 			if 35 <= data[p] && data[p] <= 60 {
-				goto tr40
+				goto tr39
 			}
 		case data[p] > 92:
 			if 94 <= data[p] && data[p] <= 126 {
-				goto tr40
+				goto tr39
 			}
 		default:
-			goto tr40
+			goto tr39
 		}
-		goto tr32
-	tr40:
+		goto tr31
+	tr39:
 //line parser/common.rl:4
 
 		tok = p
@@ -1788,12 +1717,12 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof20
 		}
 	st_case_20:
-//line rfc5424_gen.go:1750
+//line rfc5424_gen.go:1721
 		switch data[p] {
 		case 33:
 			goto st21
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -1803,7 +1732,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st21
 		}
-		goto tr32
+		goto tr31
 	st21:
 		if p++; p == pe {
 			goto _test_eof21
@@ -1813,7 +1742,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st22
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -1823,7 +1752,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st22
 		}
-		goto tr32
+		goto tr31
 	st22:
 		if p++; p == pe {
 			goto _test_eof22
@@ -1833,7 +1762,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st23
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -1843,7 +1772,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st23
 		}
-		goto tr32
+		goto tr31
 	st23:
 		if p++; p == pe {
 			goto _test_eof23
@@ -1853,7 +1782,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st24
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -1863,7 +1792,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st24
 		}
-		goto tr32
+		goto tr31
 	st24:
 		if p++; p == pe {
 			goto _test_eof24
@@ -1873,7 +1802,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st25
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -1883,7 +1812,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st25
 		}
-		goto tr32
+		goto tr31
 	st25:
 		if p++; p == pe {
 			goto _test_eof25
@@ -1893,7 +1822,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st26
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -1903,7 +1832,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st26
 		}
-		goto tr32
+		goto tr31
 	st26:
 		if p++; p == pe {
 			goto _test_eof26
@@ -1913,7 +1842,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st27
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -1923,7 +1852,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st27
 		}
-		goto tr32
+		goto tr31
 	st27:
 		if p++; p == pe {
 			goto _test_eof27
@@ -1933,7 +1862,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st28
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -1943,7 +1872,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st28
 		}
-		goto tr32
+		goto tr31
 	st28:
 		if p++; p == pe {
 			goto _test_eof28
@@ -1953,7 +1882,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st29
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -1963,7 +1892,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st29
 		}
-		goto tr32
+		goto tr31
 	st29:
 		if p++; p == pe {
 			goto _test_eof29
@@ -1973,7 +1902,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st30
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -1983,7 +1912,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st30
 		}
-		goto tr32
+		goto tr31
 	st30:
 		if p++; p == pe {
 			goto _test_eof30
@@ -1993,7 +1922,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st31
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2003,7 +1932,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st31
 		}
-		goto tr32
+		goto tr31
 	st31:
 		if p++; p == pe {
 			goto _test_eof31
@@ -2013,7 +1942,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st32
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2023,7 +1952,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st32
 		}
-		goto tr32
+		goto tr31
 	st32:
 		if p++; p == pe {
 			goto _test_eof32
@@ -2033,7 +1962,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st33
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2043,7 +1972,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st33
 		}
-		goto tr32
+		goto tr31
 	st33:
 		if p++; p == pe {
 			goto _test_eof33
@@ -2053,7 +1982,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st34
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2063,7 +1992,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st34
 		}
-		goto tr32
+		goto tr31
 	st34:
 		if p++; p == pe {
 			goto _test_eof34
@@ -2073,7 +2002,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st35
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2083,7 +2012,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st35
 		}
-		goto tr32
+		goto tr31
 	st35:
 		if p++; p == pe {
 			goto _test_eof35
@@ -2093,7 +2022,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st36
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2103,7 +2032,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st36
 		}
-		goto tr32
+		goto tr31
 	st36:
 		if p++; p == pe {
 			goto _test_eof36
@@ -2113,7 +2042,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st37
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2123,7 +2052,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st37
 		}
-		goto tr32
+		goto tr31
 	st37:
 		if p++; p == pe {
 			goto _test_eof37
@@ -2133,7 +2062,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st38
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2143,7 +2072,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st38
 		}
-		goto tr32
+		goto tr31
 	st38:
 		if p++; p == pe {
 			goto _test_eof38
@@ -2153,7 +2082,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st39
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2163,7 +2092,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st39
 		}
-		goto tr32
+		goto tr31
 	st39:
 		if p++; p == pe {
 			goto _test_eof39
@@ -2173,7 +2102,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st40
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2183,7 +2112,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st40
 		}
-		goto tr32
+		goto tr31
 	st40:
 		if p++; p == pe {
 			goto _test_eof40
@@ -2193,7 +2122,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st41
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2203,7 +2132,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st41
 		}
-		goto tr32
+		goto tr31
 	st41:
 		if p++; p == pe {
 			goto _test_eof41
@@ -2213,7 +2142,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st42
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2223,7 +2152,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st42
 		}
-		goto tr32
+		goto tr31
 	st42:
 		if p++; p == pe {
 			goto _test_eof42
@@ -2233,7 +2162,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st43
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2243,7 +2172,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st43
 		}
-		goto tr32
+		goto tr31
 	st43:
 		if p++; p == pe {
 			goto _test_eof43
@@ -2253,7 +2182,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st44
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2263,7 +2192,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st44
 		}
-		goto tr32
+		goto tr31
 	st44:
 		if p++; p == pe {
 			goto _test_eof44
@@ -2273,7 +2202,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st45
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2283,7 +2212,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st45
 		}
-		goto tr32
+		goto tr31
 	st45:
 		if p++; p == pe {
 			goto _test_eof45
@@ -2293,7 +2222,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st46
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2303,7 +2232,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st46
 		}
-		goto tr32
+		goto tr31
 	st46:
 		if p++; p == pe {
 			goto _test_eof46
@@ -2313,7 +2242,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st47
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2323,7 +2252,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st47
 		}
-		goto tr32
+		goto tr31
 	st47:
 		if p++; p == pe {
 			goto _test_eof47
@@ -2333,7 +2262,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st48
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2343,7 +2272,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st48
 		}
-		goto tr32
+		goto tr31
 	st48:
 		if p++; p == pe {
 			goto _test_eof48
@@ -2353,7 +2282,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st49
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2363,7 +2292,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st49
 		}
-		goto tr32
+		goto tr31
 	st49:
 		if p++; p == pe {
 			goto _test_eof49
@@ -2373,7 +2302,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st50
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2383,7 +2312,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st50
 		}
-		goto tr32
+		goto tr31
 	st50:
 		if p++; p == pe {
 			goto _test_eof50
@@ -2393,7 +2322,7 @@ func parseRFC5424(data string) (message, error) {
 		case 33:
 			goto st51
 		case 61:
-			goto tr42
+			goto tr41
 		}
 		switch {
 		case data[p] > 92:
@@ -2403,17 +2332,17 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st51
 		}
-		goto tr32
+		goto tr31
 	st51:
 		if p++; p == pe {
 			goto _test_eof51
 		}
 	st_case_51:
 		if data[p] == 61 {
-			goto tr42
+			goto tr41
 		}
-		goto tr32
-	tr42:
+		goto tr31
+	tr41:
 //line parser/rfc5424.rl:31
 
 		s.sdParamName = data[tok:p]
@@ -2424,11 +2353,11 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof52
 		}
 	st_case_52:
-//line rfc5424_gen.go:2386
+//line rfc5424_gen.go:2357
 		if data[p] == 34 {
 			goto st53
 		}
-		goto tr32
+		goto tr31
 	st53:
 		if p++; p == pe {
 			goto _test_eof53
@@ -2436,14 +2365,14 @@ func parseRFC5424(data string) (message, error) {
 	st_case_53:
 		switch data[p] {
 		case 34:
-			goto tr32
+			goto tr31
 		case 92:
-			goto tr75
+			goto tr74
 		case 93:
-			goto tr32
+			goto tr31
 		}
-		goto tr74
-	tr74:
+		goto tr73
+	tr73:
 //line parser/common.rl:4
 
 		tok = p
@@ -2454,17 +2383,17 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof54
 		}
 	st_case_54:
-//line rfc5424_gen.go:2416
+//line rfc5424_gen.go:2387
 		switch data[p] {
 		case 34:
-			goto tr77
+			goto tr76
 		case 92:
-			goto tr78
+			goto tr77
 		case 93:
-			goto tr79
+			goto tr78
 		}
 		goto st54
-	tr77:
+	tr76:
 //line parser/rfc5424.rl:35
 
 		m.setDataValue(s.sdID, s.sdParamName, removeBytes(data[tok:p], s.sdValueEscapes, p))
@@ -2479,15 +2408,15 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof55
 		}
 	st_case_55:
-//line rfc5424_gen.go:2441
+//line rfc5424_gen.go:2412
 		switch data[p] {
 		case 32:
 			goto st19
 		case 93:
 			goto st592
 		}
-		goto tr79
-	tr39:
+		goto tr78
+	tr38:
 //line parser/rfc5424.rl:39
 
 		s.sdID = data[tok:p]
@@ -2495,9 +2424,6 @@ func parseRFC5424(data string) (message, error) {
 			err = ErrSDIDDuplicated
 			p--
 
-			{
-				goto st593
-			}
 		} else {
 			m.structuredData[s.sdID] = map[string]string{}
 		}
@@ -2508,26 +2434,26 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof592
 		}
 	st_case_592:
-//line rfc5424_gen.go:2468
+//line rfc5424_gen.go:2438
 		switch data[p] {
 		case 32:
 			goto st590
 		case 91:
 			goto st17
 		}
-		goto tr32
-	tr75:
+		goto tr31
+	tr74:
 //line parser/common.rl:4
 
 		tok = p
 
-//line parser/rfc5424.rl:50
+//line parser/rfc5424.rl:49
 
 		s.sdValueEscapes = append(s.sdValueEscapes, p)
 
 		goto st56
-	tr78:
-//line parser/rfc5424.rl:50
+	tr77:
+//line parser/rfc5424.rl:49
 
 		s.sdValueEscapes = append(s.sdValueEscapes, p)
 
@@ -2537,14 +2463,14 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof56
 		}
 	st_case_56:
-//line rfc5424_gen.go:2497
+//line rfc5424_gen.go:2467
 		if data[p] == 34 {
 			goto st54
 		}
 		if 92 <= data[p] && data[p] <= 93 {
 			goto st54
 		}
-		goto tr32
+		goto tr31
 	st57:
 		if p++; p == pe {
 			goto _test_eof57
@@ -2552,11 +2478,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_57:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st58
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2566,7 +2492,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st58
 		}
-		goto tr35
+		goto tr34
 	st58:
 		if p++; p == pe {
 			goto _test_eof58
@@ -2574,11 +2500,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_58:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st59
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2588,7 +2514,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st59
 		}
-		goto tr35
+		goto tr34
 	st59:
 		if p++; p == pe {
 			goto _test_eof59
@@ -2596,11 +2522,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_59:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st60
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2610,7 +2536,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st60
 		}
-		goto tr35
+		goto tr34
 	st60:
 		if p++; p == pe {
 			goto _test_eof60
@@ -2618,11 +2544,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_60:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st61
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2632,7 +2558,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st61
 		}
-		goto tr35
+		goto tr34
 	st61:
 		if p++; p == pe {
 			goto _test_eof61
@@ -2640,11 +2566,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_61:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st62
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2654,7 +2580,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st62
 		}
-		goto tr35
+		goto tr34
 	st62:
 		if p++; p == pe {
 			goto _test_eof62
@@ -2662,11 +2588,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_62:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st63
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2676,7 +2602,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st63
 		}
-		goto tr35
+		goto tr34
 	st63:
 		if p++; p == pe {
 			goto _test_eof63
@@ -2684,11 +2610,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_63:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st64
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2698,7 +2624,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st64
 		}
-		goto tr35
+		goto tr34
 	st64:
 		if p++; p == pe {
 			goto _test_eof64
@@ -2706,11 +2632,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_64:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st65
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2720,7 +2646,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st65
 		}
-		goto tr35
+		goto tr34
 	st65:
 		if p++; p == pe {
 			goto _test_eof65
@@ -2728,11 +2654,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_65:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st66
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2742,7 +2668,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st66
 		}
-		goto tr35
+		goto tr34
 	st66:
 		if p++; p == pe {
 			goto _test_eof66
@@ -2750,11 +2676,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_66:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st67
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2764,7 +2690,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st67
 		}
-		goto tr35
+		goto tr34
 	st67:
 		if p++; p == pe {
 			goto _test_eof67
@@ -2772,11 +2698,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_67:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st68
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2786,7 +2712,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st68
 		}
-		goto tr35
+		goto tr34
 	st68:
 		if p++; p == pe {
 			goto _test_eof68
@@ -2794,11 +2720,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_68:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st69
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2808,7 +2734,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st69
 		}
-		goto tr35
+		goto tr34
 	st69:
 		if p++; p == pe {
 			goto _test_eof69
@@ -2816,11 +2742,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_69:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st70
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2830,7 +2756,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st70
 		}
-		goto tr35
+		goto tr34
 	st70:
 		if p++; p == pe {
 			goto _test_eof70
@@ -2838,11 +2764,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_70:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st71
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2852,7 +2778,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st71
 		}
-		goto tr35
+		goto tr34
 	st71:
 		if p++; p == pe {
 			goto _test_eof71
@@ -2860,11 +2786,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_71:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st72
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2874,7 +2800,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st72
 		}
-		goto tr35
+		goto tr34
 	st72:
 		if p++; p == pe {
 			goto _test_eof72
@@ -2882,11 +2808,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_72:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st73
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2896,7 +2822,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st73
 		}
-		goto tr35
+		goto tr34
 	st73:
 		if p++; p == pe {
 			goto _test_eof73
@@ -2904,11 +2830,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_73:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st74
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2918,7 +2844,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st74
 		}
-		goto tr35
+		goto tr34
 	st74:
 		if p++; p == pe {
 			goto _test_eof74
@@ -2926,11 +2852,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_74:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st75
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2940,7 +2866,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st75
 		}
-		goto tr35
+		goto tr34
 	st75:
 		if p++; p == pe {
 			goto _test_eof75
@@ -2948,11 +2874,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_75:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st76
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2962,7 +2888,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st76
 		}
-		goto tr35
+		goto tr34
 	st76:
 		if p++; p == pe {
 			goto _test_eof76
@@ -2970,11 +2896,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_76:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st77
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -2984,7 +2910,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st77
 		}
-		goto tr35
+		goto tr34
 	st77:
 		if p++; p == pe {
 			goto _test_eof77
@@ -2992,11 +2918,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_77:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st78
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -3006,7 +2932,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st78
 		}
-		goto tr35
+		goto tr34
 	st78:
 		if p++; p == pe {
 			goto _test_eof78
@@ -3014,11 +2940,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_78:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st79
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -3028,7 +2954,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st79
 		}
-		goto tr35
+		goto tr34
 	st79:
 		if p++; p == pe {
 			goto _test_eof79
@@ -3036,11 +2962,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_79:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st80
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -3050,7 +2976,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st80
 		}
-		goto tr35
+		goto tr34
 	st80:
 		if p++; p == pe {
 			goto _test_eof80
@@ -3058,11 +2984,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_80:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st81
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -3072,7 +2998,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st81
 		}
-		goto tr35
+		goto tr34
 	st81:
 		if p++; p == pe {
 			goto _test_eof81
@@ -3080,11 +3006,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_81:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st82
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -3094,7 +3020,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st82
 		}
-		goto tr35
+		goto tr34
 	st82:
 		if p++; p == pe {
 			goto _test_eof82
@@ -3102,11 +3028,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_82:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st83
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -3116,7 +3042,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st83
 		}
-		goto tr35
+		goto tr34
 	st83:
 		if p++; p == pe {
 			goto _test_eof83
@@ -3124,11 +3050,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_83:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st84
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -3138,7 +3064,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st84
 		}
-		goto tr35
+		goto tr34
 	st84:
 		if p++; p == pe {
 			goto _test_eof84
@@ -3146,11 +3072,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_84:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st85
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -3160,7 +3086,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st85
 		}
-		goto tr35
+		goto tr34
 	st85:
 		if p++; p == pe {
 			goto _test_eof85
@@ -3168,11 +3094,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_85:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st86
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -3182,7 +3108,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st86
 		}
-		goto tr35
+		goto tr34
 	st86:
 		if p++; p == pe {
 			goto _test_eof86
@@ -3190,11 +3116,11 @@ func parseRFC5424(data string) (message, error) {
 	st_case_86:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 33:
 			goto st87
 		case 93:
-			goto tr39
+			goto tr38
 		}
 		switch {
 		case data[p] > 60:
@@ -3204,7 +3130,7 @@ func parseRFC5424(data string) (message, error) {
 		case data[p] >= 35:
 			goto st87
 		}
-		goto tr35
+		goto tr34
 	st87:
 		if p++; p == pe {
 			goto _test_eof87
@@ -3212,5508 +3138,5508 @@ func parseRFC5424(data string) (message, error) {
 	st_case_87:
 		switch data[p] {
 		case 32:
-			goto tr37
+			goto tr36
 		case 93:
-			goto tr39
+			goto tr38
 		}
-		goto tr35
+		goto tr34
 	st88:
 		if p++; p == pe {
 			goto _test_eof88
 		}
 	st_case_88:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st89
 		}
-		goto tr28
+		goto tr27
 	st89:
 		if p++; p == pe {
 			goto _test_eof89
 		}
 	st_case_89:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st90
 		}
-		goto tr28
+		goto tr27
 	st90:
 		if p++; p == pe {
 			goto _test_eof90
 		}
 	st_case_90:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st91
 		}
-		goto tr28
+		goto tr27
 	st91:
 		if p++; p == pe {
 			goto _test_eof91
 		}
 	st_case_91:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st92
 		}
-		goto tr28
+		goto tr27
 	st92:
 		if p++; p == pe {
 			goto _test_eof92
 		}
 	st_case_92:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st93
 		}
-		goto tr28
+		goto tr27
 	st93:
 		if p++; p == pe {
 			goto _test_eof93
 		}
 	st_case_93:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st94
 		}
-		goto tr28
+		goto tr27
 	st94:
 		if p++; p == pe {
 			goto _test_eof94
 		}
 	st_case_94:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st95
 		}
-		goto tr28
+		goto tr27
 	st95:
 		if p++; p == pe {
 			goto _test_eof95
 		}
 	st_case_95:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st96
 		}
-		goto tr28
+		goto tr27
 	st96:
 		if p++; p == pe {
 			goto _test_eof96
 		}
 	st_case_96:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st97
 		}
-		goto tr28
+		goto tr27
 	st97:
 		if p++; p == pe {
 			goto _test_eof97
 		}
 	st_case_97:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st98
 		}
-		goto tr28
+		goto tr27
 	st98:
 		if p++; p == pe {
 			goto _test_eof98
 		}
 	st_case_98:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st99
 		}
-		goto tr28
+		goto tr27
 	st99:
 		if p++; p == pe {
 			goto _test_eof99
 		}
 	st_case_99:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st100
 		}
-		goto tr28
+		goto tr27
 	st100:
 		if p++; p == pe {
 			goto _test_eof100
 		}
 	st_case_100:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st101
 		}
-		goto tr28
+		goto tr27
 	st101:
 		if p++; p == pe {
 			goto _test_eof101
 		}
 	st_case_101:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st102
 		}
-		goto tr28
+		goto tr27
 	st102:
 		if p++; p == pe {
 			goto _test_eof102
 		}
 	st_case_102:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st103
 		}
-		goto tr28
+		goto tr27
 	st103:
 		if p++; p == pe {
 			goto _test_eof103
 		}
 	st_case_103:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st104
 		}
-		goto tr28
+		goto tr27
 	st104:
 		if p++; p == pe {
 			goto _test_eof104
 		}
 	st_case_104:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st105
 		}
-		goto tr28
+		goto tr27
 	st105:
 		if p++; p == pe {
 			goto _test_eof105
 		}
 	st_case_105:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st106
 		}
-		goto tr28
+		goto tr27
 	st106:
 		if p++; p == pe {
 			goto _test_eof106
 		}
 	st_case_106:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st107
 		}
-		goto tr28
+		goto tr27
 	st107:
 		if p++; p == pe {
 			goto _test_eof107
 		}
 	st_case_107:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st108
 		}
-		goto tr28
+		goto tr27
 	st108:
 		if p++; p == pe {
 			goto _test_eof108
 		}
 	st_case_108:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st109
 		}
-		goto tr28
+		goto tr27
 	st109:
 		if p++; p == pe {
 			goto _test_eof109
 		}
 	st_case_109:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st110
 		}
-		goto tr28
+		goto tr27
 	st110:
 		if p++; p == pe {
 			goto _test_eof110
 		}
 	st_case_110:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st111
 		}
-		goto tr28
+		goto tr27
 	st111:
 		if p++; p == pe {
 			goto _test_eof111
 		}
 	st_case_111:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st112
 		}
-		goto tr28
+		goto tr27
 	st112:
 		if p++; p == pe {
 			goto _test_eof112
 		}
 	st_case_112:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st113
 		}
-		goto tr28
+		goto tr27
 	st113:
 		if p++; p == pe {
 			goto _test_eof113
 		}
 	st_case_113:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st114
 		}
-		goto tr28
+		goto tr27
 	st114:
 		if p++; p == pe {
 			goto _test_eof114
 		}
 	st_case_114:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st115
 		}
-		goto tr28
+		goto tr27
 	st115:
 		if p++; p == pe {
 			goto _test_eof115
 		}
 	st_case_115:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st116
 		}
-		goto tr28
+		goto tr27
 	st116:
 		if p++; p == pe {
 			goto _test_eof116
 		}
 	st_case_116:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st117
 		}
-		goto tr28
+		goto tr27
 	st117:
 		if p++; p == pe {
 			goto _test_eof117
 		}
 	st_case_117:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st118
 		}
-		goto tr28
+		goto tr27
 	st118:
 		if p++; p == pe {
 			goto _test_eof118
 		}
 	st_case_118:
 		if data[p] == 32 {
-			goto tr30
+			goto tr29
 		}
-		goto tr28
+		goto tr27
 	st119:
 		if p++; p == pe {
 			goto _test_eof119
 		}
 	st_case_119:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st120
 		}
-		goto tr24
+		goto tr23
 	st120:
 		if p++; p == pe {
 			goto _test_eof120
 		}
 	st_case_120:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st121
 		}
-		goto tr24
+		goto tr23
 	st121:
 		if p++; p == pe {
 			goto _test_eof121
 		}
 	st_case_121:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st122
 		}
-		goto tr24
+		goto tr23
 	st122:
 		if p++; p == pe {
 			goto _test_eof122
 		}
 	st_case_122:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st123
 		}
-		goto tr24
+		goto tr23
 	st123:
 		if p++; p == pe {
 			goto _test_eof123
 		}
 	st_case_123:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st124
 		}
-		goto tr24
+		goto tr23
 	st124:
 		if p++; p == pe {
 			goto _test_eof124
 		}
 	st_case_124:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st125
 		}
-		goto tr24
+		goto tr23
 	st125:
 		if p++; p == pe {
 			goto _test_eof125
 		}
 	st_case_125:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st126
 		}
-		goto tr24
+		goto tr23
 	st126:
 		if p++; p == pe {
 			goto _test_eof126
 		}
 	st_case_126:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st127
 		}
-		goto tr24
+		goto tr23
 	st127:
 		if p++; p == pe {
 			goto _test_eof127
 		}
 	st_case_127:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st128
 		}
-		goto tr24
+		goto tr23
 	st128:
 		if p++; p == pe {
 			goto _test_eof128
 		}
 	st_case_128:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st129
 		}
-		goto tr24
+		goto tr23
 	st129:
 		if p++; p == pe {
 			goto _test_eof129
 		}
 	st_case_129:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st130
 		}
-		goto tr24
+		goto tr23
 	st130:
 		if p++; p == pe {
 			goto _test_eof130
 		}
 	st_case_130:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st131
 		}
-		goto tr24
+		goto tr23
 	st131:
 		if p++; p == pe {
 			goto _test_eof131
 		}
 	st_case_131:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st132
 		}
-		goto tr24
+		goto tr23
 	st132:
 		if p++; p == pe {
 			goto _test_eof132
 		}
 	st_case_132:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st133
 		}
-		goto tr24
+		goto tr23
 	st133:
 		if p++; p == pe {
 			goto _test_eof133
 		}
 	st_case_133:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st134
 		}
-		goto tr24
+		goto tr23
 	st134:
 		if p++; p == pe {
 			goto _test_eof134
 		}
 	st_case_134:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st135
 		}
-		goto tr24
+		goto tr23
 	st135:
 		if p++; p == pe {
 			goto _test_eof135
 		}
 	st_case_135:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st136
 		}
-		goto tr24
+		goto tr23
 	st136:
 		if p++; p == pe {
 			goto _test_eof136
 		}
 	st_case_136:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st137
 		}
-		goto tr24
+		goto tr23
 	st137:
 		if p++; p == pe {
 			goto _test_eof137
 		}
 	st_case_137:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st138
 		}
-		goto tr24
+		goto tr23
 	st138:
 		if p++; p == pe {
 			goto _test_eof138
 		}
 	st_case_138:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st139
 		}
-		goto tr24
+		goto tr23
 	st139:
 		if p++; p == pe {
 			goto _test_eof139
 		}
 	st_case_139:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st140
 		}
-		goto tr24
+		goto tr23
 	st140:
 		if p++; p == pe {
 			goto _test_eof140
 		}
 	st_case_140:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st141
 		}
-		goto tr24
+		goto tr23
 	st141:
 		if p++; p == pe {
 			goto _test_eof141
 		}
 	st_case_141:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st142
 		}
-		goto tr24
+		goto tr23
 	st142:
 		if p++; p == pe {
 			goto _test_eof142
 		}
 	st_case_142:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st143
 		}
-		goto tr24
+		goto tr23
 	st143:
 		if p++; p == pe {
 			goto _test_eof143
 		}
 	st_case_143:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st144
 		}
-		goto tr24
+		goto tr23
 	st144:
 		if p++; p == pe {
 			goto _test_eof144
 		}
 	st_case_144:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st145
 		}
-		goto tr24
+		goto tr23
 	st145:
 		if p++; p == pe {
 			goto _test_eof145
 		}
 	st_case_145:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st146
 		}
-		goto tr24
+		goto tr23
 	st146:
 		if p++; p == pe {
 			goto _test_eof146
 		}
 	st_case_146:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st147
 		}
-		goto tr24
+		goto tr23
 	st147:
 		if p++; p == pe {
 			goto _test_eof147
 		}
 	st_case_147:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st148
 		}
-		goto tr24
+		goto tr23
 	st148:
 		if p++; p == pe {
 			goto _test_eof148
 		}
 	st_case_148:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st149
 		}
-		goto tr24
+		goto tr23
 	st149:
 		if p++; p == pe {
 			goto _test_eof149
 		}
 	st_case_149:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st150
 		}
-		goto tr24
+		goto tr23
 	st150:
 		if p++; p == pe {
 			goto _test_eof150
 		}
 	st_case_150:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st151
 		}
-		goto tr24
+		goto tr23
 	st151:
 		if p++; p == pe {
 			goto _test_eof151
 		}
 	st_case_151:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st152
 		}
-		goto tr24
+		goto tr23
 	st152:
 		if p++; p == pe {
 			goto _test_eof152
 		}
 	st_case_152:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st153
 		}
-		goto tr24
+		goto tr23
 	st153:
 		if p++; p == pe {
 			goto _test_eof153
 		}
 	st_case_153:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st154
 		}
-		goto tr24
+		goto tr23
 	st154:
 		if p++; p == pe {
 			goto _test_eof154
 		}
 	st_case_154:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st155
 		}
-		goto tr24
+		goto tr23
 	st155:
 		if p++; p == pe {
 			goto _test_eof155
 		}
 	st_case_155:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st156
 		}
-		goto tr24
+		goto tr23
 	st156:
 		if p++; p == pe {
 			goto _test_eof156
 		}
 	st_case_156:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st157
 		}
-		goto tr24
+		goto tr23
 	st157:
 		if p++; p == pe {
 			goto _test_eof157
 		}
 	st_case_157:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st158
 		}
-		goto tr24
+		goto tr23
 	st158:
 		if p++; p == pe {
 			goto _test_eof158
 		}
 	st_case_158:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st159
 		}
-		goto tr24
+		goto tr23
 	st159:
 		if p++; p == pe {
 			goto _test_eof159
 		}
 	st_case_159:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st160
 		}
-		goto tr24
+		goto tr23
 	st160:
 		if p++; p == pe {
 			goto _test_eof160
 		}
 	st_case_160:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st161
 		}
-		goto tr24
+		goto tr23
 	st161:
 		if p++; p == pe {
 			goto _test_eof161
 		}
 	st_case_161:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st162
 		}
-		goto tr24
+		goto tr23
 	st162:
 		if p++; p == pe {
 			goto _test_eof162
 		}
 	st_case_162:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st163
 		}
-		goto tr24
+		goto tr23
 	st163:
 		if p++; p == pe {
 			goto _test_eof163
 		}
 	st_case_163:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st164
 		}
-		goto tr24
+		goto tr23
 	st164:
 		if p++; p == pe {
 			goto _test_eof164
 		}
 	st_case_164:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st165
 		}
-		goto tr24
+		goto tr23
 	st165:
 		if p++; p == pe {
 			goto _test_eof165
 		}
 	st_case_165:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st166
 		}
-		goto tr24
+		goto tr23
 	st166:
 		if p++; p == pe {
 			goto _test_eof166
 		}
 	st_case_166:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st167
 		}
-		goto tr24
+		goto tr23
 	st167:
 		if p++; p == pe {
 			goto _test_eof167
 		}
 	st_case_167:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st168
 		}
-		goto tr24
+		goto tr23
 	st168:
 		if p++; p == pe {
 			goto _test_eof168
 		}
 	st_case_168:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st169
 		}
-		goto tr24
+		goto tr23
 	st169:
 		if p++; p == pe {
 			goto _test_eof169
 		}
 	st_case_169:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st170
 		}
-		goto tr24
+		goto tr23
 	st170:
 		if p++; p == pe {
 			goto _test_eof170
 		}
 	st_case_170:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st171
 		}
-		goto tr24
+		goto tr23
 	st171:
 		if p++; p == pe {
 			goto _test_eof171
 		}
 	st_case_171:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st172
 		}
-		goto tr24
+		goto tr23
 	st172:
 		if p++; p == pe {
 			goto _test_eof172
 		}
 	st_case_172:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st173
 		}
-		goto tr24
+		goto tr23
 	st173:
 		if p++; p == pe {
 			goto _test_eof173
 		}
 	st_case_173:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st174
 		}
-		goto tr24
+		goto tr23
 	st174:
 		if p++; p == pe {
 			goto _test_eof174
 		}
 	st_case_174:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st175
 		}
-		goto tr24
+		goto tr23
 	st175:
 		if p++; p == pe {
 			goto _test_eof175
 		}
 	st_case_175:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st176
 		}
-		goto tr24
+		goto tr23
 	st176:
 		if p++; p == pe {
 			goto _test_eof176
 		}
 	st_case_176:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st177
 		}
-		goto tr24
+		goto tr23
 	st177:
 		if p++; p == pe {
 			goto _test_eof177
 		}
 	st_case_177:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st178
 		}
-		goto tr24
+		goto tr23
 	st178:
 		if p++; p == pe {
 			goto _test_eof178
 		}
 	st_case_178:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st179
 		}
-		goto tr24
+		goto tr23
 	st179:
 		if p++; p == pe {
 			goto _test_eof179
 		}
 	st_case_179:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st180
 		}
-		goto tr24
+		goto tr23
 	st180:
 		if p++; p == pe {
 			goto _test_eof180
 		}
 	st_case_180:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st181
 		}
-		goto tr24
+		goto tr23
 	st181:
 		if p++; p == pe {
 			goto _test_eof181
 		}
 	st_case_181:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st182
 		}
-		goto tr24
+		goto tr23
 	st182:
 		if p++; p == pe {
 			goto _test_eof182
 		}
 	st_case_182:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st183
 		}
-		goto tr24
+		goto tr23
 	st183:
 		if p++; p == pe {
 			goto _test_eof183
 		}
 	st_case_183:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st184
 		}
-		goto tr24
+		goto tr23
 	st184:
 		if p++; p == pe {
 			goto _test_eof184
 		}
 	st_case_184:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st185
 		}
-		goto tr24
+		goto tr23
 	st185:
 		if p++; p == pe {
 			goto _test_eof185
 		}
 	st_case_185:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st186
 		}
-		goto tr24
+		goto tr23
 	st186:
 		if p++; p == pe {
 			goto _test_eof186
 		}
 	st_case_186:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st187
 		}
-		goto tr24
+		goto tr23
 	st187:
 		if p++; p == pe {
 			goto _test_eof187
 		}
 	st_case_187:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st188
 		}
-		goto tr24
+		goto tr23
 	st188:
 		if p++; p == pe {
 			goto _test_eof188
 		}
 	st_case_188:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st189
 		}
-		goto tr24
+		goto tr23
 	st189:
 		if p++; p == pe {
 			goto _test_eof189
 		}
 	st_case_189:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st190
 		}
-		goto tr24
+		goto tr23
 	st190:
 		if p++; p == pe {
 			goto _test_eof190
 		}
 	st_case_190:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st191
 		}
-		goto tr24
+		goto tr23
 	st191:
 		if p++; p == pe {
 			goto _test_eof191
 		}
 	st_case_191:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st192
 		}
-		goto tr24
+		goto tr23
 	st192:
 		if p++; p == pe {
 			goto _test_eof192
 		}
 	st_case_192:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st193
 		}
-		goto tr24
+		goto tr23
 	st193:
 		if p++; p == pe {
 			goto _test_eof193
 		}
 	st_case_193:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st194
 		}
-		goto tr24
+		goto tr23
 	st194:
 		if p++; p == pe {
 			goto _test_eof194
 		}
 	st_case_194:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st195
 		}
-		goto tr24
+		goto tr23
 	st195:
 		if p++; p == pe {
 			goto _test_eof195
 		}
 	st_case_195:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st196
 		}
-		goto tr24
+		goto tr23
 	st196:
 		if p++; p == pe {
 			goto _test_eof196
 		}
 	st_case_196:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st197
 		}
-		goto tr24
+		goto tr23
 	st197:
 		if p++; p == pe {
 			goto _test_eof197
 		}
 	st_case_197:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st198
 		}
-		goto tr24
+		goto tr23
 	st198:
 		if p++; p == pe {
 			goto _test_eof198
 		}
 	st_case_198:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st199
 		}
-		goto tr24
+		goto tr23
 	st199:
 		if p++; p == pe {
 			goto _test_eof199
 		}
 	st_case_199:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st200
 		}
-		goto tr24
+		goto tr23
 	st200:
 		if p++; p == pe {
 			goto _test_eof200
 		}
 	st_case_200:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st201
 		}
-		goto tr24
+		goto tr23
 	st201:
 		if p++; p == pe {
 			goto _test_eof201
 		}
 	st_case_201:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st202
 		}
-		goto tr24
+		goto tr23
 	st202:
 		if p++; p == pe {
 			goto _test_eof202
 		}
 	st_case_202:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st203
 		}
-		goto tr24
+		goto tr23
 	st203:
 		if p++; p == pe {
 			goto _test_eof203
 		}
 	st_case_203:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st204
 		}
-		goto tr24
+		goto tr23
 	st204:
 		if p++; p == pe {
 			goto _test_eof204
 		}
 	st_case_204:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st205
 		}
-		goto tr24
+		goto tr23
 	st205:
 		if p++; p == pe {
 			goto _test_eof205
 		}
 	st_case_205:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st206
 		}
-		goto tr24
+		goto tr23
 	st206:
 		if p++; p == pe {
 			goto _test_eof206
 		}
 	st_case_206:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st207
 		}
-		goto tr24
+		goto tr23
 	st207:
 		if p++; p == pe {
 			goto _test_eof207
 		}
 	st_case_207:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st208
 		}
-		goto tr24
+		goto tr23
 	st208:
 		if p++; p == pe {
 			goto _test_eof208
 		}
 	st_case_208:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st209
 		}
-		goto tr24
+		goto tr23
 	st209:
 		if p++; p == pe {
 			goto _test_eof209
 		}
 	st_case_209:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st210
 		}
-		goto tr24
+		goto tr23
 	st210:
 		if p++; p == pe {
 			goto _test_eof210
 		}
 	st_case_210:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st211
 		}
-		goto tr24
+		goto tr23
 	st211:
 		if p++; p == pe {
 			goto _test_eof211
 		}
 	st_case_211:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st212
 		}
-		goto tr24
+		goto tr23
 	st212:
 		if p++; p == pe {
 			goto _test_eof212
 		}
 	st_case_212:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st213
 		}
-		goto tr24
+		goto tr23
 	st213:
 		if p++; p == pe {
 			goto _test_eof213
 		}
 	st_case_213:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st214
 		}
-		goto tr24
+		goto tr23
 	st214:
 		if p++; p == pe {
 			goto _test_eof214
 		}
 	st_case_214:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st215
 		}
-		goto tr24
+		goto tr23
 	st215:
 		if p++; p == pe {
 			goto _test_eof215
 		}
 	st_case_215:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st216
 		}
-		goto tr24
+		goto tr23
 	st216:
 		if p++; p == pe {
 			goto _test_eof216
 		}
 	st_case_216:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st217
 		}
-		goto tr24
+		goto tr23
 	st217:
 		if p++; p == pe {
 			goto _test_eof217
 		}
 	st_case_217:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st218
 		}
-		goto tr24
+		goto tr23
 	st218:
 		if p++; p == pe {
 			goto _test_eof218
 		}
 	st_case_218:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st219
 		}
-		goto tr24
+		goto tr23
 	st219:
 		if p++; p == pe {
 			goto _test_eof219
 		}
 	st_case_219:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st220
 		}
-		goto tr24
+		goto tr23
 	st220:
 		if p++; p == pe {
 			goto _test_eof220
 		}
 	st_case_220:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st221
 		}
-		goto tr24
+		goto tr23
 	st221:
 		if p++; p == pe {
 			goto _test_eof221
 		}
 	st_case_221:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st222
 		}
-		goto tr24
+		goto tr23
 	st222:
 		if p++; p == pe {
 			goto _test_eof222
 		}
 	st_case_222:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st223
 		}
-		goto tr24
+		goto tr23
 	st223:
 		if p++; p == pe {
 			goto _test_eof223
 		}
 	st_case_223:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st224
 		}
-		goto tr24
+		goto tr23
 	st224:
 		if p++; p == pe {
 			goto _test_eof224
 		}
 	st_case_224:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st225
 		}
-		goto tr24
+		goto tr23
 	st225:
 		if p++; p == pe {
 			goto _test_eof225
 		}
 	st_case_225:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st226
 		}
-		goto tr24
+		goto tr23
 	st226:
 		if p++; p == pe {
 			goto _test_eof226
 		}
 	st_case_226:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st227
 		}
-		goto tr24
+		goto tr23
 	st227:
 		if p++; p == pe {
 			goto _test_eof227
 		}
 	st_case_227:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st228
 		}
-		goto tr24
+		goto tr23
 	st228:
 		if p++; p == pe {
 			goto _test_eof228
 		}
 	st_case_228:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st229
 		}
-		goto tr24
+		goto tr23
 	st229:
 		if p++; p == pe {
 			goto _test_eof229
 		}
 	st_case_229:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st230
 		}
-		goto tr24
+		goto tr23
 	st230:
 		if p++; p == pe {
 			goto _test_eof230
 		}
 	st_case_230:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st231
 		}
-		goto tr24
+		goto tr23
 	st231:
 		if p++; p == pe {
 			goto _test_eof231
 		}
 	st_case_231:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st232
 		}
-		goto tr24
+		goto tr23
 	st232:
 		if p++; p == pe {
 			goto _test_eof232
 		}
 	st_case_232:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st233
 		}
-		goto tr24
+		goto tr23
 	st233:
 		if p++; p == pe {
 			goto _test_eof233
 		}
 	st_case_233:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st234
 		}
-		goto tr24
+		goto tr23
 	st234:
 		if p++; p == pe {
 			goto _test_eof234
 		}
 	st_case_234:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st235
 		}
-		goto tr24
+		goto tr23
 	st235:
 		if p++; p == pe {
 			goto _test_eof235
 		}
 	st_case_235:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st236
 		}
-		goto tr24
+		goto tr23
 	st236:
 		if p++; p == pe {
 			goto _test_eof236
 		}
 	st_case_236:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st237
 		}
-		goto tr24
+		goto tr23
 	st237:
 		if p++; p == pe {
 			goto _test_eof237
 		}
 	st_case_237:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st238
 		}
-		goto tr24
+		goto tr23
 	st238:
 		if p++; p == pe {
 			goto _test_eof238
 		}
 	st_case_238:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st239
 		}
-		goto tr24
+		goto tr23
 	st239:
 		if p++; p == pe {
 			goto _test_eof239
 		}
 	st_case_239:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st240
 		}
-		goto tr24
+		goto tr23
 	st240:
 		if p++; p == pe {
 			goto _test_eof240
 		}
 	st_case_240:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st241
 		}
-		goto tr24
+		goto tr23
 	st241:
 		if p++; p == pe {
 			goto _test_eof241
 		}
 	st_case_241:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st242
 		}
-		goto tr24
+		goto tr23
 	st242:
 		if p++; p == pe {
 			goto _test_eof242
 		}
 	st_case_242:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st243
 		}
-		goto tr24
+		goto tr23
 	st243:
 		if p++; p == pe {
 			goto _test_eof243
 		}
 	st_case_243:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st244
 		}
-		goto tr24
+		goto tr23
 	st244:
 		if p++; p == pe {
 			goto _test_eof244
 		}
 	st_case_244:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st245
 		}
-		goto tr24
+		goto tr23
 	st245:
 		if p++; p == pe {
 			goto _test_eof245
 		}
 	st_case_245:
 		if data[p] == 32 {
-			goto tr26
+			goto tr25
 		}
-		goto tr24
+		goto tr23
 	st246:
 		if p++; p == pe {
 			goto _test_eof246
 		}
 	st_case_246:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st247
 		}
-		goto tr20
+		goto tr19
 	st247:
 		if p++; p == pe {
 			goto _test_eof247
 		}
 	st_case_247:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st248
 		}
-		goto tr20
+		goto tr19
 	st248:
 		if p++; p == pe {
 			goto _test_eof248
 		}
 	st_case_248:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st249
 		}
-		goto tr20
+		goto tr19
 	st249:
 		if p++; p == pe {
 			goto _test_eof249
 		}
 	st_case_249:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st250
 		}
-		goto tr20
+		goto tr19
 	st250:
 		if p++; p == pe {
 			goto _test_eof250
 		}
 	st_case_250:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st251
 		}
-		goto tr20
+		goto tr19
 	st251:
 		if p++; p == pe {
 			goto _test_eof251
 		}
 	st_case_251:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st252
 		}
-		goto tr20
+		goto tr19
 	st252:
 		if p++; p == pe {
 			goto _test_eof252
 		}
 	st_case_252:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st253
 		}
-		goto tr20
+		goto tr19
 	st253:
 		if p++; p == pe {
 			goto _test_eof253
 		}
 	st_case_253:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st254
 		}
-		goto tr20
+		goto tr19
 	st254:
 		if p++; p == pe {
 			goto _test_eof254
 		}
 	st_case_254:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st255
 		}
-		goto tr20
+		goto tr19
 	st255:
 		if p++; p == pe {
 			goto _test_eof255
 		}
 	st_case_255:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st256
 		}
-		goto tr20
+		goto tr19
 	st256:
 		if p++; p == pe {
 			goto _test_eof256
 		}
 	st_case_256:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st257
 		}
-		goto tr20
+		goto tr19
 	st257:
 		if p++; p == pe {
 			goto _test_eof257
 		}
 	st_case_257:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st258
 		}
-		goto tr20
+		goto tr19
 	st258:
 		if p++; p == pe {
 			goto _test_eof258
 		}
 	st_case_258:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st259
 		}
-		goto tr20
+		goto tr19
 	st259:
 		if p++; p == pe {
 			goto _test_eof259
 		}
 	st_case_259:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st260
 		}
-		goto tr20
+		goto tr19
 	st260:
 		if p++; p == pe {
 			goto _test_eof260
 		}
 	st_case_260:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st261
 		}
-		goto tr20
+		goto tr19
 	st261:
 		if p++; p == pe {
 			goto _test_eof261
 		}
 	st_case_261:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st262
 		}
-		goto tr20
+		goto tr19
 	st262:
 		if p++; p == pe {
 			goto _test_eof262
 		}
 	st_case_262:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st263
 		}
-		goto tr20
+		goto tr19
 	st263:
 		if p++; p == pe {
 			goto _test_eof263
 		}
 	st_case_263:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st264
 		}
-		goto tr20
+		goto tr19
 	st264:
 		if p++; p == pe {
 			goto _test_eof264
 		}
 	st_case_264:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st265
 		}
-		goto tr20
+		goto tr19
 	st265:
 		if p++; p == pe {
 			goto _test_eof265
 		}
 	st_case_265:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st266
 		}
-		goto tr20
+		goto tr19
 	st266:
 		if p++; p == pe {
 			goto _test_eof266
 		}
 	st_case_266:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st267
 		}
-		goto tr20
+		goto tr19
 	st267:
 		if p++; p == pe {
 			goto _test_eof267
 		}
 	st_case_267:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st268
 		}
-		goto tr20
+		goto tr19
 	st268:
 		if p++; p == pe {
 			goto _test_eof268
 		}
 	st_case_268:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st269
 		}
-		goto tr20
+		goto tr19
 	st269:
 		if p++; p == pe {
 			goto _test_eof269
 		}
 	st_case_269:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st270
 		}
-		goto tr20
+		goto tr19
 	st270:
 		if p++; p == pe {
 			goto _test_eof270
 		}
 	st_case_270:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st271
 		}
-		goto tr20
+		goto tr19
 	st271:
 		if p++; p == pe {
 			goto _test_eof271
 		}
 	st_case_271:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st272
 		}
-		goto tr20
+		goto tr19
 	st272:
 		if p++; p == pe {
 			goto _test_eof272
 		}
 	st_case_272:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st273
 		}
-		goto tr20
+		goto tr19
 	st273:
 		if p++; p == pe {
 			goto _test_eof273
 		}
 	st_case_273:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st274
 		}
-		goto tr20
+		goto tr19
 	st274:
 		if p++; p == pe {
 			goto _test_eof274
 		}
 	st_case_274:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st275
 		}
-		goto tr20
+		goto tr19
 	st275:
 		if p++; p == pe {
 			goto _test_eof275
 		}
 	st_case_275:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st276
 		}
-		goto tr20
+		goto tr19
 	st276:
 		if p++; p == pe {
 			goto _test_eof276
 		}
 	st_case_276:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st277
 		}
-		goto tr20
+		goto tr19
 	st277:
 		if p++; p == pe {
 			goto _test_eof277
 		}
 	st_case_277:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st278
 		}
-		goto tr20
+		goto tr19
 	st278:
 		if p++; p == pe {
 			goto _test_eof278
 		}
 	st_case_278:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st279
 		}
-		goto tr20
+		goto tr19
 	st279:
 		if p++; p == pe {
 			goto _test_eof279
 		}
 	st_case_279:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st280
 		}
-		goto tr20
+		goto tr19
 	st280:
 		if p++; p == pe {
 			goto _test_eof280
 		}
 	st_case_280:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st281
 		}
-		goto tr20
+		goto tr19
 	st281:
 		if p++; p == pe {
 			goto _test_eof281
 		}
 	st_case_281:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st282
 		}
-		goto tr20
+		goto tr19
 	st282:
 		if p++; p == pe {
 			goto _test_eof282
 		}
 	st_case_282:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st283
 		}
-		goto tr20
+		goto tr19
 	st283:
 		if p++; p == pe {
 			goto _test_eof283
 		}
 	st_case_283:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st284
 		}
-		goto tr20
+		goto tr19
 	st284:
 		if p++; p == pe {
 			goto _test_eof284
 		}
 	st_case_284:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st285
 		}
-		goto tr20
+		goto tr19
 	st285:
 		if p++; p == pe {
 			goto _test_eof285
 		}
 	st_case_285:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st286
 		}
-		goto tr20
+		goto tr19
 	st286:
 		if p++; p == pe {
 			goto _test_eof286
 		}
 	st_case_286:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st287
 		}
-		goto tr20
+		goto tr19
 	st287:
 		if p++; p == pe {
 			goto _test_eof287
 		}
 	st_case_287:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st288
 		}
-		goto tr20
+		goto tr19
 	st288:
 		if p++; p == pe {
 			goto _test_eof288
 		}
 	st_case_288:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st289
 		}
-		goto tr20
+		goto tr19
 	st289:
 		if p++; p == pe {
 			goto _test_eof289
 		}
 	st_case_289:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st290
 		}
-		goto tr20
+		goto tr19
 	st290:
 		if p++; p == pe {
 			goto _test_eof290
 		}
 	st_case_290:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st291
 		}
-		goto tr20
+		goto tr19
 	st291:
 		if p++; p == pe {
 			goto _test_eof291
 		}
 	st_case_291:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st292
 		}
-		goto tr20
+		goto tr19
 	st292:
 		if p++; p == pe {
 			goto _test_eof292
 		}
 	st_case_292:
 		if data[p] == 32 {
-			goto tr22
+			goto tr21
 		}
-		goto tr20
+		goto tr19
 	st293:
 		if p++; p == pe {
 			goto _test_eof293
 		}
 	st_case_293:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st294
 		}
-		goto tr16
+		goto tr15
 	st294:
 		if p++; p == pe {
 			goto _test_eof294
 		}
 	st_case_294:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st295
 		}
-		goto tr16
+		goto tr15
 	st295:
 		if p++; p == pe {
 			goto _test_eof295
 		}
 	st_case_295:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st296
 		}
-		goto tr16
+		goto tr15
 	st296:
 		if p++; p == pe {
 			goto _test_eof296
 		}
 	st_case_296:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st297
 		}
-		goto tr16
+		goto tr15
 	st297:
 		if p++; p == pe {
 			goto _test_eof297
 		}
 	st_case_297:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st298
 		}
-		goto tr16
+		goto tr15
 	st298:
 		if p++; p == pe {
 			goto _test_eof298
 		}
 	st_case_298:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st299
 		}
-		goto tr16
+		goto tr15
 	st299:
 		if p++; p == pe {
 			goto _test_eof299
 		}
 	st_case_299:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st300
 		}
-		goto tr16
+		goto tr15
 	st300:
 		if p++; p == pe {
 			goto _test_eof300
 		}
 	st_case_300:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st301
 		}
-		goto tr16
+		goto tr15
 	st301:
 		if p++; p == pe {
 			goto _test_eof301
 		}
 	st_case_301:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st302
 		}
-		goto tr16
+		goto tr15
 	st302:
 		if p++; p == pe {
 			goto _test_eof302
 		}
 	st_case_302:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st303
 		}
-		goto tr16
+		goto tr15
 	st303:
 		if p++; p == pe {
 			goto _test_eof303
 		}
 	st_case_303:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st304
 		}
-		goto tr16
+		goto tr15
 	st304:
 		if p++; p == pe {
 			goto _test_eof304
 		}
 	st_case_304:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st305
 		}
-		goto tr16
+		goto tr15
 	st305:
 		if p++; p == pe {
 			goto _test_eof305
 		}
 	st_case_305:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st306
 		}
-		goto tr16
+		goto tr15
 	st306:
 		if p++; p == pe {
 			goto _test_eof306
 		}
 	st_case_306:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st307
 		}
-		goto tr16
+		goto tr15
 	st307:
 		if p++; p == pe {
 			goto _test_eof307
 		}
 	st_case_307:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st308
 		}
-		goto tr16
+		goto tr15
 	st308:
 		if p++; p == pe {
 			goto _test_eof308
 		}
 	st_case_308:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st309
 		}
-		goto tr16
+		goto tr15
 	st309:
 		if p++; p == pe {
 			goto _test_eof309
 		}
 	st_case_309:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st310
 		}
-		goto tr16
+		goto tr15
 	st310:
 		if p++; p == pe {
 			goto _test_eof310
 		}
 	st_case_310:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st311
 		}
-		goto tr16
+		goto tr15
 	st311:
 		if p++; p == pe {
 			goto _test_eof311
 		}
 	st_case_311:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st312
 		}
-		goto tr16
+		goto tr15
 	st312:
 		if p++; p == pe {
 			goto _test_eof312
 		}
 	st_case_312:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st313
 		}
-		goto tr16
+		goto tr15
 	st313:
 		if p++; p == pe {
 			goto _test_eof313
 		}
 	st_case_313:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st314
 		}
-		goto tr16
+		goto tr15
 	st314:
 		if p++; p == pe {
 			goto _test_eof314
 		}
 	st_case_314:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st315
 		}
-		goto tr16
+		goto tr15
 	st315:
 		if p++; p == pe {
 			goto _test_eof315
 		}
 	st_case_315:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st316
 		}
-		goto tr16
+		goto tr15
 	st316:
 		if p++; p == pe {
 			goto _test_eof316
 		}
 	st_case_316:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st317
 		}
-		goto tr16
+		goto tr15
 	st317:
 		if p++; p == pe {
 			goto _test_eof317
 		}
 	st_case_317:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st318
 		}
-		goto tr16
+		goto tr15
 	st318:
 		if p++; p == pe {
 			goto _test_eof318
 		}
 	st_case_318:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st319
 		}
-		goto tr16
+		goto tr15
 	st319:
 		if p++; p == pe {
 			goto _test_eof319
 		}
 	st_case_319:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st320
 		}
-		goto tr16
+		goto tr15
 	st320:
 		if p++; p == pe {
 			goto _test_eof320
 		}
 	st_case_320:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st321
 		}
-		goto tr16
+		goto tr15
 	st321:
 		if p++; p == pe {
 			goto _test_eof321
 		}
 	st_case_321:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st322
 		}
-		goto tr16
+		goto tr15
 	st322:
 		if p++; p == pe {
 			goto _test_eof322
 		}
 	st_case_322:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st323
 		}
-		goto tr16
+		goto tr15
 	st323:
 		if p++; p == pe {
 			goto _test_eof323
 		}
 	st_case_323:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st324
 		}
-		goto tr16
+		goto tr15
 	st324:
 		if p++; p == pe {
 			goto _test_eof324
 		}
 	st_case_324:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st325
 		}
-		goto tr16
+		goto tr15
 	st325:
 		if p++; p == pe {
 			goto _test_eof325
 		}
 	st_case_325:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st326
 		}
-		goto tr16
+		goto tr15
 	st326:
 		if p++; p == pe {
 			goto _test_eof326
 		}
 	st_case_326:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st327
 		}
-		goto tr16
+		goto tr15
 	st327:
 		if p++; p == pe {
 			goto _test_eof327
 		}
 	st_case_327:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st328
 		}
-		goto tr16
+		goto tr15
 	st328:
 		if p++; p == pe {
 			goto _test_eof328
 		}
 	st_case_328:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st329
 		}
-		goto tr16
+		goto tr15
 	st329:
 		if p++; p == pe {
 			goto _test_eof329
 		}
 	st_case_329:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st330
 		}
-		goto tr16
+		goto tr15
 	st330:
 		if p++; p == pe {
 			goto _test_eof330
 		}
 	st_case_330:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st331
 		}
-		goto tr16
+		goto tr15
 	st331:
 		if p++; p == pe {
 			goto _test_eof331
 		}
 	st_case_331:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st332
 		}
-		goto tr16
+		goto tr15
 	st332:
 		if p++; p == pe {
 			goto _test_eof332
 		}
 	st_case_332:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st333
 		}
-		goto tr16
+		goto tr15
 	st333:
 		if p++; p == pe {
 			goto _test_eof333
 		}
 	st_case_333:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st334
 		}
-		goto tr16
+		goto tr15
 	st334:
 		if p++; p == pe {
 			goto _test_eof334
 		}
 	st_case_334:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st335
 		}
-		goto tr16
+		goto tr15
 	st335:
 		if p++; p == pe {
 			goto _test_eof335
 		}
 	st_case_335:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st336
 		}
-		goto tr16
+		goto tr15
 	st336:
 		if p++; p == pe {
 			goto _test_eof336
 		}
 	st_case_336:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st337
 		}
-		goto tr16
+		goto tr15
 	st337:
 		if p++; p == pe {
 			goto _test_eof337
 		}
 	st_case_337:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st338
 		}
-		goto tr16
+		goto tr15
 	st338:
 		if p++; p == pe {
 			goto _test_eof338
 		}
 	st_case_338:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st339
 		}
-		goto tr16
+		goto tr15
 	st339:
 		if p++; p == pe {
 			goto _test_eof339
 		}
 	st_case_339:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st340
 		}
-		goto tr16
+		goto tr15
 	st340:
 		if p++; p == pe {
 			goto _test_eof340
 		}
 	st_case_340:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st341
 		}
-		goto tr16
+		goto tr15
 	st341:
 		if p++; p == pe {
 			goto _test_eof341
 		}
 	st_case_341:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st342
 		}
-		goto tr16
+		goto tr15
 	st342:
 		if p++; p == pe {
 			goto _test_eof342
 		}
 	st_case_342:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st343
 		}
-		goto tr16
+		goto tr15
 	st343:
 		if p++; p == pe {
 			goto _test_eof343
 		}
 	st_case_343:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st344
 		}
-		goto tr16
+		goto tr15
 	st344:
 		if p++; p == pe {
 			goto _test_eof344
 		}
 	st_case_344:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st345
 		}
-		goto tr16
+		goto tr15
 	st345:
 		if p++; p == pe {
 			goto _test_eof345
 		}
 	st_case_345:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st346
 		}
-		goto tr16
+		goto tr15
 	st346:
 		if p++; p == pe {
 			goto _test_eof346
 		}
 	st_case_346:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st347
 		}
-		goto tr16
+		goto tr15
 	st347:
 		if p++; p == pe {
 			goto _test_eof347
 		}
 	st_case_347:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st348
 		}
-		goto tr16
+		goto tr15
 	st348:
 		if p++; p == pe {
 			goto _test_eof348
 		}
 	st_case_348:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st349
 		}
-		goto tr16
+		goto tr15
 	st349:
 		if p++; p == pe {
 			goto _test_eof349
 		}
 	st_case_349:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st350
 		}
-		goto tr16
+		goto tr15
 	st350:
 		if p++; p == pe {
 			goto _test_eof350
 		}
 	st_case_350:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st351
 		}
-		goto tr16
+		goto tr15
 	st351:
 		if p++; p == pe {
 			goto _test_eof351
 		}
 	st_case_351:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st352
 		}
-		goto tr16
+		goto tr15
 	st352:
 		if p++; p == pe {
 			goto _test_eof352
 		}
 	st_case_352:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st353
 		}
-		goto tr16
+		goto tr15
 	st353:
 		if p++; p == pe {
 			goto _test_eof353
 		}
 	st_case_353:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st354
 		}
-		goto tr16
+		goto tr15
 	st354:
 		if p++; p == pe {
 			goto _test_eof354
 		}
 	st_case_354:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st355
 		}
-		goto tr16
+		goto tr15
 	st355:
 		if p++; p == pe {
 			goto _test_eof355
 		}
 	st_case_355:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st356
 		}
-		goto tr16
+		goto tr15
 	st356:
 		if p++; p == pe {
 			goto _test_eof356
 		}
 	st_case_356:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st357
 		}
-		goto tr16
+		goto tr15
 	st357:
 		if p++; p == pe {
 			goto _test_eof357
 		}
 	st_case_357:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st358
 		}
-		goto tr16
+		goto tr15
 	st358:
 		if p++; p == pe {
 			goto _test_eof358
 		}
 	st_case_358:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st359
 		}
-		goto tr16
+		goto tr15
 	st359:
 		if p++; p == pe {
 			goto _test_eof359
 		}
 	st_case_359:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st360
 		}
-		goto tr16
+		goto tr15
 	st360:
 		if p++; p == pe {
 			goto _test_eof360
 		}
 	st_case_360:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st361
 		}
-		goto tr16
+		goto tr15
 	st361:
 		if p++; p == pe {
 			goto _test_eof361
 		}
 	st_case_361:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st362
 		}
-		goto tr16
+		goto tr15
 	st362:
 		if p++; p == pe {
 			goto _test_eof362
 		}
 	st_case_362:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st363
 		}
-		goto tr16
+		goto tr15
 	st363:
 		if p++; p == pe {
 			goto _test_eof363
 		}
 	st_case_363:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st364
 		}
-		goto tr16
+		goto tr15
 	st364:
 		if p++; p == pe {
 			goto _test_eof364
 		}
 	st_case_364:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st365
 		}
-		goto tr16
+		goto tr15
 	st365:
 		if p++; p == pe {
 			goto _test_eof365
 		}
 	st_case_365:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st366
 		}
-		goto tr16
+		goto tr15
 	st366:
 		if p++; p == pe {
 			goto _test_eof366
 		}
 	st_case_366:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st367
 		}
-		goto tr16
+		goto tr15
 	st367:
 		if p++; p == pe {
 			goto _test_eof367
 		}
 	st_case_367:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st368
 		}
-		goto tr16
+		goto tr15
 	st368:
 		if p++; p == pe {
 			goto _test_eof368
 		}
 	st_case_368:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st369
 		}
-		goto tr16
+		goto tr15
 	st369:
 		if p++; p == pe {
 			goto _test_eof369
 		}
 	st_case_369:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st370
 		}
-		goto tr16
+		goto tr15
 	st370:
 		if p++; p == pe {
 			goto _test_eof370
 		}
 	st_case_370:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st371
 		}
-		goto tr16
+		goto tr15
 	st371:
 		if p++; p == pe {
 			goto _test_eof371
 		}
 	st_case_371:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st372
 		}
-		goto tr16
+		goto tr15
 	st372:
 		if p++; p == pe {
 			goto _test_eof372
 		}
 	st_case_372:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st373
 		}
-		goto tr16
+		goto tr15
 	st373:
 		if p++; p == pe {
 			goto _test_eof373
 		}
 	st_case_373:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st374
 		}
-		goto tr16
+		goto tr15
 	st374:
 		if p++; p == pe {
 			goto _test_eof374
 		}
 	st_case_374:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st375
 		}
-		goto tr16
+		goto tr15
 	st375:
 		if p++; p == pe {
 			goto _test_eof375
 		}
 	st_case_375:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st376
 		}
-		goto tr16
+		goto tr15
 	st376:
 		if p++; p == pe {
 			goto _test_eof376
 		}
 	st_case_376:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st377
 		}
-		goto tr16
+		goto tr15
 	st377:
 		if p++; p == pe {
 			goto _test_eof377
 		}
 	st_case_377:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st378
 		}
-		goto tr16
+		goto tr15
 	st378:
 		if p++; p == pe {
 			goto _test_eof378
 		}
 	st_case_378:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st379
 		}
-		goto tr16
+		goto tr15
 	st379:
 		if p++; p == pe {
 			goto _test_eof379
 		}
 	st_case_379:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st380
 		}
-		goto tr16
+		goto tr15
 	st380:
 		if p++; p == pe {
 			goto _test_eof380
 		}
 	st_case_380:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st381
 		}
-		goto tr16
+		goto tr15
 	st381:
 		if p++; p == pe {
 			goto _test_eof381
 		}
 	st_case_381:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st382
 		}
-		goto tr16
+		goto tr15
 	st382:
 		if p++; p == pe {
 			goto _test_eof382
 		}
 	st_case_382:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st383
 		}
-		goto tr16
+		goto tr15
 	st383:
 		if p++; p == pe {
 			goto _test_eof383
 		}
 	st_case_383:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st384
 		}
-		goto tr16
+		goto tr15
 	st384:
 		if p++; p == pe {
 			goto _test_eof384
 		}
 	st_case_384:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st385
 		}
-		goto tr16
+		goto tr15
 	st385:
 		if p++; p == pe {
 			goto _test_eof385
 		}
 	st_case_385:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st386
 		}
-		goto tr16
+		goto tr15
 	st386:
 		if p++; p == pe {
 			goto _test_eof386
 		}
 	st_case_386:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st387
 		}
-		goto tr16
+		goto tr15
 	st387:
 		if p++; p == pe {
 			goto _test_eof387
 		}
 	st_case_387:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st388
 		}
-		goto tr16
+		goto tr15
 	st388:
 		if p++; p == pe {
 			goto _test_eof388
 		}
 	st_case_388:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st389
 		}
-		goto tr16
+		goto tr15
 	st389:
 		if p++; p == pe {
 			goto _test_eof389
 		}
 	st_case_389:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st390
 		}
-		goto tr16
+		goto tr15
 	st390:
 		if p++; p == pe {
 			goto _test_eof390
 		}
 	st_case_390:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st391
 		}
-		goto tr16
+		goto tr15
 	st391:
 		if p++; p == pe {
 			goto _test_eof391
 		}
 	st_case_391:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st392
 		}
-		goto tr16
+		goto tr15
 	st392:
 		if p++; p == pe {
 			goto _test_eof392
 		}
 	st_case_392:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st393
 		}
-		goto tr16
+		goto tr15
 	st393:
 		if p++; p == pe {
 			goto _test_eof393
 		}
 	st_case_393:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st394
 		}
-		goto tr16
+		goto tr15
 	st394:
 		if p++; p == pe {
 			goto _test_eof394
 		}
 	st_case_394:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st395
 		}
-		goto tr16
+		goto tr15
 	st395:
 		if p++; p == pe {
 			goto _test_eof395
 		}
 	st_case_395:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st396
 		}
-		goto tr16
+		goto tr15
 	st396:
 		if p++; p == pe {
 			goto _test_eof396
 		}
 	st_case_396:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st397
 		}
-		goto tr16
+		goto tr15
 	st397:
 		if p++; p == pe {
 			goto _test_eof397
 		}
 	st_case_397:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st398
 		}
-		goto tr16
+		goto tr15
 	st398:
 		if p++; p == pe {
 			goto _test_eof398
 		}
 	st_case_398:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st399
 		}
-		goto tr16
+		goto tr15
 	st399:
 		if p++; p == pe {
 			goto _test_eof399
 		}
 	st_case_399:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st400
 		}
-		goto tr16
+		goto tr15
 	st400:
 		if p++; p == pe {
 			goto _test_eof400
 		}
 	st_case_400:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st401
 		}
-		goto tr16
+		goto tr15
 	st401:
 		if p++; p == pe {
 			goto _test_eof401
 		}
 	st_case_401:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st402
 		}
-		goto tr16
+		goto tr15
 	st402:
 		if p++; p == pe {
 			goto _test_eof402
 		}
 	st_case_402:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st403
 		}
-		goto tr16
+		goto tr15
 	st403:
 		if p++; p == pe {
 			goto _test_eof403
 		}
 	st_case_403:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st404
 		}
-		goto tr16
+		goto tr15
 	st404:
 		if p++; p == pe {
 			goto _test_eof404
 		}
 	st_case_404:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st405
 		}
-		goto tr16
+		goto tr15
 	st405:
 		if p++; p == pe {
 			goto _test_eof405
 		}
 	st_case_405:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st406
 		}
-		goto tr16
+		goto tr15
 	st406:
 		if p++; p == pe {
 			goto _test_eof406
 		}
 	st_case_406:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st407
 		}
-		goto tr16
+		goto tr15
 	st407:
 		if p++; p == pe {
 			goto _test_eof407
 		}
 	st_case_407:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st408
 		}
-		goto tr16
+		goto tr15
 	st408:
 		if p++; p == pe {
 			goto _test_eof408
 		}
 	st_case_408:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st409
 		}
-		goto tr16
+		goto tr15
 	st409:
 		if p++; p == pe {
 			goto _test_eof409
 		}
 	st_case_409:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st410
 		}
-		goto tr16
+		goto tr15
 	st410:
 		if p++; p == pe {
 			goto _test_eof410
 		}
 	st_case_410:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st411
 		}
-		goto tr16
+		goto tr15
 	st411:
 		if p++; p == pe {
 			goto _test_eof411
 		}
 	st_case_411:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st412
 		}
-		goto tr16
+		goto tr15
 	st412:
 		if p++; p == pe {
 			goto _test_eof412
 		}
 	st_case_412:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st413
 		}
-		goto tr16
+		goto tr15
 	st413:
 		if p++; p == pe {
 			goto _test_eof413
 		}
 	st_case_413:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st414
 		}
-		goto tr16
+		goto tr15
 	st414:
 		if p++; p == pe {
 			goto _test_eof414
 		}
 	st_case_414:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st415
 		}
-		goto tr16
+		goto tr15
 	st415:
 		if p++; p == pe {
 			goto _test_eof415
 		}
 	st_case_415:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st416
 		}
-		goto tr16
+		goto tr15
 	st416:
 		if p++; p == pe {
 			goto _test_eof416
 		}
 	st_case_416:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st417
 		}
-		goto tr16
+		goto tr15
 	st417:
 		if p++; p == pe {
 			goto _test_eof417
 		}
 	st_case_417:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st418
 		}
-		goto tr16
+		goto tr15
 	st418:
 		if p++; p == pe {
 			goto _test_eof418
 		}
 	st_case_418:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st419
 		}
-		goto tr16
+		goto tr15
 	st419:
 		if p++; p == pe {
 			goto _test_eof419
 		}
 	st_case_419:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st420
 		}
-		goto tr16
+		goto tr15
 	st420:
 		if p++; p == pe {
 			goto _test_eof420
 		}
 	st_case_420:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st421
 		}
-		goto tr16
+		goto tr15
 	st421:
 		if p++; p == pe {
 			goto _test_eof421
 		}
 	st_case_421:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st422
 		}
-		goto tr16
+		goto tr15
 	st422:
 		if p++; p == pe {
 			goto _test_eof422
 		}
 	st_case_422:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st423
 		}
-		goto tr16
+		goto tr15
 	st423:
 		if p++; p == pe {
 			goto _test_eof423
 		}
 	st_case_423:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st424
 		}
-		goto tr16
+		goto tr15
 	st424:
 		if p++; p == pe {
 			goto _test_eof424
 		}
 	st_case_424:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st425
 		}
-		goto tr16
+		goto tr15
 	st425:
 		if p++; p == pe {
 			goto _test_eof425
 		}
 	st_case_425:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st426
 		}
-		goto tr16
+		goto tr15
 	st426:
 		if p++; p == pe {
 			goto _test_eof426
 		}
 	st_case_426:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st427
 		}
-		goto tr16
+		goto tr15
 	st427:
 		if p++; p == pe {
 			goto _test_eof427
 		}
 	st_case_427:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st428
 		}
-		goto tr16
+		goto tr15
 	st428:
 		if p++; p == pe {
 			goto _test_eof428
 		}
 	st_case_428:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st429
 		}
-		goto tr16
+		goto tr15
 	st429:
 		if p++; p == pe {
 			goto _test_eof429
 		}
 	st_case_429:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st430
 		}
-		goto tr16
+		goto tr15
 	st430:
 		if p++; p == pe {
 			goto _test_eof430
 		}
 	st_case_430:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st431
 		}
-		goto tr16
+		goto tr15
 	st431:
 		if p++; p == pe {
 			goto _test_eof431
 		}
 	st_case_431:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st432
 		}
-		goto tr16
+		goto tr15
 	st432:
 		if p++; p == pe {
 			goto _test_eof432
 		}
 	st_case_432:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st433
 		}
-		goto tr16
+		goto tr15
 	st433:
 		if p++; p == pe {
 			goto _test_eof433
 		}
 	st_case_433:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st434
 		}
-		goto tr16
+		goto tr15
 	st434:
 		if p++; p == pe {
 			goto _test_eof434
 		}
 	st_case_434:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st435
 		}
-		goto tr16
+		goto tr15
 	st435:
 		if p++; p == pe {
 			goto _test_eof435
 		}
 	st_case_435:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st436
 		}
-		goto tr16
+		goto tr15
 	st436:
 		if p++; p == pe {
 			goto _test_eof436
 		}
 	st_case_436:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st437
 		}
-		goto tr16
+		goto tr15
 	st437:
 		if p++; p == pe {
 			goto _test_eof437
 		}
 	st_case_437:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st438
 		}
-		goto tr16
+		goto tr15
 	st438:
 		if p++; p == pe {
 			goto _test_eof438
 		}
 	st_case_438:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st439
 		}
-		goto tr16
+		goto tr15
 	st439:
 		if p++; p == pe {
 			goto _test_eof439
 		}
 	st_case_439:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st440
 		}
-		goto tr16
+		goto tr15
 	st440:
 		if p++; p == pe {
 			goto _test_eof440
 		}
 	st_case_440:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st441
 		}
-		goto tr16
+		goto tr15
 	st441:
 		if p++; p == pe {
 			goto _test_eof441
 		}
 	st_case_441:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st442
 		}
-		goto tr16
+		goto tr15
 	st442:
 		if p++; p == pe {
 			goto _test_eof442
 		}
 	st_case_442:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st443
 		}
-		goto tr16
+		goto tr15
 	st443:
 		if p++; p == pe {
 			goto _test_eof443
 		}
 	st_case_443:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st444
 		}
-		goto tr16
+		goto tr15
 	st444:
 		if p++; p == pe {
 			goto _test_eof444
 		}
 	st_case_444:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st445
 		}
-		goto tr16
+		goto tr15
 	st445:
 		if p++; p == pe {
 			goto _test_eof445
 		}
 	st_case_445:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st446
 		}
-		goto tr16
+		goto tr15
 	st446:
 		if p++; p == pe {
 			goto _test_eof446
 		}
 	st_case_446:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st447
 		}
-		goto tr16
+		goto tr15
 	st447:
 		if p++; p == pe {
 			goto _test_eof447
 		}
 	st_case_447:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st448
 		}
-		goto tr16
+		goto tr15
 	st448:
 		if p++; p == pe {
 			goto _test_eof448
 		}
 	st_case_448:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st449
 		}
-		goto tr16
+		goto tr15
 	st449:
 		if p++; p == pe {
 			goto _test_eof449
 		}
 	st_case_449:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st450
 		}
-		goto tr16
+		goto tr15
 	st450:
 		if p++; p == pe {
 			goto _test_eof450
 		}
 	st_case_450:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st451
 		}
-		goto tr16
+		goto tr15
 	st451:
 		if p++; p == pe {
 			goto _test_eof451
 		}
 	st_case_451:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st452
 		}
-		goto tr16
+		goto tr15
 	st452:
 		if p++; p == pe {
 			goto _test_eof452
 		}
 	st_case_452:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st453
 		}
-		goto tr16
+		goto tr15
 	st453:
 		if p++; p == pe {
 			goto _test_eof453
 		}
 	st_case_453:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st454
 		}
-		goto tr16
+		goto tr15
 	st454:
 		if p++; p == pe {
 			goto _test_eof454
 		}
 	st_case_454:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st455
 		}
-		goto tr16
+		goto tr15
 	st455:
 		if p++; p == pe {
 			goto _test_eof455
 		}
 	st_case_455:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st456
 		}
-		goto tr16
+		goto tr15
 	st456:
 		if p++; p == pe {
 			goto _test_eof456
 		}
 	st_case_456:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st457
 		}
-		goto tr16
+		goto tr15
 	st457:
 		if p++; p == pe {
 			goto _test_eof457
 		}
 	st_case_457:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st458
 		}
-		goto tr16
+		goto tr15
 	st458:
 		if p++; p == pe {
 			goto _test_eof458
 		}
 	st_case_458:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st459
 		}
-		goto tr16
+		goto tr15
 	st459:
 		if p++; p == pe {
 			goto _test_eof459
 		}
 	st_case_459:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st460
 		}
-		goto tr16
+		goto tr15
 	st460:
 		if p++; p == pe {
 			goto _test_eof460
 		}
 	st_case_460:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st461
 		}
-		goto tr16
+		goto tr15
 	st461:
 		if p++; p == pe {
 			goto _test_eof461
 		}
 	st_case_461:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st462
 		}
-		goto tr16
+		goto tr15
 	st462:
 		if p++; p == pe {
 			goto _test_eof462
 		}
 	st_case_462:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st463
 		}
-		goto tr16
+		goto tr15
 	st463:
 		if p++; p == pe {
 			goto _test_eof463
 		}
 	st_case_463:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st464
 		}
-		goto tr16
+		goto tr15
 	st464:
 		if p++; p == pe {
 			goto _test_eof464
 		}
 	st_case_464:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st465
 		}
-		goto tr16
+		goto tr15
 	st465:
 		if p++; p == pe {
 			goto _test_eof465
 		}
 	st_case_465:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st466
 		}
-		goto tr16
+		goto tr15
 	st466:
 		if p++; p == pe {
 			goto _test_eof466
 		}
 	st_case_466:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st467
 		}
-		goto tr16
+		goto tr15
 	st467:
 		if p++; p == pe {
 			goto _test_eof467
 		}
 	st_case_467:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st468
 		}
-		goto tr16
+		goto tr15
 	st468:
 		if p++; p == pe {
 			goto _test_eof468
 		}
 	st_case_468:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st469
 		}
-		goto tr16
+		goto tr15
 	st469:
 		if p++; p == pe {
 			goto _test_eof469
 		}
 	st_case_469:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st470
 		}
-		goto tr16
+		goto tr15
 	st470:
 		if p++; p == pe {
 			goto _test_eof470
 		}
 	st_case_470:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st471
 		}
-		goto tr16
+		goto tr15
 	st471:
 		if p++; p == pe {
 			goto _test_eof471
 		}
 	st_case_471:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st472
 		}
-		goto tr16
+		goto tr15
 	st472:
 		if p++; p == pe {
 			goto _test_eof472
 		}
 	st_case_472:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st473
 		}
-		goto tr16
+		goto tr15
 	st473:
 		if p++; p == pe {
 			goto _test_eof473
 		}
 	st_case_473:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st474
 		}
-		goto tr16
+		goto tr15
 	st474:
 		if p++; p == pe {
 			goto _test_eof474
 		}
 	st_case_474:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st475
 		}
-		goto tr16
+		goto tr15
 	st475:
 		if p++; p == pe {
 			goto _test_eof475
 		}
 	st_case_475:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st476
 		}
-		goto tr16
+		goto tr15
 	st476:
 		if p++; p == pe {
 			goto _test_eof476
 		}
 	st_case_476:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st477
 		}
-		goto tr16
+		goto tr15
 	st477:
 		if p++; p == pe {
 			goto _test_eof477
 		}
 	st_case_477:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st478
 		}
-		goto tr16
+		goto tr15
 	st478:
 		if p++; p == pe {
 			goto _test_eof478
 		}
 	st_case_478:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st479
 		}
-		goto tr16
+		goto tr15
 	st479:
 		if p++; p == pe {
 			goto _test_eof479
 		}
 	st_case_479:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st480
 		}
-		goto tr16
+		goto tr15
 	st480:
 		if p++; p == pe {
 			goto _test_eof480
 		}
 	st_case_480:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st481
 		}
-		goto tr16
+		goto tr15
 	st481:
 		if p++; p == pe {
 			goto _test_eof481
 		}
 	st_case_481:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st482
 		}
-		goto tr16
+		goto tr15
 	st482:
 		if p++; p == pe {
 			goto _test_eof482
 		}
 	st_case_482:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st483
 		}
-		goto tr16
+		goto tr15
 	st483:
 		if p++; p == pe {
 			goto _test_eof483
 		}
 	st_case_483:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st484
 		}
-		goto tr16
+		goto tr15
 	st484:
 		if p++; p == pe {
 			goto _test_eof484
 		}
 	st_case_484:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st485
 		}
-		goto tr16
+		goto tr15
 	st485:
 		if p++; p == pe {
 			goto _test_eof485
 		}
 	st_case_485:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st486
 		}
-		goto tr16
+		goto tr15
 	st486:
 		if p++; p == pe {
 			goto _test_eof486
 		}
 	st_case_486:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st487
 		}
-		goto tr16
+		goto tr15
 	st487:
 		if p++; p == pe {
 			goto _test_eof487
 		}
 	st_case_487:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st488
 		}
-		goto tr16
+		goto tr15
 	st488:
 		if p++; p == pe {
 			goto _test_eof488
 		}
 	st_case_488:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st489
 		}
-		goto tr16
+		goto tr15
 	st489:
 		if p++; p == pe {
 			goto _test_eof489
 		}
 	st_case_489:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st490
 		}
-		goto tr16
+		goto tr15
 	st490:
 		if p++; p == pe {
 			goto _test_eof490
 		}
 	st_case_490:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st491
 		}
-		goto tr16
+		goto tr15
 	st491:
 		if p++; p == pe {
 			goto _test_eof491
 		}
 	st_case_491:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st492
 		}
-		goto tr16
+		goto tr15
 	st492:
 		if p++; p == pe {
 			goto _test_eof492
 		}
 	st_case_492:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st493
 		}
-		goto tr16
+		goto tr15
 	st493:
 		if p++; p == pe {
 			goto _test_eof493
 		}
 	st_case_493:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st494
 		}
-		goto tr16
+		goto tr15
 	st494:
 		if p++; p == pe {
 			goto _test_eof494
 		}
 	st_case_494:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st495
 		}
-		goto tr16
+		goto tr15
 	st495:
 		if p++; p == pe {
 			goto _test_eof495
 		}
 	st_case_495:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st496
 		}
-		goto tr16
+		goto tr15
 	st496:
 		if p++; p == pe {
 			goto _test_eof496
 		}
 	st_case_496:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st497
 		}
-		goto tr16
+		goto tr15
 	st497:
 		if p++; p == pe {
 			goto _test_eof497
 		}
 	st_case_497:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st498
 		}
-		goto tr16
+		goto tr15
 	st498:
 		if p++; p == pe {
 			goto _test_eof498
 		}
 	st_case_498:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st499
 		}
-		goto tr16
+		goto tr15
 	st499:
 		if p++; p == pe {
 			goto _test_eof499
 		}
 	st_case_499:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st500
 		}
-		goto tr16
+		goto tr15
 	st500:
 		if p++; p == pe {
 			goto _test_eof500
 		}
 	st_case_500:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st501
 		}
-		goto tr16
+		goto tr15
 	st501:
 		if p++; p == pe {
 			goto _test_eof501
 		}
 	st_case_501:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st502
 		}
-		goto tr16
+		goto tr15
 	st502:
 		if p++; p == pe {
 			goto _test_eof502
 		}
 	st_case_502:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st503
 		}
-		goto tr16
+		goto tr15
 	st503:
 		if p++; p == pe {
 			goto _test_eof503
 		}
 	st_case_503:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st504
 		}
-		goto tr16
+		goto tr15
 	st504:
 		if p++; p == pe {
 			goto _test_eof504
 		}
 	st_case_504:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st505
 		}
-		goto tr16
+		goto tr15
 	st505:
 		if p++; p == pe {
 			goto _test_eof505
 		}
 	st_case_505:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st506
 		}
-		goto tr16
+		goto tr15
 	st506:
 		if p++; p == pe {
 			goto _test_eof506
 		}
 	st_case_506:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st507
 		}
-		goto tr16
+		goto tr15
 	st507:
 		if p++; p == pe {
 			goto _test_eof507
 		}
 	st_case_507:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st508
 		}
-		goto tr16
+		goto tr15
 	st508:
 		if p++; p == pe {
 			goto _test_eof508
 		}
 	st_case_508:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st509
 		}
-		goto tr16
+		goto tr15
 	st509:
 		if p++; p == pe {
 			goto _test_eof509
 		}
 	st_case_509:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st510
 		}
-		goto tr16
+		goto tr15
 	st510:
 		if p++; p == pe {
 			goto _test_eof510
 		}
 	st_case_510:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st511
 		}
-		goto tr16
+		goto tr15
 	st511:
 		if p++; p == pe {
 			goto _test_eof511
 		}
 	st_case_511:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st512
 		}
-		goto tr16
+		goto tr15
 	st512:
 		if p++; p == pe {
 			goto _test_eof512
 		}
 	st_case_512:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st513
 		}
-		goto tr16
+		goto tr15
 	st513:
 		if p++; p == pe {
 			goto _test_eof513
 		}
 	st_case_513:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st514
 		}
-		goto tr16
+		goto tr15
 	st514:
 		if p++; p == pe {
 			goto _test_eof514
 		}
 	st_case_514:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st515
 		}
-		goto tr16
+		goto tr15
 	st515:
 		if p++; p == pe {
 			goto _test_eof515
 		}
 	st_case_515:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st516
 		}
-		goto tr16
+		goto tr15
 	st516:
 		if p++; p == pe {
 			goto _test_eof516
 		}
 	st_case_516:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st517
 		}
-		goto tr16
+		goto tr15
 	st517:
 		if p++; p == pe {
 			goto _test_eof517
 		}
 	st_case_517:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st518
 		}
-		goto tr16
+		goto tr15
 	st518:
 		if p++; p == pe {
 			goto _test_eof518
 		}
 	st_case_518:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st519
 		}
-		goto tr16
+		goto tr15
 	st519:
 		if p++; p == pe {
 			goto _test_eof519
 		}
 	st_case_519:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st520
 		}
-		goto tr16
+		goto tr15
 	st520:
 		if p++; p == pe {
 			goto _test_eof520
 		}
 	st_case_520:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st521
 		}
-		goto tr16
+		goto tr15
 	st521:
 		if p++; p == pe {
 			goto _test_eof521
 		}
 	st_case_521:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st522
 		}
-		goto tr16
+		goto tr15
 	st522:
 		if p++; p == pe {
 			goto _test_eof522
 		}
 	st_case_522:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st523
 		}
-		goto tr16
+		goto tr15
 	st523:
 		if p++; p == pe {
 			goto _test_eof523
 		}
 	st_case_523:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st524
 		}
-		goto tr16
+		goto tr15
 	st524:
 		if p++; p == pe {
 			goto _test_eof524
 		}
 	st_case_524:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st525
 		}
-		goto tr16
+		goto tr15
 	st525:
 		if p++; p == pe {
 			goto _test_eof525
 		}
 	st_case_525:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st526
 		}
-		goto tr16
+		goto tr15
 	st526:
 		if p++; p == pe {
 			goto _test_eof526
 		}
 	st_case_526:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st527
 		}
-		goto tr16
+		goto tr15
 	st527:
 		if p++; p == pe {
 			goto _test_eof527
 		}
 	st_case_527:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st528
 		}
-		goto tr16
+		goto tr15
 	st528:
 		if p++; p == pe {
 			goto _test_eof528
 		}
 	st_case_528:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st529
 		}
-		goto tr16
+		goto tr15
 	st529:
 		if p++; p == pe {
 			goto _test_eof529
 		}
 	st_case_529:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st530
 		}
-		goto tr16
+		goto tr15
 	st530:
 		if p++; p == pe {
 			goto _test_eof530
 		}
 	st_case_530:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st531
 		}
-		goto tr16
+		goto tr15
 	st531:
 		if p++; p == pe {
 			goto _test_eof531
 		}
 	st_case_531:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st532
 		}
-		goto tr16
+		goto tr15
 	st532:
 		if p++; p == pe {
 			goto _test_eof532
 		}
 	st_case_532:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st533
 		}
-		goto tr16
+		goto tr15
 	st533:
 		if p++; p == pe {
 			goto _test_eof533
 		}
 	st_case_533:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st534
 		}
-		goto tr16
+		goto tr15
 	st534:
 		if p++; p == pe {
 			goto _test_eof534
 		}
 	st_case_534:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st535
 		}
-		goto tr16
+		goto tr15
 	st535:
 		if p++; p == pe {
 			goto _test_eof535
 		}
 	st_case_535:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st536
 		}
-		goto tr16
+		goto tr15
 	st536:
 		if p++; p == pe {
 			goto _test_eof536
 		}
 	st_case_536:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st537
 		}
-		goto tr16
+		goto tr15
 	st537:
 		if p++; p == pe {
 			goto _test_eof537
 		}
 	st_case_537:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st538
 		}
-		goto tr16
+		goto tr15
 	st538:
 		if p++; p == pe {
 			goto _test_eof538
 		}
 	st_case_538:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st539
 		}
-		goto tr16
+		goto tr15
 	st539:
 		if p++; p == pe {
 			goto _test_eof539
 		}
 	st_case_539:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st540
 		}
-		goto tr16
+		goto tr15
 	st540:
 		if p++; p == pe {
 			goto _test_eof540
 		}
 	st_case_540:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st541
 		}
-		goto tr16
+		goto tr15
 	st541:
 		if p++; p == pe {
 			goto _test_eof541
 		}
 	st_case_541:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st542
 		}
-		goto tr16
+		goto tr15
 	st542:
 		if p++; p == pe {
 			goto _test_eof542
 		}
 	st_case_542:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st543
 		}
-		goto tr16
+		goto tr15
 	st543:
 		if p++; p == pe {
 			goto _test_eof543
 		}
 	st_case_543:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st544
 		}
-		goto tr16
+		goto tr15
 	st544:
 		if p++; p == pe {
 			goto _test_eof544
 		}
 	st_case_544:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st545
 		}
-		goto tr16
+		goto tr15
 	st545:
 		if p++; p == pe {
 			goto _test_eof545
 		}
 	st_case_545:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
 		if 33 <= data[p] && data[p] <= 126 {
 			goto st546
 		}
-		goto tr16
+		goto tr15
 	st546:
 		if p++; p == pe {
 			goto _test_eof546
 		}
 	st_case_546:
 		if data[p] == 32 {
-			goto tr18
+			goto tr17
 		}
-		goto tr16
-	tr14:
+		goto tr15
+	tr13:
 //line parser/common.rl:4
 
 		tok = p
@@ -8724,11 +8650,11 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof547
 		}
 	st_case_547:
-//line rfc5424_gen.go:8684
+//line rfc5424_gen.go:8654
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st548
 		}
-		goto tr12
+		goto tr11
 	st548:
 		if p++; p == pe {
 			goto _test_eof548
@@ -8737,7 +8663,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st549
 		}
-		goto tr12
+		goto tr11
 	st549:
 		if p++; p == pe {
 			goto _test_eof549
@@ -8746,7 +8672,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st550
 		}
-		goto tr12
+		goto tr11
 	st550:
 		if p++; p == pe {
 			goto _test_eof550
@@ -8755,7 +8681,7 @@ func parseRFC5424(data string) (message, error) {
 		if data[p] == 45 {
 			goto st551
 		}
-		goto tr12
+		goto tr11
 	st551:
 		if p++; p == pe {
 			goto _test_eof551
@@ -8767,7 +8693,7 @@ func parseRFC5424(data string) (message, error) {
 		case 49:
 			goto st583
 		}
-		goto tr12
+		goto tr11
 	st552:
 		if p++; p == pe {
 			goto _test_eof552
@@ -8776,7 +8702,7 @@ func parseRFC5424(data string) (message, error) {
 		if 49 <= data[p] && data[p] <= 57 {
 			goto st553
 		}
-		goto tr12
+		goto tr11
 	st553:
 		if p++; p == pe {
 			goto _test_eof553
@@ -8785,7 +8711,7 @@ func parseRFC5424(data string) (message, error) {
 		if data[p] == 45 {
 			goto st554
 		}
-		goto tr12
+		goto tr11
 	st554:
 		if p++; p == pe {
 			goto _test_eof554
@@ -8800,7 +8726,7 @@ func parseRFC5424(data string) (message, error) {
 		if 49 <= data[p] && data[p] <= 50 {
 			goto st581
 		}
-		goto tr12
+		goto tr11
 	st555:
 		if p++; p == pe {
 			goto _test_eof555
@@ -8809,7 +8735,7 @@ func parseRFC5424(data string) (message, error) {
 		if 49 <= data[p] && data[p] <= 57 {
 			goto st556
 		}
-		goto tr12
+		goto tr11
 	st556:
 		if p++; p == pe {
 			goto _test_eof556
@@ -8818,7 +8744,7 @@ func parseRFC5424(data string) (message, error) {
 		if data[p] == 84 {
 			goto st557
 		}
-		goto tr12
+		goto tr11
 	st557:
 		if p++; p == pe {
 			goto _test_eof557
@@ -8830,7 +8756,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 49 {
 			goto st558
 		}
-		goto tr12
+		goto tr11
 	st558:
 		if p++; p == pe {
 			goto _test_eof558
@@ -8839,7 +8765,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st559
 		}
-		goto tr12
+		goto tr11
 	st559:
 		if p++; p == pe {
 			goto _test_eof559
@@ -8848,7 +8774,7 @@ func parseRFC5424(data string) (message, error) {
 		if data[p] == 58 {
 			goto st560
 		}
-		goto tr12
+		goto tr11
 	st560:
 		if p++; p == pe {
 			goto _test_eof560
@@ -8857,7 +8783,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 53 {
 			goto st561
 		}
-		goto tr12
+		goto tr11
 	st561:
 		if p++; p == pe {
 			goto _test_eof561
@@ -8866,7 +8792,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st562
 		}
-		goto tr12
+		goto tr11
 	st562:
 		if p++; p == pe {
 			goto _test_eof562
@@ -8875,7 +8801,7 @@ func parseRFC5424(data string) (message, error) {
 		if data[p] == 58 {
 			goto st563
 		}
-		goto tr12
+		goto tr11
 	st563:
 		if p++; p == pe {
 			goto _test_eof563
@@ -8884,7 +8810,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 53 {
 			goto st564
 		}
-		goto tr12
+		goto tr11
 	st564:
 		if p++; p == pe {
 			goto _test_eof564
@@ -8893,7 +8819,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st565
 		}
-		goto tr12
+		goto tr11
 	st565:
 		if p++; p == pe {
 			goto _test_eof565
@@ -8909,7 +8835,7 @@ func parseRFC5424(data string) (message, error) {
 		case 90:
 			goto st571
 		}
-		goto tr12
+		goto tr11
 	st566:
 		if p++; p == pe {
 			goto _test_eof566
@@ -8921,7 +8847,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 49 {
 			goto st567
 		}
-		goto tr12
+		goto tr11
 	st567:
 		if p++; p == pe {
 			goto _test_eof567
@@ -8930,7 +8856,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st568
 		}
-		goto tr12
+		goto tr11
 	st568:
 		if p++; p == pe {
 			goto _test_eof568
@@ -8939,7 +8865,7 @@ func parseRFC5424(data string) (message, error) {
 		if data[p] == 58 {
 			goto st569
 		}
-		goto tr12
+		goto tr11
 	st569:
 		if p++; p == pe {
 			goto _test_eof569
@@ -8948,7 +8874,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 53 {
 			goto st570
 		}
-		goto tr12
+		goto tr11
 	st570:
 		if p++; p == pe {
 			goto _test_eof570
@@ -8957,16 +8883,16 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st571
 		}
-		goto tr12
+		goto tr11
 	st571:
 		if p++; p == pe {
 			goto _test_eof571
 		}
 	st_case_571:
 		if data[p] == 32 {
-			goto tr597
+			goto tr596
 		}
-		goto tr12
+		goto tr11
 	st572:
 		if p++; p == pe {
 			goto _test_eof572
@@ -8975,7 +8901,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 51 {
 			goto st568
 		}
-		goto tr12
+		goto tr11
 	st573:
 		if p++; p == pe {
 			goto _test_eof573
@@ -8984,7 +8910,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st574
 		}
-		goto tr12
+		goto tr11
 	st574:
 		if p++; p == pe {
 			goto _test_eof574
@@ -9001,7 +8927,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st575
 		}
-		goto tr12
+		goto tr11
 	st575:
 		if p++; p == pe {
 			goto _test_eof575
@@ -9018,7 +8944,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st576
 		}
-		goto tr12
+		goto tr11
 	st576:
 		if p++; p == pe {
 			goto _test_eof576
@@ -9035,7 +8961,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st577
 		}
-		goto tr12
+		goto tr11
 	st577:
 		if p++; p == pe {
 			goto _test_eof577
@@ -9052,7 +8978,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st578
 		}
-		goto tr12
+		goto tr11
 	st578:
 		if p++; p == pe {
 			goto _test_eof578
@@ -9069,7 +8995,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st579
 		}
-		goto tr12
+		goto tr11
 	st579:
 		if p++; p == pe {
 			goto _test_eof579
@@ -9083,7 +9009,7 @@ func parseRFC5424(data string) (message, error) {
 		case 90:
 			goto st571
 		}
-		goto tr12
+		goto tr11
 	st580:
 		if p++; p == pe {
 			goto _test_eof580
@@ -9092,7 +9018,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 51 {
 			goto st559
 		}
-		goto tr12
+		goto tr11
 	st581:
 		if p++; p == pe {
 			goto _test_eof581
@@ -9101,7 +9027,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st556
 		}
-		goto tr12
+		goto tr11
 	st582:
 		if p++; p == pe {
 			goto _test_eof582
@@ -9110,7 +9036,7 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 49 {
 			goto st556
 		}
-		goto tr12
+		goto tr11
 	st583:
 		if p++; p == pe {
 			goto _test_eof583
@@ -9119,14 +9045,14 @@ func parseRFC5424(data string) (message, error) {
 		if 48 <= data[p] && data[p] <= 50 {
 			goto st553
 		}
-		goto tr12
+		goto tr11
 	st584:
 		if p++; p == pe {
 			goto _test_eof584
 		}
 	st_case_584:
 		if data[p] == 32 {
-			goto tr9
+			goto tr8
 		}
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st585
@@ -9138,10 +9064,10 @@ func parseRFC5424(data string) (message, error) {
 		}
 	st_case_585:
 		if data[p] == 32 {
-			goto tr9
+			goto tr8
 		}
 		goto st0
-	tr4:
+	tr3:
 //line parser/common.rl:4
 
 		tok = p
@@ -9152,22 +9078,18 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof586
 		}
 	st_case_586:
-//line parser/common.rl:8
-
-		m.setPriority(data[tok:p])
-
-//line rfc5424_gen.go:9116
+//line rfc5424_gen.go:9082
 		switch data[p] {
 		case 57:
 			goto st588
 		case 62:
-			goto st4
+			goto tr5
 		}
 		if 48 <= data[p] && data[p] <= 56 {
 			goto st587
 		}
-		goto tr2
-	tr5:
+		goto tr0
+	tr4:
 //line parser/common.rl:4
 
 		tok = p
@@ -9178,47 +9100,26 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof587
 		}
 	st_case_587:
-//line parser/common.rl:8
-
-		m.setPriority(data[tok:p])
-
-//line rfc5424_gen.go:9142
+//line rfc5424_gen.go:9104
 		if data[p] == 62 {
-			goto st4
+			goto tr5
 		}
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st3
 		}
-		goto tr2
+		goto tr0
 	st588:
 		if p++; p == pe {
 			goto _test_eof588
 		}
 	st_case_588:
-//line parser/common.rl:8
-
-		m.setPriority(data[tok:p])
-
-//line rfc5424_gen.go:9159
 		if data[p] == 62 {
-			goto st4
+			goto tr5
 		}
 		if 48 <= data[p] && data[p] <= 49 {
 			goto st3
 		}
-		goto tr2
-	st593:
-		if p++; p == pe {
-			goto _test_eof593
-		}
-	st_case_593:
-		switch data[p] {
-		case 10:
-			goto st0
-		case 13:
-			goto st0
-		}
-		goto st593
+		goto tr0
 	st_out:
 	_test_eof2:
 		cs = 2
@@ -10993,9 +10894,6 @@ func parseRFC5424(data string) (message, error) {
 	_test_eof588:
 		cs = 588
 		goto _test_eof
-	_test_eof593:
-		cs = 593
-		goto _test_eof
 
 	_test_eof:
 		{
@@ -11007,85 +10905,53 @@ func parseRFC5424(data string) (message, error) {
 
 				m.setMsg(data[tok:p])
 
-			case 1:
+			case 1, 2, 3, 586, 587, 588:
 //line parser/common.rl:36
 
-				err = ErrPriorityPart
+				err = ErrPriority
 				p--
 
-				{
-					goto st593
-				}
-
 			case 6, 547, 548, 549, 550, 551, 552, 553, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567, 568, 569, 570, 571, 572, 573, 574, 575, 576, 577, 578, 579, 580, 581, 582, 583:
-//line parser/common.rl:48
+//line parser/common.rl:41
 
 				err = ErrTimestamp
 				p--
 
-				{
-					goto st593
-				}
-
 			case 8, 9, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 427, 428, 429, 430, 431, 432, 433, 434, 435, 436, 437, 438, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 451, 452, 453, 454, 455, 456, 457, 458, 459, 460, 461, 462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493, 494, 495, 496, 497, 498, 499, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537, 538, 539, 540, 541, 542, 543, 544, 545, 546:
-//line parser/common.rl:54
+//line parser/common.rl:46
 
 				err = ErrHostname
 				p--
 
-				{
-					goto st593
-				}
-
 			case 4:
-//line parser/rfc5424.rl:54
+//line parser/rfc5424.rl:53
 
 				err = ErrVersion
 				p--
 
-				{
-					goto st593
-				}
-
 			case 10, 11, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292:
-//line parser/rfc5424.rl:60
+//line parser/rfc5424.rl:58
 
 				err = ErrAppName
 				p--
 
-				{
-					goto st593
-				}
-
 			case 12, 13, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245:
-//line parser/rfc5424.rl:66
+//line parser/rfc5424.rl:63
 
 				err = ErrProcID
 				p--
 
-				{
-					goto st593
-				}
-
 			case 14, 15, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118:
-//line parser/rfc5424.rl:72
+//line parser/rfc5424.rl:68
 
 				err = ErrMsgID
 				p--
 
-				{
-					goto st593
-				}
-
 			case 16, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 56:
-//line parser/rfc5424.rl:78
+//line parser/rfc5424.rl:73
 
 				err = ErrStructuredData
 				p--
-
-				{
-					goto st593
-				}
 
 			case 590:
 //line parser/common.rl:4
@@ -11096,64 +10962,29 @@ func parseRFC5424(data string) (message, error) {
 
 				m.setMsg(data[tok:p])
 
-			case 2, 3, 586, 587, 588:
-//line parser/common.rl:42
-
-				err = ErrPriority
-				p--
-
-				{
-					goto st593
-				}
-
-//line parser/common.rl:36
-
-				err = ErrPriorityPart
-				p--
-
-				{
-					goto st593
-				}
-
 			case 17, 18, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87:
-//line parser/rfc5424.rl:84
+//line parser/rfc5424.rl:78
 
 				err = ErrSDID
 				p--
 
-				{
-					goto st593
-				}
-
-//line parser/rfc5424.rl:78
+//line parser/rfc5424.rl:73
 
 				err = ErrStructuredData
 				p--
 
-				{
-					goto st593
-				}
-
 			case 54, 55:
-//line parser/rfc5424.rl:90
+//line parser/rfc5424.rl:83
 
 				err = ErrSDParam
 				p--
 
-				{
-					goto st593
-				}
-
-//line parser/rfc5424.rl:78
+//line parser/rfc5424.rl:73
 
 				err = ErrStructuredData
 				p--
 
-				{
-					goto st593
-				}
-
-//line rfc5424_gen.go:9899
+//line rfc5424_gen.go:9816
 			}
 		}
 
@@ -11171,12 +11002,11 @@ func parseRFC5424(data string) (message, error) {
 	return m, nil
 }
 
-//line rfc5424_gen.go:9917
+//line rfc5424_gen.go:9834
 const check_start int = 1
 const check_first_final int = 15
 const check_error int = 0
 
-const check_en_fail int = 16
 const check_en_main int = 1
 
 //line parser/parser_rfc5424.rl:47
@@ -11188,12 +11018,12 @@ func isRFC5424(data string) bool {
 
 	pe := len(data)
 
-//line rfc5424_gen.go:9937
+//line rfc5424_gen.go:9853
 	{
 		cs = check_start
 	}
 
-//line rfc5424_gen.go:9942
+//line rfc5424_gen.go:9858
 	{
 		if p == pe {
 			goto _test_eof
@@ -11231,8 +11061,6 @@ func isRFC5424(data string) bool {
 			goto st_case_13
 		case 14:
 			goto st_case_14
-		case 16:
-			goto st_case_16
 		}
 		goto st_out
 	st_case_1:
@@ -11309,7 +11137,7 @@ func isRFC5424(data string) bool {
 			goto _test_eof7
 		}
 	st_case_7:
-//line rfc5424_gen.go:10058
+//line rfc5424_gen.go:9972
 		if 48 <= data[p] && data[p] <= 57 {
 			goto st8
 		}
@@ -11398,18 +11226,6 @@ func isRFC5424(data string) bool {
 			goto st3
 		}
 		goto st0
-	st16:
-		if p++; p == pe {
-			goto _test_eof16
-		}
-	st_case_16:
-		switch data[p] {
-		case 10:
-			goto st0
-		case 13:
-			goto st0
-		}
-		goto st16
 	st_out:
 	_test_eof2:
 		cs = 2
@@ -11452,9 +11268,6 @@ func isRFC5424(data string) bool {
 		goto _test_eof
 	_test_eof14:
 		cs = 14
-		goto _test_eof
-	_test_eof16:
-		cs = 16
 		goto _test_eof
 
 	_test_eof:
