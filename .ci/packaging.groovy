@@ -296,15 +296,18 @@ def pushCIDockerImages(Map args = [:]) {
 * @param variants list of docker variants
 */
 def tagAndPush(Map args = [:]) {
+  def images = [ ]
+  args.variants.each { variant, sourceNamespace ->
+    images += [ source: "${sourceNamespace}/${args.beatName}${variant}",
+                target: "observability-ci/${args.beatName}",
+                arch: args.arch ]
+  }
   pushDockerImages(
-    secret: env.DOCKERELASTIC_SECRET,
     registry: env.DOCKER_REGISTRY,
-    arch: args.arch,
-    version: env.BEAT_VERSION,
+    secret: env.DOCKERELASTIC_SECRET,
     snapshot: env.SNAPSHOT,
-    imageName: args.beatName,
-    variants: args.variants,
-    targetNamespace: 'observability-ci'
+    version: env.BEAT_VERSION,
+    images: images
   )
 }
 
