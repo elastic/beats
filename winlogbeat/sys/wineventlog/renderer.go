@@ -364,8 +364,8 @@ func (r *Renderer) addEventData(evtMeta *EventMetadata, values []interface{}, ev
 // formatMessage adds the message to the event.
 func (r *Renderer) formatMessage(publisherMeta *PublisherMetadataStore,
 	eventMeta *EventMetadata, eventHandle EvtHandle, values []interface{},
-	eventID uint16) (string, error) {
-
+	eventID uint16) (string, error,
+) {
 	if eventMeta != nil {
 		if eventMeta.MsgStatic != "" {
 			return eventMeta.MsgStatic, nil
