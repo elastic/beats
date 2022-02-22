@@ -72,7 +72,7 @@ func customizePackaging() {
 	mg.Deps(prepareModulePackaging)
 
 	moduleDir := devtools.PackageFile{
-		Mode:    0644,
+		Mode:    0o644,
 		Source:  dirModuleGenerated,
 		Config:  true,
 		Modules: true,
@@ -102,8 +102,8 @@ func prepareModulePackaging() error {
 	return (&devtools.CopyTask{
 		Source:  devtools.XPackBeatDir("module"),
 		Dest:    dirModuleGenerated,
-		Mode:    0644,
-		DirMode: 0755,
+		Mode:    0o644,
+		DirMode: 0o755,
 		Exclude: []string{
 			"/_meta",
 			"/test",

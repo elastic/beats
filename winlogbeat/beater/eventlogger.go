@@ -195,8 +195,7 @@ func processorsForConfig(
 	// added before the user processors.
 	if !config.Index.IsEmpty() {
 		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
-		timestampFormat, err :=
-			fmtstr.NewTimestampFormatString(&config.Index, staticFields)
+		timestampFormat, err := fmtstr.NewTimestampFormatString(&config.Index, staticFields)
 		if err != nil {
 			return nil, err
 		}
