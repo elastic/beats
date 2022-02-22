@@ -71,6 +71,17 @@ func (e *Event) GetValue(key string) (interface{}, error) {
 	return e.Fields.GetValue(key)
 }
 
+// Clone creates an exact copy of the event
+func (e *Event) Clone() *Event {
+	return &Event{
+		Timestamp:  e.Timestamp,
+		Meta:       e.Meta.Clone(),
+		Fields:     e.Fields.Clone(),
+		Private:    e.Private,
+		TimeSeries: e.TimeSeries,
+	}
+}
+
 // DeepUpdate recursively copies the key-value pairs from `d` to various properties of the event.
 // When the key equals `@timestamp` it's set as the `Timestamp` property of the event.
 // When the key equals `@metadata` the update is routed into the `Meta` map instead of `Fields`

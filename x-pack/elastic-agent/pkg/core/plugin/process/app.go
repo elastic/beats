@@ -151,7 +151,13 @@ func (a *Application) Stop() {
 
 	if srvState != nil {
 		// signal stop through GRPC, wait and kill is performed later in gracefulKill
-		srvState.Stop(a.processConfig.StopTimeout)
+		if err := srvState.Stop(a.processConfig.StopTimeout); err != nil {
+			err := fmt.Errorf("failed to stop after %s: %w", a.processConfig.StopTimeout, err)
+			a.setState(state.Failed, err.Error(), nil)
+
+			a.logger.Error(err)
+		}
+
 	}
 
 	a.appLock.Lock()
@@ -280,7 +286,9 @@ func (a *Application) gracefulKill(proc *process.Info) {
 	}
 
 	// send stop signal to request stop
-	proc.Stop()
+	if err := proc.Stop(); err != nil {
+		a.logger.Errorf("failed to stop %s: %v", a.Name(), err)
+	}
 
 	var wg sync.WaitGroup
 	doneChan := make(chan struct{})
@@ -304,6 +312,8 @@ func (a *Application) gracefulKill(proc *process.Info) {
 	select {
 	case <-doneChan:
 	case <-t.C:
+		a.logger.Infof("gracefulKill timed out after %d, killing %s",
+			procExitTimeout, a.Name())
 		_ = proc.Process.Kill()
 	}
 }

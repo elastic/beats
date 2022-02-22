@@ -27,7 +27,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/process"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	sigar "github.com/elastic/gosigar"
@@ -63,7 +62,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	pids, err := process.Pids()
+	pids := sigar.ProcList{}
+	err := pids.Get()
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch the list of PIDs")
 	}
@@ -78,7 +78,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		dead     int
 	}
 
-	for _, pid := range pids {
+	for _, pid := range pids.List {
 		state := sigar.ProcState{}
 		err = state.Get(pid)
 		if err != nil {
@@ -110,14 +110,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	event := common.MapStr{}
 	if runtime.GOOS == "windows" {
 		event = common.MapStr{
-			"total":    len(pids),
+			"total":    len(pids.List),
 			"sleeping": summary.sleeping,
 			"running":  summary.running,
 			"unknown":  summary.unknown,
 		}
 	} else {
 		event = common.MapStr{
-			"total":    len(pids),
+			"total":    len(pids.List),
 			"sleeping": summary.sleeping,
 			"running":  summary.running,
 			"idle":     summary.idle,

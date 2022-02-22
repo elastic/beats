@@ -11,7 +11,7 @@ import (
 	"io"
 	"sync"
 
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
@@ -20,7 +20,7 @@ import (
 )
 
 type dispatcher interface {
-	Dispatch(context.Context, FleetAcker, ...action) error
+	Dispatch(acker FleetAcker, actions ...action) error
 }
 
 type store interface {
@@ -46,7 +46,7 @@ type action = fleetapi.Action
 // receives multiples actions to persist to disk, the implementation of the store only
 // take care of action policy change every other action are discarded. The store will only keep the
 // last good action on disk, we assume that the action is added to the store after it was ACK with
-// Fleet. The store is not threadsafe.
+// Fleet. The store is not thread safe.
 type StateStore struct {
 	log   *logger.Logger
 	store storeLoad
@@ -319,7 +319,6 @@ func (a *StateStoreActionAcker) Commit(ctx context.Context) error {
 
 // ReplayActions replays list of actions.
 func ReplayActions(
-	ctx context.Context,
 	log *logger.Logger,
 	dispatcher dispatcher,
 	acker FleetAcker,
@@ -327,7 +326,7 @@ func ReplayActions(
 ) error {
 	log.Info("restoring current policy from disk")
 
-	if err := dispatcher.Dispatch(ctx, acker, actions...); err != nil {
+	if err := dispatcher.Dispatch(acker, actions...); err != nil {
 		return err
 	}
 

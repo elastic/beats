@@ -91,6 +91,43 @@ co.elastic.logs/processors.dissect.tokenizer: "%{key2} %{key1}"
 In the above sample the processor definition tagged with `1` would be executed first.
 
 [float]
+===== `co.elastic.logs/pipeline`
+
+Define an ingest pipeline ID to be added to the {beatname_uc} input/module configuration.
+
+[source,yaml]
+-----
+co.elastic.logs/pipeline: custom-pipeline
+-----
+
+When hints are used along with templates, then hints will be evaluated only in case
+there is no template's condition that resolves to true. For example:
+
+[source,yaml]
+-----
+filebeat.autodiscover.providers:
+  - type: docker
+    hints.enabled: true
+    hints.default_config:
+      type: container
+      paths:
+        - /var/lib/docker/containers/${data.container.id}/*.log
+    templates:
+      - condition:
+          equals:
+            docker.container.labels.type: "pipeline"
+        config:
+          - type: container
+            paths:
+              - "/var/lib/docker/containers/${data.docker.container.id}/*.log"
+            pipeline: my-pipeline
+-----
+
+In this example first the condition `docker.container.labels.type: "pipeline"` is evaluated
+and if not matched the hints will be processed and if there is again no valid config
+the `hints.default_config` will be used.
+
+[float]
 ==== Kubernetes
 
 Kubernetes autodiscover provider supports hints in Pod annotations. To enable it just set `hints.enabled`:

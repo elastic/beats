@@ -11,8 +11,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"go.elastic.co/apm"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -40,16 +38,13 @@ func NewDownloader(config *artifact.Config) *Downloader {
 
 // Download fetches the package from configured source.
 // Returns absolute path to downloaded package and an error.
-func (e *Downloader) Download(ctx context.Context, spec program.Spec, version string) (_ string, err error) {
-	span, ctx := apm.StartSpan(ctx, "download", "app.internal")
-	defer span.End()
+func (e *Downloader) Download(_ context.Context, spec program.Spec, version string) (_ string, err error) {
 	downloadedFiles := make([]string, 0, 2)
 	defer func() {
 		if err != nil {
 			for _, path := range downloadedFiles {
 				os.Remove(path)
 			}
-			apm.CaptureError(ctx, err).Send()
 		}
 	}()
 

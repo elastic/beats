@@ -751,6 +751,42 @@ func TestAddProcessMetadata(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("supports metadata as a target", func(t *testing.T) {
+		c := common.MapStr{
+			"match_pids":     []string{"@metadata.system.ppid"},
+			"target":         "@metadata",
+			"include_fields": []string{"process.name"},
+		}
+
+		config, err := common.NewConfigFrom(c)
+		assert.NoError(t, err)
+
+		proc, err := newProcessMetadataProcessorWithProvider(config, testProcs, true)
+		assert.NoError(t, err)
+
+		event := &beat.Event{
+			Meta: common.MapStr{
+				"system": common.MapStr{
+					"ppid": "1",
+				},
+			},
+			Fields: common.MapStr{},
+		}
+		expMeta := common.MapStr{
+			"system": common.MapStr{
+				"ppid": "1",
+			},
+			"process": common.MapStr{
+				"name": "systemd",
+			},
+		}
+
+		result, err := proc.Run(event)
+		assert.NoError(t, err)
+		assert.Equal(t, expMeta, result.Meta)
+		assert.Equal(t, event.Fields, result.Fields)
+	})
 }
 
 func TestUsingCache(t *testing.T) {
