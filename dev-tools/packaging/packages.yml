@@ -482,7 +482,6 @@ shared:
       user: '{{ .BeatName }}'
       linux_capabilities: ''
       image_name: ''
-      unpack_beats: true
       beats_install_path: "install"
     files:
       'elastic-agent.yml':
