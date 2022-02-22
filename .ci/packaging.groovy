@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@feature/docker-tag-push-step') _
+@Library('apm@current') _
 
 import groovy.transform.Field
 
