@@ -36,7 +36,6 @@ func TestPercents(t *testing.T) {
 
 	assert.Equal(t, float64(1), data["page_stats"].(common.MapStr)["kswapd_efficiency"].(common.MapStr)["pct"].(float64))
 	assert.Equal(t, float64(0.7143), data["page_stats"].(common.MapStr)["direct_efficiency"].(common.MapStr)["pct"].(float64))
-
 }
 
 func TestFetch(t *testing.T) {

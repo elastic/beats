@@ -18,7 +18,7 @@
 package memory
 
 import (
-	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 
@@ -85,7 +85,6 @@ func FetchLinuxMemStats(baseMap common.MapStr, hostfs resolve.Resolver) error {
 		baseMap.Put("hugepages.swap.out.fallback", thbswpfall)
 	}
 
-	baseMap["hugepages"] = thp
 	baseMap["vmstat"] = vmstat
 
 	return nil
@@ -139,7 +138,7 @@ func getHugePages(hostfs resolve.Resolver) (common.MapStr, error) {
 // GetVMStat gets linux vmstat metrics
 func GetVMStat(hostfs resolve.Resolver) (map[string]uint64, error) {
 	vmstat_file := hostfs.ResolveHostFS("proc/vmstat")
-	content, err := ioutil.ReadFile(vmstat_file)
+	content, err := os.ReadFile(vmstat_file)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error reading vmstat from %s", vmstat_file)
 	}
@@ -154,7 +153,7 @@ func GetVMStat(hostfs resolve.Resolver) (map[string]uint64, error) {
 
 		num, err := strconv.ParseUint(string(parts[1]), 10, 64)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to parse value")
+			return nil, errors.Wrapf(err, "failed to parse value %s", parts[1])
 		}
 		vmstat[parts[0]] = num
 
