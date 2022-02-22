@@ -47,7 +47,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Metricbeat*
 
-- Enhance metricbeat on openshift documentation {pull}30054[30054]
 - Fixed missing ZooKeeper metrics due compatibility issues with versions >= 3.6.0 {pull}30068[30068]
 
 *Packetbeat*
