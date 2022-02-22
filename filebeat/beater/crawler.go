@@ -68,7 +68,7 @@ func (c *crawler) Start(
 ) error {
 	log := c.log
 
-	log.Infof("Loading Inputs: %v", len(c.inputConfigs))
+	log.Infof("Loading Inputs: %d", len(c.inputConfigs))
 
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, inputConfig := range c.inputConfigs {
@@ -105,7 +105,7 @@ func (c *crawler) Start(
 		}()
 	}
 
-	log.Infof("Loading and starting Inputs completed. Enabled inputs: %v", len(c.inputs))
+	log.Infof("Loading and starting Inputs completed. Enabled inputs: %d", len(c.inputs))
 
 	return nil
 }
@@ -115,6 +115,7 @@ func (c *crawler) startInput(
 	config *common.Config,
 ) error {
 	if !config.Enabled() {
+		c.log.Infof("input disabled, skipping it")
 		return nil
 	}
 
