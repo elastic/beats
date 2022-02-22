@@ -21,13 +21,13 @@
 package file_integrity
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/fsnotify/fsevents"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -204,7 +204,7 @@ func getFileInfo(path string) (os.FileInfo, error) {
 		path = resolved
 	}
 	info, err := os.Lstat(path)
-	return info, errors.Wrap(err, "failed to stat")
+	return info, fmt.Errorf("failed to stat: %w", err)
 }
 
 func (r *fsreader) isWatched(path string) bool {
