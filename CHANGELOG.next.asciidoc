@@ -42,23 +42,22 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-- Fix broken Kafka input {issue}29746[29746] {pull}30277[30277]
-- cisco module: Fix change the broke ASA and FTD configs that used `var.input: syslog`. {pull}30072[30072]
+- auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
+- elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
 
 *Heartbeat*
-
 
 *Metricbeat*
 
 - Enhance metricbeat on openshift documentation {pull}30054[30054]
 - Fixed missing ZooKeeper metrics due compatibility issues with versions >= 3.6.0 {pull}30068[30068]
+- Fix Docker module: rename fields on dashboards. {pull}30500[30500]
 
 *Packetbeat*
 
 
 *Winlogbeat*
 
-- Fix run loop when reading from evtx file {pull}30006[30006]
 
 *Functionbeat*
 
@@ -115,4 +114,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 

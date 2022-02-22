@@ -55,6 +55,14 @@ way to use operation types like "index" or "delete" when sending events to {es}.
 For more information, refer to the {es} documentation about
 {ref}/data-streams.html[data streams].
 
+[discrete]
+==== Homebrew formulae no longer available for {beats}
+
+Starting with version 8.0.0, Elastic no longer publishes Homebrew formulae for
+{beats}. You must use a different installation method. See
+the https://www.elastic.co/downloads/beats/[{beats} download pages]
+for available installation methods.
+
 // end::notable-breaking-changes[]
 
 
