@@ -25,9 +25,9 @@ response.split:
   target: body.records
 chain:
   - step:
-      request.url: {{ .url }}/services/data/v52.0/sobjects/EventLogFile/records.#.Id/LogFile
+      request.url: {{ .url }}/services/data/v52.0/sobjects/EventLogFile/$.records[:].Id/LogFile
       request.method: GET
-      replace: records.#.Id
+      replace: $.records[:].Id
 cursor:
   last_published_login:
     value: '[[.last_event.CreatedDate]]'
