@@ -264,7 +264,7 @@ func (c *Checkpoint) read() (*PersistedState, error) {
 	ps := &PersistedState{}
 	err = yaml.Unmarshal(contents, ps)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read persisted state: %w", err)
 	}
 
 	return ps, nil
