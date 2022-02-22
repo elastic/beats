@@ -136,6 +136,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add gcp firestore metricset. {pull}29918[29918]
 - Remove strict parsing on RabbitMQ module {pull}30090[30090]
 - Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
+- Extend documentation aboour `orchestrator.cluster` fields
 
 *Packetbeat*
 
