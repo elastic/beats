@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	"github.com/PaesslerAG/jsonpath"
+
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
