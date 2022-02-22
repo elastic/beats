@@ -22,10 +22,6 @@ package npcap
 
 import "github.com/google/gopacket/pcap"
 
-func reloadWinPCAP() error {
-	err := pcap.UnloadWinPCAP()
-	if err != nil {
-		return err
-	}
-	return pcap.LoadWinPCAP()
-}
+func loadWinPCAP() error { return pcap.LoadWinPCAP() }
+
+func unloadWinPCAP() error { return pcap.UnloadWinPCAP() }

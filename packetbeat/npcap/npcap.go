@@ -56,6 +56,18 @@ func Install(ctx context.Context, log *logp.Logger, path, dst string, compat boo
 }
 
 func install(ctx context.Context, log *logp.Logger, path, dst string, compat bool) error {
+	if pcap.Version() != "" {
+		// If we are here there is a runtime Npcap DLL loaded. We need to
+		// unload this to prevent the application being killed during the
+		// install.
+		//
+		// See https://npcap.com/guide/npcap-users-guide.html#npcap-installation-uninstall-options.
+		err := unloadWinPCAP()
+		if err != nil {
+			return fmt.Errorf("npcap: failed to unload Npcap DLL: %w", err)
+		}
+	}
+
 	args := []string{"/S", "/winpcap_mode=no"}
 	if compat {
 		args[1] = "/winpcap_mode=yes"
@@ -84,7 +96,7 @@ func install(ctx context.Context, log *logp.Logger, path, dst string, compat boo
 		return fmt.Errorf("npcap: failed to install Npcap: %w", err)
 	}
 
-	return reloadWinPCAP()
+	return loadWinPCAP()
 }
 
 func Upgradeable() bool {

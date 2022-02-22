@@ -39,7 +39,7 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 	}()
 
 	// starting only if it's not running
-	// or if it is, then only in case it's restart and this call initiates from restart call
+	// or if it is, then only in case it's a restart and this call initiates from restart call
 	if a.Started() && a.state.Status != state.Restarting {
 		if a.state.ProcessInfo == nil {
 			// already started if not stopped or crashed
