@@ -52,6 +52,7 @@ func installNpcap(b *beat.Beat) error {
 		}
 	}()
 	if !npcap.Upgradeable() {
+		npcap.Installer = nil
 		return nil
 	}
 
