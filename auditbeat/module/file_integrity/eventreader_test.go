@@ -103,7 +103,7 @@ func TestEventReader(t *testing.T) {
 				case e.Action == Moved:
 					assertSameFile(t, txt2, e.Path)
 				// Source file is moved and updated
-				case 0 != e.Action&Moved, 0 != e.Action&Updated:
+				case e.Action&Moved != 0, e.Action&Updated != 0:
 					assertSameFile(t, txt1, e.Path)
 				default:
 					t.Errorf("unexpected event: %+v", e)
@@ -112,9 +112,9 @@ func TestEventReader(t *testing.T) {
 		} else {
 			for _, e := range received {
 				switch {
-				case 0 != e.Action&Moved, 0 != e.Action&Updated:
+				case e.Action&Moved != 0, e.Action&Updated != 0:
 					assert.Equal(t, txt1, e.Path)
-				case 0 != e.Action&Created:
+				case e.Action&Created != 0:
 					assertSameFile(t, txt2, e.Path)
 				default:
 					t.Errorf("unexpected event: %+v", e)
@@ -243,13 +243,15 @@ func TestEventReader(t *testing.T) {
 func TestRaces(t *testing.T) {
 	t.Skip("Flaky test: about 1/20 of builds fails https://github.com/elastic/beats/issues/21303")
 	const (
+		// fileMode is the mode to use for watched files.
 		fileMode os.FileMode = 0o640
-		N                    = 100
+
+		// N is the number of watched directories.
+		N = 100
 	)
 
-	var dirs []string
-
-	for i := 0; i < N; i++ {
+	dirs := make([]string, N)
+	for i := range dirs {
 		dir, err := ioutil.TempDir("", "audit")
 		if err != nil {
 			t.Fatal(err)
@@ -257,7 +259,7 @@ func TestRaces(t *testing.T) {
 		if dir, err = filepath.EvalSymlinks(dir); err != nil {
 			t.Fatal(err)
 		}
-		dirs = append(dirs, dir)
+		dirs[i] = dir
 	}
 
 	defer func() {
