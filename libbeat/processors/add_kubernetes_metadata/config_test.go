@@ -60,3 +60,76 @@ func TestConfigValidate(t *testing.T) {
 		}
 	}
 }
+
+func TestConfigValidate_LogsPatchMatcher(t *testing.T) {
+	tests := []struct {
+		matcherName   string
+		matcherConfig map[string]interface{}
+		error         bool
+	}{
+		{
+			matcherName:   "",
+			matcherConfig: map[string]interface{}{},
+			error:         false,
+		},
+		{
+			matcherName: "logs_path",
+			matcherConfig: map[string]interface{}{
+				"resource_type": "pod",
+			},
+			error: true,
+		},
+		{
+			matcherName: "logs_path",
+			matcherConfig: map[string]interface{}{
+				"resource_type": "pod",
+				"invalid_field": "invalid_value",
+			},
+			error: true,
+		},
+		{
+			matcherName: "logs_path",
+			matcherConfig: map[string]interface{}{
+				"resource_type": "pod",
+				"logs_path":     "/var/log/invalid/path/",
+			},
+			error: true,
+		},
+		{
+			matcherName: "logs_path",
+			matcherConfig: map[string]interface{}{
+				"resource_type": "pod",
+				"logs_path":     "/var/log/pods/",
+			},
+			error: false,
+		},
+		{
+			matcherName: "logs_path",
+			matcherConfig: map[string]interface{}{
+				"resource_type": "container",
+				"logs_path":     "/var/log/containers/",
+			},
+			error: false,
+		},
+	}
+
+	for _, test := range tests {
+		cfg, _ := common.NewConfigFrom(test.matcherConfig)
+
+		c := defaultKubernetesAnnotatorConfig()
+		c.DefaultMatchers = Enabled{false}
+
+		err := cfg.Unpack(&c)
+		c.Matchers = PluginConfig{
+			{
+				test.matcherName: *cfg,
+			},
+		}
+		err = c.Validate()
+		if test.error {
+			require.NotNil(t, err)
+		} else {
+			require.Nil(t, err)
+		}
+	}
+}
