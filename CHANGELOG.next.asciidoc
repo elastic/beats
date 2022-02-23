@@ -115,8 +115,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Filebeat*
 
-- Extend documentation about hints annotation for processors
-
+- Extend documentation about hints annotation for processors {pull}30561[30561]
 
 *Heartbeat*
 
