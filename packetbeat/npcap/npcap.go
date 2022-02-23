@@ -15,19 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Package npcap handles fetching and installing Npcap fow Windows.
-//
-// The npcap package interacts with a registry and download server that
-// provides a current_version end point that serves a JSON message that
-// corresponds to the this Go type:
-//
-//  struct {
-//  	Version string // The semverish version of the Npcap installer.
-//  	URL     string // The location of the Npcap installer.
-//  	Hash    string // The sha256 hash of the Npcap installer.
-//  }
-//
-// The URL field will point to the location of anb Npcap installer.
+// Package npcap handles fetching and installing Npcap for Windows.
 package npcap
 
 import (
@@ -68,6 +56,18 @@ func Install(ctx context.Context, log *logp.Logger, path, dst string, compat boo
 }
 
 func install(ctx context.Context, log *logp.Logger, path, dst string, compat bool) error {
+	if pcap.Version() != "" {
+		// If we are here there is a runtime Npcap DLL loaded. We need to
+		// unload this to prevent the application being killed during the
+		// install.
+		//
+		// See https://npcap.com/guide/npcap-users-guide.html#npcap-installation-uninstall-options.
+		err := unloadWinPCAP()
+		if err != nil {
+			return fmt.Errorf("npcap: failed to unload Npcap DLL: %w", err)
+		}
+	}
+
 	args := []string{"/S", "/winpcap_mode=no"}
 	if compat {
 		args[1] = "/winpcap_mode=yes"
@@ -96,7 +96,7 @@ func install(ctx context.Context, log *logp.Logger, path, dst string, compat boo
 		return fmt.Errorf("npcap: failed to install Npcap: %w", err)
 	}
 
-	return reloadWinPCAP()
+	return loadWinPCAP()
 }
 
 func Upgradeable() bool {

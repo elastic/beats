@@ -1,35 +1,37 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
-    },
-    "metricset":{
-        "host":"localhost",
-        "module":"containerd",
-        "name":"blkio",
-        "rtt":44269
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "container": {
+        "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
     },
     "containerd": {
         "blkio": {
+            "device": "/dev/vda",
             "read": {
-                "ops": 168,
-                "bytes": 4952064
+                "bytes": 69246976,
+                "ops": 830
             },
             "summary": {
-                "ops": 168,
-                "bytes": 4952064
+                "bytes": 69271552,
+                "ops": 832
             },
             "write": {
-                "ops": 20,
-                "bytes": 123134
-            },
-            "device": "/dev/vda"
+                "bytes": 24576,
+                "ops": 2
+            }
         },
         "namespace": "k8s.io"
     },
-    "container": {
-        "id": "b4d9e874a2de96e4512a32a49df09641fa792a99bebcc6d353723850a50db831"
+    "event": {
+        "dataset": "containerd.blkio",
+        "duration": 115000,
+        "module": "containerd"
     },
-    "type":"metricsets"
+    "metricset": {
+        "name": "blkio",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "containerd"
+    }
 }

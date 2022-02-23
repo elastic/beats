@@ -36,25 +36,6 @@ Also see {beatname_url}/running-with-systemd.html[{beatname_uc} and systemd].
 ----
 // end::mac[]
 
-// tag::brew[]
-To have launchd start +elastic/tap/{beatname_lc}+ and then restart it at login,
-run:
-
-["source","sh",subs="attributes"]
------
-brew services start elastic/tap/{beatname_lc}-full
------
-
-To run {beatname_uc} in the foreground instead of running it as a background
-service, run:
-
-["source","sh",subs="attributes"]
------
-{beatname_lc} -e
------
-
-// end::brew[]
-
 // tag::linux[]
 
 ["source","sh",subs="attributes,callouts"]

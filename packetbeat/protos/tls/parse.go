@@ -63,12 +63,13 @@ type handshakeType uint8
 
 const (
 	helloRequest       handshakeType = 0
-	clientHello                      = 1
-	serverHello                      = 2
-	certificate                      = 11
-	serverKeyExchange                = 12
-	certificateRequest               = 13
-	clientKeyExchange                = 16
+	clientHello        handshakeType = 1
+	serverHello        handshakeType = 2
+	certificate        handshakeType = 11
+	serverKeyExchange  handshakeType = 12
+	certificateRequest handshakeType = 13
+	clientKeyExchange  handshakeType = 16
+	certificateStatus  handshakeType = 22
 )
 
 type parserResult int8
@@ -99,8 +100,34 @@ type parser struct {
 	// for a certificate
 	certRequested bool
 
+	// ocspResponse is the top level OCSP response status.
+	ocspResponse        ocspResponseStatus
+	ocspResponseIsValid bool
+
 	// If a key-exchange message has been sent. Used to detect session resumption
 	keyExchanged bool
+}
+
+// https://www.rfc-editor.org/rfc/rfc6960#section-4.2.1
+type ocspResponseStatus byte
+
+func (s ocspResponseStatus) String() string {
+	switch s {
+	case 0: // Response has valid confirmations
+		return "successful"
+	case 1: // Illegal confirmation request
+		return "malformedRequest"
+	case 2: // Internal error in issuer
+		return "internalError"
+	case 3: // Try again later
+		return "tryLater"
+	case 5: // Must sign the request
+		return "sigRequired"
+	case 6: // Request unauthorized
+		return "unauthorized"
+	default:
+		return fmt.Sprint(byte(s))
+	}
 }
 
 type tlsVersion struct {
@@ -120,6 +147,7 @@ type handshakeHeader struct {
 
 type helloMessage struct {
 	version   tlsVersion
+	random    []byte
 	timestamp uint32
 	sessionID string
 	ticket    tlsTicket
@@ -190,6 +218,9 @@ func (hello *helloMessage) toMap() common.MapStr {
 	}
 	if len(hello.sessionID) != 0 {
 		m["session_id"] = hello.sessionID
+	}
+	if len(hello.random) != 0 {
+		m["random"] = hex.EncodeToString(hello.random)
 	}
 
 	if len(hello.supported.compression) > 0 {
@@ -361,6 +392,9 @@ func (parser *parser) parseHandshake(handshakeType handshakeType, buffer bufferV
 	case serverKeyExchange:
 		parser.setDirection(dirServer)
 		parser.keyExchanged = true
+
+	case certificateStatus:
+		parser.ocspResponse, parser.ocspResponseIsValid = parseOCSPStatus(buffer)
 	}
 	return true
 }
@@ -394,12 +428,14 @@ func parseCommonHello(buffer bufferView, dest *helloMessage) (int, bool) {
 		return 0, false
 	}
 
-	if bytes := buffer.readBytes(7+randomDataLength, int(sessionIDLength)); len(bytes) == int(sessionIDLength) {
-		dest.sessionID = hex.EncodeToString(bytes)
-	} else {
+	bytes := buffer.readBytes(7+randomDataLength, int(sessionIDLength))
+	if len(bytes) != int(sessionIDLength) {
 		logp.Warn("Not a TLS hello (failed reading session ID)")
 		return 0, false
 	}
+	dest.sessionID = hex.EncodeToString(bytes)
+	dest.random = buffer.readBytes(2, 4+randomDataLength)
+
 	return helloHeaderLength + randomDataLength + int(sessionIDLength), true
 }
 
@@ -501,6 +537,23 @@ func parseCertificates(buffer bufferView) (certs []*x509.Certificate) {
 		pos += 3 + int(certLen)
 	}
 	return certs
+}
+
+func parseOCSPStatus(buffer bufferView) (status ocspResponseStatus, ok bool) {
+	const (
+		statusTypeLen     = 1
+		respLengthLen     = 3
+		ocspRespHeaderLen = 6
+
+		ocspStatusType = 1
+	)
+	var b byte
+	ok = buffer.read8(0, &b)
+	if !ok || b != ocspStatusType {
+		return 0, false
+	}
+	ok = buffer.read8(statusTypeLen+respLengthLen+ocspRespHeaderLen, &b)
+	return ocspResponseStatus(b), ok
 }
 
 func (version tlsVersion) String() string {
