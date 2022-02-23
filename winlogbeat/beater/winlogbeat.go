@@ -155,7 +155,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 	var wg sync.WaitGroup
 	for _, log := range eb.eventLogs {
-		state, _ := persistedState[log.source.Name()]
+		state := persistedState[log.source.Name()]
 
 		// Start a goroutine for each event log.
 		wg.Add(1)
