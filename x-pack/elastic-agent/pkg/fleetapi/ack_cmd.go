@@ -27,6 +27,7 @@ type AckEvent struct {
 	Message   string `json:"message,omitempty"` // : 'hello2',
 	Payload   string `json:"payload,omitempty"` // : 'payload2',
 
+	InputType      string                 `json:"input_type,omitempty"`      // copy of original action input_type
 	ActionData     json.RawMessage        `json:"action_data,omitempty"`     // copy of original action data
 	ActionResponse map[string]interface{} `json:"action_response,omitempty"` // custom (per beat) response payload
 	StartedAt      string                 `json:"started_at,omitempty"`      // time action started
