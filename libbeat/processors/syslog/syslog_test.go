@@ -64,23 +64,25 @@ var syslogCases = map[string]struct {
 			"message": `<13>Oct 11 22:14:15 test-host su[1024]: this is the message`,
 		},
 		Want: common.MapStr{
-			"syslog": common.MapStr{
-				"facility":       1,
-				"priority":       13,
-				"severity":       5,
-				"facility_label": "user-level",
-				"severity_label": "Notice",
+			"log": common.MapStr{
+				"syslog": common.MapStr{
+					"priority": 13,
+					"facility": common.MapStr{
+						"code": 1,
+						"name": "user-level",
+					},
+					"severity": common.MapStr{
+						"code": 5,
+						"name": "Notice",
+					},
+					"hostname": "test-host",
+					"appname":  "su",
+					"procid":   "1024",
+				},
 			},
 			"event": common.MapStr{
 				"severity": 5,
 				"original": `<13>Oct 11 22:14:15 test-host su[1024]: this is the message`,
-			},
-			"process": common.MapStr{
-				"name": "su",
-				"pid":  "1024",
-			},
-			"host": common.MapStr{
-				"name": "test-host",
 			},
 			"message": "this is the message",
 		},
@@ -92,35 +94,37 @@ var syslogCases = map[string]struct {
 			"message": `<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog 1024 ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"] this is the message`,
 		},
 		Want: common.MapStr{
-			"syslog": common.MapStr{
-				"priority":       165,
-				"facility":       20,
-				"severity":       5,
-				"facility_label": "local4",
-				"severity_label": "Notice",
-				"msgid":          "ID47",
-				"version":        1,
-				"data": map[string]map[string]string{
-					"exampleSDID@32473": {
-						"iut":         "3",
-						"eventSource": "Application",
-						"eventID":     "1011",
+			"log": common.MapStr{
+				"syslog": common.MapStr{
+					"priority": 165,
+					"facility": common.MapStr{
+						"code": 20,
+						"name": "local4",
 					},
-					"examplePriority@32473": {
-						"class": "high",
+					"severity": common.MapStr{
+						"code": 5,
+						"name": "Notice",
+					},
+					"hostname": "mymachine.example.com",
+					"appname":  "evntslog",
+					"procid":   "1024",
+					"msgid":    "ID47",
+					"version":  1,
+					"data": map[string]map[string]string{
+						"examplePriority@32473": {
+							"class": "high",
+						},
+						"exampleSDID@32473": {
+							"eventID":     "1011",
+							"eventSource": "Application",
+							"iut":         "3",
+						},
 					},
 				},
 			},
 			"event": common.MapStr{
 				"severity": 5,
 				"original": `<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog 1024 ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"] this is the message`,
-			},
-			"process": common.MapStr{
-				"name": "evntslog",
-				"pid":  "1024",
-			},
-			"host": common.MapStr{
-				"name": "mymachine.example.com",
 			},
 			"message": "this is the message",
 		},
@@ -168,6 +172,64 @@ func BenchmarkSyslog(b *testing.B) {
 
 				_, _ = p.Run(event)
 			}
+		})
+	}
+}
+
+func TestAppendStringField(t *testing.T) {
+	tests := map[string]struct {
+		InMap   common.MapStr
+		InField string
+		InValue string
+		Want    common.MapStr
+	}{
+		"nil": {
+			InMap:   common.MapStr{},
+			InField: "error",
+			InValue: "foo",
+			Want: common.MapStr{
+				"error": "foo",
+			},
+		},
+		"string": {
+			InMap: common.MapStr{
+				"error": "foo",
+			},
+			InField: "error",
+			InValue: "bar",
+			Want: common.MapStr{
+				"error": []string{"foo", "bar"},
+			},
+		},
+		"string-slice": {
+			InMap: common.MapStr{
+				"error": []string{"foo", "bar"},
+			},
+			InField: "error",
+			InValue: "some value",
+			Want: common.MapStr{
+				"error": []string{"foo", "bar", "some value"},
+			},
+		},
+		"interface-slice": {
+			InMap: common.MapStr{
+				"error": []interface{}{"foo", "bar"},
+			},
+			InField: "error",
+			InValue: "some value",
+			Want: common.MapStr{
+				"error": []interface{}{"foo", "bar", "some value"},
+			},
+		},
+	}
+
+	for name, tc := range tests {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			appendStringField(tc.InMap, tc.InField, tc.InValue)
+
+			assert.Equal(t, tc.Want, tc.InMap)
 		})
 	}
 }

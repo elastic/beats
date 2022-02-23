@@ -484,17 +484,26 @@ func TestMessage_Fields(t *testing.T) {
 				},
 			},
 			Want: common.MapStr{
-				"syslog": common.MapStr{
-					"priority":       13,
-					"facility":       1,
-					"severity":       5,
-					"severity_label": "Notice",
-					"facility_label": "user-level",
-					"msgid":          "msg123",
-					"version":        1,
-					"data": map[string]map[string]string{
-						"a": {
-							"b": "c",
+				"log": common.MapStr{
+					"syslog": common.MapStr{
+						"priority": 13,
+						"facility": common.MapStr{
+							"code": 1,
+							"name": "user-level",
+						},
+						"severity": common.MapStr{
+							"code": 5,
+							"name": "Notice",
+						},
+						"hostname": "test-host",
+						"appname":  "su",
+						"procid":   "1024",
+						"msgid":    "msg123",
+						"version":  1,
+						"data": map[string]map[string]string{
+							"a": {
+								"b": "c",
+							},
 						},
 					},
 				},
@@ -502,107 +511,6 @@ func TestMessage_Fields(t *testing.T) {
 				"event": common.MapStr{
 					"original": "",
 					"severity": 5,
-				},
-				"process": common.MapStr{
-					"name": "su",
-					"pid":  "1024",
-				},
-				"host": common.MapStr{
-					"name": "test-host",
-				},
-			},
-		},
-		"valid-ipv4-hostname": {
-			In: &message{
-				timestamp: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123456-06:00"),
-				facility:  1,
-				severity:  5,
-				priority:  13,
-				hostname:  "10.0.0.1",
-				msg:       "this is a test message",
-				process:   "su",
-				pid:       "1024",
-				msgID:     "msg123",
-				version:   1,
-				structuredData: map[string]map[string]string{
-					"a": {
-						"b": "c",
-					},
-				},
-			},
-			Want: common.MapStr{
-				"syslog": common.MapStr{
-					"priority":       13,
-					"facility":       1,
-					"severity":       5,
-					"severity_label": "Notice",
-					"facility_label": "user-level",
-					"msgid":          "msg123",
-					"version":        1,
-					"data": map[string]map[string]string{
-						"a": {
-							"b": "c",
-						},
-					},
-				},
-				"message": "this is a test message",
-				"event": common.MapStr{
-					"original": "",
-					"severity": 5,
-				},
-				"process": common.MapStr{
-					"name": "su",
-					"pid":  "1024",
-				},
-				"host": common.MapStr{
-					"ip": "10.0.0.1",
-				},
-			},
-		},
-		"valid-ipv6-hostname": {
-			In: &message{
-				timestamp: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.123456-06:00"),
-				facility:  1,
-				severity:  5,
-				priority:  13,
-				hostname:  "2a02:cf40:add:4002:91f2:a9b2:e09a:6fc6",
-				msg:       "this is a test message",
-				process:   "su",
-				pid:       "1024",
-				msgID:     "msg123",
-				version:   1,
-				structuredData: map[string]map[string]string{
-					"a": {
-						"b": "c",
-					},
-				},
-			},
-			Want: common.MapStr{
-				"syslog": common.MapStr{
-					"priority":       13,
-					"facility":       1,
-					"severity":       5,
-					"severity_label": "Notice",
-					"facility_label": "user-level",
-					"msgid":          "msg123",
-					"version":        1,
-					"data": map[string]map[string]string{
-						"a": {
-							"b": "c",
-						},
-					},
-				},
-				"message": "this is a test message",
-				"event": common.MapStr{
-					"original": "",
-					"severity": 5,
-				},
-				"process": common.MapStr{
-					"name": "su",
-					"pid":  "1024",
-				},
-				"host": common.MapStr{
-					"ip": "2a02:cf40:add:4002:91f2:a9b2:e09a:6fc6",
 				},
 			},
 		},

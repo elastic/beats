@@ -17,7 +17,11 @@
 
 package syslog
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+)
 
 // stringToInt converts a string, assumed to be ASCII numeric characters, to an int.
 // This is a simplified version of the fast path for strconv.Atoi, with error handling removed.
@@ -85,10 +89,31 @@ func removeBytes(value string, positions []int, offset int) string {
 	return sb.String()
 }
 
+// mapIndexToString will return the value at the index of idx in values. It returns the value
+// and true if the index is valid, otherwise and empty string and false if the index is invalid.
 func mapIndexToString(idx int, values []string) (string, bool) {
 	if idx < 0 || idx >= len(values) {
 		return "", false
 	}
 
 	return values[idx], true
+}
+
+// appendStringField appends value to field. If field is nil (not present in the map), then
+// the resulting field value will be a string. If the existing field is a string, then field
+// value will be converted to a string slice. If the existing field is a string slice or
+// interface slice, then the new value will be appended. If the existing value is some
+// other type, then this function does nothing.
+func appendStringField(m common.MapStr, field, value string) {
+	v, _ := m.GetValue(field)
+	switch t := v.(type) {
+	case nil:
+		m.Put(field, value)
+	case string:
+		m.Put(field, []string{t, value})
+	case []string:
+		m.Put(field, append(t, value))
+	case []interface{}:
+		m.Put(field, append(t, value))
+	}
 }

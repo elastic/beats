@@ -18,7 +18,6 @@
 package syslog
 
 import (
-	"net"
 	"strings"
 	"time"
 
@@ -175,61 +174,45 @@ func (m *message) setDataValue(id, key, value string) {
 
 // fields produces fields from the message.
 func (m message) fields(original string) common.MapStr {
-	syslogFields := common.MapStr{
-		"priority": m.priority,
-		"facility": m.facility,
-		"severity": m.severity,
-	}
-	eventFields := common.MapStr{
-		"severity": m.severity,
-		"original": original,
-	}
-	rootFields := common.MapStr{
-		"syslog": syslogFields,
-		"event":  eventFields,
-	}
+	f := common.MapStr{}
 
+	// Syslog fields.
+	f.Put("log.syslog.priority", m.priority)
+	f.Put("log.syslog.facility.code", m.facility)
+	f.Put("log.syslog.severity.code", m.severity)
 	if v, ok := mapIndexToString(m.severity, severityLabels); ok {
-		syslogFields["severity_label"] = v
+		f.Put("log.syslog.severity.name", v)
 	}
 	if v, ok := mapIndexToString(m.facility, facilityLabels); ok {
-		syslogFields["facility_label"] = v
+		f.Put("log.syslog.facility.name", v)
 	}
-
 	if m.process != "" {
-		processFields := common.MapStr{
-			"name": m.process,
-		}
+		f.Put("log.syslog.appname", m.process)
 		if m.pid != "" {
-			processFields["pid"] = m.pid
+			f.Put("log.syslog.procid", m.pid)
 		}
-
-		rootFields["process"] = processFields
 	}
 	if m.hostname != "" {
-		hostFields := common.MapStr{}
-
-		if ip := net.ParseIP(m.hostname); ip != nil {
-			hostFields["ip"] = ip.String()
-		} else {
-			hostFields["name"] = m.hostname
-		}
-
-		rootFields["host"] = hostFields
+		f.Put("log.syslog.hostname", m.hostname)
 	}
-	if m.msg != "" {
-		rootFields["message"] = strings.TrimSpace(m.msg)
-	}
-
 	if m.msgID != "" {
-		syslogFields["msgid"] = m.msgID
+		f.Put("log.syslog.msgid", m.msgID)
 	}
 	if m.version != 0 {
-		syslogFields["version"] = m.version
+		f.Put("log.syslog.version", m.version)
 	}
 	if len(m.structuredData) > 0 {
-		syslogFields["data"] = m.structuredData
+		f.Put("log.syslog.data", m.structuredData)
 	}
 
-	return rootFields
+	// Event fields.
+	f.Put("event.severity", m.severity)
+	f.Put("event.original", original)
+
+	// Message field.
+	if m.msg != "" {
+		f.Put("message", strings.TrimSpace(m.msg))
+	}
+
+	return f
 }

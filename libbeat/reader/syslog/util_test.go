@@ -21,6 +21,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestStringToInt(t *testing.T) {
@@ -192,6 +194,64 @@ func TestMapIndexToString(t *testing.T) {
 
 			assert.Equal(t, tc.Want, got)
 			assert.Equal(t, tc.WantOK, ok)
+		})
+	}
+}
+
+func TestAppendStringField(t *testing.T) {
+	tests := map[string]struct {
+		InMap   common.MapStr
+		InField string
+		InValue string
+		Want    common.MapStr
+	}{
+		"nil": {
+			InMap:   common.MapStr{},
+			InField: "error",
+			InValue: "foo",
+			Want: common.MapStr{
+				"error": "foo",
+			},
+		},
+		"string": {
+			InMap: common.MapStr{
+				"error": "foo",
+			},
+			InField: "error",
+			InValue: "bar",
+			Want: common.MapStr{
+				"error": []string{"foo", "bar"},
+			},
+		},
+		"string-slice": {
+			InMap: common.MapStr{
+				"error": []string{"foo", "bar"},
+			},
+			InField: "error",
+			InValue: "some value",
+			Want: common.MapStr{
+				"error": []string{"foo", "bar", "some value"},
+			},
+		},
+		"interface-slice": {
+			InMap: common.MapStr{
+				"error": []interface{}{"foo", "bar"},
+			},
+			InField: "error",
+			InValue: "some value",
+			Want: common.MapStr{
+				"error": []interface{}{"foo", "bar", "some value"},
+			},
+		},
+	}
+
+	for name, tc := range tests {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			appendStringField(tc.InMap, tc.InField, tc.InValue)
+
+			assert.Equal(t, tc.Want, tc.InMap)
 		})
 	}
 }

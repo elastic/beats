@@ -82,36 +82,38 @@ func TestNewParser(t *testing.T) {
 					Timestamp: mustParseTime(time.RFC3339Nano, "2003-10-11T22:14:15.003Z"),
 					Content:   []byte("this is the message"),
 					Fields: common.MapStr{
+						"log": common.MapStr{
+							"syslog": common.MapStr{
+								"priority": 165,
+								"facility": common.MapStr{
+									"code": 20,
+									"name": "local4",
+								},
+								"severity": common.MapStr{
+									"code": 5,
+									"name": "Notice",
+								},
+								"hostname": "mymachine.example.com",
+								"appname":  "evntslog",
+								"procid":   "1024",
+								"msgid":    "ID47",
+								"version":  1,
+								"data": map[string]map[string]string{
+									"examplePriority@32473": {
+										"class": "high",
+									},
+									"exampleSDID@32473": {
+										"eventID":     "1011",
+										"eventSource": "Application",
+										"iut":         "3",
+									},
+								},
+							},
+						},
+						"message": "this is the message",
 						"event": common.MapStr{
 							"original": "<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog 1024 ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"][examplePriority@32473 class=\"high\"] this is the message",
 							"severity": 5,
-						},
-						"host": common.MapStr{
-							"name": "mymachine.example.com",
-						},
-						"message": "this is the message",
-						"process": common.MapStr{
-							"name": "evntslog",
-							"pid":  "1024",
-						},
-						"syslog": common.MapStr{
-							"data": map[string]map[string]string{
-								"examplePriority@32473": {
-									"class": "high",
-								},
-								"exampleSDID@32473": {
-									"eventID":     "1011",
-									"eventSource": "Application",
-									"iut":         "3",
-								},
-							},
-							"facility":       20,
-							"facility_label": "local4",
-							"msgid":          "ID47",
-							"priority":       165,
-							"severity":       5,
-							"severity_label": "Notice",
-							"version":        1,
 						},
 					},
 				},
@@ -119,25 +121,27 @@ func TestNewParser(t *testing.T) {
 					Timestamp: mustParseTimeLoc(time.Stamp, "Oct 11 22:14:15", time.Local),
 					Content:   []byte("this is the message"),
 					Fields: common.MapStr{
+						"log": common.MapStr{
+							"syslog": common.MapStr{
+								"priority": 13,
+								"facility": common.MapStr{
+									"code": 1,
+									"name": "user-level",
+								},
+								"severity": common.MapStr{
+									"code": 5,
+									"name": "Notice",
+								},
+								"hostname": "test-host",
+								"appname":  "su",
+								"procid":   "1024",
+							},
+						},
 						"event": common.MapStr{
 							"original": `<13>Oct 11 22:14:15 test-host su[1024]: this is the message`,
 							"severity": 5,
 						},
-						"host": common.MapStr{
-							"name": "test-host",
-						},
 						"message": "this is the message",
-						"process": common.MapStr{
-							"name": "su",
-							"pid":  "1024",
-						},
-						"syslog": common.MapStr{
-							"facility":       1,
-							"facility_label": "user-level",
-							"priority":       13,
-							"severity":       5,
-							"severity_label": "Notice",
-						},
 					},
 				},
 				{

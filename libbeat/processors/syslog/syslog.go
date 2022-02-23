@@ -51,6 +51,7 @@ type config struct {
 	OverwriteKeys bool              `config:"overwrite_keys"`
 	IgnoreMissing bool              `config:"ignore_missing"`
 	IgnoreFailure bool              `config:"ignore_failure"`
+	Tag           string            `config:"tag"`
 }
 
 // processor defines a syslog processor.
@@ -111,7 +112,13 @@ func New(c *common.Config) (processors.Processor, error) {
 
 	id := int(instanceID.Inc())
 	log := logp.NewLogger(logName).With("instance_id", id)
-	registry := monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
+	registryName := logName + "." + strconv.Itoa(id)
+
+	if cfg.Tag != "" {
+		log = log.With("tag", cfg.Tag)
+		registryName = logName + "." + cfg.Tag + "-" + strconv.Itoa(id)
+	}
+	registry := monitoring.Default.NewRegistry(registryName, monitoring.DoNotReport)
 
 	return &processor{
 		config: cfg,
@@ -130,7 +137,7 @@ func New(c *common.Config) (processors.Processor, error) {
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	if err := p.run(event); err != nil && !p.IgnoreFailure {
 		err = fmt.Errorf(procName+" failed to process field %q: %w", p.Field, err)
-		_, _ = event.PutValue("error.message", err.Error())
+		appendStringField(event.Fields, "error.message", err.Error())
 		return event, err
 	}
 
@@ -141,13 +148,15 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 func (p *processor) run(event *beat.Event) error {
 	value, err := event.GetValue(p.Field)
 	if err != nil {
-		if p.IgnoreMissing {
-			p.stats.Missing.Inc()
-			if err == common.ErrKeyNotFound {
+		if err == common.ErrKeyNotFound {
+			if p.IgnoreMissing {
 				return nil
 			}
+			p.stats.Missing.Inc()
 		}
-		p.stats.Failure.Inc()
+		if !p.IgnoreFailure {
+			p.stats.Failure.Inc()
+		}
 		return err
 	}
 
@@ -175,4 +184,23 @@ func (p *processor) String() string {
 	data, _ := json.Marshal(p.config)
 
 	return procName + "=" + string(data)
+}
+
+// appendStringField appends value to field. If field is nil (not present in the map), then
+// the resulting field value will be a string. If the existing field is a string, then field
+// value will be converted to a string slice. If the existing field is a string slice or
+// interface slice, then the new value will be appended. If the existing value is some
+// other type, then this function does nothing.
+func appendStringField(m common.MapStr, field, value string) {
+	v, _ := m.GetValue(field)
+	switch t := v.(type) {
+	case nil:
+		m.Put(field, value)
+	case string:
+		m.Put(field, []string{t, value})
+	case []string:
+		m.Put(field, append(t, value))
+	case []interface{}:
+		m.Put(field, append(t, value))
+	}
 }

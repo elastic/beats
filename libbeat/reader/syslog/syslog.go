@@ -145,36 +145,18 @@ func (p *Parser) Next() (reader.Message, error) {
 			p.logger.Errorf("Error parsing syslog message: %v", err)
 		}
 		if p.cfg.AddErrorKey {
-			_, _ = fields.Put("error.message", "Error parsing syslog message: "+err.Error())
+			appendStringField(fields, "error.message", "Error parsing syslog message: "+err.Error())
 		}
 		msg.AddFields(fields)
 		return msg, nil
 	}
 
-	textValue, ok := fields["message"]
-	if !ok {
-		if p.cfg.LogErrors {
-			p.logger.Error("Error getting syslog message: message field is missing")
-		}
-		if p.cfg.AddErrorKey {
-			_, _ = fields.Put("error.message", "Error getting syslog message: message field is missing")
-		}
-		msg.AddFields(fields)
-		return msg, nil
+	textValue, _ := fields["message"]
+	if textString, _ := textValue.(string); textString != "" {
+		msg.Content = []byte(textString)
+	} else {
+		msg.Content = nil
 	}
-	textString, ok := textValue.(string)
-	if !ok {
-		if p.cfg.LogErrors {
-			p.logger.Error("Error getting syslog message: message field is not a string")
-		}
-		if p.cfg.AddErrorKey {
-			_, _ = fields.Put("error.message", "Error getting syslog message: message field is not a string")
-		}
-		msg.AddFields(fields)
-		return msg, nil
-	}
-
-	msg.Content = []byte(textString)
 	msg.Bytes = len(msg.Content)
 	msg.AddFields(fields)
 	msg.Ts = ts
