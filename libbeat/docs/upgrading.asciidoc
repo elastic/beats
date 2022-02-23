@@ -34,9 +34,11 @@ If you're upgrading other products in the stack, also read the
 {stack-ref}/index.html[Elastic Stack Installation and Upgrade Guide].
 
 We recommend that you fully upgrade {es} and {kib} to version 8.0
-before upgrading {beats}. If you're on {beats} 7.0 through 7.16,
-upgrade the {stack} and {beats} to version 7.17 *before* proceeding with the
-8.0 upgrade.
+before upgrading {beats}. The {beats} version must be lower than or equal to the
+{es} version. {beats} cannot send data to older versions of {es}.
+
+If you're on {beats} 7.0 through 7.16, upgrade the {stack} and {beats} to
+version 7.17 *before* proceeding with the 8.0 upgrade.
 
 Upgrading between non-consecutive major versions (e.g. 6.x to 8.x) is not
 supported.
@@ -138,7 +140,7 @@ include::{libbeat-dir}/tab-widgets/load-index-template-widget.asciidoc[]
 Not collecting time series data? You can continue to use {beats} to send data to
 aliases and indices. To do this, create a custom index template and load it
 manually. To learn more about creating index templates, refer to
-{ref}/index-templates.html[Index templates]
+{ref}/index-templates.html[Index templates].
 
 //REVIEWERS: Do users need to explicitly disable template loading?
 
