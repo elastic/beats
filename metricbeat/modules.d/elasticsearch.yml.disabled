@@ -1,5 +1,5 @@
 # Module: elasticsearch
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-elasticsearch.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.0/metricbeat-module-elasticsearch.html
 
 - module: elasticsearch
   #metricsets:
