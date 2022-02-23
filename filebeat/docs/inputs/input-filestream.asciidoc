@@ -42,7 +42,7 @@ Example configuration:
 ----
 {beatname_lc}.inputs:
 - type: filestream
-  id: foo
+  id: my-filestream-id
   paths:
     - /var/log/messages
     - /var/log/*.log
@@ -62,7 +62,7 @@ multiple input sections:
 ----
 {beatname_lc}.inputs:
 - type: filestream <1>
-  id: foo
+  id: my-filestream-id
   paths:
     - /var/log/system.log
     - /var/log/wifi.log
@@ -126,7 +126,7 @@ the input the following way:
 ----
 {beatname_lc}.inputs:
 - type: filestream
-  id: foo
+  id: my-filestream-id
   paths:
     - /logs/*.log
   file_identity.inode_marker.path: /logs/.filebeat-marker
