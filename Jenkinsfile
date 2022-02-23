@@ -435,8 +435,6 @@ def pushCIDockerImages(Map args = [:]) {
       tagAndPush(beatName: 'metricbeat', arch: arch)
     } else if ("${beatsFolder}" == "packetbeat"){
       tagAndPush(beatName: 'packetbeat', arch: arch)
-    } else if ("${beatsFolder}" == "x-pack/elastic-agent") {
-      tagAndPush(beatName: 'elastic-agent', arch: arch)
     }
   }
 }
