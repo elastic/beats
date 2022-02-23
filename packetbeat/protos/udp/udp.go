@@ -100,7 +100,7 @@ func buildPortsMap(plugins map[protos.Protocol]protos.UDPPlugin) (map[uint16]pro
 	return res, nil
 }
 
-// NewUDP creates and returns a new Udp.
+// NewUDP creates and returns a new UDP.
 func NewUDP(p protos.Protocols) (*UDP, error) {
 	portMap, err := buildPortsMap(p.GetAllUDP())
 	if err != nil {
