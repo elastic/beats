@@ -294,6 +294,38 @@ func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.Ppr
 	return resp, nil
 }
 
+// ProcMetrics returns all buffered metrics data for the agent and running processes.
+// If the agent.monitoring.http.buffer variable is not set, or set to false, a nil is returned
+func (s *Server) ProcMetrics(ctx context.Context, _ *proto.Empty) (*proto.ProcMetricsResponse, error) {
+	if s.monitoringCfg == nil || s.monitoringCfg.HTTP == nil || s.monitoringCfg.HTTP.Buffer == nil || !s.monitoringCfg.HTTP.Buffer {
+		return nil, nil
+	}
+
+	if s.routeFn == nil {
+		return nil, errors.New("route function is nil")
+	}
+
+	// gather metrics buffer data from the elastic-agent
+	endpoint := beats.AgentMonitoringEndpoint(runtime.GOOS, s.monitoringCfg.HTTP)
+	c := newSocketRequester("elastic-agent", "", endpoint)
+	metrics := c.procMetrics(ctx)
+
+	resp := &proto.ProcMetricsResponse{
+		Result: []*proto.MetricsResponse{metrics},
+	}
+
+	// gather metrics buffer data from all other processes
+	specs := s.getSpecInfo("", "")
+	for _, si := range specs {
+		endpoint := monitoring.MonitoringEndpoint(si.spec, runtime.GOOS, si.rk)
+		client := newSocketRequester(si.app, si.rk, endpoint)
+
+		metrics := client.procMetrics(ctx)
+		resp.Result = append(resp.Result, metrics)
+	}
+	return resp, nil
+}
+
 // getSpecs will return the specs for the program associated with the specified route key/app name, or all programs if no key(s) are specified.
 // if matchRK or matchApp are empty all results will be returned.
 func (s *Server) getSpecInfo(matchRK, matchApp string) []specInfo {
@@ -478,6 +510,30 @@ func (r *socketRequester) getPprof(ctx context.Context, opt proto.PprofOption, d
 		res.Error = err.Error()
 		return res
 	}
+	res.Result = p
+	return res
+}
+
+// procMetrics will gather metrics buffer data
+func (r *socketRequester) procMetrics(ctx context.Context) *proto.MetricsResponse {
+	res := &proto.MetricsResponse{
+		Name:     r.appName,
+		RouteKey: r.routeKey,
+	}
+
+	res, err := r.getPath(ctx, "/")
+	if err != nil {
+		res.Error = err.Error()
+		return res
+	}
+	defer res.Body.Close()
+
+	p, err := io.ReadAll(resp.Body)
+	if err != nil {
+		res.Error = err.Error()
+		return res
+	}
+
 	res.Result = p
 	return res
 }

@@ -204,6 +204,15 @@ func diagnosticsCollectCmd(streams *cli.IOStreams, fileName, outputFormat string
 		return fmt.Errorf("failed to communicate with Elastic Agent daemon: %w", err)
 	}
 
+	metrics, err := gatherMetrics(innerCtx)
+	if err == context.DeadlineExceeded {
+		return errors.New("timed out after 30 seconds trying to connect to Elastic Agent daemon")
+	} else if err == context.Canceled {
+		return nil
+	} else if err != nil {
+		return fmt.Errorf("failed to communicate with Elastic Agent daemon: %w", err)
+	}
+
 	cfg, err := gatherConfig()
 	if err != nil {
 		return fmt.Errorf("unable to gather config data: %w", err)
@@ -217,7 +226,7 @@ func diagnosticsCollectCmd(streams *cli.IOStreams, fileName, outputFormat string
 		}
 	}
 
-	err = createZip(fileName, outputFormat, diag, cfg, pprofData)
+	err = createZip(fileName, outputFormat, diag, cfg, pprofData, metrics)
 	if err != nil {
 		return fmt.Errorf("unable to create archive %q: %w", fileName, err)
 	}
@@ -312,6 +321,18 @@ func getDiagnostics(ctx context.Context) (DiagnosticsInfo, error) {
 	return diag, nil
 }
 
+func gatherMetrics(ctx context.Context) (*proto.ProcMetricsResponse, error) {
+	daemon := client.New()
+	diag := DiagnosticsInfo{}
+	err := daemon.Connect(ctx)
+	if err != nil {
+		return DiagnosticsInfo{}, err
+	}
+	defer daemon.Disconnect()
+
+	return daemon.ProcMetrics(ctx)
+}
+
 func humanDiagnosticsOutput(w io.Writer, obj interface{}) error {
 	diag, ok := obj.(DiagnosticsInfo)
 	if !ok {
@@ -399,7 +420,7 @@ func gatherConfig() (AgentConfig, error) {
 //
 // The passed DiagnosticsInfo and AgentConfig data is written in the specified output format.
 // Any local log files are collected and copied into the archive.
-func createZip(fileName, outputFormat string, diag DiagnosticsInfo, cfg AgentConfig, pprof map[string][]client.ProcPProf) error {
+func createZip(fileName, outputFormat string, diag DiagnosticsInfo, cfg AgentConfig, pprof map[string][]client.ProcPProf, metrics *proto.ProtoMetricsResponse) error {
 	f, err := os.Create(fileName)
 	if err != nil {
 		return err
@@ -466,6 +487,13 @@ func createZip(fileName, outputFormat string, diag DiagnosticsInfo, cfg AgentCon
 
 	if pprof != nil {
 		err := zipProfs(zw, pprof)
+		if err != nil {
+			return closeHandlers(err, zw, f)
+		}
+	}
+
+	if metrics != nil {
+		err := zipMetrics(zw, metrics)
 		if err != nil {
 			return closeHandlers(err, zw, f)
 		}
@@ -598,4 +626,33 @@ func zipProfs(zw *zip.Writer, pprof map[string][]client.ProcPProf) error {
 		}
 	}
 	return nil
+}
+
+func zipMetrics(zw *zip.Writer, metrics *proto.ProcMetricsResponse) error {
+	zf, err := zw.Create("metrics/")
+	if err != nil {
+		return err
+	}
+
+	for _, m := range metrics.Result {
+		if m.Error != "" {
+			zf, err := zw.Create("metrics/" + p.Name + "_" + p.RouteKey + "_error.txt")
+			if err != nil {
+				return err
+			}
+			_, err = zf.Write([]byte(p.Error))
+			if err != nil {
+				return err
+			}
+			continue
+		}
+		zf, err := zw.Create("metrics/" + p.Name + "_" + p.RouteKey + ".json")
+		if err != nil {
+			return err
+		}
+		_, err = zf.Write(p.Result)
+		if err != nil {
+			return err
+		}
+	}
 }

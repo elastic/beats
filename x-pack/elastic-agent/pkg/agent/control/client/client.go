@@ -283,3 +283,8 @@ func (c *client) Pprof(ctx context.Context, d time.Duration, pprofTypes []proto.
 	}
 	return res, nil
 }
+
+// ProcMetrics gathers /buffer data and from the agent and each running process and returns the result.
+func (c *client) ProcMetrics(ctx cotext.Context) (*proto.ProcMetricsResponse, error) {
+	c.client.ProcMetrics(ctx, &proto.Empty{})
+}
