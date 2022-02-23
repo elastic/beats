@@ -32219,13 +32219,6 @@ type: long
 
 --
 
-*`elasticsearch.node.stats.thread_pool.total_size.bytes`*::
-+
---
-type: long
-
---
-
 [float]
 === cluster.pending_task
 
