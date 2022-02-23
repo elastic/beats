@@ -74,21 +74,21 @@ func (c *crawler) Start(
 	for _, inputConfig := range c.inputConfigs {
 		err := c.startInput(pipeline, inputConfig)
 		if err != nil {
-			return fmt.Errorf("starting input failed: %+v", err)
+			return fmt.Errorf("starting input failed: %w", err)
 		}
 	}
 
 	if configInputs.Enabled() {
 		c.inputReloader = cfgfile.NewReloader(pipeline, configInputs)
 		if err := c.inputReloader.Check(c.inputsFactory); err != nil {
-			return fmt.Errorf("creating input reloader failed: %+v", err)
+			return fmt.Errorf("creating input reloader failed: %w", err)
 		}
 	}
 
 	if configModules.Enabled() {
 		c.modulesReloader = cfgfile.NewReloader(pipeline, configModules)
 		if err := c.modulesReloader.Check(c.modulesFactory); err != nil {
-			return fmt.Errorf("creating module reloader failed: %+v", err)
+			return fmt.Errorf("creating module reloader failed: %w", err)
 		}
 	}
 
@@ -112,6 +112,9 @@ func (c *crawler) startInput(
 	pipeline beat.PipelineConnector,
 	config *common.Config,
 ) error {
+	c.log.Infof("starting input, keys present on the config: %v",
+		config.FlattenedKeys())
+
 	if !config.Enabled() {
 		c.log.Infof("input disabled, skipping it")
 		return nil
