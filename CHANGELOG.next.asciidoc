@@ -41,6 +41,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix field names with `add_network_direction` processor. {issue}29747[29747] {pull}29751[29751]
 - Fix a logging bug when `ssl.verification_mode` was set to `full` or `certificate`, the command `test output` incorrectly logged that TLS was disabled.
 - Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
+- Update docker/distribution dependency library to fix a security issues concerning OCI Manifest Type Confusion Issue. {pull}30462[30462]
 
 *Auditbeat*
 
@@ -48,19 +49,20 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-- tcp/unix input: Stop accepting connections after socket is closed. {pull}29712[29712]
-- aws-s3: fix race condition in states used by s3-poller. {issue}30123[30123] {pull}30131[30131]
-- cisco module: Fix change the broke ASA and FTD configs that used `var.input: syslog`. {pull}30072[30072]
 
 *Filebeat*
-- Fix broken Kafka input {issue}29746[29746] {pull}30277[30277]
+- auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
+- elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
 
 
 *Heartbeat*
-- Fix missing mapping for `service.name`. {pull}30324[30324]
 
 *Metricbeat*
 
+- Fixed missing ZooKeeper metrics due compatibility issues with versions >= 3.6.0 {pull}30068[30068]
+- Enhance metricbeat on openshift documentation {pull}30054[30054]
+- Fixed missing ZooKeeper metrics due compatibility issues with versions >= 3.6.0 {pull}30068[30068]
+- Fix Docker module: rename fields on dashboards. {pull}30500[30500]
 
 *Packetbeat*
 
@@ -68,7 +70,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Winlogbeat*
 
 - Add provider names to Security pipeline conditional check in routing pipeline. {issue}27288[27288] {pull}29781[29781]
-- Fix run loop when reading from evtx file {pull}30006[30006]
 
 *Functionbeat*
 
@@ -133,7 +134,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
-- Add automated OEM Npcap installation handling. {pull}29112[29112] {pull}30396[30396]
+- Add automated OEM Npcap installation handling. {pull}29112[29112] {pull}30438[30438] {pull}30493[30493]
 - Add support for capturing TLS random number and OCSP status request details. {issue}29962[29962] {pull}30102[30102]
 
 *Functionbeat*
@@ -166,4 +167,3 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 ==== Known Issue
 
-*Journalbeat*
