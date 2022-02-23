@@ -2,9 +2,6 @@
 description: Pipeline for Windows Security events
 processors:
   - set:
-      field: event.ingested
-      value: '{{_ingest.timestamp}}'
-  - set:
       field: event.module
       value: security
   - convert:
