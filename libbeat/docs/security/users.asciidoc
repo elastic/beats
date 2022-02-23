@@ -55,6 +55,10 @@ the following privileges:
 |`monitor`
 |Retrieve cluster details (e.g. version)
 
+|Cluster
+|`manage_index_templates`
+|Manage index templates
+
 ifndef::no_ilm[]
 |Cluster
 |`manage_ilm`
