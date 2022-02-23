@@ -80,6 +80,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Add support for '/var/log/pods/' path for add_kubernetes_metadata processor with `resource_type: pod`. {pull}28868[28868]
+- Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
+
 *Heartbeat*
 
 
