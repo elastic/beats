@@ -372,7 +372,7 @@ func (mc *memcache) GapInStream(
 		parser.state == parseStateIncompleteData
 	if inData {
 		if msg == nil {
-			logp.WTF("parser message is nil on data load")
+			logp.NewLogger("memcache").DPanic("parser message is nil on data load")
 			return private, true
 		}
 
