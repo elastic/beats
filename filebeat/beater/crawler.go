@@ -112,6 +112,8 @@ func (c *crawler) startInput(
 	pipeline beat.PipelineConnector,
 	config *common.Config,
 ) error {
+	// TODO: Either use debug or remove it after https://github.com/elastic/beats/pull/30534
+	// is fixed.
 	c.log.Infof("starting input, keys present on the config: %v",
 		config.FlattenedKeys())
 
