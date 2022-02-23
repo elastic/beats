@@ -339,5 +339,3 @@
               type: long
             - name: rejected.count
               type: long
-        - name: total_size.bytes
-          type: long
