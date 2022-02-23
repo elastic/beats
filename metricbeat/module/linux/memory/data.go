@@ -18,6 +18,7 @@
 package memory
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -37,39 +38,16 @@ func FetchLinuxMemStats(baseMap common.MapStr, hostfs resolve.Resolver) error {
 	}
 
 	pageStats := common.MapStr{}
-	if pages, ok := vmstat["pgscan_kswapd"]; ok {
-		pageStats.Put("pgscan_kswapd.pages", pages)
-	}
-	if pages, ok := vmstat["pgscan_direct"]; ok {
-		pageStats.Put("pgscan_direct.pages", pages)
-	}
-	if pages, ok := vmstat["pgfree"]; ok {
-		pageStats.Put("pgfree.pages", pages)
-	}
-	if pages, ok := vmstat["pgsteal_kswapd"]; ok {
-		pageStats.Put("pgsteal_kswapd.pages", pages)
-	}
-	if pages, ok := vmstat["pgsteal_direct"]; ok {
-		pageStats.Put("pgsteal_direct.pages", pages)
-	}
 
-	// This is similar to the vmeff stat gathered by sar
-	// these ratios calculate thhe efficiency of page reclaim
-	pgscan, _ := vmstat["pgscan_direct"]
-	pgsteal, pgsteal_ok := vmstat["pgsteal_direct"]
-	if pgscan != 0 && pgsteal_ok {
-		pageStats["direct_efficiency"] = common.MapStr{
-			"pct": common.Round(float64(pgsteal)/float64(pgscan), common.DefaultDecimalPlacesCount),
-		}
-	}
+	insertPagesChild("pgscan_kswapd", vmstat, pageStats)
+	insertPagesChild("pgscan_direct", vmstat, pageStats)
+	insertPagesChild("pgfree", vmstat, pageStats)
+	insertPagesChild("pgsteal_kswapd", vmstat, pageStats)
+	insertPagesChild("pgsteal_direct", vmstat, pageStats)
 
-	pgscankswap, _ := vmstat["pgscan_kswapd"]
-	pgstealkswap, pgstealswap_ok := vmstat["pgsteal_kswapd"]
-	if pgscankswap != 0 && pgstealswap_ok {
-		pageStats["kswapd_efficiency"] = common.MapStr{
-			"pct": common.Round(float64(pgstealkswap)/float64(pgscankswap), common.DefaultDecimalPlacesCount),
-		}
-	}
+	computeEfficiency("pgscan_direct", "pgsteal_direct", "direct_efficiency", vmstat, pageStats)
+	computeEfficiency("pgscan_kswapd", "pgsteal_kswapd", "kswapd_efficiency", vmstat, pageStats)
+
 	baseMap["page_stats"] = pageStats
 
 	thp, err := getHugePages(hostfs)
@@ -88,6 +66,27 @@ func FetchLinuxMemStats(baseMap common.MapStr, hostfs resolve.Resolver) error {
 	baseMap["vmstat"] = vmstat
 
 	return nil
+}
+
+func computeEfficiency(scanName string, stealName string, fieldName string, raw map[string]uint64, inMap common.MapStr) {
+	scanVal, _ := raw[scanName]
+	stealVal, stealOk := raw[stealName]
+	if scanVal != 0 && stealOk {
+		inMap[fieldName] = common.MapStr{
+			"pct": common.Round(float64(stealVal)/float64(scanVal), common.DefaultDecimalPlacesCount),
+		}
+	}
+
+}
+
+// insertPagesChild inserts a "child" MapStr into given events. This is mostly so we don't break mapping for fields that have been around.
+// most of the fields in vmstat are fairly esoteric and (somewhat) self-documenting, so use of this shouldn't expand beyond what's needed for backwards compat.
+func insertPagesChild(field string, raw map[string]uint64, evt common.MapStr) {
+	stat, ok := raw[field]
+	if ok {
+		evt.Put(fmt.Sprintf("%s.pages", field), stat)
+	}
+
 }
 
 func getHugePages(hostfs resolve.Resolver) (common.MapStr, error) {
@@ -137,10 +136,10 @@ func getHugePages(hostfs resolve.Resolver) (common.MapStr, error) {
 
 // GetVMStat gets linux vmstat metrics
 func GetVMStat(hostfs resolve.Resolver) (map[string]uint64, error) {
-	vmstat_file := hostfs.ResolveHostFS("proc/vmstat")
-	content, err := os.ReadFile(vmstat_file)
+	vmstatFile := hostfs.ResolveHostFS("proc/vmstat")
+	content, err := os.ReadFile(vmstatFile)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error reading vmstat from %s", vmstat_file)
+		return nil, errors.Wrapf(err, "error reading vmstat from %s", vmstatFile)
 	}
 
 	// I'm not a fan of throwing stuff directly to maps, but this is a huge amount of kernel/config specific metrics, and we're the only consumer of this for now.
