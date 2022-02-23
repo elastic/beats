@@ -48,8 +48,8 @@ type Memory struct {
 
 // UsedMemStats wraps used.* memory metrics
 type UsedMemStats struct {
-	Pct   opt.Float `struct:"pct,omitempty" json:"pct,omitempty"`
-	Bytes opt.Uint  `struct:"bytes,omitempty" json:"bytes,omitempty"`
+	Pct   opt.Float `struct:"pct,omitempty"`
+	Bytes opt.Uint  `struct:"bytes,omitempty"`
 }
 
 // ActualMemoryMetrics wraps the actual.* memory metrics
@@ -60,41 +60,10 @@ type ActualMemoryMetrics struct {
 
 // SwapMetrics wraps swap.* memory metrics
 type SwapMetrics struct {
-	Total opt.Uint     `struct:"total,omitempty" json:"total,omitempty"`
-	Used  UsedMemStats `struct:"used,omitempty" json:"used,omitempty"`
-	Free  opt.Uint     `struct:"free,omitempty" json:"free,omitempty"`
+	Total opt.Uint     `struct:"total,omitempty"`
+	Used  UsedMemStats `struct:"used,omitempty"`
+	Free  opt.Uint     `struct:"free,omitempty"`
 }
-
-// func (m UsedMemStats) MarshalJSON() ([]byte, error) {
-
-// 	outMap := map[string]interface{}{}
-// 	bv := reflect.ValueOf(m)
-// 	bt := reflect.TypeOf(m)
-// 	for i := 0; i < bv.NumField(); i++ {
-// 		if bv.Field(i).CanInterface() {
-// 			fiface := bv.Field(i).Interface()
-// 			name := bt.Field(i).Name
-
-// 			zeroIface, ok := fiface.(opt.OptType)
-// 			if ok {
-// 				if zeroIface.IsZero() {
-// 					continue
-// 				}
-// 				//fmt.Printf("marshalling type %#v\n", zeroIface)
-// 				rawOut, err := json.Marshal(zeroIface)
-// 				if err != nil {
-// 					return nil, errors.Wrap(err, "error marshalling type from UsedMemStats")
-// 				}
-// 				outMap[name] = string(rawOut)
-
-// 			} else {
-// 				outMap[name] = fiface
-// 			}
-// 		}
-// 	}
-// 	//fmt.Printf("Pre-marshal map is %#v\n", outMap)
-// 	return json.Marshal(outMap)
-// }
 
 // Get returns platform-independent memory metrics.
 func Get(procfs resolve.Resolver) (Memory, error) {
