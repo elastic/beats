@@ -306,8 +306,8 @@ func (h *Harvester) Run() error {
 		}
 	}(h.state.Source)
 
-	logger.Infof("Harvester started for file: %v", h.config.Paths)
 	logger.Infof("Harvester started for paths: %v", h.config.Paths)
+
 	h.doneWg.Add(1)
 	go func() {
 		h.monitorFileSize()

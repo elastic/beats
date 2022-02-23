@@ -83,7 +83,6 @@ func (c *crawler) Start(
 		if err := c.inputReloader.Check(c.inputsFactory); err != nil {
 			return fmt.Errorf("creating input reloader failed: %+v", err)
 		}
-
 	}
 
 	if configModules.Enabled() {
@@ -91,7 +90,6 @@ func (c *crawler) Start(
 		if err := c.modulesReloader.Check(c.modulesFactory); err != nil {
 			return fmt.Errorf("creating module reloader failed: %+v", err)
 		}
-
 	}
 
 	if c.inputReloader != nil {
@@ -120,18 +118,21 @@ func (c *crawler) startInput(
 	}
 
 	var h map[string]interface{}
-	config.Unpack(&h)
+	err := config.Unpack(&h)
+	if err != nil {
+		return fmt.Errorf("could not unpack config: %w", err)
+	}
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {
-		return fmt.Errorf("can not compute id from configuration: %v", err)
+		return fmt.Errorf("can not compute id from configuration: %w", err)
 	}
 	if _, ok := c.inputs[id]; ok {
-		return fmt.Errorf("input with same ID already exists: %v", id)
+		return fmt.Errorf("input with same ID already exists: %d", id)
 	}
 
 	runner, err := c.inputsFactory.Create(pipeline, config)
 	if err != nil {
-		return fmt.Errorf("error while initializing input: %v", err)
+		return fmt.Errorf("error while initializing input: %w", err)
 	}
 	if inputRunner, ok := runner.(*input.Runner); ok {
 		inputRunner.Once = c.once
@@ -156,7 +157,7 @@ func (c *crawler) Stop() {
 		}()
 	}
 
-	logp.Info("Stopping %v inputs", len(c.inputs))
+	logp.Info("Stopping %d inputs", len(c.inputs))
 	// Stop inputs in parallel
 	for id, p := range c.inputs {
 		id, p := id, p
