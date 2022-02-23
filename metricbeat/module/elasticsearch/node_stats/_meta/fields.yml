@@ -7,6 +7,33 @@
     - name: indices
       type: group
       fields:
+        - name: bulk
+          type: group
+          fields:
+            - name: avg_time
+              type: group
+              fields:
+                - name: bytes
+                  type: long
+                - name: ms
+                  type: long
+            - name: total_time
+              type: group
+              fields:
+                - name: ms
+                  type: long
+            - name: total_size
+              type: group
+              fields:
+                - name: bytes
+                  type: long
+            - name: avg_size
+              type: group
+              fields:
+                - name: bytes
+                  type: long
+            - name: operations.total.count
+              type: long
         - name: docs.count
           type: long
           description: >
@@ -312,4 +339,5 @@
               type: long
             - name: rejected.count
               type: long
-
+        - name: total_size.bytes
+          type: long
