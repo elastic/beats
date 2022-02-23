@@ -121,7 +121,7 @@ func defaultCloserConfig() closerConfig {
 func defaultReaderConfig() readerConfig {
 	return readerConfig{
 		Backoff: backoffConfig{
-			Init: 1 * time.Second,
+			Init: 2 * time.Second,
 			Max:  10 * time.Second,
 		},
 		BufferSize:     16 * humanize.KiByte,
