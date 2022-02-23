@@ -112,7 +112,7 @@ Vagrant.configure("2") do |config|
       end
 
       # gvm install
-      if node[:platform] == "centos" or node[:platform] == "ubuntu" or node[:platform] == "debian" or node[:platform] == "archlinux" or node[:platform] == "opensuse" or node[:platform] == "sles"
+      if [:centos, :ubuntu, :debian, :archlinux, :opensuse, :sles].include?(node[:platform].to_sym)
         nodeconfig.vm.provision "shell", type: "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
       end
 
