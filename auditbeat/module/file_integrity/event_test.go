@@ -47,7 +47,7 @@ func testEvent() *Event {
 			Inode:  123,
 			UID:    500,
 			GID:    500,
-			Mode:   0600,
+			Mode:   0o600,
 			CTime:  testEventTime,
 			MTime:  testEventTime,
 			SetGID: true,
@@ -94,7 +94,7 @@ func TestDiffEvents(t *testing.T) {
 
 	t.Run("updated metadata", func(t *testing.T) {
 		e := testEvent()
-		e.Info.Mode = 0644
+		e.Info.Mode = 0o644
 
 		action, changed := diffEvents(testEvent(), e)
 		assert.True(t, changed)

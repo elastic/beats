@@ -488,7 +488,7 @@ func offset(buffer []byte, reader io.Reader) (uint64, error) {
 	bufferPtr := uint64(reflect.ValueOf(&buffer[0]).Pointer())
 	offset := dataPtr - bufferPtr
 
-	if offset < 0 || offset > uint64(len(buffer)) {
+	if offset > uint64(len(buffer)) {
 		return 0, fmt.Errorf("Invalid pointer %x. Cannot dereference an "+
 			"address outside of the buffer [%x:%x].", dataPtr, bufferPtr,
 			bufferPtr+uint64(len(buffer)))
