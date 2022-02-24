@@ -323,10 +323,9 @@ func getDiagnostics(ctx context.Context) (DiagnosticsInfo, error) {
 
 func gatherMetrics(ctx context.Context) (*proto.ProcMetricsResponse, error) {
 	daemon := client.New()
-	diag := DiagnosticsInfo{}
 	err := daemon.Connect(ctx)
 	if err != nil {
-		return DiagnosticsInfo{}, err
+		return nil, err
 	}
 	defer daemon.Disconnect()
 
@@ -420,7 +419,7 @@ func gatherConfig() (AgentConfig, error) {
 //
 // The passed DiagnosticsInfo and AgentConfig data is written in the specified output format.
 // Any local log files are collected and copied into the archive.
-func createZip(fileName, outputFormat string, diag DiagnosticsInfo, cfg AgentConfig, pprof map[string][]client.ProcPProf, metrics *proto.ProtoMetricsResponse) error {
+func createZip(fileName, outputFormat string, diag DiagnosticsInfo, cfg AgentConfig, pprof map[string][]client.ProcPProf, metrics *proto.ProcMetricsResponse) error {
 	f, err := os.Create(fileName)
 	if err != nil {
 		return err
@@ -636,23 +635,24 @@ func zipMetrics(zw *zip.Writer, metrics *proto.ProcMetricsResponse) error {
 
 	for _, m := range metrics.Result {
 		if m.Error != "" {
-			zf, err := zw.Create("metrics/" + p.Name + "_" + p.RouteKey + "_error.txt")
+			zf, err = zw.Create("metrics/" + m.AppName + "_" + m.RouteKey + "_error.txt")
 			if err != nil {
 				return err
 			}
-			_, err = zf.Write([]byte(p.Error))
+			_, err = zf.Write([]byte(m.Error))
 			if err != nil {
 				return err
 			}
 			continue
 		}
-		zf, err := zw.Create("metrics/" + p.Name + "_" + p.RouteKey + ".json")
+		zf, err = zw.Create("metrics/" + m.AppName + "_" + m.RouteKey + ".json")
 		if err != nil {
 			return err
 		}
-		_, err = zf.Write(p.Result)
+		_, err = zf.Write(m.Result)
 		if err != nil {
 			return err
 		}
 	}
+	return nil
 }

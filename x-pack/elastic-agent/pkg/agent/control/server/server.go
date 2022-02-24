@@ -297,7 +297,7 @@ func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.Ppr
 // ProcMetrics returns all buffered metrics data for the agent and running processes.
 // If the agent.monitoring.http.buffer variable is not set, or set to false, a nil is returned
 func (s *Server) ProcMetrics(ctx context.Context, _ *proto.Empty) (*proto.ProcMetricsResponse, error) {
-	if s.monitoringCfg == nil || s.monitoringCfg.HTTP == nil || s.monitoringCfg.HTTP.Buffer == nil || !s.monitoringCfg.HTTP.Buffer {
+	if s.monitoringCfg == nil || s.monitoringCfg.HTTP == nil || s.monitoringCfg.HTTP.Buffer == nil || !s.monitoringCfg.HTTP.Buffer.Enabled {
 		return nil, nil
 	}
 
@@ -517,16 +517,16 @@ func (r *socketRequester) getPprof(ctx context.Context, opt proto.PprofOption, d
 // procMetrics will gather metrics buffer data
 func (r *socketRequester) procMetrics(ctx context.Context) *proto.MetricsResponse {
 	res := &proto.MetricsResponse{
-		Name:     r.appName,
+		AppName:  r.appName,
 		RouteKey: r.routeKey,
 	}
 
-	res, err := r.getPath(ctx, "/")
+	resp, err := r.getPath(ctx, "/")
 	if err != nil {
 		res.Error = err.Error()
 		return res
 	}
-	defer res.Body.Close()
+	defer resp.Body.Close()
 
 	p, err := io.ReadAll(resp.Body)
 	if err != nil {

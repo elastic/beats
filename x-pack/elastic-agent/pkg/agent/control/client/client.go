@@ -105,6 +105,8 @@ type Client interface {
 	ProcMeta(ctx context.Context) ([]ProcMeta, error)
 	// Pprof gathers data from the /debug/pprof/ endpoints specified.
 	Pprof(ctx context.Context, d time.Duration, pprofTypes []proto.PprofOption, appName, routeKey string) (map[string][]ProcPProf, error)
+	// ProcMetrics gathers /buffer data and from the agent and each running process and returns the result.
+	ProcMetrics(ctx context.Context) (*proto.ProcMetricsResponse, error)
 }
 
 // client manages the state and communication to the Elastic Agent.
