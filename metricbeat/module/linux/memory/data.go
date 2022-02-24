@@ -86,7 +86,6 @@ func insertPagesChild(field string, raw map[string]uint64, evt common.MapStr) {
 	if ok {
 		evt.Put(fmt.Sprintf("%s.pages", field), stat)
 	}
-
 }
 
 func getHugePages(hostfs resolve.Resolver) (common.MapStr, error) {
