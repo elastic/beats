@@ -75,8 +75,8 @@ func (e *Controller) Update(ctx context.Context, c *config.Config) (err error) {
 		span.End()
 	}()
 
-	if err = info.InjectAgentConfig(c); err != nil {
-		return
+	if err := info.InjectAgentConfig(c); err != nil {
+		return err
 	}
 
 	// perform and verify ast translation
@@ -119,7 +119,12 @@ func (e *Controller) Update(ctx context.Context, c *config.Config) (err error) {
 
 // Set sets the transpiler vars for dynamic inputs resolution.
 func (e *Controller) Set(ctx context.Context, vars []*transpiler.Vars) {
-	var err error
+	if err := e.set(ctx, vars); err != nil {
+		e.logger.Errorf("Failed to render configuration with latest context from composable controller: %s", err)
+	}
+}
+
+func (e *Controller) set(ctx context.Context, vars []*transpiler.Vars) (err error) {
 	span, ctx := apm.StartSpan(ctx, "set", "app.internal")
 	defer func() {
 		apm.CaptureError(ctx, err).Send()
@@ -131,11 +136,9 @@ func (e *Controller) Set(ctx context.Context, vars []*transpiler.Vars) {
 	e.lock.Unlock()
 
 	if ast != nil {
-		err = e.update(ctx)
-		if err != nil {
-			e.logger.Errorf("Failed to render configuration with latest context from composable controller: %s", err)
-		}
+		return e.update(ctx)
 	}
+	return nil
 }
 
 func (e *Controller) update(ctx context.Context) (err error) {
@@ -184,7 +187,7 @@ func (e *Controller) update(ctx context.Context) (err error) {
 	}
 
 	for _, r := range e.reloadables {
-		if err = r.Reload(cfg); err != nil {
+		if err := r.Reload(cfg); err != nil {
 			return err
 		}
 	}

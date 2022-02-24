@@ -95,11 +95,11 @@ func (ad *ActionDispatcher) Dispatch(ctx context.Context, acker store.FleetAcker
 	)
 
 	for _, action := range actions {
-		if err = ad.ctx.Err(); err != nil {
+		if err := ad.ctx.Err(); err != nil {
 			return err
 		}
 
-		if err = ad.dispatchAction(action, acker); err != nil {
+		if err := ad.dispatchAction(action, acker); err != nil {
 			ad.log.Debugf("Failed to dispatch action '%+v', error: %+v", action, err)
 			return err
 		}

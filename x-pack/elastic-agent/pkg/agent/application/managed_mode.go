@@ -158,7 +158,6 @@ func newManaged(
 	if err != nil {
 		return nil, err
 	}
-	// Client has been instrumented with apm
 	acker, err := fleet.NewAcker(log, agentInfo, client)
 	if err != nil {
 		return nil, err

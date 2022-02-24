@@ -47,8 +47,7 @@ func (f *Acker) Ack(ctx context.Context, action fleetapi.Action) (err error) {
 	f.enqueue(action)
 
 	if _, isAckForced := action.(ackForcer); isAckForced {
-		err = f.Commit(ctx)
-		return
+		return f.Commit(ctx)
 	}
 
 	return nil
