@@ -39,6 +39,21 @@ import (
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
+// Linux proc status maps. See `man 5 proc`
+var pidStates = map[byte]PidState{
+	'S': Sleeping,
+	'R': Running,
+	'D': Idle, // Waiting in uninterruptible disk sleep, on some kernels this is marked as I below
+	'I': Idle, // in the scheduler, TASK_IDLE is defined as (TASK_UNINTERRUPTIBLE | TASK_NOLOAD)
+	'T': Stopped,
+	'Z': Zombie,
+	'X': Dead,
+	'x': Dead,
+	'K': WakeKill,
+	'W': Waking,
+	'P': Parked,
+}
+
 // Indulging in one non-const global variable for the sake of storing boot time
 // This value obviously won't change while this code is running.
 var bootTime uint64 = 0
@@ -433,17 +448,9 @@ func getProcStatus(hostfs resolve.Resolver, pid int) (map[string]string, error) 
 }
 
 func getProcState(b byte) PidState {
-	switch b {
-	case 'S':
-		return Sleeping
-	case 'R':
-		return Running
-	case 'D':
-		return Idle
-	case 'T':
-		return Stopped
-	case 'Z':
-		return Zombie
+	state, ok := pidStates[b]
+	if ok {
+		return state
 	}
 	return Unknown
 }

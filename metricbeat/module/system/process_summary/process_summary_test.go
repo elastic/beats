@@ -21,13 +21,13 @@
 package process_summary
 
 import (
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 )
@@ -41,6 +41,7 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
+	logp.DevelopmentSetup()
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
@@ -56,26 +57,10 @@ func TestFetch(t *testing.T) {
 	event, ok := summary.(common.MapStr)
 	require.True(t, ok)
 
-	if runtime.GOOS == "windows" {
-		assert.Contains(t, event, "total")
-		assert.Contains(t, event, "sleeping")
-		assert.Contains(t, event, "running")
-		assert.Contains(t, event, "unknown")
-		total := event["sleeping"].(int) + event["running"].(int) + event["unknown"].(int)
-		assert.Equal(t, event["total"].(int), total)
-	} else {
-		assert.Contains(t, event, "total")
-		assert.Contains(t, event, "sleeping")
-		assert.Contains(t, event, "running")
-		assert.Contains(t, event, "idle")
-		assert.Contains(t, event, "stopped")
-		assert.Contains(t, event, "zombie")
-		assert.Contains(t, event, "unknown")
-		total := event["sleeping"].(int) + event["running"].(int) + event["idle"].(int) +
-			event["stopped"].(int) + event["zombie"].(int) + event["unknown"].(int)
+	// if there's nothing marked as sleeping or idle, something weird is happening
+	assert.NotZero(t, event["idle"])
+	assert.NotZero(t, event["sleeping"])
 
-		assert.Equal(t, event["total"].(int), total)
-	}
 }
 
 func getConfig() map[string]interface{} {
