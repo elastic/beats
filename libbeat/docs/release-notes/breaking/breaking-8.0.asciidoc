@@ -5,14 +5,64 @@
 <titleabbrev>8.0</titleabbrev>
 ++++
 
-This section discusses the main changes that you should be aware of if you
-upgrade the Beats to version 8.0.
-
-{see-relnotes}
+See the <<release-notes,release notes>> for a complete list of breaking changes,
+bug fixes, and enhancements, including changes to beta or experimental
+functionality.
 
 //NOTE: The notable-breaking-changes tagged regions are re-used in the
 //Installation and Upgrade Guide
 
 //tag::notable-breaking-changes[]
 
+[discrete]
+==== {beats} logs are now ECS-compliant
+
+All Elastic {beats} now write ECS-compliant logs in JSON format, and the config
+options for enabling ECS/JSON are removed. The new log name format is
+`{beatname}-{date}(-n)?.ndjson`. For example (from oldest to newest):
+`filebeat-20200101.ndjson`, `filebeat-20200101-1.ndjson`,
+`filebeat-20200101-2.ndjson`, and so on.
+
+With this change, we now provide a uniform logging scheme across Elastic
+products, which makes it easier to develop ECS-aware visualizations for
+behaviors like correlating metrics or events across products.
+
+If you have any monitoring configurations that expect the old log format, you
+must update them to use the new log format.
+
+[discrete]
+==== {beats} now store events in data streams instead of indices
+
+All {beats} shippers now store events in data streams in {es} instead of indices
+regardless of the {es} version. This change affects the underlying data storage
+method used in {es}; it does not change the naming convention. The name of the
+data stream follows the format `{beatname}-{version}`, and the index pattern is
+`{beatname}-{version}`. Do not confuse this change with the naming convention we
+use in Elastic integrations.
+
+As part of this change, some index lifecycle managment (ILM) options
+(`rollover_alias` and `pattern`) are removed because data streams do not
+require index aliases. Also the `setup.template.type` option is removed because
+it no longer makes sense.
+
+If you are loading JSON index templates by specifying a file in
+`setup.template.json.path`, make sure you move from the legacy format to
+composable index templates.
+
+NOTE: Data streams support create operations only. Thus, there is no
+way to use operation types like "index" or "delete" when sending events to {es}.
+
+For more information, refer to the {es} documentation about
+{ref}/data-streams.html[data streams].
+
+[discrete]
+==== Homebrew formulae no longer available for {beats}
+
+Starting with version 8.0.0, Elastic no longer publishes Homebrew formulae for
+{beats}. You must use a different installation method. See
+the https://www.elastic.co/downloads/beats/[{beats} download pages]
+for available installation methods.
+
 // end::notable-breaking-changes[]
+
+

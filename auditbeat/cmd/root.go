@@ -54,7 +54,7 @@ var withECSVersion = processing.WithFields(common.MapStr{
 
 // AuditbeatSettings contains the default settings for auditbeat
 func AuditbeatSettings() instance.Settings {
-	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
+	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	return instance.Settings{
 		RunFlags:      runFlags,
 		Name:          Name,

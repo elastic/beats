@@ -79,23 +79,21 @@ func CustomizePackaging() {
 	)
 
 	for _, args := range devtools.Packages {
-		for _, pkgType := range args.Types {
-			switch pkgType {
-			case devtools.TarGz, devtools.Zip:
-				args.Spec.ReplaceFile("{{.BeatName}}.yml", configYml)
-				args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfigYml)
-				args.Spec.ReplaceFile("NOTICE.txt", npcapNoticeTxt)
-			case devtools.Deb, devtools.RPM, devtools.DMG:
-				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", configYml)
-				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfigYml)
-			case devtools.Docker:
-				args.Spec.ExtraVar("linux_capabilities", "cap_net_raw,cap_net_admin+eip")
-			default:
-				panic(errors.Errorf("unhandled package type: %v", pkgType))
-			}
-
-			// Match the first package type then continue.
-			break
+		if len(args.Types) == 0 {
+			continue
+		}
+		switch pkgType := args.Types[0]; pkgType {
+		case devtools.TarGz, devtools.Zip:
+			args.Spec.ReplaceFile("{{.BeatName}}.yml", configYml)
+			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfigYml)
+			args.Spec.ReplaceFile("NOTICE.txt", npcapNoticeTxt)
+		case devtools.Deb, devtools.RPM:
+			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", configYml)
+			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfigYml)
+		case devtools.Docker:
+			args.Spec.ExtraVar("linux_capabilities", "cap_net_raw,cap_net_admin+eip")
+		default:
+			panic(errors.Errorf("unhandled package type: %v", pkgType))
 		}
 	}
 }

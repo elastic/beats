@@ -12,8 +12,6 @@ import (
 	"sync"
 	"time"
 
-	"go.elastic.co/apm"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
@@ -157,18 +155,13 @@ func (o *Operator) Close() error {
 	o.monitor.Close()
 	o.statusReporter.Unregister()
 
-	return o.HandleConfig(context.Background(), configrequest.New("", time.Now(), nil))
+	return o.HandleConfig(configrequest.New("", time.Now(), nil))
 }
 
 // HandleConfig handles configuration for a pipeline and performs actions to achieve this configuration.
-func (o *Operator) HandleConfig(ctx context.Context, cfg configrequest.Request) (err error) {
-	// TODO: double check `route` as name
-	span, ctx := apm.StartSpan(ctx, "route", "app.internal")
+func (o *Operator) HandleConfig(cfg configrequest.Request) (err error) {
 	defer func() {
-		if err = filterContextCancelled(err); err != nil {
-			apm.CaptureError(ctx, err).Send()
-		}
-		span.End()
+		err = filterContextCancelled(err)
 	}()
 
 	_, stateID, steps, ack, err := o.stateResolver.Resolve(cfg)
@@ -225,9 +218,26 @@ func (o *Operator) Shutdown() {
 		o.logger.Debugf("pipeline installer '%s' done", o.pipelineID)
 	}
 
-	for _, app := range o.apps {
-		app.Shutdown()
+	o.appsLock.Lock()
+	defer o.appsLock.Unlock()
+
+	wg := sync.WaitGroup{}
+	wg.Add(len(o.apps))
+
+	started := time.Now()
+
+	for _, a := range o.apps {
+		go func(a Application) {
+			started := time.Now()
+			a.Shutdown()
+			wg.Done()
+			o.logger.Debugf("took %s to shutdown %s",
+				time.Now().Sub(started), a.Name())
+		}(a)
 	}
+	wg.Wait()
+	o.logger.Debugf("took %s to shutdown %d apps",
+		time.Now().Sub(started), len(o.apps))
 }
 
 // Start starts a new process based on a configuration

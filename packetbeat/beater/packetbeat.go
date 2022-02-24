@@ -95,6 +95,12 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
+	// Install Npcap if needed.
+	err := installNpcap(b)
+	if err != nil {
+		return nil, err
+	}
+
 	return &packetbeat{
 		config:  rawConfig,
 		factory: factory,
@@ -110,12 +116,6 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 			logp.Debug("main", "Streams and transactions should all be expired now.")
 		}
 	}()
-
-	// Install Npcap if needed.
-	err := installNpcap(b)
-	if err != nil {
-		return err
-	}
 
 	if !b.Manager.Enabled() {
 		return pb.runStatic(b, pb.factory)

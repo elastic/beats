@@ -7,8 +7,6 @@ package application
 import (
 	"context"
 
-	"go.elastic.co/apm"
-
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
@@ -53,7 +51,6 @@ func newFleetServerBootstrap(
 	rawConfig *config.Config,
 	statusCtrl status.Controller,
 	agentInfo *info.AgentInfo,
-	tracer *apm.Tracer,
 ) (*FleetServerBootstrap, error) {
 	cfg, err := configuration.NewFromConfig(rawConfig)
 	if err != nil {
@@ -82,7 +79,7 @@ func newFleetServerBootstrap(
 	}
 
 	bootstrapApp.bgContext, bootstrapApp.cancelCtxFn = context.WithCancel(ctx)
-	bootstrapApp.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{}, tracer)
+	bootstrapApp.srv, err = server.NewFromConfig(log, cfg.Settings.GRPC, &operation.ApplicationStatusHandler{})
 	if err != nil {
 		return nil, errors.New(err, "initialize GRPC listener")
 	}
@@ -118,8 +115,9 @@ func newFleetServerBootstrap(
 		return nil, err
 	}
 
+	loader := config.NewLoader(log, "")
 	discover := discoverer(pathConfigFile, cfg.Settings.Path)
-	bootstrapApp.source = newOnce(log, discover, emit)
+	bootstrapApp.source = newOnce(log, discover, loader, emit)
 	return bootstrapApp, nil
 }
 
@@ -169,22 +167,20 @@ func bootstrapEmitter(ctx context.Context, log *logger.Logger, agentInfo transpi
 			case c = <-ch:
 			}
 
-			err := emit(ctx, log, agentInfo, router, modifiers, c)
+			err := emit(log, agentInfo, router, modifiers, c)
 			if err != nil {
 				log.Error(err)
 			}
 		}
 	}()
 
-	return func(ctx context.Context, c *config.Config) error {
-		span, _ := apm.StartSpan(ctx, "emit", "app.internal")
-		defer span.End()
+	return func(c *config.Config) error {
 		ch <- c
 		return nil
 	}, nil
 }
 
-func emit(ctx context.Context, log *logger.Logger, agentInfo transpiler.AgentInfo, router pipeline.Router, modifiers *pipeline.ConfigModifiers, c *config.Config) error {
+func emit(log *logger.Logger, agentInfo transpiler.AgentInfo, router pipeline.Router, modifiers *pipeline.ConfigModifiers, c *config.Config) error {
 	if err := info.InjectAgentConfig(c); err != nil {
 		return err
 	}
@@ -223,7 +219,7 @@ func emit(ctx context.Context, log *logger.Logger, agentInfo transpiler.AgentInf
 		return errors.New("bootstrap configuration is incorrect causing fleet-server to not be started")
 	}
 
-	return router.Route(ctx, ast.HashStr(), map[pipeline.RoutingKey][]program.Program{
+	return router.Route(ast.HashStr(), map[pipeline.RoutingKey][]program.Program{
 		pipeline.DefaultRK: {
 			{
 				Spec:   spec,
