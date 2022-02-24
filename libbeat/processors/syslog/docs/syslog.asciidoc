@@ -116,3 +116,33 @@ The RFC 5424 format accepts the following forms of timestamps:
   ** `2003-10-11T22:14:15.123456-06:00`
 
 Formats with an asterisk (*) are a non-standard allowance.
+
+[float]
+==== Metrics
+
+Internal metrics are available to assist with debugging efforts. The metrics
+are served from the metrics HTTP endpoint (for example: `http://localhost:5066/stats`)
+and are found under `processor.syslog.[instance ID]` or `processor.syslog.[tag]-[instance ID]` if a *tag* is provided.
+
+For example, here are metrics from a processor with a *tag* of `log-input` and an *instance ID* of `1`:
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "processor": {
+    "syslog": {
+      "log-input-1": {
+        "failure": 10,
+        "missing": 0,
+        "success": 3
+      }
+    }
+  }
+}
+-------------------------------------------------------------------------------
+
+`failure`:: Measures the number of occurrences where a message was unable to be parsed.
+
+`missing`:: Measures the number of occurrences where an event was missing the required input field.
+
+`success`:: Measures the number of successfully parsed syslog messages.

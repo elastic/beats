@@ -86,6 +86,7 @@ func init() {
 				"overwrite_keys",
 				"ignore_missing",
 				"ignore_failure",
+				"tag",
 			),
 		),
 	)
