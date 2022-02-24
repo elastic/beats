@@ -24,7 +24,6 @@ The available filesets are:
 * <<otx,otx>>: Supports gathering threat intel attributes from AlientVault OTX.
 * <<anomali,anomali>>: Supports gathering threat intel attributes from Anomali Limo.
 * <<anomalithreatstream,anomalithreatstream>>: Supports gathering threat intel attributes from Anomali ThreatStream.
-* <<recordedfuture,recordedfuture>>: Supports gathering threat intel attributes from Recorded Future.
 * <<threatq,threatq>>: Supports gathering threat intel attributes from ThreatQuotient.
 
 include::../include/gs-link.asciidoc[]
@@ -510,124 +509,6 @@ Anomali ThreatStream fields are mapped to the following ECS fields:
 [[a]]
 [small]#[1]: Field is used to derive a value for the ECS field but its original value is kept under `threatintel.anomalithreatstream`.#
 
-[[recordedfuture]]
-[float]
-==== `recordedfuture` fileset settings
-
-The `recordedfuture` fileset fetches risklists from the Recorded Future Connect API.
-It supports `domain`, `hash`, `ip` and `url` entities.
-
-In order to use it you need to define the `entity` and `list` to fetch. Check the
-https://api.recordedfuture.com/index.html[Recorded Future API Explorer] for the
-available lists for each entity.
-
-Sample configuration:
-[source,yaml]
-----
-- module: threatintel
-  recordedfuture:
-    enabled: true
-    var.input: httpjson
-    var.interval: 1h
-    var.api_token: "<RF_TOKEN>"
-    var.list: default
-    var.entity: domain
-----
-
-To fetch threat intelligence from multiple entities and/or lists, you must define more
-than one instance of the module. The following configuration fetches the default list
-for domains every hour and the rfTrending list for hashes every 12 hours:
-
-[source,yaml]
-----
-- module: threatintel
-  recordedfuture:
-    enabled: true
-    var.input: httpjson
-    var.interval: 1h
-    var.api_token: "<RF_TOKEN>"
-    var.list: default
-    var.entity: domain
-- module: threatintel
-  recordedfuture:
-    enabled: true
-    var.input: httpjson
-    var.interval: 12h
-    var.api_token: "<RF_TOKEN>"
-    var.entity: hash
-    var.list: rfTrending
-----
-
-Alternatively, you can use the module to fetch custom Fusion files by setting
-`var.custom_url` to the URL of the Fusion File:
-
-[source,yaml]
-----
-- module: threatintel
-  recordedfuture:
-    enabled: true
-    var.input: httpjson
-    var.interval: 1h
-    var.api_token: "<RF_TOKEN>"
-    var.custom_url: 'https://api.recordedfuture.com/v2/fusion/files/?path=%2Fpublic%2Frisklists%2Fdefault_domain_risklist.csv'
-----
-
-It's also possible to load CSV risklists from a file:
-
-[source,yaml]
-----
-- module: threatintel
-  recordedfuture:
-    enabled: true
-    var.input: file
-    var.paths:
-        - /path/to/risklist.csv
-----
-
-*`var.input`*::
-
-The input to use to fetch indicators. Use `httpjson` to query
-Recorded Future API or `file` to load the indicators from a file.
-
-*`var.api_token`*::
-
-The API token used to access Recorded Future API (RF-Token).
-
-*`var.interval`*::
-
-How often the API is polled for updated information. It is recommended to set this
-to `1h`. For `hash` entities, it's recommended to set this to `12h`.
-
-*`var.entity`*::
-
-The type of entity to fetch. One of `domain`, `hash`, `ip` or `url`.
-
-*`var.list`*::
-
-The indicator list to fetch.
-
-*`var.proxy_url`*::
-
-Optional URL to use as HTTP proxy.
-
-*`var.custom_url`*::
-
-An alternative URL pointing to a CSV risklist. Use this option
-to fetch custom Fusion Files.
-
-Recorded Future fields are mapped to the following ECS fields:
-
-[options="header"]
-|=============================================================
-| Recorded Future fields | ECS Fields
-| entity.name            | threat.indicator.{url,ip,domain,file.hash}
-| entity.type            | threat.indicator.type
-| fileHashes             | threat.indicator.file.hash
-| risk.score             | event.risk_score
-|=============================================================
-
-:has-dashboards!:
-
 [float]
 === Dashboards
 
@@ -669,12 +550,6 @@ image::./images/filebeat-threatintel-misp.png[]
 
 [float]
 Overview of the information provided by the MISP feed.
-
-[role="screenshot"]
-image::./images/filebeat-threatintel-recordedfuture.png[]
-
-[float]
-Overview of the information provided by the Recorded Future feed.
 
 [[threatq]]
 [float]
@@ -781,12 +656,6 @@ image::./images/filebeat-threatintel-misp.png[]
 
 [float]
 Overview of the information provided by the MISP feed.
-
-[role="screenshot"]
-image::./images/filebeat-threatintel-recordedfuture.png[]
-
-[float]
-Overview of the information provided by the Recorded Future feed.
 
 [role="screenshot"]
 image::./images/filebeat-threatintel-threatq.png[]
