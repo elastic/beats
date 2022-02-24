@@ -43,7 +43,7 @@ var (
 
 // Install runs the Npcap installer at the provided path. The install
 // destination is specified by dst and installation using WinPcap
-// API-compatible Mode is specifed by compat. If dst is the empty string
+// API-compatible Mode is specified by compat. If dst is the empty string
 // the default install location is used.
 //
 // See https://nmap.org/npcap/guide/npcap-users-guide.html#npcap-installation-uninstall-options
