@@ -635,8 +635,7 @@ func newErrorLogger(t *testing.T) *logger.Logger {
 
 func createAndStartServer(t *testing.T, handler Handler, extraConfigs ...func(*Server)) *Server {
 	t.Helper()
-	tracer := apm.DefaultTracer
-	srv, err := New(newErrorLogger(t), "localhost:0", handler, tracer)
+	srv, err := New(newErrorLogger(t), "localhost:0", handler, apm.DefaultTracer)
 	require.NoError(t, err)
 	for _, extra := range extraConfigs {
 		extra(srv)

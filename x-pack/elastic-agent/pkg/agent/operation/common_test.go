@@ -65,8 +65,7 @@ func getTestOperator(t *testing.T, downloadPath string, installPath string, p *a
 	if err != nil {
 		t.Fatal(err)
 	}
-	tracer := apm.DefaultTracer
-	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{}, tracer)
+	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{}, apm.DefaultTracer)
 	if err != nil {
 		t.Fatal(err)
 	}

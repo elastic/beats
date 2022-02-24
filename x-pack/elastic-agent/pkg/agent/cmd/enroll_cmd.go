@@ -191,8 +191,7 @@ func (c *enrollCmd) Execute(ctx context.Context, streams *cli.IOStreams) error {
 		span.End()
 	}()
 
-	var persistentConfig map[string]interface{}
-	persistentConfig, err = getPersistentConfig(c.configPath)
+	persistentConfig, err := getPersistentConfig(c.configPath)
 	if err != nil {
 		return err
 	}
@@ -202,8 +201,7 @@ func (c *enrollCmd) Execute(ctx context.Context, streams *cli.IOStreams) error {
 	// Connection setup should disable proxies in that case.
 	localFleetServer := c.options.FleetServer.ConnStr != ""
 	if localFleetServer && !c.options.DelayEnroll {
-		var token string
-		token, err = c.fleetServerBootstrap(ctx, persistentConfig)
+		token, err := c.fleetServerBootstrap(ctx, persistentConfig)
 		if err != nil {
 			return err
 		}
@@ -214,11 +212,10 @@ func (c *enrollCmd) Execute(ctx context.Context, streams *cli.IOStreams) error {
 
 	c.remoteConfig, err = c.options.remoteConfig()
 	if err != nil {
-		err = errors.New(
+		return errors.New(
 			err, "Error",
 			errors.TypeConfig,
 			errors.M(errors.MetaKeyURI, c.options.URL))
-		return err
 	}
 	if localFleetServer {
 		// Ensure that the agent does not use a proxy configuration
@@ -228,32 +225,28 @@ func (c *enrollCmd) Execute(ctx context.Context, streams *cli.IOStreams) error {
 
 	c.client, err = fleetclient.NewWithConfig(c.log, c.remoteConfig)
 	if err != nil {
-		err = errors.New(
+		return errors.New(
 			err, "Error",
 			errors.TypeNetwork,
 			errors.M(errors.MetaKeyURI, c.options.URL))
-		return err
 	}
 
 	if c.options.DelayEnroll {
 		if c.options.FleetServer.Host != "" {
-			err = errors.New("--delay-enroll cannot be used with --fleet-server-es", errors.TypeConfig)
-			return err
+			return errors.New("--delay-enroll cannot be used with --fleet-server-es", errors.TypeConfig)
 		}
 		return c.writeDelayEnroll(streams)
 	}
 
 	err = c.enrollWithBackoff(ctx, persistentConfig)
 	if err != nil {
-		err = errors.New(err, "fail to enroll")
-		return err
+		return errors.New(err, "fail to enroll")
 	}
 
 	if c.options.FixPermissions {
 		err = install.FixPermissions()
 		if err != nil {
-			err = errors.New(err, "failed to fix permissions")
-			return err
+			return errors.New(err, "failed to fix permissions")
 		}
 	}
 

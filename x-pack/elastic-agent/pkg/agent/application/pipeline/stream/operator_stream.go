@@ -54,8 +54,7 @@ func (b *operatorStream) Execute(ctx context.Context, cfg configrequest.Request)
 		apm.CaptureError(ctx, err).Send()
 		span.End()
 	}()
-	err = b.configHandler.HandleConfig(ctx, cfg)
-	return
+	return b.configHandler.HandleConfig(ctx, cfg)
 }
 
 func (b *operatorStream) Shutdown() {

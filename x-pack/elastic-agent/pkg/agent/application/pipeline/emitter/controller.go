@@ -120,7 +120,7 @@ func (e *Controller) Update(ctx context.Context, c *config.Config) (err error) {
 // Set sets the transpiler vars for dynamic inputs resolution.
 func (e *Controller) Set(ctx context.Context, vars []*transpiler.Vars) {
 	var err error
-	span, ctx := apm.StartSpan(ctx, "Set", "app.internal")
+	span, ctx := apm.StartSpan(ctx, "set", "app.internal")
 	defer func() {
 		apm.CaptureError(ctx, err).Send()
 		span.End()
@@ -157,8 +157,7 @@ func (e *Controller) update(ctx context.Context) (err error) {
 	ast := rawAst.Clone()
 	inputs, ok := transpiler.Lookup(ast, "inputs")
 	if ok {
-		var renderedInputs transpiler.Node
-		renderedInputs, err = transpiler.RenderInputs(inputs, varsArray)
+		renderedInputs, err := transpiler.RenderInputs(inputs, varsArray)
 		if err != nil {
 			return err
 		}
@@ -170,8 +169,7 @@ func (e *Controller) update(ctx context.Context) (err error) {
 
 	e.logger.Debug("Converting single configuration into specific programs configuration")
 
-	programsToRun := make(map[string][]program.Program)
-	programsToRun, err = program.Programs(e.agentInfo, ast)
+	programsToRun, err := program.Programs(e.agentInfo, ast)
 	if err != nil {
 		return err
 	}

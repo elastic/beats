@@ -55,8 +55,7 @@ func TestCmdBinaryOnlyYAML(t *testing.T) {
 }
 
 func TestCmdDaemon(t *testing.T) {
-	tracer := apm.DefaultTracer
-	srv := server.New(newErrorLogger(t), nil, nil, nil, tracer)
+	srv := server.New(newErrorLogger(t), nil, nil, nil, apm.DefaultTracer)
 	require.NoError(t, srv.Start())
 	defer srv.Stop()
 
@@ -72,8 +71,7 @@ func TestCmdDaemon(t *testing.T) {
 }
 
 func TestCmdDaemonYAML(t *testing.T) {
-	tracer := apm.DefaultTracer
-	srv := server.New(newErrorLogger(t), nil, nil, nil, tracer)
+	srv := server.New(newErrorLogger(t), nil, nil, nil, apm.DefaultTracer)
 	require.NoError(t, srv.Start())
 	defer srv.Stop()
 

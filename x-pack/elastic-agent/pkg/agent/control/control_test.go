@@ -24,8 +24,7 @@ import (
 )
 
 func TestServerClient_Version(t *testing.T) {
-	tracer := apm.DefaultTracer
-	srv := server.New(newErrorLogger(t), nil, nil, nil, tracer)
+	srv := server.New(newErrorLogger(t), nil, nil, nil, apm.DefaultTracer)
 	err := srv.Start()
 	require.NoError(t, err)
 	defer srv.Stop()
@@ -49,8 +48,7 @@ func TestServerClient_Version(t *testing.T) {
 func TestServerClient_Status(t *testing.T) {
 	l := newErrorLogger(t)
 	statusCtrl := status.NewController(l)
-	tracer := apm.DefaultTracer
-	srv := server.New(l, nil, statusCtrl, nil, tracer)
+	srv := server.New(l, nil, statusCtrl, nil, apm.DefaultTracer)
 	err := srv.Start()
 	require.NoError(t, err)
 	defer srv.Stop()
