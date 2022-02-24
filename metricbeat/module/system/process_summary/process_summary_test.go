@@ -58,9 +58,17 @@ func TestFetch(t *testing.T) {
 	require.True(t, ok)
 
 	// if there's nothing marked as sleeping or idle, something weird is happening
-	assert.NotZero(t, event["idle"])
-	assert.NotZero(t, event["sleeping"])
+	assert.NotZero(t, event["total"])
 
+	var sum int
+	total := event["total"].(int)
+	for key, val := range event {
+		if key == "total" {
+			continue
+		}
+		sum = val.(int) + sum
+	}
+	assert.Equal(t, total, sum)
 }
 
 func getConfig() map[string]interface{} {
