@@ -43,3 +43,9 @@ tags:
 {{end}}
 
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0
