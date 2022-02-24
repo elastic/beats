@@ -336,7 +336,7 @@ func DebugString(c *C, filterPrivate bool) string {
 			return fmt.Sprintf("<config error> %v", err)
 		}
 		if filterPrivate {
-			applyLoggingMask(content)
+			ApplyLoggingMask(content)
 		}
 		j, _ := json.MarshalIndent(content, "", "  ")
 		bufs = append(bufs, string(j))
@@ -347,7 +347,7 @@ func DebugString(c *C, filterPrivate bool) string {
 			return fmt.Sprintf("<config error> %v", err)
 		}
 		if filterPrivate {
-			applyLoggingMask(content)
+			ApplyLoggingMask(content)
 		}
 		j, _ := json.MarshalIndent(content, "", "  ")
 		bufs = append(bufs, string(j))
@@ -359,7 +359,9 @@ func DebugString(c *C, filterPrivate bool) string {
 	return strings.Join(bufs, "\n")
 }
 
-func applyLoggingMask(c interface{}) {
+// ApplyLoggingMask redacts the values of keys that might
+// contain sensitive data (password, passphrase, etc.).
+func ApplyLoggingMask(c interface{}) {
 	switch cfg := c.(type) {
 	case map[string]interface{}:
 		for k, v := range cfg {
@@ -372,13 +374,13 @@ func applyLoggingMask(c interface{}) {
 					cfg[k] = mask
 				}
 			} else {
-				applyLoggingMask(v)
+				ApplyLoggingMask(v)
 			}
 		}
 
 	case []interface{}:
 		for _, elem := range cfg {
-			applyLoggingMask(elem)
+			ApplyLoggingMask(elem)
 		}
 	}
 }
