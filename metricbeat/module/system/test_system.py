@@ -394,8 +394,8 @@ class Test(metricbeat.BaseTest):
                 assert isinstance(summary["idle"], int)
 
             if sys.platform.startswith("windows"):
-                assert summary["total"] == summary["sleeping"] + \
-                    summary["running"] + summary["unknown"]
+                assert isinstance(summary["running"], int)
+                assert isinstance(summary["total"], int)
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process(self):
