@@ -18,6 +18,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Filebeat*
 
+- Remove Recorded Future integration from threatintel module. {pull}30564[30564]
 
 *Heartbeat*
 
@@ -41,6 +42,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix field names with `add_network_direction` processor. {issue}29747[29747] {pull}29751[29751]
 - Fix a logging bug when `ssl.verification_mode` was set to `full` or `certificate`, the command `test output` incorrectly logged that TLS was disabled.
 - Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
+- Update docker/distribution dependency library to fix a security issues concerning OCI Manifest Type Confusion Issue. {pull}30462[30462]
 - Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
 
 *Auditbeat*
@@ -107,7 +109,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
 - Add support for filtering in journald input with `unit`, `kernel`, `identifiers` and `include_matches`. {pull}29294[29294]
 - Add new `userAgent` and `beatInfo` template functions for httpjson input {pull}29528[29528]
-- threatintel module: Add new Recorded Future integration. {pull}30030[30030]
 - Add pipeline in FB's supported hints. {pull}30212[30212]
 
 *Auditbeat*
@@ -142,6 +143,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 
 *Winlogbeat*
+
+- Improve the error message when the registry file content is invalid. {pull}30543[30543]
 
 
 *Elastic Log Driver*
