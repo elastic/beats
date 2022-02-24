@@ -10,6 +10,9 @@ processors:
 - dot_expander:
     field: '*'
     override: true
+# Drop any non-slowlog messages that show up due to mixed log output configurations
+- drop:
+    if: '!["elasticsearch.slowlog", "elasticsearch.index_indexing_slowlog", "elasticsearch.index_search_slowlog"].contains(ctx.event.dataset)'
 - convert:
     field: elasticsearch.slowlog.took_millis
     type: float

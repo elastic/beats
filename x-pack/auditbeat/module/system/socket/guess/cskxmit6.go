@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"unsafe"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -107,7 +106,7 @@ func (g *guessInet6CskXmit) Prepare(ctx Context) (err error) {
 	g.acceptedFd = -1
 	g.loopback, err = helper.NewIPv6Loopback()
 	if err != nil {
-		return errors.Wrap(err, "detect IPv6 loopback failed")
+		return fmt.Errorf("detect IPv6 loopback failed: %w", err)
 	}
 	defer func() {
 		if err != nil {
@@ -116,26 +115,26 @@ func (g *guessInet6CskXmit) Prepare(ctx Context) (err error) {
 	}()
 	clientIP, err := g.loopback.AddRandomAddress()
 	if err != nil {
-		return errors.Wrap(err, "failed adding first device address")
+		return fmt.Errorf("failed adding first device address: %w", err)
 	}
 	serverIP, err := g.loopback.AddRandomAddress()
 	if err != nil {
-		return errors.Wrap(err, "failed adding second device address")
+		return fmt.Errorf("failed adding second device address: %w", err)
 	}
 	copy(g.clientAddr.Addr[:], clientIP)
 	copy(g.serverAddr.Addr[:], serverIP)
 
 	if g.client, g.clientAddr, err = createSocket6WithProto(unix.SOCK_STREAM, g.clientAddr); err != nil {
-		return errors.Wrap(err, "error creating server")
+		return fmt.Errorf("error creating server: %w", err)
 	}
 	if g.server, g.serverAddr, err = createSocket6WithProto(unix.SOCK_STREAM, g.serverAddr); err != nil {
-		return errors.Wrap(err, "error creating client")
+		return fmt.Errorf("error creating client: %w", err)
 	}
 	if err = unix.Listen(g.server, 1); err != nil {
-		return errors.Wrap(err, "error in listen")
+		return fmt.Errorf("error in listen: %w", err)
 	}
 	if err = unix.Connect(g.client, &g.serverAddr); err != nil {
-		return errors.Wrap(err, "connect failed")
+		return fmt.Errorf("connect failed: %w", err)
 	}
 	return nil
 }
@@ -156,7 +155,7 @@ func (g *guessInet6CskXmit) Terminate() error {
 func (g *guessInet6CskXmit) Trigger() error {
 	fd, _, err := unix.Accept(g.server)
 	if err != nil {
-		return errors.Wrap(err, "accept failed")
+		return fmt.Errorf("accept failed: %w", err)
 	}
 	_, err = unix.Write(fd, []byte("hello world"))
 	return err
