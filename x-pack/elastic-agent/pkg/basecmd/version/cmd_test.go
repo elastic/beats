@@ -11,7 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.elastic.co/apm"
+	"go.elastic.co/apm/apmtest"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -55,7 +55,7 @@ func TestCmdBinaryOnlyYAML(t *testing.T) {
 }
 
 func TestCmdDaemon(t *testing.T) {
-	srv := server.New(newErrorLogger(t), nil, nil, nil, apm.DefaultTracer)
+	srv := server.New(newErrorLogger(t), nil, nil, nil, apmtest.DiscardTracer)
 	require.NoError(t, srv.Start())
 	defer srv.Stop()
 
@@ -71,7 +71,7 @@ func TestCmdDaemon(t *testing.T) {
 }
 
 func TestCmdDaemonYAML(t *testing.T) {
-	srv := server.New(newErrorLogger(t), nil, nil, nil, apm.DefaultTracer)
+	srv := server.New(newErrorLogger(t), nil, nil, nil, apmtest.DiscardTracer)
 	require.NoError(t, srv.Start())
 	defer srv.Stop()
 

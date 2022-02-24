@@ -11,15 +11,14 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.elastic.co/apm"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+	"go.elastic.co/apm/apmtest"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -165,7 +164,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	if err != nil {
 		t.Fatal(err)
 	}
-	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{}, apm.DefaultTracer)
+	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{}, apmtest.DiscardTracer)
 	if err != nil {
 		t.Fatal(err)
 	}

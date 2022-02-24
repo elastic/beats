@@ -8,9 +8,7 @@ import (
 	"context"
 	"testing"
 
-	"go.elastic.co/apm"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
+	"go.elastic.co/apm/apmtest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -20,11 +18,12 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 func TestServerClient_Version(t *testing.T) {
-	srv := server.New(newErrorLogger(t), nil, nil, nil, apm.DefaultTracer)
+	srv := server.New(newErrorLogger(t), nil, nil, nil, apmtest.DiscardTracer)
 	err := srv.Start()
 	require.NoError(t, err)
 	defer srv.Stop()
@@ -48,7 +47,7 @@ func TestServerClient_Version(t *testing.T) {
 func TestServerClient_Status(t *testing.T) {
 	l := newErrorLogger(t)
 	statusCtrl := status.NewController(l)
-	srv := server.New(l, nil, statusCtrl, nil, apm.DefaultTracer)
+	srv := server.New(l, nil, statusCtrl, nil, apmtest.DiscardTracer)
 	err := srv.Start()
 	require.NoError(t, err)
 	defer srv.Stop()

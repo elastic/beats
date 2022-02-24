@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"go.elastic.co/apm"
+	"go.elastic.co/apm/apmtest"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -635,7 +635,7 @@ func newErrorLogger(t *testing.T) *logger.Logger {
 
 func createAndStartServer(t *testing.T, handler Handler, extraConfigs ...func(*Server)) *Server {
 	t.Helper()
-	srv, err := New(newErrorLogger(t), "localhost:0", handler, apm.DefaultTracer)
+	srv, err := New(newErrorLogger(t), "localhost:0", handler, apmtest.DiscardTracer)
 	require.NoError(t, err)
 	for _, extra := range extraConfigs {
 		extra(srv)
