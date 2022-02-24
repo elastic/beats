@@ -148,7 +148,7 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 
 	cfgFile := paths.ConfigFile()
 	if status != install.PackageInstall {
-		err = install.Install(cfgFile) // can't run install for package installed agent, but must stop the running service and re-enroll, then start the service?
+		err = install.Install(cfgFile)
 		if err != nil {
 			return err
 		}
