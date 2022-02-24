@@ -55,9 +55,13 @@ a previous 7.x version of {beats}, *upgrade to version 7.17 first*. If you're
 using other products in the {stack}, upgrade {beats} as part of the
 {stack-ref}/upgrading-elastic-stack.html[{stack} upgrade process].
 
-After upgrading to 7.17, use the {ref}/index-templates.html#getting[Index
-Template API] to verify that the 7.17 index template has been loaded into {es}.
-If the 7.17 index template is not loaded, load it now. 
+After upgrading to 7.17, go to *Index Management* in {kib} and verify
+that the 7.17 index template has been loaded into {es}.
+
+[role="screenshot"]
+image::images/confirm-index-template.png[Screen capture showing that metricbeat-1.17.0 index template is loaded]
+
+If the 7.17 index template is not loaded, load it now.
 
 If you created custom dashboards prior to version 7.17, you must upgrade them to
 7.17 before proceeding. Otherwise, the dashboards will stop working because
@@ -102,6 +106,10 @@ you do not specify this setting, logs are stored in the directory you extracted
 the archive to.
 --
 
+//REVIEWERS: What (if anything) should we say here ^^ about the modules.d dir?
+//Is there a situation where users might have configs defined in 7.17, but also
+//want to use some new modules from 8.0? If so, what do we recommend they do?
+
 Complete the upgrade tasks described in the following sections *before*
 restarting the {beats} process.
 
@@ -137,9 +145,9 @@ data into {es}.
 
 include::{libbeat-dir}/tab-widgets/load-index-template-widget.asciidoc[]
 
-Not collecting time series data? You can continue to use {beats} to send data to
-aliases and indices. To do this, create a custom index template and load it
-manually. To learn more about creating index templates, refer to
+If you're not collecting time series data, you can continue to use {beats}
+to send data to aliases and indices. To do this, create a custom index template
+and load it manually. To learn more about creating index templates, refer to
 {ref}/index-templates.html[Index templates].
 
 //REVIEWERS: Do users need to explicitly disable template loading?
@@ -170,6 +178,17 @@ NOTE: If you enabled the compatibility layer in 7.x (that is, if you set
 rely on the old aliases created by that setting. The old aliases are no longer
 supported. They may continue to work, but will be removed without notice in
 a future release.
+
+[discrete]
+[[start-beats]]
+==== Start your upgraded {beats}
+
+After you've completed the migration, start the upgraded Beat. Use the command
+that works with your system.
+
+Check the console and logs for errors.
+
+In {kib}, go to *Discover* and verify that events are streaming into {es}.
 
 [discrete]
 [[troubleshooting-upgrade]]
