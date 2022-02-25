@@ -20,6 +20,9 @@ else
   done
 fi
 
+# Disable core dumps
+ulimit -c 0
+
 # If neither of those worked, then they have specified the binary they want, so
 # just do exactly as they say.
 exec "$@"
