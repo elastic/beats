@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
 
 *Auditbeat*
 
@@ -106,14 +107,4 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
-
-*Journalbeat*
-
-
-
-
-
-
-
-
 
