@@ -390,9 +390,6 @@ class Test(metricbeat.BaseTest):
             summary = evt["system"]["process"]["summary"]
             assert isinstance(summary["total"], int)
 
-            if not sys.platform.startswith("win"):
-                assert isinstance(summary["idle"], int)
-
             if sys.platform.startswith("windows"):
                 assert isinstance(summary["running"], int)
                 assert isinstance(summary["total"], int)
