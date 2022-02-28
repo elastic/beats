@@ -152,9 +152,9 @@ func resolveActionOrder(action Action, existedBefore, existsNow bool) ActionArra
 }
 
 func (action Action) InOrder(existedBefore, existsNow bool) ActionArray {
-	hasConfigChange := 0 != action&ConfigChange
-	hasUpdate := 0 != action&Updated
-	hasAttrMod := 0 != action&AttributesModified
+	hasConfigChange := action&ConfigChange != 0
+	hasUpdate := action&Updated != 0
+	hasAttrMod := action&AttributesModified != 0
 	action = Action(int(action) & int(^(ConfigChange | AttributesModified)))
 	if hasAttrMod {
 		action |= Updated
@@ -189,7 +189,7 @@ func (action Action) InAnyOrder() ActionArray {
 	}
 	var result []Action
 	for k := range actionNames {
-		if 0 != action&k {
+		if action&k != 0 {
 			result = append(result, k)
 		}
 	}
