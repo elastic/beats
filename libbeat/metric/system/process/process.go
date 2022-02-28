@@ -103,6 +103,21 @@ var (
 	Unknown PidState = "unknown"
 )
 
+// PidStates is a Map of all pid states, mostly applicable to linux
+var PidStates = map[byte]PidState{
+	'S': Sleeping,
+	'R': Running,
+	'D': Idle, // Waiting in uninterruptible disk sleep, on some kernels this is marked as I below
+	'I': Idle, // in the scheduler, TASK_IDLE is defined as (TASK_UNINTERRUPTIBLE | TASK_NOLOAD)
+	'T': Stopped,
+	'Z': Zombie,
+	'X': Dead,
+	'x': Dead,
+	'K': WakeKill,
+	'W': Waking,
+	'P': Parked,
+}
+
 // ListStates is a wrapper that returns a list of processess with only the basic PID info filled out.
 func ListStates(hostfs resolve.Resolver) ([]ProcState, error) {
 	init := Stats{
