@@ -61998,6 +61998,36 @@ type: long
 
 --
 
+*`system.process.summary.wakekill`*::
++
+--
+Number of wakekill-state processes on this host. Only found on older Linux Kernel versions.
+
+
+type: long
+
+--
+
+*`system.process.summary.wake`*::
++
+--
+Number of wake-state processes on this host. Only found on older Linux Kernel versions.
+
+
+type: long
+
+--
+
+*`system.process.summary.parked`*::
++
+--
+Number of parked-state processes on this host. Only found on older Linux Kernel versions, or under certain conditions.
+
+
+type: long
+
+--
+
 *`system.process.summary.unknown`*::
 +
 --

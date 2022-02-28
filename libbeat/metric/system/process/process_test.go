@@ -65,6 +65,16 @@ func TestGetOne(t *testing.T) {
 	t.Logf("Proc: %s", procData.StringToPrint())
 }
 
+func TestProcessList(t *testing.T) {
+	plist, err := ListStates(resolve.NewTestResolver("/"))
+	assert.NoError(t, err, "ListStates")
+
+	for _, proc := range plist {
+		assert.NotEmpty(t, proc.State)
+		assert.True(t, proc.Pid.Exists())
+	}
+}
+
 func TestGetProcess(t *testing.T) {
 	stat, err := initTestResolver()
 	assert.NoError(t, err, "Init()")
