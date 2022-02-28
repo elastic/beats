@@ -9,6 +9,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"go.elastic.co/apm"
+	"go.elastic.co/apm/apmtest"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
@@ -45,8 +47,43 @@ func (m *mockActionOther) ID() string     { return "mockActionOther" }
 func (m *mockActionOther) Type() string   { return "mockActionOther" }
 func (m *mockActionOther) String() string { return "mockActionOther" }
 
+type mockAcker struct {
+	CommitFn func(ctx context.Context) error
+}
+
+func (m mockAcker) Ack(ctx context.Context, action fleetapi.Action) error {
+	panic("implement me")
+}
+
+func (m mockAcker) Commit(ctx context.Context) error {
+	return m.CommitFn(ctx)
+}
+
 func TestActionDispatcher(t *testing.T) {
 	ack := noopacker.NewAcker()
+
+	t.Run("Merges ActionDispatcher ctx cancel and Dispatch ctx value", func(t *testing.T) {
+		action1 := &mockAction{}
+		def := &mockHandler{}
+		span := apmtest.NewRecordingTracer().
+			StartTransaction("ignore", "ignore").
+			StartSpan("ignore", "ignore", nil)
+		ctx1, cancel := context.WithCancel(context.Background())
+		ack := mockAcker{CommitFn: func(ctx context.Context) error {
+			// ctx1 not cancelled yet
+			require.NoError(t, ctx.Err())
+			got := apm.SpanFromContext(ctx)
+			require.Equal(t, span.TraceContext().Span, got.ParentID())
+			cancel() // cancel function from ctx1
+			require.Equal(t, ctx.Err(), context.Canceled)
+			return nil
+		}}
+		d, err := New(ctx1, nil, def)
+		require.NoError(t, err)
+		ctx2 := apm.ContextWithSpan(context.Background(), span)
+		err = d.Dispatch(ctx2, ack, action1)
+		require.NoError(t, err)
+	})
 
 	t.Run("Success to dispatch multiples events", func(t *testing.T) {
 		ctx := context.Background()

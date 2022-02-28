@@ -76,12 +76,14 @@ func (ad *ActionDispatcher) key(a fleetapi.Action) string {
 }
 
 // Dispatch dispatches an action using pre-registered set of handlers.
+// ctx is used here ONLY to carry the span, for cancellation use the cancel
+// function of the ActionDispatcher.ctx.
 func (ad *ActionDispatcher) Dispatch(ctx context.Context, acker store.FleetAcker, actions ...fleetapi.Action) (err error) {
 	span, ctx := apm.StartSpan(ctx, "dispatch", "app.internal")
-	defer func() {
-		apm.CaptureError(ctx, err).Send()
-		span.End()
-	}()
+	// Creating a child context that carries both the ad.ctx cancellation and
+	// the span from ctx.
+	ctx, _ = context.WithCancel(ad.ctx) // ignoring the cancel func as ctx will be cancelled when ever ad.ctx is cancelled.
+	ctx = apm.ContextWithSpan(ctx, span)
 
 	if len(actions) == 0 {
 		ad.log.Debug("No action to dispatch")
