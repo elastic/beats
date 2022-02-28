@@ -3,7 +3,11 @@
 version: '2.3'
 services:
   elasticsearch:
+<<<<<<< HEAD
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+=======
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.0.0
+>>>>>>> 8e288ea85c (bump test environments versions (#30599))
     healthcheck:
       test: ["CMD-SHELL", "curl -s http://localhost:9200/_cat/health?h=status | grep -q green"]
       retries: 300
@@ -20,7 +24,11 @@ services:
       - "script.context.template.cache_max_size=2000"
 
   logstash:
+<<<<<<< HEAD
     image: docker.elastic.co/logstash/logstash:7.17.0
+=======
+    image: docker.elastic.co/logstash/logstash:8.0.0
+>>>>>>> 8e288ea85c (bump test environments versions (#30599))
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
       retries: 300
@@ -30,7 +38,11 @@ services:
       - ./docker/logstash/pki:/etc/pki:ro
 
   kibana:
+<<<<<<< HEAD
     image: docker.elastic.co/kibana/kibana:7.17.0
+=======
+    image: docker.elastic.co/kibana/kibana:8.0.0
+>>>>>>> 8e288ea85c (bump test environments versions (#30599))
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5601"]
       retries: 300
