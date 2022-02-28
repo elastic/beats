@@ -18,6 +18,7 @@ var SupportedMap map[string]Spec
 func init() {
 	// Packed Files
 	// spec/apm-server.yml
+	// spec/cloudbeat.yml
 	// spec/endpoint.yml
 	// spec/filebeat.yml
 	// spec/fleet-server.yml
