@@ -106,10 +106,6 @@ you do not specify this setting, logs are stored in the directory you extracted
 the archive to.
 --
 
-//REVIEWERS: What (if anything) should we say here ^^ about the modules.d dir?
-//Is there a situation where users might have configs defined in 7.17, but also
-//want to use some new modules from 8.0? If so, what do we recommend they do?
-
 Complete the upgrade tasks described in the following sections *before*
 restarting the {beats} process.
 
@@ -126,8 +122,6 @@ them. However, deprecation was not always possible, so if you use any of the
 settings described under breaking changes, make sure you understand the
 alternatives that we provide.
 
-//REVIEWERS: Do users need to load any other assets besides the index template
-//and dashboards?
 
 [discrete]
 [[upgrade-index-template]]
@@ -149,8 +143,6 @@ If you're not collecting time series data, you can continue to use {beats}
 to send data to aliases and indices. To do this, create a custom index template
 and load it manually. To learn more about creating index templates, refer to
 {ref}/index-templates.html[Index templates].
-
-//REVIEWERS: Do users need to explicitly disable template loading?
 
 [discrete]
 [[load-8.0-dashboards]]
@@ -216,10 +208,6 @@ the document’s backing index. To learn how, refer to the docs about
 [[missing-timestamp-field]]
 ==== Timestamp field is missing
 
-//REVIEWERS: I think this section could be improved by more detail about
-//the error message. What does the user see in the logs to indicate
-//this problem?
-
 {beats} requires a timestamp field to send data to data streams. If the
 timestamp field added by {beats} is inadvertently removed by a processor, {beats}
 will be unable to index the event. To fix the problem, modify your processor
@@ -228,9 +216,6 @@ configuration to avoid removing the timestamp field.
 [discrete]
 [[missing-fields]]
 ==== Missing fields or too many fields in the index
-
-//REVIEWERS: IS this still necessary? I think the defaults might
-//take care of this, but I'll need to do some testing.
 
 You may have run the Beat before loading the required index template. To clean
 up and start again:
