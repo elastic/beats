@@ -239,7 +239,7 @@ func TestDifferentSetValueTypes(t *testing.T) {
 	assert.EqualValues(t, exp, tr.body())
 }
 
-func newURL(u string) url.URL {
+func newURL(u string) *url.URL {
 	url, _ := url.Parse(u)
-	return *url
+	return url
 }

@@ -175,10 +175,12 @@ func (resp *response) templateValues() common.MapStr {
 		return common.MapStr{}
 	}
 	return common.MapStr{
-		"header":     resp.header.Clone(),
-		"page":       resp.page,
-		"url.value":  resp.url.String(),
-		"url.params": resp.url.Query(),
-		"body":       resp.body,
+		"header": resp.header.Clone(),
+		"page":   resp.page,
+		"url": common.MapStr{
+			"value":  resp.url.String(),
+			"params": resp.url.Query(),
+		},
+		"body": resp.body,
 	}
 }
