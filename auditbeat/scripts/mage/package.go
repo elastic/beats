@@ -84,26 +84,27 @@ func CustomizePackaging(pkgFlavor PackagingFlavor) {
 	}
 
 	for _, args := range devtools.Packages {
-		for _, pkgType := range args.Types {
-			sampleRulesTarget := defaultSampleRulesTarget
+		if len(args.Types) == 0 {
+			continue
+		}
 
-			switch pkgType {
-			case devtools.TarGz, devtools.Zip:
-				args.Spec.ReplaceFile("{{.BeatName}}.yml", shortConfig)
-				args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfig)
-			case devtools.Deb, devtools.RPM:
-				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", shortConfig)
-				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfig)
-				sampleRulesTarget = "/etc/{{.BeatName}}/" + defaultSampleRulesTarget
-			case devtools.Docker:
-			default:
-				panic(fmt.Errorf("unhandled package type: %v", pkgType))
-			}
+		sampleRulesTarget := defaultSampleRulesTarget
 
-			if args.OS == "linux" {
-				args.Spec.Files[sampleRulesTarget] = sampleRules
-			}
-			break
+		switch pkgType := args.Types[0]; pkgType {
+		case devtools.TarGz, devtools.Zip:
+			args.Spec.ReplaceFile("{{.BeatName}}.yml", shortConfig)
+			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfig)
+		case devtools.Deb, devtools.RPM:
+			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", shortConfig)
+			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfig)
+			sampleRulesTarget = "/etc/{{.BeatName}}/" + defaultSampleRulesTarget
+		case devtools.Docker:
+		default:
+			panic(fmt.Errorf("unhandled package type: %v", pkgType))
+		}
+
+		if args.OS == "linux" {
+			args.Spec.Files[sampleRulesTarget] = sampleRules
 		}
 	}
 }
