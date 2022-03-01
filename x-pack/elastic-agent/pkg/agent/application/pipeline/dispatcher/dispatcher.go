@@ -80,10 +80,13 @@ func (ad *ActionDispatcher) key(a fleetapi.Action) string {
 // function of the ActionDispatcher.ctx.
 func (ad *ActionDispatcher) Dispatch(ctx context.Context, acker store.FleetAcker, actions ...fleetapi.Action) (err error) {
 	span, ctx := apm.StartSpan(ctx, "dispatch", "app.internal")
+	defer func() {
+		apm.CaptureError(ctx, err).Send()
+		span.End()
+	}()
 	// Creating a child context that carries both the ad.ctx cancelation and
 	// the span from ctx.
-	var cancel func()
-	ctx, cancel = context.WithCancel(ad.ctx)
+	ctx, cancel := context.WithCancel(ad.ctx)
 	// golint disallows us from discarding the cancel func, even
 	// though we know that the resources for ctx will be released
 	// when ad.ctx is canceled.
