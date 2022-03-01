@@ -42,10 +42,13 @@
 # Winlogbeat
 /x-pack/winlogbeat/ @elastic/security-external-integrations
 
+# Elastic Agent
+/x-pack/elastic-agent/ @elastic/elastic-agent-control-plane
+
 # Beats Build Specific
 /dev-tools/mage/ @elastic/beats
-/dev-tools/make/ @elastic/beats 
-/dev-tools/packaging/ @elastic/beats 
+/dev-tools/make/ @elastic/beats
+/dev-tools/packaging/ @elastic/beats
 
 # CI Specific
 /.ci/ @elastic/observablt-robots
