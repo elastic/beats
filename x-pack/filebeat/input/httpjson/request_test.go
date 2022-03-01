@@ -95,7 +95,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	assert.EqualValues(t,
 		&response{
 			page: 1,
-			url:  newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T14%3A50%3A00Z")),
+			url:  *(newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T14%3A50%3A00Z"))),
 			body: common.MapStr{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
 		},
 		lastResp,
@@ -127,7 +127,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	assert.EqualValues(t,
 		&response{
 			page: 1,
-			url:  newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T15%3A00%3A00Z")),
+			url:  *(newURL(fmt.Sprintf("%s?%s", testServer.URL, "%24filter=alertCreationTime+ge+2002-10-02T15%3A00%3A00Z"))),
 			body: common.MapStr{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 		},
 		lastResp,
