@@ -47,14 +47,12 @@ const (
 	logGroupNamePrefix = "filebeat-log-group-integtest-"
 )
 
-var (
-	cloudwatchConfig = common.MapStr{
-		"start_position":    "beginning",
-		"scan_frequency":    10 * time.Second,
-		"api_timeout":       120 * time.Second,
-		"number_of_workers": 1,
-	}
-)
+var cloudwatchConfig = common.MapStr{
+	"start_position":    "beginning",
+	"scan_frequency":    10 * time.Second,
+	"api_timeout":       120 * time.Second,
+	"number_of_workers": 1,
+}
 
 type terraformOutputData struct {
 	AWSRegion  string `yaml:"aws_region"`

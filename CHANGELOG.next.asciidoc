@@ -18,6 +18,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Filebeat*
 
+- Remove Recorded Future integration from threatintel module. {pull}30564[30564]
 
 *Heartbeat*
 
@@ -46,12 +47,15 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Auditbeat*
 
 - auditd: Add error.message to events when processing fails. {pull}30009[30009]
+- Fix handling of execve call events which have no argument. {issue}30585[30585] {pull}30586[30586]
 
 *Filebeat*
 
 - Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
 - auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
 - elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
+- Fix ECS version string in threatintel to be consistent with other modules and add event.timezone. {issue}30499[30499] {pull}30570[30570]
+- Add default paths value to MySQL Enterprise module to prevent issues with pipeline installations {pull}30598[30598]
 
 *Heartbeat*
 
@@ -92,6 +96,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add FIPS configuration option for all AWS API calls. {pull}[28899]
 - Add metadata change support for some processors {pull}30183[30183]
 - Add support for non-unique Kafka headers for output messages. {pull}30369[30369]
+- Add action_input_type for the .fleet-actions-results {pull}30562[30562]
 
 *Auditbeat*
 
@@ -107,7 +112,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
 - Add support for filtering in journald input with `unit`, `kernel`, `identifiers` and `include_matches`. {pull}29294[29294]
 - Add new `userAgent` and `beatInfo` template functions for httpjson input {pull}29528[29528]
-- threatintel module: Add new Recorded Future integration. {pull}30030[30030]
 - Add pipeline in FB's supported hints. {pull}30212[30212]
 
 *Auditbeat*
