@@ -175,7 +175,6 @@ func (f *logFile) shouldBeClosed() bool {
 
 	if !f.closeRemoved && !f.closeRenamed {
 		return false
-
 	}
 
 	info, statErr := f.file.Stat()

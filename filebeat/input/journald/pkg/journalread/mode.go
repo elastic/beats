@@ -17,10 +17,7 @@
 
 package journalread
 
-import (
-	"errors"
-	"fmt"
-)
+import "fmt"
 
 // SeekMode is used by (*Reader).Seek to decide where to advance the read pointer to.
 type SeekMode uint
@@ -41,8 +38,6 @@ var seekModes = map[string]SeekMode{
 	"tail":   SeekTail,
 	"cursor": SeekCursor,
 }
-
-var errInvalidSeekFallback = errors.New("invalid setting for cursor_seek_fallback")
 
 // Unpack validates and unpack "seek" config options. It returns an error if
 // the string is no valid seek mode.

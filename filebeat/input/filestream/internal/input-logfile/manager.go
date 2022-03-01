@@ -81,7 +81,6 @@ type Source interface {
 	Name() string
 }
 
-var errNoSourceConfigured = errors.New("no source has been configured")
 var errNoInputRunner = errors.New("no input runner available")
 
 const globalInputID = ".global"
