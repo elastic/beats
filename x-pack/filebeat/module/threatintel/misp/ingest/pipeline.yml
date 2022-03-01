@@ -8,9 +8,6 @@ processors:
       field: event.ingested
       value: "{{_ingest.timestamp}}"
   - set:
-      field: ecs.version
-      value: "1.12"
-  - set:
       field: event.kind
       value: enrichment
   - set:

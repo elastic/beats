@@ -193,4 +193,16 @@
               type: long
             - name: throttle_time_in_millis
               type: long
-
+        - name: bulk
+          type: group
+          fields:
+            - name: total_size_in_bytes
+              type: long
+            - name: avg_size_in_bytes
+              type: long
+            - name: avg_time_in_millis
+              type: long
+            - name: total_operations
+              type: long
+            - name: total_time_in_millis
+              type: long
