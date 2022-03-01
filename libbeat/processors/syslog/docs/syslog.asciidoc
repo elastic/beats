@@ -78,7 +78,7 @@ Will produce the following output:
       "procid": "1024",
       "msgid": "ID47",
       "version": 1,
-      "data": {
+      "structured_data": {
         "exampleSDID@32473": {
           "iut":         "3",
           "eventSource": "Application",

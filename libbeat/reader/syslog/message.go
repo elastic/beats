@@ -202,7 +202,7 @@ func (m message) fields(original string) common.MapStr {
 		f.Put("log.syslog.version", m.version)
 	}
 	if len(m.structuredData) > 0 {
-		f.Put("log.syslog.data", m.structuredData)
+		f.Put("log.syslog.structured_data", m.structuredData)
 	}
 
 	// Event fields.
