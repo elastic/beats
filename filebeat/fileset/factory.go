@@ -32,9 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 )
 
-var (
-	moduleList = monitoring.NewUniqueList()
-)
+var moduleList = monitoring.NewUniqueList()
 
 func init() {
 	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", moduleList.Report, monitoring.Report)

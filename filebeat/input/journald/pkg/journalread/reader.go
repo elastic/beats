@@ -50,11 +50,9 @@ type canceler interface {
 
 type journal interface {
 	Close() error
-
 	Next() (uint64, error)
 	Wait(time.Duration) int
 	GetEntry() (*sdjournal.JournalEntry, error)
-
 	SeekHead() error
 	SeekTail() error
 	SeekCursor(string) error

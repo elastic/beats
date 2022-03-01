@@ -302,7 +302,6 @@ func (s *store) writeState(r *resource) {
 	} else {
 		r.stored = true
 	}
-
 }
 
 // resetCursor sets the cursor to the value in cur in the persistent store and
@@ -366,7 +365,7 @@ func (s *store) UpdateTTL(resource *resource, ttl time.Duration) {
 		// instances do not overwrite the removal of the entry
 		resource.version++
 		// invalidate it after it has been persisted to make sure it cannot
-		//be overwritten in the persistent store
+		// be overwritten in the persistent store
 		resource.invalid = true
 	}
 }
@@ -554,7 +553,6 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 
 		return true, nil
 	})
-
 	if err != nil {
 		return nil, err
 	}
