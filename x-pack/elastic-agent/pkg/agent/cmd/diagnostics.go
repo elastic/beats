@@ -491,7 +491,7 @@ func createZip(fileName, outputFormat string, diag DiagnosticsInfo, cfg AgentCon
 		}
 	}
 
-	if metrics != nil {
+	if metrics != nil && len(metrics.Result) > 0 {
 		err := zipMetrics(zw, metrics)
 		if err != nil {
 			return closeHandlers(err, zw, f)

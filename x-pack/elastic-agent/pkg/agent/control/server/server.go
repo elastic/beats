@@ -295,10 +295,10 @@ func (s *Server) Pprof(ctx context.Context, req *proto.PprofRequest) (*proto.Ppr
 }
 
 // ProcMetrics returns all buffered metrics data for the agent and running processes.
-// If the agent.monitoring.http.buffer variable is not set, or set to false, a nil is returned
+// If the agent.monitoring.http.buffer variable is not set, or set to false, a nil result attribute is returned
 func (s *Server) ProcMetrics(ctx context.Context, _ *proto.Empty) (*proto.ProcMetricsResponse, error) {
 	if s.monitoringCfg == nil || s.monitoringCfg.HTTP == nil || s.monitoringCfg.HTTP.Buffer == nil || !s.monitoringCfg.HTTP.Buffer.Enabled {
-		return nil, nil
+		return &proto.ProcMetricsResponse{}, nil
 	}
 
 	if s.routeFn == nil {
@@ -320,6 +320,7 @@ func (s *Server) ProcMetrics(ctx context.Context, _ *proto.Empty) (*proto.ProcMe
 		endpoint := monitoring.MonitoringEndpoint(si.spec, runtime.GOOS, si.rk)
 		client := newSocketRequester(si.app, si.rk, endpoint)
 
+		s.logger.Infof("GATHER METRICS FROM %s", endpoint)
 		metrics := client.procMetrics(ctx)
 		resp.Result = append(resp.Result, metrics)
 	}
@@ -521,7 +522,7 @@ func (r *socketRequester) procMetrics(ctx context.Context) *proto.MetricsRespons
 		RouteKey: r.routeKey,
 	}
 
-	resp, err := r.getPath(ctx, "/")
+	resp, err := r.getPath(ctx, "/buffer")
 	if err != nil {
 		res.Error = err.Error()
 		return res
@@ -534,6 +535,10 @@ func (r *socketRequester) procMetrics(ctx context.Context) *proto.MetricsRespons
 		return res
 	}
 
+	if len(p) == 0 {
+		res.Error = "no content"
+		return res
+	}
 	res.Result = p
 	return res
 }
