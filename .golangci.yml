@@ -64,6 +64,7 @@ linters:
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
     - godox # tool for detection of FIXME, TODO and other comment keywords
+    - revive # avoid bad imports
 
 # all available settings of specific linters
 linters-settings:
@@ -135,6 +136,15 @@ linters-settings:
     require-explanation: true
     # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
     require-specific: true
+
+  revive:
+    enable-all-rules: false
+    # https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md
+    rules:
+      - name: imports-blacklist
+        arguments:
+          - github.com/pkg/errors
+          - github.com/elastic/beats/v7
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.

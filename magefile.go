@@ -21,8 +21,6 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -199,7 +197,7 @@ func (l Linter) LastChange() error {
 // Check runs all the checks
 // nolint: deadcode,unparam // it's used as a `mage` target and requires returning an error
 func Check() error {
-	mg.Deps(Deps.CheckNoBeats, Deps.CheckModuleTidy, Linter.LastChange)
+	mg.Deps(Deps.CheckModuleTidy, Linter.LastChange)
 	return nil
 }
 
@@ -212,33 +210,6 @@ func UpdateGoVersion() error {
 
 // Deps contains targets related to checking dependencies
 type Deps mg.Namespace
-
-// CheckNoBeats is required to make sure we are not introducing
-// dependency on elastic/beats.
-func (Deps) CheckNoBeats() error {
-	goModPath, err := filepath.Abs("go.mod")
-	if err != nil {
-		return err
-	}
-	goModFile, err := os.Open(goModPath)
-	if err != nil {
-		return fmt.Errorf("failed to open module file: %w", err)
-	}
-	beatsImport := []byte("github.com/elastic/beats")
-	scanner := bufio.NewScanner(goModFile)
-	lineCount := 1
-	for scanner.Scan() {
-		line := scanner.Bytes()
-		if bytes.Contains(line, beatsImport) {
-			return fmt.Errorf("line %d is a beats dependency: '%s'\nPlease, make sure you are not adding anything that depends on %s", lineCount, line, beatsImport)
-		}
-		lineCount++
-	}
-	if err := scanner.Err(); err != nil {
-		return err
-	}
-	return nil
-}
 
 // CheckModuleTidy checks if `go mod tidy` was run before the last commit.
 func (Deps) CheckModuleTidy() error {
