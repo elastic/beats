@@ -1,14 +1,14 @@
 pull_request_rules:
-  - name: forward-port patches to master branch
+  - name: forward-port patches to main branch
     conditions:
       - merged
-      - label=backport-v8.0.0
+      - label=forwardport-main
     actions:
       backport:
         assignees:
           - "{{ author }}"
         branches:
-          - "master"
+          - "main"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
@@ -104,7 +104,9 @@ pull_request_rules:
   - name: notify the backport policy
     conditions:
       - -label~=^backport
-      - base=master
+      - base=main
+      - -merged
+      - -closed
     actions:
       comment:
         message: |

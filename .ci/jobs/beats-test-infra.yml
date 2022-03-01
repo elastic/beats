@@ -17,6 +17,6 @@
             credentials-id: f6c7695a-671e-4f4f-a331-acdce44ff9ba
             reference-repo: /var/lib/jenkins/.git-references/apm-test-pipeline.git
             branches:
-                - master
+                - main
     triggers:
         - timed: 'H H(3-4) * * 1-5'

@@ -888,6 +888,8 @@ func (e *execveCall) getProcess() *process {
 	if idx := bytes.IndexByte(e.Path[:], 0); idx >= 0 {
 		// Fast path if we already have the path.
 		p.path = string(e.Path[:idx])
+		// Keep the basename in case we can't get the process name.
+		p.name = filepath.Base(p.path)
 	} else {
 		// Attempt to get the path from the /prox/<pid>/exe symlink.
 		var err error
@@ -896,9 +898,13 @@ func (e *execveCall) getProcess() *process {
 			if pe, ok := err.(*os.PathError); ok && strings.Contains(pe.Path, "(deleted)") {
 				// Keep the deleted path from the PathError.
 				p.path = pe.Path
+				// Keep the basename in case we can't get the process name.
+				p.name = filepath.Base(strings.TrimSuffix(p.path, " (deleted)"))
 			} else {
 				// Fallback to the truncated path.
 				p.path = string(e.Path[:]) + " ..."
+				// Don't trim the ellipsis to indicate this may be incorrect.
+				p.name = filepath.Base(p.path)
 			}
 		}
 	}
@@ -943,8 +949,24 @@ func (e *execveCall) getProcess() *process {
 		}
 	}
 
-	// Get name from first argument.
-	p.name = filepath.Base(p.args[0])
+	// Carefully get the process name; we may have zero arguments.
+	if len(p.args) != 0 {
+		// Get name from first argument.
+		p.name = filepath.Base(p.args[0])
+	} else {
+		// Attempt to get name from /proc/<pid>/comm — only available since 2.6.33.
+		comm, err := os.ReadFile(fmt.Sprintf("/proc/%d/comm", e.Meta.PID))
+		if err == nil {
+			p.name = strings.TrimRight(string(comm), "\x00")
+			if len(p.name) == 16 {
+				// The name may have been truncated if it is TASK_COMM_LEN long.
+				p.name += "..."
+			}
+		} else if p.name == "" {
+			// This should never happen.
+			p.name = "(unknown)"
+		}
+	}
 
 	if e.creds != nil {
 		p.hasCreds = true
