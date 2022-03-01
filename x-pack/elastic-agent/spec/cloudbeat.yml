@@ -34,5 +34,3 @@ rules:
     - output
 
 when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
-
-# TODO cloudbeat needs to be filled up relevant Needs to  be filled according to cloudbeat config
