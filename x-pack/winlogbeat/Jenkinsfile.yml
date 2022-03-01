@@ -29,12 +29,6 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
         stage: mandatory
-    # https://github.com/elastic/beats/issues/30621
-    #windows-2022:
-    #    mage: "mage build unitTest"
-    #    platforms:             ## override default labels in this specific stage.
-    #        - "windows-2022"
-    #    stage: extended
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
