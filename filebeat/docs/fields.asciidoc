@@ -86568,7 +86568,7 @@ example: native
 [float]
 === log
 
-Kafka log lines.
+Kibana log lines.
 
 
 
@@ -151907,43 +151907,6 @@ type: keyword
 +
 --
 The indicator type, can for example be "domain, email, FileHash-SHA256".
-
-
-type: keyword
-
---
-
-[float]
-=== recordedfuture
-
-Fields for Recorded Future Threat Intel
-
-
-
-*`recordedfuture.evidence_details`*::
-+
---
-List of sightings used as evidence for this indicator.
-
-
-type: flattened
-
---
-
-*`recordedfuture.name`*::
-+
---
-Indicator value.
-
-
-type: keyword
-
---
-
-*`recordedfuture.risk_string`*::
-+
---
-Details of risk rules observed.
 
 
 type: keyword

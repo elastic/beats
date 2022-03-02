@@ -18,6 +18,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Filebeat*
 
+- Remove Recorded Future integration from threatintel module. {pull}30564[30564]
 
 *Heartbeat*
 
@@ -39,27 +40,33 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Affecting all Beats*
 
 - Fix field names with `add_network_direction` processor. {issue}29747[29747] {pull}29751[29751]
+- Fix a logging bug when `ssl.verification_mode` was set to `full` or `certificate`, the command `test output` incorrectly logged that TLS was disabled.
+- Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
+- Update docker/distribution dependency library to fix a security issues concerning OCI Manifest Type Confusion Issue. {pull}30462[30462]
 
 *Auditbeat*
 
 - auditd: Add error.message to events when processing fails. {pull}30009[30009]
-
-*Filebeat*
-
-- tcp/unix input: Stop accepting connections after socket is closed. {pull}29712[29712]
-- aws-s3: fix race condition in states used by s3-poller. {issue}30123[30123] {pull}30131[30131]
-
-*Heartbeat*
-
+- Fix handling of execve call events which have no argument. {issue}30585[30585] {pull}30586[30586]
 
 *Filebeat*
 
 
-*Heartbeat*
+*Filebeat*
+- auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
+- elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
 
+- Fix ECS version string in threatintel to be consistent with other modules and add event.timezone. {issue}30499[30499] {pull}30570[30570]
+- Add default paths value to MySQL Enterprise module to prevent issues with pipeline installations {pull}30598[30598]
+
+*Heartbeat*
 
 *Metricbeat*
 
+- Fixed missing ZooKeeper metrics due compatibility issues with versions >= 3.6.0 {pull}30068[30068]
+- Enhance metricbeat on openshift documentation {pull}30054[30054]
+- Fixed missing ZooKeeper metrics due compatibility issues with versions >= 3.6.0 {pull}30068[30068]
+- Fix Docker module: rename fields on dashboards. {pull}30500[30500]
 
 *Packetbeat*
 
@@ -67,11 +74,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Winlogbeat*
 
 - Add provider names to Security pipeline conditional check in routing pipeline. {issue}27288[27288] {pull}29781[29781]
-- Fix run loop when reading from evtx file {pull}30006[30006]
 
 *Functionbeat*
 
-- Pass AWS region configuration correctly. {issue}28520[28520] {pull}30238[30238] 
+- Pass AWS region configuration correctly. {issue}28520[28520] {pull}30238[30238]
 
 
 *Elastic Logging Plugin*
@@ -106,7 +112,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
 - Add support for filtering in journald input with `unit`, `kernel`, `identifiers` and `include_matches`. {pull}29294[29294]
 - Add new `userAgent` and `beatInfo` template functions for httpjson input {pull}29528[29528]
-- threatintel module: Add new Recorded Future integration. {pull}30030[30030]
 - Add pipeline in FB's supported hints. {pull}30212[30212]
 
 *Auditbeat*
@@ -132,7 +137,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Packetbeat*
 
-- Add automated OEM Npcap installation handling. {pull}29112[29112]
+- Add automated OEM Npcap installation handling. {pull}29112[29112] {pull}30438[30438] {pull}30493[30493]
 - Add support for capturing TLS random number and OCSP status request details. {issue}29962[29962] {pull}30102[30102]
 
 *Functionbeat*
@@ -165,4 +170,3 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 ==== Known Issue
 
-*Journalbeat*
