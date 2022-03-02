@@ -348,7 +348,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             # running tests in parallel
             pass
 
-    def wait_until(self, cond, max_timeout=10, poll_interval=0.1, name="cond"):
+    def wait_until(self, cond, max_timeout=10, poll_interval=0.1, name="cond", err_msg=""):
         """
         Waits until the cond function returns true,
         or until the max_timeout is reached. Calls the cond
@@ -360,8 +360,13 @@ class TestCase(unittest.TestCase, ComposeMixin):
         start = datetime.now()
         while not cond():
             if datetime.now() - start > timedelta(seconds=max_timeout):
+<<<<<<< HEAD
                 raise TimeoutError("Timeout waiting for '{}' to be true. ".format(name) +
                                    "Waited {} seconds.".format(max_timeout))
+=======
+                raise WaitTimeoutError(
+                    f"Timeout waiting for condition '{name}'. Waited {max_timeout} seconds: {err_msg}")
+>>>>>>> b25fdf6a35 (log error when parsing config block and disabled input on filebeat (#30534))
             time.sleep(poll_interval)
 
     def get_log(self, logfile=None):
