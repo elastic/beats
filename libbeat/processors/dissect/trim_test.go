@@ -215,6 +215,30 @@ func TestTrimmer(t *testing.T) {
 			input:    "\t\t༄𑅀߹꧁߹𑁍 ÿ",
 			expected: "༄𑅀߹꧁߹𑁍",
 		},
+		{
+			name:     "trim unicode TILDE",
+			cutset:   " ",
+			left:     true,
+			right:    true,
+			input:    "  hello world! \u007e ",
+			expected: "hello world! \u007e",
+		},
+		{
+			name:     "trim unicode DELETE",
+			cutset:   " ",
+			left:     true,
+			right:    true,
+			input:    "  hello world! \u007f ",
+			expected: "hello world! \u007f",
+		},
+		{
+			name:     "trim unicode CONTROL",
+			cutset:   " ",
+			left:     true,
+			right:    true,
+			input:    "  hello world! \u0080 ",
+			expected: "hello world! \u0080",
+		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			trimmer, err := newTrimmer(test.cutset, test.left, test.right)
