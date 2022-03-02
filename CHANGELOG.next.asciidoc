@@ -45,6 +45,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Update docker/distribution dependency library to fix a security issues concerning OCI Manifest Type Confusion Issue. {pull}30462[30462]
 - Fixes Beats crashing when glibc >= 2.35 is used {issue}30576[30576]
 - Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
+- Fix dissect trim panics from DELETE (127)(\u007f) character {issue}30657[30657] {pull}30658[30658]
 
 *Auditbeat*
 
@@ -175,4 +176,3 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Functionbeat*
 
 ==== Known Issue
-
