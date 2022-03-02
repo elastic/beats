@@ -19,6 +19,7 @@ package metadata
 
 import (
 	"context"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
@@ -107,7 +108,6 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 			}
 		}
 	}
-
 
 	if p.node != nil {
 		meta := p.node.GenerateFromName(po.Spec.NodeName, WithMetadata("node"))
