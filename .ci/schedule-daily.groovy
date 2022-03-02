@@ -36,7 +36,8 @@ def runBuilds(Map args = [:]) {
 
   def quietPeriod = 0
   branches.each { branch ->
-    build(quietPeriod: quietPeriod, job: "Beats/beats/${branch}", parameters: [booleanParam(name: 'macosTest', value: true)], wait: false, propagate: false)
+    // IMPORTANT: ephemeral Orka VMs are not provisioned so, we cannot run builds on daily basis at all.
+    // build(quietPeriod: quietPeriod, job: "Beats/beats/${branch}", parameters: [booleanParam(name: 'macosTest', value: true)], wait: false, propagate: false)
     // Increate the quiet period for the next iteration
     quietPeriod += args.quietPeriodFactor
   }

@@ -19,7 +19,6 @@ package inputest
 
 import (
 	"errors"
-	"testing"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -45,13 +44,6 @@ type MockInput struct {
 	Type   string
 	OnTest func(v2.TestContext) error
 	OnRun  func(v2.Context, beat.PipelineConnector) error
-}
-
-func makeConfigFakeInput(prototype MockInput) func(*common.Config) (v2.Input, error) {
-	return func(cfg *common.Config) (v2.Input, error) {
-		tmp := prototype
-		return &tmp, nil
-	}
 }
 
 // Init returns nil if OnInit is not set. Otherwise the return value of OnInit is returned.
@@ -111,16 +103,4 @@ func SinglePlugin(name string, manager v2.InputManager) []v2.Plugin {
 		Stability: feature.Stable,
 		Manager:   manager,
 	}}
-}
-
-func expectError(t *testing.T, err error) {
-	if err == nil {
-		t.Errorf("expected error")
-	}
-}
-
-func expectNoError(t *testing.T, err error) {
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
 }

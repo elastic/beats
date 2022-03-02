@@ -63,9 +63,7 @@ const pipelinesWarning = "Filebeat is unable to load the ingest pipelines for th
 	" already loaded the ingest pipelines or are using Logstash pipelines, you" +
 	" can ignore this warning."
 
-var (
-	once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
-)
+var once = flag.Bool("once", false, "Run filebeat only once until all harvesters reach EOF")
 
 // Filebeat is a beater object. Contains all objects needed to run the beat
 type Filebeat struct {

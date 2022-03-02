@@ -151914,43 +151914,6 @@ type: keyword
 --
 
 [float]
-=== recordedfuture
-
-Fields for Recorded Future Threat Intel
-
-
-
-*`recordedfuture.evidence_details`*::
-+
---
-List of sightings used as evidence for this indicator.
-
-
-type: flattened
-
---
-
-*`recordedfuture.name`*::
-+
---
-Indicator value.
-
-
-type: keyword
-
---
-
-*`recordedfuture.risk_string`*::
-+
---
-Details of risk rules observed.
-
-
-type: keyword
-
---
-
-[float]
 === threatq
 
 Fields for ThreatQ Threat Library

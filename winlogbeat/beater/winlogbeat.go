@@ -25,7 +25,6 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -43,9 +42,6 @@ import (
 const pipelinesWarning = "Winlogbeat is unable to load the ingest pipelines" +
 	" because the Elasticsearch output is not configured/enabled. If you have" +
 	" already loaded the ingest pipelines, you can ignore this warning."
-
-// Time the application was started.
-var startTime = time.Now().UTC()
 
 // Winlogbeat is used to conform to the beat interface
 type Winlogbeat struct {
@@ -126,7 +122,7 @@ func (eb *Winlogbeat) setup(b *beat.Beat) error {
 	var err error
 	eb.checkpoint, err = checkpoint.NewCheckpoint(config.RegistryFile, config.RegistryFlush)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to initialize checkpoint registry: %w", err)
 	}
 
 	eb.pipeline = b.Publisher
@@ -159,7 +155,7 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 	var wg sync.WaitGroup
 	for _, log := range eb.eventLogs {
-		state, _ := persistedState[log.source.Name()]
+		state := persistedState[log.source.Name()]
 
 		// Start a goroutine for each event log.
 		wg.Add(1)
