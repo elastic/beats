@@ -33,6 +33,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 - Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
+- Update docker/distribution dependency library to fix a security issues concerning OCI Manifest Type Confusion Issue. {pull}30462[30462]
+- Fixes Beats crashing when glibc >= 2.35 is used {issue}30576[30576]
+- Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
 
 *Auditbeat*
 

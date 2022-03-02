@@ -68,30 +68,28 @@ func (c *crawler) Start(
 ) error {
 	log := c.log
 
-	log.Infof("Loading Inputs: %v", len(c.inputConfigs))
+	log.Infof("Loading Inputs: %d", len(c.inputConfigs))
 
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, inputConfig := range c.inputConfigs {
 		err := c.startInput(pipeline, inputConfig)
 		if err != nil {
-			return fmt.Errorf("starting input failed: %+v", err)
+			return fmt.Errorf("starting input failed: %w", err)
 		}
 	}
 
 	if configInputs.Enabled() {
 		c.inputReloader = cfgfile.NewReloader(pipeline, configInputs)
 		if err := c.inputReloader.Check(c.inputsFactory); err != nil {
-			return fmt.Errorf("creating input reloader failed: %+v", err)
+			return fmt.Errorf("creating input reloader failed: %w", err)
 		}
-
 	}
 
 	if configModules.Enabled() {
 		c.modulesReloader = cfgfile.NewReloader(pipeline, configModules)
 		if err := c.modulesReloader.Check(c.modulesFactory); err != nil {
-			return fmt.Errorf("creating module reloader failed: %+v", err)
+			return fmt.Errorf("creating module reloader failed: %w", err)
 		}
-
 	}
 
 	if c.inputReloader != nil {
@@ -105,7 +103,7 @@ func (c *crawler) Start(
 		}()
 	}
 
-	log.Infof("Loading and starting Inputs completed. Enabled inputs: %v", len(c.inputs))
+	log.Infof("Loading and starting Inputs completed. Enabled inputs: %d", len(c.inputs))
 
 	return nil
 }
@@ -114,23 +112,36 @@ func (c *crawler) startInput(
 	pipeline beat.PipelineConnector,
 	config *common.Config,
 ) error {
+	// TODO: Either use debug or remove it after https://github.com/elastic/beats/pull/30534
+	// is fixed.
+	c.log.Infof("starting input, keys present on the config: %v",
+		config.FlattenedKeys())
+
 	if !config.Enabled() {
+		c.log.Infof("input disabled, skipping it")
 		return nil
 	}
 
 	var h map[string]interface{}
-	config.Unpack(&h)
+	err := config.Unpack(&h)
+	if err != nil {
+		return fmt.Errorf("could not unpack config: %w", err)
+	}
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {
-		return fmt.Errorf("can not compute id from configuration: %v", err)
+		return fmt.Errorf("can not compute id from configuration: %w", err)
 	}
 	if _, ok := c.inputs[id]; ok {
-		return fmt.Errorf("input with same ID already exists: %v", id)
+		return fmt.Errorf("input with same ID already exists: %d", id)
 	}
 
 	runner, err := c.inputsFactory.Create(pipeline, config)
 	if err != nil {
+<<<<<<< HEAD
 		return fmt.Errorf("Error while initializing input: %+v", err)
+=======
+		return fmt.Errorf("error while initializing input: %w", err)
+>>>>>>> b25fdf6a35 (log error when parsing config block and disabled input on filebeat (#30534))
 	}
 	if inputRunner, ok := runner.(*input.Runner); ok {
 		inputRunner.Once = c.once
@@ -155,7 +166,7 @@ func (c *crawler) Stop() {
 		}()
 	}
 
-	logp.Info("Stopping %v inputs", len(c.inputs))
+	logp.Info("Stopping %d inputs", len(c.inputs))
 	// Stop inputs in parallel
 	for id, p := range c.inputs {
 		id, p := id, p
