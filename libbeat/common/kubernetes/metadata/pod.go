@@ -87,7 +87,6 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	out := p.resource.GenerateK8s("pod", obj, opts...)
 
 	// check if Pod is handled by a ReplicaSet which is controlled by a Deployment
-	// TODO: same happens with CronJob vs Job. The hierarcy there is CronJob->Job->Pod
 	if p.addResourceMetadata.Deployment {
 		rsName, _ := out.GetValue("replicaset.name")
 		if rsName, ok := rsName.(string); ok {
@@ -98,6 +97,7 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 		}
 	}
 
+	// check if Pod is handled by a Job which is controlled by a CronJob
 	if p.addResourceMetadata.CronJob {
 		jobName, _ := out.GetValue("job.name")
 		if jobName, ok := jobName.(string); ok {
