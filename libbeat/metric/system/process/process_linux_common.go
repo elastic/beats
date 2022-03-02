@@ -433,17 +433,9 @@ func getProcStatus(hostfs resolve.Resolver, pid int) (map[string]string, error) 
 }
 
 func getProcState(b byte) PidState {
-	switch b {
-	case 'S':
-		return Sleeping
-	case 'R':
-		return Running
-	case 'D':
-		return Idle
-	case 'T':
-		return Stopped
-	case 'Z':
-		return Zombie
+	state, ok := PidStates[b]
+	if ok {
+		return state
 	}
 	return Unknown
 }

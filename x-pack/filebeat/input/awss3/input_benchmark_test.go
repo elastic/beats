@@ -31,8 +31,10 @@ import (
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
-const cloudtrailTestFile = "testdata/aws-cloudtrail.json.gz"
-const totalListingObjects = 10000
+const (
+	cloudtrailTestFile  = "testdata/aws-cloudtrail.json.gz"
+	totalListingObjects = 10000
+)
 
 type constantSQS struct {
 	msgs []sqs.Message
@@ -316,7 +318,6 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 
 		b.ReportMetric(float64(metrics.s3ObjectsAckedTotal.Get()), "objects_acked")
 		b.ReportMetric(float64(metrics.s3ObjectsAckedTotal.Get())/elapsed.Seconds(), "objects_acked_per_sec")
-
 	})
 }
 

@@ -206,7 +206,8 @@ func TestApplyOverrides(t *testing.T) {
 				"nginx": map[string]*common.Config{
 					"access": load(t, map[string]interface{}{
 						"var.a":   "test1",
-						"var.b.c": "test2"}),
+						"var.b.c": "test2",
+					}),
 				},
 			},
 			expected: FilesetConfig{
@@ -232,7 +233,8 @@ func TestApplyOverrides(t *testing.T) {
 				"nginx": map[string]*common.Config{
 					"access": load(t, map[string]interface{}{
 						"enabled":   true,
-						"var.paths": []interface{}{"/var/local/nginx/log"}}),
+						"var.paths": []interface{}{"/var/local/nginx/log"},
+					}),
 				},
 			},
 			expected: FilesetConfig{
@@ -624,5 +626,4 @@ func TestEnableFilesetsFromOverrides(t *testing.T) {
 			assert.Equal(t, test.Expected, test.Cfg)
 		})
 	}
-
 }

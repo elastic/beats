@@ -389,21 +389,10 @@ class Test(metricbeat.BaseTest):
 
             summary = evt["system"]["process"]["summary"]
             assert isinstance(summary["total"], int)
-            assert isinstance(summary["sleeping"], int)
-            assert isinstance(summary["running"], int)
-            assert isinstance(summary["unknown"], int)
-
-            if not sys.platform.startswith("win"):
-                assert isinstance(summary["idle"], int)
-                assert isinstance(summary["stopped"], int)
-                assert isinstance(summary["zombie"], int)
-                assert summary["total"] == summary["sleeping"] + summary["running"] + \
-                    summary["idle"] + summary["stopped"] + \
-                    summary["zombie"] + summary["unknown"]
 
             if sys.platform.startswith("windows"):
-                assert summary["total"] == summary["sleeping"] + \
-                    summary["running"] + summary["unknown"]
+                assert isinstance(summary["running"], int)
+                assert isinstance(summary["total"], int)
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process(self):
