@@ -27,7 +27,7 @@ func TestStatesDelete(t *testing.T) {
 		expected []state
 	}
 
-	lastModified := time.Date(2021, time.July, 22, 18, 38, 00, 0, time.UTC)
+	lastModified := time.Date(2021, time.July, 22, 18, 38, 0o0, 0, time.UTC)
 	tests := map[string]stateTestCase{
 		"delete empty states": {
 			states: func() *states {

@@ -54,7 +54,6 @@ type updateOp struct {
 
 	// state updates to persist
 	timestamp time.Time
-	ttl       time.Duration
 	delta     interface{}
 }
 

@@ -16,9 +16,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef/cef"
 )
 
-var (
-	fullExtensionNames bool
-)
+var fullExtensionNames bool
 
 func init() {
 	flag.BoolVar(&fullExtensionNames, "full", true, "Use full extension key names.")
