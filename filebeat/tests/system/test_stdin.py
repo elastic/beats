@@ -24,7 +24,7 @@ class Test(BaseTest):
 
         self.wait_until(
             lambda: self.log_contains(
-                "Harvester started for file."),
+                "Harvester started"),
             max_timeout=10)
 
         iterations1 = 5
