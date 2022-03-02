@@ -125,8 +125,7 @@ func (c *crawler) startInput(
 	var h map[string]interface{}
 	err := config.Unpack(&h)
 	if err != nil {
-		c.log.Errorf("could not unpack config: %v", err)
-		// return fmt.Errorf("could not unpack config: %w", err)
+		return fmt.Errorf("could not unpack config: %w", err)
 	}
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {
