@@ -59864,7 +59864,7 @@ type: keyword
 *`system.filesystem.files`*::
 +
 --
-The total number of file nodes in the file system.
+Total number of inodes on the system, which will be a combination of files, folders, symlinks, and devices.
 
 
 type: long
@@ -59886,7 +59886,7 @@ format: bytes
 *`system.filesystem.free_files`*::
 +
 --
-The number of free file nodes in the file system.
+The number of free inodes in the file system.
 
 
 type: long
@@ -59948,7 +59948,7 @@ type: long
 *`system.fsstat.total_files`*::
 +
 --
-Total number of files. Not on Windows.
+Total number of inodes on the system, which will be a combination of files, folders, symlinks, and devices. Not on Windows.
 
 type: long
 
