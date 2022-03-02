@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -38,15 +39,16 @@ import (
 
 // WrapCommon applies the common wrappers that all monitor jobs get.
 func WrapCommon(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+	mst := monitorstate.NewMonitorStateTracker()
 	if stdMonFields.Type == "browser" {
 		return WrapBrowser(js, stdMonFields)
 	} else {
-		return WrapLightweight(js, stdMonFields)
+		return WrapLightweight(js, stdMonFields, mst)
 	}
 }
 
 // WrapLightweight applies to http/tcp/icmp, everything but journeys involving node
-func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.Job {
+func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields, mst *monitorstate.MonitorStateTracker) []jobs.Job {
 	return jobs.WrapAllSeparately(
 		jobs.WrapAll(
 			js,
@@ -55,6 +57,7 @@ func WrapLightweight(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []j
 			addMonitorMeta(stdMonFields, len(js) > 1),
 			addMonitorStatus(false),
 			addMonitorDuration,
+			addMonitorState(stdMonFields, mst),
 		),
 		func() jobs.JobWrapper {
 			return makeAddSummary(stdMonFields.Type)
@@ -71,6 +74,58 @@ func WrapBrowser(js []jobs.Job, stdMonFields stdfields.StdMonitorFields) []jobs.
 		addServiceName(stdMonFields),
 		addMonitorStatus(true),
 	)
+}
+
+// addMonitorMeta adds the id, name, and type fields to the monitor.
+func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.MonitorStateTracker) jobs.JobWrapper {
+	return func(job jobs.Job) jobs.Job {
+		return func(event *beat.Event) ([]jobs.Job, error) {
+			cont, err := job(event)
+
+			// Only process state on summary events
+			if ok, _ := event.Fields.HasKey("summary.up"); ok {
+				return cont, err
+			}
+
+			trackerId := sf.ID
+			if ip, err := event.GetValue("monitor.ip"); err != nil {
+				trackerId = fmt.Sprintf("%s-%s", sf.ID, ip)
+			}
+			status, err := event.GetValue("monitor.status")
+
+			ms, newMs, oldMs := mst.Compute(trackerId, status == "up")
+
+			stateFields := common.MapStr{
+				"id":     ms.Id(),
+				"status": ms.Status,
+			}
+
+			if newMs != nil {
+				stateFields["starting"] = common.MapStr{
+					"id":         newMs.Id(),
+					"started_at": newMs.StartedAt.UnixMilli(),
+					"status":     newMs.Status,
+				}
+			}
+
+			if newMs != nil {
+				stateFields["ending"] = common.MapStr{
+					"id":         oldMs.StartedAt,
+					"started_at": oldMs.StartedAt.UnixMilli(),
+					// Set the end time to 1ms before the new state
+					"ended_at": newMs.StartedAt.Add(-time.Millisecond),
+					"checks":   oldMs.Checks,
+					"up":       oldMs.Up,
+					"down":     oldMs.Down,
+					"status":   oldMs.Status,
+				}
+			}
+
+			eventext.MergeEventFields(event, stateFields)
+
+			return cont, err
+		}
+	}
 }
 
 // addMonitorMeta adds the id, name, and type fields to the monitor.
@@ -201,6 +256,14 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 	}
 }
 
+type CState struct {
+	id        string
+	startedAt time.Time
+	endedAt   time.Ticker
+	up        int
+	down      int
+}
+
 // makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
 func makeAddSummary(monitorType string) jobs.JobWrapper {
 	// This is a tricky method. The way this works is that we track the state across jobs in the
@@ -213,6 +276,7 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 		down       uint16
 		checkGroup string
 		generation uint64
+		cstate     CState
 	}{
 		mtx: sync.Mutex{},
 	}

@@ -65,17 +65,89 @@
           type: keyword
           description: >
             Indicator if monitor could validate the service to be available.
-
         - name: check_group
           type: keyword
           description: >
             A token unique to a simultaneously invoked group of checks as in the case where multiple IPs are checked for a single DNS entry.
+
+        - name: status_block
+          type: date
+          description: >
+            A date representing the start time of a logically contiguous segment of statuses typically either all up
+            or all down. In the case of a rapidly flapping endpoint this may be a mix.
 
         - name: timespan
           type: date_range
           description: >
             Time range this ping reported starting at the instant the check was started, ending at the start of the next scheduled check.
 
+        - name: timespan
+          type: date_range
+          description: >
+            Time range this ping reported starting at the instant the check was started, ending at the start of the next scheduled check.
+
+- key: state
+  title: "Monitor state"
+  description: state related fields
+  fields:
+    - name: state
+      type: group
+      description: "Present in the last event emitted during a check. If a monitor checks multiple endpoints, as is the case with `mode: all`."
+      fields:
+        - name: id
+          type: long
+          description: >
+            ID of this state
+        - name: status
+          type: keyword
+          description: >
+            The current status of this state at the time of this event, can changed from up->flapping or down->flapping at any time
+    - name: starting
+      type: group
+      fields:
+        - name: id
+          type: long
+          description: >
+            ID of this state
+        - name: started_at
+          type: date
+          description: >
+            Time this state started at
+        - name: status
+          type: keyword
+          description: >
+            Time this state started at
+    - name: ending
+      type: group
+      fields:
+        - name: id
+          type: long
+          description: >
+            ID of this state
+        - name: started_at
+          type: date
+          description: >
+            Time this state started at
+        - name: ended_at
+          type: date
+          description: >
+            Time this state started at
+        - name: status
+          type: keyword
+          description: >
+            Time this state started at
+        - name: checks
+          type: long
+          description:
+            total checks within this state
+        - name: up
+          type: long
+          description: >
+            total number of up checks
+        - name: down
+          type: long
+          description: >
+            total number of up checks
 - key: summary
   title: "Monitor summary"
   description:

@@ -27,6 +27,7 @@ grouped in the following categories:
 * <<exported-fields-resolve>>
 * <<exported-fields-service>>
 * <<exported-fields-socks5>>
+* <<exported-fields-state>>
 * <<exported-fields-summary>>
 * <<exported-fields-synthetics>>
 * <<exported-fields-tcp>>
@@ -443,6 +444,26 @@ A token unique to a simultaneously invoked group of checks as in the case where 
 
 
 type: keyword
+
+--
+
+*`monitor.status_block`*::
++
+--
+A date representing the start time of a logically contiguous segment of statuses typically either all up or all down. In the case of a rapidly flapping endpoint this may be a mix.
+
+
+type: date
+
+--
+
+*`monitor.timespan`*::
++
+--
+Time range this ping reported starting at the instant the check was started, ending at the start of the next scheduled check.
+
+
+type: date_range
 
 --
 
@@ -16204,6 +16225,139 @@ Time required to establish a connection via SOCKS5 to endpoint based on availabl
 +
 --
 Duration in microseconds
+
+type: long
+
+--
+
+[[exported-fields-state]]
+== Monitor state fields
+
+state related fields
+
+
+[float]
+=== state
+
+Present in the last event emitted during a check. If a monitor checks multiple endpoints, as is the case with `mode: all`.
+
+
+*`state.id`*::
++
+--
+ID of this state
+
+
+type: long
+
+--
+
+*`state.status`*::
++
+--
+The current status of this state at the time of this event, can changed from up->flapping or down->flapping at any time
+
+
+type: keyword
+
+--
+
+
+*`starting.id`*::
++
+--
+ID of this state
+
+
+type: long
+
+--
+
+*`starting.started_at`*::
++
+--
+Time this state started at
+
+
+type: date
+
+--
+
+*`starting.status`*::
++
+--
+Time this state started at
+
+
+type: keyword
+
+--
+
+
+*`ending.id`*::
++
+--
+ID of this state
+
+
+type: long
+
+--
+
+*`ending.started_at`*::
++
+--
+Time this state started at
+
+
+type: date
+
+--
+
+*`ending.ended_at`*::
++
+--
+Time this state started at
+
+
+type: date
+
+--
+
+*`ending.status`*::
++
+--
+Time this state started at
+
+
+type: keyword
+
+--
+
+*`ending.checks`*::
++
+--
+total checks within this state
+
+type: long
+
+--
+
+*`ending.up`*::
++
+--
+total number of up checks
+
+
+type: long
+
+--
+
+*`ending.down`*::
++
+--
+total number of up checks
+
 
 type: long
 
