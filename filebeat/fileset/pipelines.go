@@ -182,7 +182,6 @@ func interpretError(initialErr error, body []byte) error {
 		return fmt.Errorf("this module requires an Elasticsearch plugin that provides the %s processor. "+
 			"Please visit the Elasticsearch documentation for instructions on how to install this plugin. "+
 			"Response body: %s", response.Error.RootCause[0].Header.ProcessorType, body)
-
 	}
 
 	// older ES version?

@@ -43,17 +43,21 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix a logging bug when `ssl.verification_mode` was set to `full` or `certificate`, the command `test output` incorrectly logged that TLS was disabled.
 - Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
 - Update docker/distribution dependency library to fix a security issues concerning OCI Manifest Type Confusion Issue. {pull}30462[30462]
+- Fixes Beats crashing when glibc >= 2.35 is used {issue}30576[30576]
 - Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
 
 *Auditbeat*
 
 - auditd: Add error.message to events when processing fails. {pull}30009[30009]
+- Fix handling of execve call events which have no argument. {issue}30585[30585] {pull}30586[30586]
 
 *Filebeat*
 
 - Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
 - auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
 - elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
+- Fix ECS version string in threatintel to be consistent with other modules and add event.timezone. {issue}30499[30499] {pull}30570[30570]
+- Add default paths value to MySQL Enterprise module to prevent issues with pipeline installations {pull}30598[30598]
 
 *Heartbeat*
 
@@ -94,6 +98,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add FIPS configuration option for all AWS API calls. {pull}[28899]
 - Add metadata change support for some processors {pull}30183[30183]
 - Add support for non-unique Kafka headers for output messages. {pull}30369[30369]
+- Add action_input_type for the .fleet-actions-results {pull}30562[30562]
 
 *Auditbeat*
 

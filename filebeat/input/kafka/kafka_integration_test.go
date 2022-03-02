@@ -66,14 +66,14 @@ func TestInput(t *testing.T) {
 
 	// Send test messages to the topic for the input to read.
 	messages := []testMessage{
-		testMessage{message: "testing"},
-		testMessage{
+		{message: "testing"},
+		{
 			message: "stuff",
 			headers: []sarama.RecordHeader{
 				recordHeader("X-Test-Header", "test header value"),
 			},
 		},
-		testMessage{
+		{
 			message: "things",
 			headers: []sarama.RecordHeader{
 				recordHeader("keys and things", "3^3 = 27"),

@@ -129,7 +129,6 @@ func NewHarvester(
 	publishState func(file.State) bool,
 	outletFactory OutletFactory,
 ) (*Harvester, error) {
-
 	id, err := uuid.NewV4()
 	if err != nil {
 		return nil, err

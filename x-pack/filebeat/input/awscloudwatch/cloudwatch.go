@@ -28,7 +28,6 @@ type cloudwatchPoller struct {
 	logStreamPrefix      string
 	startTime            int64
 	endTime              int64
-	prevEndTime          int64
 	workerSem            *awscommon.Sem
 	log                  *logp.Logger
 	metrics              *inputMetrics
