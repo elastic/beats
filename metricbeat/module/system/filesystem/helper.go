@@ -111,6 +111,7 @@ func filterFileSystemList(fsList []sigar.FileSystem) []sigar.FileSystem {
 
 // GetFileSystemStat retreves stats for a single filesystem
 func GetFileSystemStat(fs sigar.FileSystem) (sigar.FileSystemUsage, error) {
+	// Sigar, in line with the underlying `statfs` call on unix, refers to inodes as `files` in the fields.
 	stat := sigar.FileSystemUsage{}
 	//  In some case for Windows OS the disk type value will be `unavailable` and access to this information is not allowed (ex. external disks).
 	if err := stat.Get(fs.DirName); err != nil {
