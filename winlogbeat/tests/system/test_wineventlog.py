@@ -107,28 +107,25 @@ class Test(WriteReadTest):
         """
         msg1 = "First event"
         self.write_event_log(msg1)
-        msg2 = "Second event"
-        self.write_event_log(msg2)
 
-        evts = self.read_events(expected_events=2)
+        evts = self.read_events(expected_events=1)
 
-        self.assertTrue(len(evts), 2)
+        self.assertTrue(len(evts), 1)
         self.assert_common_fields(evts[0], msg=msg1)
-        self.assert_common_fields(evts[1], msg=msg2)
 
         # remove the output file, otherwise there is a race condition
         # in read_events() below where it reads the results of the previous
         # execution
         os.unlink(os.path.join(self.working_dir, "output", self.beat_name + "-" + self.today + ".ndjson"))
 
-        msg3 = "Third event"
-        self.write_event_log(msg3)
+        msg2 = "Second event"
+        self.write_event_log(msg2)
 
         event_logs = self.read_registry(requireBookmark=True)
         self.assertTrue(len(list(event_logs.keys())), 1)
         self.assertIn(self.providerName, event_logs)
         record_number = event_logs[self.providerName]["record_number"]
-        self.assertTrue(record_number, 3)
+        self.assertTrue(record_number, 2)
 
         # write invalid bookmark, it should start from the beginning again
         f = open(os.path.join(self.working_dir, "data", ".winlogbeat.yml"), "w")
@@ -142,11 +139,10 @@ class Test(WriteReadTest):
             format(self.providerName, self.providerName)
         ))
 
-        evts = self.read_events(expected_events=3)
-        self.assertTrue(len(evts), 3)
+        evts = self.read_events(expected_events=2)
+        self.assertTrue(len(evts), 2)
         self.assert_common_fields(evts[0], msg=msg1)
         self.assert_common_fields(evts[1], msg=msg2)
-        self.assert_common_fields(evts[2], msg=msg3)
 
     def test_read_unknown_event_id(self):
         """
