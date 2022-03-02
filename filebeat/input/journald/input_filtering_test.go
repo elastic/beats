@@ -164,7 +164,7 @@ func TestInputIncludeMatches(t *testing.T) {
 		"and condition": {
 			includeMatches: map[string]interface{}{
 				"and": []map[string]interface{}{
-					map[string]interface{}{
+					{
 						"match": []string{
 							"syslog.facility=3",
 							"message=6th line",
@@ -179,7 +179,7 @@ func TestInputIncludeMatches(t *testing.T) {
 		"or condition": {
 			includeMatches: map[string]interface{}{
 				"or": []map[string]interface{}{
-					map[string]interface{}{
+					{
 						"match": []string{
 							"message=5th line",
 							"message=6th line",

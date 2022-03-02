@@ -33,7 +33,7 @@ func TestParsersAgentLogs(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"ndjson": map[string]interface{}{
 					"message_key":    "log",
 					"overwrite_keys": true,
@@ -68,7 +68,7 @@ func TestParsersDockerLogsFiltering(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"ndjson": map[string]interface{}{
 					"message_key": "log",
 					"target":      "",
@@ -106,7 +106,7 @@ func TestParsersSimpleJSONOverwrite(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"ndjson": map[string]interface{}{
 					"message_key":    "message",
 					"target":         "",
@@ -141,7 +141,7 @@ func TestParsersTimestampInJSONMessage(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"ndjson": map[string]interface{}{
 					"target":         "",
 					"overwrite_keys": true,
@@ -181,7 +181,7 @@ func TestParsersJavaElasticsearchLogs(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
 					"pattern": "^\\[",
@@ -215,7 +215,7 @@ func TestParsersCStyleLog(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
 					"pattern": "\\\\$",
@@ -255,7 +255,7 @@ func TestParsersRabbitMQMultilineLog(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
 					"pattern": "^=[A-Z]+",
@@ -299,7 +299,7 @@ func TestParsersMultilineMaxLines(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"multiline": map[string]interface{}{
 					"type":      "pattern",
 					"pattern":   "^\\[",
@@ -342,7 +342,7 @@ func TestParsersMultilineTimeout(t *testing.T) {
 		"paths":                             []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval": "1ms",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"multiline": map[string]interface{}{
 					"type":      "pattern",
 					"pattern":   "^\\[",
@@ -383,7 +383,8 @@ func TestParsersMultilineTimeout(t *testing.T) {
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, len(testlines)+len(moreLines))
-	env.requireEventsReceived([]string{`[2015] hello world
+	env.requireEventsReceived([]string{
+		`[2015] hello world
   First Line
   Second Line`,
 		`  This should not be third
@@ -406,7 +407,7 @@ func TestParsersMultilineMaxBytes(t *testing.T) {
 		"prospector.scanner.check_interval": "1ms",
 		"message_max_bytes":                 50,
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
 					"pattern": "^\\[",
@@ -447,7 +448,7 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 		"prospector.scanner.check_interval": "1ms",
 		"close.reader.after_interval":       "1s",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
 					"pattern": "^\\[",
@@ -487,7 +488,8 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, len(testlines)+len(moreLines))
-	env.requireEventsReceived([]string{`[2015] hello world
+	env.requireEventsReceived([]string{
+		`[2015] hello world
   First Line
   Second Line`,
 		`  This should not be third
@@ -502,7 +504,6 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 
 // test_consecutive_newline from test_multiline.py
 func TestParsersConsecutiveNewline(t *testing.T) {
-
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
@@ -511,7 +512,7 @@ func TestParsersConsecutiveNewline(t *testing.T) {
 		"prospector.scanner.check_interval": "1ms",
 		"close.reader.after_interval":       "1s",
 		"parsers": []map[string]interface{}{
-			map[string]interface{}{
+			{
 				"multiline": map[string]interface{}{
 					"type":    "pattern",
 					"pattern": "^\\[",
