@@ -97,6 +97,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add metadata change support for some processors {pull}30183[30183]
 - Add support for non-unique Kafka headers for output messages. {pull}30369[30369]
 - Add action_input_type for the .fleet-actions-results {pull}30562[30562]
+- Add cronjob metadata by default {pull}30637[30637]
 
 *Auditbeat*
 
