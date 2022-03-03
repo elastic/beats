@@ -362,13 +362,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
         start = datetime.now()
         while not cond():
             if datetime.now() - start > timedelta(seconds=max_timeout):
-<<<<<<< HEAD
-                raise TimeoutError("Timeout waiting for '{}' to be true. ".format(name) +
-                                   "Waited {} seconds.".format(max_timeout))
-=======
                 raise WaitTimeoutError(
                     f"Timeout waiting for condition '{name}'. Waited {max_timeout} seconds: {err_msg}")
->>>>>>> b25fdf6a35 (log error when parsing config block and disabled input on filebeat (#30534))
             time.sleep(poll_interval)
 
     def get_log(self, logfile=None):
