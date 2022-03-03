@@ -51,7 +51,8 @@ func DefaultBuildArgs() BuildArgs {
 		Name: BeatName,
 		CGO:  build.Default.CgoEnabled,
 		LDFlags: []string{
-			"-s", // Strip all debug symbols from binary (does not affect Go stack traces).
+			// "-s", // Strip all debug symbols from binary (does not affect Go stack traces).
+			"-race",
 		},
 		Vars: map[string]string{
 			elasticBeatsModulePath + "/libbeat/version.buildTime": "{{ date }}",
@@ -66,7 +67,7 @@ func DefaultBuildArgs() BuildArgs {
 	if positionIndependendCodeSupported() {
 		args.ExtraFlags = append(args.ExtraFlags, "-buildmode", "pie")
 	}
-
+	args.ExtraFlags = append(args.ExtraFlags, `-gcflags`, `"all=-N -l"`, "-trimpath")
 	return args
 }
 
