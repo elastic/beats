@@ -111,20 +111,24 @@ spec:
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: basic-cronjob
+  name: hello
+  labels:
+    k8s-app: myjob
 spec:
-  schedule: "* * * * *"
+  schedule: "*/1 * * * *"
   jobTemplate:
     spec:
       template:
-        metadata:
-          name: basic-job
         spec:
           containers:
-          - name: hello
-            image: alpine:3
-            command: ["sh", "-c", "echo Hello!"]
-          restartPolicy: Never
+            - name: hello
+              image: busybox
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -c
+                - date; echo Hello from the Kubernetes cluster
+          restartPolicy: never
 ---
 apiVersion: v1
 kind: ResourceQuota
