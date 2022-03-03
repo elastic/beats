@@ -215,16 +215,16 @@ func TestTrimmer(t *testing.T) {
 			input:    "\t\t༄𑅀߹꧁߹𑁍 ÿ",
 			expected: "༄𑅀߹꧁߹𑁍",
 		},
-		{
-			name:     "trim unicode TILDE",
+		{ // demonstrates that unicode \u is converted to char in golang strings
+			name:     "trim ASCII TILDE",
 			cutset:   " ",
 			left:     true,
 			right:    true,
 			input:    "  hello world! \u007e ",
-			expected: "hello world! \u007e",
+			expected: "hello world! ~",
 		},
 		{
-			name:     "trim unicode DELETE",
+			name:     "trim ASCII DELETE",
 			cutset:   " ",
 			left:     true,
 			right:    true,
@@ -232,12 +232,28 @@ func TestTrimmer(t *testing.T) {
 			expected: "hello world! \u007f",
 		},
 		{
-			name:     "trim unicode CONTROL",
+			name:     "trim UTF-8 CONTROL",
 			cutset:   " ",
 			left:     true,
 			right:    true,
 			input:    "  hello world! \u0080 ",
 			expected: "hello world! \u0080",
+		},
+		{
+			name:     "trim ASCII DELETE cutset in UTF-8 input",
+			cutset:   " \u007f",
+			left:     true,
+			right:    true,
+			input:    "  hello world! \u0080 \u007f",
+			expected: "hello world! \u0080",
+		},
+		{
+			name:     "trim UTF-8 CONTROL cutset in UTF-8 input",
+			cutset:   " \u0080",
+			left:     true,
+			right:    true,
+			input:    "  hello world! \u007f \u0080",
+			expected: "hello world! \u007f",
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
