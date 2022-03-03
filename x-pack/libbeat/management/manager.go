@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"regexp"
 	"sort"
 	"sync"
 
@@ -28,6 +29,11 @@ import (
 var notReportedErrors = []error{
 	context.Canceled,
 }
+
+var outputRE = regexp.MustCompile(`^output$`)
+
+// Have to support all the beats.
+var inputsRE = regexp.MustCompile(`\.inputs$`)
 
 // Manager handles internal config updates. By retrieving
 // new configs from Kibana and applying them to the Beat.
@@ -192,6 +198,8 @@ func (cm *Manager) OnConfig(s string) {
 		return
 	}
 
+	assertPresenceOfInputsAndOutput(cm.logger, blocks)
+
 	if errs := cm.apply(blocks); errs != nil {
 		// `cm.apply` already logs the errors; currently allow beat to run degraded
 		cm.updateStatusWithError(err)
@@ -320,7 +328,7 @@ func (cm *Manager) toConfigBlocks(cfg common.MapStr) (ConfigBlocks, error) {
 	for _, regName := range cm.registry.GetRegisteredNames() {
 		iBlock, err := cfg.GetValue(regName)
 		if err != nil {
-			cm.logger.Errorf("failed to get '%s' from config: %v. Continuing to next one", regName, err)
+			cm.logger.Warnf("failed to get '%s' from config: %v. Continuing to next one", regName, err)
 			continue
 		}
 
@@ -371,4 +379,34 @@ func statusToProtoStatus(status lbmanagement.Status) proto.StateObserved_Status 
 	}
 	// unknown status, still reported as healthy
 	return proto.StateObserved_HEALTHY
+}
+
+func assertPresenceOfInputsAndOutput(l *logp.Logger, blocks ConfigBlocks) bool {
+	if len(blocks) == 0 {
+		l.Error("No configuration blocks found")
+		return false
+	}
+
+	inputsBlocks, err := findBlockWithRegexp(inputsRE, blocks)
+	if err != nil || len(inputsBlocks.Blocks) == 0 {
+		l.Error("No inputs blocks found in the configuration")
+		return false
+	}
+
+	outputBlocks, err := findBlockWithRegexp(outputRE, blocks)
+	if err != nil || len(outputBlocks.Blocks) == 0 {
+		l.Error("No output blocks found in the configuration")
+		return false
+	}
+
+	return true
+}
+
+func findBlockWithRegexp(re *regexp.Regexp, blocks ConfigBlocks) (ConfigBlocksWithType, error) {
+	for _, block := range blocks {
+		if re.MatchString(block.Type) {
+			return block, nil
+		}
+	}
+	return ConfigBlocksWithType{}, nil
 }
