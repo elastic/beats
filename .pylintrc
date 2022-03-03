@@ -1,0 +1,13 @@
+[MESSAGES CONTROL]
+
+disable=too-many-lines,too-many-public-methods,too-many-statements
+
+
+[BASIC]
+
+method-rgx=[a-z_][a-z0-9_]{2,50}$
+
+
+[FORMAT]
+
+max-line-length=120

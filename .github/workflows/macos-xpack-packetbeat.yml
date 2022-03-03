@@ -1,0 +1,31 @@
+name: x-pack-metricbeat
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/macos-xpack-packetbeat.yml'
+  push:
+    branches:
+      - main
+      - 7.1*
+      - 8.*
+
+env:
+  BEAT_MODULE: 'x-pack/metricbeat'
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Fetch Go version from .go-version
+      run: echo "GO_VERSION=$(cat .go-version)" >> $GITHUB_ENV
+    - uses: actions/setup-go@v2
+      with:
+        go-version: ${{ env.GO_VERSION }}
+    - name: Install dependencies
+      run:  go get -u github.com/magefile/mage
+    - name: Run build
+      run: cd ${{ env.BEAT_MODULE }} && mage build
+    - name: Run test
+      run: cd ${{ env.BEAT_MODULE }} && mage unitTest

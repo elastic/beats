@@ -1,0 +1,1 @@
+# elastic-agent-autodiscover

@@ -1,0 +1,26 @@
+---
+- job:
+    name: Beats/beats-tester-bc
+    display-name: Beats Tester orchestrator for Build Candidates
+    description: Launch the beat-tester suit on Build Candidates easily
+    view: Beats
+    disabled: false
+    project-type: pipeline
+    parameters:
+      - string:
+          name: BRANCH_REFERENCE
+          default: main
+          description: the Git branch specifier
+    pipeline-scm:
+      script-path: .ci/beats-tester-bc.groovy
+      scm:
+        - git:
+            url: git@github.com:elastic/beats.git
+            refspec: +refs/heads/*:refs/remotes/origin/*
+            wipe-workspace: true
+            name: origin
+            shallow-clone: true
+            credentials-id: f6c7695a-671e-4f4f-a331-acdce44ff9ba
+            reference-repo: /var/lib/jenkins/.git-references/beats.git
+            branches:
+              - $BRANCH_REFERENCE
