@@ -137,11 +137,7 @@ func (c *crawler) startInput(
 
 	runner, err := c.inputsFactory.Create(pipeline, config)
 	if err != nil {
-<<<<<<< HEAD
-		return fmt.Errorf("Error while initializing input: %+v", err)
-=======
 		return fmt.Errorf("error while initializing input: %w", err)
->>>>>>> b25fdf6a35 (log error when parsing config block and disabled input on filebeat (#30534))
 	}
 	if inputRunner, ok := runner.(*input.Runner); ok {
 		inputRunner.Once = c.once
