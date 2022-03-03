@@ -119,12 +119,8 @@ inputs:
 #       host: localhost
 #       # Port on which the HTTP endpoint will bind. Default is 0 meaning feature is disabled.
 #       port: 6791
-#       # Metrics buffer config
-#       buffer:
-#           enabled: false
-#           period: 10s
-#           size: 60
-#           namespaces: ['stats']
+#       # Metrics buffer endpoint
+#       buffer.enabled: false
 
 # # Allow fleet to reload its configuration locally on disk.
 # # Notes: Only specific process configuration and external input configurations will be reloaded.
