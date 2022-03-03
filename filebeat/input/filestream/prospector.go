@@ -42,12 +42,10 @@ const (
 	prospectorDebugKey               = "file_prospector"
 )
 
-var (
-	ignoreInactiveSettings = map[string]ignoreInactiveType{
-		ignoreInactiveSinceLastStartStr:  IgnoreInactiveSinceLastStart,
-		ignoreInactiveSinceFirstStartStr: IgnoreInactiveSinceFirstStart,
-	}
-)
+var ignoreInactiveSettings = map[string]ignoreInactiveType{
+	ignoreInactiveSinceLastStartStr:  IgnoreInactiveSinceLastStart,
+	ignoreInactiveSinceFirstStartStr: IgnoreInactiveSinceFirstStart,
+}
 
 // fileProspector implements the Prospector interface.
 // It contains a file scanner which returns file system events.
@@ -149,7 +147,6 @@ func (p *fileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
-
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
 		if event.Op == loginp.OpCreate {
