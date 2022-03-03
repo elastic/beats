@@ -174,6 +174,7 @@ func (cm *Manager) updateStatusWithError(err error) {
 }
 
 func (cm *Manager) OnConfig(s string) {
+	cm.logger.Infof("PH.configuration: \n %s", s)
 	cm.UpdateStatus(lbmanagement.Configuring, "Updating configuration")
 
 	var configMap common.MapStr
