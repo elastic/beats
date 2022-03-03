@@ -9,20 +9,22 @@ import (
 func main() {
 	var count, failures int
 
-	tick := time.NewTicker(4 * time.Minute)
+	interval := 4 * time.Minute
+	tick := time.NewTicker(interval)
+	log.Printf("starting elastic-agent restart every %s minutes", interval)
 	for {
 		select {
 		case <-tick.C:
 			count++
+			started := time.Now()
+			log.Printf("[INFO] restarting the agent")
 			err := exec.Command("systemctl", "restart", "elastic-agent").Run()
 			if err != nil {
 				failures++
 				log.Printf("[ERROR] %v", err)
 			}
-		}
-		if count%10 == 0 {
-			log.Printf("[INFO] count: %d, failures: %d, successes: %d",
-				count, failures, count-failures)
+			log.Printf("[INFO] restart done, took %s. Stats: count: %d, failures: %d, successes: %d",
+				time.Now().Sub(started), count, failures, count-failures)
 		}
 	}
 }
