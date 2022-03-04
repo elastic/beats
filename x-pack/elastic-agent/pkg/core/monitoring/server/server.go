@@ -17,8 +17,10 @@ import (
 	"go.elastic.co/apm/module/apmgorilla"
 
 	"github.com/elastic/beats/v7/libbeat/api"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/monitoring/report/buffer"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 )
@@ -30,6 +32,7 @@ func New(
 	ns func(string) *monitoring.Namespace,
 	routesFetchFn func() *sorted.Set,
 	enableProcessStats bool,
+	enableBuffer bool,
 	tracer *apm.Tracer,
 ) (*api.Server, error) {
 	if err := createAgentMonitoringDrop(endpointConfig.Host); err != nil {
@@ -42,7 +45,7 @@ func New(
 		return nil, err
 	}
 
-	return exposeMetricsEndpoint(log, cfg, ns, routesFetchFn, enableProcessStats, tracer)
+	return exposeMetricsEndpoint(log, cfg, ns, routesFetchFn, enableProcessStats, enableBuffer, tracer)
 }
 
 func exposeMetricsEndpoint(
@@ -51,6 +54,7 @@ func exposeMetricsEndpoint(
 	ns func(string) *monitoring.Namespace,
 	routesFetchFn func() *sorted.Set,
 	enableProcessStats bool,
+	enableBuffer bool,
 	tracer *apm.Tracer,
 ) (*api.Server, error) {
 	r := mux.NewRouter()
@@ -65,6 +69,14 @@ func exposeMetricsEndpoint(
 		r.Handle("/processes/{processID}", createHandler(processHandler(statsHandler)))
 		r.Handle("/processes/{processID}/", createHandler(processHandler(statsHandler)))
 		r.Handle("/processes/{processID}/{beatsPath}", createHandler(processHandler(statsHandler)))
+	}
+
+	if enableBuffer {
+		bufferReporter, err := buffer.MakeReporter(beat.Info{}, config) // beat.Info is not used by buffer reporter
+		if err != nil {
+			return nil, fmt.Errorf("unable to create buffer reporter for elastic-agent: %w", err)
+		}
+		r.Handle("/buffer", bufferReporter)
 	}
 
 	mux := http.NewServeMux()
