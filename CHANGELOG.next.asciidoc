@@ -75,8 +75,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Filebeat*
 
-- Add `text/csv` decoder to `httpjson` input {pull}28564[28564]
-- Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
 
 *Auditbeat*
 
