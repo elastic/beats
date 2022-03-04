@@ -255,6 +255,19 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		}()
 	}
 
+	// Start the manager after all the reload hooks are configured,
+	// the Manager is stopped at the end of the execution.
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		<-bt.done
+		b.Manager.Stop()
+	}()
+
 	wg.Wait()
 	return nil
 }
