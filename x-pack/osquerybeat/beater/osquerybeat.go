@@ -264,6 +264,12 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 		ah := bt.registerActionHandler(b, cli, configPlugin)
 		defer bt.unregisterActionHandler(b, ah)
 
+		// All the action are correctly configured Start the manager.
+		if err := b.Manager.Start(); err != nil {
+			return err
+		}
+		defer b.Manager.Stop()
+
 		// Process input
 		for {
 			select {
