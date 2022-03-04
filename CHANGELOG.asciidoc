@@ -9,34 +9,11 @@ https://github.com/elastic/beats/compare/v8.0.1...v8.1.0[View commits]
 
 ==== Breaking changes
 
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
 *Filebeat*
 
-- Remove Recorded Future integration from threatintel module. {pull}30564[30564]
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
+- Remove Recorded Future fileset integration from threatintel module. {pull}30564[30564]
 
 ==== Bugfixes
-
-*Affecting all Beats*
 
 *Auditbeat*
 
@@ -45,19 +22,8 @@ https://github.com/elastic/beats/compare/v8.0.1...v8.1.0[View commits]
 
 *Filebeat*
 
-
-*Filebeat*
-
 - Fix ECS version string in threatintel to be consistent with other modules and add event.timezone. {issue}30499[30499] {pull}30570[30570]
 - Add default paths value to MySQL Enterprise module to prevent issues with pipeline installations {pull}30598[30598]
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
 
 *Winlogbeat*
 
@@ -66,10 +32,6 @@ https://github.com/elastic/beats/compare/v8.0.1...v8.1.0[View commits]
 *Functionbeat*
 
 - Pass AWS region configuration correctly. {issue}28520[28520] {pull}30238[30238]
-
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
@@ -94,16 +56,6 @@ https://github.com/elastic/beats/compare/v8.0.1...v8.1.0[View commits]
 - Add new `userAgent` and `beatInfo` template functions for httpjson input {pull}29528[29528]
 - Add pipeline in FB's supported hints. {pull}30212[30212]
 
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
 *Metricbeat*
 
 - Add `add_resource_metadata` configuration to Kubernetes module. {pull}29133[29133]
@@ -119,39 +71,6 @@ https://github.com/elastic/beats/compare/v8.0.1...v8.1.0[View commits]
 
 - Add automated OEM Npcap installation handling. {pull}29112[29112] {pull}30438[30438] {pull}30493[30493]
 - Add support for capturing TLS random number and OCSP status request details. {issue}29962[29962] {pull}30102[30102]
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
 
 [[release-notes-8.0.1]]
 === Beats version 8.0.1
