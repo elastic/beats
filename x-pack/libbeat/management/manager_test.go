@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
@@ -56,119 +55,6 @@ output:
 
 	if len(blocks) != 2 {
 		t.Fatalf("Expected 2 block have %d: %+v", len(blocks), blocks)
-	}
-}
-
-func TestAssertPresenceOfInputsAndOutput(t *testing.T) {
-	tests := map[string]struct {
-		input    string
-		expected bool
-	}{
-		"return true when output and inputs are present": {
-			input: `
-filebeat:
-  inputs:
-    - type: log
-      paths:
-        - /var/log/hello1.log
-        - /var/log/hello2.log
-
-    - type: filestream
-      paths:
-        - /var/log/hello3.log
-        - /var/log/hello4.log
-output:
-  elasticsearch:
-    hosts:
-      - localhost:9200`,
-			expected: true,
-		},
-		"return false when output is prevent and inputs are present": {
-			input: `
-filebeat:
-  inputs:
-    - type: log
-      paths:
-        - /var/log/hello1.log
-        - /var/log/hello2.log
-
-    - type: filestream
-      paths:
-        - /var/log/hello3.log
-        - /var/log/hello4.log`,
-			expected: false,
-		},
-		"return false when output is present and inputs are 0": {
-			input: `
-filebeat:
-  inputs:
-output:
-  elasticsearch:
-    hosts:
-      - localhost:9200`,
-			expected: false,
-		},
-		"return false when output is present and inputs are absent": {
-			input: `
-filebeat:
-output:
-  elasticsearch:
-    hosts:
-      - localhost:9200`,
-			expected: false,
-		},
-		"return false when output is absent and inputs are present": {
-			input: `
-filebeat:
-  inputs:
-    - type: log
-      paths:
-        - /var/log/hello1.log
-        - /var/log/hello2.log
-
-    - type: filestream
-      paths:
-        - /var/log/hello3.log
-        - /var/log/hello4.log`,
-			expected: false,
-		},
-		"return false when output is nil and inputs are present": {
-			input: `
-output:
-filebeat:
-  inputs:
-    - type: log
-      paths:
-        - /var/log/hello1.log
-        - /var/log/hello2.log
-
-    - type: filestream
-      paths:
-        - /var/log/hello3.log
-        - /var/log/hello4.log`,
-			expected: false,
-		},
-	}
-
-	for name, test := range tests {
-		t.Run(name, func(t *testing.T) {
-			// NOTE(ph): I am not a big fan of copying this over from the Manager.OnConfig function
-			// But I want to be as closes of the real transformation and we cannot refactor that code
-			// while debugging.
-			cm := dummyCM()
-
-			var configMap common.MapStr
-			uconfig, err := common.NewConfigFrom(test.input)
-			require.NoError(t, err)
-
-			err = uconfig.Unpack(&configMap)
-			require.NoError(t, err)
-
-			blocks, err := cm.toConfigBlocks(configMap)
-			require.NoError(t, err)
-
-			require.Equal(t, test.expected, assertPresenceOfInputsAndOutput(logp.NewLogger("tests"), blocks))
-		})
 	}
 }
 
