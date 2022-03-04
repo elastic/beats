@@ -34,6 +34,23 @@ func Test_GetCLKTCK(t *testing.T) {
 	assert.Equal(t, uint32(100), GetCLKTCK())
 }
 
+func Test32BitRollover(t *testing.T) {
+	var maxUint32 uint64 = 4_294_967_295
+
+	var prev = maxUint32 - 100_000
+
+	// A rolled-over value
+	var current32 uint64 = 1000
+	// Theoretical un-rolled over value
+	var current64 = (maxUint32 + current32)
+
+	var correct = current64 - prev
+	assert.Equal(t, returnOrFix(current32, prev), returnOrFix(current64, prev))
+	assert.Equal(t, correct, returnOrFix(current32, prev))
+
+	assert.Equal(t, uint64(0), returnOrFix(current32, current32))
+}
+
 func TestDiskIOStat_CalIOStatistics(t *testing.T) {
 	counter := disk.IOCountersStat{
 		ReadCount:  13,
