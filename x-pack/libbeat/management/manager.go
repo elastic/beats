@@ -49,7 +49,6 @@ type Manager struct {
 	msg       string
 	payload   map[string]interface{}
 
-	stopFunc  func()
 	isRunning bool
 }
 
@@ -102,24 +101,26 @@ func (cm *Manager) Enabled() bool {
 	return cm.config.Enabled
 }
 
-// Start the config manager
-func (cm *Manager) Start(stopFunc func()) {
+// Start the config manager.
+func (cm *Manager) Start() {
+	cm.lock.Lock()
+	defer cm.lock.Unlock()
+
 	if !cm.Enabled() {
 		return
 	}
 
-	cm.lock.Lock()
-	defer cm.lock.Unlock()
-
 	cfgwarn.Beta("Fleet management is enabled")
 	cm.logger.Info("Starting fleet management service")
 
-	cm.stopFunc = stopFunc
 	cm.isRunning = true
 	err := cm.client.Start(context.Background())
 	if err != nil {
 		cm.logger.Errorf("failed to start elastic-agent-client: %s", err)
+	} else {
+		cm.logger.Info("Ready to receive configuration")
 	}
+	return err
 }
 
 // Stop the config manager
@@ -225,10 +226,7 @@ func (cm *Manager) SetPayload(payload map[string]interface{}) {
 }
 
 func (cm *Manager) OnStop() {
-	if cm.stopFunc != nil {
-		cm.client.Status(proto.StateObserved_STOPPING, "Stopping", nil)
-		cm.stopFunc()
-	}
+	cm.client.Status(proto.StateObserved_STOPPING, "Stopping", nil)
 }
 
 func (cm *Manager) OnError(err error) {
@@ -381,6 +379,9 @@ func statusToProtoStatus(status lbmanagement.Status) proto.StateObserved_Status 
 	return proto.StateObserved_HEALTHY
 }
 
+// assertPresenceOfInputsAndOutput verifies that the configuration contains
+// at least 1 input and one output. This is temporary check until we refactor the
+// control plane.
 func assertPresenceOfInputsAndOutput(l *logp.Logger, blocks ConfigBlocks) bool {
 	if len(blocks) == 0 {
 		l.Error("No configuration blocks found")

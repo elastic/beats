@@ -74,9 +74,8 @@ type Manager interface {
 	// Enabled returns true if manager is enabled.
 	Enabled() bool
 
-	// Start the config manager giving it a stopFunc callback
-	// so the beat can be told when to stop.
-	Start(stopFunc func())
+	// Start the config manager.
+	Start() error
 
 	// Stop the config manager.
 	Stop()
@@ -152,7 +151,7 @@ func nilFactory(*common.Config, *reload.Registry, uuid.UUID) (Manager, error) {
 }
 
 func (*nilManager) Enabled() bool                           { return false }
-func (*nilManager) Start(_ func())                          {}
+func (*nilManager) Start() error                            { return nil }
 func (*nilManager) Stop()                                   {}
 func (*nilManager) CheckRawConfig(cfg *common.Config) error { return nil }
 func (n *nilManager) UpdateStatus(status Status, msg string) {
