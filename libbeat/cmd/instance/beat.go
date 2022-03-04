@@ -504,10 +504,6 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	logp.Info("%s start running.", b.Info.Beat)
 
-	// Launch config manager
-	b.Manager.Start(beater.Stop)
-	defer b.Manager.Stop()
-
 	return beater.Run(&b.Beat)
 }
 
