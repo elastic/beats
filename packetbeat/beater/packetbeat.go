@@ -149,6 +149,13 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 
 	logp.Debug("main", "Waiting for the runner to finish")
 
+	// Start the manager after all the hooks are registered and terminates when
+	// the function return.
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
+	defer b.Manager.Stop()
+
 	for {
 		select {
 		case <-pb.done:
