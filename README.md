@@ -16,3 +16,4 @@ Provided packages:
 * `github.com/elastic/elastic-agent-libs/mapstr` is the old `github.com/elastic/beats/v7/libbeat/common.MapStr`. It is an extra layer on top of `map[string]interface{}`.
 * `github.com/elastic/elastic-agent-libs/safemapstr` contains safe operations for `mapstr.M`.
 * `github.com/elastic/elastic-agent-libs/str` the previous `stringset.go` file from `github.com/elastic/beats/v7/libbeat/common`. It provides a string set implementation. 
+* `github.com/elastic/elastic-agent-libs/transport/tlscommon` TLS configuration and validation, CA pinning, etc.
