@@ -10,8 +10,8 @@ func main() {
 	var count, failures int
 
 	interval := 4 * time.Minute
-	tick := time.NewTicker(interval)
 	log.Printf("starting elastic-agent restart every %s minutes", interval)
+	tick := time.NewTicker(interval)
 	for {
 		select {
 		case <-tick.C:
