@@ -21,11 +21,13 @@
 package diskio
 
 import (
+	"math"
 	"testing"
 
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -35,7 +37,7 @@ func Test_GetCLKTCK(t *testing.T) {
 }
 
 func Test32BitRollover(t *testing.T) {
-	var maxUint32 uint64 = 4_294_967_295
+	var maxUint32 uint64 = math.MaxUint32 // 4_294_967_295
 
 	var prev = maxUint32 - 100_000
 
@@ -75,7 +77,7 @@ func TestDiskIOStat_CalIOStatistics(t *testing.T) {
 	}
 
 	expected := IOMetric{
-		AvgAwaitTime:      24.0 / 22.0,
+		AvgAwaitTime:      common.Round(24.0/22.0, common.DefaultDecimalPlacesCount),
 		AvgReadAwaitTime:  1.2,
 		AvgWriteAwaitTime: 1,
 	}

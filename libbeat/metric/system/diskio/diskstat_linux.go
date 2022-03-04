@@ -21,6 +21,8 @@
 package diskio
 
 import (
+	"math"
+
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/disk"
 
@@ -59,7 +61,7 @@ func (stat *IOStat) OpenSampling() error {
 
 // See https://docs.kernel.org/admin-guide/iostats.html and https://github.com/torvalds/linux/blob/master/block/genhd.c
 func returnOrFix(current, prev uint64) uint64 {
-	var maxUint32 uint64 = 4_294_967_295 // Max value in uint32/unsigned int
+	var maxUint32 uint64 = math.MaxUint32 //4_294_967_295 Max value in uint32/unsigned int
 
 	if current >= prev {
 		return current - prev
