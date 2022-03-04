@@ -160,7 +160,7 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 	}
 
 	settings := struct {
-		ID             string        `config:"id"`
+		ID             string        `config:"id" validate:"required"`
 		CleanTimeout   time.Duration `config:"clean_timeout"`
 		HarvesterLimit uint64        `config:"harvester_limit"`
 	}{CleanTimeout: cim.DefaultCleanTimeout}

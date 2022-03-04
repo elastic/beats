@@ -180,16 +180,28 @@ func (e *inputTestingEnvironment) requireRegistryEntryCount(expectedCount int) {
 }
 
 // requireOffsetInRegistry checks if the expected offset is set for a file.
-func (e *inputTestingEnvironment) requireOffsetInRegistry(filename string, expectedOffset int) {
+func (e *inputTestingEnvironment) requireOffsetInRegistry(filename, inputID string, expectedOffset int) {
+	e.t.Helper()
 	filepath := e.abspath(filename)
 	fi, err := os.Stat(filepath)
 	if err != nil {
 		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
 	}
 
-	id := getIDFromPath(filepath, fi)
+	id := getIDFromPath(filepath, inputID, fi)
 	entry, err := e.getRegistryState(id)
 	if err != nil {
+		keys := []string{}
+		if store, err := e.stateStore.Access(); err == nil {
+			store.Each(func(key string, _ statestore.ValueDecoder) (bool, error) {
+				keys = append(keys, key)
+				return false, nil
+			})
+		} else {
+			e.t.Fatalf("cannot access the store: %v", err.Error())
+		}
+
+		e.t.Logf("keys in store: %v", keys)
 		e.t.Fatalf(err.Error())
 	}
 
@@ -197,7 +209,7 @@ func (e *inputTestingEnvironment) requireOffsetInRegistry(filename string, expec
 }
 
 // requireMetaInRegistry checks if the expected metadata is saved to the registry.
-func (e *inputTestingEnvironment) waitUntilMetaInRegistry(filename string, expectedMeta fileMeta) {
+func (e *inputTestingEnvironment) waitUntilMetaInRegistry(filename, inputID string, expectedMeta fileMeta) {
 	for {
 		filepath := e.abspath(filename)
 		fi, err := os.Stat(filepath)
@@ -205,7 +217,7 @@ func (e *inputTestingEnvironment) waitUntilMetaInRegistry(filename string, expec
 			continue
 		}
 
-		id := getIDFromPath(filepath, fi)
+		id := getIDFromPath(filepath, inputID, fi)
 		entry, err := e.getRegistryState(id)
 		if err != nil {
 			continue
@@ -233,14 +245,14 @@ func requireMetadataEquals(one, other fileMeta) bool {
 }
 
 // waitUntilOffsetInRegistry waits for the expected offset is set for a file.
-func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(filename string, expectedOffset int) {
+func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(filename, inputID string, expectedOffset int) {
 	filepath := e.abspath(filename)
 	fi, err := os.Stat(filepath)
 	if err != nil {
 		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
 	}
 
-	id := getIDFromPath(filepath, fi)
+	id := getIDFromPath(filepath, inputID, fi)
 	entry, err := e.getRegistryState(id)
 	for err != nil || entry.Cursor.Offset != expectedOffset {
 		entry, err = e.getRegistryState(id)
@@ -249,7 +261,7 @@ func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(filename string, exp
 	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
 }
 
-func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename string) {
+func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename, inputID string) {
 	filepath := e.abspath(filename)
 	fi, err := os.Stat(filepath)
 	if err != nil {
@@ -257,7 +269,7 @@ func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename string) {
 	}
 
 	inputStore, _ := e.stateStore.Access()
-	id := getIDFromPath(filepath, fi)
+	id := getIDFromPath(filepath, inputID, fi)
 
 	var entry registryEntry
 	err = inputStore.Get(id, &entry)
@@ -288,10 +300,10 @@ func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, e
 	return entry, nil
 }
 
-func getIDFromPath(filepath string, fi os.FileInfo) string {
+func getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
 	identifier, _ := newINodeDeviceIdentifier(nil)
 	src := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: filepath})
-	return "filestream::.global::" + src.Name()
+	return "filestream::" + inputID + "::" + src.Name()
 }
 
 // waitUntilEventCount waits until total count events arrive to the client.
