@@ -3,6 +3,158 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.1.0]]
+=== Beats version 8.1.0
+https://github.com/elastic/beats/compare/v8.0.1...v8.1.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Remove Recorded Future integration from threatintel module. {pull}30564[30564]
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
+
+*Auditbeat*
+
+- auditd: Add error.message to events when processing fails. {pull}30009[30009]
+- Fix handling of execve call events which have no argument. {issue}30585[30585] {pull}30586[30586]
+
+*Filebeat*
+
+
+*Filebeat*
+
+- Fix ECS version string in threatintel to be consistent with other modules and add event.timezone. {issue}30499[30499] {pull}30570[30570]
+- Add default paths value to MySQL Enterprise module to prevent issues with pipeline installations {pull}30598[30598]
+
+*Heartbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+- Add provider names to Security pipeline conditional check in routing pipeline. {issue}27288[27288] {pull}29781[29781]
+
+*Functionbeat*
+
+- Pass AWS region configuration correctly. {issue}28520[28520] {pull}30238[30238]
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Name all k8s workqueue. {pull}28085[28085]
+- Discover changes in Kubernetes nodes metadata as soon as they happen. {pull}23139[23139]
+- Update k8s library {pull}29394[29394]
+- Add support for latest k8s versions v1.23 and v1.22 {pull}29575[29575]
+- Add `script` processor to all beats {issue}29269[29269] {pull}29752[29752]
+- Only connect to Elasticsearch instances with the same version or newer. {pull}29683[29683]
+- Move umask from code to service files. {pull}29708[29708]
+- Add metadata change support for some processors {pull}30183[30183]
+
+*Auditbeat*
+
+- system/socket: Add process.entity_id capture for socket events. {issue}30230[30230] {pull}30231[30231]
+
+*Filebeat*
+
+- Add support for filtering in journald input with `unit`, `kernel`, `identifiers` and `include_matches`. {pull}29294[29294]
+- Add new `userAgent` and `beatInfo` template functions for httpjson input {pull}29528[29528]
+- Add pipeline in FB's supported hints. {pull}30212[30212]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+- Add `add_resource_metadata` configuration to Kubernetes module. {pull}29133[29133]
+- Add `containerd` module with `cpu`, `memory`, `blkio` metricsets. {pull}29247[29247]
+- Add `container.id` and `container.runtime` ECS fields in container metricset. {pull}29560[29560]
+- Add `memory.workingset.limit.pct` field in Kubernetes container/pod metricset. {pull}29547[29547]
+- Add k8s metadata in state_cronjob metricset. {pull}29572[29572]
+- Add `xpack.enabled` support for Enterprise Search module. {pull}29871[29871]
+- Add gcp firestore metricset. {pull}29918[29918]
+- Remove strict parsing on RabbitMQ module {pull}30090[30090]
+
+*Packetbeat*
+
+- Add automated OEM Npcap installation handling. {pull}29112[29112] {pull}30438[30438] {pull}30493[30493]
+- Add support for capturing TLS random number and OCSP status request details. {issue}29962[29962] {pull}30102[30102]
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+
+
+
 [[release-notes-8.0.1]]
 === Beats version 8.0.1
 https://github.com/elastic/beats/compare/v8.0.0...v8.0.1[View commits]
