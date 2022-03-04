@@ -60,7 +60,7 @@ func (stat *IOStat) OpenSampling() error {
 // If you want to get technical, this could be a tad unsafe, as we don't actually have any way of knowing if the word size changes in a future kernel, and we've rolled over at UINT64_MAX
 
 // See https://docs.kernel.org/admin-guide/iostats.html and https://github.com/torvalds/linux/blob/master/block/genhd.c diskstats_show()
-func returnOrFixRollover(current, prev uint64) uint64 {
+func returnOrFix32BitRollover(current, prev uint64) uint64 {
 	var maxUint32 uint64 = math.MaxUint32 //4_294_967_295 Max value in uint32/unsigned int
 
 	if current >= prev {
@@ -97,13 +97,13 @@ func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, err
 	rdIOs := counter.ReadCount - last.ReadCount
 	rdMerges := counter.MergedReadCount - last.MergedReadCount
 	rdBytes := counter.ReadBytes - last.ReadBytes
-	rdTicks := returnOrFixRollover(counter.ReadTime, last.ReadTime)
+	rdTicks := returnOrFix32BitRollover(counter.ReadTime, last.ReadTime)
 	wrIOs := counter.WriteCount - last.WriteCount
 	wrMerges := counter.MergedWriteCount - last.MergedWriteCount
 	wrBytes := counter.WriteBytes - last.WriteBytes
-	wrTicks := returnOrFixRollover(counter.WriteTime, last.WriteTime)
-	ticks := returnOrFixRollover(counter.IoTime, last.IoTime)
-	aveq := returnOrFixRollover(counter.WeightedIO, last.WeightedIO)
+	wrTicks := returnOrFix32BitRollover(counter.WriteTime, last.WriteTime)
+	ticks := returnOrFix32BitRollover(counter.IoTime, last.IoTime)
+	aveq := returnOrFix32BitRollover(counter.WeightedIO, last.WeightedIO)
 
 	nIOs := rdIOs + wrIOs
 	nTicks := rdTicks + wrTicks

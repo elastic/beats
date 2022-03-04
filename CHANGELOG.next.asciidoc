@@ -139,6 +139,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Remove strict parsing on RabbitMQ module {pull}30090[30090]
 - Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
 - Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
+- Fix overflow in `iostat` metrics {pull}30679[30679]
 
 *Packetbeat*
 

@@ -47,10 +47,10 @@ func Test32BitRollover(t *testing.T) {
 	var current64 = (maxUint32 + current32)
 
 	var correct = current64 - prev
-	assert.Equal(t, returnOrFixRollover(current32, prev), returnOrFixRollover(current64, prev))
-	assert.Equal(t, correct, returnOrFixRollover(current32, prev))
+	assert.Equal(t, returnOrFix32BitRollover(current32, prev), returnOrFix32BitRollover(current64, prev))
+	assert.Equal(t, correct, returnOrFix32BitRollover(current32, prev))
 
-	assert.Equal(t, uint64(0), returnOrFixRollover(current32, current32))
+	assert.Equal(t, uint64(0), returnOrFix32BitRollover(current32, current32))
 }
 
 func TestDiskIOStat_CalIOStatistics(t *testing.T) {
