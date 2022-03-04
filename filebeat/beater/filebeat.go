@@ -379,6 +379,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	adiscover.Start()
 
+	// We start the manager when all the subsystem are initialized and ready to received events.
+	b.Manager.Start(func() {})
+
 	// Add done channel to wait for shutdown signal
 	waitFinished.AddChan(fb.done)
 	waitFinished.Wait()
@@ -391,6 +394,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	modules.Stop()
 	adiscover.Stop()
 	crawler.Stop()
+
+	// We stop the manager and destroy his connection to Elastic Agent.
+	b.Manager.Stop()
 
 	timeout := fb.config.ShutdownTimeout
 	// Checks if on shutdown it should wait for all events to be published
