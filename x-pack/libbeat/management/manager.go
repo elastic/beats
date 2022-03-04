@@ -102,12 +102,12 @@ func (cm *Manager) Enabled() bool {
 }
 
 // Start the config manager.
-func (cm *Manager) Start() {
+func (cm *Manager) Start() error {
 	cm.lock.Lock()
 	defer cm.lock.Unlock()
 
 	if !cm.Enabled() {
-		return
+		return nil
 	}
 
 	cfgwarn.Beta("Fleet management is enabled")
