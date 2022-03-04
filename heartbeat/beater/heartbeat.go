@@ -124,6 +124,13 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 		defer bt.autodiscover.Stop()
 	}
 
+	// Configure the beats Manager to start after all the reloadable hooks are initialized
+	// and shutdown when the function return.
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
+	defer b.Manager.Stop()
+
 	defer bt.scheduler.Stop()
 
 	<-bt.done
