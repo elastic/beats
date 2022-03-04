@@ -380,7 +380,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	adiscover.Start()
 
 	// We start the manager when all the subsystem are initialized and ready to received events.
-	b.Manager.Start(func() {})
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
 
 	// Add done channel to wait for shutdown signal
 	waitFinished.AddChan(fb.done)
