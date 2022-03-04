@@ -36,6 +36,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
+- Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
 
 *Auditbeat*
 
