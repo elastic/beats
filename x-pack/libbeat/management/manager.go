@@ -199,8 +199,6 @@ func (cm *Manager) OnConfig(s string) {
 		return
 	}
 
-	assertPresenceOfInputsAndOutput(cm.logger, blocks)
-
 	if errs := cm.apply(blocks); errs != nil {
 		// `cm.apply` already logs the errors; currently allow beat to run degraded
 		cm.updateStatusWithError(err)
@@ -377,37 +375,4 @@ func statusToProtoStatus(status lbmanagement.Status) proto.StateObserved_Status 
 	}
 	// unknown status, still reported as healthy
 	return proto.StateObserved_HEALTHY
-}
-
-// assertPresenceOfInputsAndOutput verifies that the configuration contains
-// at least 1 input and one output. This is temporary check until we refactor the
-// control plane.
-func assertPresenceOfInputsAndOutput(l *logp.Logger, blocks ConfigBlocks) bool {
-	if len(blocks) == 0 {
-		l.Error("No configuration blocks found")
-		return false
-	}
-
-	inputsBlocks, err := findBlockWithRegexp(inputsRE, blocks)
-	if err != nil || len(inputsBlocks.Blocks) == 0 {
-		l.Error("No inputs blocks found in the configuration")
-		return false
-	}
-
-	outputBlocks, err := findBlockWithRegexp(outputRE, blocks)
-	if err != nil || len(outputBlocks.Blocks) == 0 {
-		l.Error("No output blocks found in the configuration")
-		return false
-	}
-
-	return true
-}
-
-func findBlockWithRegexp(re *regexp.Regexp, blocks ConfigBlocks) (ConfigBlocksWithType, error) {
-	for _, block := range blocks {
-		if re.MatchString(block.Type) {
-			return block, nil
-		}
-	}
-	return ConfigBlocksWithType{}, nil
 }
