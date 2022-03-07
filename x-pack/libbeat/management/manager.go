@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"regexp"
 	"sort"
 	"sync"
 
@@ -29,11 +28,6 @@ import (
 var notReportedErrors = []error{
 	context.Canceled,
 }
-
-var outputRE = regexp.MustCompile(`^output$`)
-
-// Have to support all the beats.
-var inputsRE = regexp.MustCompile(`\.inputs$`)
 
 // Manager handles internal config updates. By retrieving
 // new configs from Kibana and applying them to the Beat.
@@ -117,9 +111,8 @@ func (cm *Manager) Start() error {
 	err := cm.client.Start(context.Background())
 	if err != nil {
 		cm.logger.Errorf("failed to start elastic-agent-client: %s", err)
-	} else {
-		cm.logger.Info("Ready to receive configuration")
 	}
+	cm.logger.Info("Ready to receive configuration")
 	return err
 }
 

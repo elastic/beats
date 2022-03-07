@@ -13,7 +13,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
 )
 
@@ -72,25 +71,4 @@ type dummyReloadable struct{}
 
 func (dummyReloadable) Reload(config *reload.ConfigWithMeta) error {
 	return nil
-}
-
-type dummyReloadableList struct{}
-
-func (dummyReloadableList) ReloadableList() error {
-	return nil
-}
-
-func dummyCM() *Manager {
-	// Use the 3 register point of Filebeat.
-	reg := reload.NewRegistry()
-	reg.Register("output", &dummyReloadable{})
-	reg.Register("filebeat.inputs", &dummyReloadable{})
-	reg.Register("filebeat.modules", &dummyReloadable{})
-
-	cm := &Manager{
-		registry: reg,
-		logger:   logp.NewLogger("test"),
-	}
-
-	return cm
 }
