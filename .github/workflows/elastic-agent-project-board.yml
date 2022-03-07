@@ -35,7 +35,7 @@ jobs:
           headers: '{"GraphQL-Features": "projects_next_graphql"}'
           query: |
              mutation add_to_project($projectid:String!,$contentid:String!) {
-               updateIssue(input: {id:$contentid, projectIds:$projectid}) {
+               updateIssue(input: {id:${{ github.event.issue.node_id }}, projectIds:$projectid}) {
                 clientMutationId
               }
              }
