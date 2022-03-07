@@ -114,7 +114,7 @@ func (cm *Manager) Start() error {
 		return err
 	}
 	cm.logger.Info("Ready to receive configuration")
-	return err
+	return nil
 }
 
 // Stop the config manager
