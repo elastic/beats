@@ -1,6 +1,6 @@
 ---
 - job:
-    name: "elastic-agent-autodiscover-mbp"
+    name: elastic-agent-autodiscover-mbp
     display-name: elastic-agent-autodiscover
     description: elastic-agent-autodiscover
     project-type: multibranch
@@ -39,4 +39,4 @@
             timeout: 100
           timeout: '15'
           use-author: true
-          wipe-workspace: 'True'
+          wipe-workspace: true
