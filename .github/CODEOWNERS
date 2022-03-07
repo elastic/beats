@@ -4,7 +4,7 @@
 # * @elastic/beats
 
 # libbeat
-# /libbeat/ @elastic/beats
+/libbeat/ @elastic/elastic-agent-data-plane
 # /auditbeat/ @elastic/beats
 # /packetbeat/ @elastic/beats
 # /filebeat/ @elastic/beats
