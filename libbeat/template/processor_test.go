@@ -812,45 +812,76 @@ func TestProcessWildcardOSS(t *testing.T) {
 }
 
 func TestProcessWildcardElastic(t *testing.T) {
-	// Test common fields are combined even if they come from different objects
-	fields := mapping.Fields{
-		mapping.Field{
-			Name: "test",
-			Type: "group",
-			Fields: mapping.Fields{
+	for _, test := range []struct {
+		title    string
+		fields   mapping.Fields
+		expected common.MapStr
+	}{
+		{
+			title: "default",
+			fields: mapping.Fields{
 				mapping.Field{
-					Name: "one",
-					Type: "wildcard",
+					Name: "test",
+					Type: "group",
+					Fields: mapping.Fields{
+						mapping.Field{
+							Name: "one",
+							Type: "wildcard",
+						},
+					},
+				},
+			},
+			expected: common.MapStr{
+				"test": common.MapStr{
+					"properties": common.MapStr{
+						"one": common.MapStr{
+							"type": "wildcard",
+						},
+					},
 				},
 			},
 		},
-	}
-
-	output := common.MapStr{}
-	version, err := common.NewVersion("8.0.0")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	p := Processor{EsVersion: *version, ElasticLicensed: true}
-	err = p.Process(fields, nil, output)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Make sure fields without a name are skipped during template generation
-	expectedOutput := common.MapStr{
-		"test": common.MapStr{
-			"properties": common.MapStr{
-				"one": common.MapStr{
-					"ignore_above": 1024,
-					"type":         "wildcard",
+		{
+			title: "explicit ignore_above",
+			fields: mapping.Fields{
+				mapping.Field{
+					Name: "test",
+					Type: "group",
+					Fields: mapping.Fields{
+						mapping.Field{
+							Name:        "one",
+							Type:        "wildcard",
+							IgnoreAbove: 4096,
+						},
+					},
+				},
+			},
+			expected: common.MapStr{
+				"test": common.MapStr{
+					"properties": common.MapStr{
+						"one": common.MapStr{
+							"ignore_above": 4096,
+							"type":         "wildcard",
+						},
+					},
 				},
 			},
 		},
+	} {
+		t.Run(test.title, func(t *testing.T) {
+			output := common.MapStr{}
+			version, err := common.NewVersion("8.0.0")
+			if err != nil {
+				t.Fatal(err)
+			}
+			p := Processor{EsVersion: *version, ElasticLicensed: true}
+			err = p.Process(test.fields, nil, output)
+			if err != nil {
+				t.Fatal(err)
+			}
+			assert.Equal(t, test.expected, output)
+		})
 	}
-
-	assert.Equal(t, expectedOutput, output)
 }
 
 func TestProcessWildcardPreSupport(t *testing.T) {

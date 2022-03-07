@@ -52,6 +52,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Remove `NumCPU` as clients should update the CPU count on the fly in case of config changes in a VM. {pull}23154[23154]
 - Remove Metricbeat EventFetcher and EventsFetcher interface. Use the reporter interface instead. {pull}25093[25093]
 - Update Darwin build image to a debian 10 base that increases the MacOS SDK and minimum supported version used in build to 10.14. {issue}24193[24193]
+- Wildcard fields no longer have a default ignore_above setting of 1024. {issue}30096[30096] {pull}30668[30668]
 
 ==== Bugfixes
 
