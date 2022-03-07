@@ -370,6 +370,7 @@ NOTE: Only one of the credentials settings can be set at once. If none is provid
 default credentials from the environment will be attempted via ADC. For more information about
 how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
 
+[[request-parameters]]
 [float]
 ==== `request.url`
 
@@ -930,6 +931,149 @@ This will output:
   }
 ]
 ----
+
+[[chain]]
+[float]
+=== `chain`
+
+Chain is a list of calls to be made after the first call.
+
+chain list option: [`step`].
+
+[float]
+==== `chain[].step`
+
+chain[].step will contain basic request and response configurations for chain calls.
+
+[float]
+==== `chain[].step.request`
+
+Please refer <<request-parameters,request parameters>>. also place same replace string in url where collected values from previous call should be place. Required. 
+
+Example:
+
+first call: https://example.com/services/data/v1.0/
+
+second call: https://example.com/services/data/v1.0/1/export_ids
+
+third call: https://example.com/services/data/v1.0/export_ids/file_1/info
+
+[float]
+==== `chain[].step.respose.split`
+
+Please refer <<response-split,response split parameter>>. Required.
+
+[float]
+==== `chain[].step.replace`
+
+replace is JSONPath string to parse values from response JSONs, collected from previous chain calls. Please look at the official doc of https://goessner.net/articles/JsonPath/index.html#e2[JSONPath]. Required.
+
+Example:
+
+- first call: https://example.com/services/data/v1.0/
++
+<<response-json1,response>>
+
+- second call: https://example.com/services/data/v1.0/`$.records[:].id`/export_ids
++
+<<response-json2,response>>
+
+third call: https://example.com/services/data/v1.0/export_ids`/`$.file_name`/info
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  enabled: true
+  # first call
+  request.url: https://example.com/services/data/v1.0/records
+  interval: 1h
+  chain:
+    # second call
+    - step:
+      request.url: https://example.com/services/data/v1.0/$.records[:].id/export_ids
+      request.method: GET
+      replace: $.records[:].id
+    # third call
+    - step:
+      request.url: https://example.com/services/data/v1.0/export_ids/$.file_name/info
+      request.method: GET
+      replace: $.file_name
+----
+
+Example:
+
+- First call to collect record ids
+
++
+request_url: https://example.com/services/data/v1.0/records
+
++
+response_json:
+
++
+[[response-json1]]
+["source","json",subs="attributes"]
+----
+{
+    "records": [
+        {
+            "id": 1,
+        },
+        {
+            "id": 2,
+        },
+        {
+            "id": 3,
+        },
+    ]
+}
+----
+
+- Second call to collect `file_name` using collected ids from first call.
+
++
+request_url using id as '1': https://example.com/services/data/v1.0/1/export_ids
+
++
+response_json using id as '1':
+
++
+[[response-json1]]
+["source","json",subs="attributes"]
+----
+{
+    "file_name": "file_1"
+}
+----
+
++
+request_url using id as '2': https://example.com/services/data/v1.0/2/export_ids
+
++
+response_json using id as '2':
+
++
+["source","json",subs="attributes"]
+----
+{
+    "file_name": "file_2"
+}
+----
+
+- Third call to collect `files` using collected `file_name` from second call.
+
++
+request_url using file_name as 'file_1': https://example.com/services/data/v1.0/export_ids/file_1/info
+
++
+request_url using file_name as 'file_2': https://example.com/services/data/v1.0/export_ids/file_2/info
+
++
+Collect and make events from response in any format supported by httpjson for all calls.
+
+NOTE: httpjson chain will only create and ingest events from last call on chain configurations.
+httpjson chain will also 
 
 [[cursor]]
 [float]
