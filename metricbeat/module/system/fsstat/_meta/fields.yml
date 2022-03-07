@@ -10,7 +10,7 @@
       description: Number of file systems found.
     - name: total_files
       type: long
-      description: Total number of files. Not on Windows.
+      description: Total number of inodes on the system, which will be a combination of files, folders, symlinks, and devices. Not on Windows.
     - name: total_size
       format: bytes
       type: group
