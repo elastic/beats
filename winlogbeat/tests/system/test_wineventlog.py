@@ -138,6 +138,7 @@ class Test(WriteReadTest):
             "    bookmark: \"<BookmarkList>\\r\\n  <Bookmark Channel='{}' RecordId='1000' IsCurrent='true'/>\\r\\n</BookmarkList>\"\n".
             format(self.providerName, self.providerName)
         ))
+        f.close()
 
         evts = self.read_events(expected_events=2)
         self.assertTrue(len(evts), 2)
