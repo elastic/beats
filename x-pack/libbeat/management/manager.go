@@ -111,6 +111,7 @@ func (cm *Manager) Start() error {
 	err := cm.client.Start(context.Background())
 	if err != nil {
 		cm.logger.Errorf("failed to start elastic-agent-client: %s", err)
+		return err
 	}
 	cm.logger.Info("Ready to receive configuration")
 	return err
