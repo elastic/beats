@@ -44,6 +44,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
 - Update docker/distribution dependency library to fix a security issues concerning OCI Manifest Type Confusion Issue. {pull}30462[30462]
 - Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
+- Wildcard fields no longer have a default ignore_above setting of 1024. {issue}30096[30096] {pull}30668[30668]
 
 *Auditbeat*
 
