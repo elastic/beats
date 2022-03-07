@@ -126,10 +126,6 @@ type MockCloudwatchlogsClient struct {
 	cloudwatchlogsiface.ClientAPI
 }
 
-var (
-	mockSvc = &MockCloudwatchlogsClient{}
-)
-
 func (m *MockCloudwatchlogsClient) FilterLogEventsRequest(input *cloudwatchlogs.FilterLogEventsInput) cloudwatchlogs.FilterLogEventsRequest {
 	events := []cloudwatchlogs.FilteredLogEvent{
 		{

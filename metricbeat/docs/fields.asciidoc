@@ -30829,6 +30829,42 @@ type: long
 
 --
 
+
+*`elasticsearch.index.total.bulk.total_size_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.bulk.avg_size_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.bulk.avg_time_in_millis`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.bulk.total_operations`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.bulk.total_time_in_millis`*::
++
+--
+type: long
+
+--
+
 [float]
 === index.recovery
 
@@ -31495,6 +31531,53 @@ Statistics about each node in a Elasticsearch cluster
 
 
 
+
+
+
+*`elasticsearch.node.stats.indices.bulk.avg_time.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.bulk.avg_time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.bulk.total_time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.bulk.total_size.bytes`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.bulk.avg_size.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.bulk.operations.total.count`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.node.stats.indices.docs.count`*::
 +
@@ -59781,7 +59864,7 @@ type: keyword
 *`system.filesystem.files`*::
 +
 --
-The total number of file nodes in the file system.
+Total number of inodes on the system, which will be a combination of files, folders, symlinks, and devices.
 
 
 type: long
@@ -59803,7 +59886,7 @@ format: bytes
 *`system.filesystem.free_files`*::
 +
 --
-The number of free file nodes in the file system.
+The number of free inodes in the file system.
 
 
 type: long
@@ -59865,7 +59948,7 @@ type: long
 *`system.fsstat.total_files`*::
 +
 --
-Total number of files. Not on Windows.
+Total number of inodes on the system, which will be a combination of files, folders, symlinks, and devices. Not on Windows.
 
 type: long
 
@@ -61909,6 +61992,36 @@ type: long
 +
 --
 Number of dead processes on this host. It's very unlikely that it will appear but in some special situations it may happen.
+
+
+type: long
+
+--
+
+*`system.process.summary.wakekill`*::
++
+--
+Number of wakekill-state processes on this host. Only found on older Linux Kernel versions.
+
+
+type: long
+
+--
+
+*`system.process.summary.wake`*::
++
+--
+Number of wake-state processes on this host. Only found on older Linux Kernel versions.
+
+
+type: long
+
+--
+
+*`system.process.summary.parked`*::
++
+--
+Number of parked-state processes on this host. Only found on older Linux Kernel versions, or under certain conditions.
 
 
 type: long

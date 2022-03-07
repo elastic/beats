@@ -64,17 +64,18 @@ func GetInfoForPid(_ resolve.Resolver, pid int) (ProcState, error) {
 	state.Name = name
 	state.Pid = opt.IntWith(pid)
 
-	return state, nil
-}
-
-// FillPidMetrics is the darwin implementation
-func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, _ func(string) bool) (ProcState, error) {
+	// system/process doesn't need this here, but system/process_summary does.
 	status, err := getPidStatus(pid)
 	if err != nil {
 		return state, errors.Wrap(err, "error fetching status")
 	}
 	state.State = status
 
+	return state, nil
+}
+
+// FillPidMetrics is the windows implementation
+func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, _ func(string) bool) (ProcState, error) {
 	user, err := getProcCredName(pid)
 	if err != nil {
 		return state, errors.Wrap(err, "error fetching username")

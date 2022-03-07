@@ -4,7 +4,7 @@
 # * @elastic/beats
 
 # libbeat
-# /libbeat/ @elastic/beats
+/libbeat/ @elastic/elastic-agent-data-plane
 # /auditbeat/ @elastic/beats
 # /packetbeat/ @elastic/beats
 # /filebeat/ @elastic/beats
@@ -22,18 +22,18 @@
 
 # Filebeat
 # /filebeat/module/ @elastic/integrations
-# /filebeat/module/elasticsearch/ @elastic/stack-monitoring
-# /filebeat/module/kibana/ @elastic/stack-monitoring
-# /filebeat/module/logstash/ @elastic/stack-monitoring
+/filebeat/module/elasticsearch/ @elastic/infra-monitoring-ui
+/filebeat/module/kibana/ @elastic/infra-monitoring-ui
+/filebeat/module/logstash/ @elastic/infra-monitoring-ui
 # /x-pack/filebeat/module/ @elastic/integrations
 # /x-pack/filebeat/module/suricata/ @elastic/security-external-integrations
 
 # Metricbeat
 # /metricbeat/module/ @elastic/integrations
-# /metricbeat/module/elasticsearch/ @elastic/stack-monitoring
-# /metricbeat/module/kibana/ @elastic/stack-monitoring
-# /metricbeat/module/logstash/ @elastic/stack-monitoring
-# /metricbeat/module/beat/ @elastic/stack-monitoring
+/metricbeat/module/elasticsearch/ @elastic/infra-monitoring-ui
+/metricbeat/module/kibana/ @elastic/infra-monitoring-ui
+/metricbeat/module/logstash/ @elastic/infra-monitoring-ui
+/metricbeat/module/beat/ @elastic/infra-monitoring-ui
 # /x-pack/metricbeat/module/ @elastic/integrations
 
 # Heartbeat
@@ -42,10 +42,13 @@
 # Winlogbeat
 /x-pack/winlogbeat/ @elastic/security-external-integrations
 
+# Elastic Agent
+/x-pack/elastic-agent/ @elastic/elastic-agent-control-plane
+
 # Beats Build Specific
 /dev-tools/mage/ @elastic/beats
-/dev-tools/make/ @elastic/beats 
-/dev-tools/packaging/ @elastic/beats 
+/dev-tools/make/ @elastic/beats
+/dev-tools/packaging/ @elastic/beats
 
 # CI Specific
 /.ci/ @elastic/observablt-robots

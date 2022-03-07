@@ -261,8 +261,8 @@ func getModuleFilesets(modulePath, module string) ([]string, error) {
 
 func applyOverrides(fcfg *FilesetConfig,
 	module, fileset string,
-	overrides *ModuleOverrides) (*FilesetConfig, error) {
-
+	overrides *ModuleOverrides) (*FilesetConfig, error,
+) {
 	if overrides == nil {
 		return fcfg, nil
 	}

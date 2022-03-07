@@ -195,6 +195,7 @@ func (cm *Manager) OnConfig(s string) {
 	if errs := cm.apply(blocks); errs != nil {
 		// `cm.apply` already logs the errors; currently allow beat to run degraded
 		cm.updateStatusWithError(err)
+		cm.logger.Errorf("failed applying config blocks: %v", err)
 		return
 	}
 
@@ -256,8 +257,8 @@ func (cm *Manager) apply(blocks ConfigBlocks) error {
 	}
 
 	// Unset missing configs
-	for name := range missing {
-		if missing[name] {
+	for name, isMissing := range missing {
+		if isMissing {
 			if err := cm.reload(name, []*ConfigBlock{}); err != nil {
 				errors = multierror.Append(errors, err)
 			}
@@ -319,6 +320,7 @@ func (cm *Manager) toConfigBlocks(cfg common.MapStr) (ConfigBlocks, error) {
 	for _, regName := range cm.registry.GetRegisteredNames() {
 		iBlock, err := cfg.GetValue(regName)
 		if err != nil {
+			cm.logger.Errorf("failed to get '%s' from config: %v. Continuing to next one", regName, err)
 			continue
 		}
 

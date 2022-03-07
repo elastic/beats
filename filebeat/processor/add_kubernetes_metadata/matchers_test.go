@@ -152,7 +152,7 @@ func executeTest(t *testing.T, cfgLogsPath string, source string, expectedResult
 }
 
 func executeTestWithResourceType(t *testing.T, cfgLogsPath string, cfgResourceType string, source string, expectedResult string) {
-	var testConfig = common.NewConfig()
+	testConfig := common.NewConfig()
 	if cfgLogsPath != "" {
 		testConfig.SetString("logs_path", -1, cfgLogsPath)
 	}

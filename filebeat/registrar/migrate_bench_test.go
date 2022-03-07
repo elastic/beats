@@ -84,7 +84,7 @@ func BenchmarkMigration0To1(b *testing.B) {
 
 				migrator := &Migrator{
 					dataPath:    dataHome,
-					permissions: 0600,
+					permissions: 0o600,
 				}
 
 				b.StartTimer()
@@ -116,7 +116,7 @@ func tempDir(t testing.TB) string {
 }
 
 func mkDir(t testing.TB, path string) {
-	if err := os.MkdirAll(path, 0700); err != nil {
+	if err := os.MkdirAll(path, 0o700); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -135,7 +135,7 @@ func clearDir(t testing.TB, path string) {
 
 func writeFile(t testing.TB, path string, contents []byte) {
 	t.Helper()
-	err := ioutil.WriteFile(path, contents, 0600)
+	err := ioutil.WriteFile(path, contents, 0o600)
 	if err != nil {
 		t.Fatal(err)
 	}

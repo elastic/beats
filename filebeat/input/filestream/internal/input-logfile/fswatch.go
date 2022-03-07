@@ -33,17 +33,15 @@ const (
 	OpArchived
 )
 
-var (
-	operationNames = map[Operation]string{
-		OpDone:     "done",
-		OpCreate:   "create",
-		OpWrite:    "write",
-		OpDelete:   "delete",
-		OpRename:   "rename",
-		OpTruncate: "truncate",
-		OpArchived: "archive",
-	}
-)
+var operationNames = map[Operation]string{
+	OpDone:     "done",
+	OpCreate:   "create",
+	OpWrite:    "write",
+	OpDelete:   "delete",
+	OpRename:   "rename",
+	OpTruncate: "truncate",
+	OpArchived: "archive",
+}
 
 // Operation describes what happened to a file.
 type Operation uint8
