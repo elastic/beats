@@ -10,15 +10,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
-- Update docker client. {pull}28716[28716]
-- `include_matches` option of `journald` input no longer accepts a list of string. {pull}29294[29294]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Remove Recorded Future integration from threatintel module. {pull}30564[30564]
 
 *Heartbeat*
 
@@ -49,17 +46,16 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Auditbeat*
 
-- auditd: Add error.message to events when processing fails. {pull}30009[30009]
-- Fix handling of execve call events which have no argument. {issue}30585[30585] {pull}30586[30586]
 
 *Filebeat*
 
 - Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
 - auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
 - elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
-- Fix ECS version string in threatintel to be consistent with other modules and add event.timezone. {issue}30499[30499] {pull}30570[30570]
-- Add default paths value to MySQL Enterprise module to prevent issues with pipeline installations {pull}30598[30598]
 - Fix compatibility with ECS by renaming `source` log key to `source_file` {issue}30667[30667]
+
+*Filebeat*
+
 
 *Heartbeat*
 
@@ -74,11 +70,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Winlogbeat*
 
-- Add provider names to Security pipeline conditional check in routing pipeline. {issue}27288[27288] {pull}29781[29781]
 
 *Functionbeat*
 
-- Pass AWS region configuration correctly. {issue}28520[28520] {pull}30238[30238]
 
 
 *Elastic Logging Plugin*
@@ -88,35 +82,17 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
-- Name all k8s workqueue. {pull}28085[28085]
-- Discover changes in Kubernetes nodes metadata as soon as they happen. {pull}23139[23139]
-- Update k8s library {pull}29394[29394]
 - Add FIPS configuration option for all AWS API calls. {pull}28899[28899]
-- Add support for latest k8s versions v1.23 and v1.22 {pull}29575[29575]
-- Add `script` processor to all beats {issue}29269[29269] {pull}29752[29752]
-- Only connect to Elasticsearch instances with the same version or newer. {pull}29683[29683]
-- Move umask from code to service files. {pull}29708[29708]
 - Add support for kafka message headers. {pull}29940[29940]
 - Add FIPS configuration option for all AWS API calls. {pull}[28899]
-- Add metadata change support for some processors {pull}30183[30183]
 - Add support for non-unique Kafka headers for output messages. {pull}30369[30369]
 - Add action_input_type for the .fleet-actions-results {pull}30562[30562]
 
 *Auditbeat*
 
-- system/socket: Add process.entity_id capture for socket events. {issue}30230[30230] {pull}30231[30231]
 
 *Filebeat*
 
-- Add `text/csv` decoder to `httpjson` input {pull}28564[28564]
-- Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
-- Add support for '/var/log/pods/' path for add_kubernetes_metadata processor with `resource_type: pod`. {pull}28868[28868]
-- Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
-- Add support for parsers on journald input {pull}29070[29070]
-- Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
-- Add support for filtering in journald input with `unit`, `kernel`, `identifiers` and `include_matches`. {pull}29294[29294]
-- Add new `userAgent` and `beatInfo` template functions for httpjson input {pull}29528[29528]
-- Add pipeline in FB's supported hints. {pull}30212[30212]
 
 *Auditbeat*
 
@@ -130,21 +106,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Metricbeat*
 
-- Add `add_resource_metadata` configuration to Kubernetes module. {pull}29133[29133]
-- Add `containerd` module with `cpu`, `memory`, `blkio` metricsets. {pull}29247[29247]
-- Add `container.id` and `container.runtime` ECS fields in container metricset. {pull}29560[29560]
-- Add `memory.workingset.limit.pct` field in Kubernetes container/pod metricset. {pull}29547[29547]
-- Add k8s metadata in state_cronjob metricset. {pull}29572[29572]
-- Add `xpack.enabled` support for Enterprise Search module. {pull}29871[29871]
-- Add gcp firestore metricset. {pull}29918[29918]
-- Remove strict parsing on RabbitMQ module {pull}30090[30090]
 - Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
 - Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
 
 *Packetbeat*
 
-- Add automated OEM Npcap installation handling. {pull}29112[29112] {pull}30438[30438] {pull}30493[30493]
-- Add support for capturing TLS random number and OCSP status request details. {issue}29962[29962] {pull}30102[30102]
 
 *Functionbeat*
 
