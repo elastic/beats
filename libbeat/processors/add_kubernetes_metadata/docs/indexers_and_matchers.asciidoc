@@ -100,7 +100,7 @@ mounted into the filebeat Pods.
 ** `/var/log/pods/`
 Note: when using `resource_type: 'pod'` logs will be enriched only with pod
 metadata: pod id, pod name, etc., not container metadata.
-*`container`: to make the lookup based on the container ID, `logs_path` must
+* `container`: to make the lookup based on the container ID, `logs_path` must
 be set to `/var/log/containers/`.
 It defaults to `container`.
 
