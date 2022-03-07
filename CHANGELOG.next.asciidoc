@@ -10,15 +10,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
-- Update docker client. {pull}28716[28716]
-- `include_matches` option of `journald` input no longer accepts a list of string. {pull}29294[29294]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Remove Recorded Future integration from threatintel module. {pull}30564[30564]
 
 *Heartbeat*
 
@@ -49,8 +46,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Auditbeat*
 
-- auditd: Add error.message to events when processing fails. {pull}30009[30009]
-- Fix handling of execve call events which have no argument. {issue}30585[30585] {pull}30586[30586]
 
 *Filebeat*
 
@@ -60,6 +55,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix ECS version string in threatintel to be consistent with other modules and add event.timezone. {issue}30499[30499] {pull}30570[30570]
 - Add default paths value to MySQL Enterprise module to prevent issues with pipeline installations {pull}30598[30598]
 - Fix compatibility with ECS by renaming `source` log key to `source_file` {issue}30667[30667]
+
+*Filebeat*
+
 
 *Heartbeat*
 
@@ -74,11 +72,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Winlogbeat*
 
-- Add provider names to Security pipeline conditional check in routing pipeline. {issue}27288[27288] {pull}29781[29781]
 
 *Functionbeat*
 
-- Pass AWS region configuration correctly. {issue}28520[28520] {pull}30238[30238]
 
 
 *Elastic Logging Plugin*
@@ -104,19 +100,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Auditbeat*
 
-- system/socket: Add process.entity_id capture for socket events. {issue}30230[30230] {pull}30231[30231]
 
 *Filebeat*
 
-- Add `text/csv` decoder to `httpjson` input {pull}28564[28564]
-- Update `aws-s3` input to connect to non AWS S3 buckets {issue}28222[28222] {pull}28234[28234]
-- Add support for '/var/log/pods/' path for add_kubernetes_metadata processor with `resource_type: pod`. {pull}28868[28868]
-- Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
-- Add support for parsers on journald input {pull}29070[29070]
-- Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
-- Add support for filtering in journald input with `unit`, `kernel`, `identifiers` and `include_matches`. {pull}29294[29294]
-- Add new `userAgent` and `beatInfo` template functions for httpjson input {pull}29528[29528]
-- Add pipeline in FB's supported hints. {pull}30212[30212]
 
 *Auditbeat*
 
@@ -143,8 +129,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Packetbeat*
 
-- Add automated OEM Npcap installation handling. {pull}29112[29112] {pull}30438[30438] {pull}30493[30493]
-- Add support for capturing TLS random number and OCSP status request details. {issue}29962[29962] {pull}30102[30102]
 
 *Functionbeat*
 
@@ -177,4 +161,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
