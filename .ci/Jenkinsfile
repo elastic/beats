@@ -1,0 +1,106 @@
+#!/usr/bin/env groovy
+
+@Library('apm@current') _
+
+pipeline {
+  agent { label 'ubuntu-20.04 && immutable' }
+  environment {
+    REPO = "elastic-agent-autodiscover"
+    BASE_DIR = "src/github.com/elastic/${env.REPO}"
+    JOB_GIT_CREDENTIALS = "f6c7695a-671e-4f4f-a331-acdce44ff9ba"
+    PIPELINE_LOG_LEVEL = 'INFO'
+  }
+  options {
+    timeout(time: 1, unit: 'HOURS')
+    buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
+    timestamps()
+    ansiColor('xterm')
+    disableResume()
+    durabilityHint('PERFORMANCE_OPTIMIZED')
+    rateLimitBuilds(throttle: [count: 60, durationName: 'hour', userBoost: true])
+    quietPeriod(10)
+  }
+  triggers {
+    issueCommentTrigger("${obltGitHubComments()}")
+  }
+  stages {
+    stage('Checkout') {
+      steps {
+        pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
+        deleteDir()
+        gitCheckout(basedir: "${BASE_DIR}", githubNotifyFirstTimeContributor: true)
+        stash allowEmpty: true, name: 'source', useDefaultExcludes: false
+      }
+    }
+    stage('Lint'){
+      steps {
+        withGithubNotify(context: "Lint") {
+          dir("${BASE_DIR}"){
+            withGoEnv(){
+              sh(label: 'lint', script: '''
+                go mod tidy && git diff --exit-code
+                gofmt -l . | read && echo "Code differs from gofmt's style. Run 'gofmt -w .'" 1>&2 && exit 1 || true
+              ''')
+              sh(label: 'Go vet', script: 'go vet')
+            }
+          }
+        }
+      }
+    }
+    stage('Test') {
+      failFast false
+      matrix {
+        agent {label "${PLATFORM}"}
+        options { skipDefaultCheckout() }
+        axes {
+          axis {
+            name 'PLATFORM'
+            values 'macosx && x86_64', 'ubuntu-20.04 && immutable', 'windows-2019 && windows-immutable'
+          }
+          axis {
+            name 'GO_VERSION'
+            values '1.14', '1.15', '1.16'
+          }
+        }
+        stages {
+          stage('build'){
+            steps {
+              withGithubNotify(context: "Build-${GO_VERSION}-${PLATFORM}") {
+                deleteDir()
+                unstash 'source'
+                dir("${BASE_DIR}"){
+                  withGoEnv(){
+                    cmd(label: 'Go build', script: 'go build')
+                  }
+                }
+              }
+            }
+          }
+          stage('Test') {
+            steps {
+              withGithubNotify(context: "Test-${GO_VERSION}-${PLATFORM}") {
+                deleteDir()
+                unstash 'source'
+                dir("${BASE_DIR}"){
+                  withGoEnv(){
+                    goTestJUnit(options: '-v ./...', output: 'junit-report.xml')
+                  }
+                }
+              }
+            }
+            post {
+              always {
+                junit(allowEmptyResults: true, keepLongStdio: true, testResults: '**/junit-report.xml')
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  post {
+    cleanup {
+      notifyBuildResult(prComment: true)
+    }
+  }
+}
