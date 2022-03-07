@@ -1,7 +1,0 @@
----
-issues:
-  - missingLabel: needs_team
-    regex: Team:.+
-pulls:
-  - missingLabel: needs_team
-    regex: Team:.+
