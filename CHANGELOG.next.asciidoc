@@ -52,8 +52,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
 - auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
 - elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
-- Fix ECS version string in threatintel to be consistent with other modules and add event.timezone. {issue}30499[30499] {pull}30570[30570]
-- Add default paths value to MySQL Enterprise module to prevent issues with pipeline installations {pull}30598[30598]
 - Fix compatibility with ECS by renaming `source` log key to `source_file` {issue}30667[30667]
 
 *Filebeat*
@@ -84,17 +82,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
-- Name all k8s workqueue. {pull}28085[28085]
-- Discover changes in Kubernetes nodes metadata as soon as they happen. {pull}23139[23139]
-- Update k8s library {pull}29394[29394]
 - Add FIPS configuration option for all AWS API calls. {pull}28899[28899]
-- Add support for latest k8s versions v1.23 and v1.22 {pull}29575[29575]
-- Add `script` processor to all beats {issue}29269[29269] {pull}29752[29752]
-- Only connect to Elasticsearch instances with the same version or newer. {pull}29683[29683]
-- Move umask from code to service files. {pull}29708[29708]
 - Add support for kafka message headers. {pull}29940[29940]
 - Add FIPS configuration option for all AWS API calls. {pull}[28899]
-- Add metadata change support for some processors {pull}30183[30183]
 - Add support for non-unique Kafka headers for output messages. {pull}30369[30369]
 - Add action_input_type for the .fleet-actions-results {pull}30562[30562]
 
@@ -116,14 +106,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Metricbeat*
 
-- Add `add_resource_metadata` configuration to Kubernetes module. {pull}29133[29133]
-- Add `containerd` module with `cpu`, `memory`, `blkio` metricsets. {pull}29247[29247]
-- Add `container.id` and `container.runtime` ECS fields in container metricset. {pull}29560[29560]
-- Add `memory.workingset.limit.pct` field in Kubernetes container/pod metricset. {pull}29547[29547]
-- Add k8s metadata in state_cronjob metricset. {pull}29572[29572]
-- Add `xpack.enabled` support for Enterprise Search module. {pull}29871[29871]
-- Add gcp firestore metricset. {pull}29918[29918]
-- Remove strict parsing on RabbitMQ module {pull}30090[30090]
 - Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
 - Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
 
@@ -161,7 +143,4 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Functionbeat*
 
 ==== Known Issue
-
-
-
 
