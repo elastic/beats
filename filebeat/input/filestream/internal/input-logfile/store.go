@@ -211,6 +211,58 @@ func (s *sourceStore) CleanIf(pred func(v Value) bool) {
 	}
 }
 
+// FixUpIdentifiers copies an existing resource to a new ID and marks the previous one
+// for removal. This method does not check whether the resource belongs to this store
+// beause it is meant to migrate inputs without IDs to inputs with IDs without
+//  duplicating data.
+func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface{})) {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	fmt.Println("##################### FixUpIdentifiers prefix", s.identifier.prefix)
+	for key, res := range s.store.ephemeralStore.table {
+		fmt.Println("##################### FixUpIdentifiers key", key)
+		if !s.identifier.MatchesInput(key) {
+			fmt.Println("##################### FixUpIdentifiers, skipping", key)
+			continue
+		}
+
+		if !res.lock.TryLock() {
+			fmt.Println("##################### FixUpIdentifiers cannot lock", key)
+			continue
+		}
+
+		newKey, updatedMeta := getNewID(res)
+		if len(newKey) > 0 && res.internalState.TTL > 0 {
+			if _, ok := s.store.ephemeralStore.table[newKey]; ok {
+				res.lock.Unlock()
+				continue
+			}
+			fmt.Println("#####################", key, "->", newKey)
+
+			// Pending updates due to events that have not yet been ACKed
+			// are not included in the copy. Collection on
+			// the copy start from the last known ACKed position.
+			// This might lead to duplicates if configurations are adapted
+			// for inputs with the same ID are changed.
+			r := res.copyWithNewKey(newKey)
+			r.cursorMeta = updatedMeta
+			r.stored = false
+			s.store.writeState(r)
+
+			// Add the new resource to the ephemeralStore so the rest of the
+			// codebase can have access to the new value
+			s.store.ephemeralStore.table[newKey] = r
+
+			// Remove the old key from the store
+			s.store.UpdateTTL(res, 0) // aka dekete. See store.remove for details
+			s.store.log.Infof("FixUp store: '%s' -> '%s'", key, newKey)
+		}
+
+		res.lock.Unlock()
+	}
+}
+
 // UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
 // for removal.
 func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interface{})) {

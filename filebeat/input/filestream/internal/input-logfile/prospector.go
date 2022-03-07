@@ -26,7 +26,7 @@ import (
 // It also updates the statestore with the meta data of the running harvesters.
 type Prospector interface {
 	// Init runs the cleanup processes before starting the prospector.
-	Init(c ProspectorCleaner) error
+	Init(c, d ProspectorCleaner, ider func(Source) string) error
 	// Run starts the event loop and handles the incoming events
 	// either by starting/stopping a harvester, or updating the statestore.
 	Run(input.Context, StateMetadataUpdater, HarvesterGroup)
@@ -56,6 +56,7 @@ type ProspectorCleaner interface {
 	// The function passed to UpdateIdentifiers must return an empty string if the key
 	// remains the same.
 	UpdateIdentifiers(func(v Value) (string, interface{}))
+	FixUpIdentifiers(func(v Value) (string, interface{}))
 }
 
 // Value contains the cursor metadata.

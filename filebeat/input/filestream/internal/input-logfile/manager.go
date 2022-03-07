@@ -160,7 +160,9 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 	}
 
 	settings := struct {
-		ID             string        `config:"id" validate:"required"`
+		// removing the required for tesring purposes only
+		// ID             string        `config:"id" validate:"required"`
+		ID             string        `config:"id"`
 		CleanTimeout   time.Duration `config:"clean_timeout"`
 		HarvesterLimit uint64        `config:"harvester_limit"`
 	}{CleanTimeout: cim.DefaultCleanTimeout}
@@ -192,7 +194,15 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 	defer pStore.Release()
 
 	prospectorStore := newSourceStore(pStore, sourceIdentifier)
-	err = prospector.Init(prospectorStore)
+
+	// create a store with the old default ID
+	globalIdentifier, err := newSourceIdentifier(cim.Type, "")
+	if err != nil {
+		return nil, fmt.Errorf("cannot create global identifier for input: %w", err)
+	}
+	globalStore := newSourceStore(pStore, globalIdentifier)
+
+	err = prospector.Init(prospectorStore, globalStore, sourceIdentifier.ID)
 	if err != nil {
 		return nil, err
 	}

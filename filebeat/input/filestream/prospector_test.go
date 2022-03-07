@@ -85,7 +85,7 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 				cleanRemoved: testCase.cleanRemoved,
 				filewatcher:  &mockFileWatcher{filesOnDisk: testCase.filesOnDisk},
 			}
-			p.Init(testStore)
+			p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return "" })
 
 			assert.ElementsMatch(t, testCase.expectedCleanedKeys, testStore.cleanedKeys)
 		})
@@ -151,7 +151,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 				identifier:  mustPathIdentifier(false),
 				filewatcher: &mockFileWatcher{filesOnDisk: testCase.filesOnDisk},
 			}
-			p.Init(testStore)
+			p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return "" })
 
 			assert.EqualValues(t, testCase.expectedUpdatedKeys, testStore.updatedKeys)
 		})
@@ -532,6 +532,9 @@ func (c *mockProspectorCleaner) UpdateIdentifiers(updater func(v loginp.Value) (
 		}
 	}
 }
+
+// FixUpIdentifiers does nothing
+func (c *mockProspectorCleaner) FixUpIdentifiers(func(loginp.Value) (string, interface{})) {}
 
 type renamedPathIdentifier struct {
 	fileIdentifier
