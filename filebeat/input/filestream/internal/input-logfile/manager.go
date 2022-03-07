@@ -170,13 +170,6 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 		return nil, err
 	}
 
-	if settings.ID == "" {
-		cim.Logger.Warn("creating a filestream input without an ID, which may lead to duplicated data." +
-			"Filestream inputs will require an ID in a future release." +
-			"NOTE: Adding an ID to an existing input will cause all files to be re-read from the beginning.",
-		)
-	}
-
 	prospector, harvester, err := cim.Configure(config)
 	if err != nil {
 		return nil, err
