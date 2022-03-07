@@ -386,18 +386,6 @@ shared:
         source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.tar.gz.asc'
         mode: 0644
         skip_on_missing: true
-      'data/{{.BeatName}}-{{ commit_short }}/downloads/cloudbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
-        source: '{{.AgentDropPath}}/cloudbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
-        mode: 0644
-        skip_on_missing: true
-      'data/{{.BeatName}}-{{ commit_short }}/downloads/cloudbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512':
-        source: '{{.AgentDropPath}}/cloudbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512'
-        mode: 0644
-        skip_on_missing: true
-      'data/{{.BeatName}}-{{ commit_short }}/downloads/cloudbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc':
-        source: '{{.AgentDropPath}}/cloudbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc'
-        mode: 0644
-        skip_on_missing: true
 
 
   # Binary package spec (zip for windows) for community beats.
@@ -481,18 +469,6 @@ shared:
         skip_on_missing: true
       'data/{{.BeatName}}-{{ commit_short }}/downloads/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc':
         source: '{{.AgentDropPath}}/fleet-server-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc'
-        mode: 0644
-        skip_on_missing: true
-      'data/{{.BeatName}}-{{ commit_short }}/downloads/cloudbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip':
-        source: '{{.AgentDropPath}}/cloudbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip'
-        mode: 0644
-        skip_on_missing: true
-      'data/{{.BeatName}}-{{ commit_short }}/downloads/cloudbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512':
-        source: '{{.AgentDropPath}}/cloudbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.sha512'
-        mode: 0644
-        skip_on_missing: true
-      'data/{{.BeatName}}-{{ commit_short }}/downloads/cloudbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc':
-        source: '{{.AgentDropPath}}/cloudbeat-{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.GOOS}}-{{.AgentArchName}}.zip.asc'
         mode: 0644
         skip_on_missing: true
 
