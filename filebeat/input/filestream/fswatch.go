@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common"
-	filelibbeat "github.com/elastic/beats/v7/libbeat/common/file"
+	file_helper "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/timed"
@@ -386,7 +386,7 @@ func (s *fileScanner) isOriginalAndSymlinkConfigured(file string, uniqFileID map
 			s.log.Debugf("stat(%s) failed: %s", file, err)
 			return false
 		}
-		fileID := filelibbeat.GetOSState(fileInfo).String()
+		fileID := file_helper.GetOSState(fileInfo).String()
 		if finfo, exists := uniqFileID[fileID]; exists {
 			s.log.Info("Same file found as symlink and original. Skipping file: %s (as it same as %s)", file, finfo.Name())
 			return true
