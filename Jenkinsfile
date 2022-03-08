@@ -85,8 +85,8 @@ pipeline {
         GOFLAGS = '-mod=readonly'
       }
       steps {
-        stageStatusCache(id: 'Lint'){
-          withGithubNotify(context: "Lint") {
+        withGithubNotify(context: "Lint") {
+          stageStatusCache(id: 'Lint'){
             withBeatsEnv(archive: false, id: "lint") {
               dumpVariables()
               whenTrue(env.ONLY_DOCS == 'true') {

@@ -25,7 +25,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
-- Fix run loop when reading from evtx file {pull}30006[30006]
 
 *Functionbeat*
 
@@ -33,29 +32,24 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Fix mixup of TLS validation on multiple hosts configuration {pull}30305[30305]
+- Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
+- Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
 
 *Auditbeat*
 
+- Fix handling of execve call events which have no argument. {issue}30585[30585] {pull}30586[30586]
 
 *Filebeat*
-
 - Fix broken Kafka input {issue}29746[29746] {pull}30277[30277]
-- cisco module: Fix change the broke ASA and FTD configs that used `var.input: syslog`. {pull}30072[30072]
-- aws-s3: fix race condition in states used by s3-poller. {issue}30123[30123] {pull}30131[30131]
-- tcp/unix input: Stop accepting connections after socket is closed. {pull}29712[29712]
-- Fix using log_group_name_prefix in aws-cloudwatch input. {pull}29695[29695]
-- Fix multiple instances of the same module configured within `filebeat.modules` in filebeat.yml. {issue}29649[29649] {pull}29952[29952]
-- aws-s3: fix race condition in states used by s3-poller. {issue}30123[30123] {pull}30131[30131]
 - Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
-
-*Filebeat*
-- Fix broken Kafka input {issue}29746[29746] {pull}30277[30277]
+- auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
+- elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
+- Fix ECS version string in threatintel to be consistent with other modules and add event.timezone. {issue}30499[30499] {pull}30570[30570]
+- Add default paths value to MySQL Enterprise module to prevent issues with pipeline installations {pull}30598[30598]
+- Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
 
 *Heartbeat*
 
-- Add fonts to support more different types of characters for multiple languages. {pull}29861[29861]
-- Fix missing mapping for `service.name`. {pull}30324[30324]
 
 *Metricbeat*
 
@@ -69,6 +63,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 
+
 *Elastic Logging Plugin*
 
 
@@ -80,11 +75,17 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Remove beta flag for some filebeat modules. {pull}14374[14374]
+
 *Heartbeat*
 
 
 
 *Metricbeat*
+
+- Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
+- Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
+- Fix overflow in `iostat` metrics {pull}30679[30679]
 
 *Packetbeat*
 
@@ -119,11 +120,4 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
-
-*Journalbeat*
-
-
-
-
-
 

@@ -6,11 +6,16 @@ package cmd
 
 import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/beater"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install"
 
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cli"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+
+	"github.com/spf13/cobra"
 
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 )
@@ -40,5 +45,24 @@ func Osquerybeat() *cmd.BeatsRootCmd {
 	}
 	command := cmd.GenRootCmdWithSettings(beater.New, settings)
 
+	// Add verify command
+	command.AddCommand(genVerifyCmd(settings))
+
 	return command
+}
+
+func genVerifyCmd(settings instance.Settings) *cobra.Command {
+	return &cobra.Command{
+		Use:   "verify",
+		Short: "Verify installation",
+		Run: cli.RunWith(
+			func(_ *cobra.Command, args []string) error {
+				log := logp.NewLogger("osquerybeat")
+				err := install.VerifyWithExecutableDirectory(log)
+				if err != nil {
+					return err
+				}
+				return nil
+			}),
+	}
 }
