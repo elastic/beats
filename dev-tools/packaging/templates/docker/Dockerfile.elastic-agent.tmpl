@@ -37,7 +37,7 @@ RUN for iter in {1..10}; do microdnf update -y && microdnf install -y findutils 
 
 RUN for iter in {1..10}; do \
         apt-get update -y && \
-        DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes ca-certificates curl libcap2-bin xz-utils && \
+        DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes ca-certificates curl gawk libcap2-bin xz-utils && \
         apt-get clean all && \
         exit_code=0 && break || exit_code=$? && echo "apt-get error: retry $iter in 10s" && sleep 10; \
     done; \

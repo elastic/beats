@@ -78,7 +78,7 @@ type testingDispatcher struct {
 	received chan struct{}
 }
 
-func (t *testingDispatcher) Dispatch(_ context.Context, acker store.FleetAcker, actions ...fleetapi.Action) error {
+func (t *testingDispatcher) Dispatch(acker store.FleetAcker, actions ...fleetapi.Action) error {
 	t.Lock()
 	defer t.Unlock()
 	defer func() { t.received <- struct{}{} }()

@@ -48,6 +48,29 @@ co.elastic.monitor/processors.drop_fields.fields: "field3"
 
 In the above sample the processor definition tagged with `1` would be executed first.
 
+When hints are used along with templates, then hints will be evaluated only in case
+there is no template's condition that resolves to true. For example:
+
+[source,yaml]
+-----
+heartbeat.autodiscover:
+    - type: docker
+      hints.enabled: true
+      templates:
+        - condition:
+            contains:
+              docker.container.image: redis
+          config:
+            - type: tcp
+              hosts: ["${data.host}:${data.port}"]
+              schedule: "@every 1s"
+              timeout: 1s
+-----
+
+In this example first the condition `docker.container.image: redis` is evaluated
+and if not matched the hints will be processed and if there is again no valid config
+the `hints.default_config` will be used.
+
 [float]
 ==== Kubernetes
 
