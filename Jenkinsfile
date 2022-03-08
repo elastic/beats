@@ -24,6 +24,7 @@ pipeline {
     SNAPSHOT = 'true'
     TERRAFORM_VERSION = "0.13.7"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
+    MAGEFILE_VERBOSE = 'true'
   }
   options {
     timeout(time: 6, unit: 'HOURS')
@@ -320,7 +321,7 @@ def k8sTest(Map args = [:]) {
                     }
                   }
                 }
-                sh(label: "Integration tests", script: "MODULE=kubernetes MAGEFILE_VERBOSE=true make -C metricbeat integration-tests")
+                sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
                 sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
               } finally {
                 sh(label: 'Delete cluster', script: 'kind delete cluster')
