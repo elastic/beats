@@ -18,6 +18,7 @@
 package diskio
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -77,12 +78,12 @@ func NewBlkioService() *BlkioService {
 	}
 }
 
-func (io *BlkioService) getBlkioStatsList(rawStats []docker.Stat, dedot bool) []BlkioStats {
+func (io *BlkioService) getBlkioStatsList(rawStats []docker.Stat, dedot bool, skipDev []uint64) []BlkioStats {
 	formattedStats := []BlkioStats{}
 
 	statsPerContainer := make(map[string]BlkioRaw)
 	for _, myRawStats := range rawStats {
-		stats := io.getBlkioStats(&myRawStats, dedot)
+		stats := io.getBlkioStats(&myRawStats, dedot, skipDev)
 		storageStats := io.getStorageStats(&myRawStats, dedot)
 		stats.Add(&storageStats)
 
@@ -124,30 +125,36 @@ func (io *BlkioService) getStorageStats(myRawStats *docker.Stat, dedot bool) Blk
 
 // getBlkioStats collects diskio metrics from BlkioStats structures, that
 // are not populated in Windows
-func (io *BlkioService) getBlkioStats(myRawStat *docker.Stat, dedot bool) BlkioStats {
+func (io *BlkioService) getBlkioStats(myRawStat *docker.Stat, dedot bool, skipDev []uint64) BlkioStats {
 	return BlkioStats{
 		Time:      myRawStat.Stats.Read,
 		Container: docker.NewContainer(myRawStat.Container, dedot),
 
-		serviced: io.getNewStats(
+		serviced: getNewStats(
+			skipDev,
 			myRawStat.Stats.Read,
 			myRawStat.Stats.BlkioStats.IoServicedRecursive),
-		servicedBytes: io.getNewStats(
+		servicedBytes: getNewStats(
+			skipDev,
 			myRawStat.Stats.Read,
 			myRawStat.Stats.BlkioStats.IoServiceBytesRecursive),
-		servicedTime: io.getNewStats(
+		servicedTime: getNewStats(
+			skipDev,
 			myRawStat.Stats.Read,
 			myRawStat.Stats.BlkioStats.IoServiceTimeRecursive),
-		waitTime: io.getNewStats(
+		waitTime: getNewStats(
+			skipDev,
 			myRawStat.Stats.Read,
 			myRawStat.Stats.BlkioStats.IoWaitTimeRecursive),
-		queued: io.getNewStats(
+		queued: getNewStats(
+			skipDev,
 			myRawStat.Stats.Read,
 			myRawStat.Stats.BlkioStats.IoQueuedRecursive),
 	}
 }
 
-func (io *BlkioService) getNewStats(time time.Time, blkioEntry []types.BlkioStatEntry) BlkioRaw {
+func getNewStats(skip []uint64, time time.Time, blkioEntry []types.BlkioStatEntry) BlkioRaw {
+	fmt.Printf("Skip devices: %#v\n", skip)
 	stats := BlkioRaw{
 		Time:   time,
 		reads:  0,
@@ -156,6 +163,11 @@ func (io *BlkioService) getNewStats(time time.Time, blkioEntry []types.BlkioStat
 	}
 
 	for _, myEntry := range blkioEntry {
+		// certain devices, like software raid and device-mapper devices, will just control and re-report the disks
+		// under them in the hierarchy. We want to skip them, lest we merely duplicate the metrics.
+		if skipDev(myEntry.Major, skip) {
+			continue
+		}
 		switch myEntry.Op {
 		case "Write":
 			stats.writes += myEntry.Value
@@ -166,6 +178,15 @@ func (io *BlkioService) getNewStats(time time.Time, blkioEntry []types.BlkioStat
 		}
 	}
 	return stats
+}
+
+func skipDev(major uint64, skipList []uint64) bool {
+	for _, dev := range skipList {
+		if major == dev {
+			return true
+		}
+	}
+	return false
 }
 
 func (io *BlkioService) getReadPs(old *BlkioRaw, new *BlkioRaw) float64 {

@@ -243,6 +243,11 @@ metricbeat.modules:
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
 
+  # Skip metrics certain device major numbers in docker/diskio. 
+  # Necessary on systems with software RAID, device mappers, 
+  # or other configurations where virtual disks will sum metrics from other disks.
+  #skip_major: []
+
   # If set to true, collects metrics per core.
   #cpu.cores: true
 
