@@ -38,11 +38,9 @@ const (
 	watcherDebugKey    = "file_watcher"
 )
 
-var (
-	watcherFactories = map[string]watcherFactory{
-		scannerName: newScannerWatcher,
-	}
-)
+var watcherFactories = map[string]watcherFactory{
+	scannerName: newScannerWatcher,
+}
 
 type watcherFactory func(paths []string, cfg *common.Config) (loginp.FSWatcher, error)
 
@@ -198,7 +196,6 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 			return
 		case w.events <- createEvent(path, info):
 		}
-
 	}
 
 	w.log.Debugf("Found %d paths", len(paths))

@@ -31,7 +31,7 @@ import (
 
 func TestInputFieldsTranslation(t *testing.T) {
 	// A few random keys to verify
-	var keysToCheck = map[string]string{
+	keysToCheck := map[string]string{
 		"systemd.user_unit": "log-service.service",
 		"process.pid":       "2084785",
 		"systemd.transport": "stdout",
