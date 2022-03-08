@@ -18,5 +18,5 @@ stages:
             make check-no-changes;
         stage: lint
     k8sTest:
-        k8sTest: "v1.23.0,v1.22.0,v1.21.1"
+        k8sTest: "v1.23.4,v1.22.7,v1.21.10"
         stage: mandatory
