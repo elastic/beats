@@ -30365,6 +30365,42 @@ type: long
 
 --
 
+
+*`elasticsearch.index.total.bulk.total_size_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.bulk.avg_size_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.bulk.avg_time_in_millis`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.bulk.total_operations`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.bulk.total_time_in_millis`*::
++
+--
+type: long
+
+--
+
 [float]
 === index.recovery
 
@@ -31031,6 +31067,53 @@ Statistics about each node in a Elasticsearch cluster
 
 
 
+
+
+
+*`elasticsearch.node.stats.indices.bulk.avg_time.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.bulk.avg_time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.bulk.total_time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.bulk.total_size.bytes`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.bulk.avg_size.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.bulk.operations.total.count`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.node.stats.indices.docs.count`*::
 +
@@ -63206,7 +63289,7 @@ type: long
 *`zookeeper.mntr.followers`*::
 +
 --
-Number of followers seen by the current host.
+Number of followers seen by the current host (Up to ZooKeeper 3.5.9).
 
 
 type: long
@@ -63349,6 +63432,16 @@ type: long
 +
 --
 Number of znodes reported by the local ZooKeeper process.
+
+
+type: long
+
+--
+
+*`zookeeper.mntr.learners`*::
++
+--
+Number of learners (either followers or observers) seen by the current host (From ZooKeeper 3.6.0)
 
 
 type: long

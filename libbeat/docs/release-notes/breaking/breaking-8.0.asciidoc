@@ -55,6 +55,34 @@ way to use operation types like "index" or "delete" when sending events to {es}.
 For more information, refer to the {es} documentation about
 {ref}/data-streams.html[data streams].
 
+[discrete]
+==== Homebrew formulae no longer available for {beats}
+
+Starting with version 8.0.0, Elastic no longer publishes Homebrew formulae for
+{beats}. You must use a different installation method. See
+the https://www.elastic.co/downloads/beats/[{beats} download pages]
+for available installation methods.
+
+
+[discrete]
+==== Removal of older platforms from {beats} support matrix
+Starting with version 8.0.0, the following operating systems are no longer supported
+by {beats} due to lack of vendor support for the operating system. In order to have
+the best product experience, you are encouraged to move to a vendor-supported 
+version of the operating system.
+
+.*These platforms are:*
+* Centos 6
+* Centos 8
+* RHEL 6
+* Ubuntu 14.04
+* Ubuntu 16.04
+* Debian 8
+* Windows 7 SP1
+* Windows Server 2008 R2
+* MacOS 10.13
+* MacOS 10.14
+
 // end::notable-breaking-changes[]
 
 

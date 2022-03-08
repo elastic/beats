@@ -1,5 +1,5 @@
 # Module: aws
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-aws.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.0/filebeat-module-aws.html
 
 - module: aws
   cloudtrail:
