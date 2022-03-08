@@ -173,8 +173,8 @@ func (p *pod) getRSDeployment(rsName string, ns string) string {
 	return ""
 }
 
-//// getCronjobOfJob return the name of the Cronjob object that
-//// owns the Job with the given name under the given Namespace
+// getCronjobOfJob return the name of the Cronjob object that
+// owns the Job with the given name under the given Namespace
 func (p *pod) getCronjobOfJob(jobName string, ns string) string {
 	if p.client == nil {
 		return ""
