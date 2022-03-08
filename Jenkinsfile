@@ -320,7 +320,7 @@ def k8sTest(Map args = [:]) {
                     }
                   }
                 }
-                sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
+                sh(label: "Integration tests", script: "MODULE=kubernetes MAGEFILE_VERBOSE=true make -C metricbeat integration-tests")
                 sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
               } finally {
                 sh(label: 'Delete cluster', script: 'kind delete cluster')
