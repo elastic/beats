@@ -74,10 +74,18 @@ type Manager interface {
 	// Enabled returns true if manager is enabled.
 	Enabled() bool
 
-	// Start the config manager.
+	// Start needs to invoked when the system is ready to receive an external configuration and
+	// also ready to start ingesting new events. The manager expects that all the reloadable and
+	// reloadable list are fixed for the whole lifetime of the manager.
+	//
+	// Notes: Adding dynamically new reloadable hooks at runtime can lead to inconsistency in the
+	// execution.
 	Start() error
 
-	// Stop the config manager.
+	// Stop when this method is called, the manager will stop receiving new actions, no more action
+	// will be progated to the handlers and will not try to configure any reloadable parts.
+	//
+	// Note: Stop will not call UnregisterAction automaticallty.
 	Stop()
 
 	// CheckRawConfig check settings are correct before launching the beat.
@@ -85,6 +93,7 @@ type Manager interface {
 
 	// RegisterAction registers action handler with the client
 	RegisterAction(action client.Action)
+
 	// UnregisterAction unregisters action handler with the client
 	UnregisterAction(action client.Action)
 
