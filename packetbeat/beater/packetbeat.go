@@ -145,8 +145,6 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error {
 	runner := newReloader(management.DebugK, factory, b.Publisher)
 	reload.Register.MustRegisterList("inputs", runner)
-	defer runner.Stop()
-
 	logp.Debug("main", "Waiting for the runner to finish")
 
 	// Start the manager after all the hooks are registered and terminates when
@@ -154,7 +152,11 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 	if err := b.Manager.Start(); err != nil {
 		return err
 	}
-	defer b.Manager.Stop()
+
+	defer func() {
+		runner.Stop()
+		b.Manager.Stop(func() {})
+	}()
 
 	for {
 		select {

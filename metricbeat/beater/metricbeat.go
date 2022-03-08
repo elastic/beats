@@ -227,6 +227,12 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		modules.Stop()
 	}()
 
+	// Start the manager after all the reload hooks are configured,
+	// the Manager is stopped at the end of the execution.
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
+
 	// Dynamic file based modules (metricbeat.config.modules)
 	if bt.config.ConfigModules.Enabled() {
 		moduleReloader := cfgfile.NewReloader(b.Publisher, bt.config.ConfigModules)
@@ -255,20 +261,15 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 		}()
 	}
 
-	// Start the manager after all the reload hooks are configured,
-	// the Manager is stopped at the end of the execution.
-	if err := b.Manager.Start(); err != nil {
-		return err
-	}
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		<-bt.done
-		b.Manager.Stop()
-	}()
-
 	wg.Wait()
+
+	// Wait for everything is close before shutting down the Manager.
+	c := make(chan struct{})
+	b.Manager.Stop(func() {
+		close(c)
+	})
+	<-c
+
 	return nil
 }
 

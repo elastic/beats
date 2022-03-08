@@ -397,9 +397,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	adiscover.Stop()
 	crawler.Stop()
 
-	// We stop the manager and destroy his connection to Elastic Agent.
-	b.Manager.Stop()
-
 	timeout := fb.config.ShutdownTimeout
 	// Checks if on shutdown it should wait for all events to be published
 	waitPublished := fb.config.ShutdownTimeout > 0 || *once
@@ -416,6 +413,12 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			waitEvents.AddChan(fb.done)
 		}
 	}
+
+	// Stop the manager and stop the connection to any dependent services.
+	// Filebeat will wait until the Manager correctly shutdown.
+	c := make(chan struct{})
+	b.Manager.Stop(func() { close(c) })
+	<-c
 
 	return nil
 }

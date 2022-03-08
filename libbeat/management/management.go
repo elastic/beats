@@ -84,9 +84,12 @@ type Manager interface {
 
 	// Stop when this method is called, the manager will stop receiving new actions, no more action
 	// will be progated to the handlers and will not try to configure any reloadable parts.
+	// When the manager is stop the callback will be called to signal that the system can terminate.
 	//
-	// Note: Stop will not call UnregisterAction automaticallty.
-	Stop()
+	// Calls to 'CheckRawConfig()' or 'SetPayload()' will be ignored after calling stop.
+	//
+	// Note: Stop will not call 'UnregisterAction()' automaticallty.
+	Stop(f func())
 
 	// CheckRawConfig check settings are correct before launching the beat.
 	CheckRawConfig(cfg *common.Config) error
@@ -97,7 +100,7 @@ type Manager interface {
 	// UnregisterAction unregisters action handler with the client
 	UnregisterAction(action client.Action)
 
-	// SetPayload sets the client payload
+	// SetPayload Allows to add additional metadata to future requests made by the manager.
 	SetPayload(map[string]interface{})
 }
 
@@ -159,9 +162,11 @@ func nilFactory(*common.Config, *reload.Registry, uuid.UUID) (Manager, error) {
 	}, nil
 }
 
-func (*nilManager) Enabled() bool                           { return false }
-func (*nilManager) Start() error                            { return nil }
-func (*nilManager) Stop()                                   {}
+func (*nilManager) Enabled() bool { return false }
+func (*nilManager) Start() error  { return nil }
+
+// Stop will always call the callback to make sure the system is not waiting on other services.
+func (*nilManager) Stop(f func())                           { f() }
 func (*nilManager) CheckRawConfig(cfg *common.Config) error { return nil }
 func (n *nilManager) UpdateStatus(status Status, msg string) {
 	n.lock.Lock()
