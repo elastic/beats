@@ -11,6 +11,9 @@ changes, but there are breaking changes between major versions (e.g. 7.x to
 
 See the following topics for a description of breaking changes:
 
+* <<breaking-changes-8.1>>
 * <<breaking-changes-8.0>>
+
+include::breaking-8.1.asciidoc[]
 
 include::breaking-8.0.asciidoc[]
