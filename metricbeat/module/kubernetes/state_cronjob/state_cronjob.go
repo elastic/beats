@@ -59,11 +59,15 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("must be child of kubernetes module")
 	}
 
+	config := util.GetDefaultDisabledMetaConfig()
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, fmt.Errorf("error loading config of kubernetes module")
+	}
+
 	ms := CronJobMetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		mod:           mod,
-		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.CronJob{}, false),
 		mapping: &p.MetricsMapping{
 			Metrics: map[string]p.MetricMap{
 				"kube_cronjob_info":                           p.InfoMetric(),
@@ -81,6 +85,10 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				"concurrency_policy": p.KeyLabel("concurrency"),
 			},
 		},
+	}
+	if config.AddMetadata {
+		ms.enricher = util.NewResourceMetadataEnricher(
+			base, &kubernetes.CronJob{}, false)
 	}
 
 	return &ms, nil
