@@ -95,6 +95,12 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
+	// Install Npcap if needed.
+	err := installNpcap(b)
+	if err != nil {
+		return nil, err
+	}
+
 	return &packetbeat{
 		config:  rawConfig,
 		factory: factory,
