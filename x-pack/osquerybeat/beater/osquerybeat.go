@@ -174,7 +174,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	if err := b.Manager.Start(); err != nil {
 		return err
 	}
-	defer b.Manager.Stop(func() {})
+	defer b.Manager.Stop()
 
 	// Set the osquery beat version to the manager payload. This allows the bundled osquery version to be reported to the stack.
 	bt.setManagerPayload(b)
