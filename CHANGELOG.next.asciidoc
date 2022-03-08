@@ -10,6 +10,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
+- Fix mapping of parent process information provided by add_process_metadata. {issue}29874[29874] {pull}30727[30727]
 
 *Auditbeat*
 
