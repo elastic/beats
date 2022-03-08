@@ -207,11 +207,13 @@ func (m message) fields(original string) common.MapStr {
 
 	// Event fields.
 	f.Put("event.severity", m.severity)
-	f.Put("event.original", original)
+	if original != "" {
+		f.Put("event.original", original)
+	}
 
 	// Message field.
 	if m.msg != "" {
-		f.Put("message", strings.TrimSpace(m.msg))
+		f.Put("message", m.msg)
 	}
 
 	return f

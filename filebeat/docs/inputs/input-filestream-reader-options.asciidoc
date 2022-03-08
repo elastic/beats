@@ -284,10 +284,10 @@ Example configuration:
 [source,yaml]
 -------------------------------------------------------------------------------
 - syslog:
-	format: rfc3164
-	timezone: America/Chicago
-	log_errors: true
-	add_error_key: true
+    format: rfc3164
+    timezone: America/Chicago
+    log_errors: true
+    add_error_key: true
 -------------------------------------------------------------------------------
 
 *Timestamps*

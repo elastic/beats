@@ -509,7 +509,6 @@ func TestMessage_Fields(t *testing.T) {
 				},
 				"message": "this is a test message",
 				"event": common.MapStr{
-					"original": "",
 					"severity": 5,
 				},
 			},

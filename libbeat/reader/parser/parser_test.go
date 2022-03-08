@@ -242,13 +242,62 @@ func TestParsersConfigAndReading(t *testing.T) {
     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver$WildcardExpressionResolver.resolve(IndexNameExpressionResolver.java:566)
     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:133)
     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:77)
-    at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)`,
+    at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
+`,
 				`[beat-logstash-some-name-832-2015.11.28] IndexNotFoundException[no such index]
     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver$WildcardExpressionResolver.resolve(IndexNameExpressionResolver.java:566)
     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:133)
     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:77)
-    at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)`,
-				`This is some other debug message.`,
+    at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
+`,
+				`This is some other debug message.
+`,
+			},
+		},
+		"syslog multiline": {
+			parsers: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					{
+						"syslog": map[string]interface{}{
+							"format": "rfc5424",
+						},
+					},
+					{
+						"multiline": map[string]interface{}{
+							"match":        "after",
+							"pattern":      "^\\s",
+							"skip_newline": true, // This option is set since testReader does not strip newlines when splitting lines.
+						},
+					},
+				},
+			},
+			lines: `<165>1 2003-08-24T05:14:15.000003-07:00 192.0.2.1 myproc 8710 - - [beat-logstash-some-name-832-2015.11.28] IndexNotFoundException[no such index]
+<165>1 2003-08-24T05:14:15.000003-07:00 192.0.2.1 myproc 8710 - -     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver$WildcardExpressionResolver.resolve(IndexNameExpressionResolver.java:566)
+<165>1 2003-08-24T05:14:15.000003-07:00 192.0.2.1 myproc 8710 - -     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:133)
+<165>1 2003-08-24T05:14:15.000003-07:00 192.0.2.1 myproc 8710 - -     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:77)
+<165>1 2003-08-24T05:14:15.000003-07:00 192.0.2.1 myproc 8710 - -     at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
+<165>1 2003-08-24T05:14:20.000003-07:00 192.168.2.1 myproc 8710 - - This is some other debug message.
+<165>1 2003-08-24T05:14:30.000003-07:00 192.0.2.1 myproc 8710 - - [beat-logstash-some-name-832-2015.11.28] IndexNotFoundException[no such index]
+<165>1 2003-08-24T05:14:30.000003-07:00 192.0.2.1 myproc 8710 - -     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver$WildcardExpressionResolver.resolve(IndexNameExpressionResolver.java:566)
+<165>1 2003-08-24T05:14:30.000003-07:00 192.0.2.1 myproc 8710 - -     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:133)
+<165>1 2003-08-24T05:14:30.000003-07:00 192.0.2.1 myproc 8710 - -     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:77)
+<165>1 2003-08-24T05:14:30.000003-07:00 192.0.2.1 myproc 8710 - -     at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
+`,
+			expectedMessages: []string{
+				`[beat-logstash-some-name-832-2015.11.28] IndexNotFoundException[no such index]
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver$WildcardExpressionResolver.resolve(IndexNameExpressionResolver.java:566)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:133)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:77)
+    at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
+`,
+				`This is some other debug message.
+`,
+				`[beat-logstash-some-name-832-2015.11.28] IndexNotFoundException[no such index]
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver$WildcardExpressionResolver.resolve(IndexNameExpressionResolver.java:566)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:133)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:77)
+    at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
+`,
 			},
 		},
 	}
