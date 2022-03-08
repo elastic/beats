@@ -95,6 +95,7 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 		"300s",
 	}
 	kubeVersion := os.Getenv("K8S_VERSION")
+	fmt.Println("kubeVersion: ", kubeVersion)
 	if kubeVersion != "" {
 		args = append(args, "--image", fmt.Sprintf("kindest/node:%s", kubeVersion))
 	}
