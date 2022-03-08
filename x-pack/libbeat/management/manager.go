@@ -43,6 +43,7 @@ type Manager struct {
 	msg       string
 	payload   map[string]interface{}
 
+	stopFunc  func()
 	isRunning bool
 }
 
@@ -117,8 +118,10 @@ func (cm *Manager) Start() error {
 	return nil
 }
 
-// Stop the config manager
-func (cm *Manager) Stop() {
+// Stop stops the current Manager, it will send a last status status update with the status 'STOPPING',
+// it will close the remote connection and call the callback, A developper should wait on the callback
+// before terminating the execution.
+func (cm *Manager) Stop(stopFunc func()) {
 	cm.lock.Lock()
 	defer cm.lock.Unlock()
 
@@ -127,6 +130,7 @@ func (cm *Manager) Stop() {
 	}
 
 	cm.logger.Info("Stopping fleet management service")
+	cm.stopFunc = stopFunc
 	cm.isRunning = false
 	cm.client.Stop()
 }
@@ -134,6 +138,8 @@ func (cm *Manager) Stop() {
 // CheckRawConfig check settings are correct to start the beat. This method
 // checks there are no collision between the existing configuration and what
 // fleet management can configure.
+//
+// NOTE: This is currently not implemented for fleet.
 func (cm *Manager) CheckRawConfig(cfg *common.Config) error {
 	// TODO implement this method
 	return nil
@@ -218,7 +224,13 @@ func (cm *Manager) SetPayload(payload map[string]interface{}) {
 }
 
 func (cm *Manager) OnStop() {
+	cm.lock.Lock()
+	defer cm.lock.Unlock()
+
 	cm.client.Status(proto.StateObserved_STOPPING, "Stopping", nil)
+	if cm.stopFunc != nil {
+		cm.stopFunc()
+	}
 }
 
 func (cm *Manager) OnError(err error) {
