@@ -58,10 +58,6 @@ Will produce the following output:
 -------------------------------------------------------------------------------
 {
   "@timestamp": "2022-01-11T22:14:15.003Z",
-  "event": {
-    "original": "<165>1 2022-01-11T22:14:15.003Z mymachine.example.com eventslog 1024 ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"][examplePriority@32473 class=\"high\"] this is the message",
-    "severity": 5
-  },
   "log": {
     "syslog": {
       "priority": 165,

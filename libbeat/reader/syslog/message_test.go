@@ -508,9 +508,6 @@ func TestMessage_Fields(t *testing.T) {
 					},
 				},
 				"message": "this is a test message",
-				"event": common.MapStr{
-					"severity": 5,
-				},
 			},
 		},
 	}
@@ -520,7 +517,7 @@ func TestMessage_Fields(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			got := tc.In.fields("")
+			got := tc.In.fields()
 
 			assert.Equal(t, tc.Want, got)
 		})

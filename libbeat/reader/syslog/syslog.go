@@ -117,7 +117,7 @@ func ParseMessage(data string, format Format, loc *time.Location) (common.MapStr
 		return common.MapStr{}, time.Time{}, err
 	}
 
-	return m.fields(data), m.timestamp, nil
+	return m.fields(), m.timestamp, nil
 }
 
 // Parser is a syslog parser that implements parser.Parser.

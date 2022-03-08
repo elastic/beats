@@ -111,10 +111,6 @@ func TestNewParser(t *testing.T) {
 							},
 						},
 						"message": "this is the message",
-						"event": common.MapStr{
-							"original": "<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog 1024 ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"][examplePriority@32473 class=\"high\"] this is the message",
-							"severity": 5,
-						},
 					},
 				},
 				{
@@ -136,10 +132,6 @@ func TestNewParser(t *testing.T) {
 								"appname":  "su",
 								"procid":   "1024",
 							},
-						},
-						"event": common.MapStr{
-							"original": `<13>Oct 11 22:14:15 test-host su[1024]: this is the message`,
-							"severity": 5,
 						},
 						"message": "this is the message",
 					},

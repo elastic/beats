@@ -80,10 +80,6 @@ var syslogCases = map[string]struct {
 					"procid":   "1024",
 				},
 			},
-			"event": common.MapStr{
-				"severity": 5,
-				"original": `<13>Oct 11 22:14:15 test-host su[1024]: this is the message`,
-			},
 			"message": "this is the message",
 		},
 		WantTime: mustParseTimeLoc(time.Stamp, "Oct 11 22:14:15", cfgtype.MustNewTimezone("America/Chicago").Location()),
@@ -121,10 +117,6 @@ var syslogCases = map[string]struct {
 						},
 					},
 				},
-			},
-			"event": common.MapStr{
-				"severity": 5,
-				"original": `<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog 1024 ID47 [exampleSDID@32473 iut="3" eventSource="Application" eventID="1011"][examplePriority@32473 class="high"] this is the message`,
 			},
 			"message": "this is the message",
 		},

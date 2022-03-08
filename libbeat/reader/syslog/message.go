@@ -173,7 +173,7 @@ func (m *message) setDataValue(id, key, value string) {
 }
 
 // fields produces fields from the message.
-func (m message) fields(original string) common.MapStr {
+func (m message) fields() common.MapStr {
 	f := common.MapStr{}
 
 	// Syslog fields.
@@ -203,12 +203,6 @@ func (m message) fields(original string) common.MapStr {
 	}
 	if len(m.structuredData) > 0 {
 		f.Put("log.syslog.structured_data", m.structuredData)
-	}
-
-	// Event fields.
-	f.Put("event.severity", m.severity)
-	if original != "" {
-		f.Put("event.original", original)
 	}
 
 	// Message field.
