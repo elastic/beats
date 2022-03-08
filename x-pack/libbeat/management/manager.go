@@ -96,6 +96,13 @@ func (cm *Manager) Enabled() bool {
 	return cm.config.Enabled
 }
 
+// SetStopCallback sets the callback to run when the manager want to shutdown the beats gracefully.
+func (cm *Manager) SetStopCallback(stopFunc func()) {
+	cm.lock.Lock()
+	defer cm.lock.Unlock()
+	cm.stopFunc = stopFunc
+}
+
 // Start the config manager.
 func (cm *Manager) Start() error {
 	cm.lock.Lock()
@@ -118,10 +125,8 @@ func (cm *Manager) Start() error {
 	return nil
 }
 
-// Stop stops the current Manager, it will send a last status status update with the status 'STOPPING',
-// it will close the remote connection and call the callback, A developper should wait on the callback
-// before terminating the execution.
-func (cm *Manager) Stop(stopFunc func()) {
+// Stop stops the current Manager and close the connection to Elastic Agent.
+func (cm *Manager) Stop() {
 	cm.lock.Lock()
 	defer cm.lock.Unlock()
 
@@ -130,7 +135,6 @@ func (cm *Manager) Stop(stopFunc func()) {
 	}
 
 	cm.logger.Info("Stopping fleet management service")
-	cm.stopFunc = stopFunc
 	cm.isRunning = false
 	cm.client.Stop()
 }
@@ -227,8 +231,8 @@ func (cm *Manager) OnStop() {
 	cm.lock.Lock()
 	defer cm.lock.Unlock()
 
-	cm.client.Status(proto.StateObserved_STOPPING, "Stopping", nil)
 	if cm.stopFunc != nil {
+		cm.client.Status(proto.StateObserved_STOPPING, "Stopping", nil)
 		cm.stopFunc()
 	}
 }

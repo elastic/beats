@@ -89,7 +89,11 @@ type Manager interface {
 	// Calls to 'CheckRawConfig()' or 'SetPayload()' will be ignored after calling stop.
 	//
 	// Note: Stop will not call 'UnregisterAction()' automaticallty.
-	Stop(f func())
+	Stop()
+
+	// SetStopCallback accepts a function that need to be called when the manager want to shutdown the
+	// beats.
+	SetStopCallback(f func())
 
 	// CheckRawConfig check settings are correct before launching the beat.
 	CheckRawConfig(cfg *common.Config) error
@@ -147,10 +151,11 @@ func defaultModeConfig() *modeConfig {
 
 // nilManager, fallback when no manager is present
 type nilManager struct {
-	logger *logp.Logger
-	lock   sync.Mutex
-	status Status
-	msg    string
+	logger   *logp.Logger
+	lock     sync.Mutex
+	status   Status
+	msg      string
+	stopFunc func()
 }
 
 func nilFactory(*common.Config, *reload.Registry, uuid.UUID) (Manager, error) {
@@ -162,11 +167,10 @@ func nilFactory(*common.Config, *reload.Registry, uuid.UUID) (Manager, error) {
 	}, nil
 }
 
-func (*nilManager) Enabled() bool { return false }
-func (*nilManager) Start() error  { return nil }
-
-// Stop will always call the callback to make sure the system is not waiting on other services.
-func (*nilManager) Stop(f func())                           { f() }
+func (*nilManager) SetStopCallback(func())                  {}
+func (*nilManager) Enabled() bool                           { return false }
+func (*nilManager) Start() error                            { return nil }
+func (*nilManager) Stop()                                   {}
 func (*nilManager) CheckRawConfig(cfg *common.Config) error { return nil }
 func (n *nilManager) UpdateStatus(status Status, msg string) {
 	n.lock.Lock()

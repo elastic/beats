@@ -232,6 +232,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	if err := b.Manager.Start(); err != nil {
 		return err
 	}
+	defer b.Manager.Stop()
 
 	// Dynamic file based modules (metricbeat.config.modules)
 	if bt.config.ConfigModules.Enabled() {
@@ -262,13 +263,6 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	wg.Wait()
-
-	// Wait for everything is close before shutting down the Manager.
-	c := make(chan struct{})
-	b.Manager.Stop(func() {
-		close(c)
-	})
-	<-c
 
 	return nil
 }

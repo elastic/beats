@@ -415,10 +415,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Stop the manager and stop the connection to any dependent services.
-	// Filebeat will wait until the Manager correctly shutdown.
-	c := make(chan struct{})
-	b.Manager.Stop(func() { close(c) })
-	<-c
+	b.Manager.Stop()
 
 	return nil
 }
