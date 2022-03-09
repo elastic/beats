@@ -1,7 +1,7 @@
 # Cronjob that will execute each minute.
 # It will print a message and sleep (reporting being active) for 5 seconds
 
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: mycronjob
