@@ -870,6 +870,7 @@ func (b *Beat) warnAboutElasticsearchVersion() {
 	}
 
 	elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
+<<<<<<< HEAD
 		warnAboutOldES.Do(func() {
 			esVersion := conn.GetVersion()
 			beatVersion, err := common.NewVersion(b.Info.Version)
@@ -882,6 +883,16 @@ func (b *Beat) warnAboutElasticsearchVersion() {
 				logp.Warn("Connecting to older version of Elasticsearch. From 8.1, connecting to older versions will be disabled by default.")
 			}
 		})
+=======
+		esVersion := conn.GetVersion()
+		beatVersion, err := common.NewVersion(b.Info.Version)
+		if err != nil {
+			return err
+		}
+		if esVersion.LessThanMajorMinor(beatVersion) {
+			return fmt.Errorf("%v ES=%s, Beat=%s.", elasticsearch.ErrTooOld, esVersion.String(), b.Info.Version)
+		}
+>>>>>>> 46be42e7d5 (Ignore bugfix version when running version compatibility check against Elasticsearch (#30746))
 		return nil
 	})
 }
