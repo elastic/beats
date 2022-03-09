@@ -16,20 +16,20 @@ services:
     command: make
 
   # Used by base tests
-  elasticsearch:
-    image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-8.0.0}-1
-    build:
-      context: ./module/elasticsearch/_meta
-      args:
-        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-8.0.0}
-    environment:
-      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
-      - "network.host="
-      - "transport.host=127.0.0.1"
-      - "http.host=0.0.0.0"
-      - "xpack.security.enabled=false"
-    ports:
-      - 9200
+  #elasticsearch:
+  #  image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-8.0.0}-1
+  #  build:
+  #    context: ./module/elasticsearch/_meta
+  #    args:
+  #      ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-8.0.0}
+  #  environment:
+  #    - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+  #    - "network.host="
+  #    - "transport.host=127.0.0.1"
+  #    - "http.host=0.0.0.0"
+  #    - "xpack.security.enabled=false"
+  #  ports:
+  #    - 9200
 
   # Used by autodiscover tests
   jolokia:
@@ -38,16 +38,16 @@ services:
       service: jolokia
 
   # Used by base tests
-  kibana:
-    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-8.0.0}-1
-    build:
-      context: ./module/kibana/_meta
-      args:
-        KIBANA_VERSION: ${KIBANA_VERSION:-8.0.0}
-    depends_on:
-      - elasticsearch
-    ports:
-      - 5601
+  #kibana:
+  #  image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-8.0.0}-1
+  #  build:
+  #    context: ./module/kibana/_meta
+  #    args:
+  #      KIBANA_VERSION: ${KIBANA_VERSION:-8.0.0}
+  #  depends_on:
+  #    - elasticsearch
+  #  ports:
+  #    - 5601
 
   # Used by base tests
   metricbeat:
