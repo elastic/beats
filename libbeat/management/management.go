@@ -83,7 +83,7 @@ type Manager interface {
 	Start() error
 
 	// Stop when this method is called, the manager will stop receiving new actions, no more action
-	// will be progated to the handlers and will not try to configure any reloadable parts.
+	// will be propagated to the handlers and will not try to configure any reloadable parts.
 	// When the manager is stop the callback will be called to signal that the system can terminate.
 	//
 	// Calls to 'CheckRawConfig()' or 'SetPayload()' will be ignored after calling stop.
@@ -92,7 +92,8 @@ type Manager interface {
 	Stop()
 
 	// SetStopCallback accepts a function that need to be called when the manager want to shutdown the
-	// beats.
+	// beats. This is needed when you want your beats to be gracefully shutdown remotely by the Elastic Agent
+	// when a policy doesn't need to run this beat.
 	SetStopCallback(f func())
 
 	// CheckRawConfig check settings are correct before launching the beat.
