@@ -128,7 +128,7 @@ spec:
                 - /bin/sh
                 - -c
                 - date; echo Hello from the Kubernetes cluster
-          restartPolicy: never
+          restartPolicy: Never
 ---
 apiVersion: v1
 kind: ResourceQuota
