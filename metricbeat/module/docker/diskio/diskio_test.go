@@ -160,6 +160,10 @@ func TestBlkIOSkip(t *testing.T) {
 	assert.Equal(t, readVal, combined.reads)
 	assert.Equal(t, writeVal, combined.writes)
 
+	noskip := getNewStats([]uint64{}, time.Now(), testInt)
+	assert.Equal(t, readVal*2, noskip.reads)
+	assert.Equal(t, writeVal*2, noskip.writes)
+
 }
 
 func TestDeltaOneContainer(t *testing.T) {

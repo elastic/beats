@@ -18,11 +18,11 @@
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
 
-  # Skip metrics certain device major numbers in docker/diskio. 
+  # Skip metrics for certain device major numbers in docker/diskio. 
   # Necessary on systems with software RAID, device mappers, 
   # or other configurations where virtual disks will sum metrics from other disks.
   #skip_major: []
-  
+
   # To connect to Docker over TLS you must specify a client and CA certificate.
   #ssl:
     #certificate_authority: "/etc/pki/root/ca.pem"

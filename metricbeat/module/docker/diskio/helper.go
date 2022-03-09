@@ -18,7 +18,6 @@
 package diskio
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -154,7 +153,6 @@ func (io *BlkioService) getBlkioStats(myRawStat *docker.Stat, dedot bool, skipDe
 }
 
 func getNewStats(skip []uint64, time time.Time, blkioEntry []types.BlkioStatEntry) BlkioRaw {
-	fmt.Printf("Skip devices: %#v\n", skip)
 	stats := BlkioRaw{
 		Time:   time,
 		reads:  0,
