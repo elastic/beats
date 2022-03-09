@@ -47,7 +47,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix compatibility with ECS by renaming `source` log key to `source_file` {issue}30667[30667]
 - Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
 
-
 *Heartbeat*
 
 *Metricbeat*
