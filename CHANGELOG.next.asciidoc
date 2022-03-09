@@ -51,9 +51,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
 - elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
 - Set `url` as a pointer in the `httpjson` template context to ensure access to all methods. {pull}28695[28695]
-- Fix ECS version string in threatintel to be consistent with other modules and add event.timezone. {issue}30499[30499] {pull}30570[30570]
-- Add default paths value to MySQL Enterprise module to prevent issues with pipeline installations {pull}30598[30598]
 - Fix compatibility with ECS by renaming `source` log key to `source_file` {issue}30667[30667]
+- Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
 
 *Heartbeat*
 
