@@ -219,15 +219,11 @@ func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface
 	s.store.ephemeralStore.mu.Lock()
 	defer s.store.ephemeralStore.mu.Unlock()
 
-	fmt.Println("##################### FixUpIdentifiers prefix", s.identifier.prefix)
 	for key, res := range s.store.ephemeralStore.table {
-		fmt.Println("##################### FixUpIdentifiers key", key)
 		if !s.identifier.MatchesInput(key) {
-			fmt.Println("##################### FixUpIdentifiers, skipping", key)
 			continue
 		}
 
-		fmt.Println("##################### FixUpIdentifiers locking resource", key)
 		res.lock.Lock()
 
 		newKey, updatedMeta := getNewID(res)
@@ -236,7 +232,6 @@ func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface
 				res.lock.Unlock()
 				continue
 			}
-			fmt.Println("#####################", key, "->", newKey)
 
 			// Pending updates due to events that have not yet been ACKed
 			// are not included in the copy. Collection on
@@ -254,7 +249,7 @@ func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface
 
 			// Remove the old key from the store
 			s.store.UpdateTTL(res, 0) // aka dekete. See store.remove for details
-			s.store.log.Infof("FixUp store: '%s' -> '%s'", key, newKey)
+			s.store.log.Infof("migrated entry in registry from '%s' to '%s'", key, newKey)
 		}
 
 		res.lock.Unlock()

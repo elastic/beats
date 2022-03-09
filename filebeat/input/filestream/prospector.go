@@ -60,12 +60,17 @@ type fileProspector struct {
 	stateChangeCloser   stateChangeCloserConfig
 }
 
-func (p *fileProspector) Init(cleaner, global loginp.ProspectorCleaner, ider func(loginp.Source) string) error {
+func (p *fileProspector) Init(
+	cleaner,
+	globalCleaner loginp.ProspectorCleaner,
+	newID func(loginp.Source) string,
+) error {
 	files := p.filewatcher.GetFiles()
 
-	// update keys when ID has changed
-	// IT WORKS. Now we need to make it beautiful
-	global.FixUpIdentifiers(func(v loginp.Value) (id string, val interface{}) {
+	// If this fileProspector belongs to an input that did not have an ID
+	// this will find its files in the registry and update them to use the
+	// new ID.
+	globalCleaner.FixUpIdentifiers(func(v loginp.Value) (id string, val interface{}) {
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
 		if err != nil {
@@ -77,11 +82,7 @@ func (p *fileProspector) Init(cleaner, global loginp.ProspectorCleaner, ider fun
 			return "", fm
 		}
 
-		newKey := ider(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi}))
-
-		defer func() {
-			fmt.Println("@@@@@@@@@@@@@@@@@@@@@ File:", fm.Source, "New ID:", newKey)
-		}()
+		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi}))
 		return newKey, fm
 	})
 

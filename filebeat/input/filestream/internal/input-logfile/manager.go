@@ -83,6 +83,8 @@ type Source interface {
 
 var errNoInputRunner = errors.New("no input runner available")
 
+// globalInputID is a default ID for inputs created without an ID
+// Deprecated: Inputs without an ID are not supported any more.
 const globalInputID = ".global"
 
 // StateStore interface and configurations used to give the Manager access to the persistent store.
@@ -160,9 +162,7 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 	}
 
 	settings := struct {
-		// removing the required for tesring purposes only
-		// ID             string        `config:"id" validate:"required"`
-		ID             string        `config:"id"`
+		ID             string        `config:"id" validate:"required"`
 		CleanTimeout   time.Duration `config:"clean_timeout"`
 		HarvesterLimit uint64        `config:"harvester_limit"`
 	}{CleanTimeout: cim.DefaultCleanTimeout}
@@ -188,7 +188,9 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 
 	prospectorStore := newSourceStore(pStore, sourceIdentifier)
 
-	// create a store with the old default ID
+	// create a store without an input ID, this simulates the legacy behaviour of
+	// not setting an ID for a input. This will be used to migrate the entries
+	// in the registry to use the new input ID.
 	globalIdentifier, err := newSourceIdentifier(cim.Type, "")
 	if err != nil {
 		return nil, fmt.Errorf("cannot create global identifier for input: %w", err)
