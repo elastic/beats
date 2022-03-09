@@ -135,7 +135,7 @@ func (v *Version) LessThan(v1 *Version) bool {
 	return false
 }
 
-// LessThanMajorMinor returns true if v is strictly smaller than v1. When comparing, the major,
+// LessThanMajorMinor returns true if v is smaller or equal to v1 based on the major and minor version. The bugfix version and meta part are not taken into account.
 // minor numbers are compared in order. The and bugfix version and meta part is not taken into account.
 func (v *Version) LessThanMajorMinor(v1 *Version) bool {
 	if v.Major < v1.Major {
