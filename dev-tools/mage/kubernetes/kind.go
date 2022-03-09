@@ -98,6 +98,8 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 	fmt.Println("kubeVersion: ", kubeVersion)
 	if kubeVersion != "" {
 		args = append(args, "--image", fmt.Sprintf("kindest/node:%s", kubeVersion))
+	} else {
+		args = append(args, "--image", "kindest/node:latest")
 	}
 
 	_, err = sh.Exec(
