@@ -296,11 +296,7 @@ def k8sTest(Map args = [:]) {
   versions.each{ v ->
     withNode(labels: args.label, forceWorkspace: true){
       stage("${args.context} ${v}"){
-<<<<<<< HEAD
-        withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.11.1", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
-=======
         withEnv(["K8S_VERSION=${v}"]){
->>>>>>> 3560733692 (ci: configure kind/k8s for k8s in metricbeat only (#30747))
           withGithubNotify(context: "${args.context} ${v}") {
             withBeatsEnv(archive: false, withModule: false) {
               withTools(k8s: true) {
