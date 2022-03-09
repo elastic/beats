@@ -178,9 +178,9 @@ endif::[]
   while annotations are not added by default. This settings are useful when labels' and annotations'
   storing requires special handling to avoid overloading the storage output. The enrichment of `node` or `namespace` metadata
   can be individually disabled by setting `enabled: false`. If resource is `pod` and it is created from a `deployment`, by default
-  the deployment name is added, this can be disabled by set to `false`.
+  the deployment name is added, this can be disabled by setting `deployment: false`.
   If resource is `pod` and it is created from a `cronjob`, by default
-  the cronjob name is added, this can be disabled by set to `false`.
+  the cronjob name is added, this can be disabled by setting `cronjob: false`.
   Example:
 
 ["source","yaml",subs="attributes"]
