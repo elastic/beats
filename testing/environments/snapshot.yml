@@ -32,7 +32,7 @@ services:
     - "./docker/elasticsearch/users_roles:/usr/share/elasticsearch/config/users_roles"
 
   logstash:
-    image: docker.elastic.co/logstash/logstash@sha256:e01cf165142edf8d67485115b938c94deeda66153e9516aa2ce69ee417c5fc33
+    image: docker.elastic.co/logstash/logstash:8.2.0-a12f7069-SNAPSHOT
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
       retries: 600

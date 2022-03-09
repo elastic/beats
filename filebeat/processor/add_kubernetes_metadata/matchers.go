@@ -100,7 +100,7 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 
 	if f.ResourceType == "pod" {
 		// Pod resource type will extract only the pod UID, which offers less granularity of metadata when compared to the container ID
-		if strings.HasSuffix(source, ".log") {
+		if strings.Contains(source, ".log") && !strings.HasSuffix(source, ".gz") {
 			// Specify a pod resource type when writting logs into manually mounted log volume,
 			// those logs apper under under "/var/lib/kubelet/pods/<pod_id>/volumes/..."
 			if strings.HasPrefix(f.LogsPath, podKubeletLogsPath()) {
@@ -130,27 +130,27 @@ func (f *LogPathMatcher) MetadataIndex(event common.MapStr) string {
 			f.logger.Error("Error extracting pod uid - source value does not contains matcher's logs_path")
 			return ""
 		}
-	}
-	// In case of the Kubernetes log path "/var/log/containers/",
-	// the container ID will be located right before the ".log" extension.
-	// file name example: /var/log/containers/<pod_name>_<namespace>_<container_name>-<continer_id>.log
-	if strings.HasPrefix(f.LogsPath, containerLogsPath()) && strings.HasSuffix(source, ".log") && sourceLen >= containerIdLen+4 {
-		containerIDEnd := sourceLen - 4
-		cid := source[containerIDEnd-containerIdLen : containerIDEnd]
-		f.logger.Debugf("Using container id: %s", cid)
-		return cid
-	}
+	} else {
+		// In case of the Kubernetes log path "/var/log/containers/",
+		// the container ID will be located right before the ".log" extension.
+		// file name example: /var/log/containers/<pod_name>_<namespace>_<container_name>-<continer_id>.log
+		if strings.HasPrefix(f.LogsPath, containerLogsPath()) && strings.HasSuffix(source, ".log") && sourceLen >= containerIdLen+4 {
+			containerIDEnd := sourceLen - 4
+			cid := source[containerIDEnd-containerIdLen : containerIDEnd]
+			f.logger.Debugf("Using container id: %s", cid)
+			return cid
+		}
 
-	// In any other case, we assume the container ID will follow right after the log path.
-	// However we need to check the length to prevent "slice bound out of range" runtime errors.
-	// for the default log path /var/lib/docker/containers/ container ID will follow right after the log path.
-	// file name example: /var/lib/docker/containers/<container_id>/<container_id>-json.log
-	if sourceLen >= logsPathLen+containerIdLen {
-		cid := source[logsPathLen : logsPathLen+containerIdLen]
-		f.logger.Debugf("Using container id: %s", cid)
-		return cid
+		// In any other case, we assume the container ID will follow right after the log path.
+		// However we need to check the length to prevent "slice bound out of range" runtime errors.
+		// for the default log path /var/lib/docker/containers/ container ID will follow right after the log path.
+		// file name example: /var/lib/docker/containers/<container_id>/<container_id>-json.log
+		if sourceLen >= logsPathLen+containerIdLen {
+			cid := source[logsPathLen : logsPathLen+containerIdLen]
+			f.logger.Debugf("Using container id: %s", cid)
+			return cid
+		}
 	}
-
 	f.logger.Error("Error extracting container id - source value contains matcher's logs_path, however it is too short to contain a Docker container ID.")
 	return ""
 }
