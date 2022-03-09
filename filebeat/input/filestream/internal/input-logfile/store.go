@@ -227,10 +227,8 @@ func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface
 			continue
 		}
 
-		if !res.lock.TryLock() {
-			fmt.Println("##################### FixUpIdentifiers cannot lock", key)
-			continue
-		}
+		fmt.Println("##################### FixUpIdentifiers locking resource", key)
+		res.lock.Lock()
 
 		newKey, updatedMeta := getNewID(res)
 		if len(newKey) > 0 && res.internalState.TTL > 0 {
