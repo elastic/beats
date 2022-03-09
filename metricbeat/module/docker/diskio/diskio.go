@@ -42,7 +42,7 @@ type Config struct {
 	SkipMajor []uint64          `config:"skip_major"`
 }
 
-// The major devices we'll skip by default. 9 == mdraid, 253= device-mapper
+// The major devices we'll skip by default. 9 == mdraid, 253 == device-mapper
 var defaultMajorDev = []uint64{9, 253}
 
 func defaultConfig() Config {
