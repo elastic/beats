@@ -46,7 +46,7 @@ func (m *KindIntegrationTestStep) Use(dir string) (bool, error) {
 
 // Setup ensures that a kubernetes cluster is up and running.
 //
-// If `KUBECONFIG` is already deinfed in the env then it will do nothing.
+// If `KUBECONFIG` is already defined in the env then it will do nothing.
 func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 
 	envVars := []string{"KUBECONFIG", "KUBE_CONFIG"}
@@ -86,6 +86,13 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 		return err
 	}
 
+	_, err = sh.Exec(
+		map[string]string{},
+		stdOut,
+		stdErr,
+		"kind --version",
+	)
+
 	args := []string{
 		"create",
 		"cluster",
@@ -98,8 +105,6 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 	fmt.Println("kubeVersion: ", kubeVersion)
 	if kubeVersion != "" {
 		args = append(args, "--image", fmt.Sprintf("kindest/node:%s", kubeVersion))
-	} else {
-		args = append(args, "--image", "kindest/node:latest")
 	}
 
 	_, err = sh.Exec(
