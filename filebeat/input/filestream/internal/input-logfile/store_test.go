@@ -340,7 +340,7 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test", true}, s}
+		store := &sourceStore{&sourceIdentifier{"test"}, s}
 
 		store.UpdateIdentifiers(func(v Value) (string, interface{}) {
 			var m testMeta
@@ -391,7 +391,7 @@ func TestSourceStore_CleanIf(t *testing.T) {
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test", true}, s}
+		store := &sourceStore{&sourceIdentifier{"test"}, s}
 
 		store.CleanIf(func(_ Value) bool {
 			return true
@@ -423,7 +423,7 @@ func TestSourceStore_CleanIf(t *testing.T) {
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test", true}, s}
+		store := &sourceStore{&sourceIdentifier{"test"}, s}
 
 		store.CleanIf(func(v Value) bool {
 			return false

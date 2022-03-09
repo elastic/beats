@@ -72,6 +72,7 @@ type InputManager struct {
 	store      *store
 	ackUpdater *updateWriter
 	ackCH      *updateChan
+	ids        map[string]struct{}
 }
 
 // Source describe a source the input can collect data from.
@@ -110,6 +111,7 @@ func (cim *InputManager) init() error {
 		cim.store = store
 		cim.ackCH = newUpdateChan()
 		cim.ackUpdater = newUpdateWriter(store, cim.ackCH)
+		cim.ids = map[string]struct{}{}
 	})
 
 	return cim.initErr
@@ -170,6 +172,16 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 		return nil, err
 	}
 
+	if settings.ID == globalInputID {
+		return nil, fmt.Errorf("filestream input ID '%s' is reserved for internal use", globalInputID)
+	}
+
+	if _, exists := cim.ids[settings.ID]; exists {
+		return nil, fmt.Errorf("filestream input with ID '%s' already exists", settings.ID)
+	}
+
+	cim.ids[settings.ID] = struct{}{}
+
 	prospector, harvester, err := cim.Configure(config)
 	if err != nil {
 		return nil, err
@@ -191,7 +203,7 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 	// create a store without an input ID, this simulates the legacy behaviour of
 	// not setting an ID for a input. This will be used to migrate the entries
 	// in the registry to use the new input ID.
-	globalIdentifier, err := newSourceIdentifier(cim.Type, "")
+	globalIdentifier, err := newSourceIdentifier(cim.Type, globalInputID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create global identifier for input: %w", err)
 	}
@@ -221,23 +233,16 @@ func (cim *InputManager) getRetainedStore() *store {
 }
 
 type sourceIdentifier struct {
-	prefix           string
-	configuredUserID bool
+	prefix string
 }
 
 func newSourceIdentifier(pluginName, userID string) (*sourceIdentifier, error) {
-	if userID == globalInputID {
-		return nil, fmt.Errorf("invalid user ID: .global")
+	if userID == "" {
+		return nil, fmt.Errorf("userID is mandatory")
 	}
 
-	configuredUserID := true
-	if userID == "" {
-		configuredUserID = false
-		userID = globalInputID
-	}
 	return &sourceIdentifier{
-		prefix:           pluginName + "::" + userID + "::",
-		configuredUserID: configuredUserID,
+		prefix: pluginName + "::" + userID + "::",
 	}, nil
 }
 

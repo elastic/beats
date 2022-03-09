@@ -307,7 +307,7 @@ func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester) *defaultHa
 		pipeline:   &pipelinemock.MockPipelineConnector{},
 		harvester:  mockHarvester,
 		store:      testOpenStore(t, "test", nil),
-		identifier: &sourceIdentifier{"filestream::.global::", false},
+		identifier: &sourceIdentifier{"filestream::.global::"},
 		tg:         unison.TaskGroup{},
 	}
 }
