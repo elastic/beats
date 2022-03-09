@@ -121,15 +121,28 @@ func (v *Version) LessThanOrEqual(withMeta bool, v1 *Version) bool {
 // LessThan returns true if v is strictly smaller than v1. When comparing, the major,
 // minor and bugfix numbers are compared in order. The meta part is not taken into account.
 func (v *Version) LessThan(v1 *Version) bool {
+	lessThan := v.LessThanMajorMinor(v1)
+	if lessThan {
+		return true
+	}
+
+	if v.Minor == v1.Minor {
+		if v.Bugfix < v1.Bugfix {
+			return true
+		}
+	}
+
+	return false
+}
+
+// LessThanMajorMinor returns true if v is strictly smaller than v1. When comparing, the major,
+// minor numbers are compared in order. The and bugfix version and meta part is not taken into account.
+func (v *Version) LessThanMajorMinor(v1 *Version) bool {
 	if v.Major < v1.Major {
 		return true
 	} else if v.Major == v1.Major {
 		if v.Minor < v1.Minor {
 			return true
-		} else if v.Minor == v1.Minor {
-			if v.Bugfix < v1.Bugfix {
-				return true
-			}
 		}
 	}
 	return false

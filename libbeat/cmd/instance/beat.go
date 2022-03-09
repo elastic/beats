@@ -883,7 +883,7 @@ func (b *Beat) checkElasticsearchVersion() {
 		if err != nil {
 			return err
 		}
-		if esVersion.LessThan(beatVersion) {
+		if esVersion.LessThanMajorMinor(beatVersion) {
 			return fmt.Errorf("%v ES=%s, Beat=%s.", elasticsearch.ErrTooOld, esVersion.String(), b.Info.Version)
 		}
 		return nil
