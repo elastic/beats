@@ -99,15 +99,15 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 	}
 
 	// check if Pod is handled by a Job which is controlled by a CronJob
-	//if p.addResourceMetadata.CronJob {
-	//	jobName, _ := out.GetValue("job.name")
-	//	if jobName, ok := jobName.(string); ok {
-	//		dep := p.getCronjobOfJob(jobName, po.GetNamespace())
-	//		if dep != "" {
-	//			out.Put("cronjob.name", dep)
-	//		}
-	//	}
-	//}
+	if p.addResourceMetadata.CronJob {
+		jobName, _ := out.GetValue("job.name")
+		if jobName, ok := jobName.(string); ok {
+			dep := p.getCronjobOfJob(jobName, po.GetNamespace())
+			if dep != "" {
+				out.Put("cronjob.name", dep)
+			}
+		}
+	}
 
 	if p.node != nil {
 		meta := p.node.GenerateFromName(po.Spec.NodeName, WithMetadata("node"))
