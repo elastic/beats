@@ -319,7 +319,9 @@ def k8sTest(Map args = [:]) {
 }
 
 /**
-* It relies on KIND_VERSION which it's defined in the top-level environment section
+* It relies on:
+* - KIND_VERSION which it's defined in the top-level environment section.
+* - K8S_VERSION which it's defined by default in the top-level environment section or set in the withEnv.
 */
 def withTools(Map args = [:], Closure body) {
   if (args.get('k8s', false)) {
