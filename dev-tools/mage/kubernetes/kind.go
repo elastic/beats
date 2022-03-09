@@ -86,13 +86,6 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 		return err
 	}
 
-	_, err = sh.Exec(
-		map[string]string{},
-		stdOut,
-		stdErr,
-		"kind --version",
-	)
-
 	args := []string{
 		"create",
 		"cluster",
@@ -102,7 +95,6 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 		"300s",
 	}
 	kubeVersion := os.Getenv("K8S_VERSION")
-	fmt.Println("kubeVersion: ", kubeVersion)
 	if kubeVersion != "" {
 		args = append(args, "--image", fmt.Sprintf("kindest/node:%s", kubeVersion))
 	}

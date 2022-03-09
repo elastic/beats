@@ -24,7 +24,6 @@ pipeline {
     SNAPSHOT = 'true'
     TERRAFORM_VERSION = "0.13.7"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
-    MAGEFILE_VERBOSE = 'true'
   }
   options {
     timeout(time: 6, unit: 'HOURS')
