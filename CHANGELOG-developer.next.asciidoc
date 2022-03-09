@@ -59,6 +59,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Removed Beat generators. {pull}28816[28816]
 - libbeat.logp package forces ECS compliant logs. Logs are JSON formatted. Options to enable ECS/JSON have been removed. {issue}15544[15544] {pull}28573[28573]
 - Removed deprecated disk spool from Beats. Use disk queue instead. {pull}28869[28869]
+- Wildcard fields no longer have a default ignore_above setting of 1024. {issue}30096[30096] {pull}30668[30668]
 
 ==== Bugfixes
 
