@@ -50,8 +50,22 @@ type Heartbeat struct {
 	autodiscover    *autodiscover.Autodiscover
 }
 
+type CloudConfig struct {
+	Cloud struct {
+		ID   string `config:"id"`
+		Auth string `config:"auth"`
+	} `config:"cloud"`
+}
+
 // New creates a new heartbeat.
 func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
+	//es8, _ := elasticsearch8.NewDefaultClient()
+
+	//cloudConfig{}
+	//elasticsearch8.NewClient(elasticsearch8.Config{
+	//	CloudID: cfg.CloudID,
+	//})
+
 	parsedConfig := config.DefaultConfig
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)

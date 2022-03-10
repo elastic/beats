@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-const FlappingThreshold time.Duration = time.Minute
+const FlappingThreshold time.Duration = time.Second * 10
 
 const (
 	StatusUp stateStatus = iota
@@ -52,13 +52,13 @@ func (mst *MonitorStateTracker) Compute(monitorId string, isUp bool) (curState *
 			}
 		} else if state.status == currentStatus {
 			// The state is stable, no changes needed
-			state.Checks++
+			state.recordCheck(isUp)
 			return state, nil, nil
 		} else if state.StartedAt.After(time.Now().Add(-FlappingThreshold)) {
 			// The state changed too quickly, we're now flapping
 			// TODO: is the above conditional right?
 			state.flapCompute(currentStatus) // record the new state to the flap history
-			state.Checks++
+			state.recordCheck(isUp)
 			return state, nil, nil
 		}
 	}

@@ -82,8 +82,8 @@ func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.MonitorSta
 		return func(event *beat.Event) ([]jobs.Job, error) {
 			cont, err := job(event)
 
-			// Only process state on summary events
-			if ok, _ := event.Fields.HasKey("summary.up"); ok {
+			// Only process terminal docs
+			if len(cont) > 0 {
 				return cont, err
 			}
 
@@ -97,31 +97,36 @@ func addMonitorState(sf stdfields.StdMonitorFields, mst *monitorstate.MonitorSta
 
 			stateFields := common.MapStr{
 				"id":     ms.Id(),
-				"status": ms.Status,
+				"status": ms.Status(),
 			}
 
 			if newMs != nil {
 				stateFields["starting"] = common.MapStr{
 					"id":         newMs.Id(),
 					"started_at": newMs.StartedAt.UnixMilli(),
-					"status":     newMs.Status,
+					"status":     newMs.Status(),
 				}
 			}
 
-			if newMs != nil {
+			if oldMs != nil {
+				logp.Warn("!!!ADD  END")
+				endedAt := newMs.StartedAt.Add(-time.Millisecond)
+
 				stateFields["ending"] = common.MapStr{
-					"id":         oldMs.StartedAt,
+					"id":         oldMs.Id(),
 					"started_at": oldMs.StartedAt.UnixMilli(),
 					// Set the end time to 1ms before the new state
-					"ended_at": newMs.StartedAt.Add(-time.Millisecond),
-					"checks":   oldMs.Checks,
-					"up":       oldMs.Up,
-					"down":     oldMs.Down,
-					"status":   oldMs.Status,
+					"ended_at":    endedAt.UnixMilli(),
+					"duration_ms": endedAt.Sub(oldMs.StartedAt).Milliseconds(),
+					"checks":      oldMs.Checks,
+					"up":          oldMs.Up,
+					"down":        oldMs.Down,
+					"status":      oldMs.Status(),
 				}
 			}
+			logp.Warn("CHECKS: %s - u:%d d:%d", ms.Status(), ms.Up, ms.Down)
 
-			eventext.MergeEventFields(event, stateFields)
+			eventext.MergeEventFields(event, common.MapStr{"state": stateFields})
 
 			return cont, err
 		}
@@ -256,14 +261,6 @@ func addMonitorDuration(job jobs.Job) jobs.Job {
 	}
 }
 
-type CState struct {
-	id        string
-	startedAt time.Time
-	endedAt   time.Ticker
-	up        int
-	down      int
-}
-
 // makeAddSummary summarizes the job, adding the `summary` field to the last event emitted.
 func makeAddSummary(monitorType string) jobs.JobWrapper {
 	// This is a tricky method. The way this works is that we track the state across jobs in the
@@ -276,7 +273,6 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 		down       uint16
 		checkGroup string
 		generation uint64
-		cstate     CState
 	}{
 		mtx: sync.Mutex{},
 	}
@@ -334,6 +330,7 @@ func makeAddSummary(monitorType string) jobs.JobWrapper {
 				resetState()
 			}
 
+			logp.Warn("RET CONT %s %d / %s", state.checkGroup, len(cont), jobErr)
 			return cont, jobErr
 		}
 	}
