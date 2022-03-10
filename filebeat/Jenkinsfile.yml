@@ -43,7 +43,6 @@ stages:
         stage: mandatory
     pythonIntegTest:
       mage: >-
-        TESTING_FILEBEAT_ALLOW_OLDER=1  ## temporarly allow sending to older versions
         mage pythonIntegTest            ## run the ITs only if the changeset affects a specific module.
         stage: mandatory
     module-compat-prev-minor:
