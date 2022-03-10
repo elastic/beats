@@ -341,7 +341,7 @@ processors:
       ignore_failure: true
   - rename:
       field: json.authenticationContext.interface
-      target_field: okta.authentication_context.authentication_provider
+      target_field: okta.authentication_context.interface
       ignore_missing: true
       ignore_failure: true
   - rename:
