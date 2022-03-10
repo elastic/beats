@@ -327,7 +327,9 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 
 		// get replace values from collected json
 		var v interface{}
-		json.Unmarshal(b, &v)
+		if err := json.Unmarshal(b, &v); err != nil {
+			return nil, fmt.Errorf("cannot unmarshal data: %w", err)
+		}
 		values, err := jsonpath.Get(replace, v)
 		if err != nil {
 			return nil, fmt.Errorf("error while getting keys: %w", err)
@@ -338,15 +340,15 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 			for _, v := range tresp {
 				_, ok := v.(map[string]interface{})
 				if ok {
-					r.log.Debugf("events must be int, string or double, but got %T: skipping", v)
+					r.log.Errorf("events must be int, string or double, but got %T: skipping", v)
 					continue
 				}
 				ids = append(ids, fmt.Sprintf("%v", v))
 			}
-		case map[string]interface{}:
-			r.log.Debugf("cannot collect IDs from type '%T' : '%v'", values, values)
-		default:
+		case float64, string:
 			ids = append(ids, fmt.Sprintf("%v", tresp))
+		default:
+			r.log.Errorf("cannot collect IDs from type '%T' : '%v'", values, values)
 		}
 	}
 	return ids, nil
