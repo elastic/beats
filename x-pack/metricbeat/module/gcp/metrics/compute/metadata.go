@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	cacheTTL         = 2 * 60 * time.Second
+	cacheTTL         = 30 * time.Second
 	initialCacheSize = 13
 )
 
