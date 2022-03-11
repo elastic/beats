@@ -10,7 +10,6 @@ when:
         - "filebeat"
     parameters:                ## when parameter was selected in the UI.
         - "filebeat"
-    tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     lint:
@@ -33,8 +32,7 @@ stages:
             parameters:
                 - "armTest"
             branches: true     ## for all the branches
-            tags: true         ## for all the tags
-        stage: extended
+        stage: mandatory
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
@@ -66,31 +64,31 @@ stages:
                 - "macosTest"
             tags: true         ## for all the tags
         stage: extended
-    windows:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-2019"
-        stage: mandatory
     windows-2022:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2022"
-        stage: extended
+        stage: mandatory
+    windows-2019:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-2019"
+        stage: extended_win
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2016"
-        stage: extended
+        stage: mandatory
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
-        stage: extended
+        stage: extended_win
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
-        stage: extended
+        stage: extended_win
     packaging-linux:
         packaging-linux: "mage package"
         e2e:
@@ -98,7 +96,6 @@ stages:
         stage: packaging
         when:
             branches: false    ## Only on a PR basis for the time being
-            tags: false        ## packaging on branches/tags is already in place with the downstream build.
             changeset:         ## when PR contains any of those entries in the changeset
               - "^filebeat/.*"
               - "@oss"               ## special token regarding the changeset for the oss
@@ -111,7 +108,6 @@ stages:
         stage: packaging
         when:
             branches: false    ## Only on a PR basis for the time being
-            tags: false        ## packaging on branches/tags is already in place with the downstream build.
             changeset:         ## when PR contains any of those entries in the changeset
               - "^filebeat/.*"
               - "@oss"               ## special token regarding the changeset for the oss

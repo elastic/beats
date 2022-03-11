@@ -138,6 +138,23 @@ pipeline {
         runBuildAndTest(filterStage: 'extended')
       }
     }
+    stage('ExtendedWin') {
+      options { skipDefaultCheckout() }
+      when {
+        // On a branches/tags, skip if changes are only related to docs.
+        // Always when forcing the input parameter
+        anyOf {
+          allOf {                                           // If no PR and no docs changes
+            expression { return env.ONLY_DOCS == "false" }
+            not { changeRequest() }
+          }
+          expression { return params.runAllStages }         // If UI forced
+        }
+      }
+      steps {
+        runBuildAndTest(filterStage: 'extended_win')
+      }
+    }
     stage('Packaging') {
       options { skipDefaultCheckout() }
       when {
