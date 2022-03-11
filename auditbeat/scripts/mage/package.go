@@ -38,6 +38,7 @@ const (
 //
 // Customizations specific to Auditbeat:
 // - Include audit.rules.d directory in packages.
+// - Add elastic-agent specific config to x-pack tar.gz package.
 func CustomizePackaging(pkgFlavor PackagingFlavor) {
 	var (
 		shortConfig = devtools.PackageFile{
@@ -94,6 +95,14 @@ func CustomizePackaging(pkgFlavor PackagingFlavor) {
 		case devtools.TarGz, devtools.Zip:
 			args.Spec.ReplaceFile("{{.BeatName}}.yml", shortConfig)
 			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfig)
+
+			// Add an Elastic Agent specific config to the Elastic licensed packages.
+			if XPackPackaging == pkgFlavor {
+				args.Spec.Files["{{.BeatName}}.elastic-agent.yml"] = devtools.PackageFile{
+					Mode:   0o644,
+					Source: "auditbeat.elastic-agent.yml",
+				}
+			}
 		case devtools.Deb, devtools.RPM:
 			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", shortConfig)
 			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfig)
