@@ -45851,6 +45851,18 @@ type: double
 
 --
 
+*`kubernetes.volume.fs.inodes.pct`*::
++
+--
+Percentage of used inodes
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 [[exported-fields-kvm]]
 == KVM fields
 
