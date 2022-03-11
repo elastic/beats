@@ -29,7 +29,7 @@ type Monitor interface {
 	Close()
 }
 
-// NewMonitor creates a monitor based on a process configuration.
+// NewMonitor creates beats a monitor based on a process configuration.
 func NewMonitor(cfg *configuration.SettingsConfig) (Monitor, error) {
 	logMetrics := true
 	if cfg.LoggingConfig != nil {

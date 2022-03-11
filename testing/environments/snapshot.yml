@@ -3,18 +3,20 @@
 version: '2.3'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.1.0-c1a942c7-SNAPSHOT
-    healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cat/health?h=status | grep -q green"]
-      retries: 300
-      interval: 1s
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.2.0-63265ec9-SNAPSHOT
+    # When extend is used it merges healthcheck.tests, see:
+    # https://github.com/docker/compose/issues/8962
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+    #   retries: 300
+    #   interval: 1s
     environment:
     - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
     - "network.host="
     - "transport.host=127.0.0.1"
     - "http.host=0.0.0.0"
-    - "xpack.security.enabled=false"
-    # We want something as unlimited compilation rate, but 'unlimited' is not valid.
+    - "xpack.security.enabled=true"
+      # We want something as unlimited compilation rate, but 'unlimited' is not valid.
     - "script.max_compilations_rate=100000/1m"
     - "action.destructive_requires_name=false"
     # Disable geoip updates to prevent golden file test failures when the database
@@ -25,20 +27,33 @@ services:
     - "./GeoLite2-ASN.mmdb:/usr/share/elasticsearch/config/ingest-geoip/GeoLite2-ASN.mmdb:ro"
     - "./GeoLite2-City.mmdb:/usr/share/elasticsearch/config/ingest-geoip/GeoLite2-City.mmdb:ro"
     - "./GeoLite2-Country.mmdb:/usr/share/elasticsearch/config/ingest-geoip/GeoLite2-Country.mmdb:ro"
+    - "./docker/elasticsearch/roles.yml:/usr/share/elasticsearch/config/roles.yml"
+    - "./docker/elasticsearch/users:/usr/share/elasticsearch/config/users"
+    - "./docker/elasticsearch/users_roles:/usr/share/elasticsearch/config/users_roles"
 
   logstash:
-    image: docker.elastic.co/logstash/logstash@sha256:e01cf165142edf8d67485115b938c94deeda66153e9516aa2ce69ee417c5fc33
+    image: docker.elastic.co/logstash/logstash:8.2.0-63265ec9-SNAPSHOT
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
       retries: 600
       interval: 1s
     volumes:
-      - ./docker/logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./docker/logstash/pipeline-xpack:/usr/share/logstash/pipeline:ro
       - ./docker/logstash/pki:/etc/pki:ro
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.1.0-c1a942c7-SNAPSHOT
-    healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
-      retries: 600
-      interval: 1s
+    image: docker.elastic.co/kibana/kibana:8.2.0-63265ec9-SNAPSHOT
+    environment:
+    - "ELASTICSEARCH_USERNAME=kibana_system_user"
+    - "ELASTICSEARCH_PASSWORD=testing"
+    - "XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=gwaXhuYzE6l3r1wh5ZdSkJvtK6uSw11d"
+    - "XPACK_SECURITY_ENCRYPTIONKEY=wZSVeczkXAmebqNgfcKEzNMmQCBZKkSH"
+#    - "XPACK_XPACK_MAIN_TELEMETRY_ENABLED=false"
+    - "XPACK_REPORTING_ENCRYPTIONKEY=xCyqJUFqrUJJKxjZVGfnhrRkyqqaKeAG"
+    - "LOGGING_ROOT_LEVEL=all"
+    # When extend is used it merges healthcheck.tests, see:
+    # https://github.com/docker/compose/issues/8962
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
+    #   retries: 600
+

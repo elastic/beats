@@ -43,7 +43,10 @@ type journald struct {
 	MaxBackoff         time.Duration
 	Seek               journalread.SeekMode
 	CursorSeekFallback journalread.SeekMode
-	Matches            []journalfield.Matcher
+	Matches            journalfield.IncludeMatches
+	Units              []string
+	Transports         []string
+	Identifiers        []string
 	SaveRemoteHostname bool
 	Parsers            parser.Config
 }
@@ -104,7 +107,10 @@ func configure(cfg *common.Config) ([]cursor.Source, cursor.Input, error) {
 		MaxBackoff:         config.MaxBackoff,
 		Seek:               config.Seek,
 		CursorSeekFallback: config.CursorSeekFallback,
-		Matches:            config.Matches,
+		Matches:            journalfield.IncludeMatches(config.Matches),
+		Units:              config.Units,
+		Transports:         config.Transports,
+		Identifiers:        config.Identifiers,
 		SaveRemoteHostname: config.SaveRemoteHostname,
 		Parsers:            config.Parsers,
 	}, nil
@@ -139,7 +145,13 @@ func (inp *journald) Run(
 		log.Error("Continue from current position. Seek failed with: %v", err)
 	}
 
-	parser := inp.Parsers.Create(&readerAdapter{r: reader, canceler: ctx.Cancelation})
+	parser := inp.Parsers.Create(
+		&readerAdapter{
+			r:                  reader,
+			converter:          journalfield.NewConverter(ctx.Logger, nil),
+			canceler:           ctx.Cancelation,
+			saveRemoteHostname: inp.SaveRemoteHostname,
+		})
 
 	for {
 		entry, err := parser.Next()
@@ -156,7 +168,8 @@ func (inp *journald) Run(
 
 func (inp *journald) open(log *logp.Logger, canceler input.Canceler, src cursor.Source) (*journalread.Reader, error) {
 	backoff := backoff.NewExpBackoff(canceler.Done(), inp.Backoff, inp.MaxBackoff)
-	reader, err := journalread.Open(log, src.Name(), backoff, withFilters(inp.Matches))
+	reader, err := journalread.Open(log, src.Name(), backoff,
+		withFilters(inp.Matches), withUnits(inp.Units), withTransports(inp.Transports), withSyslogIdentifiers(inp.Identifiers))
 	if err != nil {
 		return nil, sderr.Wrap(err, "failed to create reader for %{path} journal", src.Name())
 	}
@@ -184,9 +197,27 @@ func initCheckpoint(log *logp.Logger, c cursor.Cursor) checkpoint {
 	return cp
 }
 
-func withFilters(filters []journalfield.Matcher) func(*sdjournal.Journal) error {
+func withFilters(filters journalfield.IncludeMatches) func(*sdjournal.Journal) error {
 	return func(j *sdjournal.Journal) error {
-		return journalfield.ApplyMatchersOr(j, filters)
+		return journalfield.ApplyIncludeMatches(j, filters)
+	}
+}
+
+func withUnits(units []string) func(*sdjournal.Journal) error {
+	return func(j *sdjournal.Journal) error {
+		return journalfield.ApplyUnitMatchers(j, units)
+	}
+}
+
+func withTransports(transports []string) func(*sdjournal.Journal) error {
+	return func(j *sdjournal.Journal) error {
+		return journalfield.ApplyTransportMatcher(j, transports)
+	}
+}
+
+func withSyslogIdentifiers(identifiers []string) func(*sdjournal.Journal) error {
+	return func(j *sdjournal.Journal) error {
+		return journalfield.ApplySyslogIdentifierMatcher(j, identifiers)
 	}
 }
 
@@ -206,11 +237,15 @@ func seekBy(log *logp.Logger, cp checkpoint, seek, defaultSeek journalread.SeekM
 	return mode, cp.Position
 }
 
-// readerAdapter is an adapter so journalread.Reader can
-// behave like reader.Reader
+// readerAdapter wraps journalread.Reader and adds two functionalities:
+// - Allows it to behave like a reader.Reader
+// - Translates the fields names from the journald format to something
+//   more human friendly
 type readerAdapter struct {
-	r        *journalread.Reader
-	canceler input.Canceler
+	r                  *journalread.Reader
+	canceler           input.Canceler
+	converter          *journalfield.Converter
+	saveRemoteHostname bool
 }
 
 func (r *readerAdapter) Close() error {
@@ -223,12 +258,22 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 		return reader.Message{}, err
 	}
 
+	created := time.Now()
+
 	content := []byte(data.Fields["MESSAGE"])
 	delete(data.Fields, "MESSAGE")
 
-	fields := make(map[string]interface{}, len(data.Fields))
-	for k, v := range data.Fields {
-		fields[k] = v
+	fields := r.converter.Convert(data.Fields)
+	fields.Put("event.kind", "event")
+	fields.Put("event.created", created)
+
+	// if entry is coming from a remote journal, add_host_metadata overwrites
+	// the source hostname, so it has to be copied to a different field
+	if r.saveRemoteHostname {
+		remoteHostname, err := fields.GetValue("host.hostname")
+		if err == nil {
+			fields.Put("log.source.address", remoteHostname)
+		}
 	}
 
 	m := reader.Message{

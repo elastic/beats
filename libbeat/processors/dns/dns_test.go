@@ -92,6 +92,36 @@ func TestDNSProcessorRun(t *testing.T) {
 		v, _ := event.GetValue("source.domain")
 		assert.Equal(t, gatewayName, v)
 	})
+
+	t.Run("metadata target", func(t *testing.T) {
+		config := defaultConfig
+		config.reverseFlat = map[string]string{
+			"@metadata.ip": "@metadata.domain",
+		}
+
+		p := &processor{
+			Config:   config,
+			resolver: &stubResolver{},
+			log:      logp.NewLogger(logName),
+		}
+
+		event := &beat.Event{
+			Meta: common.MapStr{
+				"ip": gatewayIP,
+			},
+		}
+
+		expMeta := common.MapStr{
+			"ip":     gatewayIP,
+			"domain": gatewayName,
+		}
+
+		newEvent, err := p.Run(event)
+		assert.NoError(t, err)
+		assert.Equal(t, expMeta, newEvent.Meta)
+		assert.Equal(t, event.Fields, newEvent.Fields)
+	})
+
 }
 
 func TestDNSProcessorTagOnFailure(t *testing.T) {

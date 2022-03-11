@@ -514,3 +514,12 @@ There are a few notable differences in the events:
   `winlog.event_data`.
 * Setting `include_xml: true` has no effect.
 
+
+[float]
+==== `overwrite_pipelines`
+
+By default Ingest pipelines are not updated if a pipeline with the same ID
+already exists. If this option is enabled Winlogbeat overwrites pipelines
+every time a new Elasticsearch connection is established.
+
+The default value is `false`.

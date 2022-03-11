@@ -7,6 +7,7 @@ package cmd
 import (
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	winlogbeatCmd "github.com/elastic/beats/v7/winlogbeat/cmd"
+	"github.com/elastic/beats/v7/x-pack/winlogbeat/module"
 
 	// Register fields.
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
@@ -23,4 +24,6 @@ func init() {
 	settings := winlogbeatCmd.WinlogbeatSettings()
 	settings.ElasticLicensed = true
 	RootCmd = winlogbeatCmd.Initialize(settings)
+	RootCmd.ExportCmd.AddCommand(GenExportPipelineCmd(settings))
+	module.Init()
 }

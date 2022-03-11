@@ -86,7 +86,7 @@ func TestGenerateFuzzCorpus(t *testing.T) {
 		h.Write([]byte(m))
 		name := hex.EncodeToString(h.Sum(nil))
 
-		ioutil.WriteFile(filepath.Join("fuzz/corpus", name), []byte(m), 0644)
+		ioutil.WriteFile(filepath.Join("fuzz/corpus", name), []byte(m), 0o644)
 	}
 }
 
@@ -389,6 +389,18 @@ func TestEventUnpack(t *testing.T) {
 			"msg": StringField("Newlines in messages\nare allowed.\r\nAnd so are carriage feeds\\newlines\\=."),
 		}, e.Extensions)
 	})
+
+	t.Run("error recovery with escape", func(t *testing.T) {
+		// Ensure no panic or regression of https://github.com/elastic/beats/issues/30010.
+		// key1 contains an escape, but then an invalid non-escaped =.
+		// This triggers the error recovery to try to read the next key.
+		var e Event
+		err := e.Unpack(`CEF:0|||||||key1=\\hi= key2=a`)
+		assert.Error(t, err)
+		assert.Equal(t, map[string]*Field{
+			"key2": UndocumentedField("a"),
+		}, e.Extensions)
+	})
 }
 
 func TestEventUnpackWithFullExtensionNames(t *testing.T) {
@@ -421,6 +433,7 @@ func StringField(v string) *Field { return &Field{String: v, Type: StringType, I
 func IntegerField(v int32) *Field {
 	return &Field{String: strconv.Itoa(int(v)), Type: IntegerType, Interface: v}
 }
+
 func LongField(v int64) *Field {
 	return &Field{String: strconv.Itoa(int(v)), Type: LongType, Interface: v}
 }
