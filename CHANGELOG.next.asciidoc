@@ -122,7 +122,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Heartbeat*
 
-
+- Generate summary documents for journeys which exit successfully, but do not emit `journey/end` events {pull}30825[30825]
 
 *Metricbeat*
 
