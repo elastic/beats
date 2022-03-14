@@ -89,13 +89,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 - Add support for '/var/log/pods/' path for add_kubernetes_metadata processor with `resource_type: pod`. {pull}28868[28868]
 - Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
-- Add support for parsers on journald input {pull}29070[29070]
-- Add support in httpjson input for oAuth2ProviderDefault of password grant_type. {pull}29087[29087]
-- Add support for filtering in journald input with `unit`, `kernel`, `identifiers` and `include_matches`. {pull}29294[29294]
-- Add new `userAgent` and `beatInfo` template functions for httpjson input {pull}29528[29528]
-- Add extraction of `related.hosts` to Microsoft 365 Defender ingest pipeline {issue}29859[29859] {pull}29863[29863]
-- threatintel module: Add new Recorded Future integration. {pull}30030[30030]
-- Add pipeline in FB's supported hints. {pull}30212[30212]
 
 *Auditbeat*
 
