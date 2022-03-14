@@ -10,6 +10,7 @@ when:
         - "x-pack-winlogbeat"
     parameters:                ## when parameter was selected in the UI.
         - "x-pack-winlogbeat"
+    tags: true                 ## for all the tags
 platform: "windows-2019"       ## default label for all the stages
 stages:
     lint:

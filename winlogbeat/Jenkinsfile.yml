@@ -10,6 +10,7 @@ when:
         - "winlogbeat"
     parameters:                ## when parameter was selected in the UI.
         - "winlogbeat"
+    tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     lint:
@@ -55,6 +56,7 @@ stages:
         stage: packaging
         when:
             branches: false    ## Only on a PR basis for the time being
+            tags: false        ## packaging on branches/tags is already in place with the downstream build.
             changeset:         ## when PR contains any of those entries in the changeset
               - "^winlogbeat/.*"
               - "@oss"               ## special token regarding the changeset for the oss

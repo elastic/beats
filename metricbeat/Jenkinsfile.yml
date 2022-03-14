@@ -10,6 +10,7 @@ when:
         - "metricbeat"
     parameters:                ## when parameter was selected in the UI.
         - "metricbeat"
+    tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     lint:
@@ -45,6 +46,7 @@ stages:
                 - "macOS"
             parameters:
                 - "macosTest"
+            tags: true         ## for all the tags
         stage: extended
     windows-2022:
         mage: "mage build unitTest"

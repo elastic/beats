@@ -10,6 +10,7 @@ when:
         - "x-pack-filebeat"
     parameters:                ## when parameter was selected in the UI.
         - "x-pack-filebeat"
+    tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     lint:
@@ -32,6 +33,7 @@ stages:
             parameters:
                 - "armTest"
             branches: true     ## for all the branches
+            tags: true         ## for all the tags
         stage: mandatory
     unitTest:
         mage: "mage build unitTest"
@@ -62,6 +64,7 @@ stages:
                 - "macOS"
             parameters:
                 - "macosTest"
+            tags: true         ## for all the tags
         stage: extended
     windows-2022:
         mage: "mage build unitTest"
@@ -127,6 +130,7 @@ stages:
         stage: packaging
         when:
             branches: false    ## Only on a PR basis for the time being
+            tags: false        ## packaging on branches/tags is already in place with the downstream build.
             changeset:         ## when PR contains any of those entries in the changeset
               - "^x-pack/filebeat/.*"
               - "@xpack"             ## special token regarding the changeset for the xpack
@@ -139,6 +143,7 @@ stages:
         stage: packaging
         when:
             branches: false    ## Only on a PR basis for the time being
+            tags: false        ## packaging on branches/tags is already in place with the downstream build.
             changeset:         ## when PR contains any of those entries in the changeset
               - "^x-pack/filebeat/.*"
               - "@xpack"             ## special token regarding the changeset for the xpack

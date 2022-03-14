@@ -10,6 +10,7 @@ when:
         - "auditbeat"
     parameters:                ## when parameter was selected in the UI.
         - "auditbeat"
+    tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     lint:

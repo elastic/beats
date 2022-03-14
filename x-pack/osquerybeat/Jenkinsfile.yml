@@ -10,6 +10,7 @@ when:
         - "x-pack-osquerybeat"
     parameters:                ## when parameter was selected in the UI.
         - "x-pack-osquerybeat"
+    tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     lint:
@@ -35,6 +36,7 @@ stages:
                 - "macOS"
             parameters:
                 - "macosTest"
+            tags: true         ## for all the tags
         stage: extended
     windows-2022:
         mage: "mage build unitTest"
@@ -73,6 +75,7 @@ stages:
         stage: packaging
         when:
             branches: false    ## Only on a PR basis for the time being
+            tags: false        ## packaging on branches/tags is already in place with the downstream build.
             changeset:         ## when PR contains any of those entries in the changeset
               - "^x-pack/osquerybeat/.*"
               - "@xpack"             ## special token regarding the changeset for the xpack

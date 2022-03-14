@@ -10,6 +10,7 @@ when:
         - "x-pack-heartbeat"
     parameters:                ## when parameter was selected in the UI.
         - "x-pack-heartbeat"
+    tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     lint:
@@ -37,6 +38,7 @@ stages:
                 - "macOS"
             parameters:
                 - "macosTest"
+            tags: true         ## for all the tags
         stage: extended
 # TODO: there are windows test failures already reported
 # https://github.com/elastic/beats/issues/23957 and https://github.com/elastic/beats/issues/23958
@@ -73,6 +75,7 @@ stages:
         stage: packaging
         when:
             branches: false    ## Only on a PR basis for the time being
+            tags: false        ## packaging on branches/tags is already in place with the downstream build.
             changeset:         ## when PR contains any of those entries in the changeset
               - "^x-pack/heartbeat/.*"
               - "@xpack"             ## special token regarding the changeset for the xpack
@@ -85,6 +88,7 @@ stages:
         stage: packaging
         when:
             branches: false    ## Only on a PR basis for the time being
+            tags: false        ## packaging on branches/tags is already in place with the downstream build.
             changeset:         ## when PR contains any of those entries in the changeset
               - "^x-pack/heartbeat/.*"
               - "@xpack"             ## special token regarding the changeset for the xpack
