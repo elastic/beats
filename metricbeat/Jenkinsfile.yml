@@ -10,7 +10,6 @@ when:
         - "metricbeat"
     parameters:                ## when parameter was selected in the UI.
         - "metricbeat"
-    tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     lint:
@@ -46,7 +45,6 @@ stages:
                 - "macOS"
             parameters:
                 - "macosTest"
-            tags: true         ## for all the tags
         stage: extended
     windows-2022:
         mage: "mage build unitTest"
@@ -67,17 +65,17 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2012-r2"
-        stage: extended
+        stage: extended_win
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
-        stage: extended
+        stage: extended_win
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
-        stage: extended
+        stage: extended_win
     packaging-linux:
         packaging-linux: "mage package"
         e2e:
