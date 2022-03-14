@@ -57,9 +57,13 @@ It also supports the options described in <<module-http-config-options>>.
 
 The following metricsets are available:
 
-* <<metricbeat-metricset-kibana-actions,actions>>
+* <<metricbeat-metricset-kibana-cluster_actions,cluster_actions>>
 
-* <<metricbeat-metricset-kibana-rules,rules>>
+* <<metricbeat-metricset-kibana-cluster_rules,cluster_rules>>
+
+* <<metricbeat-metricset-kibana-node_actions,node_actions>>
+
+* <<metricbeat-metricset-kibana-node_rules,node_rules>>
 
 * <<metricbeat-metricset-kibana-settings,settings>>
 
@@ -67,9 +71,13 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kibana-status,status>>
 
-include::kibana/actions.asciidoc[]
+include::kibana/cluster_actions.asciidoc[]
 
-include::kibana/rules.asciidoc[]
+include::kibana/cluster_rules.asciidoc[]
+
+include::kibana/node_actions.asciidoc[]
+
+include::kibana/node_rules.asciidoc[]
 
 include::kibana/settings.asciidoc[]
 

@@ -41510,20 +41510,6 @@ type: float
 
 --
 
-*`kibana.actions.failures`*::
-+
---
-type: long
-
---
-
-*`kibana.actions.executions`*::
-+
---
-type: long
-
---
-
 [float]
 === rules
 
@@ -41562,14 +41548,58 @@ type: float
 
 --
 
-*`kibana.rules.failures`*::
+[float]
+=== actions
+
+Kibana actions metrics.
+
+
+
+
+*`kibana.actions.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.actions.failures`*::
 +
 --
 type: long
 
 --
 
-*`kibana.rules.executions`*::
+*`kibana.actions.executions`*::
++
+--
+type: long
+
+--
+
+[float]
+=== node_rules
+
+Kibana rule metrics.
+
+
+
+
+*`kibana.node_rules.kibana.status`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.node_rules.failures`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_rules.executions`*::
 +
 --
 type: long

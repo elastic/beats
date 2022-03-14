@@ -56,7 +56,7 @@ var (
 )
 
 type response struct {
-	Actions     map[string]interface{} `json:"actions"`
+	Actions     map[string]interface{} `json:"cluster_actions"`
 	Kibana      map[string]interface{} `json:"kibana"`
 	ClusterUuid string                 `json:"cluster_uuid"`
 }

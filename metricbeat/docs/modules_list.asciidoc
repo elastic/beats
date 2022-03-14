@@ -163,8 +163,10 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kafka-partition,partition>>   
 |<<metricbeat-metricset-kafka-producer,producer>> beta[]  
 |<<metricbeat-module-kibana,Kibana>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.5+| .5+|  |<<metricbeat-metricset-kibana-actions,actions>> beta[]  
-|<<metricbeat-metricset-kibana-rules,rules>> beta[]  
+.7+| .7+|  |<<metricbeat-metricset-kibana-cluster_actions,cluster_actions>> beta[]  
+|<<metricbeat-metricset-kibana-cluster_rules,cluster_rules>> beta[]  
+|<<metricbeat-metricset-kibana-node_actions,node_actions>> beta[]  
+|<<metricbeat-metricset-kibana-node_rules,node_rules>> beta[]  
 |<<metricbeat-metricset-kibana-settings,settings>>   
 |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
