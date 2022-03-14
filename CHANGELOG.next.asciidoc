@@ -89,12 +89,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 - Add support for '/var/log/pods/' path for add_kubernetes_metadata processor with `resource_type: pod`. {pull}28868[28868]
 - Add documentation for add_kubernetes_metadata processors `log_path` matcher. {pull}28868[28868]
-
-*Auditbeat*
-
-
-*Filebeat*
-
 - Extend documentation about hints annotation for processors {pull}30561[30561]
 
 *Heartbeat*
