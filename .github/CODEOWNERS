@@ -57,6 +57,7 @@
 
 ### libbeat
 /libbeat/ @elastic/elastic-agent-data-plane
+/libbeat/management @elastic/elastic-agent-control-plane
 
 ### licenses
 /licenses/ @elastic/elastic-agent-data-plane
