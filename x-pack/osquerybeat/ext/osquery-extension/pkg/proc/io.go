@@ -6,7 +6,8 @@ package proc
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io/fs"
+	"os"
 	"strings"
 )
 
@@ -16,12 +17,11 @@ type ProcIO struct {
 	CancelledWriteBytes string
 }
 
-// ReadProcStat reads proccess stats from /proc/<pid>/io.
-// The parsing code logic is borrowed from osquery C++ implementation and translated to Go.
-// This makes the data returned from the `host_processes` table
-// consistent with data returned from the original osquery `processes` table.
-// https://github.com/osquery/osquery/blob/master/osquery/tables/system/linux/processes.cpp
 func ReadIO(root string, pid string) (procio ProcIO, err error) {
+	return ReadIOFS(os.DirFS("/"), root, pid)
+}
+
+func ReadIOFS(fsys fs.FS, root string, pid string) (procio ProcIO, err error) {
 	// Proc IO example
 	// rchar: 1527371144
 	// wchar: 1495591102
@@ -31,7 +31,7 @@ func ReadIO(root string, pid string) (procio ProcIO, err error) {
 	// write_bytes: 815329280
 	// cancelled_write_bytes: 40976384
 	fn := getProcAttr(root, pid, "io")
-	b, err := ioutil.ReadFile(fn)
+	b, err := fs.ReadFile(fsys, fn)
 	if err != nil {
 		return
 	}

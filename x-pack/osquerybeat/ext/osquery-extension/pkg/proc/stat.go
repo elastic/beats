@@ -7,7 +7,8 @@ package proc
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
+	"io/fs"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -41,14 +42,18 @@ func getProcAttr(root, pid, attr string) string {
 	return filepath.Join(root, "/proc", pid, attr)
 }
 
-// ReadProcStat reads proccess stats from /proc/<pid>/stat.
+// ReadStat ReadProcStat reads proccess stats from /proc/<pid>/stat.
 // The parsing code logic is borrowed from osquery C++ implementation and translated to Go.
 // This makes the data returned from the `host_processes` table
 // consistent with data returned from the original osquery `processes` table.
 // https://github.com/osquery/osquery/blob/master/osquery/tables/system/linux/processes.cpp
 func ReadStat(root string, pid string) (stat ProcStat, err error) {
+	return ReadStatFS(os.DirFS("/"), root, pid)
+}
+
+func ReadStatFS(sysfs fs.FS, root string, pid string) (stat ProcStat, err error) {
 	fn := getProcAttr(root, pid, "stat")
-	b, err := ioutil.ReadFile(fn)
+	b, err := fs.ReadFile(sysfs, fn)
 	if err != nil {
 		return
 	}
@@ -75,7 +80,7 @@ func ReadStat(root string, pid string) (stat ProcStat, err error) {
 	stat.StartTime = details[19]
 
 	fn = getProcAttr(root, pid, "status")
-	b, err = ioutil.ReadFile(fn)
+	b, err = fs.ReadFile(sysfs, fn)
 	if err != nil {
 		return
 	}

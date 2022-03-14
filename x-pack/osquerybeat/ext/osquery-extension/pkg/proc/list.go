@@ -5,17 +5,22 @@
 package proc
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strconv"
 )
 
 func List(root string) ([]string, error) {
+	return ListFS(os.DirFS("/"), root)
+}
+
+func ListFS(fsys fs.FS, root string) ([]string, error) {
 	var pids []string
 
 	root = filepath.Join(root, "/proc")
 
-	dirs, err := os.ReadDir(root)
+	dirs, err := fs.ReadDir(fsys, root)
 
 	if err != nil {
 		return nil, err
