@@ -52,6 +52,7 @@ type kafkaInputConfig struct {
 	Kerberos                 *kerberos.Config  `config:"kerberos"`
 	Username                 string            `config:"username"`
 	Password                 string            `config:"password"`
+	Sasl                     kafka.SaslConfig  `config:"sasl"`
 	ExpandEventListFromField string            `config:"expand_event_list_from_field"`
 	Parsers                  parser.Config     `config:",inline"`
 }
@@ -195,12 +196,11 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 			Realm:              config.Kerberos.Realm,
 			DisablePAFXFAST:    !config.Kerberos.EnableFAST,
 		}
-	}
-
-	if config.Username != "" {
+	} else if config.Username != "" {
 		k.Net.SASL.Enable = true
 		k.Net.SASL.User = config.Username
 		k.Net.SASL.Password = config.Password
+		config.Sasl.ConfigureSarama(k)
 	}
 
 	// configure client ID
