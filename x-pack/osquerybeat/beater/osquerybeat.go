@@ -169,13 +169,6 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		runner.Update(ctx, bt.config.Inputs)
 	}
 
-	// Ensure that all the hooks and actions are ready before starting the Manager
-	// to receive configuration.
-	if err := b.Manager.Start(); err != nil {
-		return err
-	}
-	defer b.Manager.Stop()
-
 	// Set the osquery beat version to the manager payload. This allows the bundled osquery version to be reported to the stack.
 	bt.setManagerPayload(b)
 
