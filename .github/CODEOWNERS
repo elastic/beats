@@ -1,55 +1,102 @@
 # GitHub CODEOWNERS definition
 # See: https://help.github.com/articles/about-codeowners/
 
-# * @elastic/beats
+# The beats repository is owned by the @elastic/elastic-agent-data-plane Many teams contribute to it. The goal
+# is to cover all directories in the CODEOWNERS file. The list is sorted alphabetically by directory and sub directories.
 
-# libbeat
-/libbeat/ @elastic/elastic-agent-data-plane
-# /auditbeat/ @elastic/beats
-# /packetbeat/ @elastic/beats
-# /filebeat/ @elastic/beats
-# /metricbeat/ @elastic/beats
-# /journalbeat/ @elastic/beats
-# /winlogbeat/ @elastic/beats
+* @elastic/elastic-agent-data-plane
 
-# Auditbeat
-/auditbeat/module/ @elastic/security-external-integrations
+
+### Private directories
+# Any changes to the CI system or .github must be reviewed by the data plane team.
+/.ci/ @elastic/elastic-agent-data-plane
+/.github/ @elastic/elastic-agent-data-plane
+
+### Auditbeat
+/auditbeat/ @elastic/security-external-integrations
 /x-pack/auditbeat/ @elastic/security-external-integrations
 
-# Packetbeat
-/packetbeat/protos/ @elastic/security-external-integrations
-/x-pack/packetbeat/ @elastic/security-external-integrations
+### Deploy
+# All changes to the different deployments must be reviewed by data plane team.
+# TODO: This where k8s falls
+/deploy/ @elastic/elastic-agent-data-plane
 
-# Filebeat
-# /filebeat/module/ @elastic/integrations
+# Beats Build Specific
+/dev-tools/ @elastic/elastic-agent-data-plane
+
+# Most docs change are inside each beat / module. For global docs, data plane team should review.
+/docs/ @elastic/elastic-agent-data-plane
+
+### Filebeat
+# Filebeat is owned by the data plan team
+# TODO: CLEANUP, go into more details
+/filebeat @elastic/elastic-agent-data-plane
+/x-pack/filebeat @elastic/elastic-agent-data-plane
+
+# Modules are by defaul owned by the integrations team
+/filebeat/module/ @elastic/integrations
+/x-pack/filebeat/module/ @elastic/integrations
+
+# Infra UI modules
 /filebeat/module/elasticsearch/ @elastic/infra-monitoring-ui
 /filebeat/module/kibana/ @elastic/infra-monitoring-ui
 /filebeat/module/logstash/ @elastic/infra-monitoring-ui
-# /x-pack/filebeat/module/ @elastic/integrations
-# /x-pack/filebeat/module/suricata/ @elastic/security-external-integrations
 
-# Metricbeat
-# /metricbeat/module/ @elastic/integrations
+# Security integrations modules
+/x-pack/filebeat/module/suricata/ @elastic/security-external-integrations
+
+
+### Heartbeat
+# TODO: Is this team still accurate?
+/heartbeat/ @elastic/uptime
+/x-pack/heartbeat/ @elastic/uptime
+
+### Journalbeat
+# Journalbeat is owned by the data plan team
+/journalbeat @elastic/elastic-agent-data-plane
+
+### libbeat
+/libbeat/ @elastic/elastic-agent-data-plane
+
+### licenses
+/licenses/ @elastic/elastic-agent-data-plane
+
+### Metricbeat
+# The core of metricbeat is owned by the data plane team. Bits inside are owned by different teams.
+/metricbeat/ @elastic/elastic-agent-data-plane
+/x-pack/metricbeat/ @elastic/elastic-agent-data-plane
+
+# Modules are owned by the integrations team by default
+/metricbeat/module/ @elastic/integrations
+/x-pack/metricbeat/module/ @elastic/integrations
+
+# Infra UI modules
 /metricbeat/module/elasticsearch/ @elastic/infra-monitoring-ui
 /metricbeat/module/kibana/ @elastic/infra-monitoring-ui
 /metricbeat/module/logstash/ @elastic/infra-monitoring-ui
 /metricbeat/module/beat/ @elastic/infra-monitoring-ui
-# /x-pack/metricbeat/module/ @elastic/integrations
 
-# Heartbeat
-/heartbeat/ @elastic/uptime
+#### monitors.d
+# TODO: Does this belong to synthetics? Why is this in the top dir?
+/monitors.d/ @elastic/uptime
 
-# Winlogbeat
+#### Packetbeat
+/packetbeat/ @elastic/security-external-integrations
+/x-pack/packetbeat/ @elastic/security-external-integrations
+
+### script
+/script/ @elastic/elastic-agent-data-plane
+
+### testing
+/testing/ @elastic/elastic-agent-data-plane
+
+### tools
+/tools/ @elastic/elastic-agent-data-plane
+
+### Winlogbeat
+/winlogbeat/ @elastic/security-external-integrations
 /x-pack/winlogbeat/ @elastic/security-external-integrations
 
 # Elastic Agent
 /x-pack/elastic-agent/ @elastic/elastic-agent-control-plane
 
-# Beats Build Specific
-/dev-tools/mage/ @elastic/beats
-/dev-tools/make/ @elastic/beats
-/dev-tools/packaging/ @elastic/beats
-
-# CI Specific
-/.ci/ @elastic/observablt-robots
-/Jenkinsfile @elastic/observablt-robots
