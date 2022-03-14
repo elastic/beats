@@ -70,8 +70,12 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
-            #- "windows-2008-r2"  https://github.com/elastic/beats/issues/19795
         stage: mandatory
+    windows-2022:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-2022"
+        stage: extended
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
@@ -86,17 +90,6 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
-        stage: extended
-    #windows-7:  See https://github.com/elastic/beats/issues/22317
-    #    mage: "mage build unitTest"
-    #    platforms:             ## override default labels in this specific stage.
-    #        - "windows-7"
-    #    when:                  ## Override the top-level when.
-    #    stage: packaging
-    windows-7-32:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-7-32-bit"
         stage: extended
     packaging-linux:
         packaging-linux: "mage package"

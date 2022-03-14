@@ -103,7 +103,6 @@ func httpReadJSON(body io.Reader) (objs []common.MapStr, rawMessages []json.RawM
 		return nil, nil, http.StatusBadRequest, err
 	}
 	return obj, rawMessage, http.StatusOK, err
-
 }
 
 func decodeJSON(body io.Reader) (objs []common.MapStr, rawMessages []json.RawMessage, err error) {

@@ -120,8 +120,10 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-etcd-self,self>>   
 |<<metricbeat-metricset-etcd-store,store>>   
 |<<metricbeat-module-gcp,Google Cloud Platform>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.7+| .7+|  |<<metricbeat-metricset-gcp-billing,billing>> beta[]  
+.9+| .9+|  |<<metricbeat-metricset-gcp-billing,billing>> beta[]  
 |<<metricbeat-metricset-gcp-compute,compute>> beta[]  
+|<<metricbeat-metricset-gcp-dataproc,dataproc>> beta[]  
+|<<metricbeat-metricset-gcp-firestore,firestore>> beta[]  
 |<<metricbeat-metricset-gcp-gke,gke>> beta[]  
 |<<metricbeat-metricset-gcp-loadbalancing,loadbalancing>> beta[]  
 |<<metricbeat-metricset-gcp-metrics,metrics>> beta[]  

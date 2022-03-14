@@ -43,8 +43,9 @@ const defaultCrossBuildTarget = "golangCrossBuild"
 // See NewPlatformList for details about platform filtering expressions.
 var Platforms = BuildPlatforms.Defaults()
 
-// SelectedPackageTypes is the list of package types
-var SelectedPackageTypes []PackageType = []PackageType{}
+// SelectedPackageTypes is the list of package types. If empty, all packages types
+// are considered to be selected (see isPackageTypeSelected).
+var SelectedPackageTypes []PackageType
 
 func init() {
 	// Allow overriding via PLATFORMS.
@@ -65,7 +66,7 @@ func init() {
 	}
 }
 
-// CrossBuildOption defines a option to the CrossBuild target.
+// CrossBuildOption defines an option to the CrossBuild target.
 type CrossBuildOption func(params *crossBuildParams)
 
 // ImageSelectorFunc returns the name of the builder image.
@@ -183,7 +184,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 		builder := GolangCrossBuilder{buildPlatform.Name, params.Target, params.InDir, params.ImageSelector}
 		if params.Serial {
 			if err := builder.Build(); err != nil {
-				return errors.Wrapf(err, "failed cross-building target=%v for platform=%v %v", params.ImageSelector,
+				return errors.Wrapf(err, "failed cross-building target=%s for platform=%s",
 					params.Target, buildPlatform.Name)
 			}
 		} else {
@@ -321,8 +322,11 @@ func (b GolangCrossBuilder) Build() error {
 		"-v", repoInfo.RootDir+":"+mountPoint,
 		"-w", workDir,
 		image,
+
+		// Arguments for docker crossbuild entrypoint. For details see
+		// https://github.com/elastic/golang-crossbuild/blob/main/go1.17/base/rootfs/entrypoint.go.
 		"--build-cmd", buildCmd+" "+b.Target,
-		"-p", b.Platform,
+		"--platforms", b.Platform,
 	)
 
 	return dockerRun(args...)

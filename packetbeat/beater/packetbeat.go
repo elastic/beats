@@ -95,6 +95,12 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
+	// Install Npcap if needed.
+	err := installNpcap(b)
+	if err != nil {
+		return nil, err
+	}
+
 	return &packetbeat{
 		config:  rawConfig,
 		factory: factory,
@@ -139,9 +145,18 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error {
 	runner := newReloader(management.DebugK, factory, b.Publisher)
 	reload.Register.MustRegisterList("inputs", runner)
-	defer runner.Stop()
-
 	logp.Debug("main", "Waiting for the runner to finish")
+
+	// Start the manager after all the hooks are registered and terminates when
+	// the function return.
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
+
+	defer func() {
+		runner.Stop()
+		b.Manager.Stop()
+	}()
 
 	for {
 		select {

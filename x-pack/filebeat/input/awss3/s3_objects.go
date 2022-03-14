@@ -171,7 +171,6 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 // close the returned reader.
 func (p *s3ObjectProcessor) download() (contentType string, metadata map[string]interface{}, body io.ReadCloser, err error) {
 	resp, err := p.s3.GetObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
-
 	if err != nil {
 		return "", nil, nil, err
 	}
@@ -337,7 +336,8 @@ func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event
 				"s3": common.MapStr{
 					"bucket": common.MapStr{
 						"name": p.s3Obj.S3.Bucket.Name,
-						"arn":  p.s3Obj.S3.Bucket.ARN},
+						"arn":  p.s3Obj.S3.Bucket.ARN,
+					},
 					"object": common.MapStr{
 						"key": p.s3Obj.S3.Object.Key,
 					},

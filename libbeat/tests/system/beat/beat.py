@@ -1,6 +1,9 @@
+"""
+beat defines the basic testing infrastructure used by individual python unit/integration tests
+"""
+
 import subprocess
 
-import jinja2
 import unittest
 import os
 import shutil
@@ -8,15 +11,16 @@ import json
 import signal
 import sys
 import time
-import yaml
 import hashlib
 import re
 import glob
 from datetime import datetime, timedelta
 
-from .compose import ComposeMixin
-
+import jinja2
+import yaml
 from elasticsearch import Elasticsearch
+
+from .compose import ComposeMixin
 
 
 BEAT_REQUIRED_FIELDS = ["@timestamp",
@@ -24,16 +28,32 @@ BEAT_REQUIRED_FIELDS = ["@timestamp",
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
-yaml_cache = {}
+YAML_CACHE = {}
 
 REGEXP_TYPE = type(re.compile("t"))
 
 
-class TimeoutError(Exception):
+def json_raise_on_duplicates(ordered_pairs):
+    """
+    Helper function to reject duplicate keys. To be used as a custom hook in JSON unmarshaling
+    to error out in case of any duplicates in the keys.
+    """
+    key_dict = {}
+    for key, val in ordered_pairs:
+        if key in key_dict:
+            raise ValueError(f"duplicate key: {key}")
+        key_dict[key] = val
+    return key_dict
+
+
+class WaitTimeoutError(Exception):
+    """
+    WaitTimeoutError is raised by the wait_until function if the `until` logic passes its timeout.
+    """
     pass
 
 
-class Proc(object):
+class Proc():
     """
     Slim wrapper on subprocess.Popen that redirects
     both stdout and stderr to a file on disk and makes
@@ -41,13 +61,21 @@ class Proc(object):
     the object gets collected.
     """
 
-    def __init__(self, args, outputfile, env={}):
+    def __init__(self, args, outputfile, env=None):
         self.args = args
         self.output = open(outputfile, "ab")
         self.stdin_read, self.stdin_write = os.pipe()
-        self.env = env
+        if env:
+            self.env = env
+        else:
+            self.env = {}
+
+        self.proc = None
 
     def start(self):
+        """
+        start wraps the underlying `popen` method used by the tests
+        """
         # ensure that the environment is inherited to the subprocess.
         variables = os.environ.copy()
         variables.update(self.env)
@@ -74,34 +102,49 @@ class Proc(object):
         return self.proc
 
     def kill(self):
+        """
+        kill terminates the process started by `Popen`
+        """
         if sys.platform.startswith("win"):
             # proc.terminate on Windows does not initiate a graceful shutdown
             # through the processes signal handlers it just kills it hard. So
             # this sends a SIGBREAK. You cannot sends a SIGINT (CTRL_C_EVENT)
             # to a process group in Windows, otherwise Ctrl+C would be
             # sent.
-            self.proc.send_signal(signal.CTRL_BREAK_EVENT)
+            self.proc.send_signal(
+                signal.CTRL_BREAK_EVENT)  # pylint: disable=no-member
         else:
             self.proc.terminate()
 
     def wait(self):
+        """
+        wait wraps the underlying `Popen` wait call, and will wait for the process to exit
+        """
         try:
             return self.proc.wait()
         finally:
             self.output.close()
 
     def check_wait(self, exit_code=0):
+        """
+        check_wait waits for the process to exit, and checks the return code of the process
+        """
         actual_exit_code = self.wait()
-        assert actual_exit_code == exit_code, "Expected exit code to be %d, but it was %d" % (
-            exit_code, actual_exit_code)
+        assert actual_exit_code == exit_code, f"Expected exit code to be {exit_code}, but it was {actual_exit_code}"
         return actual_exit_code
 
     def kill_and_wait(self):
+        """
+        kill_and_wait will kill the process and wait for it to return
+        """
         self.kill()
         os.close(self.stdin_write)
         return self.wait()
 
     def check_kill_and_wait(self, exit_code=0):
+        """
+        check_kill_and_wait will kill the process, then check the resulting exit code
+        """
         self.kill()
         os.close(self.stdin_write)
         return self.check_wait(exit_code=exit_code)
@@ -121,60 +164,68 @@ class Proc(object):
 
 
 class TestCase(unittest.TestCase, ComposeMixin):
+    """
+    TestCase is the class for individual tests, and provides the methods for starting the beat and checking output
+    """
     today = datetime.now().strftime("%Y%m%d")
+    default_docker_args = ["-e", "-v", "-d", "*"]
 
     @classmethod
-    def setUpClass(self):
+    def setUpClass(cls):
 
         # Path to test binary
-        if not hasattr(self, 'beat_name'):
-            self.beat_name = "beat"
+        if not hasattr(cls, 'beat_name'):
+            cls.beat_name = "beat"
 
-        if not hasattr(self, 'beat_path'):
-            self.beat_path = "."
+        if not hasattr(cls, 'beat_path'):
+            cls.beat_path = "."
 
         # Path to test binary
-        if not hasattr(self, 'test_binary'):
-            self.test_binary = os.path.abspath(self.beat_path + "/" + self.beat_name + ".test")
+        if not hasattr(cls, 'test_binary'):
+            cls.test_binary = os.path.abspath(
+                cls.beat_path + "/" + cls.beat_name + ".test")
 
-        if not hasattr(self, 'template_paths'):
-            self.template_paths = [
-                self.beat_path,
-                os.path.abspath(os.path.join(self.beat_path, "../libbeat"))
+        if not hasattr(cls, 'template_paths'):
+            cls.template_paths = [
+                cls.beat_path,
+                os.path.abspath(os.path.join(cls.beat_path, "../libbeat"))
             ]
 
         # Create build path
-        build_dir = self.beat_path + "/build"
-        self.build_path = build_dir + "/system-tests/"
+        build_dir = cls.beat_path + "/build"
+        cls.build_path = build_dir + "/system-tests/"
 
         # Start the containers needed to run these tests
-        self.compose_up_with_retries()
+        cls.compose_up_with_retries()
 
     @classmethod
-    def tearDownClass(self):
-        self.compose_down()
+    def tearDownClass(cls):
+        cls.compose_down()
 
     @classmethod
-    def compose_up_with_retries(self):
+    def compose_up_with_retries(cls):
+        """
+        compose_up_with_retries runs docker compose to start the test containers
+        """
         retries = 3
         for i in range(retries):
             try:
-                self.compose_up()
+                cls.compose_up()
                 return
-            except Exception as e:
+            except Exception as ex:
                 if i + 1 >= retries:
-                    raise e
-                print("Compose up failed, retrying: {}".format(e))
-                self.compose_down()
+                    raise ex
+                print(f"Compose up failed, retrying: {ex}")
+                cls.compose_down()
 
     def run_beat(self,
                  cmd=None,
                  config=None,
                  output=None,
-                 logging_args=["-e", "-v", "-d", "*"],
-                 extra_args=[],
+                 logging_args: list = None,
+                 extra_args: list = None,
                  exit_code=None,
-                 env={}):
+                 env: object = None):
         """
         Executes beat.
         Waits for the process to finish before returning to
@@ -192,16 +243,17 @@ class TestCase(unittest.TestCase, ComposeMixin):
                    cmd=None,
                    config=None,
                    output=None,
-                   logging_args=["-e", "-v", "-d", "*"],
-                   extra_args=[],
-                   env={},
+                   logging_args: list = None,
+                   extra_args: list = None,
+                   env: object = None,
                    home=""):
         """
         Starts beat and returns the process handle. The
         caller is responsible for stopping / waiting for the
         Proc instance.
         """
-
+        if logging_args is None:
+            logging_args = self.default_docker_args
         # Init defaults
         if cmd is None:
             cmd = self.test_binary
@@ -231,7 +283,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if logging_args:
             args.extend(logging_args)
 
-        if extra_args:
+        if extra_args is not None:
             args.extend(extra_args)
 
         proc = Proc(args, os.path.join(self.working_dir, output), env)
@@ -240,6 +292,9 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
     def render_config_template(self, template_name=None,
                                output=None, **kargs):
+        """
+        render_config_template fetches a given jinja2 config template and writes the formatted config
+        """
 
         # Init defaults
         if template_name is None:
@@ -256,42 +311,65 @@ class TestCase(unittest.TestCase, ComposeMixin):
         output_str = template.render(**kargs)
 
         output_path = os.path.join(self.working_dir, output)
-        with open(output_path, "wb") as f:
+        with open(output_path, "wb") as beat_output:
             os.chmod(output_path, 0o600)
-            f.write(output_str.encode('utf_8'))
+            beat_output.write(output_str.encode('utf_8'))
 
-    # Returns output as JSON object with flattened fields (. notation)
+    def default_output_file(self):
+        """
+        default_output_file returns the default path and name of the beat metrics file output
+        """
+        return "output/" + self.beat_name + "-" + self.today + ".ndjson"
+
     def read_output(self,
                     output_file=None,
-                    required_fields=None):
+                    required_fields=None,
+                    filter_key: str = ""):
+        """
+        read_output Returns output as JSON object with flattened fields (. notation)
+        """
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
+            output_file = self.default_output_file()
 
         jsons = []
-        with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
-            for line in f:
+        with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as beat_output:
+            for line in beat_output:
                 if len(line) == 0 or line[len(line) - 1] != "\n":
                     # hit EOF
                     break
 
                 try:
                     jsons.append(self.flatten_object(json.loads(
-                        line, object_pairs_hook=self.json_raise_on_duplicates), []))
+                        line, object_pairs_hook=json_raise_on_duplicates), []))
                 except BaseException:
-                    print("Fail to load the json {}".format(line))
+                    print(f"Failed to load the json {line}")
                     raise
 
         self.all_have_fields(jsons, required_fields or BEAT_REQUIRED_FIELDS)
+        if filter_key != "":
+            return list(filter(lambda x: filter_key in x, jsons))
         return jsons
 
-    # Returns output as JSON object
+    def read_output_filter(self, key: str, output_file=None, required_fields=None):
+        """
+        same as read_output, but filters the events down based on the availability of a key
+        this is needed with newer versions of the system module will only report fields if they contain valid data.
+        """
+        output = self.read_output(
+            output_file=output_file, required_fields=required_fields)
+
+        return list(filter(lambda x: key in x, output))
+
     def read_output_json(self, output_file=None):
+        """
+        read_output_json Returns output as JSON object
+        """
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
+            output_file = self.default_output_file()
 
         jsons = []
         with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
@@ -300,29 +378,13 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     # hit EOF
                     break
 
-                event = json.loads(line, object_pairs_hook=self.json_raise_on_duplicates)
+                event = json.loads(
+                    line, object_pairs_hook=json_raise_on_duplicates)
                 del event['@metadata']
                 jsons.append(event)
         return jsons
 
-    def json_raise_on_duplicates(self, ordered_pairs):
-        """Reject duplicate keys. To be used as a custom hook in JSON unmarshaling
-           to error out in case of any duplicates in the keys."""
-        d = {}
-        for k, v in ordered_pairs:
-            if k in d:
-                raise ValueError("duplicate key: %r" % (k,))
-            else:
-                d[k] = v
-        return d
-
-    def copy_files(self, files, source_dir="files/"):
-        for file_ in files:
-            shutil.copy(os.path.join(source_dir, file_),
-                        self.working_dir)
-
     def setUp(self):
-
         self.template_env = jinja2.Environment(
             loader=jinja2.FileSystemLoader(self.template_paths)
         )
@@ -337,21 +399,23 @@ class TestCase(unittest.TestCase, ComposeMixin):
         fields_yml = os.path.join(self.beat_path, "fields.yml")
         # Only add it if it exists
         if os.path.isfile(fields_yml):
-            shutil.copyfile(fields_yml, os.path.join(self.working_dir, "fields.yml"))
+            shutil.copyfile(fields_yml, os.path.join(
+                self.working_dir, "fields.yml"))
 
         try:
             # update the last_run link
             if os.path.islink(self.build_path + "last_run"):
                 os.unlink(self.build_path + "last_run")
-            os.symlink(self.build_path + "run/{}".format(self.id()),
+            os.symlink(self.build_path + f"run/{self.id()}",
                        self.build_path + "last_run")
         except BaseException:
             # symlink is best effort and can fail when
             # running tests in parallel
             pass
 
-    def wait_until(self, cond, max_timeout=10, poll_interval=0.1, name="cond"):
+    def wait_until(self, cond, max_timeout=10, poll_interval=0.1, name="cond", err_msg=""):
         """
+        TODO: this can probably be a "wait_until_output_count", among other things, since that could actually use `self`, and this can become an internal function
         Waits until the cond function returns true,
         or until the max_timeout is reached. Calls the cond
         function every poll_interval seconds.
@@ -362,9 +426,17 @@ class TestCase(unittest.TestCase, ComposeMixin):
         start = datetime.now()
         while not cond():
             if datetime.now() - start > timedelta(seconds=max_timeout):
-                raise TimeoutError("Timeout waiting for '{}' to be true. ".format(name) +
-                                   "Waited {} seconds.".format(max_timeout))
+                raise WaitTimeoutError(
+                    f"Timeout waiting for condition '{name}'. Waited {max_timeout} seconds: {err_msg}")
             time.sleep(poll_interval)
+
+    def wait_until_output_has_key(self, key: str, max_timeout=15):
+        """
+        a convenience function that will wait until we see a given key in an output event
+        """
+        self.wait_until(
+            lambda: self.output_has_key(key),
+            max_timeout=max_timeout, name=f"key '{key}' to appear in output")
 
     def get_log(self, logfile=None):
         """
@@ -392,13 +464,16 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
     def wait_log_contains(self, msg, logfile=None,
                           max_timeout=10, poll_interval=0.1,
-                          name="log_contains",
                           ignore_case=False):
+        """
+        wait_log_contains will wait until the log contains a given message
+        """
         self.wait_until(
-            cond=lambda: self.log_contains(msg, logfile, ignore_case=ignore_case),
+            cond=lambda: self.log_contains(
+                msg, logfile, ignore_case=ignore_case),
             max_timeout=max_timeout,
             poll_interval=poll_interval,
-            name=name)
+            name="log_contains")
 
     def log_contains(self, msg, logfile=None, ignore_case=False):
         """
@@ -434,8 +509,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                         line = line.lower()
                     if line.find(msg) >= 0:
                         counter = counter + 1
-        except IOError as e:
-            print(e)
+        except IOError as ioe:
+            print(ioe)
             counter = -1
 
         return counter
@@ -467,11 +542,11 @@ class TestCase(unittest.TestCase, ComposeMixin):
     def output_lines(self, output_file=None):
         """ Count number of lines in a file."""
         if output_file is None:
-            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
+            output_file = self.default_output_file()
 
         try:
-            with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
-                return sum([1 for line in f])
+            with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as beat_output:
+                return sum([1 for line in beat_output])
         except IOError:
             return 0
 
@@ -482,13 +557,29 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
-
+            output_file = self.default_output_file()
         try:
-            with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as f:
-                return len([1 for line in f]) == lines
+            with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as beat_output:
+                return len([1 for line in beat_output]) == lines
         except IOError:
             return False
+
+    def output_has_key(self, key: str, output_file=None):
+        """
+        output_has_key returns true if the given key is found in the list of events
+        """
+
+        # Awkward try/except here is for the "upstream" wait functions, if the file hasn't been created yet, it will handle the retry.
+        try:
+            lines = self.read_output(
+                output_file=output_file, required_fields=["@timestamp"])
+        except IOError:
+            return False
+
+        for line in lines:
+            if key in line:
+                return True
+        return False
 
     def output_is_empty(self, output_file=None):
         """
@@ -497,11 +588,11 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
+            output_file = self.default_output_file()
 
         try:
-            with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as f:
-                return len([1 for line in f]) == 0
+            with open(os.path.join(self.working_dir, output_file, ), "r", encoding="utf_8") as beat_file:
+                return len([1 for line in beat_file]) == 0
         except IOError:
             return True
 
@@ -523,8 +614,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         """
         for field in fields:
             if not all([field in o for o in objs]):
-                raise Exception("Not all objects have a '{}' field"
-                                .format(field))
+                raise Exception(f"Not all objects have a '{field}' field")
 
     def all_have_only_fields(self, objs, fields):
         """
@@ -535,19 +625,17 @@ class TestCase(unittest.TestCase, ComposeMixin):
         self.all_have_fields(objs, fields)
         self.all_fields_are_expected(objs, fields)
 
-    def all_fields_are_expected(self, objs, expected_fields,
-                                dict_fields=[]):
+    def all_fields_are_expected(self, objs, expected_fields):
         """
         Checks that all fields in the objects are from the
         given list of expected fields.
         """
         for o in objs:
             for key in o.keys():
-                known = key in dict_fields or key in expected_fields
+                known = key in expected_fields
                 ismeta = key.startswith('@metadata.')
                 if not(known or ismeta):
-                    raise Exception("Unexpected key '{}' found"
-                                    .format(key))
+                    raise Exception(f"Unexpected key '{key}' found")
 
     def load_fields(self, fields_doc=None):
         """
@@ -582,7 +670,8 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     newName = field["name"]
 
                 if field.get("type") == "group":
-                    subfields, subdictfields, subaliases = extract_fields(field["fields"], newName)
+                    subfields, subdictfields, subaliases = extract_fields(
+                        field["fields"], newName)
                     fields.extend(subfields)
                     dictfields.extend(subdictfields)
                     aliases.extend(subaliases)
@@ -600,39 +689,43 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
             return fields, dictfields, aliases
 
-        global yaml_cache
-
         # TODO: Make fields_doc path more generic to work with beat-generator. If it can't find file
         # "fields.yml" you should run "make update" on metricbeat folder
         with open(fields_doc, "r", encoding="utf_8") as f:
-            path = os.path.abspath(os.path.dirname(__file__) + "../../../../fields.yml")
+            path = os.path.abspath(os.path.dirname(
+                __file__) + "../../../../fields.yml")
             if not os.path.isfile(path):
-                path = os.path.abspath(os.path.dirname(__file__) + "../../../../_meta/fields.common.yml")
-            with open(path) as f2:
+                path = os.path.abspath(os.path.dirname(
+                    __file__) + "../../../../_meta/fields.common.yml")
+            with open(path, encoding="utf-8") as f2:
                 content = f2.read()
 
             content += f.read()
-
-            hash = hashlib.md5(content.encode("utf-8")).hexdigest()
+            global YAML_CACHE
+            content_hash = hashlib.md5(content.encode("utf-8")).hexdigest()
             doc = ""
-            if hash in yaml_cache:
-                doc = yaml_cache[hash]
+            if content_hash in YAML_CACHE:
+                doc = YAML_CACHE[content_hash]
             else:
                 doc = yaml.safe_load(content)
-                yaml_cache[hash] = doc
+                YAML_CACHE[content_hash] = doc
 
             fields = []
             dictfields = []
             aliases = []
 
             for item in doc:
-                subfields, subdictfields, subaliases = extract_fields(item["fields"], "")
+                subfields, subdictfields, subaliases = extract_fields(
+                    item["fields"], "")
                 fields.extend(subfields)
                 dictfields.extend(subdictfields)
                 aliases.extend(subaliases)
             return fields, dictfields, aliases
 
     def flatten_object(self, obj, dict_fields, prefix=""):
+        """
+        flatten_object will flatten a beat event, turning nested keys into *.* notation
+        """
         result = {}
         for key, value in obj.items():
             if isinstance(value, dict) and prefix + key not in dict_fields:
@@ -644,6 +737,9 @@ class TestCase(unittest.TestCase, ComposeMixin):
         return result
 
     def copy_files(self, files, source_dir="", target_dir=""):
+        """
+        copy_files copies a set of files from the source to target, or the working directory if no target specified.
+        """
         if not source_dir:
             source_dir = self.beat_path + "/tests/files/"
         if target_dir:
@@ -661,87 +757,13 @@ class TestCase(unittest.TestCase, ComposeMixin):
 
         # Init defaults
         if output_file is None:
-            output_file = "output/" + self.beat_name + "-" + self.today + ".ndjson"
+            output_file = self.default_output_file()
 
         try:
-            with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as f:
-                return pred(len([1 for line in f]))
+            with open(os.path.join(self.working_dir, output_file), "r", encoding="utf_8") as beat_out:
+                return pred(len([1 for line in beat_out]))
         except IOError:
             return False
-
-    def get_elasticsearch_url(self):
-        """
-        Returns a string with the Elasticsearch URL
-        """
-        return "http://{host}:{port}".format(
-            host=os.getenv("ES_HOST", "localhost"),
-            port=os.getenv("ES_PORT", "9200"),
-        )
-
-    def get_elasticsearch_url_ssl(self):
-        """
-        Returns a string with the Elasticsearch URL
-        """
-        return "https://{host}:{port}".format(
-            host=os.getenv("ES_HOST_SSL", "localhost"),
-            port=os.getenv("ES_PORT_SSL", "9205"),
-        )
-
-    def get_elasticsearch_template_config(self, security=True, user=None):
-        """
-        Returns a template suitable for a Beats config
-        """
-        template = {
-            "host": self.get_elasticsearch_url(),
-        }
-
-        if security:
-            template["user"] = user or os.getenv("ES_USER", "")
-            template["pass"] = os.getenv("ES_PASS", "")
-
-        return template
-
-    def get_elasticsearch_instance(self, security=True, ssl=False, url=None, user=None):
-        """
-        Returns an elasticsearch.Elasticsearch instance built from the
-        env variables like the integration tests.
-        """
-        if url is None:
-            if ssl:
-                url = self.get_elasticsearch_url_ssl()
-            else:
-                url = self.get_elasticsearch_url()
-
-        if security:
-            username = user or os.getenv("ES_USER", "")
-            password = os.getenv("ES_PASS", "")
-            es_instance = Elasticsearch([url], http_auth=(username, password))
-        else:
-            es_instance = Elasticsearch([url])
-        return es_instance
-
-    def get_kibana_url(self):
-        """
-        Returns kibana host URL
-        """
-        return "http://{host}:{port}".format(
-            host=os.getenv("KIBANA_HOST", "localhost"),
-            port=os.getenv("KIBANA_PORT", "5601"),
-        )
-
-    def get_kibana_template_config(self, security=True, user=None):
-        """
-        Returns a Kibana template suitable for a Beat
-        """
-        template = {
-            "host": self.get_kibana_url()
-        }
-
-        if security:
-            template["user"] = user or os.getenv("ES_USER", "")
-            template["pass"] = os.getenv("ES_PASS", "")
-
-        return template
 
     def assert_fields_are_documented(self, evt):
         """
@@ -772,15 +794,20 @@ class TestCase(unittest.TestCase, ComposeMixin):
             return False
 
         for key in flat.keys():
-            metaKey = key.startswith('@metadata.')
+            meta_key = key.startswith('@metadata.')
             # Range keys as used in 'date_range' etc will not have docs of course
-            isRangeKey = key.split('.')[-1] in ['gte', 'gt', 'lte', 'lt']
-            if not(is_documented(key, expected_fields) or metaKey or isRangeKey):
-                raise Exception("Key '{}' found in event is not documented!".format(key))
+            is_range_key = key.split('.')[-1] in ['gte', 'gt', 'lte', 'lt']
+            if not(is_documented(key, expected_fields) or meta_key or is_range_key):
+                raise Exception(
+                    f"Key '{key}' found in event ({str(evt)}) is not documented!")
             if is_documented(key, aliases):
-                raise Exception("Key '{}' found in event is documented as an alias!".format(key))
+                raise Exception(
+                    "Key '{key}' found in event is documented as an alias!")
 
     def get_beat_version(self):
+        """
+        get_beat_version returns the beats version from the exe
+        """
         proc = self.start_beat(extra_args=["version"], output="version")
         proc.wait()
 
@@ -807,13 +834,88 @@ class TestCase(unittest.TestCase, ComposeMixin):
         def is_ecs_version_set(path):
             # parsing the yml file would be better but go templates in
             # the file make that difficult
-            with open(path) as fhandle:
+            with open(path, encoding="utf-8") as fhandle:
                 for line in fhandle:
                     if re.search(r"ecs\.version", line):
                         return True
             return False
 
-        for cfg_path in get_config_paths(self.modules_path, module, fileset):
+        for cfg_path in get_config_paths(self.modules_path, module, fileset):  # pylint: disable=no-member
             if is_ecs_version_set(cfg_path):
                 return
-        raise Exception("{}/{} ecs.version not explicitly set in config or pipeline".format(module, fileset))
+        raise Exception(
+            f"{module}/{fileset} ecs.version not explicitly set in config or pipeline")
+
+    def get_elasticsearch_url(self):
+        """
+        Returns a string with the Elasticsearch URL
+        """
+        return "http://{host}:{port}".format(
+            host=os.getenv("ES_HOST", "localhost"),
+            port=os.getenv("ES_PORT", "9200"),
+        )
+
+    def get_elasticsearch_url_ssl(self):
+        """
+        Returns a string with the Elasticsearch URL
+        """
+        return "https://{host}:{port}".format(
+            host=os.getenv("ES_HOST_SSL", "localhost"),
+            port=os.getenv("ES_PORT_SSL", "9205"),
+        )
+
+    def get_kibana_url(self):
+        """
+        Returns kibana host URL
+        """
+        return "http://{host}:{port}".format(
+            host=os.getenv("KIBANA_HOST", "localhost"),
+            port=os.getenv("KIBANA_PORT", "5601"),
+        )
+
+    def get_elasticsearch_instance(self, security=True, ssl=False, url=None, user=None):
+        """
+        Returns an elasticsearch.Elasticsearch instance built from the
+        env variables like the integration tests.
+        """
+        if url is None:
+            if ssl:
+                url = self.get_elasticsearch_url_ssl()
+            else:
+                url = self.get_elasticsearch_url()
+
+        if security:
+            username = user or os.getenv("ES_USER", "")
+            password = os.getenv("ES_PASS", "")
+            es_instance = Elasticsearch([url], http_auth=(username, password))
+        else:
+            es_instance = Elasticsearch([url])
+        return es_instance
+
+    def get_kibana_template_config(self, security=True, user=None):
+        """
+        Returns a Kibana template suitable for a Beat
+        """
+        template = {
+            "host": self.get_kibana_url()
+        }
+
+        if security:
+            template["user"] = user or os.getenv("ES_USER", "")
+            template["pass"] = os.getenv("ES_PASS", "")
+
+        return template
+
+    def get_elasticsearch_template_config(self, security=True, user=None):
+        """
+        Returns a template suitable for a Beats config
+        """
+        template = {
+            "host": self.get_elasticsearch_url(),
+        }
+
+        if security:
+            template["user"] = user or os.getenv("ES_USER", "")
+            template["pass"] = os.getenv("ES_PASS", "")
+
+        return template

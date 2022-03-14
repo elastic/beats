@@ -188,12 +188,12 @@ func writeGolden(t testing.TB, source string, events []common.MapStr) {
 		t.Fatal(err)
 	}
 
-	if err := os.MkdirAll("testdata", 0755); err != nil {
+	if err := os.MkdirAll("testdata", 0o755); err != nil {
 		t.Fatal(err)
 	}
 
 	outPath := filepath.Join("testdata", filepath.Base(source)+".golden.json")
-	if err := ioutil.WriteFile(outPath, data, 0644); err != nil {
+	if err := ioutil.WriteFile(outPath, data, 0o644); err != nil {
 		t.Fatal(err)
 	}
 }

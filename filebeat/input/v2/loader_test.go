@@ -187,6 +187,7 @@ func (b loaderConfig) MustNewLoader() *Loader {
 	}
 	return l
 }
+
 func (b loaderConfig) NewLoader() (*Loader, error) {
 	return NewLoader(logp.NewLogger("test"), b.Plugins, b.TypeField, b.DefaultType)
 }

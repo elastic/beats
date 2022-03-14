@@ -251,12 +251,15 @@ type channelCtx struct {
 func doneChannelContext(ctx input.Context) context.Context {
 	return channelCtx{ctx}
 }
+
 func (c channelCtx) Deadline() (deadline time.Time, ok bool) {
 	return
 }
+
 func (c channelCtx) Done() <-chan struct{} {
 	return c.ctx.Cancelation.Done()
 }
+
 func (c channelCtx) Err() error {
 	return c.ctx.Cancelation.Err()
 }
@@ -276,7 +279,6 @@ type groupHandler struct {
 	// ex. in this case are the azure fielsets where the events are found under the json object "records"
 	expandEventListFromField string // TODO
 	log                      *logp.Logger
-	reader                   reader.Reader
 }
 
 func (h *groupHandler) Setup(session sarama.ConsumerGroupSession) error {
@@ -318,6 +320,7 @@ func (h *groupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim s
 			Timestamp: message.Ts,
 			Meta:      message.Meta,
 			Fields:    message.Fields,
+			Private:   message.Private,
 		})
 	}
 	return nil
@@ -458,8 +461,8 @@ func composeMessage(timestamp time.Time, content []byte, kafkaFields common.MapS
 			"kafka":   kafkaFields,
 			"message": string(content),
 		},
-		Meta: common.MapStr{
-			"ackHandler": ackHandler,
+		Private: eventMeta{
+			ackHandler: ackHandler,
 		},
 	}
 }
