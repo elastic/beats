@@ -11,14 +11,15 @@ import (
 	"strings"
 )
 
+// ReadCmdLine Reads process CmdLine from <root>/proc/<pid>/cmdline
 func ReadCmdLine(root string, pid string) (string, error) {
 	return ReadCmdLineFS(os.DirFS("/"), root, pid)
 }
 
-func ReadCmdLineFS(fsys fs.FS, root string, pid string) (string, error) {
+func ReadCmdLineFS(sysfs fs.FS, root string, pid string) (string, error) {
 	fn := getProcAttr(root, pid, "cmdline")
 
-	b, err := fs.ReadFile(fsys, fn)
+	b, err := fs.ReadFile(sysfs, fn)
 	if err != nil {
 		return "", err
 	}

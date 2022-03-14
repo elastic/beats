@@ -42,7 +42,7 @@ func getProcAttr(root, pid, attr string) string {
 	return filepath.Join(root, "/proc", pid, attr)
 }
 
-// ReadStat ReadProcStat reads proccess stats from /proc/<pid>/stat.
+// ReadStat reads process stats from /proc/<pid>/stat.
 // The parsing code logic is borrowed from osquery C++ implementation and translated to Go.
 // This makes the data returned from the `host_processes` table
 // consistent with data returned from the original osquery `processes` table.

@@ -22,9 +22,9 @@ func ReadUptime(root string) (secs int64, err error) {
 	return ReadUptimeFS(os.DirFS("/"), root)
 }
 
-func ReadUptimeFS(fsys fs.FS, root string) (secs int64, err error) {
+func ReadUptimeFS(sysfs fs.FS, root string) (secs int64, err error) {
 	fp := filepath.Join(root, "/proc/uptime")
-	b, err := fs.ReadFile(fsys, fp)
+	b, err := fs.ReadFile(sysfs, fp)
 	if err != nil {
 		return
 	}

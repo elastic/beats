@@ -11,16 +11,17 @@ import (
 	"strconv"
 )
 
+// List returns all the processes in the proc folder
 func List(root string) ([]string, error) {
 	return ListFS(os.DirFS("/"), root)
 }
 
-func ListFS(fsys fs.FS, root string) ([]string, error) {
+func ListFS(sysfs fs.FS, root string) ([]string, error) {
 	var pids []string
 
 	root = filepath.Join(root, "/proc")
 
-	dirs, err := fs.ReadDir(fsys, root)
+	dirs, err := fs.ReadDir(sysfs, root)
 
 	if err != nil {
 		return nil, err
