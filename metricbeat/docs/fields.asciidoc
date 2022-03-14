@@ -46245,6 +46245,100 @@ format: bytes
 --
 
 [float]
+=== swap
+
+This group contains statistics related to the swap memory usage on the system.
+
+
+*`linux.memory.swap.total`*::
++
+--
+Total swap memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.swap.used.bytes`*::
++
+--
+Used swap memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.swap.free`*::
++
+--
+Available swap memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.swap.used.pct`*::
++
+--
+The percentage of used swap memory.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`linux.memory.swap.in.pages`*::
++
+--
+Pages swapped in.
+
+
+type: long
+
+--
+
+*`linux.memory.swap.out.pages`*::
++
+--
+Pages swapped out.
+
+
+type: long
+
+--
+
+*`linux.memory.swap.readahead.cached`*::
++
+--
+Swap readahead pages hit from swap_ra_hit.
+
+
+type: long
+
+--
+
+*`linux.memory.swap.readahead.pages`*::
++
+--
+Pages swapped based on readahead predictions.
+
+
+type: long
+
+--
+
+[float]
 === pageinfo
 
 pageinfo
