@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package rules
+package node_rules
 
 import (
 	"fmt"
@@ -31,7 +31,7 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	mb.Registry.MustAddMetricSet(kibana.ModuleName, "rules", New,
+	mb.Registry.MustAddMetricSet(kibana.ModuleName, "node_rules", New,
 		mb.WithHostParser(hostParser),
 	)
 }
@@ -39,7 +39,7 @@ func init() {
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: "http",
-		DefaultPath:   kibana.RulesPath,
+		DefaultPath:   kibana.NodeRulesPath,
 	}.Build()
 )
 
@@ -70,7 +70,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) (err error) {
 	}
 
 	if err = m.fetchMetrics(r); err != nil {
-		return errors.Wrap(err, "error trying to get rule data from Kibana")
+		return errors.Wrap(err, "error trying to get node rule data from Kibana")
 	}
 
 	return
@@ -82,14 +82,14 @@ func (m *MetricSet) init() error {
 		return err
 	}
 
-	kibanaVersion, err := kibana.GetVersion(rulesHTTP, kibana.RulesPath)
+	kibanaVersion, err := kibana.GetVersion(rulesHTTP, kibana.NodeRulesPath)
 	if err != nil {
 		return err
 	}
 
 	isMetricsAPIAvailable := kibana.IsRulesAPIAvailable(kibanaVersion)
 	if !isMetricsAPIAvailable {
-		const errorMsg = "the %v rules is only supported with Kibana >= %v. You are currently running Kibana %v"
+		const errorMsg = "the %v node_rules is only supported with Kibana >= %v. You are currently running Kibana %v"
 		return fmt.Errorf(errorMsg, m.FullyQualifiedName(), kibana.RulesAPIAvailableVersion, kibanaVersion)
 	}
 

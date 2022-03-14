@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package rules
+package cluster_rules
 
 import (
 	"encoding/json"
@@ -52,8 +52,6 @@ var (
 				"p99": c.Float("p99"),
 			}),
 		}),
-		"failures":   c.Int("failures"),
-		"executions": c.Int("executions"),
 	}
 )
 
@@ -67,7 +65,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	var data response
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Kibana Rules API response")
+		return errors.Wrap(err, "failure parsing Kibana Cluster Rules API response")
 	}
 
 	event := mb.Event{ModuleFields: common.MapStr{}, RootFields: common.MapStr{}}
@@ -107,7 +105,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 
 	rulesFields, err := rulesSchema.Apply(data.Rules)
 	if err != nil {
-		return errors.Wrap(err, "failure to apply rules specific schema")
+		return errors.Wrap(err, "failure to apply cluster rules specific schema")
 	}
 	event.MetricSetFields = rulesFields
 

@@ -34,11 +34,13 @@ const (
 	ModuleName = "kibana"
 
 	// API Paths
-	StatusPath   = "api/status"
-	StatsPath    = "api/stats"
-	RulesPath    = "api/monitoring_collection/rules"
-	ActionsPath  = "api/monitoring_collection/actions"
-	SettingsPath = "api/settings"
+	StatusPath         = "api/status"
+	StatsPath          = "api/stats"
+	ClusterRulesPath   = "api/monitoring_collection/cluster_rules"
+	NodeRulesPath      = "api/monitoring_collection/node_rules"
+	ClusterActionsPath = "api/monitoring_collection/cluster_actions"
+	NodeActionsPath    = "api/monitoring_collection/node_actions"
+	SettingsPath       = "api/settings"
 )
 
 var (
@@ -47,7 +49,7 @@ var (
 	v6_7_2 = common.MustNewVersion("6.7.2")
 	v7_0_0 = common.MustNewVersion("7.0.0")
 	v7_0_1 = common.MustNewVersion("7.0.1")
-	v8_1_0 = common.MustNewVersion("8.1.0")
+	v8_2_0 = common.MustNewVersion("8.2.0")
 
 	// StatsAPIAvailableVersion is the version of Kibana since when the stats API is available
 	StatsAPIAvailableVersion = v6_4_0
@@ -56,8 +58,8 @@ var (
 	SettingsAPIAvailableVersion = v6_5_0
 
 	// Version of Kibana since when the rules and task manager APIs are available
-	RulesAPIAvailableVersion   = v8_1_0
-	ActionsAPIAvailableVersion = v8_1_0
+	RulesAPIAvailableVersion   = v8_2_0
+	ActionsAPIAvailableVersion = v8_2_0
 )
 
 func init() {
@@ -69,7 +71,7 @@ func init() {
 
 // NewModule creates a new module.
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	return elastic.NewModule(&base, []string{"stats", "rules", "actions"}, logp.NewLogger(ModuleName))
+	return elastic.NewModule(&base, []string{"stats", "cluster_rules", "node_rules", "cluster_actions", "node_actions"}, logp.NewLogger(ModuleName))
 }
 
 // GetVersion returns the version of the Kibana instance
@@ -108,7 +110,7 @@ func IsRulesAPIAvailable(currentKibanaVersion *common.Version) bool {
 	return elastic.IsFeatureAvailable(currentKibanaVersion, RulesAPIAvailableVersion)
 }
 
-// IsActionsAPIAvailable returns whether the rules API is available in the given version of Kibana
+// IsActionsAPIAvailable returns whether the actions API is available in the given version of Kibana
 func IsActionsAPIAvailable(currentKibanaVersion *common.Version) bool {
 	return elastic.IsFeatureAvailable(currentKibanaVersion, ActionsAPIAvailableVersion)
 }

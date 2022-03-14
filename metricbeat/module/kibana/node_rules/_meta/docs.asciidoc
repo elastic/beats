@@ -1,0 +1,1 @@
+This is the node_rules metricset of the module kibana.

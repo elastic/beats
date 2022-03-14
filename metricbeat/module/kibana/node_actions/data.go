@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package actions
+package node_actions
 
 import (
 	"encoding/json"
@@ -45,13 +45,6 @@ var (
 	}
 
 	actionsSchema = s.Schema{
-		"overdue": c.Dict("overdue", s.Schema{
-			"count": c.Int("count"),
-			"duration": c.Dict("duration", s.Schema{
-				"p50": c.Float("p50"),
-				"p99": c.Float("p99"),
-			}),
-		}),
 		"failures":   c.Int("failures"),
 		"executions": c.Int("executions"),
 	}
@@ -67,7 +60,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	var data response
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Kibana Actions API response")
+		return errors.Wrap(err, "failure parsing Kibana Node Actions API response")
 	}
 
 	event := mb.Event{ModuleFields: common.MapStr{}, RootFields: common.MapStr{}}
@@ -107,7 +100,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 
 	actionsFields, err := actionsSchema.Apply(data.Actions)
 	if err != nil {
-		return errors.Wrap(err, "failure to apply actions specific schema")
+		return errors.Wrap(err, "failure to apply node actions specific schema")
 	}
 	event.MetricSetFields = actionsFields
 
