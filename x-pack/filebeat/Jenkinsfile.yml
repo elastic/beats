@@ -34,7 +34,7 @@ stages:
                 - "armTest"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
-        stage: extended
+        stage: mandatory
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
@@ -66,36 +66,36 @@ stages:
                 - "macosTest"
             tags: true         ## for all the tags
         stage: extended
-    windows:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-2019"
-        stage: mandatory
     windows-2022:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2022"
-        stage: extended
+        stage: mandatory
+    windows-2019:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-2019"
+        stage: extended_win
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2016"
-        stage: extended
+        stage: mandatory
     windows-2012:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2012-r2"
-        stage: extended
+        stage: extended_win
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
-        stage: extended
+        stage: extended_win
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
-        stage: extended
+        stage: extended_win
     cloud:
       cloud: "mage build test"
       withModule: true       ## run the ITs only if the changeset affects a specific module.

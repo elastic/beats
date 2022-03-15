@@ -46459,6 +46459,100 @@ format: bytes
 --
 
 [float]
+=== swap
+
+This group contains statistics related to the swap memory usage on the system.
+
+
+*`linux.memory.swap.total`*::
++
+--
+Total swap memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.swap.used.bytes`*::
++
+--
+Used swap memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.swap.free`*::
++
+--
+Available swap memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.swap.used.pct`*::
++
+--
+The percentage of used swap memory.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`linux.memory.swap.in.pages`*::
++
+--
+Pages swapped in.
+
+
+type: long
+
+--
+
+*`linux.memory.swap.out.pages`*::
++
+--
+Pages swapped out.
+
+
+type: long
+
+--
+
+*`linux.memory.swap.readahead.cached`*::
++
+--
+Swap readahead pages hit from swap_ra_hit.
+
+
+type: long
+
+--
+
+*`linux.memory.swap.readahead.pages`*::
++
+--
+Pages swapped based on readahead predictions.
+
+
+type: long
+
+--
+
+[float]
 === pageinfo
 
 pageinfo
@@ -57419,6 +57513,63 @@ type: long
 +
 --
 Count of slow operations
+
+
+type: long
+
+--
+
+[float]
+=== commandstats
+
+Redis command statistics
+
+
+
+*`redis.info.commandstats.*.calls`*::
++
+--
+The number of calls that reached command execution (not rejected).
+
+
+type: long
+
+--
+
+*`redis.info.commandstats.*.usec`*::
++
+--
+The total CPU time consumed by these commands.
+
+
+type: long
+
+--
+
+*`redis.info.commandstats.*.usec_per_call`*::
++
+--
+The average CPU consumed per command execution.
+
+
+type: float
+
+--
+
+*`redis.info.commandstats.*.rejected_calls`*::
++
+--
+The number of rejected calls (on redis 6.2-rc2).
+
+
+type: long
+
+--
+
+*`redis.info.commandstats.*.failed_calls`*::
++
+--
+The number of failed calls (on redis 6.2-rc2).
 
 
 type: long

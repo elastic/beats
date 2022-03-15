@@ -106,7 +106,7 @@ The `httpjson` input keeps a runtime state between requests. This state can be a
 The state has the following elements:
 
 - `last_response.url.value`: The full URL with params and fragments from the last request with a successful response.
-- `last_response.url.params`: A map containing the params from the URL in `last_response.url.value`.
+- `last_response.url.params`: A https://pkg.go.dev/net/url#Values[`url.Values`] of the params from the URL in `last_response.url.value`.  Can be queried with the https://pkg.go.dev/net/url#Values.Get[`Get`] function.
 - `last_response.header`: A map containing the headers from the last successful response.
 - `last_response.body`: A map containing the parsed JSON body from the last successful response. This is the response as it comes from the remote server.
 - `last_response.page`: A number indicating the page number of the last response.

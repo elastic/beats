@@ -20,7 +20,7 @@ pipeline {
     PIPELINE_LOG_LEVEL = 'INFO'
     PYTEST_ADDOPTS = "${params.PYTEST_ADDOPTS}"
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
-    SLACK_CHANNEL = "#beats-build"
+    SLACK_CHANNEL = "#beats"
     SNAPSHOT = 'true'
     TERRAFORM_VERSION = "0.13.7"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
@@ -140,6 +140,23 @@ pipeline {
         runBuildAndTest(filterStage: 'extended')
       }
     }
+    stage('ExtendedWin') {
+      options { skipDefaultCheckout() }
+      when {
+        // On a branches/tags, skip if changes are only related to docs.
+        // Always when forcing the input parameter
+        anyOf {
+          allOf {                                           // If no PR and no docs changes
+            expression { return env.ONLY_DOCS == "false" }
+            not { changeRequest() }
+          }
+          expression { return params.runAllStages }         // If UI forced
+        }
+      }
+      steps {
+        runBuildAndTest(filterStage: 'extended_win')
+      }
+    }
     stage('Packaging') {
       options { skipDefaultCheckout() }
       when {
@@ -187,7 +204,7 @@ VERSION=${env.VERSION}-SNAPSHOT""")
       // Required to enable the flaky test reporting with GitHub. Workspace exists since the post/always runs earlier
       dir("${BASE_DIR}"){
         notifyBuildResult(prComment: true,
-                          slackComment: true, slackNotify: (isBranch() || isTag()),
+                          slackComment: true,
                           analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()))
       }
     }
