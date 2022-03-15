@@ -38,8 +38,8 @@ type ProcStat struct {
 	StartTime    string
 }
 
-func getProcAttr(root, pid, attr string) string {
-	return filepath.Join(root, "/proc", pid, attr)
+func getProcAttr(pid, attr string) string {
+	return filepath.Join("proc", pid, attr)
 }
 
 // ReadStat reads process stats from /proc/<pid>/stat.
@@ -48,11 +48,11 @@ func getProcAttr(root, pid, attr string) string {
 // consistent with data returned from the original osquery `processes` table.
 // https://github.com/osquery/osquery/blob/master/osquery/tables/system/linux/processes.cpp
 func ReadStat(root string, pid string) (stat ProcStat, err error) {
-	return ReadStatFS(os.DirFS("/"), root, pid)
+	return ReadStatFS(os.DirFS(root), pid)
 }
 
-func ReadStatFS(sysfs fs.FS, root string, pid string) (stat ProcStat, err error) {
-	fn := getProcAttr(root, pid, "stat")
+func ReadStatFS(sysfs fs.FS, pid string) (stat ProcStat, err error) {
+	fn := getProcAttr(pid, "stat")
 	b, err := fs.ReadFile(sysfs, fn)
 	if err != nil {
 		return
@@ -79,7 +79,7 @@ func ReadStatFS(sysfs fs.FS, root string, pid string) (stat ProcStat, err error)
 	stat.Threads = details[17]
 	stat.StartTime = details[19]
 
-	fn = getProcAttr(root, pid, "status")
+	fn = getProcAttr(pid, "status")
 	b, err = fs.ReadFile(sysfs, fn)
 	if err != nil {
 		return

@@ -9,7 +9,6 @@ import (
 	"errors"
 	"io/fs"
 	"os"
-	"path/filepath"
 	"strconv"
 )
 
@@ -19,12 +18,11 @@ var (
 
 // ReadUptime Reads system uptime from <root>/proc/uptime
 func ReadUptime(root string) (secs int64, err error) {
-	return ReadUptimeFS(os.DirFS("/"), root)
+	return ReadUptimeFS(os.DirFS(root))
 }
 
-func ReadUptimeFS(sysfs fs.FS, root string) (secs int64, err error) {
-	fp := filepath.Join(root, "/proc/uptime")
-	b, err := fs.ReadFile(sysfs, fp)
+func ReadUptimeFS(sysfs fs.FS) (secs int64, err error) {
+	b, err := fs.ReadFile(sysfs, "/proc/uptime")
 	if err != nil {
 		return
 	}

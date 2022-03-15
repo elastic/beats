@@ -18,10 +18,10 @@ type ProcIO struct {
 }
 
 func ReadIO(root string, pid string) (procio ProcIO, err error) {
-	return ReadIOFS(os.DirFS("/"), root, pid)
+	return ReadIOFS(os.DirFS(root), pid)
 }
 
-func ReadIOFS(fsys fs.FS, root string, pid string) (procio ProcIO, err error) {
+func ReadIOFS(fsys fs.FS, pid string) (procio ProcIO, err error) {
 	// Proc IO example
 	// rchar: 1527371144
 	// wchar: 1495591102
@@ -30,7 +30,7 @@ func ReadIOFS(fsys fs.FS, root string, pid string) (procio ProcIO, err error) {
 	// read_bytes: 14401536
 	// write_bytes: 815329280
 	// cancelled_write_bytes: 40976384
-	fn := getProcAttr(root, pid, "io")
+	fn := getProcAttr(pid, "io")
 	b, err := fs.ReadFile(fsys, fn)
 	if err != nil {
 		return
