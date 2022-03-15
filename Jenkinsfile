@@ -404,7 +404,7 @@ def publishPackages(beatsFolder){
       credentialsId: env.JOB_GCS_EXT_CREDENTIALS,
       repo: env.REPO,
       bucket: env.JOB_GCS_BUCKET,
-      folder: getBeatsName(env.BEATS_FOLDER),
+      folder: getBeatsName(beatsFolder),
       pattern: "build/distributions/**/*"
     )
   }
