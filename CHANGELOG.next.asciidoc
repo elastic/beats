@@ -92,6 +92,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Metricbeat*
 
+- Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
 
 *Packetbeat*
 
