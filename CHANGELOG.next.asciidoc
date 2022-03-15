@@ -92,15 +92,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Metricbeat*
 
-- Add `add_resource_metadata` configuration to Kubernetes module. {pull}29133[29133]
-- Add `containerd` module with `cpu`, `memory`, `blkio` metricsets. {pull}29247[29247]
-- Add `container.id` and `container.runtime` ECS fields in container metricset. {pull}29560[29560]
-- Add `memory.workingset.limit.pct` field in Kubernetes container/pod metricset. {pull}29547[29547]
-- Add k8s metadata in state_cronjob metricset. {pull}29572[29572]
-- Add `xpack.enabled` support for Enterprise Search module. {pull}29871[29871]
-- Add gcp firestore metricset. {pull}29918[29918]
-- Remove strict parsing on RabbitMQ module {pull}30090[30090]
-- Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
 - Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
 
 *Packetbeat*
