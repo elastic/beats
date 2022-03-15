@@ -122,7 +122,6 @@ func (fakeTransform) transformName() string { return "fake" }
 
 func TestNewBasicTransformsFromConfig(t *testing.T) {
 	fakeConstr := func(*common.Config, *logp.Logger) (transform, error) {
-
 		return fakeTransform{}, nil
 	}
 

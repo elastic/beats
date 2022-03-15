@@ -69,23 +69,76 @@ type Stats struct {
 	CgroupOpts    cgroup.ReaderOptions
 	EnableCgroups bool
 
-	procRegexps []match.Matcher // List of regular expressions used to whitelist processes.
-	envRegexps  []match.Matcher // List of regular expressions used to whitelist env vars.
-	cgroups     *cgroup.Reader
-	logger      *logp.Logger
-	host        types.Host
+	skipExtended bool
+	procRegexps  []match.Matcher // List of regular expressions used to whitelist processes.
+	envRegexps   []match.Matcher // List of regular expressions used to whitelist env vars.
+	cgroups      *cgroup.Reader
+	logger       *logp.Logger
+	host         types.Host
 }
 
+//PidState are the constants for various PID states
 type PidState string
 
 var (
-	Running  PidState = "running"
+	//Dead state, on linux this is both "x" and "X"
+	Dead PidState = "dead"
+	//Running state
+	Running PidState = "running"
+	//Sleeping state
 	Sleeping PidState = "sleeping"
-	Idle     PidState = "idle"
-	Stopped  PidState = "stopped"
-	Zombie   PidState = "zombie"
-	Unknown  PidState = "unknown"
+	//Idle state. On linux this is "D"
+	Idle PidState = "idle"
+	//Stopped state.
+	Stopped PidState = "stopped"
+	//Zombie state.
+	Zombie PidState = "zombie"
+	//WakeKill is a linux state only found on kernels 2.6.33-3.13
+	WakeKill PidState = "wakekill"
+	//Waking  is a linux state only found on kernels 2.6.33-3.13
+	Waking PidState = "waking"
+	//Parked is a linux state. On the proc man page, it says it's available on 3.9-3.13, but it appears to still be in the code.
+	Parked PidState = "parked"
+	//Unknown state
+	Unknown PidState = "unknown"
 )
+
+// PidStates is a Map of all pid states, mostly applicable to linux
+var PidStates = map[byte]PidState{
+	'S': Sleeping,
+	'R': Running,
+	'D': Idle, // Waiting in uninterruptible disk sleep, on some kernels this is marked as I below
+	'I': Idle, // in the scheduler, TASK_IDLE is defined as (TASK_UNINTERRUPTIBLE | TASK_NOLOAD)
+	'T': Stopped,
+	'Z': Zombie,
+	'X': Dead,
+	'x': Dead,
+	'K': WakeKill,
+	'W': Waking,
+	'P': Parked,
+}
+
+// ListStates is a wrapper that returns a list of processess with only the basic PID info filled out.
+func ListStates(hostfs resolve.Resolver) ([]ProcState, error) {
+	init := Stats{
+		Hostfs:        hostfs,
+		Procs:         []string{".*"},
+		EnableCgroups: false,
+		skipExtended:  true,
+	}
+	err := init.Init()
+	if err != nil {
+		return nil, errors.Wrap(err, "error initializing process collectors")
+	}
+
+	// actually fetch the PIDs from the OS-specific code
+	_, plist, err := init.FetchPids()
+	if err != nil {
+		return nil, errors.Wrap(err, "error gathering PIDs")
+	}
+
+	return plist, nil
+}
 
 // Init initializes a Stats instance. It returns errors if the provided process regexes
 // cannot be compiled.
@@ -249,6 +302,9 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	status, err := GetInfoForPid(procStats.Hostfs, pid)
 	if err != nil {
 		return status, true, errors.Wrap(err, "GetInfoForPid")
+	}
+	if procStats.skipExtended {
+		return status, true, nil
 	}
 	status = procStats.cacheCmdLine(status)
 

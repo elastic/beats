@@ -38,6 +38,7 @@ const (
 //
 // Customizations specific to Auditbeat:
 // - Include audit.rules.d directory in packages.
+// - Add elastic-agent specific config to x-pack tar.gz package.
 func CustomizePackaging(pkgFlavor PackagingFlavor) {
 	var (
 		shortConfig = devtools.PackageFile{
@@ -84,26 +85,35 @@ func CustomizePackaging(pkgFlavor PackagingFlavor) {
 	}
 
 	for _, args := range devtools.Packages {
-		for _, pkgType := range args.Types {
-			sampleRulesTarget := defaultSampleRulesTarget
+		if len(args.Types) == 0 {
+			continue
+		}
 
-			switch pkgType {
-			case devtools.TarGz, devtools.Zip:
-				args.Spec.ReplaceFile("{{.BeatName}}.yml", shortConfig)
-				args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfig)
-			case devtools.Deb, devtools.RPM:
-				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", shortConfig)
-				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfig)
-				sampleRulesTarget = "/etc/{{.BeatName}}/" + defaultSampleRulesTarget
-			case devtools.Docker:
-			default:
-				panic(fmt.Errorf("unhandled package type: %v", pkgType))
-			}
+		sampleRulesTarget := defaultSampleRulesTarget
 
-			if args.OS == "linux" {
-				args.Spec.Files[sampleRulesTarget] = sampleRules
+		switch pkgType := args.Types[0]; pkgType {
+		case devtools.TarGz, devtools.Zip:
+			args.Spec.ReplaceFile("{{.BeatName}}.yml", shortConfig)
+			args.Spec.ReplaceFile("{{.BeatName}}.reference.yml", referenceConfig)
+
+			// Add an Elastic Agent specific config to the Elastic licensed packages.
+			if XPackPackaging == pkgFlavor {
+				args.Spec.Files["{{.BeatName}}.elastic-agent.yml"] = devtools.PackageFile{
+					Mode:   0o644,
+					Source: "auditbeat.elastic-agent.yml",
+				}
 			}
-			break
+		case devtools.Deb, devtools.RPM:
+			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", shortConfig)
+			args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfig)
+			sampleRulesTarget = "/etc/{{.BeatName}}/" + defaultSampleRulesTarget
+		case devtools.Docker:
+		default:
+			panic(fmt.Errorf("unhandled package type: %v", pkgType))
+		}
+
+		if args.OS == "linux" {
+			args.Spec.Files[sampleRulesTarget] = sampleRules
 		}
 	}
 }

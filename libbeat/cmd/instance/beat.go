@@ -504,9 +504,8 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	logp.Info("%s start running.", b.Info.Beat)
 
-	// Launch config manager
-	b.Manager.Start(beater.Stop)
-	defer b.Manager.Stop()
+	// Allow the manager to stop a currently running beats out of bound.
+	b.Manager.SetStopCallback(beater.Stop)
 
 	return beater.Run(&b.Beat)
 }
@@ -883,7 +882,7 @@ func (b *Beat) checkElasticsearchVersion() {
 		if err != nil {
 			return err
 		}
-		if esVersion.LessThan(beatVersion) {
+		if esVersion.LessThanMajorMinor(beatVersion) {
 			return fmt.Errorf("%v ES=%s, Beat=%s.", elasticsearch.ErrTooOld, esVersion.String(), b.Info.Version)
 		}
 		return nil

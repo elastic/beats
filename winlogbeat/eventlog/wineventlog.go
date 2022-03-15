@@ -465,7 +465,7 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 	// the event's message.
 	switch {
 	case c.Forwarded == nil && c.Name == "ForwardedEvents",
-		c.Forwarded != nil && *c.Forwarded == true:
+		c.Forwarded != nil && *c.Forwarded:
 		l.render = func(event win.EvtHandle, out io.Writer) error {
 			return win.RenderEventXML(event, l.renderBuf, out)
 		}

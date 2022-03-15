@@ -32,12 +32,10 @@ const (
 	DefaultRegistryFile = ".winlogbeat.yml"
 )
 
-var (
-	DefaultSettings = WinlogbeatConfig{
-		RegistryFile:  DefaultRegistryFile,
-		RegistryFlush: 5 * time.Second,
-	}
-)
+var DefaultSettings = WinlogbeatConfig{
+	RegistryFile:  DefaultRegistryFile,
+	RegistryFlush: 5 * time.Second,
+}
 
 // WinlogbeatConfig contains all of Winlogbeat configuration data.
 type WinlogbeatConfig struct {

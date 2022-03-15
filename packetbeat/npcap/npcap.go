@@ -15,19 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Package npcap handles fetching and installing Npcap fow Windows.
-//
-// The npcap package interacts with a registry and download server that
-// provides a current_version end point that serves a JSON message that
-// corresponds to the this Go type:
-//
-//  struct {
-//  	Version string // The semverish version of the Npcap installer.
-//  	URL     string // The location of the Npcap installer.
-//  	Hash    string // The sha256 hash of the Npcap installer.
-//  }
-//
-// The URL field will point to the location of anb Npcap installer.
+// Package npcap handles fetching and installing Npcap for Windows.
 package npcap
 
 import (
@@ -55,7 +43,7 @@ var (
 
 // Install runs the Npcap installer at the provided path. The install
 // destination is specified by dst and installation using WinPcap
-// API-compatible Mode is specifed by compat. If dst is the empty string
+// API-compatible Mode is specified by compat. If dst is the empty string
 // the default install location is used.
 //
 // See https://nmap.org/npcap/guide/npcap-users-guide.html#npcap-installation-uninstall-options

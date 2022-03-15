@@ -55,7 +55,6 @@ func NewInput(
 	connector channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
-
 	out, err := connector.Connect(cfg)
 	if err != nil {
 		return nil, err
