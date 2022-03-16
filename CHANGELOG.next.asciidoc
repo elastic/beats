@@ -72,9 +72,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix Docker module: rename fields on dashboards. {pull}30500[30500]
 - Add back missing metrics to system/linux. {pull}30774[30774]
 - Allow named instances in mssql module. {issue}24076[24076] {pull}30859[30859]
+- GCP metrics query instances with aggregatedList API to improve efficiency. {pull}30154[#30153]
 
 *Packetbeat*
 
+- Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821]
 
 *Winlogbeat*
 
@@ -116,6 +118,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Auditbeat*
 
+- Include config file (`auditbeat.elastic-agent.yml`) in tar.gz and zip packages for use with Elastic Agent.
+
 
 *Filebeat*
 
@@ -131,7 +135,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
 - Fix overflow in `iostat` metrics {pull}30679[30679]
 - Add `commandstats` field to Redis module {pull}29662[29662]
-
+- Extend documentation about `kubernetes.node.network.*` fields {pull}30826[30826]
 
 *Packetbeat*
 
