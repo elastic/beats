@@ -20,6 +20,8 @@
 # All changes to the different deployments must be reviewed by data plane team.
 # TODO: This where k8s falls
 /deploy/ @elastic/elastic-agent-data-plane
+/deploy/kubernetes @elastic/elastic-agent-data-plane
+
 
 # Beats Build Specific
 /dev-tools/ @elastic/elastic-agent-data-plane
@@ -52,7 +54,7 @@
 /x-pack/heartbeat/ @elastic/uptime
 
 ### Journalbeat
-# Journalbeat is owned by the data plan team
+# Journalbeat is owned by the data plane team
 /journalbeat @elastic/elastic-agent-data-plane
 
 ### libbeat
@@ -70,6 +72,9 @@
 # Modules are owned by the integrations team by default
 /metricbeat/module/ @elastic/integrations
 /x-pack/metricbeat/module/ @elastic/integrations
+
+# Modules owned by the data plane team
+/metricbeat/module/system/ @elastic/elastic-agent-data-plane
 
 # Infra UI modules
 /metricbeat/module/elasticsearch/ @elastic/infra-monitoring-ui
