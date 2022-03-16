@@ -76,7 +76,7 @@ file, add entries to the +{beatname_lc}.modules+ list. Each entry in the
 list begins with a dash (-) and is followed by settings for that module.
 
 TIP: Check the `modules.d` directory to verify that the modules you've
-specified in the +{beatname_lc}.yml+ are disabled (filename ends with
+specified in +{beatname_lc}.yml+ are disabled (filename ends with
 `.disabled`). If they aren't, disable them now by running
 +{beatname_lc} modules disable <modulename>+.
 
