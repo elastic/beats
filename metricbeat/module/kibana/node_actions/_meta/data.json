@@ -7,12 +7,13 @@
     "metricset":{
         "host":"localhost",
         "module":"kibana",
-        "name":"actions",
+        "name":"node_actions",
         "rtt":44269
     },
     "kibana":{
-        "actions":{
-            "example": "actions"
+        "node_actions":{
+            "executions": 10,
+            "failures": 0
         }
     },
     "type":"metricsets"

@@ -7,12 +7,18 @@
     "metricset":{
         "host":"localhost",
         "module":"kibana",
-        "name":"actions",
+        "name":"cluster_actions",
         "rtt":44269
     },
     "kibana":{
-        "actions":{
-            "example": "actions"
+        "cluster_actions":{
+            "overdue": {
+                "count": 3,
+                "duration": {
+                    "p50": 500,
+                    "p99": 3000
+                }
+            }
         }
     },
     "type":"metricsets"
