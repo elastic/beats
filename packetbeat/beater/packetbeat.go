@@ -90,14 +90,16 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		configurator = initialConfig().FromStatic
 	}
 
-	factory := newProcessorFactory(b.Info.Name, make(chan error, maxSniffers), b, configurator)
-	if err := factory.CheckConfig(rawConfig); err != nil {
+	// Install Npcap if needed. This need to happen before any other
+	// work on Windows, including config checking, because that involves
+	// probing interfaces.
+	err := installNpcap(b)
+	if err != nil {
 		return nil, err
 	}
 
-	// Install Npcap if needed.
-	err := installNpcap(b)
-	if err != nil {
+	factory := newProcessorFactory(b.Info.Name, make(chan error, maxSniffers), b, configurator)
+	if err := factory.CheckConfig(rawConfig); err != nil {
 		return nil, err
 	}
 
