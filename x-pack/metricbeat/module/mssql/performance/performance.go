@@ -69,40 +69,29 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	var err error
 	var rows *sql.Rows
 	rows, err = m.db.Query(`SELECT object_name,
-       counter_name,
-       instance_name,
-       cntr_value
+	counter_name,
+	instance_name,
+	cntr_value
 FROM   sys.dm_os_performance_counters
 WHERE  counter_name = 'SQL Compilations/sec'
-        OR counter_name = 'SQL Re-Compilations/sec'
-        OR counter_name = 'User Connections'
-        OR counter_name = 'Page splits/sec'
-        OR ( counter_name = 'Lock Waits/sec'
-             AND instance_name = '_Total' )
-        OR counter_name = 'Page splits/sec'
-        OR ( object_name = 'SQLServer:Buffer Manager'
-             AND counter_name = 'Page life expectancy' )
-        OR counter_name = 'Batch Requests/sec'
-        OR ( counter_name = 'Buffer cache hit ratio'
-             AND object_name = 'SQLServer:Buffer Manager' )
-        OR ( counter_name = 'Target pages'
-             AND object_name = 'SQLServer:Buffer Manager' )
-        OR ( counter_name = 'Database pages'
-             AND object_name = 'SQLServer:Buffer Manager' )
-        OR ( counter_name = 'Checkpoint pages/sec'
-             AND object_name = 'SQLServer:Buffer Manager' )
-        OR ( counter_name = 'Lock Waits/sec'
-             AND instance_name = '_Total' )
-        OR ( counter_name = 'Transactions'
-             AND object_name = 'SQLServer:General Statistics' )
-        OR ( counter_name = 'Logins/sec'
-             AND object_name = 'SQLServer:General Statistics' )
-        OR ( counter_name = 'Logouts/sec'
-             AND object_name = 'SQLServer:General Statistics' )
-        OR ( counter_name = 'Connection Reset/sec'
-             AND object_name = 'SQLServer:General Statistics' )
-        OR ( counter_name = 'Active Temp Tables'
-             AND object_name = 'SQLServer:General Statistics' )`)
+	 OR counter_name = 'SQL Re-Compilations/sec'
+	 OR counter_name = 'User Connections'
+	 OR counter_name = 'Page splits/sec'
+	 OR counter_name = 'Page splits/sec'
+	 OR counter_name = 'Batch Requests/sec'
+	 OR ( counter_name = 'Lock Waits/sec'
+		  AND instance_name = '_Total' )
+	 OR ( counter_name IN ( 'Page life expectancy', 
+							'Buffer cache hit ratio', 
+							'Target pages', 'Database pages', 
+							'Checkpoint pages/sec' )
+		  AND object_name LIKE '%:Buffer Manager%' )
+	 OR ( counter_name IN ( 'Transactions', 
+							'Logins/sec', 
+							'Logouts/sec', 
+							'Connection Reset/sec', 
+							'Active Temp Tables' )
+		  AND object_name LIKE '%:General Statistics%' )`)
 	if err != nil {
 		reporter.Error(errors.Wrapf(err, "error closing rows"))
 		return
