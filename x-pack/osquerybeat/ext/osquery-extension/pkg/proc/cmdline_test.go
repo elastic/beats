@@ -2,6 +2,9 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !windows
+// +build !windows
+
 package proc
 
 import (
@@ -34,16 +37,16 @@ func TestReadCmdLineFS(t *testing.T) {
 				assert.Nil(t, err)
 				assert.Equal(t, result, cmdData)
 			}},
-		//{
-		//	fstest.MapFS{
-		//		"hello.txt": {
-		//			Data: []byte("hello, world"),
-		//		},
-		//	},
-		//	func(result string, err error) {
-		//		assert.Error(t, err)
-		//		assert.Equal(t, result, "")
-		//	}},
+		{
+			fstest.MapFS{
+				"hello.txt": {
+					Data: []byte("hello, world"),
+				},
+			},
+			func(result string, err error) {
+				assert.Error(t, err)
+				assert.Equal(t, result, "")
+			}},
 	}
 
 	for _, testCase := range testCases {
