@@ -13,7 +13,12 @@ import (
 
 func TestNewInputDone(t *testing.T) {
 	config := common.MapStr{
-		"channel_name": "some-channel",
+		"channel_name":              "cometd-channel",
+		"auth.oauth2.client.id":     "DEMOCLIENTID",
+		"auth.oauth2.client.secret": "DEMOCLIENTSECRET",
+		"auth.oauth2.user":          "salesforce_user",
+		"auth.oauth2.password":      "P@$$w0₹D",
+		"auth.oauth2.token_url":     "https://login.salesforce.com/services/oauth2/token",
 	}
 	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
 }

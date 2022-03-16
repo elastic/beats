@@ -22,7 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
-	bay "github.com/kush-elastic/bayeux"
+	bay "github.com/elastic/bayeux"
 )
 
 const (
@@ -106,6 +106,7 @@ func NewInput(
 	os.Setenv("SALESFORCE_CONSUMER_SECRET", conf.Auth.OAuth2.ClientSecret)
 	os.Setenv("SALESFORCE_USER", conf.Auth.OAuth2.User)
 	os.Setenv("SALESFORCE_PASSWORD", conf.Auth.OAuth2.Password)
+	os.Setenv("SALESFORCE_TOKEN_URL", conf.Auth.OAuth2.TokenURL)
 
 	logger := logp.NewLogger("cometd").With(
 		"pubsub_channel", conf.ChannelName)
