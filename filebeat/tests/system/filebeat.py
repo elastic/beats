@@ -172,6 +172,7 @@ class Registry:
 
         return list(data.values())
 
+
 class LogState:
     def __init__(self, path):
         self.path = path

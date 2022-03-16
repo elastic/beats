@@ -27,7 +27,7 @@ class Test(BaseTest):
         )
         os.mkdir(self.working_dir + "/log/")
         file = open(testfile, 'w')
-        offset = 0 # keep count of the bytes written
+        offset = 0  # keep count of the bytes written
         for n in range(0, 5):
             offset += file.write("hello world\n")
         file.close()
@@ -63,7 +63,8 @@ class Test(BaseTest):
 
         # Compare the key excluding the inode and device ID bits
         assert global_entry['_key'].startswith('filestream::.global::native::'), "old key must contain '.global' ID"
-        assert fixed_entry['_key'].startswith('filestream::test-fix-global-id::native::'), "key in registry does not have the expected ID"
+        assert fixed_entry['_key'].startswith(
+            'filestream::test-fix-global-id::native::'), "key in registry does not have the expected ID"
 
         # Compare the TTL because it indicates if the entry has been 'removed' or not
         assert global_entry['ttl'] == 0, "ttl must be 0 because that's the effect of 'removing' the entry from the registry"
