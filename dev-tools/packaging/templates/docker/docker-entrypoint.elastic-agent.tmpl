@@ -2,6 +2,9 @@
 
 set -eo pipefail
 
+# Update umask to retain group write permissions on runtime directories: $root/tmp/default, $root/logs/default and $root/run/default
+umask 0007
+
 # For information on the possible environment variables that can be passed into the container. Run the following
 # command for information on the options that are available.
 #
