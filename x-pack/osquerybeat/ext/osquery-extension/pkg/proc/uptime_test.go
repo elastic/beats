@@ -25,7 +25,7 @@ func TestReadUpTimeFS(t *testing.T) {
 			},
 			func(result int64, err error) {
 				assert.Nil(t, err)
-				assert.Equal(t, result, 179118)
+				assert.Equal(t, result, int64(179118))
 			}},
 		{
 			fstest.MapFS{
