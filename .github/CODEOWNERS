@@ -33,7 +33,7 @@
 /filebeat @elastic/elastic-agent-data-plane
 /x-pack/filebeat @elastic/elastic-agent-data-plane
 
-# Modules are by defaul owned by the integrations team
+# Modules are by default owned by the integrations team
 /filebeat/module/ @elastic/integrations
 /x-pack/filebeat/module/ @elastic/integrations
 
