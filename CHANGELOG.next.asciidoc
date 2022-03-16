@@ -99,6 +99,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Metricbeat*
 
 - Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
+- Fix overflow in `iostat` metrics {pull}30679[30679]
+- Add `commandstats` field to Redis module {pull}29662[29662]
+- Extend documentation about `kubernetes.node.network.*` fields {pull}30826[30826]
 
 *Packetbeat*
 
