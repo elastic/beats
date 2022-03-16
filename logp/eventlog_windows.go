@@ -18,10 +18,10 @@
 package logp
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
-	"errors"
 	"go.uber.org/zap/zapcore"
 	"golang.org/x/sys/windows/svc/eventlog"
 )

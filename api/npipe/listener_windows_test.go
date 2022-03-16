@@ -54,6 +54,7 @@ func TestHTTPOverNamedPipe(t *testing.T) {
 		},
 	}
 
+	// nolint:noctx // for testing purposes
 	r, err := c.Get("http://npipe/echo-hello")
 	require.NoError(t, err)
 	body, err := ioutil.ReadAll(r.Body)

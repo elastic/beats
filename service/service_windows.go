@@ -36,8 +36,8 @@ type beatService struct {
 
 var serviceInstance = &beatService{
 	stopCallback:    nil,
-	done:            make(chan struct{}, 0),
-	executeFinished: make(chan struct{}, 0),
+	done:            make(chan struct{}),
+	executeFinished: make(chan struct{}),
 }
 
 // Execute runs the beat service with the arguments and manages changes that
@@ -67,7 +67,7 @@ loop:
 	// as the windows/svc package will transition the service to STOPPED state
 	// once this function returns.
 	<-m.done
-	return
+	return ssec, errno
 }
 
 func (m *beatService) stop() {
@@ -89,6 +89,7 @@ const couldNotConnect syscall.Errno = 1063
 func ProcessWindowsControlEvents(stopCallback func()) {
 	defer close(serviceInstance.executeFinished)
 
+	// nolint: staticcheck // keep using the deprecated method in order to maintain the existing behavior
 	isInteractive, err := svc.IsAnInteractiveSession()
 	if err != nil {
 		logp.Err("IsAnInteractiveSession: %v", err)
@@ -108,6 +109,7 @@ func ProcessWindowsControlEvents(stopCallback func()) {
 		return
 	}
 
+	// nolint: errorlint // this system error is a special case
 	if errnoErr, ok := err.(syscall.Errno); ok && errnoErr == couldNotConnect {
 		/*
 			 If, as in the case of Jenkins, the process is started as an interactive process, but the invoking process

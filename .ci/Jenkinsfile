@@ -38,6 +38,8 @@ pipeline {
           dir("${BASE_DIR}"){
             withMageEnv(){
               sh(label: 'Mage check', script: 'mage -v check')
+              sh(label: 'Lint Last Change on Darwin', script: 'GOOS=darwin mage -v llc')
+              sh(label: 'Lint Last Change on Windows', script: 'GOOS=windows mage -v llc')
             }
           }
         }

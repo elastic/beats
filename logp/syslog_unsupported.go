@@ -22,6 +22,7 @@ package logp
 
 import (
 	"errors"
+
 	"go.uber.org/zap/zapcore"
 )
 

@@ -225,6 +225,7 @@ func makeSyslogOutput(cfg Config) (zapcore.Core, error) {
 
 func makeEventLogOutput(cfg Config) (zapcore.Core, error) {
 	core, err := newEventLog(cfg.Beat, buildEncoder(cfg), cfg.Level.ZapLevel())
+	// nolint: staticcheck,nolintlint // the implementation is OS-specific and some implementations always return errors
 	if err != nil {
 		return nil, err
 	}
