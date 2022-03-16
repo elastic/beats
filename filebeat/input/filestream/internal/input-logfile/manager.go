@@ -200,9 +200,8 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 
 	prospectorStore := newSourceStore(pStore, sourceIdentifier)
 
-	// create a store without an input ID, this simulates the legacy behaviour of
-	// not setting an ID for a input. This will be used to migrate the entries
-	// in the registry to use the new input ID.
+	// create a store with the deprecated global id. This will be used to
+	// migrate the entries in the registry to use the new input ID.
 	globalIdentifier, err := newSourceIdentifier(cim.Type, globalInputID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create global identifier for input: %w", err)

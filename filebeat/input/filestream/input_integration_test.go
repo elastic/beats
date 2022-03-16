@@ -969,4 +969,3 @@ func TestGlobalIDCannotBeUsed(t *testing.T) {
 		t.Fatal("expecting an error because '.global' cannot be used as input ID")
 	}
 }
-

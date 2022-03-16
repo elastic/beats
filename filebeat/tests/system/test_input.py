@@ -57,13 +57,15 @@ class Test(BaseTest):
 
         # We got the latest entry for each key in the registry,
         # they're ordered by the time of creation, so we can be sure the
-        # first uses the old, global, and the second is the 'fixed' one
+        # first uses the old, '.global' ID, and the second is the 'fixed' one
         global_entry = entries[0]
         fixed_entry = entries[1]
 
         # Compare the key excluding the inode and device ID bits
-        assert global_entry['_key'].startswith('filestream::.global::native::'), "old key must contain '.global' ID"
-        assert fixed_entry['_key'].startswith('filestream::test-fix-global-id::native::'), "key in registry has not been fixed"
+        assert global_entry['_key'].startswith('filestream::.global::native::'),
+        "old key must contain '.global' ID"
+        assert fixed_entry['_key'].startswith('filestream::test-fix-global-id::native::'),
+        "key in registry does not have the expected ID"
 
         # Compare the TTL because it indicates if the entry has been 'removed' or not
         assert global_entry['ttl'] == 0, "ttl must be 0 because that's the effect of 'removing' the entry from the registry"
