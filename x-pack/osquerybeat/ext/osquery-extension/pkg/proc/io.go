@@ -17,6 +17,11 @@ type ProcIO struct {
 	CancelledWriteBytes string
 }
 
+// ReadIO ReadProcStat reads process io from /proc/<pid>/io.
+// The parsing code logic is borrowed from osquery C++ implementation and translated to Go.
+// This makes the data returned from the `host_processes` table
+// consistent with data returned from the original osquery `processes` table.
+// https://github.com/osquery/osquery/blob/master/osquery/tables/system/linux/processes.cpp
 func ReadIO(root string, pid string) (procio ProcIO, err error) {
 	return ReadIOFS(os.DirFS(root), pid)
 }
