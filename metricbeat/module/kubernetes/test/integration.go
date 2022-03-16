@@ -82,7 +82,11 @@ func GetSchedulerConfig(t *testing.T, metricSetName string) map[string]interface
 		"module":     "kubernetes",
 		"metricsets": []string{metricSetName},
 		"host":       "${NODE_NAME}",
-		"hosts":      []string{"localhost:10251"},
+		"hosts":      []string{"https://0.0.0.0:10259"},
+		"bearer_token_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
+		"ssl": map[string]interface{}{
+			"verification_mode": "none",
+		},
 	}
 }
 
@@ -93,6 +97,10 @@ func GetControllerManagerConfig(t *testing.T, metricSetName string) map[string]i
 		"module":     "kubernetes",
 		"metricsets": []string{metricSetName},
 		"host":       "${NODE_NAME}",
-		"hosts":      []string{"localhost:10252"},
+		"hosts":      []string{"https://0.0.0.0:10257"},
+		"bearer_token_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
+		"ssl": map[string]interface{}{
+			"verification_mode": "none",
+		},
 	}
 }
