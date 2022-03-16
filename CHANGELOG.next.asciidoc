@@ -72,6 +72,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix Docker module: rename fields on dashboards. {pull}30500[30500]
 - Add back missing metrics to system/linux. {pull}30774[30774]
 - GCP metrics query instances with aggregatedList API to improve efficiency. {pull}30154[#30153]
+- Fix delay in perfmon counters collection {pull}30861[#30861]
 
 *Packetbeat*
 
