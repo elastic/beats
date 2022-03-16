@@ -29,7 +29,7 @@ import (
 type kubeAnnotatorConfig struct {
 	KubeConfig        string                       `config:"kube_config"`
 	KubeClientOptions kubernetes.KubeClientOptions `config:"kube_client_options"`
-	Host              string                       `config:"host"`
+	Node              string                       `config:"node"`
 	Scope             string                       `config:"scope"`
 	Namespace         string                       `config:"namespace"`
 	SyncPeriod        time.Duration                `config:"sync_period"`
@@ -52,11 +52,12 @@ type PluginConfig []map[string]common.Config
 
 func defaultKubernetesAnnotatorConfig() kubeAnnotatorConfig {
 	return kubeAnnotatorConfig{
-		SyncPeriod:      10 * time.Minute,
-		CleanupTimeout:  60 * time.Second,
-		DefaultMatchers: Enabled{true},
-		DefaultIndexers: Enabled{true},
-		Scope:           "node",
+		SyncPeriod:          10 * time.Minute,
+		CleanupTimeout:      60 * time.Second,
+		DefaultMatchers:     Enabled{true},
+		DefaultIndexers:     Enabled{true},
+		Scope:               "node",
+		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
 	}
 }
 
@@ -66,7 +67,7 @@ func (k *kubeAnnotatorConfig) Validate() error {
 	}
 
 	if k.Scope == "cluster" {
-		k.Host = ""
+		k.Node = ""
 	}
 
 	// Checks below were added to warn the users early on and avoid initialising the processor in case the `logs_path`

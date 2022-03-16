@@ -106,7 +106,7 @@ The `httpjson` input keeps a runtime state between requests. This state can be a
 The state has the following elements:
 
 - `last_response.url.value`: The full URL with params and fragments from the last request with a successful response.
-- `last_response.url.params`: A map containing the params from the URL in `last_response.url.value`.
+- `last_response.url.params`: A https://pkg.go.dev/net/url#Values[`url.Values`] of the params from the URL in `last_response.url.value`.  Can be queried with the https://pkg.go.dev/net/url#Values.Get[`Get`] function.
 - `last_response.header`: A map containing the headers from the last successful response.
 - `last_response.body`: A map containing the parsed JSON body from the last successful response. This is the response as it comes from the remote server.
 - `last_response.page`: A number indicating the page number of the last response.
@@ -219,7 +219,9 @@ Some built-in helper functions are provided to work with the input state inside 
 - `join`: joins a list using the specified separator. Example: `[[join .body.arr ","]]`
 - `sprintf`: formats according to a format specifier and returns the resulting string. Refer to https://pkg.go.dev/fmt#Sprintf[the Go docs] for usage. Example: `[[sprintf "%d:%q" 34 "quote this"]]`
 - `hmacBase64`: calculates the hmac signature of a list of strings concatenated together. Returns a base64 encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
-- `uuid`: returns a random UUID such as `a11e8780-e3e7-46d0-8e76-f66e75acf019` Example: `[[ uuid ]]`
+- `uuid`: returns a random UUID such as `a11e8780-e3e7-46d0-8e76-f66e75acf019`. Example: `[[ uuid ]]`
+- `userAgent`: generates the User Agent with optional additional values. If no arguments are provided, it will generate the default User Agent that is added to all requests by default. It is recommended to delete the existing User-Agent header before setting a new one. Example: `[[ userAgent "integration/1.2.3" ]]` would generate `Elastic-Filebeat/8.1.0 (darwin; amd64; 9b893e88cfe109e64638d65c58fd75c2ff695402; 2021-12-15 13:20:00 +0000 UTC; integration_name/1.2.3)`
+- `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns `{version}`.
 
 In addition to the provided functions, any of the native functions for https://golang.org/pkg/time/#Time[`time.Time`], https://golang.org/pkg/net/http/#Header[`http.Header`], and https://golang.org/pkg/net/url/#Values[`url.Values`] types can be used on the corresponding objects. Examples: `[[(now).Day]]`, `[[.last_response.header.Get "key"]]`
 
@@ -290,8 +292,8 @@ The user used as part of the authentication flow. It is required for authenticat
 The password used as part of the authentication flow. It is required for authentication
  - grant type password. It is only available for provider `default`.
 
-NOTE: user and password are required for grant_type password. If user and 
-password is not used then it will automatically use the `token_url` and 
+NOTE: user and password are required for grant_type password. If user and
+password is not used then it will automatically use the `token_url` and
 `client credential` method.
 
 [float]

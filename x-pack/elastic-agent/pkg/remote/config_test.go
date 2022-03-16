@@ -21,8 +21,6 @@ func TestPackUnpack(t *testing.T) {
 	c := Config{
 		Protocol: Protocol("https"),
 		SpaceID:  "123",
-		Username: "foo",
-		Password: "bar",
 		Path:     "/ok",
 		Transport: httpcommon.HTTPTransportSettings{
 			Timeout: 10 * time.Second,

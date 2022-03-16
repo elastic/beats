@@ -19,7 +19,6 @@ package pressure
 
 import (
 	"fmt"
-	"path/filepath"
 	"runtime"
 
 	"github.com/pkg/errors"
@@ -27,8 +26,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/linux"
 )
 
 const (
@@ -50,8 +49,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	fs     string
-	procfs procfs.FS
+	mod resolve.Resolver
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -63,19 +61,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("the %v/%v metricset is only supported on Linux", moduleName, metricsetName)
 	}
 
-	sys := base.Module().(linux.LinuxModule)
-	hostfs := sys.GetHostFS()
-
-	path := filepath.Join(hostfs, "proc")
-	procfs, err := procfs.NewFS(path)
-	if err != nil {
-		return nil, errors.Wrapf(err, "error creating new Host FS at %s", path)
-	}
+	sys := base.Module().(resolve.Resolver)
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		fs:            hostfs,
-		procfs:        procfs,
+		mod:           sys,
 	}, nil
 }
 
@@ -100,8 +90,13 @@ func fetchLinuxPSIStats(m *MetricSet) ([]common.MapStr, error) {
 	resources := []string{"cpu", "memory", "io"}
 	events := []common.MapStr{}
 
+	procfs, err := procfs.NewFS(m.mod.ResolveHostFS("/proc"))
+	if err != nil {
+		return nil, errors.Wrapf(err, "error creating new Host FS at %s", m.mod.ResolveHostFS("/proc"))
+	}
+
 	for _, resource := range resources {
-		psiMetric, err := m.procfs.PSIStatsForResource(resource)
+		psiMetric, err := procfs.PSIStatsForResource(resource)
 		if err != nil {
 			return nil, errors.Wrap(err, "check that /proc/pressure is available, and/or enabled")
 		}

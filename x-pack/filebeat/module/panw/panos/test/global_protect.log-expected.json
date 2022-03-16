@@ -368,6 +368,71 @@
         "user.name": "maxmustermann"
     },
     {
+        "@timestamp": "2021-03-02T11:01:02.000-02:00",
+        "client.address": "10.20.30.40",
+        "client.ip": "10.20.30.40",
+        "client.nat.ip": "67.43.156.12",
+        "event.code": "gateway-setup-ipsec",
+        "event.dataset": "panw.panos",
+        "event.duration": 0,
+        "event.module": "panw",
+        "event.original": "1,2021/03/02 11:01:03,123456789999,GLOBALPROTECT,0,2305,2021/03/02 11:01:02,vsys1,gateway-setup-ipsec,tunnel,,IPSec,domain\\musterman,DE,Rechner123,67.43.156.12,0.0.0.0,10.20.30.40,0.0.0.0,96c43d47-8bb5-4f78-8dfc-413a189a29e0,SERIALNR,5.1.1,Windows,\"Microsoft Windows 10 Enterprise, 64-bit\",1,,,,success,,0,,0,GPGateway,6894571632887761989,0x8000000000000000,1970-01-01T01:00:00.000+01:00,,0,manual only,,",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "fileset.name": "panos",
+        "host.id": "96c43d47-8bb5-4f78-8dfc-413a189a29e0",
+        "host.ip": "10.20.30.40",
+        "host.name": "Rechner123",
+        "host.os.family": "Windows",
+        "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
+        "input.type": "log",
+        "log.offset": 2061,
+        "network.type": "ipv4",
+        "observer.hostname": "GPGateway",
+        "observer.product": "PAN-OS",
+        "observer.serial_number": "123456789999",
+        "observer.type": "firewall",
+        "observer.vendor": "Palo Alto Networks",
+        "panw.panos.actionflags": "0x8000000000000000",
+        "panw.panos.client_ver": "5.1.1",
+        "panw.panos.error_code": "0",
+        "panw.panos.priority": "manual only",
+        "panw.panos.repeatcnt": 1,
+        "panw.panos.response_time": "0",
+        "panw.panos.sequence_number": 6894571632887761989,
+        "panw.panos.serial_number": "SERIALNR",
+        "panw.panos.source.nat.ip": "67.43.156.12",
+        "panw.panos.stage": "tunnel",
+        "panw.panos.sub_type": "0",
+        "panw.panos.tunnel_type": "IPSec",
+        "panw.panos.type": "GLOBALPROTECT",
+        "panw.panos.virtual_sys": "vsys1",
+        "related.hosts": [
+            "GPGateway",
+            "Rechner123"
+        ],
+        "related.ip": [
+            "10.20.30.40",
+            "67.43.156.12"
+        ],
+        "related.user": [
+            "musterman"
+        ],
+        "service.type": "panw",
+        "source.address": "10.20.30.40",
+        "source.geo.name": "DE",
+        "source.ip": "10.20.30.40",
+        "source.nat.ip": "67.43.156.12",
+        "source.user.domain": "domain",
+        "source.user.name": "musterman",
+        "tags": [
+            "forwarded",
+            "pan-os"
+        ],
+        "user.domain": "domain",
+        "user.name": "musterman"
+    },
+    {
         "@timestamp": "2021-03-02T09:39:26.000-02:00",
         "client.address": "0.0.0.0",
         "client.ip": "0.0.0.0",
@@ -495,7 +560,7 @@
         "user.name": "maxmustermann"
     },
     {
-        "@timestamp": "2021-10-22T16:10:05.000Z",
+        "@timestamp": "2021-10-22T14:10:05.000-02:00",
         "client.address": "10.2.2.2",
         "client.ip": "10.2.2.2",
         "client.nat.ip": "10.1.1.1",
@@ -553,7 +618,7 @@
         "user.name": "host"
     },
     {
-        "@timestamp": "2021-11-09T21:45:14.000Z",
+        "@timestamp": "2021-11-09T19:45:14.000-02:00",
         "client.address": "10.4.4.4",
         "client.ip": "10.4.4.4",
         "client.nat.ip": "10.3.3.3",
@@ -611,7 +676,7 @@
         "user.name": "user"
     },
     {
-        "@timestamp": "2021-11-09T21:45:14.000Z",
+        "@timestamp": "2021-11-09T19:45:14.000-02:00",
         "event.code": "gateway-tunnel-latency",
         "event.dataset": "panw.panos",
         "event.duration": 0,

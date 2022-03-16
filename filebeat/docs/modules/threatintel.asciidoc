@@ -29,7 +29,6 @@ The available filesets are:
 * <<otx,otx>>: Supports gathering threat intel attributes from AlientVault OTX.
 * <<anomali,anomali>>: Supports gathering threat intel attributes from Anomali Limo.
 * <<anomalithreatstream,anomalithreatstream>>: Supports gathering threat intel attributes from Anomali ThreatStream.
-* <<recordedfuture,recordedfuture>>: Supports gathering threat intel attributes from Recorded Future.
 * <<threatq,threatq>>: Supports gathering threat intel attributes from ThreatQuotient.
 
 include::../include/gs-link.asciidoc[]
@@ -515,96 +514,6 @@ Anomali ThreatStream fields are mapped to the following ECS fields:
 [[a]]
 [small]#[1]: Field is used to derive a value for the ECS field but its original value is kept under `threatintel.anomalithreatstream`.#
 
-[[recordedfuture]]
-[float]
-==== `recordedfuture` fileset settings
-
-The `recordedfuture` fileset fetches intelligence from the Recorded Future Connect API.
-It supports `domain`, `hash`, `ip` and `url` data types.
-
-To enable it you need to define the URL to fetch data from. You can construct this URL
-using the https://api.recordedfuture.com/index.html[Recorded Future API Explorer.] The URL
-must point to the `/search` endpoint and contain a suitable `limit`
-(how many records to return from a single request) and `fields` parameters.
-The `entity` and `timestamps` fields are required.
-
-Sample configuration:
-[source,yaml]
-----
-- module: threatintel
-  recordedfuture:
-    enabled: true
-    var.input: httpjson
-    var.interval: 5m
-    var.first_interval: 168h
-    var.url: "https://api.recordedfuture.com/v2/ip/search?limit=200&fields=entity,timestamps,risk,intelCard,location&metadata=false"
-    var.api_token: "<RF_TOKEN>"
-----
-
-To fetch threat intelligence from multiple data types, you must define more than
-one instance of the module:
-[source,yaml]
-----
-- module: threatintel
-  recordedfuture:
-    enabled: true
-    var.input: httpjson
-    var.interval: 5m
-    var.first_interval: 168h
-    var.url: "https://api.recordedfuture.com/v2/ip/search?limit=200&fields=entity,timestamps,risk,intelCard,location&metadata=false"
-    var.api_token: "<RF_TOKEN>"
-- module: threatintel
-  recordedfuture:
-    enabled: true
-    var.input: httpjson
-    var.interval: 1m
-    var.first_interval: 168h
-    var.url: "https://api.recordedfuture.com/v2/hash/search?limit=200&fields=entity,fileHashes,timestamps,risk,intelCard,location&metadata=false"
-    var.api_token: "<RF_TOKEN>"
-----
-
-*`var.url`*::
-
-The URL of the API endpoint to connect with.
-
-*`var.api_token`*::
-
-The API token used to access Recorded Future API.
-
-*`var.interval`*::
-
-How often the API is polled for updated information.
-
-*`var.first_interval`*::
-
-How far back to search when retrieving events the first time {beatname_uc} starts up.
-After the first interval has passed the module itself will use the timestamp
-from the last response as the filter when retrieving new events.
-
-*`var.proxy_url`*::
-
-Optional URL to use as HTTP proxy.
-
-
-Recorded Future fields are mapped to the following ECS fields:
-
-[options="header"]
-|=============================================================
-| Recorded Future fields | ECS Fields
-| entity.name            | threat.indicator.{url,ip,domain,file.hash}
-| entity.type            | threat.indicator.type
-| fileHashes             | threat.indicator.file.hash
-| intelCard              | event.reference
-| location.asn           | threat.indicator.as.number
-| location.location      | threat.indicator.geo
-| location.organization  | threat.indicator.as.organization.name
-| risk.score             | event.risk_score
-| timestamps.firstSeen   | threat.indicator.first_seen
-| timestamps.lastSeen    | threat.indicator.last_seen
-|=============================================================
-
-:has-dashboards!:
-
 [float]
 === Dashboards
 
@@ -646,12 +555,6 @@ image::./images/filebeat-threatintel-misp.png[]
 
 [float]
 Overview of the information provided by the MISP feed.
-
-[role="screenshot"]
-image::./images/filebeat-threatintel-recordedfuture.png[]
-
-[float]
-Overview of the information provided by the Recorded Future feed.
 
 [[threatq]]
 [float]
@@ -758,12 +661,6 @@ image::./images/filebeat-threatintel-misp.png[]
 
 [float]
 Overview of the information provided by the MISP feed.
-
-[role="screenshot"]
-image::./images/filebeat-threatintel-recordedfuture.png[]
-
-[float]
-Overview of the information provided by the Recorded Future feed.
 
 [role="screenshot"]
 image::./images/filebeat-threatintel-threatq.png[]

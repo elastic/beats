@@ -20,7 +20,7 @@ package decoder
 import "github.com/google/gopacket"
 
 // implement DecodingLayer with support of switching between multiple layers to
-// remember outter layer results
+// remember outer layer results
 type multiLayer struct {
 	layers []gopacket.DecodingLayer // all layers must have same type
 	i      int

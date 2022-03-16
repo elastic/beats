@@ -8,14 +8,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws/awserr"
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -101,7 +105,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 
 		gomock.InOrder(
 			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-				Do(func(ctx context.Context, _ *logp.Logger, _ *eventACKTracker, _ s3EventV2) {
+				Do(func(ctx context.Context, _ *logp.Logger, _ *awscommon.EventACKTracker, _ s3EventV2) {
 					timed.Wait(ctx, 5*visibilityTimeout)
 				}).Return(mockS3Handler),
 			mockS3Handler.EXPECT().ProcessS3Object().Return(nil),
@@ -158,6 +162,35 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		err := p.ProcessSQS(ctx, &msg)
 		t.Log(err)
 		require.Error(t, err)
+	})
+}
+
+func TestSqsProcessor_keepalive(t *testing.T) {
+	msg := newSQSMessage(newS3Event("log.json"))
+
+	// Test will call ChangeMessageVisibility once and then keepalive will
+	// exit because the SQS receipt handle is not usable.
+	t.Run("keepalive stops after receipt handle is invalid", func(t *testing.T) {
+		const visibilityTimeout = time.Second
+
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockAPI := NewMockSQSAPI(ctrl)
+		mockS3HandlerFactory := NewMockS3ObjectHandlerFactory(ctrl)
+
+		receiptHandleErr := awserr.New(sqs.ErrCodeReceiptHandleIsInvalid, "fake receipt handle is invalid.", nil)
+
+		mockAPI.EXPECT().ChangeMessageVisibility(gomock.Any(), gomock.Eq(&msg), gomock.Eq(visibilityTimeout)).
+			Times(1).Return(receiptHandleErr)
+
+		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, visibilityTimeout, 5, mockS3HandlerFactory)
+		var wg sync.WaitGroup
+		wg.Add(1)
+		p.keepalive(ctx, p.log, &wg, &msg)
+		wg.Wait()
 	})
 }
 

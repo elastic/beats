@@ -22,8 +22,6 @@ package entropy
 
 import (
 	"io/ioutil"
-	"path"
-	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -31,8 +29,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -49,7 +47,7 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	randomPath string
+	mod resolve.Resolver
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -57,12 +55,11 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The system entropy metricset is beta.")
 
-	sys := base.Module().(system.SystemModule)
-	totalPath := filepath.Join(sys.GetHostFS(), "/proc/sys/kernel/random")
+	sys := base.Module().(resolve.Resolver)
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		randomPath:    totalPath,
+		mod:           sys,
 	}, nil
 }
 
@@ -70,11 +67,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	entropy, err := getEntropyData(path.Join(m.randomPath, "entropy_avail"))
+	entropy, err := getEntropyData(m.mod.ResolveHostFS("/proc/sys/kernel/random/entropy_avail"))
 	if err != nil {
 		return errors.Wrap(err, "error getting entropy")
 	}
-	poolsize, err := getEntropyData(path.Join(m.randomPath, "poolsize"))
+	poolsize, err := getEntropyData(m.mod.ResolveHostFS("/proc/sys/kernel/random/poolsize"))
 	if err != nil {
 		return errors.Wrap(err, "error getting poolsize")
 	}

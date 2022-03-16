@@ -39,20 +39,130 @@ import (
 
 const (
 	// Names that are registered by the test for logging events.
-	providerName = "WinlogbeatTestGo"
-	sourceName   = "Integration Test"
+	providerName   = "WinlogbeatTestGo"
+	sourceName     = "Integration Test"
+	customXMLQuery = `<QueryList>
+    <Query Id="0" Path="WinlogbeatTestGo">
+        <Select Path="WinlogbeatTestGo">*</Select>
+    </Query>
+</QueryList>`
 
 	// Event message files used when logging events.
 
 	// EventCreate.exe has valid event IDs in the range of 1-1000 where each
 	// event message requires a single parameter.
 	eventCreateMsgFile = "%SystemRoot%\\System32\\EventCreate.exe"
-	// services.exe is used by the Service Control Manager as its event message
-	// file; these tests use it to log messages with more than one parameter.
-	servicesMsgFile = "%SystemRoot%\\System32\\services.exe"
-	// netevent.dll has messages that require no message parameters.
-	netEventMsgFile = "%SystemRoot%\\System32\\netevent.dll"
 )
+
+func TestWinEventLogConfig_Validate(t *testing.T) {
+	tests := []struct {
+		In      winEventLogConfig
+		WantErr bool
+		Desc    string
+	}{
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{
+					ID:       "test",
+					XMLQuery: customXMLQuery,
+				},
+			},
+			WantErr: false,
+			Desc:    "xml query: all good",
+		},
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{
+					ID:       "test",
+					XMLQuery: customXMLQuery[:len(customXMLQuery)-4], // Malformed XML by truncation.
+				},
+			},
+			WantErr: true,
+			Desc:    "xml query: malformed XML",
+		},
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{
+					XMLQuery: customXMLQuery,
+				},
+			},
+			WantErr: true,
+			Desc:    "xml query: missing ID",
+		},
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{
+					ID:       "test",
+					Name:     "test",
+					XMLQuery: customXMLQuery,
+				},
+			},
+			WantErr: true,
+			Desc:    "xml query: conflicting keys (xml query and name)",
+		},
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{
+					ID:       "test",
+					XMLQuery: customXMLQuery,
+				},
+				SimpleQuery: query{IgnoreOlder: 1},
+			},
+			WantErr: true,
+			Desc:    "xml query: conflicting keys (xml query and ignore_older)",
+		},
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{
+					ID:       "test",
+					XMLQuery: customXMLQuery,
+				},
+				SimpleQuery: query{Level: "error"},
+			},
+			WantErr: true,
+			Desc:    "xml query: conflicting keys (xml query and level)",
+		},
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{
+					ID:       "test",
+					XMLQuery: customXMLQuery,
+				},
+				SimpleQuery: query{EventID: "1000"},
+			},
+			WantErr: true,
+			Desc:    "xml query: conflicting keys (xml query and event_id)",
+		},
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{
+					ID:       "test",
+					XMLQuery: customXMLQuery,
+				},
+				SimpleQuery: query{Provider: []string{providerName}},
+			},
+			WantErr: true,
+			Desc:    "xml query: conflicting keys (xml query and provider)",
+		},
+		{
+			In: winEventLogConfig{
+				ConfigCommon: ConfigCommon{},
+			},
+			WantErr: true,
+			Desc:    "missing name",
+		},
+	}
+
+	for _, tc := range tests {
+		gotErr := tc.In.Validate()
+
+		if tc.WantErr {
+			assert.NotNil(t, gotErr, tc.Desc)
+		} else {
+			assert.Nil(t, gotErr, "%q got unexpected err: %v", tc.Desc, gotErr)
+		}
+	}
+}
 
 func TestWindowsEventLogAPI(t *testing.T) {
 	testWindowsEventLog(t, winEventLogAPIName)
@@ -78,6 +188,34 @@ func testWindowsEventLog(t *testing.T, api string) {
 	openLog := func(t testing.TB, config map[string]interface{}) EventLog {
 		return openLog(t, api, nil, config)
 	}
+
+	// Test reading from an event log using a custom XML query.
+	t.Run("custom_xml_query", func(t *testing.T) {
+		cfg := map[string]interface{}{
+			"id":        "custom-xml-query",
+			"xml_query": customXMLQuery,
+		}
+
+		log := openLog(t, cfg)
+		defer log.Close()
+
+		var eventCount int
+
+		for eventCount < totalEvents {
+			records, err := log.Read()
+			if err != nil {
+				t.Fatal("read error", err)
+			}
+			if len(records) == 0 {
+				t.Fatal("read returned 0 records")
+			}
+
+			t.Logf("Read() returned %d events.", len(records))
+			eventCount += len(records)
+		}
+
+		assert.Equal(t, totalEvents, eventCount)
+	})
 
 	t.Run("batch_read_size_config", func(t *testing.T) {
 		const batchReadSize = 2

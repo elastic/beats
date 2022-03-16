@@ -55,6 +55,7 @@ func (c *Config) InitDefaults() {
 	c.Scope = "node"
 	c.LabelsDedot = true
 	c.AnnotationsDedot = true
+	c.AddResourceMetadata = metadata.GetDefaultResourceMetadataConfig()
 }
 
 // Validate ensures correctness of config

@@ -21,9 +21,10 @@ import (
 const metadataPrefix = "aws.rds.db_instance."
 
 // AddMetadata adds metadata for RDS instances from a specific region
-func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, events map[string]mb.Event) map[string]mb.Event {
+func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) map[string]mb.Event {
+	rdsServiceName := awscommon.CreateServiceName("rds", fips_enabled, regionName)
 	svc := rds.New(awscommon.EnrichAWSConfigWithEndpoint(
-		endpoint, "rds", regionName, awsConfig))
+		endpoint, rdsServiceName, regionName, awsConfig))
 
 	// Get DBInstance IDs per region
 	dbDetailsMap, err := getDBInstancesPerRegion(svc)

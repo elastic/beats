@@ -21,14 +21,16 @@
 package process_summary
 
 import (
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/process"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 func TestData(t *testing.T) {
@@ -40,6 +42,7 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
+	logp.DevelopmentSetup()
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
@@ -49,32 +52,49 @@ func TestFetch(t *testing.T) {
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		event.StringToPrint())
 
+	_, err := event.GetValue("system.process.summary")
+	require.NoError(t, err)
+
+}
+
+func TestStateNames(t *testing.T) {
+	logp.DevelopmentSetup()
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+	events, errs := mbtest.ReportingFetchV2Error(f)
+
+	require.Empty(t, errs)
+	require.NotEmpty(t, events)
+	event := events[0].BeatEvent("system", "process_summary").Fields
+
 	summary, err := event.GetValue("system.process.summary")
 	require.NoError(t, err)
 
 	event, ok := summary.(common.MapStr)
 	require.True(t, ok)
 
-	if runtime.GOOS == "windows" {
-		assert.Contains(t, event, "total")
-		assert.Contains(t, event, "sleeping")
-		assert.Contains(t, event, "running")
-		assert.Contains(t, event, "unknown")
-		total := event["sleeping"].(int) + event["running"].(int) + event["unknown"].(int)
-		assert.Equal(t, event["total"].(int), total)
-	} else {
-		assert.Contains(t, event, "total")
-		assert.Contains(t, event, "sleeping")
-		assert.Contains(t, event, "running")
-		assert.Contains(t, event, "idle")
-		assert.Contains(t, event, "stopped")
-		assert.Contains(t, event, "zombie")
-		assert.Contains(t, event, "unknown")
-		total := event["sleeping"].(int) + event["running"].(int) + event["idle"].(int) +
-			event["stopped"].(int) + event["zombie"].(int) + event["unknown"].(int)
+	// if there's nothing marked as sleeping or idle, something weird is happening
+	assert.NotZero(t, event["total"])
 
-		assert.Equal(t, event["total"].(int), total)
+	var sum int
+	total := event["total"].(int)
+	for key, val := range event {
+		if key == "total" {
+			continue
+		}
+		// Check to make sure the values we got actually exist
+		exists := false
+		for _, proc := range process.PidStates {
+			if string(proc) == key {
+				exists = true
+				break
+			}
+		}
+		assert.True(t, exists, "could not find value %s in event #%v", key, event.StringToPrint())
+
+		sum = val.(int) + sum
 	}
+	assert.Equal(t, total, sum)
+
 }
 
 func getConfig() map[string]interface{} {

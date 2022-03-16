@@ -22,9 +22,10 @@ import (
 const metadataPrefix = "aws.ec2.instance."
 
 // AddMetadata adds metadata for EC2 instances from a specific region
-func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, events map[string]mb.Event) map[string]mb.Event {
+func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) map[string]mb.Event {
+	ec2ServiceName := awscommon.CreateServiceName("ec2", fips_enabled, regionName)
 	svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
-		endpoint, "ec2", regionName, awsConfig))
+		endpoint, ec2ServiceName, regionName, awsConfig))
 
 	instancesOutputs, err := getInstancesPerRegion(svcEC2)
 	if err != nil {

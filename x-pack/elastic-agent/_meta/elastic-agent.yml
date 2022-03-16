@@ -43,8 +43,7 @@ inputs:
 
 #     # optional values
 #     #protocol: "https"
-#     #username: "elastic"
-#     #password: "changeme"
+#     #service_token: "example-token"
 #     #path: ""
 #     #ssl.verification_mode: full
 #     #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
@@ -111,6 +110,8 @@ inputs:
 #       host: localhost
 #       # Port on which the HTTP endpoint will bind. Default is 0 meaning feature is disabled.
 #       port: 6791
+#       # Metrics buffer endpoint
+#       buffer.enabled: false
 
 # # Allow fleet to reload his configuration locally on disk.
 # # Notes: Only specific process configuration will be reloaded.

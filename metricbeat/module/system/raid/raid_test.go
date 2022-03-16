@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 func TestData(t *testing.T) {
@@ -47,8 +48,8 @@ func TestFetch(t *testing.T) {
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":           "system",
-		"metricsets":       []string{"raid"},
-		"raid.mount_point": "./_meta/testdata",
+		"module":     "system",
+		"metricsets": []string{"raid"},
+		"hostfs":     "./_meta/testdata",
 	}
 }

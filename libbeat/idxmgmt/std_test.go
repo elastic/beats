@@ -18,7 +18,6 @@
 package idxmgmt
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -108,13 +107,6 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 	stable := func(s string) nameFunc {
 		return func(_ time.Time) string { return s }
 	}
-	dateIdx := func(base string) nameFunc {
-		return func(ts time.Time) string {
-			ts = ts.UTC()
-			ext := fmt.Sprintf("%d.%02d.%02d", ts.Year(), ts.Month(), ts.Day())
-			return fmt.Sprintf("%v-%v", base, ext)
-		}
-	}
 
 	cases := map[string]struct {
 		ilmCalls []onCall
@@ -136,7 +128,7 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 		"event index without ilm": {
 			ilmCalls: noILM,
 			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
-			want:     dateIdx("test"),
+			want:     stable("test"),
 			meta: common.MapStr{
 				"index": "test",
 			},
@@ -144,7 +136,7 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 		"event index without ilm must be lowercase": {
 			ilmCalls: noILM,
 			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
-			want:     dateIdx("test"),
+			want:     stable("test"),
 			meta: common.MapStr{
 				"index": "Test",
 			},
@@ -162,7 +154,7 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 		"event index with ilm": {
 			ilmCalls: ilmTemplateSettings("test-9.9.9"),
 			cfg:      map[string]interface{}{"index": "test-%{[agent.version]}"},
-			want:     dateIdx("event-index"),
+			want:     stable("event-index"),
 			meta: common.MapStr{
 				"index": "event-index",
 			},

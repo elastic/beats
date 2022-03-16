@@ -1900,6 +1900,7 @@ func TestPod_EmitEvent(t *testing.T) {
 	}
 
 	client := k8sfake.NewSimpleClientset()
+	addResourceMetadata := metadata.GetDefaultResourceMetadataConfig()
 	for _, test := range tests {
 		t.Run(test.Message, func(t *testing.T) {
 			mapper, err := template.NewConfigMapper(nil, nil, nil)
@@ -1907,7 +1908,7 @@ func TestPod_EmitEvent(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, client, nil, nil, nil)
+			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, client, nil, nil, addResourceMetadata)
 			p := &Provider{
 				config:    defaultConfig(),
 				bus:       bus.New(logp.NewLogger("bus"), "test"),
@@ -1986,7 +1987,7 @@ func TestNamespacePodUpdater(t *testing.T) {
 		t.Run(title, func(t *testing.T) {
 			handler := &mockUpdaterHandler{}
 			store := &mockUpdaterStore{objects: c.pods}
-			updater := newNamespacePodUpdater(handler.OnUpdate, store, &sync.Mutex{})
+			updater := kubernetes.NewNamespacePodUpdater(handler.OnUpdate, store, &sync.Mutex{})
 
 			namespace := &kubernetes.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
@@ -1994,6 +1995,58 @@ func TestNamespacePodUpdater(t *testing.T) {
 				},
 			}
 			updater.OnUpdate(namespace)
+
+			assert.EqualValues(t, c.expected, handler.objects)
+		})
+	}
+}
+
+func TestNodePodUpdater(t *testing.T) {
+	pod := func(name, node string) *kubernetes.Pod {
+		return &kubernetes.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: name,
+			},
+			Spec: v1.PodSpec{
+				NodeName: node,
+			},
+		}
+	}
+
+	cases := map[string]struct {
+		pods     []interface{}
+		expected []interface{}
+	}{
+		"no pods": {},
+		"two pods but only one in node": {
+			pods: []interface{}{
+				pod("onepod", "foo"),
+				pod("onepod", "bar"),
+			},
+			expected: []interface{}{
+				pod("onepod", "foo"),
+			},
+		},
+		"two pods but none in node": {
+			pods: []interface{}{
+				pod("onepod", "bar"),
+				pod("otherpod", "bar"),
+			},
+		},
+	}
+
+	for title, c := range cases {
+		t.Run(title, func(t *testing.T) {
+			handler := &mockUpdaterHandler{}
+			store := &mockUpdaterStore{objects: c.pods}
+			updater := kubernetes.NewNodePodUpdater(handler.OnUpdate, store, &sync.Mutex{})
+
+			node := &kubernetes.Node{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "foo",
+				},
+			}
+			updater.OnUpdate(node)
 
 			assert.EqualValues(t, c.expected, handler.objects)
 		})

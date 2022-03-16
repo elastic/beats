@@ -136,7 +136,7 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output, an
 
 		if *field.DefaultField {
 			switch field.Type {
-			case "", "keyword", "text":
+			case "", "keyword", "text", "match_only_text", "wildcard":
 				addToDefaultFields(&field)
 			}
 		}
@@ -317,11 +317,11 @@ func (p *Processor) wildcard(f *mapping.Field, analyzers common.MapStr) common.M
 
 	property["type"] = "wildcard"
 
-	switch f.IgnoreAbove {
-	case 0: // Use libbeat default
-		property["ignore_above"] = defaultIgnoreAbove
-	case -1: // Use ES default
-	default: // Use user value
+	/* For wildcard fields, unlike keywords, don't force a default ignore_above limit.
+	   The default in ES will be used unless an explicit limit is set.
+	   This is to take advantage of wildcard type benefits when indexing large strings.
+	*/
+	if f.IgnoreAbove > 0 {
 		property["ignore_above"] = f.IgnoreAbove
 	}
 

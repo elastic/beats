@@ -47,7 +47,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cloudid"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
@@ -63,6 +62,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/metric/system/host"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
+	"github.com/elastic/beats/v7/libbeat/monitoring/report/buffer"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
@@ -106,6 +106,7 @@ type beatConfig struct {
 	// beat internal components configurations
 	HTTP            *common.Config         `config:"http"`
 	HTTPPprof       *common.Config         `config:"http.pprof"`
+	BufferConfig    *common.Config         `config:"http.buffer"`
 	Path            paths.Path             `config:"path"`
 	Logging         *common.Config         `config:"logging"`
 	MetricLogging   *common.Config         `config:"logging.metrics"`
@@ -158,10 +159,6 @@ func initRand() {
 // instance.
 // XXX Move this as a *Beat method?
 func Run(settings Settings, bt beat.Creator) error {
-	err := setUmaskWithSettings(settings)
-	if err != nil && err != errNotImplemented {
-		return errw.Wrap(err, "could not set umask")
-	}
 
 	return handleError(func() error {
 		defer func() {
@@ -327,6 +324,8 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	logSystemInfo(b.Info)
 	logp.Info("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
 
+	b.checkElasticsearchVersion()
+
 	err = b.registerESIndexManagement()
 	if err != nil {
 		return nil, err
@@ -440,8 +439,9 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Start the API Server before the Seccomp lock down, we do this so we can create the unix socket
 	// set the appropriate permission on the unix domain file without having to whitelist anything
 	// that would be set at runtime.
+	var s *api.Server // buffer reporter may need to attach to the server.
 	if b.Config.HTTP.Enabled() {
-		s, err := api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
+		s, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
 		if err != nil {
 			return errw.Wrap(err, "could not start the HTTP server for the API")
 		}
@@ -477,6 +477,19 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 		defer reporter.Stop()
 	}
 
+	// only collect into a ring buffer if HTTP, and the ring buffer are explicitly enabled
+	if b.Config.HTTP.Enabled() && monitoring.IsBufferEnabled(b.Config.BufferConfig) {
+		buffReporter, err := buffer.MakeReporter(b.Info, b.Config.BufferConfig)
+		if err != nil {
+			return err
+		}
+		defer buffReporter.Stop()
+
+		if err := s.AttachHandler("/buffer", buffReporter); err != nil {
+			return err
+		}
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	var stopBeat = func() {
 		b.Instrumentation.Tracer().Close()
@@ -491,9 +504,8 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 
 	logp.Info("%s start running.", b.Info.Beat)
 
-	// Launch config manager
-	b.Manager.Start(beater.Stop)
-	defer b.Manager.Stop()
+	// Allow the manager to stop a currently running beats out of bound.
+	b.Manager.SetStopCallback(beater.Stop)
 
 	return beater.Run(&b.Beat)
 }
@@ -856,6 +868,37 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 	return nil
 }
 
+// checkElasticsearchVersion registers a global callback to make sure ES instance we are connecting
+// to is at least on the same version as the Beat.
+// If the check is disabled or the output is not Elasticsearch, nothing happens.
+func (b *Beat) checkElasticsearchVersion() {
+	if b.Config.Output.Name() != "elasticsearch" || b.isConnectionToOlderVersionAllowed() {
+		return
+	}
+
+	elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
+		esVersion := conn.GetVersion()
+		beatVersion, err := common.NewVersion(b.Info.Version)
+		if err != nil {
+			return err
+		}
+		if esVersion.LessThanMajorMinor(beatVersion) {
+			return fmt.Errorf("%v ES=%s, Beat=%s.", elasticsearch.ErrTooOld, esVersion.String(), b.Info.Version)
+		}
+		return nil
+	})
+}
+
+func (b *Beat) isConnectionToOlderVersionAllowed() bool {
+	config := struct {
+		AllowOlder bool `config:"allow_older_versions"`
+	}{false}
+
+	b.Config.Output.Config().Unpack(&config)
+
+	return config.AllowOlder
+}
+
 // registerESIndexManagement registers the loading of the template and ILM
 // policy as a callback with the elasticsearch output. It is important the
 // registration happens before the publisher is created.
@@ -1130,31 +1173,15 @@ func initPaths(cfg *common.Config) error {
 	// the paths field. After we will unpack the complete configuration and keystore reference
 	// will be correctly replaced.
 	partialConfig := struct {
-		Path   paths.Path `config:"path"`
-		Hostfs string     `config:"system.hostfs"`
+		Path paths.Path `config:"path"`
 	}{}
-
-	if paths.IsCLISet() {
-		cfgwarn.Deprecate("8.0.0", "This flag will be removed in the future and replaced by a config value.")
-	}
 
 	if err := cfg.Unpack(&partialConfig); err != nil {
 		return fmt.Errorf("error extracting default paths: %+v", err)
 	}
 
-	// Read the value for hostfs as `system.hostfs`
-	// In the config, there is no `path.hostfs`, as we're merely using the path struct to carry the hostfs variable.
-	partialConfig.Path.Hostfs = partialConfig.Hostfs
-
 	if err := paths.InitPaths(&partialConfig.Path); err != nil {
 		return fmt.Errorf("error setting default paths: %+v", err)
 	}
 	return nil
-}
-
-func setUmaskWithSettings(settings Settings) error {
-	if settings.Umask != nil {
-		return setUmask(*settings.Umask)
-	}
-	return setUmask(0027) // 0640 for files | 0750 for dirs
 }
