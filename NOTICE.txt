@@ -12409,12 +12409,12 @@ freely, subject to the following restrictions:
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/kush-elastic/bayeux
+Dependency : github.com/elastic/bayeux
 Version: v1.0.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/kush-elastic/bayeux@v1.0.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/bayeux@v1.0.1/LICENSE:
 
 MIT License
 
