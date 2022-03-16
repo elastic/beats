@@ -37,7 +37,7 @@ func newTrimmer(trimChars string, trimLeft, trimRight bool) (t trimmer, err erro
 }
 
 type asciiTrimmer struct {
-	chars       [127]byte
+	chars       [asciiLimit]byte
 	left, right bool
 }
 
