@@ -22,7 +22,7 @@ func ReadUptime(root string) (secs int64, err error) {
 }
 
 func ReadUptimeFS(sysfs fs.FS) (secs int64, err error) {
-	b, err := fs.ReadFile(sysfs, "/proc/uptime")
+	b, err := fs.ReadFile(sysfs, "proc/uptime")
 	if err != nil {
 		return
 	}
