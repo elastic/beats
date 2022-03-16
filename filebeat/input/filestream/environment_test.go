@@ -87,6 +87,19 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 	return inp
 }
 
+func (e *inputTestingEnvironment) createInput(config map[string]interface{}) (v2.Input, error) {
+	e.grp = unison.TaskGroup{}
+	manager := e.getManager()
+	manager.Init(&e.grp, v2.ModeRun)
+	c := common.MustNewConfigFrom(config)
+	inp, err := manager.Create(c)
+	if err != nil {
+		return nil, err
+	}
+
+	return inp, nil
+}
+
 func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	e.pluginInitOnce.Do(func() {
 		e.plugin = Plugin(logp.L(), e.stateStore)
@@ -192,17 +205,6 @@ func (e *inputTestingEnvironment) requireOffsetInRegistry(filename, inputID stri
 	id := getIDFromPath(filepath, inputID, fi)
 	entry, err := e.getRegistryState(id)
 	if err != nil {
-		keys := []string{}
-		if store, err := e.stateStore.Access(); err == nil {
-			store.Each(func(key string, _ statestore.ValueDecoder) (bool, error) {
-				keys = append(keys, key)
-				return false, nil
-			})
-		} else {
-			e.t.Fatalf("cannot access the store: %v", err.Error())
-		}
-
-		e.t.Logf("keys in store: %v", keys)
 		e.t.Fatalf(err.Error())
 	}
 
@@ -295,6 +297,13 @@ func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, e
 	var entry registryEntry
 	err := inputStore.Get(key, &entry)
 	if err != nil {
+		keys := []string{}
+		inputStore.Each(func(key string, _ statestore.ValueDecoder) (bool, error) {
+			keys = append(keys, key)
+			return false, nil
+		})
+		e.t.Logf("keys in store: %v", keys)
+
 		return registryEntry{}, fmt.Errorf("error when getting expected key '%s' from store: %+v", key, err)
 	}
 
