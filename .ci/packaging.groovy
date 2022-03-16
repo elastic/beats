@@ -328,9 +328,15 @@ def release(){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dir("${env.BEATS_FOLDER}") {
         sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
+        uploadPackagesToGoogleBucket(
+          credentialsId: env.JOB_GCS_EXT_CREDENTIALS,
+          repo: env.REPO,
+          bucket: env.JOB_GCS_BUCKET,
+          folder: getBeatsName(env.BEATS_FOLDER),
+          pattern: "build/distributions/**/*"
+        )
       }
     }
-    publishPackages("${env.BEATS_FOLDER}")
   }
 }
 
@@ -367,27 +373,6 @@ def withMacOSEnv(Closure body){
   ]){
     body()
   }
-}
-
-def publishPackages(baseDir){
-  def bucketUri = "gs://${JOB_GCS_BUCKET}/snapshots"
-  if (isPR()) {
-    bucketUri = "gs://${JOB_GCS_BUCKET}/pull-requests/pr-${env.CHANGE_ID}"
-  }
-  def beatsFolderName = getBeatsName(baseDir)
-  uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
-
-  // Copy those files to another location with the sha commit to test them
-  // afterward.
-  bucketUri = "gs://${JOB_GCS_BUCKET}/commits/${env.GIT_BASE_COMMIT}"
-  uploadPackages("${bucketUri}/${beatsFolderName}", baseDir)
-}
-
-def uploadPackages(bucketUri, beatsFolder){
-  googleStorageUploadExt(bucket: bucketUri,
-    credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-    pattern: "${beatsFolder}/build/distributions/**/*",
-    sharedPublicly: true)
 }
 
 /**

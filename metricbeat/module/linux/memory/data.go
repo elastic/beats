@@ -26,8 +26,10 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
+	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
 )
 
 // FetchLinuxMemStats gets page_stat and huge pages data for linux
@@ -56,6 +58,7 @@ func FetchLinuxMemStats(baseMap common.MapStr, hostfs resolve.Resolver) error {
 	}
 	baseMap["hugepages"] = thp
 
+	// huge pages swap out
 	if thbswpout, ok := vmstat["thp_swpout"]; ok {
 		baseMap.Put("hugepages.swap.out.pages", thbswpout)
 	}
@@ -63,9 +66,41 @@ func FetchLinuxMemStats(baseMap common.MapStr, hostfs resolve.Resolver) error {
 		baseMap.Put("hugepages.swap.out.fallback", thbswpfall)
 	}
 
+	// This is largely for convenience, and allows the swap.* metrics to more closely emulate how they're reported on system/memory
+	// This way very similar metrics aren't split across different modules, even though Linux reports them in different places.
+	eventRaw, err := metrics.Get(hostfs)
+	if err != nil {
+		return errors.Wrap(err, "error fetching memory metrics")
+	}
+	swap := common.MapStr{}
+	err = typeconv.Convert(&swap, &eventRaw.Swap)
+
+	baseMap["swap"] = swap
+
+	// linux-exclusive swap data
+	map2evt("pswpin", "swap.in.pages", vmstat, baseMap)
+	map2evt("pswpout", "swap.out.pages", vmstat, baseMap)
+	map2evt("swap_ra", "swap.readahead.pages", vmstat, baseMap)
+	map2evt("swap_ra_hit", "swap.readahead.cached", vmstat, baseMap)
+
 	baseMap["vmstat"] = vmstat
 
 	return nil
+}
+
+func map2evt(inName string, outName string, rawEvt map[string]uint64, outEvt common.MapStr) {
+	if selected, ok := rawEvt[inName]; ok {
+		outEvt.Put(outName, selected)
+	}
+}
+
+// insertPagesChild inserts a "child" MapStr into given events. This is mostly so we don't break mapping for fields that have been around.
+// most of the fields in vmstat are fairly esoteric and (somewhat) self-documenting, so use of this shouldn't expand beyond what's needed for backwards compat.
+func insertPagesChild(field string, raw map[string]uint64, evt common.MapStr) {
+	stat, ok := raw[field]
+	if ok {
+		evt.Put(fmt.Sprintf("%s.pages", field), stat)
+	}
 }
 
 func computeEfficiency(scanName string, stealName string, fieldName string, raw map[string]uint64, inMap common.MapStr) {
@@ -77,15 +112,6 @@ func computeEfficiency(scanName string, stealName string, fieldName string, raw 
 		}
 	}
 
-}
-
-// insertPagesChild inserts a "child" MapStr into given events. This is mostly so we don't break mapping for fields that have been around.
-// most of the fields in vmstat are fairly esoteric and (somewhat) self-documenting, so use of this shouldn't expand beyond what's needed for backwards compat.
-func insertPagesChild(field string, raw map[string]uint64, evt common.MapStr) {
-	stat, ok := raw[field]
-	if ok {
-		evt.Put(fmt.Sprintf("%s.pages", field), stat)
-	}
 }
 
 func getHugePages(hostfs resolve.Resolver) (common.MapStr, error) {
