@@ -22,7 +22,6 @@ package perfmon
 
 import (
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
