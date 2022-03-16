@@ -24,7 +24,7 @@ stages:
     crosscompile:
         make: "make -C winlogbeat crosscompile"
         stage: mandatory
-    windows-2019:
+    windows:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
@@ -33,21 +33,17 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2016"
-        stage: mandatory
+        stage: extended_win
     windows-2012:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2012-r2"
-<<<<<<< HEAD
-        stage: extended
+        stage: extended_win
     windows-2008:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2008-r2"
-        stage: extended
-=======
         stage: extended_win
->>>>>>> f0912dac8b (ci: split windows in mandatory and ext_win stages (#30781))
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
@@ -57,21 +53,17 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
-<<<<<<< HEAD
-        stage: extended
+        stage: extended_win
     windows-7:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-7"
-        stage: extended
+        stage: extended_win
     windows-7-32:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-7-32-bit"
-        stage: extended
-=======
         stage: extended_win
->>>>>>> f0912dac8b (ci: split windows in mandatory and ext_win stages (#30781))
     packaging-linux:
         packaging-linux: "mage package"
         e2e:

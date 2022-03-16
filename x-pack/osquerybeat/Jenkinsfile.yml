@@ -38,29 +38,16 @@ stages:
                 - "macosTest"
             tags: true         ## for all the tags
         stage: extended
-<<<<<<< HEAD
     windows:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
         stage: mandatory
-=======
-    windows-2022:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-2022"
-        stage: mandatory
-    windows-2019:
-        mage: "mage build unitTest"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-2019"
-        stage: extended_win
->>>>>>> f0912dac8b (ci: split windows in mandatory and ext_win stages (#30781))
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2016"
-        stage: mandatory
+        stage: extended_win
     windows-2012:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
@@ -70,30 +57,22 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
-<<<<<<< HEAD
-        stage: extended
+        stage: extended_win
     windows-2008:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2008-r2"
-        stage: extended
-=======
         stage: extended_win
->>>>>>> f0912dac8b (ci: split windows in mandatory and ext_win stages (#30781))
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
-<<<<<<< HEAD
-        stage: extended
+        stage: extended_win
     windows-7:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-7"
-        stage: extended
-=======
         stage: extended_win
->>>>>>> f0912dac8b (ci: split windows in mandatory and ext_win stages (#30781))
     packaging-linux:
         packaging-linux: "mage package"
         e2e:
