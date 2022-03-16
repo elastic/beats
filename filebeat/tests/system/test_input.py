@@ -20,7 +20,7 @@ class Test(BaseTest):
         Should update the registry correctly when there were entries using the
         default '.global' input ID
         """
-        testfile = self.working_dir + "/log/test.log"
+        testfile = os.path.join(self.working_dir, "log","test.log")
         self.render_config_template(
             template_name="filebeat-duplicated-id",
             path=testfile,
@@ -33,12 +33,12 @@ class Test(BaseTest):
         file.close()
 
         os.makedirs(self.registry.path)
-        registry_file = self.registry.path + "/log.json"
+        registry_file = os.path.join(self.registry.path, "log.json")
 
         template_path = "./tests/system/input/registry-fix-global-id.j2"
         self.render_template(template_path, registry_file, log_file=testfile, offset=offset)
 
-        shutil.copyfile("./tests/system/input/registry-meta.json", self.registry.path+"/meta.json")
+        shutil.copyfile(os.path.join(os.getcwd(),"tests", "system", "input", "registry-meta.json"), os.path.join(self.registry.path, "meta.json"))
 
         proc = self.start_beat()
 
@@ -58,8 +58,20 @@ class Test(BaseTest):
         # We got the latest entry for each key in the registry,
         # they're ordered by the time of creation, so we can be sure the
         # first uses the old, '.global' ID, and the second is the 'fixed' one
-        global_entry = entries[0]
-        fixed_entry = entries[1]
+        try:
+            global_entry = entries[0]
+            fixed_entry = entries[1]
+        except e:
+            print("Entries returned by the registry: ", entries)
+            print("Raw registry file: ")
+            with open(reg._log_path) as f:
+                try:
+                    for line in f:
+                        print(line)
+                except e:
+                    raise e
+            print("end of raw registry file")
+            raise e
 
         # Compare the key excluding the inode and device ID bits
         assert global_entry['_key'].startswith('filestream::.global::native::'), "old key must contain '.global' ID"
