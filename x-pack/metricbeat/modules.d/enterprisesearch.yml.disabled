@@ -1,5 +1,5 @@
 # Module: enterprisesearch
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-enterprisesearch.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.1/metricbeat-module-enterprisesearch.html
 
 - module: enterprisesearch
   metricsets: ["health", "stats"]
