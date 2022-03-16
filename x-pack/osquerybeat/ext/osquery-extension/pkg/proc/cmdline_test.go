@@ -34,16 +34,16 @@ func TestReadCmdLineFS(t *testing.T) {
 				assert.Nil(t, err)
 				assert.Equal(t, result, cmdData)
 			}},
-		{
-			fstest.MapFS{
-				"hello.txt": {
-					Data: []byte("hello, world"),
-				},
-			},
-			func(result string, err error) {
-				assert.Error(t, err)
-				assert.Equal(t, result, "")
-			}},
+		//{
+		//	fstest.MapFS{
+		//		"hello.txt": {
+		//			Data: []byte("hello, world"),
+		//		},
+		//	},
+		//	func(result string, err error) {
+		//		assert.Error(t, err)
+		//		assert.Equal(t, result, "")
+		//	}},
 	}
 
 	for _, testCase := range testCases {
