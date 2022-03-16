@@ -20,7 +20,7 @@ class Test(BaseTest):
         Should update the registry correctly when there were entries using the
         default '.global' input ID
         """
-        testfile = os.path.join(self.working_dir, "log","test.log")
+        testfile = os.path.join(self.working_dir, "log", "test.log")
         self.render_config_template(
             template_name="filebeat-duplicated-id",
             path=testfile,
@@ -38,7 +38,8 @@ class Test(BaseTest):
         template_path = "./tests/system/input/registry-fix-global-id.j2"
         self.render_template(template_path, registry_file, log_file=testfile, offset=offset)
 
-        shutil.copyfile(os.path.join(os.getcwd(),"tests", "system", "input", "registry-meta.json"), os.path.join(self.registry.path, "meta.json"))
+        shutil.copyfile(os.path.join(os.getcwd(), "tests", "system", "input", "registry-meta.json"),
+                        os.path.join(self.registry.path, "meta.json"))
 
         proc = self.start_beat()
 
