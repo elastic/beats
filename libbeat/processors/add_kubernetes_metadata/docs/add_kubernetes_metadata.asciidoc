@@ -164,7 +164,5 @@ running configuration for a container. This is `60s` by default.
 `sync_period`:: (Optional) Specify the timeout for listing historical resources.
 `default_indexers.enabled`:: (Optional) Enable or disable default pod indexers when you want to specify your own.
 `default_matchers.enabled`:: (Optional) Enable or disable default pod matchers when you want to specify your own.
-`labels.dedot`:: (Optional) Default to be true. If set to true, replace dots in
- labels with `_`.
- `annotations.dedot`:: (Optional) Default to be true. If set to true, replace dots in
- annotations with `_`.
+`labels.dedot`:: (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.
+`annotations.dedot`:: (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.
