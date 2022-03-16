@@ -20,7 +20,7 @@
 # All changes to the different deployments must be reviewed by data plane team.
 # TODO: This where k8s falls
 /deploy/ @elastic/elastic-agent-data-plane
-/deploy/kubernetes @elastic/elastic-agent-data-plane
+/deploy/kubernetes @elastic/elastic-agent-data-plane @elastic/obs-cloudnative-monitoring
 
 
 # Beats Build Specific
