@@ -125,9 +125,11 @@ inputs:
 #       host: localhost
 #       # Port on which the HTTP endpoint will bind. Default is 0 meaning feature is disabled.
 #       port: 6791
+#       # Metrics buffer endpoint
+#       buffer.enabled: false
 
 # # Allow fleet to reload its configuration locally on disk.
-# # Notes: Only specific process configuration will be reloaded.
+# # Notes: Only specific process configuration and external input configurations will be reloaded.
 # agent.reload:
 #   # enabled configure the Elastic Agent to reload or not the local configuration.
 #   #

@@ -18,12 +18,12 @@
 package monitor
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -96,7 +96,7 @@ func (watcher *recursiveWatcher) addRecursive(path string) error {
 		}
 
 		if fnErr != nil {
-			errs = append(errs, errors.Wrapf(fnErr, "error walking path '%s'", path))
+			errs = append(errs, fmt.Errorf("error walking path '%s': %w", path, fnErr))
 			// If FileInfo is not nil, the directory entry can be processed
 			// even if there was some error
 			if info == nil {
@@ -107,7 +107,7 @@ func (watcher *recursiveWatcher) addRecursive(path string) error {
 		if info.IsDir() {
 			if err = watcher.tree.AddDir(path); err == nil {
 				if err = watcher.inner.Add(path); err != nil {
-					errs = append(errs, errors.Wrapf(err, "failed adding watcher to '%s'", path))
+					errs = append(errs, fmt.Errorf("failed adding watcher to '%s': %w", path, err))
 					return nil
 				}
 			}
@@ -119,7 +119,7 @@ func (watcher *recursiveWatcher) addRecursive(path string) error {
 	watcher.log.Debugw("Added recursive watch", "path", path)
 
 	if err != nil {
-		errs = append(errs, errors.Wrapf(err, "failed to walk path '%s'", path))
+		errs = append(errs, fmt.Errorf("failed to walk path '%s': %w", path, err))
 	}
 	return errs.Err()
 }
@@ -166,7 +166,7 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 			case fsnotify.Create:
 				err := watcher.addRecursive(event.Name)
 				if err != nil {
-					watcher.inner.Errors <- errors.Wrapf(err, "failed to add created path '%s'", event.Name)
+					watcher.inner.Errors <- fmt.Errorf("failed to add created path '%s': %w", event.Name, err)
 				}
 				err = watcher.tree.Visit(event.Name, PreOrder, func(path string, _ bool) error {
 					watcher.deliver(fsnotify.Event{
@@ -176,7 +176,7 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 					return nil
 				})
 				if err != nil {
-					watcher.inner.Errors <- errors.Wrapf(err, "failed to visit created path '%s'", event.Name)
+					watcher.inner.Errors <- fmt.Errorf("failed to visit created path '%s': %w", event.Name, err)
 				}
 
 			case fsnotify.Remove:
@@ -188,12 +188,12 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 					return nil
 				})
 				if err != nil {
-					watcher.inner.Errors <- errors.Wrapf(err, "failed to visit removed path '%s'", event.Name)
+					watcher.inner.Errors <- fmt.Errorf("failed to visit removed path '%s': %w", event.Name, err)
 				}
 
 				err = watcher.tree.Remove(event.Name)
 				if err != nil {
-					watcher.inner.Errors <- errors.Wrapf(err, "failed to visit removed path '%s'", event.Name)
+					watcher.inner.Errors <- fmt.Errorf("failed to visit removed path '%s': %w", event.Name, err)
 				}
 
 			// Handling rename (move) as a special case to give this recursion
@@ -203,7 +203,7 @@ func (watcher *recursiveWatcher) forwardEvents() error {
 			case fsnotify.Rename:
 				err := watcher.tree.Remove(event.Name)
 				if err != nil {
-					watcher.inner.Errors <- errors.Wrapf(err, "failed to remove path '%s'", event.Name)
+					watcher.inner.Errors <- fmt.Errorf("failed to remove path '%s': %w", event.Name, err)
 				}
 				fallthrough
 

@@ -132,7 +132,7 @@ func (r *Registry) Remove(name string) {
 // Clear removes all entries from the current registry
 func (r *Registry) Clear() error {
 	r.mu.Lock()
-	r.mu.Unlock()
+	defer r.mu.Unlock()
 
 	if r.opts.publishExpvar {
 		return errors.New("Can not clear registry with metrics being exported via expvar")
@@ -244,7 +244,7 @@ func (r *Registry) removeNames(names []string) {
 	if ok {
 		sub.removeNames(names[1:])
 		sub.mu.RLock()
-		sub.mu.RUnlock()
+		defer sub.mu.RUnlock()
 
 		if len(sub.entries) == 0 {
 			delete(r.entries, names[0])

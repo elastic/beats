@@ -214,7 +214,7 @@ func (amqp *amqpPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 			message: &amqpMessage{ts: pkt.Ts},
 		}
 	} else {
-		// concatenate databytes
+		// concatenate data bytes
 		priv.data[dir].data = append(priv.data[dir].data, pkt.Payload...)
 		if len(priv.data[dir].data) > tcp.TCPMaxDataInStream {
 			debugf("Stream data too large, dropping TCP stream")
@@ -278,7 +278,7 @@ func (amqp *amqpPlugin) handleAmqpRequest(msg *amqpMessage) {
 	}
 
 	trans.method = msg.method
-	// get the righ request
+	// get the right request
 	if len(msg.request) > 0 {
 		trans.request = strings.Join([]string{msg.method, msg.request}, " ")
 	} else {

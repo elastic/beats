@@ -46,7 +46,7 @@ import (
 // Fileset struct is the representation of a fileset.
 type Fileset struct {
 	name        string
-	mcfg        *ModuleConfig
+	mname       string
 	fcfg        *FilesetConfig
 	modulePath  string
 	manifest    *manifest
@@ -63,17 +63,17 @@ type pipeline struct {
 func New(
 	modulesPath string,
 	name string,
-	mcfg *ModuleConfig,
-	fcfg *FilesetConfig) (*Fileset, error) {
-
-	modulePath := filepath.Join(modulesPath, mcfg.Module)
+	mname string,
+	fcfg *FilesetConfig) (*Fileset, error,
+) {
+	modulePath := filepath.Join(modulesPath, mname)
 	if _, err := os.Stat(modulePath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("module %s (%s) doesn't exist", mcfg.Module, modulePath)
+		return nil, fmt.Errorf("module %s (%s) doesn't exist", mname, modulePath)
 	}
 
 	return &Fileset{
 		name:       name,
-		mcfg:       mcfg,
+		mname:      mname,
 		fcfg:       fcfg,
 		modulePath: modulePath,
 	}, nil
@@ -81,7 +81,7 @@ func New(
 
 // String returns the module and the name of the fileset.
 func (fs *Fileset) String() string {
-	return fs.mcfg.Module + "/" + fs.name
+	return fs.mname + "/" + fs.name
 }
 
 // Read reads the manifest file and evaluates the variables.
@@ -336,7 +336,7 @@ func (fs *Fileset) getBuiltinVars(info beat.Info) (map[string]interface{}, error
 		"prefix":      info.IndexPrefix,
 		"hostname":    hostname,
 		"domain":      domain,
-		"module":      fs.mcfg.Module,
+		"module":      fs.mname,
 		"fileset":     fs.name,
 		"beatVersion": info.Version,
 	}, nil
@@ -391,7 +391,7 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 	}
 
 	// force our the module/fileset name
-	err = cfg.SetString("_module_name", -1, fs.mcfg.Module)
+	err = cfg.SetString("_module_name", -1, fs.mname)
 	if err != nil {
 		return nil, fmt.Errorf("Error setting the _module_name cfg in the input config: %v", err)
 	}
@@ -400,7 +400,7 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 		return nil, fmt.Errorf("Error setting the _fileset_name cfg in the input config: %v", err)
 	}
 
-	cfg.PrintDebugf("Merged input config for fileset %s/%s", fs.mcfg.Module, fs.name)
+	cfg.PrintDebugf("Merged input config for fileset %s/%s", fs.mname, fs.name)
 
 	return cfg, nil
 }
@@ -414,7 +414,7 @@ func (fs *Fileset) getPipelineIDs(info beat.Info) ([]string, error) {
 			return nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %v", err)
 		}
 
-		pipelineIDs = append(pipelineIDs, FormatPipelineID(info.IndexPrefix, fs.mcfg.Module, fs.name, path, info.Version))
+		pipelineIDs = append(pipelineIDs, FormatPipelineID(info.IndexPrefix, fs.mname, fs.name, path, info.Version))
 	}
 
 	return pipelineIDs, nil

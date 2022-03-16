@@ -39,7 +39,7 @@ var RootCmd *cmd.BeatsRootCmd
 
 // FilebeatSettings contains the default settings for filebeat
 func FilebeatSettings() instance.Settings {
-	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
+	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("once"))
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("modules"))
 	return instance.Settings{

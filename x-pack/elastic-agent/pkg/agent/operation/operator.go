@@ -218,9 +218,26 @@ func (o *Operator) Shutdown() {
 		o.logger.Debugf("pipeline installer '%s' done", o.pipelineID)
 	}
 
-	for _, app := range o.apps {
-		app.Shutdown()
+	o.appsLock.Lock()
+	defer o.appsLock.Unlock()
+
+	wg := sync.WaitGroup{}
+	wg.Add(len(o.apps))
+
+	started := time.Now()
+
+	for _, a := range o.apps {
+		go func(a Application) {
+			started := time.Now()
+			a.Shutdown()
+			wg.Done()
+			o.logger.Debugf("took %s to shutdown %s",
+				time.Now().Sub(started), a.Name())
+		}(a)
 	}
+	wg.Wait()
+	o.logger.Debugf("took %s to shutdown %d apps",
+		time.Now().Sub(started), len(o.apps))
 }
 
 // Start starts a new process based on a configuration

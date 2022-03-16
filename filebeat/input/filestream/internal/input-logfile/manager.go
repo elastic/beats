@@ -81,7 +81,6 @@ type Source interface {
 	Name() string
 }
 
-var errNoSourceConfigured = errors.New("no source has been configured")
 var errNoInputRunner = errors.New("no input runner available")
 
 const globalInputID = ".global"
@@ -164,9 +163,16 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 		ID             string        `config:"id"`
 		CleanTimeout   time.Duration `config:"clean_timeout"`
 		HarvesterLimit uint64        `config:"harvester_limit"`
-	}{ID: "", CleanTimeout: cim.DefaultCleanTimeout, HarvesterLimit: 0}
+	}{CleanTimeout: cim.DefaultCleanTimeout}
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
+	}
+
+	if settings.ID == "" {
+		cim.Logger.Warn("creating a filestream input without an ID, which may lead to duplicated data." +
+			"Filestream inputs will require an ID in a future release." +
+			"NOTE: Adding an ID to an existing input will cause all files to be re-read from the beginning.",
+		)
 	}
 
 	prospector, harvester, err := cim.Configure(config)
