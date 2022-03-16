@@ -373,32 +373,14 @@ def packagingLinux(Map args = [:]) {
 * @param beatsFolder beats folder
 */
 def publishPackages(beatsFolder){
-  def bucketUri = "gs://beats-ci-artifacts/snapshots"
-  if (isPR()) {
-    bucketUri = "gs://beats-ci-artifacts/pull-requests/pr-${env.CHANGE_ID}"
-  }
-  def beatsFolderName = getBeatsName(beatsFolder)
-  uploadPackages("${bucketUri}/${beatsFolderName}", beatsFolder)
-
-  // Copy those files to another location with the sha commit to test them
-  // afterward.
-  bucketUri = "gs://beats-ci-artifacts/commits/${env.GIT_BASE_COMMIT}"
-  uploadPackages("${bucketUri}/${beatsFolderName}", beatsFolder)
-}
-
-/**
-* Upload the distribution files to google cloud.
-* TODO: There is a known issue with Google Storage plugin.
-* @param bucketUri the buckets URI.
-* @param beatsFolder the beats folder.
-*/
-def uploadPackages(bucketUri, beatsFolder){
-  // sometimes google storage reports ResumableUploadException: 503 Server Error
-  retryWithSleep(retries: 3, seconds: 5, backoff: true) {
-    googleStorageUploadExt(bucket: bucketUri,
-      credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-      pattern: "${beatsFolder}/build/distributions/**/*",
-      sharedPublicly: true)
+  dir(beatsFolder) {
+    uploadPackagesToGoogleBucket(
+      credentialsId: env.JOB_GCS_EXT_CREDENTIALS,
+      repo: env.REPO,
+      bucket: env.JOB_GCS_BUCKET,
+      folder: getBeatsName(beatsFolder),
+      pattern: "build/distributions/**/*"
+    )
   }
 }
 
