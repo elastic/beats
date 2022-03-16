@@ -75,6 +75,7 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 }
 
 func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{}) v2.Input {
+	e.t.Helper()
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
 	manager.Init(&e.grp, v2.ModeRun)
