@@ -482,6 +482,7 @@ shared:
       user: '{{ .BeatName }}'
       linux_capabilities: ''
       image_name: ''
+      beats_install_path: "install"
     files:
       'elastic-agent.yml':
         source: 'elastic-agent.docker.yml'
