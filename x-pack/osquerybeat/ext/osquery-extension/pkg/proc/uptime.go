@@ -7,8 +7,8 @@ package proc
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
-	"path/filepath"
+	"io/fs"
+	"os"
 	"strconv"
 )
 
@@ -16,10 +16,13 @@ var (
 	ErrInvalidProcUptimecontent = errors.New("invalid /proc/uptime content")
 )
 
-// Reads system uptime from <root>/proc/uptime
+// ReadUptime Reads system uptime from <root>/proc/uptime
 func ReadUptime(root string) (secs int64, err error) {
-	fp := filepath.Join(root, "/proc/uptime")
-	b, err := ioutil.ReadFile(fp)
+	return ReadUptimeFS(os.DirFS(root))
+}
+
+func ReadUptimeFS(sysfs fs.FS) (secs int64, err error) {
+	b, err := fs.ReadFile(sysfs, "proc/uptime")
 	if err != nil {
 		return
 	}
