@@ -157,6 +157,20 @@ class Registry:
 
         return list(data.values())
 
+    def render_template(self, template_path,
+                        output, **kargs):
+        """
+        render_template fetches a given jinja2 template and writes the formatted template
+        """
+        template = self.template_env.get_template(template_path)
+
+        kargs["beat"] = self
+        output_str = template.render(**kargs)
+
+        output_path = os.path.join(self.working_dir, output)
+        with open(output_path, "wb") as beat_output:
+            os.chmod(output_path, 0o600)
+            beat_output.write(output_str.encode('utf_8'))
 
 class LogState:
     def __init__(self, path):

@@ -2,6 +2,7 @@
 
 from filebeat import BaseTest
 import os
+import shutil
 import sys
 import time
 import unittest
@@ -14,6 +15,59 @@ Tests for the input functionality.
 
 
 class Test(BaseTest):
+    def test_fixup_registry_entries_with_global_id(self):
+        """
+        Should update the registry correctly when there were entries using the
+        default '.global' input ID
+        """
+        testfile = self.working_dir + "/log/test.log"
+        self.render_config_template(
+            template_name="filebeat-duplicated-id",
+            path=testfile,
+        )
+        os.mkdir(self.working_dir + "/log/")
+        file = open(testfile, 'w')
+        offset = 0 # keep count of the bytes written
+        for n in range(0, 5):
+            offset += file.write("hello world\n")
+        file.close()
+
+        os.makedirs(self.registry.path)
+        registry_file = self.registry.path + "/log.json"
+
+        template_path = "./tests/system/input/registry-fix-global-id.j2"
+        self.render_template(template_path, registry_file, log_file=testfile, offset=offset)
+
+        shutil.copyfile("./tests/system/input/registry-meta.json", self.registry.path+"/meta.json")
+
+        proc = self.start_beat()
+
+        # wait for the "Start next scan" log message, this means the file has been
+        # fully harvested
+        self.wait_until(
+            lambda: self.log_contains(
+                "Start next scan"),
+            max_timeout=10)
+
+        proc.check_kill_and_wait()
+
+        reg = self.access_registry()
+        self.wait_until(reg.exists)
+        entries = [entry for entry in reg.load()]
+
+        # We got the latest entry for each key in the registry,
+        # they're ordered by the time of creation, so we can be sure the
+        # first uses the old, global, and the second is the 'fixed' one
+        global_entry = entries[0]
+        fixed_entry = entries[1]
+
+        # Compare the key excluding the inode and device ID bits
+        assert global_entry['_key'].startswith('filestream::.global::native::'), "old key must contain '.global' ID"
+        assert fixed_entry['_key'].startswith('filestream::test-fix-global-id::native::'), "key in registry has not been fixed"
+
+        # Compare the TTL because it indicates if the entry has been 'removed' or not
+        assert global_entry['ttl'] == 0, "ttl must be 0 because that's the effect of 'removing' the entry from the registry"
+        assert fixed_entry['ttl'] != 0, "ttl must not be 0 because the entry has recently been added"
 
     def test_ignore_older_files(self):
         """
