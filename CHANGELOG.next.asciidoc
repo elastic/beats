@@ -74,7 +74,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Packetbeat*
 
-- Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821]
+- Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821] {pull}30837[30837]
 
 *Winlogbeat*
 
