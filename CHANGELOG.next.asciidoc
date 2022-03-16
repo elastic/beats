@@ -90,6 +90,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
 - Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
 - Fix overflow in `iostat` metrics {pull}30679[30679]
+- Add `commandstats` field to Redis module {pull}29662[29662]
+- Extend documentation about `kubernetes.node.network.*` fields {pull}30826[30826]
 
 *Packetbeat*
 
