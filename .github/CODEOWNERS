@@ -28,7 +28,7 @@
 /docs/ @elastic/elastic-agent-data-plane
 
 ### Filebeat
-# Filebeat is owned by the data plan team
+# Filebeat is owned by the data plane team
 # TODO: CLEANUP, go into more details
 /filebeat @elastic/elastic-agent-data-plane
 /x-pack/filebeat @elastic/elastic-agent-data-plane
