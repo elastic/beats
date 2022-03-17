@@ -225,9 +225,9 @@ def runLinting() {
   mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)
 
-  cmd(label: 'Lint Last Change [Linux]', script: 'GOOS=linux mage llc')
-  cmd(label: 'Lint Last Change [Darwin]', script: 'GOOS=darwin mage llc')
-  cmd(label: 'Lint Last Change [Windows]', script: 'GOOS=windows mage llc')
+  cmd(label: 'Lint Last Change [Linux]', script: 'GOOS=linux mage -v llc')
+  cmd(label: 'Lint Last Change [Darwin]', script: 'GOOS=darwin mage -v llc')
+  cmd(label: 'Lint Last Change [Windows]', script: 'GOOS=windows mage -v llc')
 }
 
 def runPreCommit() {
