@@ -95,10 +95,6 @@ pipeline {
           }
         }
         stage('Build Packages'){
-          when {
-            beforeAgent true
-            expression { return false }
-          }
           matrix {
             axes {
               axis {
@@ -194,10 +190,6 @@ pipeline {
           }
         }
         stage('Build Packages ARM'){
-          when {
-            beforeAgent true
-            expression { return false }
-          }
           matrix {
             axes {
               axis {
@@ -259,8 +251,7 @@ pipeline {
         }
         stage('DRA') {
           environment {
-            GIT_COMMIT = '6a6b8f99b3293d0e31581fa7f7d2b798d2c60823'
-            URI_SUFFIX = "commits/${env.GIT_COMMIT}"
+            URI_SUFFIX = "commits/${env.GIT_BASE_COMMIT}"
             PATH_PREFIX = "${env.JOB_GCS_BUCKET.contains('/') ? env.JOB_GCS_BUCKET.substring(env.JOB_GCS_BUCKET.indexOf('/') + 1) + '/' + env.URI_SUFFIX : env.URI_SUFFIX}"
             BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/${env.URI_SUFFIX}"
           }
@@ -269,7 +260,7 @@ pipeline {
               // TODO: as long as googleStorageDownload does not support recursive copy with **/*
               dir("build/distributions") {
                 gsutil(command: "-m -q cp -r ${env.BUCKET_URI} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
-                sh(label: 'move one level up', script: "mv ${env.GIT_COMMIT}/** .")
+                sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
               }
               dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
               script {
