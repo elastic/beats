@@ -267,10 +267,10 @@ pipeline {
             echo "credentialsId: ${env.JOB_GCS_CREDENTIALS}"
             echo "localDirectory: ${env.BASE_DIR}/build/distributions"
             echo "pathPrefix: ${env.PATH_PREFIX}"
-            googleStorageDownload(bucketUri: "gs://${env.JOB_GCS_BUCKET}/${env.URI_SUFFIX}/*",
+            googleStorageDownload(bucketUri: "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/${env.URI_SUFFIX}/*",
                                   credentialsId: "${env.JOB_GCS_CREDENTIALS}",
                                   localDirectory: "${env.BASE_DIR}/build/distributions",
-                                  pathPrefix: "${env.PATH_PREFIX}")
+                                  pathPrefix: "${env.REPO}/${env.PATH_PREFIX}")
             dir("${BASE_DIR}") {
               dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
               script {
