@@ -28,9 +28,9 @@ class Test(BaseTest):
         os.mkdir(os.path.join(self.working_dir, "log/"))
 
         with open(testfile, 'w') as file:
-           offset = 0  # keep count of the bytes written
-           for n in range(0, 5):
-               offset += file.write("hello world\n")
+            offset = 0  # keep count of the bytes written
+            for n in range(0, 5):
+                offset += file.write("hello world\n")
 
         os.makedirs(self.registry.path)
         registry_file = os.path.join(self.registry.path, "log.json")
