@@ -41496,14 +41496,14 @@ type: long
 --
 
 
-*`kibana.actions.overdue.duration.p50`*::
+*`kibana.actions.overdue.delay.p50`*::
 +
 --
 type: float
 
 --
 
-*`kibana.actions.overdue.duration.p99`*::
+*`kibana.actions.overdue.delay.p99`*::
 +
 --
 type: float
@@ -41534,14 +41534,14 @@ type: long
 --
 
 
-*`kibana.rules.overdue.duration.p50`*::
+*`kibana.rules.overdue.delay.p50`*::
 +
 --
 type: float
 
 --
 
-*`kibana.rules.overdue.duration.p99`*::
+*`kibana.rules.overdue.delay.p99`*::
 +
 --
 type: float
@@ -41577,6 +41577,13 @@ type: long
 
 --
 
+*`kibana.actions.failures`*::
++
+--
+type: long
+
+--
+
 [float]
 === node_rules
 
@@ -41600,6 +41607,13 @@ type: long
 --
 
 *`kibana.node_rules.executions`*::
++
+--
+type: long
+
+--
+
+*`kibana.node_rules.failures`*::
 +
 --
 type: long

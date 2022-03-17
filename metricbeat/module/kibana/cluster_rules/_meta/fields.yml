@@ -14,7 +14,7 @@
       fields:
         - name: count
           type: long
-        - name: duration
+        - name: delay
           type: group
           fields:
             - name: p50

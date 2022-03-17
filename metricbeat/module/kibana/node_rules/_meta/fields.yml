@@ -13,3 +13,5 @@
       type: long
     - name: executions
       type: long
+    - name: failures
+      type: long

@@ -14,7 +14,7 @@
         "cluster_rules":{
             "overdue": {
                 "count": 3,
-                "duration": {
+                "delay": {
                     "p50": 500,
                     "p99": 3000
                 }

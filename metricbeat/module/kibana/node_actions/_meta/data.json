@@ -13,7 +13,8 @@
     "kibana":{
         "node_actions":{
             "executions": 10,
-            "failures": 0
+            "failures": 0,
+            "timeouts": 0
         }
     },
     "type":"metricsets"

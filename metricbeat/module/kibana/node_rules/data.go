@@ -47,6 +47,7 @@ var (
 	rulesSchema = s.Schema{
 		"failures":   c.Int("failures"),
 		"executions": c.Int("executions"),
+		"timeouts":   c.Int("timeouts"),
 	}
 )
 

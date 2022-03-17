@@ -47,7 +47,7 @@ var (
 	rulesSchema = s.Schema{
 		"overdue": c.Dict("overdue", s.Schema{
 			"count": c.Int("count"),
-			"duration": c.Dict("duration", s.Schema{
+			"delay": c.Dict("delay", s.Schema{
 				"p50": c.Float("p50"),
 				"p99": c.Float("p99"),
 			}),
