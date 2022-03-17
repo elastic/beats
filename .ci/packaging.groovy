@@ -23,6 +23,8 @@ pipeline {
     GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
     SNAPSHOT = "true"
     PIPELINE_LOG_LEVEL = "INFO"
+    SLACK_CHANNEL = '#beats'
+    NOTIFY_TO = 'package+beats-beats-contrib@elastic.co'
   }
   options {
     timeout(time: 3, unit: 'HOURS')
@@ -246,6 +248,32 @@ pipeline {
             runE2ETests()
           }
         }
+        stage('DRA') {
+          environment {
+            URI_SUFFIX = "commits/${env.GIT_BASE_COMMIT}"
+            PATH_PREFIX = "${JOB_GCS_BUCKET.contains('/') ? JOB_GCS_BUCKET.substring(JOB_GCS_BUCKET.indexOf('/') + 1) + '/' + env.URI_SUFFIX : env.URI_SUFFIX}"
+          }
+          steps {
+            googleStorageDownload(bucketUri: "gs://${JOB_GCS_BUCKET}/${URI_SUFFIX}/*",
+                                  credentialsId: "${JOB_GCS_CREDENTIALS}",
+                                  localDirectory: "${BASE_DIR}/build/distributions",
+                                  pathPrefix: env.PATH_PREFIX)
+            dir("${BASE_DIR}") {
+              dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
+              script {
+                getVaultSecret.readSecretWrapper {
+                  sh(label: 'release-manager.sh', script: '.ci/scripts/release-manager.sh')
+                }
+              }
+            }
+          }
+          post {
+            failure {
+              echo 'disabled'
+            // notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}] DRA failed", body: "Build: (<${env.RUN_DISPLAY_URL}|here>)")
+            }
+          }
+        }
       }
       post {
         success {
@@ -433,4 +461,13 @@ def fixPermissions() {
       }
     }
   }
+}
+
+def notifyStatus(def args = [:]) {
+  releaseNotification(slackChannel: "${env.SLACK_CHANNEL}",
+                      slackColor: args.slackStatus,
+                      slackCredentialsId: 'jenkins-slack-integration-token',
+                      to: "${env.NOTIFY_TO}",
+                      subject: args.subject,
+                      body: args.body)
 }
