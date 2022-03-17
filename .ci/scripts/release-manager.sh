@@ -17,15 +17,18 @@ chmod -R a+w build/distributions
 # TODO: this could be supported by the package system itself
 #       or the unified release process the one to do the transformation
 #       See https://github.com/elastic/beats/pull/30895
-for i in build/distributions/*linux-arm64.docker.tar.gz*
-do
-    mv "$i" "${i/linux-arm64.docker.tar.gz/docker-image-arm64.tar.gz}"
-done
 
-for i in build/distributions/*linux-amd64.docker.tar.gz*
-do
-    mv "$i" "${i/linux-amd64.docker.tar.gz/docker-image.tar.gz}"
-done
+find build/distributions -name '*linux-arm64.docker.tar.gz*' -print0 |
+  while IFS= read -r -d '' file
+  do
+    mv "$file" "${file/linux-arm64.docker.tar.gz/docker-image-arm64.tar.gz}"
+  done
+
+find build/distributions -name '*linux-amd64.docker.tar.gz*' -print0 |
+  while IFS= read -r -d '' file
+  do
+    mv "$file" "${file/linux-amd64.docker.tar.gz/docker-image.tar.gz}"
+  done
 
 # ensure the latest image has been pulled
 IMAGE=docker.elastic.co/infra/release-manager:latest
