@@ -174,7 +174,7 @@ def generateStep(String beat, String type){
 }
 
 def generateArmStep(beat) {
-  withEnv(["HOME=${env.WORKSPACE}", 'PLATFORMS=linux/arm64',' PACKAGES=docker']) {
+  withEnv(["HOME=${env.WORKSPACE}", 'PLATFORMS=linux/arm64',' PACKAGES=docker', "BEATS_FOLDER=${beat}"]) {
     withGithubNotify(context: "Packaging Arm ${beat}") {
       deleteDir()
       release()
@@ -186,7 +186,7 @@ def generateArmStep(beat) {
 }
 
 def generateLinuxStep(beat) {
-  withEnv(["HOME=${env.WORKSPACE}", "PLATFORMS=${linuxPlatforms()}"]) {
+  withEnv(["HOME=${env.WORKSPACE}", "PLATFORMS=${linuxPlatforms()}", "BEATS_FOLDER=${beat}"]) {
     withGithubNotify(context: "Packaging Linux ${beat}") {
       deleteDir()
       release()
