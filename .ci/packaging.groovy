@@ -38,9 +38,6 @@ pipeline {
     // disable upstream trigger on a PR basis
     upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
-  parameters {
-    booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
-  }
   stages {
     stage('Filter build') {
       agent { label 'ubuntu-18 && immutable' }
@@ -93,148 +90,9 @@ pipeline {
           }
         }
         stage('Build Packages'){
-          matrix {
-            axes {
-              axis {
-                name 'BEATS_FOLDER'
-                values (
-                  'auditbeat',
-                  'filebeat',
-                  'heartbeat',
-                  'metricbeat',
-                  'packetbeat',
-                  'winlogbeat',
-                  'x-pack/auditbeat',
-                  'x-pack/dockerlogbeat',
-                  'x-pack/filebeat',
-                  'x-pack/functionbeat',
-                   'x-pack/heartbeat',
-                  'x-pack/metricbeat',
-                  'x-pack/osquerybeat',
-                  'x-pack/packetbeat',
-                  'x-pack/winlogbeat'
-                )
-              }
-            }
-            stages {
-              stage('Package Linux'){
-                agent { label 'ubuntu-18 && immutable' }
-                options { skipDefaultCheckout() }
-                environment {
-                  HOME = "${env.WORKSPACE}"
-                  PLATFORMS = [
-                    '+all',
-                    'linux/amd64',
-                    'linux/386',
-                    'linux/arm64',
-                    // armv7 packaging isn't working, and we don't currently
-                    // need it for release. Do not re-enable it without
-                    // confirming it is fixed, you will break the packaging
-                    // pipeline!
-                    //'linux/armv7',
-                    // The platforms above are disabled temporarly as crossbuild images are
-                    // not available. See: https://github.com/elastic/golang-crossbuild/issues/71
-                    //'linux/ppc64le',
-                    //'linux/mips64',
-                    //'linux/s390x',
-                    'windows/amd64',
-                    'windows/386',
-                    (params.macos ? '' : 'darwin/amd64'),
-                  ].join(' ')
-                }
-                steps {
-                  withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
-                    deleteDir()
-                    release()
-                    dir("${BASE_DIR}"){
-                      pushCIDockerImages(arch: 'amd64')
-                    }
-                  }
-                  prepareE2ETestForPackage("${BEATS_FOLDER}")
-                }
-              }
-              stage('Package Mac OS'){
-                agent { label 'macosx-10.12' }
-                options { skipDefaultCheckout() }
-                when {
-                  beforeAgent true
-                  expression {
-                    return params.macos
-                  }
-                }
-                environment {
-                  HOME = "${env.WORKSPACE}"
-                  PLATFORMS = [
-                    '+all',
-                    'darwin/amd64',
-                  ].join(' ')
-                }
-                steps {
-                  withGithubNotify(context: "Packaging MacOS ${BEATS_FOLDER}") {
-                    deleteWorkspace()
-                    withMacOSEnv(){
-                      release()
-                    }
-                  }
-                }
-                post {
-                  always {
-                    // static workers require this
-                    deleteWorkspace()
-                  }
-                }
-              }
-            }
-          }
-        }
-        stage('Build Packages ARM'){
-          matrix {
-            axes {
-              axis {
-                name 'BEATS_FOLDER'
-                values (
-                  'auditbeat',
-                  'filebeat',
-                  'heartbeat',
-                  'metricbeat',
-                  'packetbeat',
-                  'x-pack/auditbeat',
-                  'x-pack/dockerlogbeat',
-                  'x-pack/filebeat',
-                  'x-pack/heartbeat',
-                  'x-pack/metricbeat',
-                  'x-pack/packetbeat'
-                )
-              }
-            }
-            stages {
-              stage('Package Docker images for linux/arm64'){
-                agent { label 'arm' }
-                options { skipDefaultCheckout() }
-                environment {
-                  HOME = "${env.WORKSPACE}"
-                  PACKAGES = "docker"
-                  PLATFORMS = [
-                    'linux/arm64',
-                  ].join(' ')
-                }
-                steps {
-                  withGithubNotify(context: "Packaging linux/arm64 ${BEATS_FOLDER}") {
-                    deleteWorkspace()
-                    release()
-                    dir("${BASE_DIR}"){
-                      pushCIDockerImages(arch: 'arm64')
-                    }
-                  }
-                }
-                post {
-                  always {
-                    // static workers require this
-                    deleteWorkspace()
-                  }
-                }
-              }
-            }
+          options { skipDefaultCheckout() }
+          steps {
+            generateSteps()
           }
         }
         stage('Run E2E Tests for Packages'){
@@ -258,6 +116,109 @@ pipeline {
       }
     }
   }
+}
+
+def generateSteps() {
+  def parallelTasks = [:]
+  def beats = [
+    'auditbeat',
+    'filebeat',
+    'heartbeat',
+    'metricbeat',
+    'packetbeat',
+    'winlogbeat',
+    'x-pack/auditbeat',
+    'x-pack/dockerlogbeat',
+    'x-pack/filebeat',
+    'x-pack/functionbeat',
+    'x-pack/heartbeat',
+    'x-pack/metricbeat',
+    'x-pack/osquerybeat',
+    'x-pack/packetbeat',
+    'x-pack/winlogbeat'
+  ]
+
+  def armBeats = [
+    'auditbeat',
+    'filebeat',
+    'heartbeat',
+    'metricbeat',
+    'packetbeat',
+    'x-pack/auditbeat',
+    'x-pack/dockerlogbeat',
+    'x-pack/filebeat',
+    'x-pack/heartbeat',
+    'x-pack/metricbeat',
+    'x-pack/packetbeat'
+  ]
+  beats.each { beat ->
+    parallelTasks["linux-${beat}"] = generateStep(beat, 'linux')
+    if (armBeats.contains(beat)) {
+      parallelTasks["linux-${beat}"] = generateStep(beat, 'arm')
+    }
+  }
+  parallel(parallelTasks)
+}
+
+def generateStep(String beat, String type){
+  return {
+    if (type == 'arm') {
+      withNode(labels: 'arm') {
+        generateArmStep(beat)
+      }
+    } else {
+      withNode(labels: 'ubuntu-18.04 && immutable') {
+        generateLinuxStep(beat)
+      }
+    }
+  }
+}
+
+def generateArmStep(beat) {
+  withEnv(["HOME=${env.WORKSPACE}", 'PLATFORMS=linux/arm64',' PACKAGES=docker']) {
+    withGithubNotify(context: "Packaging Arm ${beat}") {
+      deleteDir()
+      release()
+      dir("${BASE_DIR}"){
+        pushCIDockerImages(arch: 'arm64')
+      }
+    }
+  }
+}
+
+def generateLinuxStep(beat) {
+  withEnv(["HOME=${env.WORKSPACE}", "PLATFORMS=${linuxPlatforms()}"]) {
+    withGithubNotify(context: "Packaging Linux ${beat}") {
+      deleteDir()
+      release()
+      dir("${BASE_DIR}"){
+        pushCIDockerImages(arch: 'amd64')
+      }
+    }
+    prepareE2ETestForPackage("${beat}")
+  }
+}
+
+def linuxPlatforms() {
+  return [
+            '+all',
+            'linux/amd64',
+            'linux/386',
+            'linux/arm64',
+            // armv7 packaging isn't working, and we don't currently
+            // need it for release. Do not re-enable it without
+            // confirming it is fixed, you will break the packaging
+            // pipeline!
+            //'linux/armv7',
+            // The platforms above are disabled temporarly as crossbuild images are
+            // not available. See: https://github.com/elastic/golang-crossbuild/issues/71
+            //'linux/ppc64le',
+            //'linux/mips64',
+            //'linux/s390x',
+            'windows/amd64',
+            'windows/386',
+            'darwin/amd64'
+          ].join(' ')
 }
 
 /**
