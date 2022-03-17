@@ -34,7 +34,7 @@ stages:
                 - "armTest"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
-        stage: mandatory
+        stage: extended
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
