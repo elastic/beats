@@ -35,6 +35,11 @@ class Test(BaseTest):
         os.makedirs(self.registry.path)
         registry_file = os.path.join(self.registry.path, "log.json")
 
+        if os.name == "nt":
+            import json
+            testfile = json.encoder.c_encode_basestring(testfile)
+            testfile = testfile.replace('"', '')
+
         template_path = "./tests/system/input/registry-fix-global-id.j2"
         self.render_template(template_path, registry_file, log_file=testfile, offset=offset)
 
