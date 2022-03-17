@@ -251,9 +251,8 @@ pipeline {
         }
         stage('DRA') {
           environment {
-            URI_SUFFIX = "commits/${env.GIT_BASE_COMMIT}"
-            PATH_PREFIX = "${env.JOB_GCS_BUCKET.contains('/') ? env.JOB_GCS_BUCKET.substring(env.JOB_GCS_BUCKET.indexOf('/') + 1) + '/' + env.URI_SUFFIX : env.URI_SUFFIX}"
-            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/${env.URI_SUFFIX}"
+            // It uses the folder structure done in uploadPackagesToGoogleBucket
+            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
           }
           steps {
             dir("${BASE_DIR}") {
