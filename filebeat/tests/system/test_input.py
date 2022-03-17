@@ -25,7 +25,7 @@ class Test(BaseTest):
             template_name="filebeat-duplicated-id",
             path=testfile,
         )
-        os.mkdir(self.working_dir + "/log/")
+        os.mkdir(os.path.join(self.working_dir, "log/"))
         file = open(testfile, 'w')
         offset = 0  # keep count of the bytes written
         for n in range(0, 5):
@@ -62,15 +62,15 @@ class Test(BaseTest):
         try:
             global_entry = entries[0]
             fixed_entry = entries[1]
-        except e:
+        except Exception as e:
             print("Entries returned by the registry: ", entries)
             print("Raw registry file: ")
             with open(reg._log_path) as f:
                 try:
                     for line in f:
                         print(line)
-                except e:
-                    raise e
+                except Exception as open_e:
+                    raise open_e
             print("end of raw registry file")
             raise e
 
