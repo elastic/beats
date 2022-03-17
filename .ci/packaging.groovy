@@ -162,7 +162,7 @@ def generateSteps() {
 def generateArmStep(beat) {
   return {
     withNode(labels: 'arm') {
-      withEnv(["HOME=${env.WORKSPACE}", 'PLATFORMS=linux/arm64',' PACKAGES=docker', "BEATS_FOLDER=${beat}"]) {
+      withEnv(["HOME=${env.WORKSPACE}", 'PLATFORMS=linux/arm64','PACKAGES=docker', "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Arm ${beat}") {
           deleteDir()
           release()
@@ -330,41 +330,12 @@ def getBeatsName(baseDir) {
 
 def withBeatsEnv(Closure body) {
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-  fixPermissions()
   withMageEnv(){
     withEnv([
       "PYTHON_ENV=${WORKSPACE}/python-env"
     ]) {
       dir("${env.BASE_DIR}"){
         body()
-      }
-    }
-  }
-}
-
-/**
-* This method fixes the filesystem permissions after the build has happenend. The reason is to
-* ensure any non-ephemeral workers don't have any leftovers that could cause some environmental
-* issues.
-*/
-def deleteWorkspace() {
-  catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
-    fixPermissions()
-    deleteDir()
-  }
-}
-
-def fixPermissions() {
-  if(isUnix()) {
-    catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
-      dir("${env.BASE_DIR}") {
-        if (fileExists('script/fix_permissions.sh')) {
-          sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
-            set +x
-            source ./dev-tools/common.bash
-            docker_setup
-            script/fix_permissions.sh ${WORKSPACE}""", returnStatus: true)
-        }
       }
     }
   }
