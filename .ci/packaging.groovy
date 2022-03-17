@@ -262,9 +262,13 @@ pipeline {
         stage('DRA') {
           environment {
             URI_SUFFIX = "commits/6a6b8f99b3293d0e31581fa7f7d2b798d2c60823"
-            PATH_PREFIX = "${JOB_GCS_BUCKET.contains('/') ? JOB_GCS_BUCKET.substring(JOB_GCS_BUCKET.indexOf('/') + 1) + '/' + env.URI_SUFFIX : env.URI_SUFFIX}"
+            PATH_PREFIX = "${env.JOB_GCS_BUCKET.contains('/') ? env.JOB_GCS_BUCKET.substring(env.JOB_GCS_BUCKET.indexOf('/') + 1) + '/' + env.URI_SUFFIX : env.URI_SUFFIX}"
           }
           steps {
+            echo "bucketUri: gs://${env.JOB_GCS_BUCKET}/${env.URI_SUFFIX}/*"
+            echo "credentialsId: ${env.JOB_GCS_CREDENTIALS}"
+            echo "localDirectory: ${env.BASE_DIR}/build/distributions"
+            echo "pathPrefix: ${env.PATH_PREFIX}"
             googleStorageDownload(bucketUri: "gs://${env.JOB_GCS_BUCKET}/${env.URI_SUFFIX}/*",
                                   credentialsId: "${env.JOB_GCS_CREDENTIALS}",
                                   localDirectory: "${env.BASE_DIR}/build/distributions",
