@@ -322,16 +322,6 @@ def runE2ETests(){
   }
 }
 
-def withMacOSEnv(Closure body){
-  withEnvMask( vars: [
-      [var: "KEYCHAIN_PASS", password: getVaultSecret(secret: "secret/jenkins-ci/macos-codesign-keychain").data.password],
-      [var: "KEYCHAIN", password: "/var/lib/jenkins/Library/Keychains/Elastic.keychain-db"],
-      [var: "APPLE_SIGNING_ENABLED", password: "true"],
-  ]){
-    body()
-  }
-}
-
 /**
 * There is a specific folder structure in https://staging.elastic.co/ and https://artifacts.elastic.co/downloads/
 * therefore the storage bucket in GCP should follow the same folder structure.
