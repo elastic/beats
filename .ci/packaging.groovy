@@ -151,50 +151,44 @@ def generateSteps() {
     'x-pack/packetbeat'
   ]
   beats.each { beat ->
-    parallelTasks["linux-${beat}"] = generateStep(beat, 'linux')
+    parallelTasks["linux-${beat}"] = generateLinuxStep(beat)
     if (armBeats.contains(beat)) {
-      parallelTasks["arm-${beat}"] = generateStep(beat, 'arm')
+      parallelTasks["arm-${beat}"] =  generateArmStep(beat)
     }
   }
   parallel(parallelTasks)
 }
 
-def generateStep(String beat, String type){
-  return {
-    if (type == 'arm') {
-      withNode(labels: 'arm') {
-        generateArmStep(beat)
-      }
-    } else {
-      withNode(labels: 'ubuntu-18.04 && immutable') {
-        generateLinuxStep(beat)
-      }
-    }
-  }
-}
-
 def generateArmStep(beat) {
-  withEnv(["HOME=${env.WORKSPACE}", 'PLATFORMS=linux/arm64',' PACKAGES=docker', "BEATS_FOLDER=${beat}"]) {
-    withGithubNotify(context: "Packaging Arm ${beat}") {
-      deleteDir()
-      release()
-      dir("${BASE_DIR}"){
-        pushCIDockerImages(arch: 'arm64')
+  return {
+    withNode(labels: 'arm') {
+      withEnv(["HOME=${env.WORKSPACE}", 'PLATFORMS=linux/arm64',' PACKAGES=docker', "BEATS_FOLDER=${beat}"]) {
+        withGithubNotify(context: "Packaging Arm ${beat}") {
+          deleteDir()
+          release()
+          dir("${BASE_DIR}"){
+            pushCIDockerImages(arch: 'arm64')
+          }
+        }
       }
     }
   }
 }
 
 def generateLinuxStep(beat) {
-  withEnv(["HOME=${env.WORKSPACE}", "PLATFORMS=${linuxPlatforms()}", "BEATS_FOLDER=${beat}"]) {
-    withGithubNotify(context: "Packaging Linux ${beat}") {
-      deleteDir()
-      release()
-      dir("${BASE_DIR}"){
-        pushCIDockerImages(arch: 'amd64')
+  return {
+    withNode(labels: 'ubuntu-18.04 && immutable') {
+      withEnv(["HOME=${env.WORKSPACE}", "PLATFORMS=${linuxPlatforms()}", "BEATS_FOLDER=${beat}"]) {
+        withGithubNotify(context: "Packaging Linux ${beat}") {
+          deleteDir()
+          release()
+          dir("${BASE_DIR}"){
+            pushCIDockerImages(arch: 'amd64')
+          }
+        }
+        prepareE2ETestForPackage("${beat}")
       }
     }
-    prepareE2ETestForPackage("${beat}")
   }
 }
 
