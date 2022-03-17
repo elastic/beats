@@ -159,6 +159,4 @@
 - Discover changes in Kubernetes nodes metadata as soon as they happen. {pull}23139[23139]
 - Add results of inspect output command into archive produced by diagnostics collect. {pull}29902[29902]
 - Add support for loading input configuration from external configuration files in standalone mode. You can load inputs from YAML configuration files under the folder `{path.config}/inputs.d`. {pull}30087[30087]
-- Install command will skip install/uninstall steps when installation via package is detected on Linux distros. {pull}30289[30289]
-- Add support for enabling the metrics buffer endpoint in the elastic-agent and beats it runs. diagnostics collect command will gather metrics-buffer data if enabled. {pull}30471[30471]
 - Elastic Agent now propagates ID for Filebeat input. {pull}30386[30386]
