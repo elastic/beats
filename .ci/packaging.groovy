@@ -268,7 +268,7 @@ pipeline {
             dir("${BASE_DIR}") {
               // TODO: as long as googleStorageDownload does not support recursive copy with **/*
               dir("build/distributions") {
-                gsutil(command: "-m -q cp ${env.BUCKET_URI} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
+                gsutil(command: "-m -q cp -r ${env.BUCKET_URI} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
                 sh(label: 'move one level up', script: "mv ${env.GIT_COMMIT}/** .")
               }
               dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
