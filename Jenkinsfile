@@ -412,88 +412,45 @@ def pushCIDockerImages(Map args = [:]) {
   def arch = args.get('arch', 'amd64')
   def beatsFolder = args.beatsFolder
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
+    def defaultVariants = [ '' : 'beats', '-oss' : 'beats', '-ubi8' : 'beats' ]
+    def completeVariant = ['-complete' : 'beats']
     if (beatsFolder.endsWith('auditbeat')) {
-      tagAndPush(beatName: 'auditbeat', arch: arch)
+      tagAndPush(beatName: 'auditbeat', arch: arch, variants: defaultVariants)
     } else if (beatsFolder.endsWith('filebeat')) {
-      tagAndPush(beatName: 'filebeat', arch: arch)
+      tagAndPush(beatName: 'filebeat', arch: arch, variants: defaultVariants)
     } else if (beatsFolder.endsWith('heartbeat')) {
-      tagAndPush(beatName: 'heartbeat', arch: arch)
+      tagAndPush(beatName: 'heartbeat', arch: arch, variants: defaultVariants)
     } else if (beatsFolder.endsWith('metricbeat')) {
-      tagAndPush(beatName: 'metricbeat', arch: arch)
+      tagAndPush(beatName: 'metricbeat', arch: arch, variants: defaultVariants)
+    } else if (beatsFolder.endsWith('osquerybeat')) {
+      tagAndPush(beatName: 'osquerybeat', arch: arch, variants: defaultVariants)
     } else if ("${beatsFolder}" == "packetbeat"){
-      tagAndPush(beatName: 'packetbeat', arch: arch)
+      tagAndPush(beatName: 'packetbeat', arch: arch, variants: defaultVariants)
     } else if ("${beatsFolder}" == "x-pack/elastic-agent") {
-      tagAndPush(beatName: 'elastic-agent', arch: arch)
+      tagAndPush(beatName: 'elastic-agent', arch: arch, variants: defaultVariants + completeVariant)
     }
   }
 }
 
 /**
-* Tag and push all the docker images for the given beat.
 * @param beatName name of the Beat
+* @param arch what architecture
+* @param variants list of docker variants
 */
 def tagAndPush(Map args = [:]) {
-  def beatName = args.beatName
-  def arch = args.get('arch', 'amd64')
-  def libbetaVer = env.VERSION
-  if("${env?.SNAPSHOT.trim()}" == "true"){
-    aliasVersion = libbetaVer.substring(0, libbetaVer.lastIndexOf(".")) // remove third number in version
-
-    libbetaVer += "-SNAPSHOT"
-    aliasVersion += "-SNAPSHOT"
+  def images = [ ]
+  args.variants.each { variant, sourceNamespace ->
+    images += [ source: "${sourceNamespace}/${args.beatName}${variant}",
+                target: "observability-ci/${args.beatName}",
+                arch: args.arch ]
   }
-
-  def tagName = "${libbetaVer}"
-  if (isPR()) {
-    tagName = "pr-${env.CHANGE_ID}"
-  }
-
-  // supported tags
-  def tags = [tagName, "${env.GIT_BASE_COMMIT}"]
-  if (!isPR() && aliasVersion != "") {
-    tags << aliasVersion
-  }
-  // supported image flavours
-  def variants = ["", "-oss", "-ubi8"]
-
-  // only add complete variant for the elastic-agent
-  if(beatName == 'elastic-agent'){
-      variants.add("-complete")
-  }
-
-  variants.each { variant ->
-    tags.each { tag ->
-      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}")
-    }
-  }
-}
-
-/**
-* @param beatName name of the Beat
-* @param variant name of the variant used to build the docker image name
-* @param sourceTag tag to be used as source for the docker tag command, usually under the 'beats' namespace
-* @param targetTag tag to be used as target for the docker tag command, usually under the 'observability-ci' namespace
-*/
-def doTagAndPush(Map args = [:]) {
-  def beatName = args.beatName
-  def variant = args.variant
-  def sourceTag = args.sourceTag
-  def targetTag = args.targetTag
-  def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
-  def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
-
-  def iterations = 0
-  retryWithSleep(retries: 3, seconds: 5, backoff: true) {
-    iterations++
-    def status = sh(label: "Change tag and push ${targetName}",
-                    script: ".ci/scripts/docker-tag-push.sh ${sourceName} ${targetName}",
-                    returnStatus: true)
-    if ( status > 0 && iterations < 3) {
-      error("tag and push failed for ${beatName}, retry")
-    } else if ( status > 0 ) {
-      log(level: 'WARN', text: "${beatName} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
-    }
-  }
+  pushDockerImages(
+    registry: env.DOCKER_REGISTRY,
+    secret: env.DOCKER_ELASTIC_SECRET,
+    snapshot: env.SNAPSHOT,
+    version: env.VERSION,
+    images: images
+  )
 }
 
 /**
