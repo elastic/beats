@@ -16,25 +16,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 )
 
 const metadataPrefix = "aws.rds.db_instance."
 
-// DBDetails holds detailed information from DescribeDBInstances for each rds.
-type DBDetails struct {
-	dbArn              string
-	dbClass            string
-	dbAvailabilityZone string
-	dbIdentifier       string
-	dbStatus           string
-	tags               []aws.Tag
-}
-
 // AddMetadata adds metadata for RDS instances from a specific region
-func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, events map[string]mb.Event) map[string]mb.Event {
+func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) map[string]mb.Event {
+	rdsServiceName := awscommon.CreateServiceName("rds", fips_enabled, regionName)
 	svc := rds.New(awscommon.EnrichAWSConfigWithEndpoint(
-		endpoint, "rds", regionName, awsConfig))
+		endpoint, rdsServiceName, regionName, awsConfig))
 
 	// Get DBInstance IDs per region
 	dbDetailsMap, err := getDBInstancesPerRegion(svc)
@@ -43,17 +33,47 @@ func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, ev
 		return events
 	}
 
+	for _, event := range events {
+		cpuValue, err := event.RootFields.GetValue("aws.rds.metrics.CPUUtilization.avg")
+		if err == nil {
+			if value, ok := cpuValue.(float64); ok {
+				event.RootFields.Put("aws.rds.metrics.CPUUtilization.avg", value/100)
+			}
+		}
+	}
+
 	for identifier, output := range dbDetailsMap {
 		if _, ok := events[identifier]; !ok {
 			continue
 		}
-		events[identifier].RootFields.Put(metadataPrefix+"arn", &output.DBInstanceArn)
-		events[identifier].RootFields.Put(metadataPrefix+"status", &output.DBInstanceStatus)
-		events[identifier].RootFields.Put(metadataPrefix+"identifier", &output.DBInstanceIdentifier)
-		events[identifier].RootFields.Put(metadataPrefix+"db_cluster_identifier", &output.DBClusterIdentifier)
-		events[identifier].RootFields.Put(metadataPrefix+"class", &output.DBInstanceClass)
-		events[identifier].RootFields.Put(metadataPrefix+"engine_name", &output.Engine)
-		events[identifier].RootFields.Put("cloud.availability_zone", &output.AvailabilityZone)
+
+		if output.DBInstanceArn != nil {
+			events[identifier].RootFields.Put(metadataPrefix+"arn", *output.DBInstanceArn)
+		}
+
+		if output.DBInstanceStatus != nil {
+			events[identifier].RootFields.Put(metadataPrefix+"status", *output.DBInstanceStatus)
+		}
+
+		if output.DBInstanceIdentifier != nil {
+			events[identifier].RootFields.Put(metadataPrefix+"identifier", *output.DBInstanceIdentifier)
+		}
+
+		if output.DBClusterIdentifier != nil {
+			events[identifier].RootFields.Put(metadataPrefix+"db_cluster_identifier", *output.DBClusterIdentifier)
+		}
+
+		if output.DBInstanceClass != nil {
+			events[identifier].RootFields.Put(metadataPrefix+"class", *output.DBInstanceClass)
+		}
+
+		if output.Engine != nil {
+			events[identifier].RootFields.Put(metadataPrefix+"engine_name", *output.Engine)
+		}
+
+		if output.AvailabilityZone != nil {
+			events[identifier].RootFields.Put("cloud.availability_zone", *output.AvailabilityZone)
+		}
 	}
 	return events
 }
@@ -68,7 +88,8 @@ func getDBInstancesPerRegion(svc rdsiface.ClientAPI) (map[string]*rds.DBInstance
 
 	instancesOutputs := map[string]*rds.DBInstance{}
 	for _, dbInstance := range output.DBInstances {
-		instancesOutputs[*dbInstance.DBInstanceIdentifier] = &dbInstance
+		instance := dbInstance
+		instancesOutputs[*instance.DBInstanceIdentifier] = &instance
 	}
 	return instancesOutputs, nil
 }

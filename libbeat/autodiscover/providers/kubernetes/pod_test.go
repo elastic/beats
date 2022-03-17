@@ -162,19 +162,17 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.logs/json.keys_under_root": "true",
 						"not.to.include":                       "true",
 					}),
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module":        "prometheus",
+						"co.elastic.metrics/period":        "10s",
+						"co.elastic.metrics.foobar/period": "15s",
+					}),
 					"container": common.MapStr{
 						"name":    "foobar",
 						"id":      "abc",
 						"runtime": "docker",
 					},
-					"namespace": common.MapStr{
-						"name": "ns",
-						"annotations": getNestedAnnotations(common.MapStr{
-							"co.elastic.metrics/module":        "prometheus",
-							"co.elastic.metrics/period":        "10s",
-							"co.elastic.metrics.foobar/period": "15s",
-						}),
-					},
+					"namespace": "ns",
 				},
 			},
 			result: bus.Event{
@@ -184,19 +182,17 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.logs/json.keys_under_root": "true",
 						"not.to.include":                       "true",
 					}),
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/period":        "10s",
+						"co.elastic.metrics.foobar/period": "15s",
+						"co.elastic.metrics/module":        "prometheus",
+					}),
 					"container": common.MapStr{
 						"name":    "foobar",
 						"id":      "abc",
 						"runtime": "docker",
 					},
-					"namespace": common.MapStr{
-						"name": "ns",
-						"annotations": getNestedAnnotations(common.MapStr{
-							"co.elastic.metrics/period":        "10s",
-							"co.elastic.metrics.foobar/period": "15s",
-							"co.elastic.metrics/module":        "prometheus",
-						}),
-					},
+					"namespace": "ns",
 				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{
@@ -231,14 +227,12 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.metrics.foobar/period": "15s",
 						"not.to.include":                   "true",
 					}),
-					"namespace": common.MapStr{
-						"name": "ns",
-						"annotations": getNestedAnnotations(common.MapStr{
-							"co.elastic.metrics/module":        "dropwizard",
-							"co.elastic.metrics/period":        "60s",
-							"co.elastic.metrics.foobar/period": "25s",
-						}),
-					},
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module":        "dropwizard",
+						"co.elastic.metrics/period":        "60s",
+						"co.elastic.metrics.foobar/period": "25s",
+					}),
+					"namespace": "ns",
 					"container": common.MapStr{
 						"name":    "foobar",
 						"id":      "abc",
@@ -254,19 +248,17 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.metrics.foobar/period": "15s",
 						"not.to.include":                   "true",
 					}),
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module":        "dropwizard",
+						"co.elastic.metrics/period":        "60s",
+						"co.elastic.metrics.foobar/period": "25s",
+					}),
 					"container": common.MapStr{
 						"name":    "foobar",
 						"id":      "abc",
 						"runtime": "docker",
 					},
-					"namespace": common.MapStr{
-						"name": "ns",
-						"annotations": getNestedAnnotations(common.MapStr{
-							"co.elastic.metrics/module":        "dropwizard",
-							"co.elastic.metrics/period":        "60s",
-							"co.elastic.metrics.foobar/period": "25s",
-						}),
-					},
+					"namespace": "ns",
 				},
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
@@ -287,36 +279,32 @@ func TestGenerateHints(t *testing.T) {
 		{
 			event: bus.Event{
 				"kubernetes": common.MapStr{
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module":        "prometheus",
+						"co.elastic.metrics/period":        "10s",
+						"co.elastic.metrics.foobar/period": "15s",
+					}),
 					"container": common.MapStr{
 						"name":    "foobar",
 						"id":      "abc",
 						"runtime": "docker",
 					},
-					"namespace": common.MapStr{
-						"name": "ns",
-						"annotations": getNestedAnnotations(common.MapStr{
-							"co.elastic.metrics/module":        "prometheus",
-							"co.elastic.metrics/period":        "10s",
-							"co.elastic.metrics.foobar/period": "15s",
-						}),
-					},
+					"namespace": "ns",
 				},
 			},
 			result: bus.Event{
 				"kubernetes": common.MapStr{
+					"namespace_annotations": getNestedAnnotations(common.MapStr{
+						"co.elastic.metrics/module":        "prometheus",
+						"co.elastic.metrics/period":        "10s",
+						"co.elastic.metrics.foobar/period": "15s",
+					}),
 					"container": common.MapStr{
 						"name":    "foobar",
 						"id":      "abc",
 						"runtime": "docker",
 					},
-					"namespace": common.MapStr{
-						"name": "ns",
-						"annotations": getNestedAnnotations(common.MapStr{
-							"co.elastic.metrics/module":        "prometheus",
-							"co.elastic.metrics/period":        "10s",
-							"co.elastic.metrics.foobar/period": "15s",
-						}),
-					},
+					"namespace": "ns",
 				},
 				"hints": common.MapStr{
 					"metrics": common.MapStr{
@@ -419,16 +407,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -461,16 +445,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -555,16 +535,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -597,16 +573,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -646,16 +618,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -736,16 +704,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -776,16 +740,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -823,16 +783,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -960,16 +916,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -998,16 +950,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -1071,16 +1019,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -1111,16 +1055,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -1201,16 +1141,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -1241,16 +1177,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -1288,16 +1220,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -1392,16 +1320,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -1434,16 +1358,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -1481,16 +1401,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -1561,16 +1477,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -1603,16 +1515,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -1685,16 +1593,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -1727,16 +1631,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -1840,16 +1740,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -1883,16 +1779,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -1933,16 +1825,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -1983,16 +1871,12 @@ func TestPod_EmitEvent(t *testing.T) {
 						"node": common.MapStr{
 							"name": "node",
 						},
-						"namespace": common.MapStr{
-							"name": "default",
-						},
+						"namespace":   "default",
 						"annotations": common.MapStr{},
 					},
 					"meta": common.MapStr{
 						"kubernetes": common.MapStr{
-							"namespace": common.MapStr{
-								"name": "default",
-							},
+							"namespace": "default",
 							"pod": common.MapStr{
 								"name": "filebeat",
 								"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
@@ -2016,6 +1900,7 @@ func TestPod_EmitEvent(t *testing.T) {
 	}
 
 	client := k8sfake.NewSimpleClientset()
+	addResourceMetadata := metadata.GetDefaultResourceMetadataConfig()
 	for _, test := range tests {
 		t.Run(test.Message, func(t *testing.T) {
 			mapper, err := template.NewConfigMapper(nil, nil, nil)
@@ -2023,7 +1908,7 @@ func TestPod_EmitEvent(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, client, nil, nil)
+			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, client, nil, nil, addResourceMetadata)
 			p := &Provider{
 				config:    defaultConfig(),
 				bus:       bus.New(logp.NewLogger("bus"), "test"),
@@ -2102,7 +1987,7 @@ func TestNamespacePodUpdater(t *testing.T) {
 		t.Run(title, func(t *testing.T) {
 			handler := &mockUpdaterHandler{}
 			store := &mockUpdaterStore{objects: c.pods}
-			updater := newNamespacePodUpdater(handler.OnUpdate, store, &sync.Mutex{})
+			updater := kubernetes.NewNamespacePodUpdater(handler.OnUpdate, store, &sync.Mutex{})
 
 			namespace := &kubernetes.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
@@ -2110,6 +1995,58 @@ func TestNamespacePodUpdater(t *testing.T) {
 				},
 			}
 			updater.OnUpdate(namespace)
+
+			assert.EqualValues(t, c.expected, handler.objects)
+		})
+	}
+}
+
+func TestNodePodUpdater(t *testing.T) {
+	pod := func(name, node string) *kubernetes.Pod {
+		return &kubernetes.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: name,
+			},
+			Spec: v1.PodSpec{
+				NodeName: node,
+			},
+		}
+	}
+
+	cases := map[string]struct {
+		pods     []interface{}
+		expected []interface{}
+	}{
+		"no pods": {},
+		"two pods but only one in node": {
+			pods: []interface{}{
+				pod("onepod", "foo"),
+				pod("onepod", "bar"),
+			},
+			expected: []interface{}{
+				pod("onepod", "foo"),
+			},
+		},
+		"two pods but none in node": {
+			pods: []interface{}{
+				pod("onepod", "bar"),
+				pod("otherpod", "bar"),
+			},
+		},
+	}
+
+	for title, c := range cases {
+		t.Run(title, func(t *testing.T) {
+			handler := &mockUpdaterHandler{}
+			store := &mockUpdaterStore{objects: c.pods}
+			updater := kubernetes.NewNodePodUpdater(handler.OnUpdate, store, &sync.Mutex{})
+
+			node := &kubernetes.Node{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "foo",
+				},
+			}
+			updater.OnUpdate(node)
 
 			assert.EqualValues(t, c.expected, handler.objects)
 		})

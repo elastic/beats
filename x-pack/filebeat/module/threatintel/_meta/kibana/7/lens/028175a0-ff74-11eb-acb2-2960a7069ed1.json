@@ -1,0 +1,98 @@
+{
+    "attributes": {
+        "description": "This is a pie chart displaying the top sources/providers of indicators.",
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "55450fa9-7fdf-4ea5-a0db-b68c202d5d39": {
+                            "columnOrder": [
+                                "018f5a03-1498-427b-a0c0-37650af1868e",
+                                "11576d1f-5400-4a71-bf04-681099e755d5"
+                            ],
+                            "columns": {
+                                "018f5a03-1498-427b-a0c0-37650af1868e": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top Indicator Sources",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "11576d1f-5400-4a71-bf04-681099e755d5",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "size": 5
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "threat.indicator.provider"
+                                },
+                                "11576d1f-5400-4a71-bf04-681099e755d5": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Count of records",
+                                    "operationType": "count",
+                                    "scale": "ratio",
+                                    "sourceField": "Records"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "layers": [
+                    {
+                        "categoryDisplay": "default",
+                        "groups": [
+                            "018f5a03-1498-427b-a0c0-37650af1868e"
+                        ],
+                        "layerId": "55450fa9-7fdf-4ea5-a0db-b68c202d5d39",
+                        "layerType": "data",
+                        "legendDisplay": "default",
+                        "metric": "11576d1f-5400-4a71-bf04-681099e755d5",
+                        "nestedLegend": false,
+                        "numberDisplay": "percent"
+                    }
+                ],
+                "shape": "pie"
+            }
+        },
+        "title": "ThreatQ Top Indicator Providers [Filebeat Threat Intel]",
+        "visualizationType": "lnsPie"
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "028175a0-ff74-11eb-acb2-2960a7069ed1",
+    "migrationVersion": {
+        "lens": "7.15.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-55450fa9-7fdf-4ea5-a0db-b68c202d5d39",
+            "type": "index-pattern"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-ref-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-10-11T08:02:55.512Z",
+    "version": "WzUyOSwxXQ=="
+}

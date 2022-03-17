@@ -6,8 +6,10 @@ package httpjson
 
 import (
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"errors"
+	"io"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -77,14 +79,23 @@ func decode(contentType string, p []byte, dst *response) error {
 
 func registerEncoders() {
 	log := logp.L().Named(logName)
-	log.Debug(registerEncoder("application/json", encodeAsJSON))
-	log.Debug(registerEncoder("application/x-www-form-urlencoded", encodeAsForm))
+	log.Debugf("registering encoder 'application/json': returned error: %#v",
+		registerEncoder("application/json", encodeAsJSON))
+
+	log.Debugf("registering encoder 'application/x-www-form-urlencoded': returned error: %#v",
+		registerEncoder("application/x-www-form-urlencoded", encodeAsForm))
 }
 
 func registerDecoders() {
 	log := logp.L().Named(logName)
-	log.Debug(registerDecoder("application/json", decodeAsJSON))
-	log.Debug(registerDecoder("application/x-ndjson", decodeAsNdjson))
+	log.Debugf("registering decoder 'application/json': returned error: %#v",
+		registerDecoder("application/json", decodeAsJSON))
+
+	log.Debugf("registering decoder 'application/x-ndjson': returned error: %#v",
+		registerDecoder("application/x-ndjson", decodeAsNdjson))
+
+	log.Debugf("registering decoder 'text/csv': returned error: %#v",
+		registerDecoder("text/csv", decodeAsCSV))
 }
 
 func encodeAsJSON(trReq transformable) ([]byte, error) {
@@ -123,5 +134,45 @@ func decodeAsNdjson(p []byte, dst *response) error {
 		results = append(results, o)
 	}
 	dst.body = results
+	return nil
+}
+
+func decodeAsCSV(p []byte, dst *response) error {
+	var results []interface{}
+
+	r := csv.NewReader(bytes.NewReader(p))
+
+	// a header is always expected, otherwise we can't map
+	// values to keys in the event
+	header, err := r.Read()
+	if err != nil {
+		if err == io.EOF {
+			return nil
+		}
+		return err
+	}
+
+	event, err := r.Read()
+	for ; err == nil; event, err = r.Read() {
+		o := make(map[string]interface{}, len(header))
+		if len(header) != len(event) {
+			// sanity check, csv.Reader should fail on this scenario
+			// and this code path should be unreachable
+			return errors.New("malformed CSV, record does not match header length")
+		}
+		for i, h := range header {
+			o[h] = event[i]
+		}
+		results = append(results, o)
+	}
+
+	if err != nil {
+		if err != io.EOF {
+			return err
+		}
+	}
+
+	dst.body = results
+
 	return nil
 }

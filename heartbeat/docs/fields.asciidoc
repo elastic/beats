@@ -13,6 +13,7 @@ This document describes the fields that are exported by Heartbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-beat-common>>
+* <<exported-fields-browser>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
 * <<exported-fields-docker-processor>>
@@ -24,6 +25,7 @@ grouped in the following categories:
 * <<exported-fields-kubernetes-processor>>
 * <<exported-fields-process>>
 * <<exported-fields-resolve>>
+* <<exported-fields-service>>
 * <<exported-fields-socks5>>
 * <<exported-fields-summary>>
 * <<exported-fields-synthetics>>
@@ -93,6 +95,146 @@ alias to: agent.name
 Time series instance id
 
 type: keyword
+
+--
+
+[[exported-fields-browser]]
+== Synthetics browser metrics fields
+
+None
+
+
+[float]
+=== browser
+
+Browser metrics and traces
+
+
+[float]
+=== experience
+
+Absolute values of all user experience metrics in the browser relative to the navigation start event in microseconds
+
+
+
+[float]
+=== fcp
+
+duration of First contentful paint metric
+
+
+*`browser.experience.fcp.us`*::
++
+--
+type: integer
+
+--
+
+[float]
+=== lcp
+
+duration of Largest contentful paint metric
+
+
+*`browser.experience.lcp.us`*::
++
+--
+type: integer
+
+--
+
+[float]
+=== dcl
+
+duration of Document content loaded end event
+
+
+*`browser.experience.dcl.us`*::
++
+--
+type: integer
+
+--
+
+[float]
+=== load
+
+duration of Load end event
+
+
+*`browser.experience.load.duration`*::
++
+--
+type: integer
+
+--
+
+*`browser.experience.cls`*::
++
+--
+culumative layout shift score across all frames
+
+type: integer
+
+--
+
+[float]
+=== relative_trace
+
+trace event with timing information that are realtive to journey timings in microseconds
+
+
+
+*`browser.relative_trace.name`*::
++
+--
+name of the trace event
+
+type: keyword
+
+--
+
+*`browser.relative_trace.type`*::
++
+--
+could be one of mark or measure event types
+
+type: text
+
+--
+
+[float]
+=== start
+
+monotonically increasing trace start time in microseconds
+
+
+*`browser.relative_trace.start.us`*::
++
+--
+type: long
+
+--
+
+[float]
+=== duration
+
+duration of the trace event in microseconds.
+
+
+*`browser.relative_trace.duration.us`*::
++
+--
+type: integer
+
+--
+
+*`browser.relative_trace.score`*::
++
+--
+weighted score of the layout shift event
+
+type: integer
 
 --
 
@@ -602,9 +744,12 @@ format: bytes
 *`client.domain`*::
 +
 --
-Client domain.
+The domain name of the client system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -1021,6 +1166,130 @@ example: t2.medium
 
 --
 
+*`cloud.origin.account.id`*::
++
+--
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
+
+type: keyword
+
+example: 666777888999
+
+--
+
+*`cloud.origin.account.name`*::
++
+--
+The cloud account name or alias used to identify different entities in a multi-tenant environment.
+Examples: AWS account name, Google Cloud ORG display name.
+
+type: keyword
+
+example: elastic-dev
+
+--
+
+*`cloud.origin.availability_zone`*::
++
+--
+Availability zone in which this host, resource, or service is located.
+
+type: keyword
+
+example: us-east-1c
+
+--
+
+*`cloud.origin.instance.id`*::
++
+--
+Instance ID of the host machine.
+
+type: keyword
+
+example: i-1234567890abcdef0
+
+--
+
+*`cloud.origin.instance.name`*::
++
+--
+Instance name of the host machine.
+
+type: keyword
+
+--
+
+*`cloud.origin.machine.type`*::
++
+--
+Machine type of the host machine.
+
+type: keyword
+
+example: t2.medium
+
+--
+
+*`cloud.origin.project.id`*::
++
+--
+The cloud project identifier.
+Examples: Google Cloud Project id, Azure Project id.
+
+type: keyword
+
+example: my-project
+
+--
+
+*`cloud.origin.project.name`*::
++
+--
+The cloud project name.
+Examples: Google Cloud Project name, Azure Project name.
+
+type: keyword
+
+example: my project
+
+--
+
+*`cloud.origin.provider`*::
++
+--
+Name of the cloud provider. Example values are aws, azure, gcp, or digitalocean.
+
+type: keyword
+
+example: aws
+
+--
+
+*`cloud.origin.region`*::
++
+--
+Region in which this host, resource, or service is located.
+
+type: keyword
+
+example: us-east-1
+
+--
+
+*`cloud.origin.service.name`*::
++
+--
+The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
+Examples: app engine, app service, cloud run, fargate, lambda.
+
+type: keyword
+
+example: lambda
+
+--
+
 *`cloud.project.id`*::
 +
 --
@@ -1068,6 +1337,130 @@ example: us-east-1
 --
 
 *`cloud.service.name`*::
++
+--
+The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
+Examples: app engine, app service, cloud run, fargate, lambda.
+
+type: keyword
+
+example: lambda
+
+--
+
+*`cloud.target.account.id`*::
++
+--
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
+
+type: keyword
+
+example: 666777888999
+
+--
+
+*`cloud.target.account.name`*::
++
+--
+The cloud account name or alias used to identify different entities in a multi-tenant environment.
+Examples: AWS account name, Google Cloud ORG display name.
+
+type: keyword
+
+example: elastic-dev
+
+--
+
+*`cloud.target.availability_zone`*::
++
+--
+Availability zone in which this host, resource, or service is located.
+
+type: keyword
+
+example: us-east-1c
+
+--
+
+*`cloud.target.instance.id`*::
++
+--
+Instance ID of the host machine.
+
+type: keyword
+
+example: i-1234567890abcdef0
+
+--
+
+*`cloud.target.instance.name`*::
++
+--
+Instance name of the host machine.
+
+type: keyword
+
+--
+
+*`cloud.target.machine.type`*::
++
+--
+Machine type of the host machine.
+
+type: keyword
+
+example: t2.medium
+
+--
+
+*`cloud.target.project.id`*::
++
+--
+The cloud project identifier.
+Examples: Google Cloud Project id, Azure Project id.
+
+type: keyword
+
+example: my-project
+
+--
+
+*`cloud.target.project.name`*::
++
+--
+The cloud project name.
+Examples: Google Cloud Project name, Azure Project name.
+
+type: keyword
+
+example: my project
+
+--
+
+*`cloud.target.provider`*::
++
+--
+Name of the cloud provider. Example values are aws, azure, gcp, or digitalocean.
+
+type: keyword
+
+example: aws
+
+--
+
+*`cloud.target.region`*::
++
+--
+Region in which this host, resource, or service is located.
+
+type: keyword
+
+example: us-east-1
+
+--
+
+*`cloud.target.service.name`*::
 +
 --
 The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
@@ -1365,9 +1758,12 @@ format: bytes
 *`destination.domain`*::
 +
 --
-Destination domain.
+The domain name of the destination system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -2878,6 +3274,69 @@ This URL links to another system where in-depth investigation of the specific oc
 type: keyword
 
 example: https://mysystem.example.com/alert/5271dedb-f5b0-4218-87f0-4ac4870a38fe
+
+--
+
+[float]
+=== faas
+
+The user fields describe information about the function as a service that is relevant to the event.
+
+
+*`faas.coldstart`*::
++
+--
+Boolean value indicating a cold start of a function.
+
+type: boolean
+
+--
+
+*`faas.execution`*::
++
+--
+The execution ID of the current function execution.
+
+type: keyword
+
+example: af9d5aa4-a685-4c5f-a22b-444f80b3cc28
+
+--
+
+*`faas.trigger`*::
++
+--
+Details about the function trigger.
+
+type: nested
+
+--
+
+*`faas.trigger.request_id`*::
++
+--
+The ID of the trigger request , message, event, etc.
+
+type: keyword
+
+example: 123456789
+
+--
+
+*`faas.trigger.type`*::
++
+--
+The trigger for the function execution.
+Expected values are:
+  * http
+  * pubsub
+  * datasource
+  * timer
+  * other
+
+type: keyword
+
+example: http
 
 --
 
@@ -4517,121 +4976,6 @@ example: 1325
 
 --
 
-*`host.user.domain`*::
-+
---
-Name of the directory the user is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`host.user.email`*::
-+
---
-User email address.
-
-type: keyword
-
---
-
-*`host.user.full_name`*::
-+
---
-User's full name, if available.
-
-type: keyword
-
-example: Albert Einstein
-
---
-
-*`host.user.full_name.text`*::
-+
---
-type: match_only_text
-
---
-
-*`host.user.group.domain`*::
-+
---
-Name of the directory the group is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`host.user.group.id`*::
-+
---
-Unique identifier for the group on the system/platform.
-
-type: keyword
-
---
-
-*`host.user.group.name`*::
-+
---
-Name of the group.
-
-type: keyword
-
---
-
-*`host.user.hash`*::
-+
---
-Unique user hash to correlate information for a user in anonymized form.
-Useful if `user.id` or `user.name` contain confidential information and cannot be used.
-
-type: keyword
-
---
-
-*`host.user.id`*::
-+
---
-Unique identifier of the user.
-
-type: keyword
-
-example: S-1-5-21-202424912787-2692429404-2351956786-1000
-
---
-
-*`host.user.name`*::
-+
---
-Short name or login of the user.
-
-type: keyword
-
-example: a.einstein
-
---
-
-*`host.user.name.text`*::
-+
---
-type: match_only_text
-
---
-
-*`host.user.roles`*::
-+
---
-Array of user roles at the time of the event.
-
-type: keyword
-
-example: ["kibana_admin", "reporting_user"]
-
---
-
 [float]
 === http
 
@@ -4698,13 +5042,11 @@ example: 123e4567-e89b-12d3-a456-426614174000
 +
 --
 HTTP request method.
-Prior to ECS 1.6.0 the following guidance was provided:
-"The field value must be normalized to lowercase for querying."
-As of ECS 1.6.0, the guidance is deprecated because the original case of the method may be useful in anomaly detection.  Original case will be mandated in ECS 2.0.0
+The value should retain its casing from the original event. For example, `GET`, `get`, and `GeT` are all considered valid values for this field.
 
 type: keyword
 
-example: GET, POST, PUT, PoST
+example: POST
 
 --
 
@@ -4899,7 +5241,7 @@ example: org.elasticsearch.bootstrap.Bootstrap
 --
 The line number of the file containing the source code which originated the log event.
 
-type: integer
+type: long
 
 example: 42
 
@@ -4925,22 +5267,6 @@ The name of the function or method which originated the log event.
 type: keyword
 
 example: init
-
---
-
-*`log.original`*::
-+
---
-Deprecated for removal in next major version release. This field is superseded by  `event.original`.
-This is the original log message and contains the full log message before splitting it up in multiple parts.
-In contrast to the `message` field which can contain an extracted part of the log message, this field contains the original, full log message. It can have already some modifications applied like encoding or new lines removed to clean up the log message.
-This field is not indexed and doc_values are disabled so it can't be queried but the value can be retrieved from `_source`.
-
-type: keyword
-
-example: Sep 19 08:26:10 localhost My log
-
-Field is not indexed.
 
 --
 
@@ -5026,8 +5352,9 @@ The network.* fields should be populated with details about the network activity
 *`network.application`*::
 +
 --
-A name given to an application level protocol. This can be arbitrarily assigned for things like microservices, but also apply to things like skype, icq, facebook, twitter. This would be used in situations where the vendor or service can be decoded such as from the source/dest IP owners, ports, or wire format.
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+When a specific application or service is identified from network connection details (source/dest IPs, ports, certificates, or wire format), this field captures the application's or service's name.
+For example, the original event identifies the network connection being from a specific web service in a `https` network connection, like `facebook` or `twitter`.
+The field value must be normalized to lowercase for querying.
 
 type: keyword
 
@@ -5163,8 +5490,8 @@ example: 24
 *`network.protocol`*::
 +
 --
-L7 Network protocol name. ex. http, lumberjack, transport protocol.
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+In the OSI Model this would be the Application Layer protocol. For example, `http`, `dns`, or `ssh`.
+The field value must be normalized to lowercase for querying.
 
 type: keyword
 
@@ -5176,7 +5503,7 @@ example: http
 +
 --
 Same as network.iana_number, but instead using the Keyword name of the transport layer (udp, tcp, ipv6-icmp, etc.)
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+The field value must be normalized to lowercase for querying.
 
 type: keyword
 
@@ -5188,7 +5515,7 @@ example: tcp
 +
 --
 In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+The field value must be normalized to lowercase for querying.
 
 type: keyword
 
@@ -7356,19 +7683,6 @@ format: string
 
 --
 
-*`process.parent.ppid`*::
-+
---
-Parent process' pid.
-
-type: long
-
-example: 4241
-
-format: string
-
---
-
 *`process.parent.start`*::
 +
 --
@@ -7547,19 +7861,6 @@ Process id.
 type: long
 
 example: 4242
-
-format: string
-
---
-
-*`process.ppid`*::
-+
---
-Parent process' pid.
-
-type: long
-
-example: 4241
 
 format: string
 
@@ -7956,9 +8257,12 @@ format: bytes
 *`server.domain`*::
 +
 --
-Server domain.
+The domain name of the server system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -8385,12 +8689,230 @@ example: instance-0000000016
 
 --
 
+*`service.origin.address`*::
++
+--
+Address where data about this service was collected from.
+This should be a URI, network address (ipv4:port or [ipv6]:port) or a resource path (sockets).
+
+type: keyword
+
+example: 172.26.0.2:5432
+
+--
+
+*`service.origin.environment`*::
++
+--
+Identifies the environment where the service is running.
+If the same service runs in different environments (production, staging, QA, development, etc.), the environment can identify other instances of the same service. Can also group services and applications from the same environment.
+
+type: keyword
+
+example: production
+
+--
+
+*`service.origin.ephemeral_id`*::
++
+--
+Ephemeral identifier of this service (if one exists).
+This id normally changes across restarts, but `service.id` does not.
+
+type: keyword
+
+example: 8a4f500f
+
+--
+
+*`service.origin.id`*::
++
+--
+Unique identifier of the running service. If the service is comprised of many nodes, the `service.id` should be the same for all nodes.
+This id should uniquely identify the service. This makes it possible to correlate logs and metrics for one specific service, no matter which particular node emitted the event.
+Note that if you need to see the events from one specific host of the service, you should filter on that `host.name` or `host.id` instead.
+
+type: keyword
+
+example: d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6
+
+--
+
+*`service.origin.name`*::
++
+--
+Name of the service data is collected from.
+The name of the service is normally user given. This allows for distributed services that run on multiple hosts to correlate the related instances based on the name.
+In the case of Elasticsearch the `service.name` could contain the cluster name. For Beats the `service.name` is by default a copy of the `service.type` field if no name is specified.
+
+type: keyword
+
+example: elasticsearch-metrics
+
+--
+
+*`service.origin.node.name`*::
++
+--
+Name of a service node.
+This allows for two nodes of the same service running on the same host to be differentiated. Therefore, `service.node.name` should typically be unique across nodes of a given service.
+In the case of Elasticsearch, the `service.node.name` could contain the unique node name within the Elasticsearch cluster. In cases where the service doesn't have the concept of a node name, the host name or container name can be used to distinguish running instances that make up this service. If those do not provide uniqueness (e.g. multiple instances of the service running on the same host) - the node name can be manually set.
+
+type: keyword
+
+example: instance-0000000016
+
+--
+
+*`service.origin.state`*::
++
+--
+Current state of the service.
+
+type: keyword
+
+--
+
+*`service.origin.type`*::
++
+--
+The type of the service data is collected from.
+The type can be used to group and correlate logs and metrics from one service type.
+Example: If logs or metrics are collected from Elasticsearch, `service.type` would be `elasticsearch`.
+
+type: keyword
+
+example: elasticsearch
+
+--
+
+*`service.origin.version`*::
++
+--
+Version of the service the data was collected from.
+This allows to look at a data set only for a specific version of a service.
+
+type: keyword
+
+example: 3.2.4
+
+--
+
 *`service.state`*::
 +
 --
 Current state of the service.
 
 type: keyword
+
+--
+
+*`service.target.address`*::
++
+--
+Address where data about this service was collected from.
+This should be a URI, network address (ipv4:port or [ipv6]:port) or a resource path (sockets).
+
+type: keyword
+
+example: 172.26.0.2:5432
+
+--
+
+*`service.target.environment`*::
++
+--
+Identifies the environment where the service is running.
+If the same service runs in different environments (production, staging, QA, development, etc.), the environment can identify other instances of the same service. Can also group services and applications from the same environment.
+
+type: keyword
+
+example: production
+
+--
+
+*`service.target.ephemeral_id`*::
++
+--
+Ephemeral identifier of this service (if one exists).
+This id normally changes across restarts, but `service.id` does not.
+
+type: keyword
+
+example: 8a4f500f
+
+--
+
+*`service.target.id`*::
++
+--
+Unique identifier of the running service. If the service is comprised of many nodes, the `service.id` should be the same for all nodes.
+This id should uniquely identify the service. This makes it possible to correlate logs and metrics for one specific service, no matter which particular node emitted the event.
+Note that if you need to see the events from one specific host of the service, you should filter on that `host.name` or `host.id` instead.
+
+type: keyword
+
+example: d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6
+
+--
+
+*`service.target.name`*::
++
+--
+Name of the service data is collected from.
+The name of the service is normally user given. This allows for distributed services that run on multiple hosts to correlate the related instances based on the name.
+In the case of Elasticsearch the `service.name` could contain the cluster name. For Beats the `service.name` is by default a copy of the `service.type` field if no name is specified.
+
+type: keyword
+
+example: elasticsearch-metrics
+
+--
+
+*`service.target.node.name`*::
++
+--
+Name of a service node.
+This allows for two nodes of the same service running on the same host to be differentiated. Therefore, `service.node.name` should typically be unique across nodes of a given service.
+In the case of Elasticsearch, the `service.node.name` could contain the unique node name within the Elasticsearch cluster. In cases where the service doesn't have the concept of a node name, the host name or container name can be used to distinguish running instances that make up this service. If those do not provide uniqueness (e.g. multiple instances of the service running on the same host) - the node name can be manually set.
+
+type: keyword
+
+example: instance-0000000016
+
+--
+
+*`service.target.state`*::
++
+--
+Current state of the service.
+
+type: keyword
+
+--
+
+*`service.target.type`*::
++
+--
+The type of the service data is collected from.
+The type can be used to group and correlate logs and metrics from one service type.
+Example: If logs or metrics are collected from Elasticsearch, `service.type` would be `elasticsearch`.
+
+type: keyword
+
+example: elasticsearch
+
+--
+
+*`service.target.version`*::
++
+--
+Version of the service the data was collected from.
+This allows to look at a data set only for a specific version of a service.
+
+type: keyword
+
+example: 3.2.4
 
 --
 
@@ -8481,9 +9003,12 @@ format: bytes
 *`source.domain`*::
 +
 --
-Source domain.
+The domain name of the source system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -8832,7 +9357,7 @@ example: ["kibana_admin", "reporting_user"]
 === threat
 
 Fields to classify events and alerts according to a threat taxonomy such as the MITRE ATT&CK® framework.
-These fields are for users to classify alerts from all of their sources (e.g. IDS, NGFW, etc.) within a common taxonomy. The threat.tactic.* are meant to capture the high level category of the threat (e.g. "impact"). The threat.technique.* fields are meant to capture which kind of approach is used by this detected threat, to accomplish the goal (e.g. "endpoint denial of service").
+These fields are for users to classify alerts from all of their sources (e.g. IDS, NGFW, etc.) within a common taxonomy. The threat.tactic.* fields are meant to capture the high level category of the threat (e.g. "impact"). The threat.technique.* fields are meant to capture which kind of approach is used by this detected threat, to accomplish the goal (e.g. "endpoint denial of service").
 
 
 *`threat.enrichments`*::
@@ -8885,16 +9410,17 @@ type: match_only_text
 *`threat.enrichments.indicator.confidence`*::
 +
 --
-Identifies the confidence rating assigned by the provider using STIX confidence scales. Expected values:
-  * Not Specified, None, Low, Medium, High
-  * 0-10
-  * Admirality Scale (1-6)
-  * DNI Scale (5-95)
-  * WEP Scale (Impossible - Certain)
+Identifies the vendor-neutral confidence rating using the None/Low/Medium/High scale defined in Appendix A of the STIX 2.1 framework. Vendor-specific confidence scales may be added as custom fields.
+Expected values are:
+  * Not Specified
+  * None
+  * Low
+  * Medium
+  * High
 
 type: keyword
 
-example: High
+example: Medium
 
 --
 
@@ -9679,6 +10205,270 @@ The user ID (UID) or security identifier (SID) of the file owner.
 type: keyword
 
 example: 1001
+
+--
+
+*`threat.enrichments.indicator.file.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.country`*::
++
+--
+List of country (C) codes
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: Mountain View
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.organization`*::
++
+--
+List of organizations (O) of issuing certificate authority.
+
+type: keyword
+
+example: Example Inc
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.organizational_unit`*::
++
+--
+List of organizational units (OU) of issuing certificate authority.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.enrichments.indicator.file.x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39+00:00
+
+--
+
+*`threat.enrichments.indicator.file.x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25+00:00
+
+--
+
+*`threat.enrichments.indicator.file.x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`threat.enrichments.indicator.file.x509.public_key_curve`*::
++
+--
+The curve used by the elliptic curve public key algorithm. This is algorithm specific.
+
+type: keyword
+
+example: nistp521
+
+--
+
+*`threat.enrichments.indicator.file.x509.public_key_exponent`*::
++
+--
+Exponent used to derive the public key. This is algorithm specific.
+
+type: long
+
+example: 65537
+
+Field is not indexed.
+
+--
+
+*`threat.enrichments.indicator.file.x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`threat.enrichments.indicator.file.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`threat.enrichments.indicator.file.x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. We recommend using names found in Go Lang Crypto library. See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353.
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: shared.global.example.net
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.country`*::
++
+--
+List of country (C) code
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: San Francisco
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.organization`*::
++
+--
+List of organizations (O) of subject.
+
+type: keyword
+
+example: Example, Inc.
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.organizational_unit`*::
++
+--
+List of organizational units (OU) of subject.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.enrichments.indicator.file.x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
 
 --
 
@@ -10611,17 +11401,17 @@ type: match_only_text
 *`threat.indicator.confidence`*::
 +
 --
-Identifies the confidence rating assigned by the provider using STIX confidence scales.
-Recommended values:
-  * Not Specified, None, Low, Medium, High
-  * 0-10
-  * Admirality Scale (1-6)
-  * DNI Scale (5-95)
-  * WEP Scale (Impossible - Certain)
+Identifies the vendor-neutral confidence rating using the None/Low/Medium/High scale defined in Appendix A of the STIX 2.1 framework. Vendor-specific confidence scales may be added as custom fields.
+Expected values are:
+  * Not Specified
+  * None
+  * Low
+  * Medium
+  * High
 
 type: keyword
 
-example: High
+example: Medium
 
 --
 
@@ -11406,6 +12196,270 @@ The user ID (UID) or security identifier (SID) of the file owner.
 type: keyword
 
 example: 1001
+
+--
+
+*`threat.indicator.file.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+*`threat.indicator.file.x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.indicator.file.x509.issuer.country`*::
++
+--
+List of country (C) codes
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.indicator.file.x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.indicator.file.x509.issuer.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: Mountain View
+
+--
+
+*`threat.indicator.file.x509.issuer.organization`*::
++
+--
+List of organizations (O) of issuing certificate authority.
+
+type: keyword
+
+example: Example Inc
+
+--
+
+*`threat.indicator.file.x509.issuer.organizational_unit`*::
++
+--
+List of organizational units (OU) of issuing certificate authority.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`threat.indicator.file.x509.issuer.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.indicator.file.x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39+00:00
+
+--
+
+*`threat.indicator.file.x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25+00:00
+
+--
+
+*`threat.indicator.file.x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`threat.indicator.file.x509.public_key_curve`*::
++
+--
+The curve used by the elliptic curve public key algorithm. This is algorithm specific.
+
+type: keyword
+
+example: nistp521
+
+--
+
+*`threat.indicator.file.x509.public_key_exponent`*::
++
+--
+Exponent used to derive the public key. This is algorithm specific.
+
+type: long
+
+example: 65537
+
+Field is not indexed.
+
+--
+
+*`threat.indicator.file.x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`threat.indicator.file.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`threat.indicator.file.x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. We recommend using names found in Go Lang Crypto library. See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353.
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+*`threat.indicator.file.x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: shared.global.example.net
+
+--
+
+*`threat.indicator.file.x509.subject.country`*::
++
+--
+List of country (C) code
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.indicator.file.x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`threat.indicator.file.x509.subject.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: San Francisco
+
+--
+
+*`threat.indicator.file.x509.subject.organization`*::
++
+--
+List of organizations (O) of subject.
+
+type: keyword
+
+example: Example, Inc.
+
+--
+
+*`threat.indicator.file.x509.subject.organizational_unit`*::
++
+--
+List of organizational units (OU) of subject.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.x509.subject.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.indicator.file.x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
 
 --
 
@@ -14904,44 +15958,13 @@ type: ip
 
 --
 
-
-*`kubernetes.namespace.name`*::
+*`kubernetes.namespace`*::
 +
 --
-Kubernetes namespace name
+Kubernetes namespace
 
 
 type: keyword
-
---
-
-*`kubernetes.namespace.uuid`*::
-+
---
-Kubernetes namespace uuid
-
-
-type: keyword
-
---
-
-*`kubernetes.namespace.labels.*`*::
-+
---
-Kubernetes namespace labels map
-
-
-type: object
-
---
-
-*`kubernetes.namespace.annotations.*`*::
-+
---
-Kubernetes namespace annotations map
-
-
-type: object
 
 --
 
@@ -15132,6 +16155,21 @@ Duration required to resolve an IP from hostname.
 Duration in microseconds
 
 type: long
+
+--
+
+[[exported-fields-service]]
+== APM Service fields
+
+None
+
+
+*`name`*::
++
+--
+APM service name this monitor is linked to
+
+type: keyword
 
 --
 
@@ -15388,135 +16426,6 @@ Attributes representing individual screenshot blocks. Only hash is indexed since
 Hash that uniquely identifies this image by content. Corresponds to block document id.
 
 type: keyword
-
---
-
-
-[float]
-=== experience
-
-Absolute values of all user experience metrics in the browser relative to the navigation start event in microseconds
-
-
-
-[float]
-=== fcp
-
-duration of First contentful paint metric
-
-
-*`synthetics.browser.experience.fcp.us`*::
-+
---
-type: integer
-
---
-
-[float]
-=== lcp
-
-duration of Largest contentful paint metric
-
-
-*`synthetics.browser.experience.lcp.us`*::
-+
---
-type: integer
-
---
-
-[float]
-=== dcl
-
-duration of Document content loaded end event
-
-
-*`synthetics.browser.experience.dcl.us`*::
-+
---
-type: integer
-
---
-
-[float]
-=== load
-
-duration of Load end event
-
-
-*`synthetics.browser.experience.load.duration`*::
-+
---
-type: integer
-
---
-
-*`synthetics.browser.experience.cls`*::
-+
---
-culumative layout shift score across all frames
-
-type: integer
-
---
-
-[float]
-=== relative_trace
-
-trace event with timing information that are realtive to journey timings in microseconds
-
-
-
-*`synthetics.browser.relative_trace.name`*::
-+
---
-name of the trace event
-
-type: keyword
-
---
-
-*`synthetics.browser.relative_trace.type`*::
-+
---
-could be one of mark or measure event types
-
-type: text
-
---
-
-[float]
-=== start
-
-monotonically increasing trace start time in microseconds
-
-
-*`synthetics.browser.relative_trace.start.us`*::
-+
---
-type: long
-
---
-
-[float]
-=== duration
-
-duration of the trace event in microseconds.
-
-
-*`synthetics.browser.relative_trace.duration.us`*::
-+
---
-type: integer
-
---
-
-*`synthetics.browser.relative_trace.score`*::
-+
---
-weighted score of the layout shift event
-
-type: integer
 
 --
 

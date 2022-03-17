@@ -31,11 +31,15 @@ stages:
                 - "arm"
             parameters:
                 - "armTest"
+        stage: extended
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
     goIntegTest:
         mage: "mage goIntegTest"
+        stage: mandatory
+    pythonIntegTest:
+        mage: "mage pythonIntegTest"
         stage: mandatory
     crosscompile:
         make: "make -C libbeat crosscompile"

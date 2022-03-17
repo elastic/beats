@@ -73,14 +73,14 @@ func TestTimestampFormatString(t *testing.T) {
 			"test timestamp formatter",
 			"%{[key]}: %{+YYYY.MM.dd}",
 			common.MapStr{"key": "timestamp"},
-			time.Date(2015, 5, 1, 20, 12, 34, 0, time.Local),
+			time.Date(2015, 5, 1, 20, 12, 34, 0, time.UTC),
 			"timestamp: 2015.05.01",
 		},
 		{
 			"test timestamp formatter",
 			"%{[@timestamp]}: %{+YYYY.MM.dd}",
 			common.MapStr{"key": "timestamp"},
-			time.Date(2015, 5, 1, 20, 12, 34, 0, time.Local),
+			time.Date(2015, 5, 1, 20, 12, 34, 0, time.UTC),
 			"2015-05-01T20:12:34.000Z: 2015.05.01",
 		},
 	}

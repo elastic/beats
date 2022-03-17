@@ -1,4 +1,5 @@
 {
+  "cluster_uuid": "s7QHFAuAQmqeqnGZmAqXIA",
   "http": {
     "connections": {
       "current": 1,
@@ -101,6 +102,42 @@
         "incremental": 4,
         "delete": 5,
         "permissions": 6
+      }
+    }
+  },
+  "crawler": {
+    "global": {
+      "crawl_requests": {
+        "pending": 0,
+        "active": 2,
+        "successful": 2,
+        "failed": 0
+      }
+    },
+    "node": {
+      "pages_visited": 385,
+      "urls_allowed": 478,
+      "urls_denied": {
+        "nofollow": 98,
+        "already_seen": 8466,
+        "domain_filter_denied": 5286,
+        "incorrect_protocol": 23,
+        "unsupported_content_type": 4,
+        "link_too_deep": 45
+      },
+      "status_codes": {
+        "200": 367,
+        "301": 18
+      },
+      "queue_size": {
+        "primary": 91,
+        "purge": 0
+      },
+      "active_threads": 18,
+      "workers": {
+        "pool_size": 16,
+        "active": 2,
+        "available": 14
       }
     }
   },

@@ -23,6 +23,23 @@ start/stop events. This ensures you don't need to worry about state, but only de
 
 The Docker autodiscover provider watches for Docker containers to start and stop.
 
+It has the following settings:
+
+`host`:: (Optional) Docker socket (UNIX or TCP socket). It uses
+`unix:///var/run/docker.sock` by default.
+`ssl`:: (Optional) SSL configuration to use when connecting to the Docker
+socket.
+`cleanup_timeout`:: (Optional) Specify the time of inactivity before stopping the
+running configuration for a container,
+ifeval::["{beatname_lc}"=="filebeat"]
+ 60s by default.
+endif::[]
+ifeval::["{beatname_lc}"!="filebeat"]
+ disabled by default.
+endif::[]
+`labels.dedot`:: (Optional) Default to be false. If set to true, replace dots in
+ labels with `_`.
+
 
 These are the fields available within config templating. The `docker.*` fields will be available on each emitted event.
 event:
@@ -109,24 +126,6 @@ autodiscover.providers:
             paths:
               - "/mnt/logs/${data.docker.container.id}/*.log"
 -------------------------------------------------------------------------------------
-
-It has the following settings:
-
-`host`:: (Optional) Docker socket (UNIX or TCP socket). It uses
-`unix:///var/run/docker.sock` by default.
-`ssl`:: (Optional) SSL configuration to use when connecting to the Docker
-socket.
-`cleanup_timeout`:: (Optional) Specify the time of inactivity before stopping the
-running configuration for a container,
-ifeval::["{beatname_lc}"=="filebeat"]
- 60s by default.
-endif::[]
-ifeval::["{beatname_lc}"!="filebeat"]
- disabled by default.
-endif::[]
-`labels.dedot`:: (Optional) Default to be false. If set to true, replace dots in
- labels with `_`.
-
 =======================================
 endif::[]
 
@@ -135,6 +134,78 @@ endif::[]
 ===== Kubernetes
 
 The Kubernetes autodiscover provider watches for Kubernetes nodes, pods, services to start, update, and stop.
+
+The `kubernetes` autodiscover provider has the following configuration settings:
+
+`node`:: (Optional) Specify the node to scope {beatname_lc} to in case it
+  cannot be accurately detected, as when running {beatname_lc} in host network
+  mode.
+`namespace`:: (Optional) Select the namespace from which to collect the
+  metadata. If it is not set, the processor collects metadata from all
+  namespaces. It is unset by default. The namespace configuration only applies to
+  kubernetes resources that are namespace scoped.
+`cleanup_timeout`:: (Optional) Specify the time of inactivity before stopping the
+running configuration for a container,
+ifeval::["{beatname_lc}"=="filebeat"]
+ 60s by default.
+endif::[]
+ifeval::["{beatname_lc}"!="filebeat"]
+ disabled by default.
+endif::[]
+`kube_config`:: (Optional) Use given config file as configuration for Kubernetes
+  client. If kube_config is not set, KUBECONFIG environment variable will be
+  checked and if not present it will fall back to InCluster.
+`kube_client_options`:: (Optional) Additional options can be configured for Kubernetes
+  client. Currently client QPS and burst are supported, if not set Kubernetes client's
+  https://pkg.go.dev/k8s.io/client-go/rest#pkg-constants[default QPS and burst] will be used.
+  Example:
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+      kube_client_options:
+        qps: 5
+        burst: 10
+-------------------------------------------------------------------------------------
+
+`resource`:: (Optional) Select the resource to do discovery on. Currently supported
+  Kubernetes resources are `pod`, `service` and `node`. If not configured `resource`
+  defaults to `pod`.
+`scope`:: (Optional) Specify at what level autodiscover needs to be done at. `scope` can
+  either take `node` or `cluster` as values. `node` scope allows discovery of resources in
+  the specified node. `cluster` scope allows cluster wide discovery. Only `pod` and `node` resources
+  can be discovered at node scope.
+`add_resource_metadata`:: (Optional) Specify labels and annotations filters for the extra metadata coming from Node and Namespace.
+ `add_resource_metadata` can be done for `node` or `namespace`. By default all labels will be included
+  while annotations are not added by default. This settings are useful when labels' and annotations'
+  storing requires special handling to avoid overloading the storage output. The enrichment of `node` or `namespace` metadata
+  can be individually disabled by setting `enabled: false`. If resource is `pod` and it is created from a `deployment`, by default
+  the deployment name is added, this can be disabled by setting `deployment: false`.
+  If resource is `pod` and it is created from a `cronjob`, by default
+  the cronjob name is added, this can be disabled by setting `cronjob: false`.
+  Example:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+      add_resource_metadata:
+        namespace:
+          include_labels: ["namespacelabel1"]
+        node:
+          include_labels: ["nodelabel2"]
+          include_annotations: ["nodeannotation1"]
+        deployment: false
+        cronjob: false
+-------------------------------------------------------------------------------------
+
+`unique`:: (Optional) Defaults to `false`. Marking an autodiscover provider as unique results into
+  making the provider to enable the provided templates only when it will gain the leader lease.
+  This setting can only be combined with `cluster` scope. When `unique` is enabled enabled, `resource`
+  and `add_resource_metadata` settings are not taken into account.
+`leader_lease`:: (Optional) Defaults to +{beatname_lc}-cluster-leader+. This will be name of the lock lease.
+  One can monitor the status of the lease with `kubectl describe lease beats-cluster-leader`.
+  Different Beats that refer to the same leader lease will be competitors in holding the lease
+  and only one will be elected as leader each time.
+
+The configuration of templates and conditions is similar to that of the Docker provider. Configuration templates can
+contain variables from the autodiscover event. They can be accessed under data namespace.
 
 These are the fields available within config templating. The `kubernetes.*` fields will be available on each emitted event.
 
@@ -211,62 +282,6 @@ For example:
 }
 -------------------------------------------------------------------------------------
 
-The configuration of templates and conditions is similar to that of the Docker provider. Configuration templates can
-contain variables from the autodiscover event. They can be accessed under data namespace.
-
-The `kubernetes` autodiscover provider has the following configuration settings:
-
-`node`:: (Optional) Specify the node to scope {beatname_lc} to in case it
-  cannot be accurately detected, as when running {beatname_lc} in host network
-  mode.
-`namespace`:: (Optional) Select the namespace from which to collect the
-  metadata. If it is not set, the processor collects metadata from all
-  namespaces. It is unset by default. The namespace configuration only applies to
-  kubernetes resources that are namespace scoped.
-`cleanup_timeout`:: (Optional) Specify the time of inactivity before stopping the
-running configuration for a container,
-ifeval::["{beatname_lc}"=="filebeat"]
- 60s by default.
-endif::[]
-ifeval::["{beatname_lc}"!="filebeat"]
- disabled by default.
-endif::[]
-`kube_config`:: (Optional) Use given config file as configuration for Kubernetes
-  client. If kube_config is not set, KUBECONFIG environment variable will be
-  checked and if not present it will fall back to InCluster.
-`resource`:: (Optional) Select the resource to do discovery on. Currently supported
-  Kubernetes resources are `pod`, `service` and `node`. If not configured `resource`
-  defaults to `pod`.
-`scope`:: (Optional) Specify at what level autodiscover needs to be done at. `scope` can
-  either take `node` or `cluster` as values. `node` scope allows discovery of resources in
-  the specified node. `cluster` scope allows cluster wide discovery. Only `pod` and `node` resources
-  can be discovered at node scope.
-`add_resource_metadata`:: (Optional) Specify labels and annotations filters for the extra metadata coming from Node and Namespace.
- `add_resource_metadata` can be done for `node` or `namespace`. By default all labels will be included
-  while annotations are not added by default. This settings are useful when labels' and annotations'
-  storing requires special handling to avoid overloading the storage output. The enrichment of `node` or `namespace` metadata
-  can be individually disabled by setting `enabled: false`.
-  Example:
-
-["source","yaml",subs="attributes"]
--------------------------------------------------------------------------------------
-      add_resource_metadata:
-        namespace:
-          include_labels: ["namespacelabel1"]
-        node:
-          include_labels: ["nodelabel2"]
-          include_annotations: ["nodeannotation1"]
--------------------------------------------------------------------------------------
-
-`unique`:: (Optional) Defaults to `false`. Marking an autodiscover provider as unique results into
-  making the provider to enable the provided templates only when it will gain the leader lease.
-  This setting can only be combined with `cluster` scope. When `unique` is enabled enabled, `resource`
-  and `add_resource_metadata` settings are not taken into account.
-`leader_lease`:: (Optional) Defaults to `{beatname_lc}-cluster-leader`. This will be name of the lock lease.
-  One can monitor the status of the lease with `kubectl describe lease beats-cluster-leader`.
-  Different Beats that refer to the same leader lease will be competitors in holding the lease
-  and only one will be elected as leader each time.
-
 ifeval::["{beatname_lc}"=="metricbeat"]
 Example:
 
@@ -304,6 +319,19 @@ ifdef::autodiscoverJolokia[]
 The Jolokia autodiscover provider uses Jolokia Discovery to find agents running
 in your host or your network.
 
+The configuration of this provider consists in a set of network interfaces, as
+well as a set of templates as in other providers. The network interfaces will be
+the ones used for discovery probes, each item of `interfaces` has these settings:
+
+`name`:: the name of the interface (e.g. `br0`), it can contain a wildcard
+  as suffix to apply the same settings to multiple network interfaces of
+  the same type (e.g. `br*`).
+`interval`:: time between probes (defaults to 10s)
+ `grace_period`:: time since the last reply to consider an instance stopped
+  (defaults to 30s)
+`probe_timeout`:: max time to wait for responses since a probe is sent
+  (defaults to 1s)
+
 Jolokia Discovery mechanism is supported by any Jolokia agent since version
 1.2.0, it is enabled by default when Jolokia is included in the application as
 a JVM agent, but disabled in other cases as the OSGI or WAR (Java EE) agents.
@@ -333,19 +361,6 @@ These are the available fields during within config templating. The `jolokia.*` 
   * jolokia.server.vendor
   * jolokia.server.version
   * jolokia.url
-
-The configuration of this provider consists in a set of network interfaces, as
-well as a set of templates as in other providers. The network interfaces will be
-the ones used for discovery probes, they have these settings:
-
-`name`:: the name of the interface (e.g. `br0`), it can contain a wildcard
-  as suffix to apply the same settings to multiple network interfaces of
-  the same type (e.g. `br*`).
-`interval`:: time between probes (defaults to 10s)
- `grace_period`:: time since the last reply to consider an instance stopped
-  (defaults to 30s)
-`probe_timeout`:: max time to wait for responses since a probe is sent
-  (defaults to 1s)
 
 include::../../{beatname_lc}/docs/autodiscover-jolokia-config.asciidoc[]
 endif::autodiscoverJolokia[]
@@ -404,6 +419,49 @@ ifdef::autodiscoverNomad[]
 experimental[]
 
 The Nomad autodiscover provider watches for Nomad jobs to start, update, and stop.
+
+The `nomad` autodiscover provider has the following configuration settings:
+
+`address`:: (Optional) Specify the address of the Nomad agent. By default it will try to talk to a
+  Nomad agent running locally (`http://127.0.0.1:4646`).
+
+`region`:: (Optional) Region to use. If not provided, the default agent region is used.
+
+`namespace`:: (Optional) Namespace to use. If not provided the `default` namespace is used.
+
+`secret_id`:: (Optional) SecretID to use if ACL is enabled in Nomad. This is an
+example ACL policy to apply to the token.
+
+[source,hcl]
+----
+namespace "*" {
+  policy = "read"
+}
+node {
+  policy = "read"
+}
+agent {
+  policy = "read"
+}
+----
+
+`node`:: (Optional) Specify the node to scope {beatname_lc} to in case it
+  cannot be accurately detected when `node` scope is used.
+
+`scope`:: (Optional) Specify at what level autodiscover needs to be done at. `scope` can
+  either take `node` or `cluster` as values. `node` scope allows discovery of resources in
+  the specified node. `cluster` scope allows cluster wide discovery. Defaults to `node`.
+
+`wait_time`:: (Optional) Limits how long a Watch will block. If not specified (or set to `0`) the
+  default configuration from the agent will be used.
+
+`allow_stale`:: (Optional) allows any Nomad server (non-leader) to service a read. This normally
+  means that the local node where filebeat is allocated will service filebeat's requests.
+  Defaults to `true`.
+
+The configuration of templates and conditions is similar to that of the Docker provider.
+Configuration templates can contain variables from the autodiscover event. They can be accessed under
+`data` namespace.
 
 These are the available fields during config templating. The `nomad.*` fields will be available
 on each emitted event.
@@ -468,49 +526,6 @@ For example:
   ...
 }
 -------------------------------------------------------------------------------------
-
-The configuration of templates and conditions is similar to that of the Docker provider.
-Configuration templates can contain variables from the autodiscover event. They can be accessed under
-`data` namespace.
-
-The `nomad` autodiscover provider has the following configuration settings:
-
-`address`:: (Optional) Specify the address of the Nomad agent. By default it will try to talk to a
-  Nomad agent running locally (`http://127.0.0.1:4646`).
-
-`region`:: (Optional) Region to use. If not provided, the default agent region is used.
-
-`namespace`:: (Optional) Namespace to use. If not provided the `default` namespace is used.
-
-`secret_id`:: (Optional) SecretID to use if ACL is enabled in Nomad. This is an
-example ACL policy to apply to the token.
-
-[source,hcl]
-----
-namespace "*" {
-  policy = "read"
-}
-node {
-  policy = "read"
-}
-agent {
-  policy = "read"
-}
-----
-
-`node`:: (Optional) Specify the node to scope {beatname_lc} to in case it
-  cannot be accurately detected when `node` scope is used.
-
-`scope`:: (Optional) Specify at what level autodiscover needs to be done at. `scope` can
-  either take `node` or `cluster` as values. `node` scope allows discovery of resources in
-  the specified node. `cluster` scope allows cluster wide discovery. Defaults to `node`.
-
-`wait_time`:: (Optional) Limits how long a Watch will block. If not specified (or set to `0`) the
-  default configuration from the agent will be used.
-
-`allow_stale`:: (Optional) allows any Nomad server (non-leader) to service a read. This normally
-  means that the local node where filebeat is allocated will service filebeat's requests.
-  Defaults to `true`.
 
 include::../../{beatname_lc}/docs/autodiscover-nomad-config.asciidoc[]
 

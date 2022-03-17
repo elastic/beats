@@ -1,7 +1,6 @@
 - name: cloudwatch
   type: group
   release: ga
-  default_field: false
   description: >
     Fields for AWS CloudWatch logs.
   fields:

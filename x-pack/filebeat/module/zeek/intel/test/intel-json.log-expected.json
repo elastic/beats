@@ -2,13 +2,6 @@
     {
         "@timestamp": "2019-11-06T09:03:00.989Z",
         "destination.address": "198.41.0.4",
-        "destination.as.number": 20172,
-        "destination.as.organization.name": "VeriSign Global Registry Services",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": "198.41.0.4",
         "destination.port": 53,
         "event.dataset": "zeek.intel",

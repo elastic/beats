@@ -13,12 +13,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 var (
 	schema = s.Schema{
-		"cluster_uuid": c.Str("cluster_uuid"), // This is going to be included in 7.16+
-		"name":         c.Str("name"),
+		"name": c.Str("name"),
 
 		"version": c.Dict("version", s.Schema{
 			"number":     c.Str("number"),
@@ -73,13 +74,20 @@ var (
 	}
 )
 
-func eventMapping(input []byte) (common.MapStr, error) {
+func eventMapping(report mb.ReporterV2, input []byte, isXpack bool) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(input, &data)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	var errs multierror.Errors
+
+	// All events need to have a cluster_uuid to work with Stack Monitoring
+	event := mb.Event{
+		ModuleFields:    common.MapStr{},
+		MetricSetFields: common.MapStr{},
+	}
+	event.ModuleFields.Put("cluster_uuid", data["cluster_uuid"])
 
 	// Collect process info in a form ready for mapping
 	process := make(map[string]interface{})
@@ -108,10 +116,19 @@ func eventMapping(input []byte) (common.MapStr, error) {
 	// Set the process info we have collected
 	data["process"] = process
 
-	dataFields, err := schema.Apply(data)
-	if err != nil {
-		errs = append(errs, errors.Wrap(err, "failure to apply health schema"))
+	// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
+	// When using Agent, the index name is overwritten anyways.
+	if isXpack {
+		index := elastic.MakeXPackMonitoringIndexName(elastic.EnterpriseSearch)
+		event.Index = index
 	}
 
-	return dataFields, errs.Err()
+	event.MetricSetFields, err = schema.Apply(data)
+	if err != nil {
+		errs = append(errs, errors.Wrap(err, "failure to apply health schema"))
+	} else {
+		report.Event(event)
+	}
+
+	return errs.Err()
 }

@@ -6,13 +6,13 @@ processors:
 - grok:
     field: message
     patterns:
-    - '\[%{TIMESTAMP_ISO8601:process.start}\] %{NOT_SEPARATOR:log.level} santad: action=%{NOT_SEPARATOR:santa.action}\|decision=%{NOT_SEPARATOR:santa.decision}\|reason=%{NOT_SEPARATOR:santa.reason}\|sha256=%{NOT_SEPARATOR:process.hash.sha256}\|path=%{NOT_SEPARATOR:process.executable}(\|args=%{NOT_SEPARATOR:santa.args})?(\|cert_sha256=%{NOT_SEPARATOR:santa.certificate.sha256})?(\|cert_cn=%{NOT_SEPARATOR:santa.certificate.common_name})?\|pid=%{NUMBER:process.pid:long}\|ppid=%{NUMBER:process.ppid:long}\|uid=%{NUMBER:user.id}\|user=%{NOT_SEPARATOR:user.name}\|gid=%{NUMBER:group.id}\|group=%{NOT_SEPARATOR:group.name}\|mode=%{WORD:santa.mode}'
+    - '\[%{TIMESTAMP_ISO8601:process.start}\] %{NOT_SEPARATOR:log.level} santad: action=%{NOT_SEPARATOR:santa.action}\|decision=%{NOT_SEPARATOR:santa.decision}\|reason=%{NOT_SEPARATOR:santa.reason}\|sha256=%{NOT_SEPARATOR:process.hash.sha256}\|path=%{NOT_SEPARATOR:process.executable}(\|args=%{NOT_SEPARATOR:santa.args})?(\|cert_sha256=%{NOT_SEPARATOR:santa.certificate.sha256})?(\|cert_cn=%{NOT_SEPARATOR:santa.certificate.common_name})?\|pid=%{NUMBER:process.pid:long}\|ppid=%{NUMBER:process.parent.pid:long}\|uid=%{NUMBER:user.id}\|user=%{NOT_SEPARATOR:user.name}\|gid=%{NUMBER:group.id}\|group=%{NOT_SEPARATOR:group.name}\|mode=%{WORD:santa.mode}'
     - '\[%{TIMESTAMP_ISO8601:timestamp}\] %{NOT_SEPARATOR:log.level} santad: action=%{NOT_SEPARATOR:santa.action}\|mount=%{NOT_SEPARATOR:santa.disk.mount}\|volume=%{NOT_SEPARATOR:santa.disk.volume}\|bsdname=%{NOT_SEPARATOR:santa.disk.bsdname}\|fs=%{NOT_SEPARATOR:santa.disk.fs}\|model=%{NOT_SEPARATOR:santa.disk.model}\|serial=%{NOT_SEPARATOR:santa.disk.serial}\|bus=%{NOT_SEPARATOR:santa.disk.bus}\|dmgpath=%{NOT_SEPARATOR:santa.disk.dmgpath}?'
     pattern_definitions:
       NOT_SEPARATOR: '[^\|]+'
 - rename:
     field: message
-    target_field: log.original
+    target_field: event.original
 - date:
     field: process.start
     target_field: process.start

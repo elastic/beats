@@ -31,6 +31,12 @@ stages:
         e2e:
             enabled: false
         stage: packaging
+        when:
+            branches: false    ## Only on a PR basis for the time being
+            tags: false        ## packaging on branches/tags is already in place with the downstream build.
+            changeset:         ## when PR contains any of those entries in the changeset
+              - "^x-pack/dockerlogbeat/.*"
+              - "@xpack"             ## special token regarding the changeset for the xpack
     packaging-arm:
         packaging-arm: "mage package"
         e2e:
@@ -38,3 +44,9 @@ stages:
         platforms:             ## override default label in this specific stage.
           - "arm"
         stage: packaging
+        when:
+            branches: false    ## Only on a PR basis for the time being
+            tags: false        ## packaging on branches/tags is already in place with the downstream build.
+            changeset:         ## when PR contains any of those entries in the changeset
+              - "^x-pack/dockerlogbeat/.*"
+              - "@xpack"             ## special token regarding the changeset for the xpack

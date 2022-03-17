@@ -87,7 +87,7 @@ func createEvent(t *testing.T) {
 	resp, err := c.ContainerCreate(context.Background(), &container.Config{
 		Image: "busybox",
 		Cmd:   []string{"echo", "foo"},
-	}, nil, nil, "")
+	}, nil, nil, nil, "")
 	if err != nil {
 		t.Fatal(err)
 	}

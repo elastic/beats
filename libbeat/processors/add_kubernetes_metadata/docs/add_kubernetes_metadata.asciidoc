@@ -67,6 +67,8 @@ ifndef::kubernetes_default_indexers[]
       #  - fields:
       #      lookup_fields: ["metricset.host"]
 endif::kubernetes_default_indexers[]
+      #labels.dedot: true
+      #annotations.dedot: true
 -------------------------------------------------------------------------------
 
 The configuration below enables the processor on a Beat running as a process on
@@ -88,6 +90,8 @@ ifndef::kubernetes_default_indexers[]
       #  - fields:
       #      lookup_fields: ["metricset.host"]
 endif::kubernetes_default_indexers[]
+      #labels.dedot: true
+      #annotations.dedot: true
 -------------------------------------------------------------------------------
 
 The configuration below has the default indexers and matchers disabled and
@@ -108,6 +112,8 @@ processors:
       matchers:
         - fields:
             lookup_fields: ["metricset.host"]
+      #labels.dedot: true
+      #annotations.dedot: true
 -------------------------------------------------------------------------------
 
 The `add_kubernetes_metadata` processor has the following configuration settings:
@@ -132,14 +138,31 @@ Example:
       add_resource_metadata:
         namespace:
           include_labels: ["namespacelabel1"]
+          #labels.dedot: true
+          #annotations.dedot: true
         node:
           include_labels: ["nodelabel2"]
           include_annotations: ["nodeannotation1"]
+          #labels.dedot: true
+          #annotations.dedot: true
 -------------------------------------------------------------------------------------
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
 client. It defaults to `KUBECONFIG` environment variable if present.
+`kube_client_options`:: (Optional) Additional options can be configured for Kubernetes
+client. Currently client QPS and burst are supported, if not set Kubernetes client's
+https://pkg.go.dev/k8s.io/client-go/rest#pkg-constants[default QPS and burst] will be used.
+Example:
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+      kube_client_options:
+        qps: 5
+        burst: 10
+-------------------------------------------------------------------------------------
+
 `cleanup_timeout`:: (Optional) Specify the time of inactivity before stopping the
 running configuration for a container. This is `60s` by default.
 `sync_period`:: (Optional) Specify the timeout for listing historical resources.
 `default_indexers.enabled`:: (Optional) Enable or disable default pod indexers when you want to specify your own.
 `default_matchers.enabled`:: (Optional) Enable or disable default pod matchers when you want to specify your own.
+`labels.dedot`:: (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.
+`annotations.dedot`:: (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.

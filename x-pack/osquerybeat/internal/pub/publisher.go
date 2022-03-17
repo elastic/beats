@@ -117,9 +117,17 @@ func hitToEvent(index, eventType, actionID, responseID string, hit map[string]in
 	}
 
 	// Add event.module for ECS
-	fields["event"] = map[string]string{
-		"module": eventModule,
+	// There could be already "event" properties set, preserve them and set the "event.module"
+	var evf map[string]interface{}
+	ievf, ok := fields["event"]
+	if ok {
+		evf, ok = ievf.(map[string]interface{})
 	}
+	if !ok {
+		evf = make(map[string]interface{})
+	}
+	evf["module"] = eventModule
+	fields["event"] = evf
 
 	fields["type"] = eventType
 	fields["action_id"] = actionID

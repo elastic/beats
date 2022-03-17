@@ -28,9 +28,9 @@ func SocketPath(dir string) string {
 	return `\\.\pipe\elastic\osquery\` + uuid.Must(uuid.NewV4()).String()
 }
 
-func platformArgs() []string {
-	return []string{
-		"--allow_unsafe",
+func platformArgs() map[string]interface{} {
+	return map[string]interface{}{
+		"allow_unsafe": true,
 	}
 }
 
@@ -44,8 +44,4 @@ func killProcessGroup(cmd *exec.Cmd) error {
 	// https://github.com/golang/dep/pull/857
 	exec.Command("taskkill", "/F", "/T", "/PID", fmt.Sprint(cmd.Process.Pid)).Run()
 	return nil
-}
-
-func osquerydFilename() string {
-	return osqueryDName + ".exe"
 }

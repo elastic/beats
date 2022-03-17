@@ -9,6 +9,8 @@ import (
 	"context"
 	"errors"
 	"io/ioutil"
+	"net/http"
+	"net/url"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -22,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.GetObjectResponse) {
@@ -36,13 +39,30 @@ func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.Get
 func newS3GetObjectResponse(filename string, data []byte, contentType string) *s3.GetObjectResponse {
 	r := bytes.NewReader(data)
 	contentLen := int64(r.Len())
-	resp := &s3.GetObjectResponse{
-		GetObjectOutput: &s3.GetObjectOutput{
-			Body:          ioutil.NopCloser(r),
-			ContentLength: &contentLen,
-			ContentType:   &contentType,
+
+	req := &s3.GetObjectRequest{
+		Request: &awssdk.Request{
+			HTTPRequest: &http.Request{
+				URL: &url.URL{Path: filename},
+			},
+			Retryer: awssdk.NoOpRetryer{},
+			Data: &s3.GetObjectOutput{
+				Body:          ioutil.NopCloser(r),
+				ContentLength: &contentLen,
+			},
+		},
+		Input: &s3.GetObjectInput{
+			Bucket: awssdk.String("dummy_bucket"),
+			Key:    awssdk.String(filename),
 		},
 	}
+
+	resp, _ := req.Send(context.Background())
+
+	if contentType != "" {
+		resp.ContentType = &contentType
+	}
+
 	switch strings.ToLower(filepath.Ext(filename)) {
 	case ".gz":
 		gzipEncoding := "gzip"
@@ -143,7 +163,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil)
-		ack := newEventACKTracker(ctx)
+		ack := awscommon.NewEventACKTracker(ctx)
 		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
 		require.Error(t, err)
 		assert.True(t, errors.Is(err, errFakeConnectivityFailure), "expected errFakeConnectivityFailure error")
@@ -165,9 +185,36 @@ func TestS3ObjectProcessor(t *testing.T) {
 			Return(nil, nil)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil)
-		ack := newEventACKTracker(ctx)
+		ack := awscommon.NewEventACKTracker(ctx)
 		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
 		require.Error(t, err)
+	})
+
+	t.Run("no content type in GetObject response", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockS3API := NewMockS3API(ctrl)
+		mockPublisher := NewMockBeatClient(ctrl)
+		s3Event, s3Resp := newS3Object(t, "testdata/log.txt", "")
+
+		var events []beat.Event
+		gomock.InOrder(
+			mockS3API.EXPECT().
+				GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
+				Return(s3Resp, nil),
+			mockPublisher.EXPECT().
+				Publish(gomock.Any()).
+				Do(func(event beat.Event) { events = append(events, event) }).
+				Times(2),
+		)
+
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil)
+		ack := awscommon.NewEventACKTracker(ctx)
+		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
+		require.NoError(t, err)
 	})
 }
 
@@ -203,13 +250,13 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int,
 	)
 
 	s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, selectors)
-	ack := newEventACKTracker(ctx)
+	ack := awscommon.NewEventACKTracker(ctx)
 	err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
 
 	if !expectErr {
 		require.NoError(t, err)
 		assert.Equal(t, numEvents, len(events))
-		assert.EqualValues(t, numEvents, ack.pendingACKs)
+		assert.EqualValues(t, numEvents, ack.PendingACKs)
 	} else {
 		require.Error(t, err)
 	}

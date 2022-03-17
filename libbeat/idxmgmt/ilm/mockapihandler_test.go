@@ -44,22 +44,10 @@ func newMockHandler(calls ...onCall) *mockHandler {
 	return m
 }
 
-func onCheckILMEnabled(m Mode) onCall { return makeOnCall("CheckILMEnabled", m) }
-func (h *mockHandler) CheckILMEnabled(mode Mode) (bool, error) {
-	args := h.Called(mode)
+func onCheckILMEnabled(enabled bool) onCall { return makeOnCall("CheckILMEnabled", enabled) }
+func (h *mockHandler) CheckILMEnabled(enabled bool) (bool, error) {
+	args := h.Called(enabled)
 	return args.Bool(0), args.Error(1)
-}
-
-func onHasAlias(name string) onCall { return makeOnCall("HasAlias", name) }
-func (h *mockHandler) HasAlias(name string) (bool, error) {
-	args := h.Called(name)
-	return args.Bool(0), args.Error(1)
-}
-
-func onCreateAlias(alias Alias) onCall { return makeOnCall("CreateAlias", alias) }
-func (h *mockHandler) CreateAlias(alias Alias) error {
-	args := h.Called(alias)
-	return args.Error(0)
 }
 
 func onHasILMPolicy(name string) onCall { return makeOnCall("HasILMPolicy", name) }

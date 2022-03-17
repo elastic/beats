@@ -209,7 +209,6 @@ func (r *Registrar) commitStateUpdates() {
 		r.out.Published(r.bufferedStateUpdates)
 	}
 	r.bufferedStateUpdates = 0
-
 }
 
 // onEvents processes events received from the publisher pipeline
@@ -290,7 +289,6 @@ func readStatesFrom(store *statestore.Store) ([]file.State, error) {
 		states = append(states, st)
 		return true, nil
 	})
-
 	if err != nil {
 		return nil, err
 	}

@@ -1,0 +1,3 @@
+dashboards:
+    - id: e179f130-2c4a-11ec-9ab7-4fbdf1480ffc
+      file: Metricbeat-enterprise-search-overview.json

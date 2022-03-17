@@ -15,7 +15,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface"
 
-	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
@@ -26,6 +25,7 @@ func TestGetStartPosition(t *testing.T) {
 		startPosition     string
 		prevEndTime       int64
 		scanFrequency     time.Duration
+		latency           time.Duration
 		expectedStartTime int64
 		expectedEndTime   int64
 	}{
@@ -34,6 +34,7 @@ func TestGetStartPosition(t *testing.T) {
 			"beginning",
 			int64(0),
 			30 * time.Second,
+			0,
 			int64(0),
 			int64(1590969600000),
 		},
@@ -42,6 +43,7 @@ func TestGetStartPosition(t *testing.T) {
 			"end",
 			int64(0),
 			30 * time.Second,
+			0,
 			int64(1590969570000),
 			int64(1590969600000),
 		},
@@ -50,6 +52,7 @@ func TestGetStartPosition(t *testing.T) {
 			"typo",
 			int64(0),
 			30 * time.Second,
+			0,
 			int64(0),
 			int64(0),
 		},
@@ -58,6 +61,7 @@ func TestGetStartPosition(t *testing.T) {
 			"beginning",
 			int64(1590000000000),
 			30 * time.Second,
+			0,
 			int64(1590000000000),
 			int64(1590969600000),
 		},
@@ -66,14 +70,51 @@ func TestGetStartPosition(t *testing.T) {
 			"end",
 			int64(1590000000000),
 			30 * time.Second,
+			0,
 			int64(1590000000000),
 			int64(1590969600000),
+		},
+		{
+			"startPosition=beginning with latency",
+			"beginning",
+			int64(0),
+			30 * time.Second,
+			10 * time.Minute,
+			int64(0),
+			int64(1590969000000),
+		},
+		{
+			"startPosition=beginning with prevEndTime and latency",
+			"beginning",
+			int64(1590000000000),
+			30 * time.Second,
+			10 * time.Minute,
+			int64(1590000000000),
+			int64(1590969000000),
+		},
+		{
+			"startPosition=end with latency",
+			"end",
+			int64(0),
+			30 * time.Second,
+			10 * time.Minute,
+			int64(1590968970000),
+			int64(1590969000000),
+		},
+		{
+			"startPosition=end with prevEndTime and latency",
+			"end",
+			int64(1590000000000),
+			30 * time.Second,
+			10 * time.Minute,
+			int64(1590000000000),
+			int64(1590969000000),
 		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			startTime, endTime := getStartPosition(c.startPosition, currentTime, c.prevEndTime, c.scanFrequency)
+			startTime, endTime := getStartPosition(c.startPosition, currentTime, c.prevEndTime, c.scanFrequency, c.latency)
 			assert.Equal(t, c.expectedStartTime, startTime)
 			assert.Equal(t, c.expectedEndTime, endTime)
 		})
@@ -84,10 +125,6 @@ func TestGetStartPosition(t *testing.T) {
 type MockCloudwatchlogsClient struct {
 	cloudwatchlogsiface.ClientAPI
 }
-
-var (
-	mockSvc = &MockCloudwatchlogsClient{}
-)
 
 func (m *MockCloudwatchlogsClient) FilterLogEventsRequest(input *cloudwatchlogs.FilterLogEventsInput) cloudwatchlogs.FilterLogEventsRequest {
 	events := []cloudwatchlogs.FilteredLogEvent{
@@ -154,12 +191,4 @@ func TestParseARN(t *testing.T) {
 	assert.Equal(t, "test", logGroup)
 	assert.Equal(t, "us-east-1", regionName)
 	assert.NoError(t, err)
-}
-
-func TestNewInputDone(t *testing.T) {
-	config := common.MapStr{
-		"log_group_name": "some-group",
-		"region_name":    "eu-west-1",
-	}
-	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
 }

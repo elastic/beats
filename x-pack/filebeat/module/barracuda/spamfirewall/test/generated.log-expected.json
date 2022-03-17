@@ -25,9 +25,7 @@
         "rsa.misc.log_session_id": "illumqui",
         "rsa.misc.version": "1.2364",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.224.15.48"
-        ],
+        "source.ip": "10.224.15.48",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -68,9 +66,7 @@
         "rsa.time.endtime": "2016-02-12T13:12:33.000Z",
         "rsa.time.starttime": "2016-02-12T13:12:33.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.173.228.223"
-        ],
+        "source.ip": "10.173.228.223",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -106,9 +102,7 @@
         "rsa.misc.reference_id": "eosquir",
         "rsa.misc.result_code": "nibus",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.104.162.169"
-        ],
+        "source.ip": "10.104.162.169",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -143,9 +137,7 @@
         "rsa.misc.log_session_id": "com",
         "rsa.misc.version": "1.2548",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.57.70.73"
-        ],
+        "source.ip": "10.57.70.73",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -179,9 +171,7 @@
         "rsa.misc.reference_id": "tconsec",
         "rsa.misc.result_code": "uptassi",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.236.42.236"
-        ],
+        "source.ip": "10.236.42.236",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -237,9 +227,7 @@
         "rsa.time.endtime": "2016-04-24T00:25:25.000Z",
         "rsa.time.starttime": "2016-04-24T00:25:25.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.162.151.94"
-        ],
+        "source.ip": "10.162.151.94",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -281,9 +269,7 @@
         "rsa.time.endtime": "2016-05-08T07:27:59.000Z",
         "rsa.time.starttime": "2016-05-08T07:27:59.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.138.137.28"
-        ],
+        "source.ip": "10.138.137.28",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -324,9 +310,7 @@
         "rsa.time.endtime": "2016-05-22T14:30:33.000Z",
         "rsa.time.starttime": "2016-05-22T14:30:33.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.108.180.105"
-        ],
+        "source.ip": "10.108.180.105",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -365,9 +349,7 @@
         "rsa.time.endtime": "2016-06-05T21:33:08.000Z",
         "rsa.time.starttime": "2016-06-05T21:33:08.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.206.159.177"
-        ],
+        "source.ip": "10.206.159.177",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -408,9 +390,7 @@
         "rsa.time.endtime": "2016-06-20T04:35:42.000Z",
         "rsa.time.starttime": "2016-06-20T04:35:42.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.206.224.241"
-        ],
+        "source.ip": "10.206.224.241",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -449,9 +429,7 @@
         "rsa.time.endtime": "2016-07-04T11:38:16.000Z",
         "rsa.time.starttime": "2016-07-04T11:38:16.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.82.201.113"
-        ],
+        "source.ip": "10.82.201.113",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -479,9 +457,7 @@
         ]
     },
     {
-        "destination.ip": [
-            "10.18.165.35"
-        ],
+        "destination.ip": "10.18.165.35",
         "event.action": "accept",
         "event.code": "ittenbyC",
         "event.dataset": "barracuda.spamfirewall",
@@ -509,9 +485,7 @@
         "rsa.misc.reference_id": "ittenbyC",
         "rsa.misc.result_code": "eseru",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.110.109.5"
-        ],
+        "source.ip": "10.110.109.5",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -551,9 +525,7 @@
         "rsa.time.endtime": "2016-08-16T08:45:59.000Z",
         "rsa.time.starttime": "2016-08-16T08:45:59.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.195.109.134"
-        ],
+        "source.ip": "10.195.109.134",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -594,9 +566,7 @@
         "rsa.time.endtime": "2016-08-30T15:48:33.000Z",
         "rsa.time.starttime": "2016-08-30T15:48:33.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.21.92.218"
-        ],
+        "source.ip": "10.21.92.218",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -687,9 +657,7 @@
             "LOGOUT"
         ],
         "service.type": "barracuda",
-        "source.ip": [
-            "10.45.25.68"
-        ],
+        "source.ip": "10.45.25.68",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -743,9 +711,7 @@
         "rsa.misc.log_session_id": "emoeni",
         "rsa.misc.version": "1.2857",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.18.109.121"
-        ],
+        "source.ip": "10.18.109.121",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -773,9 +739,7 @@
         ],
         "rsa.misc.category": "orinrepr",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.19.194.101"
-        ],
+        "source.ip": "10.19.194.101",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -850,9 +814,7 @@
         "rsa.misc.log_session_id": "ationul",
         "rsa.misc.version": "1.5361",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.116.193.182"
-        ],
+        "source.ip": "10.116.193.182",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -898,9 +860,7 @@
         "server.registered_domain": "lit5929.test",
         "server.top_level_domain": "test",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.198.6.166"
-        ],
+        "source.ip": "10.198.6.166",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -936,9 +896,7 @@
         "rsa.misc.reference_id": "aquaeabi",
         "rsa.misc.result_code": "corp",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.198.19.111"
-        ],
+        "source.ip": "10.198.19.111",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -985,9 +943,7 @@
         "server.subdomain": "uptat3156",
         "server.top_level_domain": "test",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.77.137.72"
-        ],
+        "source.ip": "10.77.137.72",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1035,9 +991,7 @@
         "server.subdomain": "neav6028",
         "server.top_level_domain": "domain",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.128.114.77"
-        ],
+        "source.ip": "10.128.114.77",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1072,9 +1026,7 @@
         "rsa.misc.reference_id": "hitecto",
         "rsa.misc.result_code": "eprehend",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.181.80.139"
-        ],
+        "source.ip": "10.181.80.139",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1110,9 +1062,7 @@
         "rsa.time.endtime": "2017-04-16T08:29:41.000Z",
         "rsa.time.starttime": "2017-04-16T08:29:41.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.138.252.123"
-        ],
+        "source.ip": "10.138.252.123",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1166,9 +1116,7 @@
         "rsa.time.endtime": "2017-05-14T22:34:50.000Z",
         "rsa.time.starttime": "2017-05-14T22:34:50.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.153.108.27"
-        ],
+        "source.ip": "10.153.108.27",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1199,9 +1147,7 @@
         "rsa.misc.reference_id": "gnido",
         "rsa.misc.result_code": "eroi",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.120.167.239"
-        ],
+        "source.ip": "10.120.167.239",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1237,9 +1183,7 @@
         "rsa.time.endtime": "2017-06-12T12:39:58.000Z",
         "rsa.time.starttime": "2017-06-12T12:39:58.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.105.88.20"
-        ],
+        "source.ip": "10.105.88.20",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1280,9 +1224,7 @@
         "rsa.time.endtime": "2017-06-26T19:42:33.000Z",
         "rsa.time.starttime": "2017-06-26T19:42:33.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.98.92.244"
-        ],
+        "source.ip": "10.98.92.244",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1323,9 +1265,7 @@
         "rsa.time.endtime": "2017-07-11T02:45:07.000Z",
         "rsa.time.starttime": "2017-07-11T02:45:07.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.185.107.75"
-        ],
+        "source.ip": "10.185.107.75",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1381,9 +1321,7 @@
         "rsa.misc.log_session_id": "quinesc",
         "rsa.misc.version": "1.5651",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.80.214.206"
-        ],
+        "source.ip": "10.80.214.206",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1418,9 +1356,7 @@
         "rsa.misc.log_session_id": "ntN",
         "rsa.misc.version": "1.2364",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.48.34.226"
-        ],
+        "source.ip": "10.48.34.226",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1478,9 +1414,7 @@
         "rsa.time.endtime": "2017-09-20T13:57:58.000Z",
         "rsa.time.starttime": "2017-09-20T13:57:58.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.211.93.62"
-        ],
+        "source.ip": "10.211.93.62",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1541,9 +1475,7 @@
         "rsa.time.endtime": "2017-10-19T04:03:07.000Z",
         "rsa.time.starttime": "2017-10-19T04:03:07.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.199.182.123"
-        ],
+        "source.ip": "10.199.182.123",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1604,9 +1536,7 @@
         "rsa.time.endtime": "2017-11-16T18:08:15.000Z",
         "rsa.time.starttime": "2017-11-16T18:08:15.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.130.38.118"
-        ],
+        "source.ip": "10.130.38.118",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1640,9 +1570,7 @@
         "rsa.time.endtime": "2017-12-01T01:10:49.000Z",
         "rsa.time.starttime": "2017-12-01T01:10:49.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.153.152.219"
-        ],
+        "source.ip": "10.153.152.219",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1734,9 +1662,7 @@
         "rsa.misc.reference_id": "tali",
         "rsa.misc.result_code": "edic",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.167.227.44"
-        ],
+        "source.ip": "10.167.227.44",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1771,9 +1697,7 @@
         "rsa.misc.log_session_id": "amc",
         "rsa.misc.version": "1.375",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.56.136.27"
-        ],
+        "source.ip": "10.56.136.27",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1807,9 +1731,7 @@
             "FAILED_LOGIN"
         ],
         "service.type": "barracuda",
-        "source.ip": [
-            "10.194.90.130"
-        ],
+        "source.ip": "10.194.90.130",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1843,9 +1765,7 @@
         "rsa.time.endtime": "2018-03-11T02:28:49.000Z",
         "rsa.time.starttime": "2018-03-11T02:28:49.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.103.69.44"
-        ],
+        "source.ip": "10.103.69.44",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1892,9 +1812,7 @@
         "server.subdomain": "oremagna3521",
         "server.top_level_domain": "home",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.29.155.171"
-        ],
+        "source.ip": "10.29.155.171",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1928,9 +1846,7 @@
         "rsa.time.endtime": "2018-04-08T16:33:58.000Z",
         "rsa.time.starttime": "2018-04-08T16:33:58.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.145.193.93"
-        ],
+        "source.ip": "10.145.193.93",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -1966,9 +1882,7 @@
         "rsa.time.endtime": "2018-04-22T23:36:32.000Z",
         "rsa.time.starttime": "2018-04-22T23:36:32.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.143.79.226"
-        ],
+        "source.ip": "10.143.79.226",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2003,9 +1917,7 @@
             "FAILED_LOGIN"
         ],
         "service.type": "barracuda",
-        "source.ip": [
-            "10.30.25.84"
-        ],
+        "source.ip": "10.30.25.84",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2044,9 +1956,7 @@
         "rsa.time.endtime": "2018-05-21T13:41:41.000Z",
         "rsa.time.starttime": "2018-05-21T13:41:41.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.141.225.182"
-        ],
+        "source.ip": "10.141.225.182",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2094,9 +2004,7 @@
         ],
         "rsa.misc.category": "umexerc",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.90.9.88"
-        ],
+        "source.ip": "10.90.9.88",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2171,9 +2079,7 @@
         "rsa.misc.log_session_id": "lillum",
         "rsa.misc.version": "1.2000",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.226.20.199"
-        ],
+        "source.ip": "10.226.20.199",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2201,9 +2107,7 @@
         ],
         "rsa.misc.category": "nte",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.134.140.191"
-        ],
+        "source.ip": "10.134.140.191",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2234,9 +2138,7 @@
         "rsa.misc.reference_id": "nimadmin",
         "rsa.misc.result_code": "cola",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.252.40.172"
-        ],
+        "source.ip": "10.252.40.172",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2273,9 +2175,7 @@
         "rsa.time.endtime": "2018-09-12T22:02:15.000Z",
         "rsa.time.starttime": "2018-09-12T22:02:15.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.126.26.131"
-        ],
+        "source.ip": "10.126.26.131",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2316,9 +2216,7 @@
         "rsa.time.endtime": "2018-09-27T05:04:49.000Z",
         "rsa.time.starttime": "2018-09-27T05:04:49.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.187.210.173"
-        ],
+        "source.ip": "10.187.210.173",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2399,9 +2297,7 @@
         "rsa.time.endtime": "2018-11-09T02:12:32.000Z",
         "rsa.time.starttime": "2018-11-09T02:12:32.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.180.147.129"
-        ],
+        "source.ip": "10.180.147.129",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2437,9 +2333,7 @@
         "rsa.misc.log_session_id": "turadip",
         "rsa.misc.version": "1.7484",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.99.17.210"
-        ],
+        "source.ip": "10.99.17.210",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2471,9 +2365,7 @@
         "rsa.misc.log_session_id": "siuta",
         "rsa.misc.version": "1.2607",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.230.46.162"
-        ],
+        "source.ip": "10.230.46.162",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2513,9 +2405,7 @@
         "rsa.time.endtime": "2018-12-21T23:20:14.000Z",
         "rsa.time.starttime": "2018-12-21T23:20:14.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.96.135.47"
-        ],
+        "source.ip": "10.96.135.47",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2576,9 +2466,7 @@
         "rsa.time.endtime": "2019-01-19T13:25:23.000Z",
         "rsa.time.starttime": "2019-01-19T13:25:23.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.139.127.232"
-        ],
+        "source.ip": "10.139.127.232",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2620,9 +2508,7 @@
         "rsa.time.endtime": "2019-02-02T20:27:57.000Z",
         "rsa.time.starttime": "2019-02-02T20:27:57.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.163.209.70"
-        ],
+        "source.ip": "10.163.209.70",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2683,9 +2569,7 @@
         "rsa.time.endtime": "2019-03-03T10:33:06.000Z",
         "rsa.time.starttime": "2019-03-03T10:33:06.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.191.7.121"
-        ],
+        "source.ip": "10.191.7.121",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2719,9 +2603,7 @@
         "rsa.time.endtime": "2019-03-17T17:35:40.000Z",
         "rsa.time.starttime": "2019-03-17T17:35:40.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.157.196.101"
-        ],
+        "source.ip": "10.157.196.101",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2749,9 +2631,7 @@
         ],
         "rsa.misc.category": "eprehend",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.171.72.5"
-        ],
+        "source.ip": "10.171.72.5",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2791,9 +2671,7 @@
         "rsa.time.endtime": "2019-04-15T07:40:49.000Z",
         "rsa.time.starttime": "2019-04-15T07:40:49.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.209.184.60"
-        ],
+        "source.ip": "10.209.184.60",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2830,9 +2708,7 @@
         "rsa.time.endtime": "2019-04-29T14:43:23.000Z",
         "rsa.time.starttime": "2019-04-29T14:43:23.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.143.228.97"
-        ],
+        "source.ip": "10.143.228.97",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2893,9 +2769,7 @@
         "rsa.time.endtime": "2019-05-28T04:48:31.000Z",
         "rsa.time.starttime": "2019-05-28T04:48:31.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.17.87.79"
-        ],
+        "source.ip": "10.17.87.79",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -2930,9 +2804,7 @@
             "FAILED_LOGIN"
         ],
         "service.type": "barracuda",
-        "source.ip": [
-            "10.163.18.29"
-        ],
+        "source.ip": "10.163.18.29",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -3011,9 +2883,7 @@
         "rsa.time.endtime": "2019-07-24T08:58:48.000Z",
         "rsa.time.starttime": "2019-07-24T08:58:48.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.17.98.243"
-        ],
+        "source.ip": "10.17.98.243",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -3090,9 +2960,7 @@
         "rsa.time.endtime": "2019-09-05T06:06:31.000Z",
         "rsa.time.starttime": "2019-09-05T06:06:31.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.181.247.224"
-        ],
+        "source.ip": "10.181.247.224",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -3133,9 +3001,7 @@
         "rsa.time.endtime": "2019-09-19T13:09:05.000Z",
         "rsa.time.starttime": "2019-09-19T13:09:05.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.235.116.121"
-        ],
+        "source.ip": "10.235.116.121",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -3143,9 +3009,7 @@
         "user.name": "quiineav"
     },
     {
-        "destination.ip": [
-            "10.1.6.115"
-        ],
+        "destination.ip": "10.1.6.115",
         "event.action": "allow",
         "event.code": "llit",
         "event.dataset": "barracuda.spamfirewall",
@@ -3173,9 +3037,7 @@
         "rsa.misc.reference_id": "llit",
         "rsa.misc.result_code": "riosa",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.178.30.158"
-        ],
+        "source.ip": "10.178.30.158",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -3207,9 +3069,7 @@
         "rsa.misc.log_session_id": "mullam",
         "rsa.misc.version": "1.4254",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.124.32.120"
-        ],
+        "source.ip": "10.124.32.120",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -3296,9 +3156,7 @@
         "server.subdomain": "piciatis2460",
         "server.top_level_domain": "host",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.77.182.191"
-        ],
+        "source.ip": "10.77.182.191",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"
@@ -3339,9 +3197,7 @@
         "rsa.time.endtime": "2019-12-14T07:24:31.000Z",
         "rsa.time.starttime": "2019-12-14T07:24:31.000Z",
         "service.type": "barracuda",
-        "source.ip": [
-            "10.193.110.71"
-        ],
+        "source.ip": "10.193.110.71",
         "tags": [
             "barracuda.spamfirewall",
             "forwarded"

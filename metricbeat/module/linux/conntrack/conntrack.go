@@ -18,15 +18,13 @@
 package conntrack
 
 import (
-	"path/filepath"
-
 	"github.com/pkg/errors"
 	"github.com/prometheus/procfs"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/linux"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -43,27 +41,19 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	fs procfs.FS
+	mod resolve.Resolver
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The linux conntrack metricset is beta.")
-	linuxModule, ok := base.Module().(*linux.Module)
-	if !ok {
-		return nil, errors.New("unexpected module type")
-	}
 
-	path := filepath.Join(linuxModule.HostFS, "proc")
-	newFS, err := procfs.NewFS(path)
-	if err != nil {
-		return nil, errors.Wrapf(err, "error creating new Host FS at %s", path)
-	}
+	sys := base.Module().(resolve.Resolver)
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		fs:            newFS,
+		mod:           sys,
 	}, nil
 }
 
@@ -71,7 +61,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	conntrackStats, err := m.fs.ConntrackStat()
+	newFS, err := procfs.NewFS(m.mod.ResolveHostFS("/proc"))
+	if err != nil {
+		return errors.Wrapf(err, "error creating new Host FS at %s", m.mod.ResolveHostFS("/proc"))
+	}
+	conntrackStats, err := newFS.ConntrackStat()
 	if err != nil {
 		return errors.Wrap(err, "error fetching conntrack stats")
 	}

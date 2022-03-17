@@ -34,9 +34,7 @@ const (
 	errnoERROR_IO_PENDING = 997
 )
 
-var (
-	errERROR_IO_PENDING error = syscall.Errno(errnoERROR_IO_PENDING)
-)
+var errERROR_IO_PENDING error = syscall.Errno(errnoERROR_IO_PENDING)
 
 // errnoErr returns common boxed Errno values, to prevent
 // allocations at runtime.

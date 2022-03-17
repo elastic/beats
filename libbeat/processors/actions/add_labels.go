@@ -41,10 +41,15 @@ func createAddLabels(c *common.Config) (processors.Processor, error) {
 	}{}
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the add_fields configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the add_fields configuration: %w", err)
 	}
 
-	return makeFieldsProcessor(LabelsKey, config.Labels.Flatten(), true), nil
+	flatLabels, err := flattenLabels(config.Labels)
+	if err != nil {
+		return nil, fmt.Errorf("failed to flatten labels: %w", err)
+	}
+
+	return makeFieldsProcessor(LabelsKey, flatLabels, true), nil
 }
 
 // NewAddLabels creates a new processor adding the given object to events. Set
@@ -53,8 +58,32 @@ func createAddLabels(c *common.Config) (processors.Processor, error) {
 // If labels contains nested objects, NewAddLabels will flatten keys into labels by
 // by joining names with a dot ('.') .
 // The labels will be inserted into the 'labels' field.
-func NewAddLabels(labels common.MapStr, shared bool) processors.Processor {
+func NewAddLabels(labels common.MapStr, shared bool) (processors.Processor, error) {
+	flatLabels, err := flattenLabels(labels)
+	if err != nil {
+		return nil, fmt.Errorf("failed to flatten labels: %w", err)
+	}
+
 	return NewAddFields(common.MapStr{
-		LabelsKey: labels.Flatten(),
-	}, shared, true)
+		LabelsKey: flatLabels,
+	}, shared, true), nil
+}
+
+func flattenLabels(labels common.MapStr) (common.MapStr, error) {
+	labelConfig, err := common.NewConfigFrom(labels)
+	if err != nil {
+		return nil, err
+	}
+
+	flatKeys := labelConfig.FlattenedKeys()
+	flatMap := make(common.MapStr, len(flatKeys))
+	for _, k := range flatKeys {
+		v, err := labelConfig.String(k, -1)
+		if err != nil {
+			return nil, err
+		}
+		flatMap[k] = v
+	}
+
+	return flatMap, nil
 }

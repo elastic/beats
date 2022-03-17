@@ -132,7 +132,7 @@
     var.listen_port: 8080
 
     # Secret key to authenticate requests from the SDK.
-    var.secret: '<Add your secret here>'
+    var.secret: "<Add your secret here>"
 
     # Uncomment the following and set the absolute paths
     # to the server SSL certificate and private key to
@@ -141,34 +141,33 @@
     # var.ssl_certificate: path/to/server_ssl_cert.pem
     # var.ssl_key: path/to/ssl_key.pem
 
-  recordedfuture:
+  threatq:
     enabled: false
 
     # Input used for ingesting threat intel data
     var.input: httpjson
 
+    # The URL used for ThreatQ ThreatLibrary API calls.
+    # Remember to put a slash at the end of the host URL
+    var.host: https://www.threatq.com/
+
+    # Oauth 2.0 Access Token URL
+    var.token_url: https://www.threatq.com/api/token
+
+    # Oauth 2.0 Client ID
+    var.client_id: "INSERT_CLIENT_ID"
+
+    # Oauth 2.0 Client Secret
+    var.client_secret: "INSERT_CLIENT_SECRET"
+
     # The interval to poll the API for updates
-    var.interval: 5m
+    var.interval: 1m
 
-    # How far back in time to start fetching intelligence when run for the
-    # first time. Value must be in hours. Default: 168h (1 week).
-    var.first_interval: 168h
+    # The ID for the ThreatQ smart data collection
+    var.data_collection_id: "INSERT_THREATQ_DATA_COLLECTION_ID"
 
-    # The URL used for Threat Intel API calls.
-    # Must include the `limit` parameter and at least `entity` and `timestamps` fields.
-    # See the Connect API Explorer for a list of possible parameters.
-    #
-    # For `ip` entities:
-    var.url: "https://api.recordedfuture.com/v2/ip/search?limit=200&fields=entity,timestamps,risk,intelCard,location&metadata=false"
+    # The URL of the proxy if used
+    #var.proxy_url: http://proxy:8000
 
-    # For `domain` entities:
-    # var.url: "https://api.recordedfuture.com/v2/domain/search?limit=200&fields=entity,timestamps,risk,intelCard,location&metadata=false"
-
-    # For `hash` entities:
-    # var.url: "https://api.recordedfuture.com/v2/hash/search?limit=200&fields=entity,fileHashes,timestamps,risk,intelCard,location&metadata=false"
-
-    # For `url` entities:
-    # var.url: "https://api.recordedfuture.com/v2/url/search?limit=200&fields=entity,timestamps,risk&metadata=false"
-
-    # Set your API Token.
-    var.api_token: "<RF_TOKEN>"
+    # Customize the HTTP timeout configured for the API requests
+    #var.http_client_timeout: 30s

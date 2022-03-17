@@ -69,10 +69,11 @@ func TestEventMapping(t *testing.T) {
 		"memory.majorpagefaults":  0,
 
 		// calculated pct fields:
-		"cpu.usage.node.pct":     0.005631997,
-		"cpu.usage.limit.pct":    0.005631997,
-		"memory.usage.node.pct":  0.01,
-		"memory.usage.limit.pct": 0.1,
+		"cpu.usage.node.pct":          0.005631997,
+		"cpu.usage.limit.pct":         0.005631997,
+		"memory.usage.node.pct":       0.01,
+		"memory.usage.limit.pct":      0.1,
+		"memory.workingset.limit.pct": 0.09943977591036414,
 
 		"name": "nginx",
 

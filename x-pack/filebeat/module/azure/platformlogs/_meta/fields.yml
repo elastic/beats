@@ -1,7 +1,6 @@
 - name: platformlogs
   type: group
   release: ga
-  default_field: false
   description: >
     Fields for Azure platform logs.
   fields:

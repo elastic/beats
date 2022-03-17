@@ -35,7 +35,7 @@ func TestMap(t *testing.T) {
 		"a.b.c.d.g":     {Field: "uid_signed"},
 	}
 
-	doc := mapping.Map(testOsqueryResult)
+	doc := Doc(mapping.Map(testOsqueryResult))
 
 	for dst, mi := range mapping {
 		val, ok := doc.Get(dst)
@@ -55,7 +55,7 @@ func TestMapBadKeys(t *testing.T) {
 		"..": {Field: "test"},
 	}
 
-	doc := mapping.Map(testOsqueryResult)
+	doc := Doc(mapping.Map(testOsqueryResult))
 
 	for _, mi := range mapping {
 		_, ok := doc.Get(mi.Field)
@@ -74,7 +74,7 @@ func TestMapValue(t *testing.T) {
 		"value.array":  {Value: []interface{}{"1234", "test", 42}},
 	}
 
-	doc := mapping.Map(testOsqueryResult)
+	doc := Doc(mapping.Map(testOsqueryResult))
 
 	for dst, mi := range mapping {
 		val, ok := doc.Get(dst)

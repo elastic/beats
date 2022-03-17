@@ -43,7 +43,8 @@ const defaultCrossBuildTarget = "golangCrossBuild"
 // See NewPlatformList for details about platform filtering expressions.
 var Platforms = BuildPlatforms.Defaults()
 
-// Types is the list of package types
+// SelectedPackageTypes is the list of package types. If empty, all packages types
+// are considered to be selected (see isPackageTypeSelected).
 var SelectedPackageTypes []PackageType
 
 func init() {
@@ -65,7 +66,7 @@ func init() {
 	}
 }
 
-// CrossBuildOption defines a option to the CrossBuild target.
+// CrossBuildOption defines an option to the CrossBuild target.
 type CrossBuildOption func(params *crossBuildParams)
 
 // ImageSelectorFunc returns the name of the builder image.
@@ -134,14 +135,35 @@ func CrossBuild(options ...CrossBuildOption) error {
 		opt(&params)
 	}
 
-	// Docker is required for this target.
-	if err := HaveDocker(); err != nil {
-		return err
-	}
-
 	if len(params.Platforms) == 0 {
 		log.Printf("Skipping cross-build of target=%v because platforms list is empty.", params.Target)
 		return nil
+	}
+
+	// AIX can't really be crossbuilt, due to cgo and various compiler shortcomings.
+	// If we have a singular AIX platform set, revert to a native build toolchain
+	if runtime.GOOS == "aix" {
+		for _, platform := range params.Platforms {
+			if platform.GOOS() == "aix" {
+				if len(params.Platforms) != 1 {
+					return errors.New("AIX cannot be crossbuilt with other platforms. Set PLATFORMS='aix/ppc64'")
+				} else {
+					// This is basically a short-out so we can attempt to build on AIX in a relatively generic way
+					log.Printf("Target is building for AIX, skipping normal crossbuild process")
+					args := DefaultBuildArgs()
+					args.OutputDir = filepath.Join("build", "golang-crossbuild")
+					args.Name += "-" + Platform.GOOS + "-" + Platform.Arch
+					return Build(args)
+				}
+			}
+		}
+		// If we're here, something isn't set.
+		return errors.New("Cannot crossbuild on AIX. Either run `mage build` or set PLATFORMS='aix/ppc64'")
+	}
+
+	// Docker is required for this target.
+	if err := HaveDocker(); err != nil {
+		return err
 	}
 
 	if CrossBuildMountModcache {
@@ -162,7 +184,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 		builder := GolangCrossBuilder{buildPlatform.Name, params.Target, params.InDir, params.ImageSelector}
 		if params.Serial {
 			if err := builder.Build(); err != nil {
-				return errors.Wrapf(err, "failed cross-building target=%v for platform=%v %v", params.ImageSelector,
+				return errors.Wrapf(err, "failed cross-building target=%s for platform=%s",
 					params.Target, buildPlatform.Name)
 			}
 		} else {
@@ -221,8 +243,8 @@ func CrossBuildImage(platform string) (string, error) {
 		tagSuffix = "s390x"
 	case strings.HasPrefix(platform, "linux"):
 		// Use an older version of libc to gain greater OS compatibility.
-		// Debian 7 uses glibc 2.13.
-		tagSuffix = "main-debian7"
+		// Debian 8 uses glibc 2.19.
+		tagSuffix = "main-debian8"
 	}
 
 	goVersion, err := GoVersion()
@@ -300,8 +322,11 @@ func (b GolangCrossBuilder) Build() error {
 		"-v", repoInfo.RootDir+":"+mountPoint,
 		"-w", workDir,
 		image,
+
+		// Arguments for docker crossbuild entrypoint. For details see
+		// https://github.com/elastic/golang-crossbuild/blob/main/go1.17/base/rootfs/entrypoint.go.
 		"--build-cmd", buildCmd+" "+b.Target,
-		"-p", b.Platform,
+		"--platforms", b.Platform,
 	)
 
 	return dockerRun(args...)

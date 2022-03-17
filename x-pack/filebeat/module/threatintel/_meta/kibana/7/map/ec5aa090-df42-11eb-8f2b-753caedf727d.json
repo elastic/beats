@@ -29,16 +29,16 @@
                     "applyGlobalQuery": true,
                     "applyGlobalTime": true,
                     "filterByMapBounds": true,
-                    "geoField": "threatintel.indicator.geo.location",
+                    "geoField": "threat.indicator.geo.location",
                     "id": "a3ecc6af-0299-4cb9-a29c-0b70f666b011",
                     "indexPatternRefName": "layer_1_source_index_pattern",
                     "scalingType": "LIMIT",
                     "sortField": "",
                     "sortOrder": "desc",
                     "tooltipProperties": [
-                        "threatintel.indicator.as.number",
-                        "threatintel.indicator.as.organization.name",
-                        "threatintel.indicator.geo.country_iso_code"
+                        "threat.indicator.as.number",
+                        "threat.indicator.as.organization.name",
+                        "threat.indicator.geo.country_iso_code"
                     ],
                     "topHitsSize": 1,
                     "topHitsSplitField": "",

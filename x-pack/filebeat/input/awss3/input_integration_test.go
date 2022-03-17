@@ -19,9 +19,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/s3manager"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/stretchr/testify/assert"
@@ -36,7 +39,6 @@ import (
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 const (
@@ -48,9 +50,11 @@ const (
 )
 
 type terraformOutputData struct {
-	AWSRegion  string `yaml:"aws_region"`
-	BucketName string `yaml:"bucket_name"`
-	QueueURL   string `yaml:"queue_url"`
+	AWSRegion        string `yaml:"aws_region"`
+	BucketName       string `yaml:"bucket_name"`
+	QueueURL         string `yaml:"queue_url"`
+	BucketNameForSNS string `yaml:"bucket_name_for_sns"`
+	QueueURLForSNS   string `yaml:"queue_url_for_sns"`
 }
 
 func getTerraformOutputs(t *testing.T) terraformOutputData {
@@ -174,11 +178,11 @@ func newV2Context() (v2.Context, func()) {
 func TestInputRunSQS(t *testing.T) {
 	logp.TestingSetup()
 
-	// Terraform is used to setup S3 and SQS and must be executed manually.
+	// Terraform is used to set up S3 and SQS and must be executed manually.
 	tfConfig := getTerraformOutputs(t)
 
 	// Ensure SQS is empty before testing.
-	drainSQS(t, tfConfig)
+	drainSQS(t, tfConfig.AWSRegion, tfConfig.QueueURL)
 
 	// Ensure metrics are removed before testing.
 	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
@@ -207,7 +211,7 @@ func TestInputRunSQS(t *testing.T) {
 	go func() {
 		for event := range client.Channel {
 			// Fake the ACK handling that's not implemented in pubtest.
-			event.Private.(*eventACKTracker).ACK()
+			event.Private.(*awscommon.EventACKTracker).ACK()
 		}
 	}()
 
@@ -240,7 +244,7 @@ func TestInputRunSQS(t *testing.T) {
 func TestInputRunS3(t *testing.T) {
 	logp.TestingSetup()
 
-	// Terraform is used to setup S3 and must be executed manually.
+	// Terraform is used to set up S3 and must be executed manually.
 	tfConfig := getTerraformOutputs(t)
 
 	// Ensure metrics are removed before testing.
@@ -270,7 +274,7 @@ func TestInputRunS3(t *testing.T) {
 	go func() {
 		for event := range client.Channel {
 			// Fake the ACK handling that's not implemented in pubtest.
-			event.Private.(*eventACKTracker).ACK()
+			event.Private.(*awscommon.EventACKTracker).ACK()
 		}
 	}()
 
@@ -297,6 +301,7 @@ func TestInputRunS3(t *testing.T) {
 	assertMetric(t, snap, "s3_objects_acked_total", 6)
 	assertMetric(t, snap, "s3_events_created_total", 12)
 }
+
 func assertMetric(t *testing.T, snapshot common.MapStr, name string, value interface{}) {
 	n, _ := snapshot.GetValue(inputID + "." + name)
 	assert.EqualValues(t, value, n, name)
@@ -332,16 +337,16 @@ func uploadS3TestFiles(t *testing.T, region, bucket string, filenames ...string)
 	}
 }
 
-func drainSQS(t *testing.T, tfConfig terraformOutputData) {
+func drainSQS(t *testing.T, region string, queueURL string) {
 	cfg, err := external.LoadDefaultAWSConfig()
 	if err != nil {
 		t.Fatal(err)
 	}
-	cfg.Region = tfConfig.AWSRegion
+	cfg.Region = region
 
 	sqs := &awsSQSAPI{
 		client:            sqs.New(cfg),
-		queueURL:          tfConfig.QueueURL,
+		queueURL:          queueURL,
 		apiTimeout:        1 * time.Minute,
 		visibilityTimeout: 30 * time.Second,
 		longPollWaitTime:  10,
@@ -368,10 +373,15 @@ func drainSQS(t *testing.T, tfConfig terraformOutputData) {
 	t.Logf("Drained %d SQS messages.", deletedCount)
 }
 
+func TestGetBucketNameFromARN(t *testing.T) {
+	bucketName := getBucketNameFromARN("arn:aws:s3:::my_corporate_bucket")
+	assert.Equal(t, "my_corporate_bucket", bucketName)
+}
+
 func TestGetRegionForBucketARN(t *testing.T) {
 	logp.TestingSetup()
 
-	// Terraform is used to setup S3 and must be executed manually.
+	// Terraform is used to set up S3 and must be executed manually.
 	tfConfig := getTerraformOutputs(t)
 
 	awsConfig, err := external.LoadDefaultAWSConfig()
@@ -381,14 +391,14 @@ func TestGetRegionForBucketARN(t *testing.T) {
 
 	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", awsConfig))
 
-	regionName, err := getRegionForBucketARN(context.Background(), s3Client, tfConfig.BucketName)
+	regionName, err := getRegionForBucket(context.Background(), s3Client, getBucketNameFromARN(tfConfig.BucketName))
 	assert.Equal(t, tfConfig.AWSRegion, regionName)
 }
 
 func TestPaginatorListPrefix(t *testing.T) {
 	logp.TestingSetup()
 
-	// Terraform is used to setup S3 and must be executed manually.
+	// Terraform is used to set up S3 and must be executed manually.
 	tfConfig := getTerraformOutputs(t)
 
 	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName,
@@ -432,4 +442,69 @@ func TestPaginatorListPrefix(t *testing.T) {
 	}
 
 	assert.Equal(t, expected, objects)
+}
+
+func TestInputRunSNS(t *testing.T) {
+	logp.TestingSetup()
+
+	// Terraform is used to set up S3, SNS and SQS and must be executed manually.
+	tfConfig := getTerraformOutputs(t)
+
+	// Ensure SQS is empty before testing.
+	drainSQS(t, tfConfig.AWSRegion, tfConfig.QueueURLForSNS)
+
+	// Ensure metrics are removed before testing.
+	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
+
+	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketNameForSNS,
+		"testdata/events-array.json",
+		"testdata/invalid.json",
+		"testdata/log.json",
+		"testdata/log.ndjson",
+		"testdata/multiline.json",
+		"testdata/multiline.json.gz",
+		"testdata/multiline.txt",
+		"testdata/log.txt", // Skipped (no match).
+	)
+
+	s3Input := createInput(t, makeTestConfigSQS(tfConfig.QueueURLForSNS))
+
+	inputCtx, cancel := newV2Context()
+	t.Cleanup(cancel)
+	time.AfterFunc(15*time.Second, func() {
+		cancel()
+	})
+
+	client := pubtest.NewChanClient(0)
+	defer close(client.Channel)
+	go func() {
+		for event := range client.Channel {
+			event.Private.(*awscommon.EventACKTracker).ACK()
+		}
+	}()
+
+	var errGroup errgroup.Group
+	errGroup.Go(func() error {
+		pipeline := pubtest.PublisherWithClient(client)
+		return s3Input.Run(inputCtx, pipeline)
+	})
+
+	if err := errGroup.Wait(); err != nil {
+		t.Fatal(err)
+	}
+
+	snap := common.MapStr(monitoring.CollectStructSnapshot(
+		monitoring.GetNamespace("dataset").GetRegistry(),
+		monitoring.Full,
+		false))
+	t.Log(snap.StringToPrint())
+
+	assertMetric(t, snap, "sqs_messages_received_total", 8) // S3 could batch notifications.
+	assertMetric(t, snap, "sqs_messages_inflight_gauge", 0)
+	assertMetric(t, snap, "sqs_messages_deleted_total", 7)
+	assertMetric(t, snap, "sqs_messages_returned_total", 1) // Invalid JSON is returned so that it can eventually be DLQed.
+	assertMetric(t, snap, "sqs_visibility_timeout_extensions_total", 0)
+	assertMetric(t, snap, "s3_objects_inflight_gauge", 0)
+	assertMetric(t, snap, "s3_objects_requested_total", 7)
+	assertMetric(t, snap, "s3_events_created_total", 12)
 }

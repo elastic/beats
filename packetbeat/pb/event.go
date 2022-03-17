@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
 	"github.com/elastic/beats/v7/libbeat/conditions"
-	"github.com/elastic/ecs/code/go/ecs"
+	"github.com/elastic/beats/v7/libbeat/ecs"
 )
 
 // FieldsKey is the key under which a *pb.Fields value may be stored in a
@@ -63,7 +63,7 @@ type Fields struct {
 	Server      *ecs.Server      `ecs:"server"`
 	Related     *ecsRelated      `ecs:"related"`
 	Network     ecs.Network      `ecs:"network"`
-	Event       ecsEvent         `ecs:"event"`
+	Event       ecs.Event        `ecs:"event"`
 
 	SourceProcess      *ecs.Process `ecs:"source.process"`
 	DestinationProcess *ecs.Process `ecs:"destination.process"`
@@ -80,11 +80,9 @@ type Fields struct {
 // NewFields returns a new Fields value.
 func NewFields() *Fields {
 	return &Fields{
-		Event: ecsEvent{
-			Event: ecs.Event{
-				Duration: -1,
-				Kind:     "event",
-			},
+		Event: ecs.Event{
+			Duration: -1,
+			Kind:     "event",
 			Type:     []string{"connection", "protocol"},
 			Category: []string{"network"},
 		},
@@ -210,11 +208,13 @@ func (f *Fields) AddHost(h ...string) {
 
 func makeProcess(p *common.Process) *ecs.Process {
 	return &ecs.Process{
-		Name:             p.Name,
-		Args:             p.Args,
-		Executable:       p.Exe,
-		PID:              int64(p.PID),
-		PPID:             int64(p.PPID),
+		Name:       p.Name,
+		Args:       p.Args,
+		Executable: p.Exe,
+		PID:        int64(p.PID),
+		Parent: &ecs.Process{
+			PID: int64(p.PPID),
+		},
 		Start:            p.StartTime,
 		WorkingDirectory: p.CWD,
 	}
@@ -237,14 +237,14 @@ func (f *Fields) ComputeValues(localIPs []net.IP, internalNetworks []string) err
 	}
 
 	// network.community_id
-	switch {
-	case f.Network.Transport == "udp":
+	switch f.Network.Transport {
+	case "udp":
 		flow.Protocol = 17
-	case f.Network.Transport == "tcp":
+	case "tcp":
 		flow.Protocol = 6
-	case f.Network.Transport == "icmp":
+	case "icmp":
 		flow.Protocol = 1
-	case f.Network.Transport == "ipv6-icmp":
+	case "ipv6-icmp":
 		flow.Protocol = 58
 	}
 	flow.ICMP.Type = f.ICMPType

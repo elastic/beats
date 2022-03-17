@@ -16,7 +16,6 @@ grouped in the following categories:
 * <<exported-fields-aerospike>>
 * <<exported-fields-airflow>>
 * <<exported-fields-apache>>
-* <<exported-fields-appsearch>>
 * <<exported-fields-aws>>
 * <<exported-fields-awsfargate>>
 * <<exported-fields-azure>>
@@ -28,6 +27,7 @@ grouped in the following categories:
 * <<exported-fields-cockroachdb>>
 * <<exported-fields-common>>
 * <<exported-fields-consul>>
+* <<exported-fields-containerd>>
 * <<exported-fields-coredns>>
 * <<exported-fields-couchbase>>
 * <<exported-fields-couchdb>>
@@ -1463,278 +1463,6 @@ type: long
 +
 --
 Total.
-
-
-type: long
-
---
-
-[[exported-fields-appsearch]]
-== App Search fields
-
-App Search module
-
-
-
-[float]
-=== appsearch
-
-
-
-
-[float]
-=== stats
-
-App Search stats
-
-
-
-[float]
-=== jvm
-
-JVM stats
-
-
-
-[float]
-=== memory_usage
-
-Memory usage
-
-
-
-*`appsearch.stats.jvm.memory_usage.heap_init.bytes`*::
-+
---
-Heap init used by the JVM in bytes.
-
-
-type: long
-
---
-
-*`appsearch.stats.jvm.memory_usage.heap_used.bytes`*::
-+
---
-Heap used by the JVM in bytes.
-
-
-type: long
-
---
-
-*`appsearch.stats.jvm.memory_usage.heap_committed.bytes`*::
-+
---
-Committed heap to the JVM in bytes.
-
-
-type: long
-
---
-
-*`appsearch.stats.jvm.memory_usage.heap_max.bytes`*::
-+
---
-Max heap used by the JVM in bytes
-
-
-type: long
-
---
-
-*`appsearch.stats.jvm.memory_usage.non_heap_init.bytes`*::
-+
---
-Non-Heap initial memory used by the JVM in bytes.
-
-
-type: long
-
---
-
-*`appsearch.stats.jvm.memory_usage.non_heap_committed.bytes`*::
-+
---
-Non-Heap committed memory used by the JVM in bytes.
-
-
-type: long
-
---
-
-[float]
-=== queues
-
-Worker queues
-
-
-
-*`appsearch.stats.queues.analytics_events.count`*::
-+
---
-Number of pending jobs in the `analytics_events` queue.
-
-
-type: long
-
---
-
-*`appsearch.stats.queues.document_destroyer.count`*::
-+
---
-Number of pending jobs in the `document_destroyer` queue.
-
-
-type: long
-
---
-
-*`appsearch.stats.queues.engine_destroyer.count`*::
-+
---
-Number of pending jobs in the `engine_destroyer` queue.
-
-
-type: long
-
---
-
-*`appsearch.stats.queues.index_adder.count`*::
-+
---
-Number of pending jobs in the `index_adder` queue.
-
-
-type: long
-
---
-
-*`appsearch.stats.queues.indexed_doc_remover.count`*::
-+
---
-Number of pending jobs in the `indexed_doc_remover` queue.
-
-
-type: long
-
---
-
-*`appsearch.stats.queues.mailer.count`*::
-+
---
-Number of pending jobs in the `mailer` queue.
-
-
-type: long
-
---
-
-*`appsearch.stats.queues.refresh_document_counts.count`*::
-+
---
-Number of pending jobs in the `refresh_document_counts` queue.
-
-
-type: long
-
---
-
-*`appsearch.stats.queues.reindexer.count`*::
-+
---
-Number of pending jobs in the `reindexer` queue.
-
-
-type: long
-
---
-
-*`appsearch.stats.queues.schema_updater.count`*::
-+
---
-Number of pending jobs in the `schema_updater` queue.
-
-
-type: long
-
---
-
-*`appsearch.stats.queues.failed.count`*::
-+
---
-Number of failed jobs waiting to be retried.
-
-
-type: long
-
---
-
-[float]
-=== requests
-
-Request metrics
-
-
-
-*`appsearch.stats.requests.count`*::
-+
---
-Number of recently completed requests
-
-
-type: long
-
---
-
-[float]
-=== api.duration
-
-API response time metrics
-
-
-
-*`appsearch.stats.requests.api.duration.avg.ms`*::
-+
---
-Average response time in milliseconds
-
-
-type: long
-
---
-
-*`appsearch.stats.requests.api.duration.max.ms`*::
-+
---
-Max response time in milliseconds
-
-
-type: long
-
---
-
-[float]
-=== web.response_time
-
-Dashboard response time metrics
-
-
-
-*`appsearch.stats.requests.web.response_time.avg.ms`*::
-+
---
-Average response time in milliseconds
-
-
-type: long
-
---
-
-*`appsearch.stats.requests.web.response_time.max.ms`*::
-+
---
-Max response time in milliseconds
 
 
 type: long
@@ -3931,7 +3659,7 @@ type: long
 
 --
 
-*`aws.rds.read_io.ops_per_sec`*::
+*`aws.rds.read.iops`*::
 +
 --
 The average number of disk read I/O operations per second.
@@ -3975,7 +3703,7 @@ type: long
 
 --
 
-*`aws.rds.write_io.ops_per_sec`*::
+*`aws.rds.write.iops`*::
 +
 --
 The average number of disk write I/O operations per second.
@@ -7009,7 +6737,7 @@ alias to: beat.stats.apm_server.acm.response.errors.unauthorized
 --
 type: alias
 
-alias to: beat.stats.beat.host
+alias to: beat.stats.info.host
 
 --
 
@@ -7018,7 +6746,7 @@ alias to: beat.stats.beat.host
 --
 type: alias
 
-alias to: beat.stats.beat.name
+alias to: beat.stats.info.name
 
 --
 
@@ -7027,7 +6755,7 @@ alias to: beat.stats.beat.name
 --
 type: alias
 
-alias to: beat.stats.beat.type
+alias to: beat.stats.info.type
 
 --
 
@@ -7036,7 +6764,7 @@ alias to: beat.stats.beat.type
 --
 type: alias
 
-alias to: beat.stats.beat.uuid
+alias to: beat.stats.info.uuid
 
 --
 
@@ -7045,7 +6773,7 @@ alias to: beat.stats.beat.uuid
 --
 type: alias
 
-alias to: beat.stats.beat.version
+alias to: beat.stats.info.version
 
 --
 
@@ -7808,6 +7536,13 @@ type: keyword
 
 --
 
+*`beat.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
+
 [float]
 === state
 
@@ -8546,6 +8281,42 @@ type: long
 --
 
 
+*`beat.stats.info.name`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.info.host`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.info.type`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.info.uuid`*::
++
+--
+type: keyword
+
+--
+
+*`beat.stats.info.version`*::
++
+--
+type: keyword
+
+--
+
+
 *`beat.stats.beat.name`*::
 +
 --
@@ -8938,6 +8709,13 @@ type: short
 --
 
 *`beat.stats.libbeat.config.stops`*::
++
+--
+type: short
+
+--
+
+*`beat.stats.libbeat.config.reloads`*::
 +
 --
 type: short
@@ -10487,6 +10265,469 @@ type: long
 Nanoseconds consumed by stop-the-world garbage collection pauses since Consul started.
 
 type: long
+
+--
+
+[[exported-fields-containerd]]
+== Containerd fields
+
+Containerd stats collected from containerd
+
+
+
+[float]
+=== containerd
+
+Information and statistics about containerd's running containers.
+
+
+
+*`containerd.namespace`*::
++
+--
+Containerd namespace
+
+
+type: keyword
+
+--
+
+[float]
+=== blkio
+
+Block I/O metrics.
+
+
+
+*`containerd.blkio.device`*::
++
+--
+Name of block device
+
+
+type: keyword
+
+--
+
+[float]
+=== read
+
+Accumulated reads during the life of the container
+
+
+
+*`containerd.blkio.read.ops`*::
++
+--
+Number of reads during the life of the container
+
+
+type: long
+
+--
+
+*`containerd.blkio.read.bytes`*::
++
+--
+Bytes read during the life of the container
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== write
+
+Accumulated writes during the life of the container
+
+
+
+*`containerd.blkio.write.ops`*::
++
+--
+Number of writes during the life of the container
+
+
+type: long
+
+--
+
+*`containerd.blkio.write.bytes`*::
++
+--
+Bytes written during the life of the container
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== summary
+
+Accumulated reads and writes during the life of the container
+
+
+
+*`containerd.blkio.summary.ops`*::
++
+--
+Number of I/O operations during the life of the container
+
+
+type: long
+
+--
+
+*`containerd.blkio.summary.bytes`*::
++
+--
+Bytes read and written during the life of the container
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== cpu
+
+Containerd Runtime CPU metrics.
+
+
+
+*`containerd.cpu.system.total`*::
++
+--
+Total user and system CPU time spent in seconds.
+
+
+type: double
+
+--
+
+
+
+*`containerd.cpu.usage.kernel.ns`*::
++
+--
+CPU Kernel usage nanoseconds
+
+
+type: double
+
+--
+
+
+*`containerd.cpu.usage.user.ns`*::
++
+--
+CPU User usage nanoseconds
+
+
+type: double
+
+--
+
+
+*`containerd.cpu.usage.total.ns`*::
++
+--
+CPU total usage nanoseconds
+
+
+type: double
+
+--
+
+*`containerd.cpu.usage.total.pct`*::
++
+--
+Percentage of total CPU time normalized by the number of CPU cores
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`containerd.cpu.usage.kernel.pct`*::
++
+--
+Percentage of time in kernel space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`containerd.cpu.usage.user.pct`*::
++
+--
+Percentage of time in user space normalized by the number of CPU cores.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`containerd.cpu.usage.cpu.*.ns`*::
++
+--
+CPU usage nanoseconds in this cpu.
+
+
+type: object
+
+--
+
+[float]
+=== memory
+
+memory
+
+
+
+*`containerd.memory.workingset.pct`*::
++
+--
+Memory working set percentage.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`containerd.memory.rss`*::
++
+--
+Total memory resident set size.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`containerd.memory.activeFiles`*::
++
+--
+Total active file bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`containerd.memory.cache`*::
++
+--
+Total cache bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`containerd.memory.inactiveFiles`*::
++
+--
+Total inactive file bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== usage
+
+Usage memory stats.
+
+
+
+*`containerd.memory.usage.max`*::
++
+--
+Max memory usage.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`containerd.memory.usage.pct`*::
++
+--
+Total allocated memory percentage.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`containerd.memory.usage.total`*::
++
+--
+Total memory usage.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`containerd.memory.usage.fail.count`*::
++
+--
+Fail counter.
+
+
+type: scaled_float
+
+--
+
+*`containerd.memory.usage.limit`*::
++
+--
+Memory usage limit.
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== kernel
+
+Kernel memory stats.
+
+
+
+*`containerd.memory.kernel.max`*::
++
+--
+Kernel max memory usage.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`containerd.memory.kernel.total`*::
++
+--
+Kernel total memory usage.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`containerd.memory.kernel.fail.count`*::
++
+--
+Kernel fail counter.
+
+
+type: scaled_float
+
+--
+
+*`containerd.memory.kernel.limit`*::
++
+--
+Kernel memory limit.
+
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== swap
+
+Swap memory stats.
+
+
+
+*`containerd.memory.swap.max`*::
++
+--
+Swap max memory usage.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`containerd.memory.swap.total`*::
++
+--
+Swap total memory usage.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`containerd.memory.swap.fail.count`*::
++
+--
+Swap fail counter.
+
+
+type: scaled_float
+
+--
+
+*`containerd.memory.swap.limit`*::
++
+--
+Swap memory limit.
+
+
+type: long
+
+format: bytes
 
 --
 
@@ -13098,9 +13339,12 @@ format: bytes
 *`client.domain`*::
 +
 --
-Client domain.
+The domain name of the client system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -13517,6 +13761,130 @@ example: t2.medium
 
 --
 
+*`cloud.origin.account.id`*::
++
+--
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
+
+type: keyword
+
+example: 666777888999
+
+--
+
+*`cloud.origin.account.name`*::
++
+--
+The cloud account name or alias used to identify different entities in a multi-tenant environment.
+Examples: AWS account name, Google Cloud ORG display name.
+
+type: keyword
+
+example: elastic-dev
+
+--
+
+*`cloud.origin.availability_zone`*::
++
+--
+Availability zone in which this host, resource, or service is located.
+
+type: keyword
+
+example: us-east-1c
+
+--
+
+*`cloud.origin.instance.id`*::
++
+--
+Instance ID of the host machine.
+
+type: keyword
+
+example: i-1234567890abcdef0
+
+--
+
+*`cloud.origin.instance.name`*::
++
+--
+Instance name of the host machine.
+
+type: keyword
+
+--
+
+*`cloud.origin.machine.type`*::
++
+--
+Machine type of the host machine.
+
+type: keyword
+
+example: t2.medium
+
+--
+
+*`cloud.origin.project.id`*::
++
+--
+The cloud project identifier.
+Examples: Google Cloud Project id, Azure Project id.
+
+type: keyword
+
+example: my-project
+
+--
+
+*`cloud.origin.project.name`*::
++
+--
+The cloud project name.
+Examples: Google Cloud Project name, Azure Project name.
+
+type: keyword
+
+example: my project
+
+--
+
+*`cloud.origin.provider`*::
++
+--
+Name of the cloud provider. Example values are aws, azure, gcp, or digitalocean.
+
+type: keyword
+
+example: aws
+
+--
+
+*`cloud.origin.region`*::
++
+--
+Region in which this host, resource, or service is located.
+
+type: keyword
+
+example: us-east-1
+
+--
+
+*`cloud.origin.service.name`*::
++
+--
+The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
+Examples: app engine, app service, cloud run, fargate, lambda.
+
+type: keyword
+
+example: lambda
+
+--
+
 *`cloud.project.id`*::
 +
 --
@@ -13564,6 +13932,130 @@ example: us-east-1
 --
 
 *`cloud.service.name`*::
++
+--
+The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
+Examples: app engine, app service, cloud run, fargate, lambda.
+
+type: keyword
+
+example: lambda
+
+--
+
+*`cloud.target.account.id`*::
++
+--
+The cloud account or organization id used to identify different entities in a multi-tenant environment.
+Examples: AWS account id, Google Cloud ORG Id, or other unique identifier.
+
+type: keyword
+
+example: 666777888999
+
+--
+
+*`cloud.target.account.name`*::
++
+--
+The cloud account name or alias used to identify different entities in a multi-tenant environment.
+Examples: AWS account name, Google Cloud ORG display name.
+
+type: keyword
+
+example: elastic-dev
+
+--
+
+*`cloud.target.availability_zone`*::
++
+--
+Availability zone in which this host, resource, or service is located.
+
+type: keyword
+
+example: us-east-1c
+
+--
+
+*`cloud.target.instance.id`*::
++
+--
+Instance ID of the host machine.
+
+type: keyword
+
+example: i-1234567890abcdef0
+
+--
+
+*`cloud.target.instance.name`*::
++
+--
+Instance name of the host machine.
+
+type: keyword
+
+--
+
+*`cloud.target.machine.type`*::
++
+--
+Machine type of the host machine.
+
+type: keyword
+
+example: t2.medium
+
+--
+
+*`cloud.target.project.id`*::
++
+--
+The cloud project identifier.
+Examples: Google Cloud Project id, Azure Project id.
+
+type: keyword
+
+example: my-project
+
+--
+
+*`cloud.target.project.name`*::
++
+--
+The cloud project name.
+Examples: Google Cloud Project name, Azure Project name.
+
+type: keyword
+
+example: my project
+
+--
+
+*`cloud.target.provider`*::
++
+--
+Name of the cloud provider. Example values are aws, azure, gcp, or digitalocean.
+
+type: keyword
+
+example: aws
+
+--
+
+*`cloud.target.region`*::
++
+--
+Region in which this host, resource, or service is located.
+
+type: keyword
+
+example: us-east-1
+
+--
+
+*`cloud.target.service.name`*::
 +
 --
 The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
@@ -13861,9 +14353,12 @@ format: bytes
 *`destination.domain`*::
 +
 --
-Destination domain.
+The domain name of the destination system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -15374,6 +15869,69 @@ This URL links to another system where in-depth investigation of the specific oc
 type: keyword
 
 example: https://mysystem.example.com/alert/5271dedb-f5b0-4218-87f0-4ac4870a38fe
+
+--
+
+[float]
+=== faas
+
+The user fields describe information about the function as a service that is relevant to the event.
+
+
+*`faas.coldstart`*::
++
+--
+Boolean value indicating a cold start of a function.
+
+type: boolean
+
+--
+
+*`faas.execution`*::
++
+--
+The execution ID of the current function execution.
+
+type: keyword
+
+example: af9d5aa4-a685-4c5f-a22b-444f80b3cc28
+
+--
+
+*`faas.trigger`*::
++
+--
+Details about the function trigger.
+
+type: nested
+
+--
+
+*`faas.trigger.request_id`*::
++
+--
+The ID of the trigger request , message, event, etc.
+
+type: keyword
+
+example: 123456789
+
+--
+
+*`faas.trigger.type`*::
++
+--
+The trigger for the function execution.
+Expected values are:
+  * http
+  * pubsub
+  * datasource
+  * timer
+  * other
+
+type: keyword
+
+example: http
 
 --
 
@@ -17013,121 +17571,6 @@ example: 1325
 
 --
 
-*`host.user.domain`*::
-+
---
-Name of the directory the user is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`host.user.email`*::
-+
---
-User email address.
-
-type: keyword
-
---
-
-*`host.user.full_name`*::
-+
---
-User's full name, if available.
-
-type: keyword
-
-example: Albert Einstein
-
---
-
-*`host.user.full_name.text`*::
-+
---
-type: match_only_text
-
---
-
-*`host.user.group.domain`*::
-+
---
-Name of the directory the group is a member of.
-For example, an LDAP or Active Directory domain name.
-
-type: keyword
-
---
-
-*`host.user.group.id`*::
-+
---
-Unique identifier for the group on the system/platform.
-
-type: keyword
-
---
-
-*`host.user.group.name`*::
-+
---
-Name of the group.
-
-type: keyword
-
---
-
-*`host.user.hash`*::
-+
---
-Unique user hash to correlate information for a user in anonymized form.
-Useful if `user.id` or `user.name` contain confidential information and cannot be used.
-
-type: keyword
-
---
-
-*`host.user.id`*::
-+
---
-Unique identifier of the user.
-
-type: keyword
-
-example: S-1-5-21-202424912787-2692429404-2351956786-1000
-
---
-
-*`host.user.name`*::
-+
---
-Short name or login of the user.
-
-type: keyword
-
-example: a.einstein
-
---
-
-*`host.user.name.text`*::
-+
---
-type: match_only_text
-
---
-
-*`host.user.roles`*::
-+
---
-Array of user roles at the time of the event.
-
-type: keyword
-
-example: ["kibana_admin", "reporting_user"]
-
---
-
 [float]
 === http
 
@@ -17194,13 +17637,11 @@ example: 123e4567-e89b-12d3-a456-426614174000
 +
 --
 HTTP request method.
-Prior to ECS 1.6.0 the following guidance was provided:
-"The field value must be normalized to lowercase for querying."
-As of ECS 1.6.0, the guidance is deprecated because the original case of the method may be useful in anomaly detection.  Original case will be mandated in ECS 2.0.0
+The value should retain its casing from the original event. For example, `GET`, `get`, and `GeT` are all considered valid values for this field.
 
 type: keyword
 
-example: GET, POST, PUT, PoST
+example: POST
 
 --
 
@@ -17395,7 +17836,7 @@ example: org.elasticsearch.bootstrap.Bootstrap
 --
 The line number of the file containing the source code which originated the log event.
 
-type: integer
+type: long
 
 example: 42
 
@@ -17421,22 +17862,6 @@ The name of the function or method which originated the log event.
 type: keyword
 
 example: init
-
---
-
-*`log.original`*::
-+
---
-Deprecated for removal in next major version release. This field is superseded by  `event.original`.
-This is the original log message and contains the full log message before splitting it up in multiple parts.
-In contrast to the `message` field which can contain an extracted part of the log message, this field contains the original, full log message. It can have already some modifications applied like encoding or new lines removed to clean up the log message.
-This field is not indexed and doc_values are disabled so it can't be queried but the value can be retrieved from `_source`.
-
-type: keyword
-
-example: Sep 19 08:26:10 localhost My log
-
-Field is not indexed.
 
 --
 
@@ -17522,8 +17947,9 @@ The network.* fields should be populated with details about the network activity
 *`network.application`*::
 +
 --
-A name given to an application level protocol. This can be arbitrarily assigned for things like microservices, but also apply to things like skype, icq, facebook, twitter. This would be used in situations where the vendor or service can be decoded such as from the source/dest IP owners, ports, or wire format.
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+When a specific application or service is identified from network connection details (source/dest IPs, ports, certificates, or wire format), this field captures the application's or service's name.
+For example, the original event identifies the network connection being from a specific web service in a `https` network connection, like `facebook` or `twitter`.
+The field value must be normalized to lowercase for querying.
 
 type: keyword
 
@@ -17659,8 +18085,8 @@ example: 24
 *`network.protocol`*::
 +
 --
-L7 Network protocol name. ex. http, lumberjack, transport protocol.
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+In the OSI Model this would be the Application Layer protocol. For example, `http`, `dns`, or `ssh`.
+The field value must be normalized to lowercase for querying.
 
 type: keyword
 
@@ -17672,7 +18098,7 @@ example: http
 +
 --
 Same as network.iana_number, but instead using the Keyword name of the transport layer (udp, tcp, ipv6-icmp, etc.)
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+The field value must be normalized to lowercase for querying.
 
 type: keyword
 
@@ -17684,7 +18110,7 @@ example: tcp
 +
 --
 In the OSI Model this would be the Network Layer. ipv4, ipv6, ipsec, pim, etc
-The field value must be normalized to lowercase for querying. See the documentation section "Implementing ECS".
+The field value must be normalized to lowercase for querying.
 
 type: keyword
 
@@ -19852,19 +20278,6 @@ format: string
 
 --
 
-*`process.parent.ppid`*::
-+
---
-Parent process' pid.
-
-type: long
-
-example: 4241
-
-format: string
-
---
-
 *`process.parent.start`*::
 +
 --
@@ -20043,19 +20456,6 @@ Process id.
 type: long
 
 example: 4242
-
-format: string
-
---
-
-*`process.ppid`*::
-+
---
-Parent process' pid.
-
-type: long
-
-example: 4241
 
 format: string
 
@@ -20452,9 +20852,12 @@ format: bytes
 *`server.domain`*::
 +
 --
-Server domain.
+The domain name of the server system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -20881,12 +21284,230 @@ example: instance-0000000016
 
 --
 
+*`service.origin.address`*::
++
+--
+Address where data about this service was collected from.
+This should be a URI, network address (ipv4:port or [ipv6]:port) or a resource path (sockets).
+
+type: keyword
+
+example: 172.26.0.2:5432
+
+--
+
+*`service.origin.environment`*::
++
+--
+Identifies the environment where the service is running.
+If the same service runs in different environments (production, staging, QA, development, etc.), the environment can identify other instances of the same service. Can also group services and applications from the same environment.
+
+type: keyword
+
+example: production
+
+--
+
+*`service.origin.ephemeral_id`*::
++
+--
+Ephemeral identifier of this service (if one exists).
+This id normally changes across restarts, but `service.id` does not.
+
+type: keyword
+
+example: 8a4f500f
+
+--
+
+*`service.origin.id`*::
++
+--
+Unique identifier of the running service. If the service is comprised of many nodes, the `service.id` should be the same for all nodes.
+This id should uniquely identify the service. This makes it possible to correlate logs and metrics for one specific service, no matter which particular node emitted the event.
+Note that if you need to see the events from one specific host of the service, you should filter on that `host.name` or `host.id` instead.
+
+type: keyword
+
+example: d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6
+
+--
+
+*`service.origin.name`*::
++
+--
+Name of the service data is collected from.
+The name of the service is normally user given. This allows for distributed services that run on multiple hosts to correlate the related instances based on the name.
+In the case of Elasticsearch the `service.name` could contain the cluster name. For Beats the `service.name` is by default a copy of the `service.type` field if no name is specified.
+
+type: keyword
+
+example: elasticsearch-metrics
+
+--
+
+*`service.origin.node.name`*::
++
+--
+Name of a service node.
+This allows for two nodes of the same service running on the same host to be differentiated. Therefore, `service.node.name` should typically be unique across nodes of a given service.
+In the case of Elasticsearch, the `service.node.name` could contain the unique node name within the Elasticsearch cluster. In cases where the service doesn't have the concept of a node name, the host name or container name can be used to distinguish running instances that make up this service. If those do not provide uniqueness (e.g. multiple instances of the service running on the same host) - the node name can be manually set.
+
+type: keyword
+
+example: instance-0000000016
+
+--
+
+*`service.origin.state`*::
++
+--
+Current state of the service.
+
+type: keyword
+
+--
+
+*`service.origin.type`*::
++
+--
+The type of the service data is collected from.
+The type can be used to group and correlate logs and metrics from one service type.
+Example: If logs or metrics are collected from Elasticsearch, `service.type` would be `elasticsearch`.
+
+type: keyword
+
+example: elasticsearch
+
+--
+
+*`service.origin.version`*::
++
+--
+Version of the service the data was collected from.
+This allows to look at a data set only for a specific version of a service.
+
+type: keyword
+
+example: 3.2.4
+
+--
+
 *`service.state`*::
 +
 --
 Current state of the service.
 
 type: keyword
+
+--
+
+*`service.target.address`*::
++
+--
+Address where data about this service was collected from.
+This should be a URI, network address (ipv4:port or [ipv6]:port) or a resource path (sockets).
+
+type: keyword
+
+example: 172.26.0.2:5432
+
+--
+
+*`service.target.environment`*::
++
+--
+Identifies the environment where the service is running.
+If the same service runs in different environments (production, staging, QA, development, etc.), the environment can identify other instances of the same service. Can also group services and applications from the same environment.
+
+type: keyword
+
+example: production
+
+--
+
+*`service.target.ephemeral_id`*::
++
+--
+Ephemeral identifier of this service (if one exists).
+This id normally changes across restarts, but `service.id` does not.
+
+type: keyword
+
+example: 8a4f500f
+
+--
+
+*`service.target.id`*::
++
+--
+Unique identifier of the running service. If the service is comprised of many nodes, the `service.id` should be the same for all nodes.
+This id should uniquely identify the service. This makes it possible to correlate logs and metrics for one specific service, no matter which particular node emitted the event.
+Note that if you need to see the events from one specific host of the service, you should filter on that `host.name` or `host.id` instead.
+
+type: keyword
+
+example: d37e5ebfe0ae6c4972dbe9f0174a1637bb8247f6
+
+--
+
+*`service.target.name`*::
++
+--
+Name of the service data is collected from.
+The name of the service is normally user given. This allows for distributed services that run on multiple hosts to correlate the related instances based on the name.
+In the case of Elasticsearch the `service.name` could contain the cluster name. For Beats the `service.name` is by default a copy of the `service.type` field if no name is specified.
+
+type: keyword
+
+example: elasticsearch-metrics
+
+--
+
+*`service.target.node.name`*::
++
+--
+Name of a service node.
+This allows for two nodes of the same service running on the same host to be differentiated. Therefore, `service.node.name` should typically be unique across nodes of a given service.
+In the case of Elasticsearch, the `service.node.name` could contain the unique node name within the Elasticsearch cluster. In cases where the service doesn't have the concept of a node name, the host name or container name can be used to distinguish running instances that make up this service. If those do not provide uniqueness (e.g. multiple instances of the service running on the same host) - the node name can be manually set.
+
+type: keyword
+
+example: instance-0000000016
+
+--
+
+*`service.target.state`*::
++
+--
+Current state of the service.
+
+type: keyword
+
+--
+
+*`service.target.type`*::
++
+--
+The type of the service data is collected from.
+The type can be used to group and correlate logs and metrics from one service type.
+Example: If logs or metrics are collected from Elasticsearch, `service.type` would be `elasticsearch`.
+
+type: keyword
+
+example: elasticsearch
+
+--
+
+*`service.target.version`*::
++
+--
+Version of the service the data was collected from.
+This allows to look at a data set only for a specific version of a service.
+
+type: keyword
+
+example: 3.2.4
 
 --
 
@@ -20977,9 +21598,12 @@ format: bytes
 *`source.domain`*::
 +
 --
-Source domain.
+The domain name of the source system.
+This value may be a host name, a fully qualified domain name, or another host naming format. The value may derive from the original event or be added from enrichment.
 
 type: keyword
+
+example: foo.example.com
 
 --
 
@@ -21328,7 +21952,7 @@ example: ["kibana_admin", "reporting_user"]
 === threat
 
 Fields to classify events and alerts according to a threat taxonomy such as the MITRE ATT&CK® framework.
-These fields are for users to classify alerts from all of their sources (e.g. IDS, NGFW, etc.) within a common taxonomy. The threat.tactic.* are meant to capture the high level category of the threat (e.g. "impact"). The threat.technique.* fields are meant to capture which kind of approach is used by this detected threat, to accomplish the goal (e.g. "endpoint denial of service").
+These fields are for users to classify alerts from all of their sources (e.g. IDS, NGFW, etc.) within a common taxonomy. The threat.tactic.* fields are meant to capture the high level category of the threat (e.g. "impact"). The threat.technique.* fields are meant to capture which kind of approach is used by this detected threat, to accomplish the goal (e.g. "endpoint denial of service").
 
 
 *`threat.enrichments`*::
@@ -21381,16 +22005,17 @@ type: match_only_text
 *`threat.enrichments.indicator.confidence`*::
 +
 --
-Identifies the confidence rating assigned by the provider using STIX confidence scales. Expected values:
-  * Not Specified, None, Low, Medium, High
-  * 0-10
-  * Admirality Scale (1-6)
-  * DNI Scale (5-95)
-  * WEP Scale (Impossible - Certain)
+Identifies the vendor-neutral confidence rating using the None/Low/Medium/High scale defined in Appendix A of the STIX 2.1 framework. Vendor-specific confidence scales may be added as custom fields.
+Expected values are:
+  * Not Specified
+  * None
+  * Low
+  * Medium
+  * High
 
 type: keyword
 
-example: High
+example: Medium
 
 --
 
@@ -22175,6 +22800,270 @@ The user ID (UID) or security identifier (SID) of the file owner.
 type: keyword
 
 example: 1001
+
+--
+
+*`threat.enrichments.indicator.file.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.country`*::
++
+--
+List of country (C) codes
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: Mountain View
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.organization`*::
++
+--
+List of organizations (O) of issuing certificate authority.
+
+type: keyword
+
+example: Example Inc
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.organizational_unit`*::
++
+--
+List of organizational units (OU) of issuing certificate authority.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`threat.enrichments.indicator.file.x509.issuer.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.enrichments.indicator.file.x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39+00:00
+
+--
+
+*`threat.enrichments.indicator.file.x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25+00:00
+
+--
+
+*`threat.enrichments.indicator.file.x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`threat.enrichments.indicator.file.x509.public_key_curve`*::
++
+--
+The curve used by the elliptic curve public key algorithm. This is algorithm specific.
+
+type: keyword
+
+example: nistp521
+
+--
+
+*`threat.enrichments.indicator.file.x509.public_key_exponent`*::
++
+--
+Exponent used to derive the public key. This is algorithm specific.
+
+type: long
+
+example: 65537
+
+Field is not indexed.
+
+--
+
+*`threat.enrichments.indicator.file.x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`threat.enrichments.indicator.file.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`threat.enrichments.indicator.file.x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. We recommend using names found in Go Lang Crypto library. See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353.
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: shared.global.example.net
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.country`*::
++
+--
+List of country (C) code
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: San Francisco
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.organization`*::
++
+--
+List of organizations (O) of subject.
+
+type: keyword
+
+example: Example, Inc.
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.organizational_unit`*::
++
+--
+List of organizational units (OU) of subject.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.x509.subject.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.enrichments.indicator.file.x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
 
 --
 
@@ -23107,17 +23996,17 @@ type: match_only_text
 *`threat.indicator.confidence`*::
 +
 --
-Identifies the confidence rating assigned by the provider using STIX confidence scales.
-Recommended values:
-  * Not Specified, None, Low, Medium, High
-  * 0-10
-  * Admirality Scale (1-6)
-  * DNI Scale (5-95)
-  * WEP Scale (Impossible - Certain)
+Identifies the vendor-neutral confidence rating using the None/Low/Medium/High scale defined in Appendix A of the STIX 2.1 framework. Vendor-specific confidence scales may be added as custom fields.
+Expected values are:
+  * Not Specified
+  * None
+  * Low
+  * Medium
+  * High
 
 type: keyword
 
-example: High
+example: Medium
 
 --
 
@@ -23902,6 +24791,270 @@ The user ID (UID) or security identifier (SID) of the file owner.
 type: keyword
 
 example: 1001
+
+--
+
+*`threat.indicator.file.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+*`threat.indicator.file.x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.indicator.file.x509.issuer.country`*::
++
+--
+List of country (C) codes
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.indicator.file.x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.indicator.file.x509.issuer.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: Mountain View
+
+--
+
+*`threat.indicator.file.x509.issuer.organization`*::
++
+--
+List of organizations (O) of issuing certificate authority.
+
+type: keyword
+
+example: Example Inc
+
+--
+
+*`threat.indicator.file.x509.issuer.organizational_unit`*::
++
+--
+List of organizational units (OU) of issuing certificate authority.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`threat.indicator.file.x509.issuer.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.indicator.file.x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39+00:00
+
+--
+
+*`threat.indicator.file.x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25+00:00
+
+--
+
+*`threat.indicator.file.x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`threat.indicator.file.x509.public_key_curve`*::
++
+--
+The curve used by the elliptic curve public key algorithm. This is algorithm specific.
+
+type: keyword
+
+example: nistp521
+
+--
+
+*`threat.indicator.file.x509.public_key_exponent`*::
++
+--
+Exponent used to derive the public key. This is algorithm specific.
+
+type: long
+
+example: 65537
+
+Field is not indexed.
+
+--
+
+*`threat.indicator.file.x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`threat.indicator.file.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`threat.indicator.file.x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. We recommend using names found in Go Lang Crypto library. See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353.
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+*`threat.indicator.file.x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: shared.global.example.net
+
+--
+
+*`threat.indicator.file.x509.subject.country`*::
++
+--
+List of country (C) code
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.indicator.file.x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`threat.indicator.file.x509.subject.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: San Francisco
+
+--
+
+*`threat.indicator.file.x509.subject.organization`*::
++
+--
+List of organizations (O) of subject.
+
+type: keyword
+
+example: Example, Inc.
+
+--
+
+*`threat.indicator.file.x509.subject.organizational_unit`*::
++
+--
+List of organizational units (OU) of subject.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.x509.subject.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.indicator.file.x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
 
 --
 
@@ -29187,6 +30340,13 @@ type: long
 
 --
 
+*`elasticsearch.index.shards.primaries`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.index.uuid`*::
 +
 --
@@ -29663,6 +30823,42 @@ type: long
 --
 
 *`elasticsearch.index.total.indexing.throttle_time_in_millis`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.total.bulk.total_size_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.bulk.avg_size_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.bulk.avg_time_in_millis`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.bulk.total_operations`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.bulk.total_time_in_millis`*::
 +
 --
 type: long
@@ -30335,6 +31531,53 @@ Statistics about each node in a Elasticsearch cluster
 
 
 
+
+
+
+*`elasticsearch.node.stats.indices.bulk.avg_time.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.bulk.avg_time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.bulk.total_time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.bulk.total_size.bytes`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.bulk.avg_size.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.bulk.operations.total.count`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.node.stats.indices.docs.count`*::
 +
@@ -31134,7 +32377,7 @@ type: keyword
 --
 
 [[exported-fields-enterprisesearch]]
-== enterprisesearch fields
+== Enterprise Search fields
 
 Enterprise Search module
 
@@ -31147,20 +32390,20 @@ Enterprise Search module
 
 
 
+*`enterprisesearch.cluster_uuid`*::
++
+--
+Cluster UUID for the Elasticsearch cluster used as the data store for Enterprise Search.
+
+type: keyword
+
+--
+
 [float]
 === health
 
 Enterprise Search health
 
-
-*`enterprisesearch.health.cluster_uuid`*::
-+
---
-Elasticsearch Cluster UUID used by Enterprise Search
-
-type: keyword
-
---
 
 *`enterprisesearch.health.name`*::
 +
@@ -31541,7 +32784,7 @@ Workplace Search worker pools stats.
 [float]
 === extract_worker_pool
 
-Status information for the extrator workers pool.
+Status information for the extractor workers pool.
 
 
 *`enterprisesearch.stats.connectors.pool.extract_worker_pool.size`*::
@@ -31601,7 +32844,7 @@ type: long
 [float]
 === subextract_worker_pool
 
-Status information for the sub-extrator workers pool.
+Status information for the sub-extractor workers pool.
 
 
 *`enterprisesearch.stats.connectors.pool.subextract_worker_pool.size`*::
@@ -31928,6 +33171,414 @@ type: long
 +
 --
 Total number of jobs waiting in the failed queue.
+
+type: long
+
+--
+
+[float]
+=== crawler
+
+Aggregate stats on the functioning of the crawler subsystem within Enterprise Search.
+
+
+[float]
+=== global
+
+Global deployment-wide metrics for the crawler.
+
+
+[float]
+=== crawl_requests
+
+Crawl request summary for the deployment.
+
+
+*`enterprisesearch.stats.crawler.global.crawl_requests.pending`*::
++
+--
+Total number of crawl requests waiting to be processed.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.global.crawl_requests.active`*::
++
+--
+Total number of crawl requests currently being processed (running crawls).
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.global.crawl_requests.successful`*::
++
+--
+Total number of crawl requests that have succeeded.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.global.crawl_requests.failed`*::
++
+--
+Total number of failed crawl requests.
+
+type: long
+
+--
+
+[float]
+=== node
+
+Node-level statistics for the crawler.
+
+
+*`enterprisesearch.stats.crawler.node.pages_visited`*::
++
+--
+Total number of pages visited by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.urls_allowed`*::
++
+--
+Total number of URLs allowed by the crawler during discovery since the instance start.
+
+type: long
+
+--
+
+[float]
+=== urls_denied
+
+Total number of URLs denied by the crawler during discovery since the instance start, broken down by deny reason.
+
+
+*`enterprisesearch.stats.crawler.node.urls_denied.already_seen`*::
++
+--
+Total number of URLs not followed because of URL de-duplication (each URL is visited only once).
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.urls_denied.domain_filter_denied`*::
++
+--
+Total number of URLs denied because of an unknown domain.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.urls_denied.incorrect_protocol`*::
++
+--
+Total number of URLs with incorrect/invalid/unsupported protocols.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.urls_denied.link_too_deep`*::
++
+--
+Total number of URLs not followed due to crawl depth limits.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.urls_denied.nofollow`*::
++
+--
+Total number of URLs denied due to a nofollow meta tag or an HTML link attribute.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.urls_denied.unsupported_content_type`*::
++
+--
+Total number of URLs denied due to an unsupported content type.
+
+type: long
+
+--
+
+[float]
+=== status_codes
+
+HTTP request result counts, by status code.
+
+
+*`enterprisesearch.stats.crawler.node.status_codes.200`*::
++
+--
+Total number of HTTP 200 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.301`*::
++
+--
+Total number of HTTP 301 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.302`*::
++
+--
+Total number of HTTP 302 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.400`*::
++
+--
+Total number of HTTP 400 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.401`*::
++
+--
+Total number of HTTP 401 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.402`*::
++
+--
+Total number of HTTP 402 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.403`*::
++
+--
+Total number of HTTP 403 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.404`*::
++
+--
+Total number of HTTP 404 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.405`*::
++
+--
+Total number of HTTP 405 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.410`*::
++
+--
+Total number of HTTP 410 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.422`*::
++
+--
+Total number of HTTP 422 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.429`*::
++
+--
+Total number of HTTP 429 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.500`*::
++
+--
+Total number of HTTP 500 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.501`*::
++
+--
+Total number of HTTP 501 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.502`*::
++
+--
+Total number of HTTP 502 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.503`*::
++
+--
+Total number of HTTP 503 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.status_codes.504`*::
++
+--
+Total number of HTTP 504 responses seen by the crawler since the instance start.
+
+type: long
+
+--
+
+[float]
+=== queue_size
+
+Total current URL queue size for the instance.
+
+
+*`enterprisesearch.stats.crawler.node.queue_size.primary`*::
++
+--
+Total number of URLs waiting to be crawled by the instance.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.queue_size.purge`*::
++
+--
+Total number of URLs waiting to be checked by the purge crawl phase.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.active_threads`*::
++
+--
+Total number of crawler worker threads currently active on the instance.
+
+type: long
+
+--
+
+[float]
+=== workers
+
+Crawler workers information for the instance.
+
+
+*`enterprisesearch.stats.crawler.node.workers.pool_size`*::
++
+--
+Total size of the crawl workers pool (number of concurrent crawls possible) for the instance.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.workers.active`*::
++
+--
+Total number of currently active crawl workers (running crawls) for the instance.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.crawler.node.workers.available`*::
++
+--
+Total number of currently available (free) crawl workers for the instance.
+
+type: long
+
+--
+
+[float]
+=== product_usage
+
+Aggregate product usage statistics for the Enterprise Search deployment.
+
+
+[float]
+=== app_search
+
+App Search product usage statistics.
+
+
+*`enterprisesearch.stats.product_usage.app_search.total_engines`*::
++
+--
+Current number of App Search engines within the deployment.
+
+type: long
+
+--
+
+[float]
+=== workplace_search
+
+Workplace Search product usage statistics.
+
+
+*`enterprisesearch.stats.product_usage.workplace_search.total_org_sources`*::
++
+--
+Current number of Workplace Search org-wide content sources within the deployment.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.product_usage.workplace_search.total_private_sources`*::
++
+--
+Current number of Workplace Search private content sources within the deployment.
 
 type: long
 
@@ -33163,7 +34814,7 @@ type: float
 Google Cloud Compute metrics
 
 
-*`gcp.compute.firewall.dropped_bytes_count.value`*::
+*`gcp.compute.firewall.dropped.bytes`*::
 +
 --
 Incoming bytes dropped by the firewall
@@ -33190,7 +34841,7 @@ type: double
 
 --
 
-*`gcp.compute.instance.cpu.usage_time.value`*::
+*`gcp.compute.instance.cpu.usage_time.sec`*::
 +
 --
 Usage for all cores in seconds
@@ -33199,7 +34850,7 @@ type: double
 
 --
 
-*`gcp.compute.instance.cpu.utilization.value`*::
+*`gcp.compute.instance.cpu.usage.pct`*::
 +
 --
 The fraction of the allocated CPU that is currently in use on the instance
@@ -33208,7 +34859,7 @@ type: double
 
 --
 
-*`gcp.compute.instance.disk.read_bytes_count.value`*::
+*`gcp.compute.instance.disk.read.bytes`*::
 +
 --
 Count of bytes read from disk
@@ -33226,7 +34877,7 @@ type: long
 
 --
 
-*`gcp.compute.instance.disk.write_bytes_count.value`*::
+*`gcp.compute.instance.disk.write.bytes`*::
 +
 --
 Count of bytes written to disk
@@ -33262,7 +34913,7 @@ type: long
 
 --
 
-*`gcp.compute.instance.memory.balloon.swap_in_bytes_count.value`*::
+*`gcp.compute.instance.memory.balloon.swap_in.bytes`*::
 +
 --
 The amount of memory read into the guest from its own swap space. This metric is only available for VMs that belong to the e2 family.
@@ -33271,7 +34922,7 @@ type: long
 
 --
 
-*`gcp.compute.instance.memory.balloon.swap_out_bytes_count.value`*::
+*`gcp.compute.instance.memory.balloon.swap_out.bytes`*::
 +
 --
 The amount of memory written from the guest to its own swap space. This metric is only available for VMs that belong to the e2 family.
@@ -33280,7 +34931,7 @@ type: long
 
 --
 
-*`gcp.compute.instance.network.received_bytes_count.value`*::
+*`gcp.compute.instance.network.ingress.bytes`*::
 +
 --
 Count of bytes received from the network
@@ -33289,7 +34940,7 @@ type: long
 
 --
 
-*`gcp.compute.instance.network.received_packets_count.value`*::
+*`gcp.compute.instance.network.ingress.packets.count`*::
 +
 --
 Count of packets received from the network
@@ -33298,7 +34949,7 @@ type: long
 
 --
 
-*`gcp.compute.instance.network.sent_bytes_count.value`*::
+*`gcp.compute.instance.network.egress.bytes`*::
 +
 --
 Count of bytes sent over the network
@@ -33307,7 +34958,7 @@ type: long
 
 --
 
-*`gcp.compute.instance.network.sent_packets_count.value`*::
+*`gcp.compute.instance.network.egress.packets.count`*::
 +
 --
 Count of packets sent over the network
@@ -33316,7 +34967,7 @@ type: long
 
 --
 
-*`gcp.compute.instance.uptime.value`*::
+*`gcp.compute.instance.uptime.sec`*::
 +
 --
 Number of seconds the VM has been running.
@@ -33325,10 +34976,247 @@ type: long
 
 --
 
-*`gcp.compute.instance.uptime_total.value`*::
+*`gcp.compute.instance.uptime_total.sec`*::
 +
 --
 Elapsed time since the VM was started, in seconds. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
+
+type: long
+
+--
+
+[float]
+=== dataproc
+
+Google Cloud Dataproc metrics
+
+
+*`gcp.dataproc.batch.spark.executors.count`*::
++
+--
+Indicates the number of Batch Spark executors.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.hdfs.datanodes.count`*::
++
+--
+Indicates the number of HDFS DataNodes that are running inside a cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.hdfs.storage_capacity.value`*::
++
+--
+Indicates capacity of HDFS system running on cluster in GB.
+
+type: double
+
+--
+
+*`gcp.dataproc.cluster.hdfs.storage_utilization.value`*::
++
+--
+The percentage of HDFS storage currently used.
+
+type: double
+
+--
+
+*`gcp.dataproc.cluster.hdfs.unhealthy_blocks.count`*::
++
+--
+Indicates the number of unhealthy blocks inside the cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.job.completion_time.value`*::
++
+--
+The time jobs took to complete from the time the user submits a job to the time Dataproc reports it is completed.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.job.duration.value`*::
++
+--
+The time jobs have spent in a given state.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.job.failed.count`*::
++
+--
+Indicates the number of jobs that have failed on a cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.job.running.count`*::
++
+--
+Indicates the number of jobs that are running on a cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.job.submitted.count`*::
++
+--
+Indicates the number of jobs that have been submitted to a cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.operation.completion_time.value`*::
++
+--
+The time operations took to complete from the time the user submits a operation to the time Dataproc reports it is completed.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.operation.duration.value`*::
++
+--
+The time operations have spent in a given state.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.operation.failed.count`*::
++
+--
+Indicates the number of operations that have failed on a cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.operation.running.count`*::
++
+--
+Indicates the number of operations that are running on a cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.operation.submitted.count`*::
++
+--
+Indicates the number of operations that have been submitted to a cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.yarn.allocated_memory_percentage.value`*::
++
+--
+The percentage of YARN memory is allocated.
+
+type: double
+
+--
+
+*`gcp.dataproc.cluster.yarn.apps.count`*::
++
+--
+Indicates the number of active YARN applications.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.yarn.containers.count`*::
++
+--
+Indicates the number of YARN containers.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.yarn.memory_size.value`*::
++
+--
+Indicates the YARN memory size in GB.
+
+type: double
+
+--
+
+*`gcp.dataproc.cluster.yarn.nodemanagers.count`*::
++
+--
+Indicates the number of YARN NodeManagers running inside cluster.
+
+type: long
+
+--
+
+*`gcp.dataproc.cluster.yarn.pending_memory_size.value`*::
++
+--
+The current memory request, in GB, that is pending to be fulfilled by the scheduler.
+
+type: double
+
+--
+
+*`gcp.dataproc.cluster.yarn.virtual_cores.count`*::
++
+--
+Indicates the number of virtual cores in YARN.
+
+type: long
+
+--
+
+[float]
+=== firestore
+
+Google Cloud Firestore metrics
+
+
+*`gcp.firestore.document.delete.count`*::
++
+--
+The number of successful document deletes.
+
+type: long
+
+--
+
+*`gcp.firestore.document.read.count`*::
++
+--
+The number of successful document reads from queries or lookups.
+
+type: long
+
+--
+
+*`gcp.firestore.document.write.count`*::
++
+--
+The number of successful document writes.
 
 type: long
 
@@ -33340,7 +35228,7 @@ type: long
 `gke` contains the metrics that we scraped from GCP Stackdriver API containing monitoring metrics for GCP GKE
 
 
-*`gcp.gke.container.cpu.core_usage_time.value`*::
+*`gcp.gke.container.cpu.core_usage_time.sec`*::
 +
 --
 Cumulative CPU usage on all cores used by the container in seconds. Sampled every 60 seconds.
@@ -33358,7 +35246,7 @@ type: double
 
 --
 
-*`gcp.gke.container.cpu.limit_utilization.value`*::
+*`gcp.gke.container.cpu.limit_utilization.pct`*::
 +
 --
 The fraction of the CPU limit that is currently in use on the instance. This value cannot exceed 1 as usage cannot exceed the limit. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
@@ -33376,7 +35264,7 @@ type: double
 
 --
 
-*`gcp.gke.container.cpu.request_utilization.value`*::
+*`gcp.gke.container.cpu.request_utilization.pct`*::
 +
 --
 The fraction of the requested CPU that is currently in use on the instance. This value can be greater than 1 as usage can exceed the request. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
@@ -33385,7 +35273,7 @@ type: double
 
 --
 
-*`gcp.gke.container.ephemeral_storage.limit_bytes.value`*::
+*`gcp.gke.container.ephemeral_storage.limit.bytes`*::
 +
 --
 Local ephemeral storage limit in bytes. Sampled every 60 seconds.
@@ -33394,7 +35282,7 @@ type: long
 
 --
 
-*`gcp.gke.container.ephemeral_storage.request_bytes.value`*::
+*`gcp.gke.container.ephemeral_storage.request.bytes`*::
 +
 --
 Local ephemeral storage request in bytes. Sampled every 60 seconds.
@@ -33403,7 +35291,7 @@ type: long
 
 --
 
-*`gcp.gke.container.ephemeral_storage.used_bytes.value`*::
+*`gcp.gke.container.ephemeral_storage.used.bytes`*::
 +
 --
 Local ephemeral storage usage in bytes. Sampled every 60 seconds.
@@ -33412,7 +35300,7 @@ type: long
 
 --
 
-*`gcp.gke.container.memory.limit_bytes.value`*::
+*`gcp.gke.container.memory.limit.bytes`*::
 +
 --
 Memory limit of the container in bytes. Sampled every 60 seconds.
@@ -33421,7 +35309,7 @@ type: long
 
 --
 
-*`gcp.gke.container.memory.limit_utilization.value`*::
+*`gcp.gke.container.memory.limit_utilization.pct`*::
 +
 --
 The fraction of the memory limit that is currently in use on the instance. This value cannot exceed 1 as usage cannot exceed the limit. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
@@ -33430,7 +35318,7 @@ type: double
 
 --
 
-*`gcp.gke.container.memory.page_fault_count.value`*::
+*`gcp.gke.container.memory.page_fault.count`*::
 +
 --
 Number of page faults, broken down by type, major and minor.
@@ -33439,7 +35327,7 @@ type: long
 
 --
 
-*`gcp.gke.container.memory.request_bytes.value`*::
+*`gcp.gke.container.memory.request.bytes`*::
 +
 --
 Memory request of the container in bytes. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
@@ -33448,7 +35336,7 @@ type: long
 
 --
 
-*`gcp.gke.container.memory.request_utilization.value`*::
+*`gcp.gke.container.memory.request_utilization.pct`*::
 +
 --
 The fraction of the requested memory that is currently in use on the instance. This value can be greater than 1 as usage can exceed the request. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
@@ -33457,7 +35345,7 @@ type: double
 
 --
 
-*`gcp.gke.container.memory.used_bytes.value`*::
+*`gcp.gke.container.memory.used.bytes`*::
 +
 --
 Memory usage in bytes. Sampled every 60 seconds.
@@ -33466,7 +35354,7 @@ type: long
 
 --
 
-*`gcp.gke.container.restart_count.value`*::
+*`gcp.gke.container.restart.count`*::
 +
 --
 Number of times the container has restarted. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
@@ -33475,7 +35363,7 @@ type: long
 
 --
 
-*`gcp.gke.container.uptime.value`*::
+*`gcp.gke.container.uptime.sec`*::
 +
 --
 Time in seconds that the container has been running. Sampled every 60 seconds.
@@ -33493,7 +35381,7 @@ type: double
 
 --
 
-*`gcp.gke.node.cpu.allocatable_utilization.value`*::
+*`gcp.gke.node.cpu.allocatable_utilization.pct`*::
 +
 --
 The fraction of the allocatable CPU that is currently in use on the instance. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
@@ -33502,7 +35390,7 @@ type: double
 
 --
 
-*`gcp.gke.node.cpu.core_usage_time.value`*::
+*`gcp.gke.node.cpu.core_usage_time.sec`*::
 +
 --
 Cumulative CPU usage on all cores used on the node in seconds. Sampled every 60 seconds.
@@ -33520,7 +35408,7 @@ type: double
 
 --
 
-*`gcp.gke.node.ephemeral_storage.allocatable_bytes.value`*::
+*`gcp.gke.node.ephemeral_storage.allocatable.bytes`*::
 +
 --
 Local ephemeral storage bytes allocatable on the node. Sampled every 60 seconds.
@@ -33547,7 +35435,7 @@ type: long
 
 --
 
-*`gcp.gke.node.ephemeral_storage.total_bytes.value`*::
+*`gcp.gke.node.ephemeral_storage.total.bytes`*::
 +
 --
 Total ephemeral storage bytes on the node. Sampled every 60 seconds.
@@ -33556,7 +35444,7 @@ type: long
 
 --
 
-*`gcp.gke.node.ephemeral_storage.used_bytes.value`*::
+*`gcp.gke.node.ephemeral_storage.used.bytes`*::
 +
 --
 Local ephemeral storage bytes used by the node. Sampled every 60 seconds.
@@ -33565,7 +35453,7 @@ type: long
 
 --
 
-*`gcp.gke.node.memory.allocatable_bytes.value`*::
+*`gcp.gke.node.memory.allocatable.bytes`*::
 +
 --
 Cumulative memory bytes used by the node. Sampled every 60 seconds.
@@ -33574,7 +35462,7 @@ type: long
 
 --
 
-*`gcp.gke.node.memory.allocatable_utilization.value`*::
+*`gcp.gke.node.memory.allocatable_utilization.pct`*::
 +
 --
 The fraction of the allocatable memory that is currently in use on the instance. This value cannot exceed 1 as usage cannot exceed allocatable memory bytes. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
@@ -33583,7 +35471,7 @@ type: double
 
 --
 
-*`gcp.gke.node.memory.total_bytes.value`*::
+*`gcp.gke.node.memory.total.bytes`*::
 +
 --
 Number of bytes of memory allocatable on the node. Sampled every 60 seconds.
@@ -33592,7 +35480,7 @@ type: long
 
 --
 
-*`gcp.gke.node.memory.used_bytes.value`*::
+*`gcp.gke.node.memory.used.bytes`*::
 +
 --
 Cumulative memory bytes used by the node. Sampled every 60 seconds.
@@ -33601,7 +35489,7 @@ type: long
 
 --
 
-*`gcp.gke.node.network.received_bytes_count.value`*::
+*`gcp.gke.node.network.received_bytes.count`*::
 +
 --
 Cumulative number of bytes received by the node over the network. Sampled every 60 seconds.
@@ -33610,7 +35498,7 @@ type: long
 
 --
 
-*`gcp.gke.node.network.sent_bytes_count.value`*::
+*`gcp.gke.node.network.sent_bytes.count`*::
 +
 --
 Cumulative number of bytes transmitted by the node over the network. Sampled every 60 seconds.
@@ -33637,7 +35525,7 @@ type: long
 
 --
 
-*`gcp.gke.node_daemon.cpu.core_usage_time.value`*::
+*`gcp.gke.node_daemon.cpu.core_usage_time.sec`*::
 +
 --
 Cumulative CPU usage on all cores used by the node level system daemon in seconds. Sampled every 60 seconds.
@@ -33646,7 +35534,7 @@ type: double
 
 --
 
-*`gcp.gke.node_daemon.memory.used_bytes.value`*::
+*`gcp.gke.node_daemon.memory.used.bytes`*::
 +
 --
 Memory usage by the system daemon in bytes. Sampled every 60 seconds.
@@ -33655,7 +35543,7 @@ type: long
 
 --
 
-*`gcp.gke.pod.network.received_bytes_count.value`*::
+*`gcp.gke.pod.network.received.bytes`*::
 +
 --
 Cumulative number of bytes received by the pod over the network. Sampled every 60 seconds.
@@ -33664,7 +35552,7 @@ type: long
 
 --
 
-*`gcp.gke.pod.network.sent_bytes_count.value`*::
+*`gcp.gke.pod.network.sent.bytes`*::
 +
 --
 Cumulative number of bytes transmitted by the pod over the network. Sampled every 60 seconds.
@@ -33673,7 +35561,7 @@ type: long
 
 --
 
-*`gcp.gke.pod.volume.total_bytes.value`*::
+*`gcp.gke.pod.volume.total.bytes`*::
 +
 --
 Total number of disk bytes available to the pod. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
@@ -33682,7 +35570,7 @@ type: long
 
 --
 
-*`gcp.gke.pod.volume.used_bytes.value`*::
+*`gcp.gke.pod.volume.used.bytes`*::
 +
 --
 Number of disk bytes used by the pod. Sampled every 60 seconds.
@@ -33691,7 +35579,7 @@ type: long
 
 --
 
-*`gcp.gke.pod.volume.utilization.value`*::
+*`gcp.gke.pod.volume.utilization.pct`*::
 +
 --
 The fraction of the volume that is currently being used by the instance. This value cannot be greater than 1 as usage cannot exceed the total available volume space. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
@@ -33706,7 +35594,7 @@ type: double
 Google Cloud Load Balancing metrics
 
 
-*`gcp.loadbalancing.https.backend_request_bytes_count.value`*::
+*`gcp.loadbalancing.https.backend_request.bytes`*::
 +
 --
 The number of bytes sent as requests from HTTP/S load balancer to backends.
@@ -33715,7 +35603,7 @@ type: long
 
 --
 
-*`gcp.loadbalancing.https.backend_request_count.value`*::
+*`gcp.loadbalancing.https.backend_request.count`*::
 +
 --
 The number of requests served by backends of HTTP/S load balancer.
@@ -33724,7 +35612,7 @@ type: long
 
 --
 
-*`gcp.loadbalancing.https.backend_response_bytes_count.value`*::
+*`gcp.loadbalancing.https.backend_response.bytes`*::
 +
 --
 The number of bytes sent as responses from backends (or cache) to external HTTP(S) load balancer.
@@ -33733,7 +35621,7 @@ type: long
 
 --
 
-*`gcp.loadbalancing.https.request_bytes_count.value`*::
+*`gcp.loadbalancing.https.request.bytes`*::
 +
 --
 The number of bytes sent as requests from clients to HTTP/S load balancer.
@@ -33742,7 +35630,7 @@ type: long
 
 --
 
-*`gcp.loadbalancing.https.request_count.value`*::
+*`gcp.loadbalancing.https.request.count`*::
 +
 --
 The number of requests served by HTTP/S load balancer.
@@ -33751,7 +35639,7 @@ type: long
 
 --
 
-*`gcp.loadbalancing.https.response_bytes_count.value`*::
+*`gcp.loadbalancing.https.response.bytes`*::
 +
 --
 The number of bytes sent as responses from HTTP/S load balancer to clients.
@@ -33760,7 +35648,7 @@ type: long
 
 --
 
-*`gcp.loadbalancing.l3.external.egress_bytes_count.value`*::
+*`gcp.loadbalancing.l3.external.egress.bytes`*::
 +
 --
 The number of bytes sent from external TCP/UDP network load balancer backend to client of the flow. For TCP flows it's counting bytes on application stream only.
@@ -33769,7 +35657,7 @@ type: long
 
 --
 
-*`gcp.loadbalancing.l3.external.egress_packets_count.value`*::
+*`gcp.loadbalancing.l3.external.egress_packets.count`*::
 +
 --
 The number of packets sent from external TCP/UDP network load balancer backend to client of the flow.
@@ -33778,7 +35666,7 @@ type: long
 
 --
 
-*`gcp.loadbalancing.l3.external.ingress_bytes_count.value`*::
+*`gcp.loadbalancing.l3.external.ingress.bytes`*::
 +
 --
 The number of bytes sent from client to external TCP/UDP network load balancer backend. For TCP flows it's counting bytes on application stream only.
@@ -33787,7 +35675,7 @@ type: long
 
 --
 
-*`gcp.loadbalancing.l3.external.ingress_packets_count.value`*::
+*`gcp.loadbalancing.l3.external.ingress_packets.count`*::
 +
 --
 The number of packets sent from client to external TCP/UDP network load balancer backend.
@@ -33796,7 +35684,7 @@ type: long
 
 --
 
-*`gcp.loadbalancing.l3.internal.egress_bytes_count.value`*::
+*`gcp.loadbalancing.l3.internal.egress.bytes`*::
 +
 --
 The number of bytes sent from ILB backend to client (for TCP flows it's counting bytes on application stream only).
@@ -33805,7 +35693,7 @@ type: long
 
 --
 
-*`gcp.loadbalancing.l3.internal.egress_packets_count.value`*::
+*`gcp.loadbalancing.l3.internal.egress_packets.count`*::
 +
 --
 The number of packets sent from ILB backend to client of the flow.
@@ -33814,7 +35702,7 @@ type: long
 
 --
 
-*`gcp.loadbalancing.l3.internal.ingress_bytes_count.value`*::
+*`gcp.loadbalancing.l3.internal.ingress.bytes`*::
 +
 --
 The number of bytes sent from client to ILB backend (for TCP flows it's counting bytes on application stream only).
@@ -33823,7 +35711,7 @@ type: long
 
 --
 
-*`gcp.loadbalancing.l3.internal.ingress_packets_count.value`*::
+*`gcp.loadbalancing.l3.internal.ingress_packets.count`*::
 +
 --
 The number of packets sent from client to ILB backend.
@@ -33841,7 +35729,7 @@ type: long
 
 --
 
-*`gcp.loadbalancing.tcp_ssl_proxy.egress_bytes_count.value`*::
+*`gcp.loadbalancing.tcp_ssl_proxy.egress.bytes`*::
 +
 --
 Number of bytes sent from VM to client using proxy.
@@ -33850,7 +35738,7 @@ type: long
 
 --
 
-*`gcp.loadbalancing.tcp_ssl_proxy.ingress_bytes_count.value`*::
+*`gcp.loadbalancing.tcp_ssl_proxy.ingress.bytes`*::
 +
 --
 Number of bytes sent from client to VM using proxy.
@@ -33883,7 +35771,7 @@ type: long
 Google Cloud PubSub metrics
 
 
-*`gcp.pubsub.snapshot.backlog_bytes.value`*::
+*`gcp.pubsub.snapshot.backlog.bytes`*::
 +
 --
 Total byte size of the messages retained in a snapshot.
@@ -33892,7 +35780,7 @@ type: long
 
 --
 
-*`gcp.pubsub.snapshot.backlog_bytes_by_region.value`*::
+*`gcp.pubsub.snapshot.backlog_bytes_by_region.bytes`*::
 +
 --
 Total byte size of the messages retained in a snapshot, broken down by Cloud region.
@@ -33901,7 +35789,7 @@ type: long
 
 --
 
-*`gcp.pubsub.snapshot.config_updates_count.value`*::
+*`gcp.pubsub.snapshot.config_updates.count`*::
 +
 --
 Cumulative count of configuration changes, grouped by operation type and result.
@@ -33928,7 +35816,7 @@ type: long
 
 --
 
-*`gcp.pubsub.snapshot.oldest_message_age.value`*::
+*`gcp.pubsub.snapshot.oldest_message_age.sec`*::
 +
 --
 Age (in seconds) of the oldest message retained in a snapshot.
@@ -33937,7 +35825,7 @@ type: long
 
 --
 
-*`gcp.pubsub.snapshot.oldest_message_age_by_region.value`*::
+*`gcp.pubsub.snapshot.oldest_message_age_by_region.sec`*::
 +
 --
 Age (in seconds) of the oldest message retained in a snapshot, broken down by Cloud region.
@@ -33946,7 +35834,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.ack_message_count.value`*::
+*`gcp.pubsub.subscription.ack_message.count`*::
 +
 --
 Cumulative count of messages acknowledged by Acknowledge requests, grouped by delivery type.
@@ -33955,7 +35843,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.backlog_bytes.value`*::
+*`gcp.pubsub.subscription.backlog.bytes`*::
 +
 --
 Total byte size of the unacknowledged messages (a.k.a. backlog messages) in a subscription.
@@ -33964,7 +35852,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.byte_cost.value`*::
+*`gcp.pubsub.subscription.byte_cost.bytes`*::
 +
 --
 Cumulative cost of operations, measured in bytes. This is used to measure quota utilization.
@@ -33973,7 +35861,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.config_updates_count.value`*::
+*`gcp.pubsub.subscription.config_updates.count`*::
 +
 --
 Cumulative count of configuration changes for each subscription, grouped by operation type and result.
@@ -33982,7 +35870,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.dead_letter_message_count.value`*::
+*`gcp.pubsub.subscription.dead_letter_message.count`*::
 +
 --
 Cumulative count of messages published to dead letter topic, grouped by result.
@@ -33991,7 +35879,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.mod_ack_deadline_message_count.value`*::
+*`gcp.pubsub.subscription.mod_ack_deadline_message.count`*::
 +
 --
 Cumulative count of messages whose deadline was updated by ModifyAckDeadline requests, grouped by delivery type.
@@ -34000,7 +35888,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.mod_ack_deadline_message_operation_count.value`*::
+*`gcp.pubsub.subscription.mod_ack_deadline_message_operation.count`*::
 +
 --
 Cumulative count of ModifyAckDeadline message operations, grouped by result.
@@ -34009,7 +35897,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.mod_ack_deadline_request_count.value`*::
+*`gcp.pubsub.subscription.mod_ack_deadline_request.count`*::
 +
 --
 Cumulative count of ModifyAckDeadline requests, grouped by result.
@@ -34036,7 +35924,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.oldest_retained_acked_message_age.value`*::
+*`gcp.pubsub.subscription.oldest_retained_acked_message_age.sec`*::
 +
 --
 Age (in seconds) of the oldest acknowledged message retained in a subscription.
@@ -34054,7 +35942,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.oldest_unacked_message_age.value`*::
+*`gcp.pubsub.subscription.oldest_unacked_message_age.sec`*::
 +
 --
 Age (in seconds) of the oldest unacknowledged message (a.k.a. backlog message) in a subscription.
@@ -34072,7 +35960,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.pull_ack_message_operation_count.value`*::
+*`gcp.pubsub.subscription.pull_ack_message_operation.count`*::
 +
 --
 Cumulative count of acknowledge message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
@@ -34081,7 +35969,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.pull_ack_request_count.value`*::
+*`gcp.pubsub.subscription.pull_ack_request.count`*::
 +
 --
 Cumulative count of acknowledge requests, grouped by result.
@@ -34090,7 +35978,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.pull_message_operation_count.value`*::
+*`gcp.pubsub.subscription.pull_message_operation.count`*::
 +
 --
 Cumulative count of pull message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
@@ -34099,7 +35987,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.pull_request_count.value`*::
+*`gcp.pubsub.subscription.pull_request.count`*::
 +
 --
 Cumulative count of pull requests, grouped by result.
@@ -34108,7 +35996,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.push_request_count.value`*::
+*`gcp.pubsub.subscription.push_request.count`*::
 +
 --
 Cumulative count of push attempts, grouped by result. Unlike pulls, the push server implementation does not batch user messages. So each request only contains one user message. The push server retries on errors, so a given user message can appear multiple times.
@@ -34126,7 +36014,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.retained_acked_bytes.value`*::
+*`gcp.pubsub.subscription.retained_acked.bytes`*::
 +
 --
 Total byte size of the acknowledged messages retained in a subscription.
@@ -34135,7 +36023,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.retained_acked_bytes_by_region.value`*::
+*`gcp.pubsub.subscription.retained_acked_bytes_by_region.bytes`*::
 +
 --
 Total byte size of the acknowledged messages retained in a subscription, broken down by Cloud region.
@@ -34144,7 +36032,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.seek_request_count.value`*::
+*`gcp.pubsub.subscription.seek_request.count`*::
 +
 --
 Cumulative count of seek attempts, grouped by result.
@@ -34153,7 +36041,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.sent_message_count.value`*::
+*`gcp.pubsub.subscription.sent_message.count`*::
 +
 --
 Cumulative count of messages sent by Cloud Pub/Sub to subscriber clients, grouped by delivery type.
@@ -34162,7 +36050,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.streaming_pull_ack_message_operation_count.value`*::
+*`gcp.pubsub.subscription.streaming_pull_ack_message_operation.count`*::
 +
 --
 Cumulative count of StreamingPull acknowledge message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
@@ -34171,7 +36059,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.streaming_pull_ack_request_count.value`*::
+*`gcp.pubsub.subscription.streaming_pull_ack_request.count`*::
 +
 --
 Cumulative count of streaming pull requests with non-empty acknowledge ids, grouped by result.
@@ -34180,7 +36068,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.streaming_pull_message_operation_count.value`*::
+*`gcp.pubsub.subscription.streaming_pull_message_operation.count`*::
 +
 --
 Cumulative count of streaming pull message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric <code>subscription/mod_ack_deadline_message_operation_count
@@ -34189,7 +36077,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.streaming_pull_mod_ack_deadline_message_operation_count.value`*::
+*`gcp.pubsub.subscription.streaming_pull_mod_ack_deadline_message_operation.count`*::
 +
 --
 Cumulative count of StreamingPull ModifyAckDeadline operations, grouped by result.
@@ -34198,7 +36086,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.streaming_pull_mod_ack_deadline_request_count.value`*::
+*`gcp.pubsub.subscription.streaming_pull_mod_ack_deadline_request.count`*::
 +
 --
 Cumulative count of streaming pull requests with non-empty ModifyAckDeadline fields, grouped by result.
@@ -34207,7 +36095,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.streaming_pull_response_count.value`*::
+*`gcp.pubsub.subscription.streaming_pull_response.count`*::
 +
 --
 Cumulative count of streaming pull responses, grouped by result.
@@ -34216,7 +36104,7 @@ type: long
 
 --
 
-*`gcp.pubsub.subscription.unacked_bytes_by_region.value`*::
+*`gcp.pubsub.subscription.unacked_bytes_by_region.bytes`*::
 +
 --
 Total byte size of the unacknowledged messages in a subscription, broken down by Cloud region.
@@ -34225,7 +36113,7 @@ type: long
 
 --
 
-*`gcp.pubsub.topic.byte_cost.value`*::
+*`gcp.pubsub.topic.byte_cost.bytes`*::
 +
 --
 Cost of operations, measured in bytes. This is used to measure utilization for quotas.
@@ -34234,7 +36122,7 @@ type: long
 
 --
 
-*`gcp.pubsub.topic.config_updates_count.value`*::
+*`gcp.pubsub.topic.config_updates.count`*::
 +
 --
 Cumulative count of configuration changes, grouped by operation type and result.
@@ -34243,7 +36131,7 @@ type: long
 
 --
 
-*`gcp.pubsub.topic.message_sizes.value`*::
+*`gcp.pubsub.topic.message_sizes.bytes`*::
 +
 --
 Distribution of publish message sizes (in bytes)
@@ -34270,7 +36158,7 @@ type: long
 
 --
 
-*`gcp.pubsub.topic.retained_acked_bytes_by_region.value`*::
+*`gcp.pubsub.topic.retained_acked_bytes_by_region.bytes`*::
 +
 --
 Total byte size of the acknowledged messages retained in a topic, broken down by Cloud region.
@@ -34279,7 +36167,7 @@ type: long
 
 --
 
-*`gcp.pubsub.topic.send_message_operation_count.value`*::
+*`gcp.pubsub.topic.send_message_operation.count`*::
 +
 --
 Cumulative count of publish message operations, grouped by result. For a definition of message operations, see Cloud Pub/Sub metric subscription/mod_ack_deadline_message_operation_count.
@@ -34288,7 +36176,7 @@ type: long
 
 --
 
-*`gcp.pubsub.topic.send_request_count.value`*::
+*`gcp.pubsub.topic.send_request.count`*::
 +
 --
 Cumulative count of publish requests, grouped by result.
@@ -34297,7 +36185,7 @@ type: long
 
 --
 
-*`gcp.pubsub.topic.streaming_pull_response_count.value`*::
+*`gcp.pubsub.topic.streaming_pull_response.count`*::
 +
 --
 Cumulative count of streaming pull responses, grouped by result.
@@ -34306,7 +36194,7 @@ type: long
 
 --
 
-*`gcp.pubsub.topic.unacked_bytes_by_region.value`*::
+*`gcp.pubsub.topic.unacked_bytes_by_region.bytes`*::
 +
 --
 Total byte size of the unacknowledged messages in a topic, broken down by Cloud region.
@@ -34321,7 +36209,7 @@ type: long
 Google Cloud Storage metrics
 
 
-*`gcp.storage.api.request_count.value`*::
+*`gcp.storage.api.request.count`*::
 +
 --
 Delta count of API calls, grouped by the API method name and response code.
@@ -34330,7 +36218,7 @@ type: long
 
 --
 
-*`gcp.storage.authz.acl_based_object_access_count.value`*::
+*`gcp.storage.authz.acl_based_object_access_.ount`*::
 +
 --
 Delta count of requests that result in an object being granted access solely due to object ACLs.
@@ -34339,7 +36227,7 @@ type: long
 
 --
 
-*`gcp.storage.authz.acl_operations_count.value`*::
+*`gcp.storage.authz.acl_operations.count`*::
 +
 --
 Usage of ACL operations broken down by type.
@@ -34348,7 +36236,7 @@ type: long
 
 --
 
-*`gcp.storage.authz.object_specific_acl_mutation_count.value`*::
+*`gcp.storage.authz.object_specific_acl_mutation.count`*::
 +
 --
 Delta count of changes made to object specific ACLs.
@@ -34357,7 +36245,7 @@ type: long
 
 --
 
-*`gcp.storage.network.received_bytes_count.value`*::
+*`gcp.storage.network.received.bytes`*::
 +
 --
 Delta count of bytes received over the network, grouped by the API method name and response code.
@@ -34366,7 +36254,7 @@ type: long
 
 --
 
-*`gcp.storage.network.sent_bytes_count.value`*::
+*`gcp.storage.network.sent.bytes`*::
 +
 --
 Delta count of bytes sent over the network, grouped by the API method name and response code.
@@ -34375,7 +36263,7 @@ type: long
 
 --
 
-*`gcp.storage.storage.object_count.value`*::
+*`gcp.storage.storage.object.count`*::
 +
 --
 Total number of objects per bucket, grouped by storage class. This value is measured once per day, and the value is repeated at each sampling interval throughout the day.
@@ -34384,7 +36272,7 @@ type: long
 
 --
 
-*`gcp.storage.storage.total_byte_seconds.value`*::
+*`gcp.storage.storage.total_byte_seconds.bytes`*::
 +
 --
 Delta count of bytes received over the network, grouped by the API method name and response code.
@@ -34393,7 +36281,7 @@ type: long
 
 --
 
-*`gcp.storage.storage.total_bytes.value`*::
+*`gcp.storage.storage.total.bytes`*::
 +
 --
 Total size of all objects in the bucket, grouped by storage class. This value is measured once per day, and the value is repeated at each sampling interval throughout the day.
@@ -39615,6 +41503,13 @@ alias to: service.id
 --
 
 
+*`kibana.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
+
 [float]
 === settings
 
@@ -40168,44 +42063,13 @@ type: ip
 
 --
 
-
-*`kubernetes.namespace.name`*::
+*`kubernetes.namespace`*::
 +
 --
-Kubernetes namespace name
+Kubernetes namespace
 
 
 type: keyword
-
---
-
-*`kubernetes.namespace.uuid`*::
-+
---
-Kubernetes namespace uuid
-
-
-type: keyword
-
---
-
-*`kubernetes.namespace.labels.*`*::
-+
---
-Kubernetes namespace labels map
-
-
-type: object
-
---
-
-*`kubernetes.namespace.annotations.*`*::
-+
---
-Kubernetes namespace annotations map
-
-
-type: object
 
 --
 
@@ -40957,6 +42821,18 @@ format: bytes
 
 --
 
+*`kubernetes.container.memory.workingset.limit.pct`*::
++
+--
+Working set memory usage as a percentage of the defined limit for the container (or total node allocatable memory if unlimited)
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`kubernetes.container.memory.pagefaults`*::
 +
 --
@@ -41697,7 +43573,7 @@ type: double
 *`kubernetes.node.network.rx.bytes`*::
 +
 --
-Received bytes
+Received bytes on the default interface. If default interface is not defined, will be reported not correct value `0`
 
 
 type: double
@@ -41709,7 +43585,7 @@ format: bytes
 *`kubernetes.node.network.rx.errors`*::
 +
 --
-Rx errors
+Rx errors on the default interface. If default interface is not defined, will be reported not correct value `0`
 
 
 type: double
@@ -41720,7 +43596,7 @@ type: double
 *`kubernetes.node.network.tx.bytes`*::
 +
 --
-Transmitted bytes
+Transmitted bytes on the default interface. If default interface is not defined, will be reported not correct value `0`
 
 
 type: double
@@ -41732,7 +43608,7 @@ format: bytes
 *`kubernetes.node.network.tx.errors`*::
 +
 --
-Tx errors
+Tx errors on the default interface. If default interface is not defined, will be reported not correct value `0`
 
 
 type: double
@@ -42018,6 +43894,18 @@ Total working set memory
 type: double
 
 format: bytes
+
+--
+
+*`kubernetes.pod.memory.working_set.limit.pct`*::
++
+--
+Working set memory usage as a percentage of the defined limit for the pod containers (or total node allocatable memory if unlimited)
+
+
+type: scaled_float
+
+format: percent
 
 --
 
@@ -42700,7 +44588,17 @@ type: integer
 *`kubernetes.container.status.reason`*::
 +
 --
-Waiting (ContainerCreating, CrashLoopBackoff, ErrImagePull, ImagePullBackoff) or termination (Completed, ContainerCannotRun, Error, OOMKilled) reason.
+The reason the container is currently in waiting (ContainerCreating, CrashLoopBackoff, ErrImagePull, ImagePullBackoff) or terminated (Completed, ContainerCannotRun, Error, OOMKilled) state.
+
+
+type: keyword
+
+--
+
+*`kubernetes.container.status.last_terminated_reason`*::
++
+--
+The last reason the container was in terminated state (Completed, ContainerCannotRun, Error or OOMKilled).
 
 
 type: keyword
@@ -43991,6 +45889,18 @@ type: double
 
 --
 
+*`kubernetes.volume.fs.inodes.pct`*::
++
+--
+Percentage of used inodes
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 [[exported-fields-kvm]]
 == KVM fields
 
@@ -44599,6 +46509,100 @@ format: bytes
 --
 
 [float]
+=== swap
+
+This group contains statistics related to the swap memory usage on the system.
+
+
+*`linux.memory.swap.total`*::
++
+--
+Total swap memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.swap.used.bytes`*::
++
+--
+Used swap memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.swap.free`*::
++
+--
+Available swap memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.swap.used.pct`*::
++
+--
+The percentage of used swap memory.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`linux.memory.swap.in.pages`*::
++
+--
+Pages swapped in.
+
+
+type: long
+
+--
+
+*`linux.memory.swap.out.pages`*::
++
+--
+Pages swapped out.
+
+
+type: long
+
+--
+
+*`linux.memory.swap.readahead.cached`*::
++
+--
+Swap readahead pages hit from swap_ra_hit.
+
+
+type: long
+
+--
+
+*`linux.memory.swap.readahead.pages`*::
++
+--
+Pages swapped based on readahead predictions.
+
+
+type: long
+
+--
+
+[float]
 === pageinfo
 
 pageinfo
@@ -44975,6 +46979,103 @@ type: long
 
 --
 
+[float]
+=== rapl
+
+Wattage as reported by Intel RAPL
+
+
+
+*`linux.rapl.core`*::
++
+--
+The core where the RAPL request originated from. Only one core is queried per hardware CPU.
+
+
+type: long
+
+--
+
+*`linux.rapl.dram.watts`*::
++
+--
+Power usage in watts on the DRAM RAPL domain
+
+
+type: float
+
+--
+
+*`linux.rapl.dram.joules`*::
++
+--
+Raw power usage counter for the DRAM domain
+
+
+type: float
+
+--
+
+*`linux.rapl.pp0.watts`*::
++
+--
+Power usage in watts on the PP0 RAPL domain
+
+
+type: float
+
+--
+
+*`linux.rapl.pp0.joules`*::
++
+--
+Raw power usage counter for the PP0 domain
+
+
+type: float
+
+--
+
+*`linux.rapl.pp1.watts`*::
++
+--
+Power usage in watts on the PP1 RAPL domain
+
+
+type: float
+
+--
+
+*`linux.rapl.pp1.joules`*::
++
+--
+Raw power usage counter for the PP1 domain
+
+
+type: float
+
+--
+
+*`linux.rapl.package.watts`*::
++
+--
+Power usage in watts on the Package RAPL domain
+
+
+type: float
+
+--
+
+*`linux.rapl.package.joules`*::
++
+--
+Raw power usage counter for the package domain
+
+
+type: float
+
+--
+
 [[exported-fields-logstash]]
 == Logstash fields
 
@@ -45180,6 +47281,13 @@ alias to: logstash.node.state.pipeline.hash
 
 --
 
+
+*`logstash.elasticsearch.cluster.id`*::
++
+--
+type: keyword
+
+--
 
 [float]
 === node
@@ -50794,7 +52902,7 @@ type: long
 *`mysql.status.innodb.buffer_pool.pages.data`*::
 +
 --
-he number of pages in the InnoDB buffer pool containing data.
+The number of pages in the InnoDB buffer pool containing data.
 
 
 type: long
@@ -51696,10 +53804,40 @@ Openmetrics module
 
 
 
+*`openmetrics.help`*::
++
+--
+Brief description of the MetricFamily
+
+
+type: keyword
+
+--
+
+*`openmetrics.type`*::
++
+--
+Metric type
+
+
+type: keyword
+
+--
+
+*`openmetrics.unit`*::
++
+--
+Metric unit
+
+
+type: keyword
+
+--
+
 *`openmetrics.labels.*`*::
 +
 --
-Prometheus metric labels
+Openmetrics metric labels
 
 
 type: object
@@ -51709,7 +53847,27 @@ type: object
 *`openmetrics.metrics.*`*::
 +
 --
-Prometheus metric
+Openmetrics metric
+
+
+type: object
+
+--
+
+*`openmetrics.exemplar.*`*::
++
+--
+Openmetrics exemplars
+
+
+type: object
+
+--
+
+*`openmetrics.exemplar.labels.*`*::
++
+--
+Openmetrics metric exemplar labels
 
 
 type: object
@@ -55412,6 +57570,63 @@ type: long
 --
 
 [float]
+=== commandstats
+
+Redis command statistics
+
+
+
+*`redis.info.commandstats.*.calls`*::
++
+--
+The number of calls that reached command execution (not rejected).
+
+
+type: long
+
+--
+
+*`redis.info.commandstats.*.usec`*::
++
+--
+The total CPU time consumed by these commands.
+
+
+type: long
+
+--
+
+*`redis.info.commandstats.*.usec_per_call`*::
++
+--
+The average CPU consumed per command execution.
+
+
+type: float
+
+--
+
+*`redis.info.commandstats.*.rejected_calls`*::
++
+--
+The number of rejected calls (on redis 6.2-rc2).
+
+
+type: long
+
+--
+
+*`redis.info.commandstats.*.failed_calls`*::
++
+--
+The number of failed calls (on redis 6.2-rc2).
+
+
+type: long
+
+--
+
+[float]
 === key
 
 `key` contains information about keys.
@@ -57769,140 +59984,6 @@ type: long
 
 --
 
-*`system.diskio.iostat.read.request.merges_per_sec`*::
-+
---
-The number of read requests merged per second that were queued to the device.
-
-
-type: float
-
---
-
-*`system.diskio.iostat.write.request.merges_per_sec`*::
-+
---
-The number of write requests merged per second that were queued to the device.
-
-
-type: float
-
---
-
-*`system.diskio.iostat.read.request.per_sec`*::
-+
---
-The number of read requests that were issued to the device per second
-
-
-type: float
-
---
-
-*`system.diskio.iostat.write.request.per_sec`*::
-+
---
-The number of write requests that were issued to the device per second
-
-
-type: float
-
---
-
-*`system.diskio.iostat.read.per_sec.bytes`*::
-+
---
-The number of Bytes read from the device per second.
-
-
-type: float
-
-format: bytes
-
---
-
-*`system.diskio.iostat.read.await`*::
-+
---
-The average time spent for read requests issued to the device to be served.
-
-
-type: float
-
---
-
-*`system.diskio.iostat.write.per_sec.bytes`*::
-+
---
-The number of Bytes write from the device per second.
-
-
-type: float
-
-format: bytes
-
---
-
-*`system.diskio.iostat.write.await`*::
-+
---
-The average time spent for write requests issued to the device to be served.
-
-
-type: float
-
---
-
-*`system.diskio.iostat.request.avg_size`*::
-+
---
-The average size (in bytes) of the requests that were issued to the device.
-
-
-type: float
-
---
-
-*`system.diskio.iostat.queue.avg_size`*::
-+
---
-The average queue length of the requests that were issued to the device.
-
-
-type: float
-
---
-
-*`system.diskio.iostat.await`*::
-+
---
-The average time spent for requests issued to the device to be served.
-
-
-type: float
-
---
-
-*`system.diskio.iostat.service_time`*::
-+
---
-The average service time (in milliseconds) for I/O requests that were issued to the device.
-
-
-type: float
-
---
-
-*`system.diskio.iostat.busy`*::
-+
---
-Percentage of CPU time during which I/O requests were issued to the device (bandwidth utilization for the device). Device saturation occurs when this value is close to 100%.
-
-
-type: float
-
---
-
 [float]
 === entropy
 
@@ -57964,7 +60045,7 @@ type: keyword
 *`system.filesystem.type`*::
 +
 --
-The disk type. For example: `ext4`
+The disk type. For example: `ext4`. In some case for Windows OS the value will be `unavailable` as access to this information is not allowed (ex. external disks).
 
 
 type: keyword
@@ -57984,7 +60065,7 @@ type: keyword
 *`system.filesystem.files`*::
 +
 --
-The total number of file nodes in the file system.
+Total number of inodes on the system, which will be a combination of files, folders, symlinks, and devices.
 
 
 type: long
@@ -58006,7 +60087,7 @@ format: bytes
 *`system.filesystem.free_files`*::
 +
 --
-The number of free file nodes in the file system.
+The number of free inodes in the file system.
 
 
 type: long
@@ -58068,7 +60149,7 @@ type: long
 *`system.fsstat.total_files`*::
 +
 --
-Total number of files. Not on Windows.
+Total number of inodes on the system, which will be a combination of files, folders, symlinks, and devices. Not on Windows.
 
 type: long
 
@@ -58345,42 +60426,6 @@ format: bytes
 
 --
 
-*`system.memory.swap.out.pages`*::
-+
---
-count of pages swapped out
-
-type: long
-
---
-
-*`system.memory.swap.in.pages`*::
-+
---
-count of pages swapped in
-
-type: long
-
---
-
-*`system.memory.swap.readahead.pages`*::
-+
---
-swap readahead pages
-
-type: long
-
---
-
-*`system.memory.swap.readahead.cached`*::
-+
---
-swap readahead cache hits
-
-type: long
-
---
-
 *`system.memory.swap.used.pct`*::
 +
 --
@@ -58390,203 +60435,6 @@ The percentage of used swap memory.
 type: scaled_float
 
 format: percent
-
---
-
-[float]
-=== page_stats
-
-memory page statistics
-
-
-*`system.memory.page_stats.pgscan_kswapd.pages`*::
-+
---
-pages scanned by kswapd
-
-type: long
-
-format: number
-
---
-
-*`system.memory.page_stats.pgscan_direct.pages`*::
-+
---
-pages scanned directly
-
-type: long
-
-format: number
-
---
-
-*`system.memory.page_stats.pgfree.pages`*::
-+
---
-pages freed by the system
-
-type: long
-
-format: number
-
---
-
-*`system.memory.page_stats.pgsteal_kswapd.pages`*::
-+
---
-number of pages reclaimed by kswapd
-
-type: long
-
-format: number
-
---
-
-*`system.memory.page_stats.pgsteal_direct.pages`*::
-+
---
-number of pages reclaimed directly
-
-type: long
-
-format: number
-
---
-
-*`system.memory.page_stats.direct_efficiency.pct`*::
-+
---
-direct reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
-
-type: scaled_float
-
-format: percent
-
---
-
-*`system.memory.page_stats.kswapd_efficiency.pct`*::
-+
---
-kswapd reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
-
-type: scaled_float
-
-format: percent
-
---
-
-[float]
-=== hugepages
-
-This group contains statistics related to huge pages usage on the system.
-
-
-*`system.memory.hugepages.total`*::
-+
---
-Number of huge pages in the pool.
-
-
-type: long
-
-format: number
-
---
-
-*`system.memory.hugepages.used.bytes`*::
-+
---
-Memory used in allocated huge pages.
-
-
-type: long
-
-format: bytes
-
---
-
-*`system.memory.hugepages.used.pct`*::
-+
---
-Percentage of huge pages used.
-
-
-type: long
-
-format: percent
-
---
-
-*`system.memory.hugepages.free`*::
-+
---
-Number of available huge pages in the pool.
-
-
-type: long
-
-format: number
-
---
-
-*`system.memory.hugepages.reserved`*::
-+
---
-Number of reserved but not allocated huge pages in the pool.
-
-
-type: long
-
-format: number
-
---
-
-*`system.memory.hugepages.surplus`*::
-+
---
-Number of overcommited huge pages.
-
-
-type: long
-
-format: number
-
---
-
-*`system.memory.hugepages.default_size`*::
-+
---
-Default size for huge pages.
-
-
-type: long
-
-format: bytes
-
---
-
-[float]
-=== swap.out
-
-huge pages swapped out
-
-
-*`system.memory.hugepages.swap.out.pages`*::
-+
---
-pages swapped out
-
-type: long
-
---
-
-*`system.memory.hugepages.swap.out.fallback`*::
-+
---
-Count of huge pages that must be split before swapout
-
-type: long
 
 --
 
@@ -58790,7 +60638,7 @@ alias to: process.pid
 --
 type: alias
 
-alias to: process.ppid
+alias to: process.parent.pid
 
 --
 
@@ -60345,6 +62193,36 @@ type: long
 +
 --
 Number of dead processes on this host. It's very unlikely that it will appear but in some special situations it may happen.
+
+
+type: long
+
+--
+
+*`system.process.summary.wakekill`*::
++
+--
+Number of wakekill-state processes on this host. Only found on older Linux Kernel versions.
+
+
+type: long
+
+--
+
+*`system.process.summary.wake`*::
++
+--
+Number of wake-state processes on this host. Only found on older Linux Kernel versions.
+
+
+type: long
+
+--
+
+*`system.process.summary.parked`*::
++
+--
+Number of parked-state processes on this host. Only found on older Linux Kernel versions, or under certain conditions.
 
 
 type: long
@@ -62427,7 +64305,7 @@ type: long
 *`zookeeper.mntr.followers`*::
 +
 --
-Number of followers seen by the current host.
+Number of followers seen by the current host (Up to ZooKeeper 3.5.9).
 
 
 type: long
@@ -62570,6 +64448,16 @@ type: long
 +
 --
 Number of znodes reported by the local ZooKeeper process.
+
+
+type: long
+
+--
+
+*`zookeeper.mntr.learners`*::
++
+--
+Number of learners (either followers or observers) seen by the current host (From ZooKeeper 3.6.0)
 
 
 type: long

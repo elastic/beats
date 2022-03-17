@@ -10,6 +10,8 @@
     # - conntrack
     # - iostat
     # - pressure
+    # - rapl
   enabled: true
   #hostfs: /hostfs
+  #rapl.use_msr_safe: false
 

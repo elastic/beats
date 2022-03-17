@@ -15,8 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build darwin || freebsd || linux || windows
-// +build darwin freebsd linux windows
+//go:build darwin || freebsd || linux || windows || aix
+// +build darwin freebsd linux windows aix
 
 package network
 
@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
 	"github.com/pkg/errors"
-	"github.com/shirou/gopsutil/net"
+	"github.com/shirou/gopsutil/v3/net"
 )
 
 var debugf = logp.MakeDebug("system-network")

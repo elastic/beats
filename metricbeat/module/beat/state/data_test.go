@@ -47,7 +47,7 @@ func TestEventMapping(t *testing.T) {
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, info, input)
+		err = eventMapping(reporter, info, input, true)
 
 		require.NoError(t, err, f)
 		require.True(t, len(reporter.GetEvents()) >= 1, f)

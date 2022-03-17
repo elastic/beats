@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/winlogbeat/beater"
 
@@ -28,22 +29,18 @@ import (
 	_ "github.com/elastic/beats/v7/winlogbeat/include"
 
 	// Import processors and supporting modules.
-	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
 )
 
 const (
 	// Name of this beat.
 	Name = "winlogbeat"
-
-	// ecsVersion specifies the version of ECS that Winlogbeat is implementing.
-	ecsVersion = "1.12.0"
 )
 
 // withECSVersion is a modifier that adds ecs.version to events.
 var withECSVersion = processing.WithFields(common.MapStr{
 	"ecs": common.MapStr{
-		"version": ecsVersion,
+		"version": ecs.Version,
 	},
 })
 

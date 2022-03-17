@@ -70,7 +70,7 @@ func TestSQSReceiver(t *testing.T) {
 		// Execute sqsReader and verify calls/state.
 		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
 		require.NoError(t, receiver.Receive(ctx))
-		assert.Equal(t, maxMessages, receiver.workerSem.available)
+		assert.Equal(t, maxMessages, receiver.workerSem.Available())
 	})
 
 	t.Run("retry after ReceiveMessage error", func(t *testing.T) {
@@ -103,7 +103,7 @@ func TestSQSReceiver(t *testing.T) {
 		// Execute SQSReceiver and verify calls/state.
 		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
 		require.NoError(t, receiver.Receive(ctx))
-		assert.Equal(t, maxMessages, receiver.workerSem.available)
+		assert.Equal(t, maxMessages, receiver.workerSem.Available())
 	})
 }
 
@@ -126,11 +126,34 @@ func newSQSMessage(events ...s3EventV2) sqs.Message {
 	}
 }
 
+func newSNSSQSMessage() sqs.Message {
+	body, err := json.Marshal(s3EventsV2{
+		TopicArn: "arn:aws:sns:us-east-1:1234:sns-topic",
+		Message:  "{\"Records\":[{\"eventSource\":\"aws:s3\",\"awsRegion\":\"us-east-1\",\"eventName\":\"ObjectCreated:Put\",\"s3\":{\"configurationId\":\"sns-notification-vpc-flow-logs\",\"bucket\":{\"name\":\"vpc-flow-logs-ks\",\"arn\":\"arn:aws:s3:::vpc-flow-logs-ks\"},\"object\":{\"key\":\"test-object-key\"}}}]}",
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	hash := sha256.Sum256(body)
+	id, _ := uuid.FromBytes(hash[:16])
+	messageID := id.String()
+	receipt := "receipt-" + messageID
+	bodyStr := string(body)
+
+	return sqs.Message{
+		Body:          &bodyStr,
+		MessageId:     &messageID,
+		ReceiptHandle: &receipt,
+	}
+}
+
 func newS3Event(key string) s3EventV2 {
 	record := s3EventV2{
 		AWSRegion:   "us-east-1",
 		EventSource: "aws:s3",
 		EventName:   "ObjectCreated:Put",
+		Provider:    "aws",
 	}
 	record.S3.Bucket.Name = "foo"
 	record.S3.Bucket.ARN = "arn:aws:s3:::foo"

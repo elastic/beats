@@ -46,7 +46,7 @@ func ListAll(path string) ([]MDDevice, error) {
 	}
 
 	if len(mds) == 0 {
-		return nil, fmt.Errorf("no matches from path %s,", path)
+		return nil, fmt.Errorf("no matches from path %s", path)
 	}
 
 	return mds, nil

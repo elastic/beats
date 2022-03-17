@@ -115,7 +115,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 	var err error
 	if server.TLSConfig != nil {
 		log.Infof("Starting HTTPS server on %s", server.Addr)
-		//certificate is already loaded. That's why the parameters are empty
+		// certificate is already loaded. That's why the parameters are empty
 		err = server.ListenAndServeTLS("", "")
 	} else {
 		log.Infof("Starting HTTP server on %s", server.Addr)

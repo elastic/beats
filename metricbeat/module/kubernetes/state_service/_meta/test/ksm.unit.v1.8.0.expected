@@ -3,38 +3,9 @@
 		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
-				"app": "example4"
-			},
-			"namespace": {
-				"name": "default"
-			}
-		},
-		"MetricSetFields": {
-			"created": "2017-07-14T02:40:00.000Z",
-			"external_name": "www.example.com",
-			"name": "test-service4",
-			"type": "ExternalName"
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.service",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": null,
-		"ModuleFields": {
-			"labels": {
 				"app": "example2"
 			},
-			"namespace": {
-				"name": "default"
-			}
+			"namespace": "default"
 		},
 		"MetricSetFields": {
 			"cluster_ip": "1.2.3.5",
@@ -59,9 +30,7 @@
 			"labels": {
 				"app": "example3"
 			},
-			"namespace": {
-				"name": "default"
-			}
+			"namespace": "default"
 		},
 		"MetricSetFields": {
 			"cluster_ip": "1.2.3.6",
@@ -87,9 +56,7 @@
 			"labels": {
 				"app": "example5"
 			},
-			"namespace": {
-				"name": "default"
-			}
+			"namespace": "default"
 		},
 		"MetricSetFields": {
 			"created": "2017-07-14T02:40:00.000Z",
@@ -113,11 +80,34 @@
 		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
+				"app": "example4"
+			},
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"created": "2017-07-14T02:40:00.000Z",
+			"external_name": "www.example.com",
+			"name": "test-service4",
+			"type": "ExternalName"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.service",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"labels": {
 				"app": "example6"
 			},
-			"namespace": {
-				"name": "default"
-			}
+			"namespace": "default"
 		},
 		"MetricSetFields": {
 			"created": "2017-07-14T02:40:00.000Z",
@@ -142,9 +132,7 @@
 			"labels": {
 				"app": "example1"
 			},
-			"namespace": {
-				"name": "default"
-			}
+			"namespace": "default"
 		},
 		"MetricSetFields": {
 			"cluster_ip": "1.2.3.4",

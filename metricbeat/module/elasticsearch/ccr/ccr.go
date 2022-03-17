@@ -89,7 +89,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	return eventsMapping(r, *info, content)
+	return eventsMapping(r, *info, content, m.XPackEnabled)
 }
 
 func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion *common.Version) (message string, err error) {

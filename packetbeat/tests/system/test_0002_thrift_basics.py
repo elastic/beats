@@ -208,7 +208,7 @@ class Test(BaseTest):
         self.run_packetbeat(pcap="thrift_integration.pcap",
                             debug_selectors=["thrift"])
 
-        objs = self.read_output()
+        objs = self.read_output(output_file="output/packetbeat-" + self.today + "-1.ndjson")
 
         assert all(["request" not in o for o in objs])
         assert all(["response" not in o for o in objs])

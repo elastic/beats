@@ -8,71 +8,71 @@
     "kibana": {
         "elasticsearch": {
             "cluster": {
-                "id": "9Am6m3bHTJ6YrNg1pmac2Q"
+                "id": "WocBBA0QRma0sGpdQ7vLfQ"
             }
         },
         "stats": {
-            "concurrent_connections": 0,
+            "concurrent_connections": 4,
             "host": {
-                "name": "0"
+                "name": "0.0.0.0"
             },
-            "index": "kibana",
-            "name": "kibana",
+            "index": ".kibana",
+            "name": "b04775fa6831",
             "os": {
                 "distro": "CentOS",
-                "distroRelease": "CentOS-8.2.2004",
+                "distroRelease": "CentOS-8.4.2105\n",
                 "load": {
-                    "15m": 2.291015625,
-                    "1m": 2.34912109375,
-                    "5m": 2.49072265625
+                    "15m": 1.12,
+                    "1m": 0.97,
+                    "5m": 1.01
                 },
                 "memory": {
-                    "free_in_bytes": 12719185920,
-                    "total_in_bytes": 33291984896,
-                    "used_in_bytes": 20572798976
+                    "free_in_bytes": 323694592,
+                    "total_in_bytes": 33295835136,
+                    "used_in_bytes": 32972140544
                 },
                 "platform": "linux",
-                "platformRelease": "linux-5.10.14-arch1-1"
+                "platformRelease": "linux-5.14.13-200.fc34.x86_64"
             },
             "process": {
                 "event_loop_delay": {
-                    "ms": 0.7828890010714531
+                    "ms": 0.14306800067424774
                 },
                 "memory": {
                     "heap": {
                         "size_limit": {
-                            "bytes": 1526909922
+                            "bytes": 4345298944
                         },
                         "total": {
-                            "bytes": 238911488
+                            "bytes": 264982528
                         },
                         "used": {
-                            "bytes": 169990928
+                            "bytes": 226086648
                         }
                     },
                     "resident_set_size": {
-                        "bytes": 354504704
+                        "bytes": 346976256
                     }
                 },
                 "uptime": {
-                    "ms": 986355
+                    "ms": 79081
                 }
             },
             "request": {
                 "disconnects": 0,
-                "total": 4
+                "total": 7
             },
             "response_time": {
                 "avg": {
-                    "ms": 279
+                    "ms": 74
                 },
                 "max": {
-                    "ms": 300
+                    "ms": 389
                 }
             },
             "snapshot": false,
             "status": "green",
-            "transport_address": "0:5601"
+            "transport_address": "0.0.0.0:5601"
         }
     },
     "metricset": {
@@ -80,12 +80,12 @@
         "period": 10000
     },
     "process": {
-        "pid": 7
+        "pid": 1222
     },
     "service": {
-        "address": "172.20.0.3:5601",
-        "id": "2076c0f0-fd6e-4ce0-bf04-59541bd3ba0c",
+        "address": "172.19.0.3:5601",
+        "id": "f87393a7-e8ae-48fd-af1e-91f229fd93fd",
         "type": "kibana",
-        "version": "7.10.0"
+        "version": "7.14.0"
     }
 }

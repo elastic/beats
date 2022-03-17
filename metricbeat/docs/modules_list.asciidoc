@@ -15,8 +15,6 @@ This file is generated! See scripts/mage/docs_collector.go
 .1+| .1+|  |<<metricbeat-metricset-airflow-statsd,statsd>> beta[]  
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-apache-status,status>>   
-|<<metricbeat-module-appsearch,App Search>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-appsearch-stats,stats>> beta[]  
 |<<metricbeat-module-aws,AWS>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .17+| .17+|  |<<metricbeat-metricset-aws-billing,billing>> beta[]  
 |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>>   
@@ -74,6 +72,10 @@ This file is generated! See scripts/mage/docs_collector.go
 .1+| .1+|  |<<metricbeat-metricset-cockroachdb-status,status>> beta[]  
 |<<metricbeat-module-consul,Consul>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-consul-agent,agent>> beta[]  
+|<<metricbeat-module-containerd,Containerd>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.3+| .3+|  |<<metricbeat-metricset-containerd-blkio,blkio>> beta[]  
+|<<metricbeat-metricset-containerd-cpu,cpu>> beta[]  
+|<<metricbeat-metricset-containerd-memory,memory>> beta[]  
 |<<metricbeat-module-coredns,Coredns>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-coredns-stats,stats>>   
 |<<metricbeat-module-couchbase,Couchbase>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -107,7 +109,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-elasticsearch-node_stats,node_stats>>   
 |<<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>>   
 |<<metricbeat-metricset-elasticsearch-shard,shard>>   
-|<<metricbeat-module-enterprisesearch,enterprisesearch>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+|<<metricbeat-module-enterprisesearch,Enterprise Search>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-enterprisesearch-health,health>> beta[]  
 |<<metricbeat-metricset-enterprisesearch-stats,stats>> beta[]  
 |<<metricbeat-module-envoyproxy,Envoyproxy>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
@@ -118,8 +120,10 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-etcd-self,self>>   
 |<<metricbeat-metricset-etcd-store,store>>   
 |<<metricbeat-module-gcp,Google Cloud Platform>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.7+| .7+|  |<<metricbeat-metricset-gcp-billing,billing>> beta[]  
+.9+| .9+|  |<<metricbeat-metricset-gcp-billing,billing>> beta[]  
 |<<metricbeat-metricset-gcp-compute,compute>> beta[]  
+|<<metricbeat-metricset-gcp-dataproc,dataproc>> beta[]  
+|<<metricbeat-metricset-gcp-firestore,firestore>> beta[]  
 |<<metricbeat-metricset-gcp-gke,gke>> beta[]  
 |<<metricbeat-metricset-gcp-loadbalancing,loadbalancing>> beta[]  
 |<<metricbeat-metricset-gcp-metrics,metrics>> beta[]  
@@ -190,12 +194,13 @@ This file is generated! See scripts/mage/docs_collector.go
 .2+| .2+|  |<<metricbeat-metricset-kvm-dommemstat,dommemstat>> beta[]  
 |<<metricbeat-metricset-kvm-status,status>> beta[]  
 |<<metricbeat-module-linux,Linux>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.6+| .6+|  |<<metricbeat-metricset-linux-conntrack,conntrack>> beta[]  
+.7+| .7+|  |<<metricbeat-metricset-linux-conntrack,conntrack>> beta[]  
 |<<metricbeat-metricset-linux-iostat,iostat>> beta[]  
 |<<metricbeat-metricset-linux-ksm,ksm>> beta[]  
 |<<metricbeat-metricset-linux-memory,memory>> beta[]  
 |<<metricbeat-metricset-linux-pageinfo,pageinfo>> beta[]  
 |<<metricbeat-metricset-linux-pressure,pressure>> beta[]  
+|<<metricbeat-metricset-linux-rapl,rapl>> beta[]  
 |<<metricbeat-module-logstash,Logstash>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-logstash-node,node>>   
 |<<metricbeat-metricset-logstash-node_stats,node_stats>>   
@@ -315,7 +320,6 @@ include::modules/activemq.asciidoc[]
 include::modules/aerospike.asciidoc[]
 include::modules/airflow.asciidoc[]
 include::modules/apache.asciidoc[]
-include::modules/appsearch.asciidoc[]
 include::modules/aws.asciidoc[]
 include::modules/awsfargate.asciidoc[]
 include::modules/azure.asciidoc[]
@@ -324,6 +328,7 @@ include::modules/ceph.asciidoc[]
 include::modules/cloudfoundry.asciidoc[]
 include::modules/cockroachdb.asciidoc[]
 include::modules/consul.asciidoc[]
+include::modules/containerd.asciidoc[]
 include::modules/coredns.asciidoc[]
 include::modules/couchbase.asciidoc[]
 include::modules/couchdb.asciidoc[]

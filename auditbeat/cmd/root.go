@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
@@ -33,9 +34,6 @@ import (
 const (
 	// Name of the beat (auditbeat).
 	Name = "auditbeat"
-
-	// ecsVersion specifies the version of ECS that Auditbeat is implementing.
-	ecsVersion = "1.12.0"
 )
 
 // RootCmd for running auditbeat.
@@ -50,13 +48,13 @@ var ShowCmd = &cobra.Command{
 // withECSVersion is a modifier that adds ecs.version to events.
 var withECSVersion = processing.WithFields(common.MapStr{
 	"ecs": common.MapStr{
-		"version": ecsVersion,
+		"version": ecs.Version,
 	},
 })
 
 // AuditbeatSettings contains the default settings for auditbeat
 func AuditbeatSettings() instance.Settings {
-	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
+	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	return instance.Settings{
 		RunFlags:      runFlags,
 		Name:          Name,
@@ -65,7 +63,7 @@ func AuditbeatSettings() instance.Settings {
 	}
 }
 
-// Initialize initializes the entrypoint commands for journalbeat
+// Initialize initializes the entrypoint commands for auditbeat
 func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 	create := beater.Creator(
 		beater.WithModuleOptions(

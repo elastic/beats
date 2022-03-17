@@ -1,4 +1,4 @@
-- name: anomali
+- name: anomali.limo
   type: group
   description: >
     Fields for Anomali Threat Intel

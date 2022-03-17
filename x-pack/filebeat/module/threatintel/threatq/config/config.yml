@@ -1,0 +1,67 @@
+{{ if eq .input "httpjson" }}
+
+type: httpjson
+interval: {{ .interval }}
+
+auth.oauth2:
+  client.id: {{ .client_id }}
+  client.secret: {{ .client_secret }}
+  token_url: {{ .token_url }}
+request.method: GET
+{{ if .ssl }}
+request.ssl: {{ .ssl | tojson }}
+{{ end }}
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
+{{ if .http_client_timeout }}
+request.timeout: {{ .http_client_timeout }}
+{{ end }}
+request.url: "{{ .host }}api/indicators/query/hash/{{ .data_collection_id }}"
+request.transforms:
+  - set:
+      target: url.params.sort
+      value: updated_at
+  - set:
+      target: url.params.limit
+      value: 100
+  - set:
+      target: url.params.cursorMark
+      value: '[[.cursor.cursor_mark]]'
+      default: "*"
+cursor:
+  cursor_mark:
+    ignore_empty_value: true
+    value: '[[.last_response.body.nextCursorMark]]'
+response.request_body_on_pagination: true
+
+response.split:
+  target: body.data
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags:
+{{if .preserve_original_event}}
+  - preserve_original_event
+{{end}}
+{{range $val := .tags}}
+  - {{$val}}
+{{end}}
+
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - add_locale: ~
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0

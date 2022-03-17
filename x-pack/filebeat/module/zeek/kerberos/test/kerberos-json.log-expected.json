@@ -2,8 +2,16 @@
     {
         "@timestamp": "2017-10-09T16:13:19.590Z",
         "client.address": "192.168.10.31",
-        "destination.address": "192.168.10.10",
-        "destination.ip": "192.168.10.10",
+        "destination.address": "175.16.199.1",
+        "destination.geo.city_name": "Changchun",
+        "destination.geo.continent_name": "Asia",
+        "destination.geo.country_iso_code": "CN",
+        "destination.geo.country_name": "China",
+        "destination.geo.location.lat": 43.88,
+        "destination.geo.location.lon": 125.3228,
+        "destination.geo.region_iso_code": "CN-22",
+        "destination.geo.region_name": "Jilin Sheng",
+        "destination.ip": "175.16.199.1",
         "destination.port": 88,
         "event.action": "TGS",
         "event.category": [
@@ -22,18 +30,18 @@
         "fileset.name": "kerberos",
         "input.type": "log",
         "log.offset": 0,
-        "network.community_id": "1:DW/lSsosl8gZ8pqO9kKMm7cZheQ=",
-        "network.direction": "internal",
+        "network.community_id": "1:b3Wq/ZUliRnevvni5Ppqi3dfzfE=",
+        "network.direction": "outbound",
         "network.protocol": "kerberos",
         "network.transport": "tcp",
         "related.ip": [
-            "192.168.10.10",
+            "175.16.199.1",
             "192.168.10.31"
         ],
         "related.user": [
             "RonHD"
         ],
-        "server.address": "192.168.10.10",
+        "server.address": "175.16.199.1",
         "service.type": "zeek",
         "source.address": "192.168.10.31",
         "source.ip": "192.168.10.31",

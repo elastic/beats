@@ -3,212 +3,209 @@
   release: ga
   description: >
     Fields for Azure sign-in logs.
-  default_field: false
   fields:
     - name: operation_name
       type: keyword
-      description: >
+      description: |
         The operation name
     - name: operation_version
       type: keyword
-      description: >
+      description: |
         The operation version
     - name: tenant_id
       type: keyword
-      description: >
+      description: |
         Tenant ID
     - name: result_signature
       type: keyword
-      description: >
+      description: |
         Result signature
     - name: result_description
       type: keyword
-      description: >
+      description: |
         Result description
     - name: result_type
       type: keyword
-      description: >
+      description: |
         Result type
     - name: identity
       type: keyword
-      description: >
+      description: |
         Identity
     - name: category
       type: keyword
-      description: >
+      description: |
         Category
     - name: properties
       type: group
-      description: >
-        The signin log properties
+      # See https://docs.microsoft.com/en-au/graph/api/resources/signin
       fields:
         - name: id
           type: keyword
-          description: >
-            ID
+          description: |
+            Unique ID representing the sign-in activity.
         - name: created_at
           type: date
-          description: >
-            Created date time
+          description: |
+            Date and time (UTC) the sign-in was initiated.
         - name: user_display_name
           type: keyword
-          description: >
+          description: |
             User display name
         - name: correlation_id
           type: keyword
-          description: >
+          description: |
             Correlation ID
         - name: user_principal_name
           type: keyword
-          description: >
+          description: |
             User principal name
         - name: user_id
           type: keyword
-          description: >
+          description: |
             User ID
         - name: app_id
           type: keyword
-          description: >
+          description: |
             App ID
         - name: app_display_name
           type: keyword
-          description: >
+          description: |
             App display name
-        - name: ip_address
-          type: keyword
-          description: >
-            Ip address
+        - name: autonomous_system_number
+          type: long
+          description: Autonomous system number.
         - name: client_app_used
           type: keyword
-          description: >
+          description: |
             Client app used
         - name: conditional_access_status
           type: keyword
-          description: >
+          description: |
             Conditional access status
         - name: original_request_id
           type: keyword
-          description: >
+          description: |
             Original request ID
         - name: is_interactive
-          type: keyword
-          description: >
+          type: boolean
+          description: |
             Is interactive
         - name: token_issuer_name
           type: keyword
-          description: >
+          description: |
             Token issuer name
         - name: token_issuer_type
           type: keyword
-          description: >
+          description: |
             Token issuer type
         - name: processing_time_ms
           type: float
-          description: >
+          description: |
             Processing time in milliseconds
         - name: risk_detail
           type: keyword
-          description: >
+          description: |
             Risk detail
         - name: risk_level_aggregated
           type: keyword
-          description: >
+          description: |
             Risk level aggregated
         - name: risk_level_during_signin
           type: keyword
-          description: >
+          description: |
             Risk level during signIn
         - name: risk_state
           type: keyword
-          description: >
+          description: |
             Risk state
         - name: resource_display_name
           type: keyword
-          description: >
+          description: |
             Resource display name
         - name: status
           type: group
-          description: >
-            Status
           fields:
             - name: error_code
-              type: keyword
-              description: >
+              type: long
+              description: |
                 Error code
         - name: device_detail
           type: group
-          description: >
-            Status
           fields:
             - name: device_id
               type: keyword
-              description: >
+              description: |
                 Device ID
             - name: operating_system
               type: keyword
-              description: >
+              description: |
                 Operating system
             - name: browser
               type: keyword
-              description: >
+              description: |
                 Browser
             - name: display_name
               type: keyword
-              description: >
+              description: |
                 Display name
             - name: trust_type
               type: keyword
-              description: >
+              description: |
                 Trust type
-        - name: service_principal_id
-          type: keyword
-          description: >
-            Status
-        - name: authentication_requirement_policies
-          type: keyword
-          description: >
-            Set of CA policies that apply to this sign-in, each as CA: policy name, and/or MFA: Per-user.
         - name: applied_conditional_access_policies
-          type: nested
-          description: >
-            Details of the conditional access policies being applied for the sign-in.
-        - name: resource_tenant_id
-          type: keyword
-          description: >
-            The resource tenantId for B2B(business-to-business) scenarios.
+          type: array
+          description: |
+            A list of conditional access policies that are triggered by the corresponding sign-in activity.
         - name: authentication_details
-          type: nested
-          description: >
-            A record of each step of authentication undertaken in the sign-in.
+          type: array
+          description: |
+            The result of the authentication attempt and additional details on the authentication method.
         - name: authentication_processing_details
           type: flattened
-          description: >
-            Provides the details associated with authentication processor.
-        - name: flagged_for_review
-          type: boolean
-          description: Event was flagged for review.
-        - name: network_location_details
-          type: keyword
-          description: >
-            Provides the details associated with authentication processor.
-        - name: risk_event_types
-          type: keyword
-          description: >
-            The list of risk event types associated with the sign-in.
-        - name: risk_event_types_v2
-          type: keyword
-          description: >
-            The list of risk event types associated with the sign-in.
+          description: |
+            Additional authentication processing details, such as the agent name in case of PTA/PHS or Server/farm name in case of federated authentication.
         - name: authentication_requirement
           type: keyword
-          description: >
-            Type of authentication required for the sign-in. If set to
-            multiFactorAuthentication, an MFA step was required. If set to
-            singleFactorAuthentication, no MFA was required
+          description: |
+            This holds the highest level of authentication needed through all the sign-in steps, for sign-in to succeed.
+        - name: authentication_requirement_policies
+          type: keyword
+          description: |
+            Set of CA policies that apply to this sign-in, each as CA: policy name, and/or MFA: Per-user
+        - name: flagged_for_review
+          type: boolean
+        - name: home_tenant_id
+          type: keyword
+        - name: network_location_details
+          type: array
+          description: The network location details including the type of network used and its names.
         - name: resource_id
           type: keyword
-          description: >
-            ID of the resource that the user signed into.
+          description: The identifier of the resource that the user signed in to.
+        - name: resource_tenant_id
+          type: keyword
+        - name: risk_event_types
+          type: keyword
+          description: |
+            The list of risk event types associated with the sign-in. Possible values: unlikelyTravel, anonymizedIPAddress, maliciousIPAddress, unfamiliarFeatures, malwareInfectedIPAddress, suspiciousIPAddress, leakedCredentials, investigationsThreatIntelligence, generic, or unknownFutureValue.
+        - name: risk_event_types_v2
+          type: keyword
+          description: |
+            The list of risk event types associated with the sign-in. Possible values: unlikelyTravel, anonymizedIPAddress, maliciousIPAddress, unfamiliarFeatures, malwareInfectedIPAddress, suspiciousIPAddress, leakedCredentials, investigationsThreatIntelligence, generic, or unknownFutureValue.
+        - name: service_principal_name
+          type: keyword
+          description: |
+            The application name used for sign-in. This field is populated when you are signing in using an application.
         - name: user_type
           type: keyword
-          description: User type.
+        - name: service_principal_id
+          type: keyword
+          description: |
+            The application identifier used for sign-in. This field is populated when you are signing in using an application.
+        - name: cross_tenant_access_type
+          type: keyword
+        - name: is_tenant_restricted
+          type: boolean
+        - name: sso_extension_version
+          type: keyword

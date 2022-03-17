@@ -32,17 +32,18 @@ const (
 	DefaultRegistryFile = ".winlogbeat.yml"
 )
 
-var (
-	DefaultSettings = WinlogbeatConfig{
-		RegistryFile: DefaultRegistryFile,
-	}
-)
+var DefaultSettings = WinlogbeatConfig{
+	RegistryFile:  DefaultRegistryFile,
+	RegistryFlush: 5 * time.Second,
+}
 
 // WinlogbeatConfig contains all of Winlogbeat configuration data.
 type WinlogbeatConfig struct {
-	EventLogs       []*common.Config `config:"event_logs"`
-	RegistryFile    string           `config:"registry_file"`
-	ShutdownTimeout time.Duration    `config:"shutdown_timeout"`
+	EventLogs          []*common.Config `config:"event_logs"`
+	RegistryFile       string           `config:"registry_file"`
+	RegistryFlush      time.Duration    `config:"registry_flush"`
+	ShutdownTimeout    time.Duration    `config:"shutdown_timeout"`
+	OverwritePipelines bool             `config:"overwrite_pipelines"`
 }
 
 // Validate validates the WinlogbeatConfig data and returns an error describing

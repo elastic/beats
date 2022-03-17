@@ -48,7 +48,7 @@ const (
 	packageStagingDir = "build/package"
 
 	// defaultBinaryName specifies the output file for zip and tar.gz.
-	defaultBinaryName = "{{.Name}}-{{if .Variant}}{{.Variant}}-{{end}}{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}"
+	defaultBinaryName = "{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}"
 )
 
 // PackageType defines the file format of the package (e.g. zip, rpm, etc).
@@ -60,7 +60,6 @@ const (
 	Deb
 	Zip
 	TarGz
-	DMG
 	Docker
 )
 
@@ -90,7 +89,6 @@ type PackageSpec struct {
 	Files             map[string]PackageFile `yaml:"files"`
 	OutputFile        string                 `yaml:"output_file,omitempty"` // Optional
 	ExtraVars         map[string]string      `yaml:"extra_vars,omitempty"`  // Optional
-	Variants          []string               `yaml:"variants"`              // Optional
 
 	evalContext            map[string]interface{}
 	packageDir             string
@@ -123,10 +121,6 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 	},
 	"darwin": map[PackageType]map[string]string{
 		TarGz: map[string]string{
-			"386":   "x86",
-			"amd64": "x86_64",
-		},
-		DMG: map[string]string{
 			"386":   "x86",
 			"amd64": "x86_64",
 		},
@@ -177,6 +171,11 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 			"arm64": "arm64",
 		},
 	},
+	"aix": map[PackageType]map[string]string{
+		TarGz: map[string]string{
+			"ppc64": "ppc64",
+		},
+	},
 }
 
 // getOSArchName returns the architecture name to use in a package.
@@ -213,8 +212,6 @@ func (typ PackageType) String() string {
 		return "zip"
 	case TarGz:
 		return "tar.gz"
-	case DMG:
-		return "dmg"
 	case Docker:
 		return "docker"
 	default:
@@ -238,8 +235,6 @@ func (typ *PackageType) UnmarshalText(text []byte) error {
 		*typ = TarGz
 	case "zip":
 		*typ = Zip
-	case "dmg":
-		*typ = DMG
 	case "docker":
 		*typ = Docker
 	default:
@@ -285,8 +280,6 @@ func (typ PackageType) Build(spec PackageSpec) error {
 		return PackageZip(spec)
 	case TarGz:
 		return PackageTarGz(spec)
-	case DMG:
-		return PackageDMG(spec)
 	case Docker:
 		return PackageDocker(spec)
 	default:
@@ -329,10 +322,8 @@ func (s *PackageSpec) ExtraVar(key, value string) {
 
 // Expand expands a templated string using data from the spec.
 func (s PackageSpec) Expand(in string, args ...map[string]interface{}) (string, error) {
-	// Assign a default value for variant since it's not always passed in
 	return expandTemplate("inline", in, FuncMap,
-
-		EnvMap(append([]map[string]interface{}{s.evalContext, {"Variant": ""}, s.toMap()}, args...)...))
+		EnvMap(append([]map[string]interface{}{s.evalContext, s.toMap()}, args...)...))
 }
 
 // MustExpand expands a templated string using data from the spec. It panics if
@@ -969,21 +960,6 @@ func addSymlinkToTar(tmpdir string, ar *tar.Writer, baseDir string, pkgFile Pack
 
 		return nil
 	})
-}
-
-// PackageDMG packages the Beat into a .dmg file containing an installer pkg
-// and uninstaller app.
-func PackageDMG(spec PackageSpec) error {
-	if runtime.GOOS != "darwin" {
-		return errors.New("packaging a dmg requires darwin")
-	}
-
-	b, err := newDMGBuilder(spec)
-	if err != nil {
-		return err
-	}
-
-	return b.Build()
 }
 
 // PackageDocker packages the Beat into a docker image.

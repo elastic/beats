@@ -32,7 +32,7 @@ func Generate(module, modulesPath, beatsPath string) error {
 		return fmt.Errorf("module already exists: %s", module)
 	}
 
-	err := os.MkdirAll(path.Join(modulePath, "_meta"), 0750)
+	err := os.MkdirAll(path.Join(modulePath, "_meta"), 0o750)
 	if err != nil {
 		return err
 	}

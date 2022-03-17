@@ -50,11 +50,17 @@ log_group_name is given.
 ==== `log_group_name_prefix`
 The prefix for a group of log group names. Note: `region_name` is required when
 log_group_name_prefix is given. `log_group_name` and `log_group_name_prefix`
-cannot be given at the same time.
+cannot be given at the same time. The number of workers that will process the
+log groups under this prefix is set through the `number_of_workers` config.
 
 [float]
 ==== `region_name`
 Region that the specified log group or log group prefix belongs to.
+
+[float]
+==== `number_of_workers`
+Number of workers that will process the log groups with the given `log_group_name_prefix`.
+Default value is 1.
 
 [float]
 ==== `log_streams`
@@ -103,6 +109,13 @@ collection period. `FilterLogEvents` API has a quota of 5 transactions per
 second (TPS)/account/Region. By default, `api_sleep` is 200 ms. This value should
 only be adjusted when there are multiple Filebeats or multiple Filebeat inputs
 collecting logs from the same region and AWS account.
+
+[float]
+==== `latency`
+Some AWS services send logs to CloudWatch with a latency to process larger than
+`aws-cloudwatch` input `scan_frequency`. This case, please specify a `latency`
+parameter so collection start time and end time will be shifted by the given
+latency amount.
 
 [float]
 ==== `aws credentials`

@@ -21,15 +21,12 @@
 package diskio
 
 import (
-	"fmt"
 	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/metric/system/diskio"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/beats/v7/metricbeat/module/linux/iostat"
-	"github.com/elastic/beats/v7/metricbeat/module/system"
 
 	"github.com/pkg/errors"
 )
@@ -46,7 +43,6 @@ type MetricSet struct {
 	statistics     *diskio.IOStat
 	includeDevices []string
 	prevCounters   diskCounter
-	IsAgent        bool
 }
 
 // diskCounter stores previous disk counter values for calculating gauges in next collection
@@ -65,17 +61,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	systemModule, ok := base.Module().(*system.Module)
-	if !ok {
-		return nil, fmt.Errorf("unexpected module type")
-	}
-
 	return &MetricSet{
 		BaseMetricSet:  base,
 		statistics:     diskio.NewDiskIOStat(),
 		includeDevices: config.IncludeDevices,
 		prevCounters:   diskCounter{},
-		IsAgent:        systemModule.IsAgent,
 	}, nil
 }
 
@@ -116,15 +106,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		// accumulate values from all interfaces
 		diskReadBytes += counters.ReadBytes
 		diskWriteBytes += counters.WriteBytes
-
-		//Add linux-only data if agent is off as not to make breaking changes.
-		if !m.IsAgent && runtime.GOOS == "linux" {
-			result, err := m.statistics.CalcIOStatistics(counters)
-			if err != nil {
-				return errors.Wrap(err, "error calculating iostat")
-			}
-			event["iostat"] = iostat.AddLinuxIOStat(result)
-		}
 
 		if runtime.GOOS != "windows" {
 			event.Put("io.time", counters.IoTime)

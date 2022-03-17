@@ -2,7 +2,6 @@ import os
 import unittest
 
 from heartbeat import BaseTest
-from elasticsearch import Elasticsearch
 from beat.beat import INTEGRATION_TESTS
 from beat import common_tests
 from time import sleep
@@ -39,7 +38,8 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         """
 
         config = {
-            "run_once": [
+            "run_once": True,
+            "monitors": [
                 {
                     "type": "http",
                     "id": "http-check",
@@ -193,19 +193,19 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         return doc
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    def test_template(self):
+    def test_index_management(self):
         """
-        Test that the template can be loaded with `setup --template`
+        Test that the template can be loaded with `setup --index-management`
         """
-        es = Elasticsearch([self.get_elasticsearch_url()])
+        es = self.get_elasticsearch_instance()
         self.render_config_template(
             monitors=[{
                 "type": "http",
                 "urls": ["http://localhost:9200"],
             }],
-            elasticsearch={"host": self.get_elasticsearch_url()},
+            elasticsearch=self.get_elasticsearch_template_config()
         )
-        exit_code = self.run_beat(extra_args=["setup", "--template"])
+        exit_code = self.run_beat(extra_args=["setup", "--index-management"])
 
         assert exit_code == 0
         assert self.log_contains('Loaded index template')

@@ -6,13 +6,16 @@ package httpjson
 
 import (
 	"net/http"
+	"runtime"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/version"
 )
 
 func TestValueTpl(t *testing.T) {
@@ -27,6 +30,18 @@ func TestValueTpl(t *testing.T) {
 		setup         func()
 		teardown      func()
 	}{
+		{
+			name:  "can access Go types in context",
+			value: `[[.last_response.header.Get "foo"]] [[.last_response.url.params.Get "foo"]] [[.url.Host]] [[.url.Query.Get "bar"]]`,
+			paramCtx: &transformContext{
+				firstEvent:   &common.MapStr{},
+				lastEvent:    &common.MapStr{},
+				lastResponse: newTestResponse(common.MapStr{"param": 25}, http.Header{"Foo": []string{"bar"}}, "http://localhost?foo=bar"),
+			},
+			paramTr:     transformable{"url": newURL("http://localhost?bar=bazz")},
+			paramDefVal: "",
+			expectedVal: "bar bar localhost bazz",
+		},
 		{
 			name:  "can render values from ctx",
 			value: "[[.last_response.body.param]]",
@@ -382,6 +397,69 @@ func TestValueTpl(t *testing.T) {
 			expectedVal:   "",
 			expectedError: errEmptyTemplateResult.Error(),
 		},
+		{
+			name:        "func userAgent no values",
+			value:       `[[userAgent]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: useragent.UserAgent("Filebeat"),
+		},
+		{
+			name:        "func userAgent blank value",
+			value:       `[[userAgent ""]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: useragent.UserAgent("Filebeat"),
+		},
+		{
+			name:        "func userAgent 1 value",
+			value:       `[[userAgent "integration_name/1.2.3"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: useragent.UserAgent("Filebeat", "integration_name/1.2.3"),
+		},
+		{
+			name:        "func userAgent 2 value",
+			value:       `[[userAgent "integration_name/1.2.3" "test"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: useragent.UserAgent("Filebeat", "integration_name/1.2.3", "test"),
+		},
+		{
+			name:        "func beatInfo GOOS",
+			value:       `[[beatInfo.goos]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: runtime.GOOS,
+		},
+		{
+			name:        "func beatInfo Arch",
+			value:       `[[beatInfo.goarch]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: runtime.GOARCH,
+		},
+		{
+			name:        "func beatInfo Commit",
+			value:       `[[beatInfo.commit]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: version.Commit(),
+		},
+		{
+			name:        "func beatInfo Build Time",
+			value:       `[[beatInfo.buildtime]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: version.BuildTime().String(),
+		},
+		{
+			name:        "func beatInfo Version",
+			value:       `[[beatInfo.version]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: version.GetDefaultVersion(),
+		},
 	}
 
 	for _, tc := range cases {
@@ -424,7 +502,7 @@ func newTestResponse(body common.MapStr, header http.Header, url string) *respon
 		resp.header = header
 	}
 	if url != "" {
-		resp.url = newURL(url)
+		resp.url = *(newURL(url))
 	}
 	return resp
 }

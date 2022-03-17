@@ -29,8 +29,6 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
-	"github.com/elastic/beats/v7/generator/common/beatgen"
-
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
@@ -46,11 +44,6 @@ var (
 		"x-pack/metricbeat",
 	}
 )
-
-// GenerateCustomBeat generates a new custom beat
-func GenerateCustomBeat() error {
-	return beatgen.Generate()
-}
 
 // PackageBeatDashboards packages the dashboards from all Beats into a zip
 // file. The dashboards must be generated first.

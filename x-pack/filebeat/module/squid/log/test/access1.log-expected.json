@@ -1,16 +1,7 @@
 [
     {
         "@timestamp": "2006-09-08T04:21:52.000Z",
-        "destination.as.number": 36752,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "209.73.177.115"
-        ],
+        "destination.ip": "209.73.177.115",
         "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
@@ -53,9 +44,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 19763,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -69,19 +58,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:00.000Z",
-        "destination.as.number": 30633,
-        "destination.as.organization.name": "Leaseweb USA, Inc.",
-        "destination.geo.city_name": "Falls Church",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9307,
-        "destination.geo.location.lon": -77.1673,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
-        "destination.ip": [
-            "207.58.145.61"
-        ],
+        "destination.ip": "207.58.145.61",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -125,9 +102,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 10182,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -143,19 +118,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:00.000Z",
-        "destination.as.number": 30633,
-        "destination.as.organization.name": "Leaseweb USA, Inc.",
-        "destination.geo.city_name": "Falls Church",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9307,
-        "destination.geo.location.lon": -77.1673,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
-        "destination.ip": [
-            "207.58.145.61"
-        ],
+        "destination.ip": "207.58.145.61",
         "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -200,9 +163,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 214,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -262,9 +223,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1464,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -324,9 +283,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 5626,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -343,19 +300,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:03.000Z",
-        "destination.as.number": 30633,
-        "destination.as.organization.name": "Leaseweb USA, Inc.",
-        "destination.geo.city_name": "Falls Church",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9307,
-        "destination.geo.location.lon": -77.1673,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
-        "destination.ip": [
-            "207.58.145.61"
-        ],
+        "destination.ip": "207.58.145.61",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -399,9 +344,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 30169,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -417,16 +360,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:04.000Z",
-        "destination.as.number": 15169,
-        "destination.as.organization.name": "Google LLC",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "66.102.9.147"
-        ],
+        "destination.ip": "66.102.9.147",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -471,9 +405,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 399,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -491,19 +423,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:04.000Z",
-        "destination.as.number": 30633,
-        "destination.as.organization.name": "Leaseweb USA, Inc.",
-        "destination.geo.city_name": "Falls Church",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9307,
-        "destination.geo.location.lon": -77.1673,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
-        "destination.ip": [
-            "207.58.145.61"
-        ],
+        "destination.ip": "207.58.145.61",
         "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -548,9 +468,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 215,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -567,19 +485,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:04.000Z",
-        "destination.as.number": 30633,
-        "destination.as.organization.name": "Leaseweb USA, Inc.",
-        "destination.geo.city_name": "Falls Church",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9307,
-        "destination.geo.location.lon": -77.1673,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
-        "destination.ip": [
-            "207.58.145.61"
-        ],
+        "destination.ip": "207.58.145.61",
         "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -624,9 +530,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 215,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -643,19 +547,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:05.000Z",
-        "destination.as.number": 30633,
-        "destination.as.organization.name": "Leaseweb USA, Inc.",
-        "destination.geo.city_name": "Falls Church",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9307,
-        "destination.geo.location.lon": -77.1673,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
-        "destination.ip": [
-            "207.58.145.61"
-        ],
+        "destination.ip": "207.58.145.61",
         "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -700,9 +592,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 214,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -762,9 +652,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1353,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -781,19 +669,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:05.000Z",
-        "destination.as.number": 36351,
-        "destination.as.organization.name": "SoftLayer Technologies Inc.",
-        "destination.geo.city_name": "Dallas",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 32.9379,
-        "destination.geo.location.lon": -96.8384,
-        "destination.geo.region_iso_code": "US-TX",
-        "destination.geo.region_name": "Texas",
-        "destination.ip": [
-            "209.85.16.38"
-        ],
+        "destination.ip": "209.85.16.38",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -838,9 +714,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1013,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -857,14 +731,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:06.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.213.132"
-        ],
+        "destination.ip": "68.142.213.132",
         "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
@@ -907,9 +774,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1845,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -923,16 +788,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:07.000Z",
-        "destination.as.number": 1299,
-        "destination.as.organization.name": "Telia Company AB",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "SE",
-        "destination.geo.country_name": "Sweden",
-        "destination.geo.location.lat": 59.3247,
-        "destination.geo.location.lon": 18.056,
-        "destination.ip": [
-            "217.212.240.172"
-        ],
+        "destination.ip": "217.212.240.172",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -977,9 +833,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 729,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -995,19 +849,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:07.000Z",
-        "destination.as.number": 3549,
-        "destination.as.organization.name": "Level 3 Parent, LLC",
-        "destination.geo.city_name": "Los Angeles",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 34.0675,
-        "destination.geo.location.lon": -118.3521,
-        "destination.geo.region_iso_code": "US-CA",
-        "destination.geo.region_name": "California",
-        "destination.ip": [
-            "206.169.136.22"
-        ],
+        "destination.ip": "206.169.136.22",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -1052,9 +894,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1577,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -1115,9 +955,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1353,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -1134,19 +972,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:09.000Z",
-        "destination.as.number": 30633,
-        "destination.as.organization.name": "Leaseweb USA, Inc.",
-        "destination.geo.city_name": "Falls Church",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9307,
-        "destination.geo.location.lon": -77.1673,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
-        "destination.ip": [
-            "207.58.145.61"
-        ],
+        "destination.ip": "207.58.145.61",
         "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -1191,9 +1017,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 214,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -1210,19 +1034,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:09.000Z",
-        "destination.as.number": 30633,
-        "destination.as.organization.name": "Leaseweb USA, Inc.",
-        "destination.geo.city_name": "Falls Church",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.9307,
-        "destination.geo.location.lon": -77.1673,
-        "destination.geo.region_iso_code": "US-VA",
-        "destination.geo.region_name": "Virginia",
-        "destination.ip": [
-            "207.58.145.61"
-        ],
+        "destination.ip": "207.58.145.61",
         "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -1267,9 +1079,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 213,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -1286,14 +1096,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:10.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "64.127.126.178"
-        ],
+        "destination.ip": "64.127.126.178",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -1338,9 +1141,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1784,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -1358,19 +1159,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:11.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
-        "destination.ip": [
-            "213.160.98.161"
-        ],
+        "destination.ip": "213.160.98.161",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -1415,9 +1204,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 851,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -1434,19 +1221,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:15.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
-        "destination.ip": [
-            "213.160.98.160"
-        ],
+        "destination.ip": "213.160.98.160",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -1491,9 +1266,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 30904,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -1551,9 +1324,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1661,
-        "source.ip": [
-            "10.105.47.218"
-        ],
+        "source.ip": "10.105.47.218",
         "tags": [
             "forwarded",
             "squid.log"
@@ -1568,16 +1339,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:22.000Z",
-        "destination.as.number": 36752,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "209.73.177.115"
-        ],
+        "destination.ip": "209.73.177.115",
         "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
@@ -1620,9 +1382,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 12569,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -1679,9 +1439,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1752,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -1698,16 +1456,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:23.000Z",
-        "destination.as.number": 36646,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "216.155.194.239"
-        ],
+        "destination.ip": "216.155.194.239",
         "event.action": "TCP_MISS",
         "event.code": "POST",
         "event.dataset": "squid.log",
@@ -1750,9 +1499,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 484,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -1768,19 +1515,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:24.000Z",
-        "destination.as.number": 36077,
-        "destination.as.organization.name": "Dynamic ASP Inc.",
-        "destination.geo.city_name": "Victoria",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "CA",
-        "destination.geo.country_name": "Canada",
-        "destination.geo.location.lat": 48.4267,
-        "destination.geo.location.lon": -123.3655,
-        "destination.geo.region_iso_code": "CA-BC",
-        "destination.geo.region_name": "British Columbia",
-        "destination.ip": [
-            "204.13.51.238"
-        ],
+        "destination.ip": "204.13.51.238",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -1823,9 +1558,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 29359,
-        "source.ip": [
-            "10.105.47.218"
-        ],
+        "source.ip": "10.105.47.218",
         "tags": [
             "forwarded",
             "squid.log"
@@ -1840,19 +1573,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:24.000Z",
-        "destination.as.number": 36077,
-        "destination.as.organization.name": "Dynamic ASP Inc.",
-        "destination.geo.city_name": "Victoria",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "CA",
-        "destination.geo.country_name": "Canada",
-        "destination.geo.location.lat": 48.4267,
-        "destination.geo.location.lon": -123.3655,
-        "destination.geo.region_iso_code": "CA-BC",
-        "destination.geo.region_name": "British Columbia",
-        "destination.ip": [
-            "204.13.51.238"
-        ],
+        "destination.ip": "204.13.51.238",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -1896,9 +1617,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 5930,
-        "source.ip": [
-            "10.105.47.218"
-        ],
+        "source.ip": "10.105.47.218",
         "tags": [
             "forwarded",
             "squid.log"
@@ -1914,16 +1633,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:25.000Z",
-        "destination.as.number": 36646,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "216.155.194.239"
-        ],
+        "destination.ip": "216.155.194.239",
         "event.action": "TCP_MISS",
         "event.code": "POST",
         "event.dataset": "squid.log",
@@ -1966,9 +1676,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1645,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -2027,9 +1735,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1812,
-        "source.ip": [
-            "10.105.37.58"
-        ],
+        "source.ip": "10.105.37.58",
         "tags": [
             "forwarded",
             "squid.log"
@@ -2089,9 +1795,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 217,
-        "source.ip": [
-            "10.105.47.218"
-        ],
+        "source.ip": "10.105.47.218",
         "tags": [
             "forwarded",
             "squid.log"
@@ -2151,9 +1855,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 217,
-        "source.ip": [
-            "10.105.47.218"
-        ],
+        "source.ip": "10.105.47.218",
         "tags": [
             "forwarded",
             "squid.log"
@@ -2170,19 +1872,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:27.000Z",
-        "destination.as.number": 36077,
-        "destination.as.organization.name": "Dynamic ASP Inc.",
-        "destination.geo.city_name": "Victoria",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "CA",
-        "destination.geo.country_name": "Canada",
-        "destination.geo.location.lat": 48.4267,
-        "destination.geo.location.lon": -123.3655,
-        "destination.geo.region_iso_code": "CA-BC",
-        "destination.geo.region_name": "British Columbia",
-        "destination.ip": [
-            "204.13.51.238"
-        ],
+        "destination.ip": "204.13.51.238",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -2225,9 +1915,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 27799,
-        "source.ip": [
-            "10.105.47.218"
-        ],
+        "source.ip": "10.105.47.218",
         "tags": [
             "forwarded",
             "squid.log"
@@ -2242,19 +1930,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:29.000Z",
-        "destination.as.number": 36077,
-        "destination.as.organization.name": "Dynamic ASP Inc.",
-        "destination.geo.city_name": "Victoria",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "CA",
-        "destination.geo.country_name": "Canada",
-        "destination.geo.location.lat": 48.4267,
-        "destination.geo.location.lon": -123.3655,
-        "destination.geo.region_iso_code": "CA-BC",
-        "destination.geo.region_name": "British Columbia",
-        "destination.ip": [
-            "204.13.51.238"
-        ],
+        "destination.ip": "204.13.51.238",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -2298,9 +1974,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 4470,
-        "source.ip": [
-            "10.105.47.218"
-        ],
+        "source.ip": "10.105.47.218",
         "tags": [
             "forwarded",
             "squid.log"
@@ -2316,16 +1990,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:30.000Z",
-        "destination.as.number": 36646,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "216.155.194.239"
-        ],
+        "destination.ip": "216.155.194.239",
         "event.action": "TCP_MISS",
         "event.code": "POST",
         "event.dataset": "squid.log",
@@ -2368,9 +2033,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 382,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -2386,14 +2049,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:33.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.194.14"
-        ],
+        "destination.ip": "68.142.194.14",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -2437,9 +2093,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 24095,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -2456,16 +2110,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:33.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
+        "destination.ip": "68.142.219.132",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -2510,9 +2155,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 22964,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -2529,16 +2172,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:34.000Z",
-        "destination.as.number": 36646,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "216.155.194.239"
-        ],
+        "destination.ip": "216.155.194.239",
         "event.action": "TCP_MISS",
         "event.code": "POST",
         "event.dataset": "squid.log",
@@ -2581,9 +2215,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 646,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -2599,14 +2231,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:35.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "209.191.93.51"
-        ],
+        "destination.ip": "209.191.93.51",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -2651,9 +2276,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 699,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -2670,19 +2293,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:36.000Z",
-        "destination.as.number": 36856,
-        "destination.as.organization.name": "Mozilla Corporation",
-        "destination.geo.city_name": "Sacramento",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 38.6415,
-        "destination.geo.location.lon": -121.5114,
-        "destination.geo.region_iso_code": "US-CA",
-        "destination.geo.region_name": "California",
-        "destination.ip": [
-            "63.245.209.21"
-        ],
+        "destination.ip": "63.245.209.21",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -2727,9 +2338,7 @@
         "server.top_level_domain": "org",
         "service.type": "squid",
         "source.bytes": 734,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -2746,16 +2355,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:37.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.231.252"
-        ],
+        "destination.ip": "68.142.231.252",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -2799,9 +2399,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 31400,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -2818,14 +2416,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:37.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.194.14"
-        ],
+        "destination.ip": "68.142.194.14",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -2869,9 +2460,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 21152,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -2929,9 +2518,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1667,
-        "source.ip": [
-            "10.105.37.17"
-        ],
+        "source.ip": "10.105.37.17",
         "tags": [
             "forwarded",
             "squid.log"
@@ -2987,9 +2574,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1767,
-        "source.ip": [
-            "10.105.37.17"
-        ],
+        "source.ip": "10.105.37.17",
         "tags": [
             "forwarded",
             "squid.log"
@@ -3048,9 +2633,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1761,
-        "source.ip": [
-            "10.105.37.17"
-        ],
+        "source.ip": "10.105.37.17",
         "tags": [
             "forwarded",
             "squid.log"
@@ -3108,9 +2691,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1667,
-        "source.ip": [
-            "10.105.37.17"
-        ],
+        "source.ip": "10.105.37.17",
         "tags": [
             "forwarded",
             "squid.log"
@@ -3124,16 +2705,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:38.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
+        "destination.ip": "68.142.219.132",
         "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -3178,9 +2750,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 512,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -3238,9 +2808,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1667,
-        "source.ip": [
-            "10.105.37.17"
-        ],
+        "source.ip": "10.105.37.17",
         "tags": [
             "forwarded",
             "squid.log"
@@ -3254,16 +2822,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:39.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
+        "destination.ip": "68.142.219.132",
         "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -3308,9 +2867,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 512,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -3327,16 +2884,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:39.000Z",
-        "destination.as.number": 36646,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "216.155.194.239"
-        ],
+        "destination.ip": "216.155.194.239",
         "event.action": "TCP_MISS",
         "event.code": "POST",
         "event.dataset": "squid.log",
@@ -3379,9 +2927,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 362,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -3397,16 +2943,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:39.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
+        "destination.ip": "68.142.219.132",
         "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -3451,9 +2988,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 511,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -3470,16 +3005,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:40.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
+        "destination.ip": "68.142.219.132",
         "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -3524,9 +3050,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 512,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -3585,9 +3109,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1767,
-        "source.ip": [
-            "10.105.47.191"
-        ],
+        "source.ip": "10.105.47.191",
         "tags": [
             "forwarded",
             "squid.log"
@@ -3646,9 +3168,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1761,
-        "source.ip": [
-            "10.105.47.191"
-        ],
+        "source.ip": "10.105.47.191",
         "tags": [
             "forwarded",
             "squid.log"
@@ -3665,16 +3185,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:41.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
+        "destination.ip": "68.142.219.132",
         "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -3719,9 +3230,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 512,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -3738,16 +3247,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:41.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
+        "destination.ip": "68.142.219.132",
         "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -3792,9 +3292,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 512,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -3811,16 +3309,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:42.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
+        "destination.ip": "68.142.219.132",
         "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -3865,9 +3354,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 512,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -3884,16 +3371,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:42.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
+        "destination.ip": "68.142.219.132",
         "event.action": "TCP_REFRESH_HIT",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -3938,9 +3416,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 512,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -4000,9 +3476,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 218,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -4062,9 +3536,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 218,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -4124,9 +3596,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 2263,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -4143,16 +3613,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:43.000Z",
-        "destination.as.number": 2818,
-        "destination.as.organization.name": "BBC",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.4964,
-        "destination.geo.location.lon": -0.1224,
-        "destination.ip": [
-            "212.58.226.33"
-        ],
+        "destination.ip": "212.58.226.33",
         "event.action": "TCP_REFRESH_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -4197,9 +3658,7 @@
         "server.top_level_domain": "co.uk",
         "service.type": "squid",
         "source.bytes": 17396,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -4216,16 +3675,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:44.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.231.252"
-        ],
+        "destination.ip": "68.142.231.252",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -4270,9 +3720,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 407,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -4332,9 +3780,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 219,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -4394,9 +3840,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 10593,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -4413,16 +3857,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:45.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
+        "destination.ip": "68.142.219.132",
         "event.action": "TCP_MISS",
         "event.code": "POST",
         "event.dataset": "squid.log",
@@ -4466,9 +3901,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1270,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -4485,19 +3918,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:46.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
-        "destination.ip": [
-            "213.160.98.159"
-        ],
+        "destination.ip": "213.160.98.159",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -4542,9 +3963,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 10519,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -4561,16 +3980,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:48.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
+        "destination.ip": "68.142.219.132",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -4615,9 +4025,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 515,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -4635,16 +4043,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:48.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
+        "destination.ip": "68.142.219.132",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -4689,9 +4088,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 14411,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -4709,16 +4106,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:48.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
+        "destination.ip": "68.142.219.132",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -4763,9 +4151,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1627,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -4826,9 +4212,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 1728,
-        "source.ip": [
-            "10.105.37.65"
-        ],
+        "source.ip": "10.105.37.65",
         "tags": [
             "forwarded",
             "squid.log"
@@ -4889,9 +4273,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 1725,
-        "source.ip": [
-            "10.105.37.65"
-        ],
+        "source.ip": "10.105.37.65",
         "tags": [
             "forwarded",
             "squid.log"
@@ -4909,19 +4291,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:50.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
-        "destination.ip": [
-            "213.160.98.159"
-        ],
+        "destination.ip": "213.160.98.159",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -4966,9 +4336,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 13124,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -4985,16 +4353,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:50.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
+        "destination.ip": "68.142.219.132",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -5039,9 +4398,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 912,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -5059,16 +4416,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:51.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
+        "destination.ip": "68.142.219.132",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -5113,9 +4461,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1450,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -5133,19 +4479,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:51.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
-        "destination.ip": [
-            "213.160.98.152"
-        ],
+        "destination.ip": "213.160.98.152",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -5190,9 +4524,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 30432,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -5210,16 +4542,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:53.000Z",
-        "destination.as.number": 26101,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.219.132"
-        ],
+        "destination.ip": "68.142.219.132",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -5264,9 +4587,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 14643,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -5284,14 +4605,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:54.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.213.132"
-        ],
+        "destination.ip": "68.142.213.132",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -5336,9 +4650,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 425,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -5355,14 +4667,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:56.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "68.142.194.14"
-        ],
+        "destination.ip": "68.142.194.14",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -5407,9 +4712,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 407,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -5427,14 +4730,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:57.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "216.109.124.55"
-        ],
+        "destination.ip": "216.109.124.55",
         "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
@@ -5477,9 +4773,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1476,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -5536,9 +4830,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 233,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -5555,19 +4847,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:57.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
-        "destination.ip": [
-            "213.160.98.159"
-        ],
+        "destination.ip": "213.160.98.159",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -5612,9 +4892,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 236,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -5631,19 +4909,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:58.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
-        "destination.ip": [
-            "213.160.98.159"
-        ],
+        "destination.ip": "213.160.98.159",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -5688,9 +4954,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 238,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -5707,16 +4971,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:58.000Z",
-        "destination.as.number": 36752,
-        "destination.as.organization.name": "Oath Holdings Inc.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "209.73.177.115"
-        ],
+        "destination.ip": "209.73.177.115",
         "event.action": "TCP_MISS",
         "event.code": "CONNECT",
         "event.dataset": "squid.log",
@@ -5759,9 +5014,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 2681,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -5775,19 +5028,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:58.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
-        "destination.ip": [
-            "213.160.98.167"
-        ],
+        "destination.ip": "213.160.98.167",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -5832,9 +5073,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 136,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -5851,19 +5090,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:58.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
-        "destination.ip": [
-            "213.160.98.159"
-        ],
+        "destination.ip": "213.160.98.159",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -5908,9 +5135,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 237,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -5970,9 +5195,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 218,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -5989,19 +5212,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:59.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
-        "destination.ip": [
-            "213.160.98.167"
-        ],
+        "destination.ip": "213.160.98.167",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -6046,9 +5257,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 238,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -6065,19 +5274,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:22:59.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
-        "destination.ip": [
-            "213.160.98.159"
-        ],
+        "destination.ip": "213.160.98.159",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -6122,9 +5319,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 238,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -6141,19 +5336,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:23:00.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
-        "destination.ip": [
-            "213.160.98.167"
-        ],
+        "destination.ip": "213.160.98.167",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -6198,9 +5381,7 @@
         "server.top_level_domain": "net",
         "service.type": "squid",
         "source.bytes": 238,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -6260,9 +5441,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1728,
-        "source.ip": [
-            "10.105.37.180"
-        ],
+        "source.ip": "10.105.37.180",
         "tags": [
             "forwarded",
             "squid.log"
@@ -6321,9 +5500,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1782,
-        "source.ip": [
-            "10.105.47.191"
-        ],
+        "source.ip": "10.105.47.191",
         "tags": [
             "forwarded",
             "squid.log"
@@ -6341,14 +5518,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:23:01.000Z",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
-        "destination.ip": [
-            "216.109.125.112"
-        ],
+        "destination.ip": "216.109.125.112",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -6393,9 +5563,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 449,
-        "source.ip": [
-            "10.105.33.214"
-        ],
+        "source.ip": "10.105.33.214",
         "tags": [
             "forwarded",
             "squid.log"
@@ -6412,16 +5580,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:23:02.000Z",
-        "destination.as.number": 34010,
-        "destination.as.organization.name": "Yahoo! UK Services Limited",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.4964,
-        "destination.geo.location.lon": -0.1224,
-        "destination.ip": [
-            "217.12.10.96"
-        ],
+        "destination.ip": "217.12.10.96",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -6466,9 +5625,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 11746,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -6526,9 +5683,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1670,
-        "source.ip": [
-            "10.105.37.180"
-        ],
+        "source.ip": "10.105.37.180",
         "tags": [
             "forwarded",
             "squid.log"
@@ -6542,19 +5697,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:23:04.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
-        "destination.ip": [
-            "213.160.98.169"
-        ],
+        "destination.ip": "213.160.98.169",
         "event.action": "TCP_SWAPFAIL_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -6599,9 +5742,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 633,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -6661,9 +5802,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 1742,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -6680,19 +5819,7 @@
     },
     {
         "@timestamp": "2006-09-08T04:23:07.000Z",
-        "destination.as.number": 8190,
-        "destination.as.organization.name": "MDNX Internet Limited",
-        "destination.geo.city_name": "London",
-        "destination.geo.continent_name": "Europe",
-        "destination.geo.country_iso_code": "GB",
-        "destination.geo.country_name": "United Kingdom",
-        "destination.geo.location.lat": 51.5064,
-        "destination.geo.location.lon": -0.02,
-        "destination.geo.region_iso_code": "GB-ENG",
-        "destination.geo.region_name": "England",
-        "destination.ip": [
-            "213.160.98.169"
-        ],
+        "destination.ip": "213.160.98.169",
         "event.action": "TCP_MISS",
         "event.code": "GET",
         "event.dataset": "squid.log",
@@ -6737,9 +5864,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 14561,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -6799,9 +5924,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 68733,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -6861,9 +5984,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 898,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"
@@ -6923,9 +6044,7 @@
         "server.top_level_domain": "com",
         "service.type": "squid",
         "source.bytes": 26803,
-        "source.ip": [
-            "10.105.21.199"
-        ],
+        "source.ip": "10.105.21.199",
         "tags": [
             "forwarded",
             "squid.log"

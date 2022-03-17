@@ -28,7 +28,6 @@ import (
 	"unsafe"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 )
@@ -39,7 +38,7 @@ import (
 func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	attrs, ok := info.Sys().(*syscall.Win32FileAttributeData)
 	if !ok {
-		return nil, errors.Errorf("unexpected fileinfo sys type %T for %v", info.Sys(), path)
+		return nil, fmt.Errorf("unexpected fileinfo sys type %T for %v", info.Sys(), path)
 	}
 
 	var errs multierror.Errors
@@ -69,12 +68,11 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	var err error
 	if !info.IsDir() {
 		if fileInfo.SID, fileInfo.Owner, err = fileOwner(path); err != nil {
-			errs = append(errs, errors.Wrap(err, "fileOwner failed"))
+			errs = append(errs, fmt.Errorf("fileOwner failed: %w", err))
 		}
-
 	}
 	if fileInfo.Origin, err = GetFileOrigin(path); err != nil {
-		errs = append(errs, errors.Wrap(err, "GetFileOrigin failed"))
+		errs = append(errs, fmt.Errorf("GetFileOrigin failed: %w", err))
 	}
 	return fileInfo, errs.Err()
 }
@@ -86,15 +84,15 @@ func fileOwner(path string) (sid, owner string, err error) {
 
 	pathW, err := syscall.UTF16PtrFromString(path)
 	if err != nil {
-		return sid, owner, errors.Wrapf(err, "failed to convert path:'%s' to UTF16", path)
+		return sid, owner, fmt.Errorf("failed to convert path:'%s' to UTF16: %w", path, err)
 	}
 	if err = GetNamedSecurityInfo(pathW, FileObject,
 		OwnerSecurityInformation, &securityID, nil, nil, nil, &securityDescriptor); err != nil {
-		return "", "", errors.Wrapf(err, "failed on GetSecurityInfo for %v", path)
+		return "", "", fmt.Errorf("failed on GetSecurityInfo for %v: %w", path, err)
 	}
 	defer syscall.LocalFree((syscall.Handle)(unsafe.Pointer(securityDescriptor)))
 
-	// Covert SID to a string and lookup the username.
+	// Convert SID to a string and lookup the username.
 	var errs multierror.Errors
 	sid, err = securityID.String()
 	if err != nil {

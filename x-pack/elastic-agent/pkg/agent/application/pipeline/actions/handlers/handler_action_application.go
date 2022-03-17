@@ -87,9 +87,48 @@ func (h *AppAction) Handle(ctx context.Context, a fleetapi.Action, acker store.F
 		action.StartedAt = readMapString(res, "started_at", startFormatted)
 		action.CompletedAt = readMapString(res, "completed_at", endFormatted)
 		action.Error = readMapString(res, "error", "")
+		appendActionResponse(action, action.InputType, res)
 	}
 
 	return acker.Ack(ctx, action)
+}
+
+var (
+	none = struct{}{}
+
+	// The set of action response fields are not included in the action_response property, because there are already set to top level fields
+	excludeActionResponseFields = map[string]struct{}{
+		"started_at":   none,
+		"completed_at": none,
+		"error":        none,
+	}
+)
+
+// appendActionResponse appends the action response property with all the action response values excluding the ones specified in excludeActionResponseFields
+// "action_response": {
+// 	   "endpoint": {
+// 		   "acked": true
+// 	   }
+//  }
+func appendActionResponse(action *fleetapi.ActionApp, inputType string, res map[string]interface{}) {
+	if len(res) == 0 {
+		return
+	}
+
+	m := make(map[string]interface{}, len(res))
+
+	for k, v := range res {
+		if _, ok := excludeActionResponseFields[k]; !ok {
+			m[k] = v
+		}
+	}
+
+	if len(m) > 0 {
+		mt := make(map[string]interface{}, 1)
+		mt[inputType] = m
+
+		action.Response = mt
+	}
 }
 
 func readMapString(m map[string]interface{}, key string, def string) string {

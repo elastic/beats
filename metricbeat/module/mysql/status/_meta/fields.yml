@@ -388,7 +388,7 @@
               - name: data
                 type: long
                 description: >
-                  he number of pages in the InnoDB buffer pool containing data.
+                  The number of pages in the InnoDB buffer pool containing data.
 
               - name: dirty
                 type: long

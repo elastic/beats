@@ -65,7 +65,7 @@ var (
 		Labels: map[string]p.LabelMap{
 			// Jobs are uniquely identified by the combination of name and namespace.
 			"job_name":  p.KeyLabel("name"),
-			"namespace": p.KeyLabel(mb.ModuleDataKey + ".namespace.name"),
+			"namespace": p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 			// Add owner information provided by the "kube_job_owner" InfoMetric.
 			"owner_kind":          p.Label("owner.kind"),
 			"owner_name":          p.Label("owner.name"),

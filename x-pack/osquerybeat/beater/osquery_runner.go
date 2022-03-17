@@ -68,10 +68,10 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 
 			// Wait until osquery runner exists
 			wg.Wait()
-
-			// Set the flags to use
-			flags = newFlags
 		}
+
+		// Set the flags to use
+		flags = newFlags
 
 		// Start osqueryd if not running
 		if cn == nil {

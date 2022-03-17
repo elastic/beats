@@ -40,9 +40,7 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 		for _, volume := range pod.Volume {
 			volumeEvent := common.MapStr{
 				mb.ModuleDataKey: common.MapStr{
-					"namespace": common.MapStr{
-						"name": pod.PodRef.Namespace,
-					},
+					"namespace": pod.PodRef.Namespace,
 					"node": common.MapStr{
 						"name": node.NodeName,
 					},
@@ -71,6 +69,9 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 			}
 			if volume.CapacityBytes > 0 {
 				volumeEvent.Put("fs.used.pct", float64(volume.UsedBytes)/float64(volume.CapacityBytes))
+			}
+			if volume.Inodes > 0 {
+				volumeEvent.Put("fs.inodes.pct", float64(volume.InodesUsed)/float64(volume.Inodes))
 			}
 			events = append(events, volumeEvent)
 		}

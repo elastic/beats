@@ -18,7 +18,7 @@
                                     "label": "Snapshot Oldest Message",
                                     "operationType": "average",
                                     "scale": "ratio",
-                                    "sourceField": "gcp.pubsub.snapshot.oldest_message_age.value"
+                                    "sourceField": "gcp.pubsub.snapshot.oldest_message_age.sec"
                                 },
                                 "6be62612-437b-448d-9631-c6cc0938225d": {
                                     "dataType": "date",

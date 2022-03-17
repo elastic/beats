@@ -37,17 +37,8 @@ heartbeat.monitors:
   # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
   #service.name: my-apm-service-name
 
-# Experimental: Configure monitors that run exactly once.
-# If enabled, heartbeat.monitors will be ignored
-# Heartbeat will run these monitors once then exit.
-#heartbeat.run_once:
-#- type: http
-  #id: my-monitor
-  #name: My Monitor
-  #urls: ["http://localhost:9200"]
-  # NOTE: you must still provide the schedule field! Heartbeat
-  # Uses this to determine the contents of the monitor.timespan field
-  #schedule: '@every 10s'
+# Experimental: Set this to true to run heartbeat monitors exactly once at startup
+#heartbeat.run_once: true
 
 # ======================= Elasticsearch template setting =======================
 

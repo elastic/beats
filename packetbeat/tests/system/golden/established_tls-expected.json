@@ -109,40 +109,11 @@
             "secp256r1",
             "secp384r1"
         ],
+        "tls.detailed.client_hello.random": "d7c809b4ac3a60b62f53c9d9366ca89a703d25491ff2a246a89f32f945f7b42b",
         "tls.detailed.client_hello.supported_compression_methods": [
             "NULL"
         ],
         "tls.detailed.client_hello.version": "3.3",
-        "tls.detailed.server_certificate.alternative_names": [
-            "www.example.org",
-            "example.com",
-            "example.edu",
-            "example.net",
-            "example.org",
-            "www.example.com",
-            "www.example.edu",
-            "www.example.net"
-        ],
-        "tls.detailed.server_certificate.issuer.common_name": "DigiCert SHA2 Secure Server CA",
-        "tls.detailed.server_certificate.issuer.country": "US",
-        "tls.detailed.server_certificate.issuer.distinguished_name": "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US",
-        "tls.detailed.server_certificate.issuer.organization": "DigiCert Inc",
-        "tls.detailed.server_certificate.not_after": "2020-12-02T12:00:00.000Z",
-        "tls.detailed.server_certificate.not_before": "2018-11-28T00:00:00.000Z",
-        "tls.detailed.server_certificate.public_key_algorithm": "RSA",
-        "tls.detailed.server_certificate.public_key_size": 2048,
-        "tls.detailed.server_certificate.serial_number": "21020869104500376438182461249190639870",
-        "tls.detailed.server_certificate.signature_algorithm": "SHA256-RSA",
-        "tls.detailed.server_certificate.subject.common_name": "www.example.org",
-        "tls.detailed.server_certificate.subject.country": "US",
-        "tls.detailed.server_certificate.subject.distinguished_name": "CN=www.example.org,OU=Technology,O=Internet Corporation for Assigned Names and Numbers,L=Los Angeles,ST=California,C=US",
-        "tls.detailed.server_certificate.subject.locality": "Los Angeles",
-        "tls.detailed.server_certificate.subject.organization": "Internet Corporation for Assigned Names and Numbers",
-        "tls.detailed.server_certificate.subject.organizational_unit": "Technology",
-        "tls.detailed.server_certificate.subject.province": "California",
-        "tls.detailed.server_certificate.subject.state_or_province": "California",
-        "tls.detailed.server_certificate.version": 3,
-        "tls.detailed.server_certificate.version_number": 3,
         "tls.detailed.server_certificate_chain": [
             {
                 "issuer": {
@@ -164,7 +135,6 @@
                     "distinguished_name": "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US",
                     "organization": "DigiCert Inc"
                 },
-                "version": 3,
                 "version_number": 3
             },
             {
@@ -188,7 +158,6 @@
                     "organization": "DigiCert Inc",
                     "organizational_unit": "www.digicert.com"
                 },
-                "version": 3,
                 "version_number": 3
             }
         ],
@@ -204,6 +173,7 @@
             "ansiX962_compressed_prime",
             "ansiX962_compressed_char2"
         ],
+        "tls.detailed.server_hello.random": "d1fd553a5a270f08e09eda6690fb3c8f9884e9a9fe7949e9444f574e47524401",
         "tls.detailed.server_hello.selected_compression_method": "NULL",
         "tls.detailed.server_hello.session_id": "23bb2aed5d215e1228220b0a51d7aa220785e9e4b83b4f430229117971e9913f",
         "tls.detailed.server_hello.version": "3.3",
@@ -242,9 +212,7 @@
         "tls.server.x509.subject.locality": "Los Angeles",
         "tls.server.x509.subject.organization": "Internet Corporation for Assigned Names and Numbers",
         "tls.server.x509.subject.organizational_unit": "Technology",
-        "tls.server.x509.subject.province": "California",
         "tls.server.x509.subject.state_or_province": "California",
-        "tls.server.x509.version": 3,
         "tls.server.x509.version_number": 3,
         "tls.version": "1.2",
         "tls.version_protocol": "tls",

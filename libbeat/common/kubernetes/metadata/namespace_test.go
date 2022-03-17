@@ -51,9 +51,11 @@ func TestNamespace_Generate(t *testing.T) {
 					UID:  types.UID(uid),
 					Labels: map[string]string{
 						"foo": "bar",
+						"key": "value",
 					},
 					Annotations: map[string]string{
 						"spam": "baz",
+						"key":  "value",
 					},
 				},
 				TypeMeta: metav1.TypeMeta{
@@ -61,24 +63,21 @@ func TestNamespace_Generate(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{
-				"kubernetes": common.MapStr{
-					"namespace": common.MapStr{
-						"name": name,
-						"uid":  uid,
-						"labels": common.MapStr{
-							"foo": "bar",
-						},
-						"annotations": common.MapStr{
-							"spam": "baz",
-						},
-					},
+			output: common.MapStr{"kubernetes": common.MapStr{
+				"namespace":     name,
+				"namespace_uid": uid,
+				"namespace_labels": common.MapStr{
+					"foo": "bar",
 				},
-			},
+				"namespace_annotations": common.MapStr{
+					"spam": "baz",
+				},
+			}},
 		},
 	}
 
 	cfg, err := common.NewConfigFrom(Config{
+		IncludeLabels:      []string{"foo"},
 		IncludeAnnotations: []string{"spam"},
 	})
 	if err != nil {
@@ -121,15 +120,13 @@ func TestNamespace_GenerateFromName(t *testing.T) {
 				},
 			},
 			output: common.MapStr{
-				"namespace": common.MapStr{
-					"name": name,
-					"uid":  uid,
-					"labels": common.MapStr{
-						"foo": "bar",
-					},
-					"annotations": common.MapStr{
-						"spam": "baz",
-					},
+				"namespace":     name,
+				"namespace_uid": uid,
+				"namespace_labels": common.MapStr{
+					"foo": "bar",
+				},
+				"namespace_annotations": common.MapStr{
+					"spam": "baz",
 				},
 			},
 		},

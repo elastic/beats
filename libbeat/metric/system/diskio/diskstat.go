@@ -15,13 +15,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build darwin || freebsd || linux || windows
-// +build darwin freebsd linux windows
+//go:build darwin || freebsd || linux || windows || aix
+// +build darwin freebsd linux windows aix
 
 package diskio
 
 import (
-	"github.com/shirou/gopsutil/disk"
+	"github.com/shirou/gopsutil/v3/disk"
 
 	sigar "github.com/elastic/gosigar"
 )

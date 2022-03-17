@@ -4,7 +4,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 [[metricbeat-metricset-enterprisesearch-health]]
 [role="xpack"]
-=== enterprisesearch health metricset
+=== Enterprise Search health metricset
 
 beta[]
 

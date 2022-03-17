@@ -10,6 +10,8 @@ import urllib.parse
 import urllib.request
 
 
+@metricbeat.parameterized_with_supported_versions
+@unittest.skip("Unsure which fields can be deleted")
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['logstash']
@@ -20,8 +22,6 @@ class Test(metricbeat.BaseTest):
         """
         logstash node metricset test
         """
-        unittest.skip('Skipping this test to check documented fields. We will unskip once we know which fields can be deleted')
-        return
         self.check_metricset("logstash", "node", self.get_hosts(), self.FIELDS + ["process"])
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
@@ -30,8 +30,6 @@ class Test(metricbeat.BaseTest):
         """
         logstash node_stats metricset test
         """
-        unittest.skip('Skipping this test to check documented fields. We will unskip once we know which fields can be deleted')
-        return
         self.check_metricset("logstash", "node_stats", self.get_hosts(), self.FIELDS)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")

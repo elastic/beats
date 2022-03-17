@@ -51,57 +51,8 @@ heartbeat.monitors:
 {% endfor -%}
 
 {%- if run_once is defined %}
-heartbeat.run_once:
-{% for monitor in run_once -%}
-- type: {{ monitor.type }}
-  schedule: '{{ monitor.schedule|default("@every 1s") }}'
-  {%- if monitor.timeout is defined %}
-  timeout: {{monitor.timeout}}
-  {% endif -%}
-
-  {%- if monitor.enabled is defined %}
-  enabled: {{monitor.enabled}}
-  {% endif -%}
-
-  {%- if monitor.tags is defined %}
-  tags:
-    {% for tag in monitor.tags -%}
-    - '{{ tag }}'
-    {% endfor %}
-  {% endif -%}
-
-  {%- if monitor.hosts is defined %}
-  hosts:
-    {%- for host in monitor.hosts %}
-    - '{{ host }}'
-    {% endfor -%}
-  {% endif -%}
-
-  {%- if monitor.urls is defined %}
-  urls:
-    {%- for url in monitor.urls %}
-    - '{{ url }}'
-    {% endfor %}
-  {% endif -%}
-
-
-  {%- if monitor.check_response_json is defined %}
-  check.response.json:
-    {%- for check in monitor.check_response_json %}
-    - {{check}}
-    {% endfor %}
-  {% endif -%}
-
-  {%- if monitor.fields is defined %}
-  {% if monitor.fields_under_root %}fields_under_root: true{% endif %}
-  fields:
-    {% for k, v in monitor.fields.items() -%}
-    {{ k }}: {{ v }}
-    {% endfor %}
-  {% endif %}
-{% endfor -%}
-{% endif %}
-
+heartbeat.run_once: {{run_once}}
+{% endif -%}
 
 {% if reload or reload_path -%}
 heartbeat.config.monitors:
@@ -154,6 +105,8 @@ queue.mem:
 {%- if elasticsearch %}
 output.elasticsearch:
   hosts: ["{{ elasticsearch.host }}"]
+  username: {{ elasticsearch.user }}
+  password: {{ elasticsearch.pass }}
 {%- else %}
 output.file:
   path: '{{ output_file_path|default(beat.working_dir + "/output") }}'

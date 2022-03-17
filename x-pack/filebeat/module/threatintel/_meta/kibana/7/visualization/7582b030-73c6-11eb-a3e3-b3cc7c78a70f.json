@@ -30,13 +30,13 @@
                             "store": "appState"
                         },
                         "exists": {
-                            "field": "threatintel.indicator.domain"
+                            "field": "threat.indicator.url.domain"
                         },
                         "meta": {
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                            "key": "threatintel.indicator.domain",
+                            "key": "threat.indicator.url.domain",
                             "negate": false,
                             "type": "exists",
                             "value": "exists"
@@ -67,7 +67,7 @@
                     "id": "2",
                     "params": {
                         "customLabel": "MISP Domain Indicator",
-                        "field": "threatintel.indicator.domain",
+                        "field": "threat.indicator.url.domain",
                         "missingBucket": false,
                         "missingBucketLabel": "Missing",
                         "order": "desc",

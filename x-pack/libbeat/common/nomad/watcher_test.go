@@ -242,6 +242,30 @@ func TestAllocationWatcher(t *testing.T) {
 				deleted: nil,
 			},
 		},
+		{
+			name: "old allocation index new modify index should be detected",
+			node: api.Node{ID: uuid.Must(uuid.NewV4()).String(), Name: "nomad1"},
+			allocs: []api.Allocation{
+				{
+					ModifyIndex: 20, CreateIndex: 11,
+					AllocModifyIndex: 11, TaskGroup: "group1",
+					NodeName: "nomad1", ClientStatus: AllocClientStatusRunning,
+				},
+			},
+			waitIndex:        24,
+			initialWaitIndex: 17,
+			expected: watcherEvents{
+				added: nil,
+				updated: []api.Allocation{
+					{
+						ModifyIndex: 20, CreateIndex: 11,
+						AllocModifyIndex: 11, TaskGroup: "group1",
+						NodeName: "nomad1", ClientStatus: AllocClientStatusRunning,
+					},
+				},
+				deleted: nil,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

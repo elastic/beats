@@ -15,10 +15,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"reflect"
 	"strings"
 	"time"
+
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/pkg/errors"
@@ -74,7 +75,7 @@ func (f *s3ObjectProcessorFactory) findReaderConfig(key string) *readerConfig {
 
 // Create returns a new s3ObjectProcessor. It returns nil when no file selectors
 // match the S3 object key.
-func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger, ack *eventACKTracker, obj s3EventV2) s3ObjectHandler {
+func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger, ack *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler {
 	log = log.With(
 		"bucket_arn", obj.S3.Bucket.Name,
 		"object_key", obj.S3.Object.Key)
@@ -101,10 +102,11 @@ type s3ObjectProcessor struct {
 
 	log          *logp.Logger
 	ctx          context.Context
-	acker        *eventACKTracker // ACKer tied to the SQS message (multiple S3 readers share an ACKer when the S3 notification event contains more than one S3 object).
-	readerConfig *readerConfig    // Config about how to process the object.
-	s3Obj        s3EventV2        // S3 object information.
+	acker        *awscommon.EventACKTracker // ACKer tied to the SQS message (multiple S3 readers share an ACKer when the S3 notification event contains more than one S3 object).
+	readerConfig *readerConfig              // Config about how to process the object.
+	s3Obj        s3EventV2                  // S3 object information.
 	s3ObjHash    string
+	s3RequestURL string
 
 	s3Metadata map[string]interface{} // S3 object metadata.
 }
@@ -119,23 +121,22 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	}
 
 	// Metrics and Logging
-	{
-		p.log.Debug("Begin S3 object processing.")
-		p.metrics.s3ObjectsRequestedTotal.Inc()
-		p.metrics.s3ObjectsInflight.Inc()
-		start := time.Now()
-		defer func() {
-			elapsed := time.Since(start)
-			p.metrics.s3ObjectsInflight.Dec()
-			p.metrics.s3ObjectProcessingTime.Update(elapsed.Nanoseconds())
-			p.log.Debugw("End S3 object processing.", "elapsed_time_ns", elapsed)
-		}()
-	}
+	p.log.Debug("Begin S3 object processing.")
+	p.metrics.s3ObjectsRequestedTotal.Inc()
+	p.metrics.s3ObjectsInflight.Inc()
+	start := time.Now()
+	defer func() {
+		elapsed := time.Since(start)
+		p.metrics.s3ObjectsInflight.Dec()
+		p.metrics.s3ObjectProcessingTime.Update(elapsed.Nanoseconds())
+		p.log.Debugw("End S3 object processing.", "elapsed_time_ns", elapsed)
+	}()
 
 	// Request object (download).
 	contentType, meta, body, err := p.download()
 	if err != nil {
-		return errors.Wrap(err, "failed to get s3 object")
+		return errors.Wrapf(err, "failed to get s3 object (elasped_time_ns=%d)",
+			time.Since(start).Nanoseconds())
 	}
 	defer body.Close()
 	p.s3Metadata = meta
@@ -158,7 +159,8 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 		err = p.readFile(reader)
 	}
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "failed reading s3 object (elasped_time_ns=%d)",
+			time.Since(start).Nanoseconds())
 	}
 
 	return nil
@@ -174,10 +176,14 @@ func (p *s3ObjectProcessor) download() (contentType string, metadata map[string]
 	}
 
 	if resp == nil {
-		return "", nil, nil, errors.New("empty reponse from s3 get object")
+		return "", nil, nil, errors.New("empty response from s3 get object")
 	}
+	p.s3RequestURL = resp.SDKResponseMetdata().Request.HTTPRequest.URL.String()
 
 	meta := s3Metadata(resp, p.readerConfig.IncludeS3Metadata...)
+	if resp.ContentType == nil {
+		return "", meta, resp.Body, nil
+	}
 	return *resp.ContentType, meta, resp.Body, nil
 }
 
@@ -215,7 +221,7 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 		}
 
 		data, _ := item.MarshalJSON()
-		evt := createEvent(string(data), offset, p.s3Obj, p.s3ObjHash, p.s3Metadata)
+		evt := p.createEvent(string(data), offset)
 		p.publish(p.acker, &evt)
 	}
 
@@ -254,7 +260,8 @@ func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offs
 		}
 
 		data, _ := item.MarshalJSON()
-		evt := createEvent(string(data), offset+arrayOffset, p.s3Obj, objHash, p.s3Metadata)
+		p.s3ObjHash = objHash
+		evt := p.createEvent(string(data), offset+arrayOffset)
 		p.publish(p.acker, &evt)
 	}
 
@@ -298,7 +305,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 			return fmt.Errorf("error reading message: %w", err)
 		}
 
-		event := createEvent(string(message.Content), offset, p.s3Obj, p.s3ObjHash, p.s3Metadata)
+		event := p.createEvent(string(message.Content), offset)
 		event.Fields.DeepUpdate(message.Fields)
 		offset += int64(message.Bytes)
 		p.publish(p.acker, &event)
@@ -307,14 +314,14 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	return nil
 }
 
-func (p *s3ObjectProcessor) publish(ack *eventACKTracker, event *beat.Event) {
+func (p *s3ObjectProcessor) publish(ack *awscommon.EventACKTracker, event *beat.Event) {
 	ack.Add()
 	event.Private = ack
 	p.metrics.s3EventsCreatedTotal.Inc()
 	p.publisher.Publish(*event)
 }
 
-func createEvent(message string, offset int64, obj s3EventV2, objectHash string, meta map[string]interface{}) beat.Event {
+func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
 		Fields: common.MapStr{
@@ -322,29 +329,30 @@ func createEvent(message string, offset int64, obj s3EventV2, objectHash string,
 			"log": common.MapStr{
 				"offset": offset,
 				"file": common.MapStr{
-					"path": constructObjectURL(obj),
+					"path": p.s3RequestURL,
 				},
 			},
 			"aws": common.MapStr{
 				"s3": common.MapStr{
 					"bucket": common.MapStr{
-						"name": obj.S3.Bucket.Name,
-						"arn":  obj.S3.Bucket.ARN},
+						"name": p.s3Obj.S3.Bucket.Name,
+						"arn":  p.s3Obj.S3.Bucket.ARN,
+					},
 					"object": common.MapStr{
-						"key": obj.S3.Object.Key,
+						"key": p.s3Obj.S3.Object.Key,
 					},
 				},
 			},
 			"cloud": common.MapStr{
-				"provider": "aws",
-				"region":   obj.AWSRegion,
+				"provider": p.s3Obj.Provider,
+				"region":   p.s3Obj.AWSRegion,
 			},
 		},
 	}
-	event.SetID(objectID(objectHash, offset))
+	event.SetID(objectID(p.s3ObjHash, offset))
 
-	if len(meta) > 0 {
-		event.Fields.Put("aws.s3.metadata", meta)
+	if len(p.s3Metadata) > 0 {
+		event.Fields.Put("aws.s3.metadata", p.s3Metadata)
 	}
 
 	return event
@@ -352,10 +360,6 @@ func createEvent(message string, offset int64, obj s3EventV2, objectHash string,
 
 func objectID(objectHash string, offset int64) string {
 	return fmt.Sprintf("%s-%012d", objectHash, offset)
-}
-
-func constructObjectURL(obj s3EventV2) string {
-	return "https://" + obj.S3.Bucket.Name + ".s3." + obj.AWSRegion + ".amazonaws.com/" + obj.S3.Object.Key
 }
 
 // s3ObjectHash returns a short sha256 hash of the bucket arn + object key name.
@@ -372,18 +376,13 @@ func s3ObjectHash(obj s3EventV2) string {
 // stream without consuming it. This makes it convenient for code executed after this function call
 // to consume the stream if it wants.
 func isStreamGzipped(r *bufio.Reader) (bool, error) {
-	// Why 512? See https://godoc.org/net/http#DetectContentType
-	buf, err := r.Peek(512)
+	buf, err := r.Peek(3)
 	if err != nil && err != io.EOF {
 		return false, err
 	}
 
-	switch http.DetectContentType(buf) {
-	case "application/x-gzip", "application/zip":
-		return true, nil
-	default:
-		return false, nil
-	}
+	// gzip magic number (1f 8b) and the compression method (08 for DEFLATE).
+	return bytes.HasPrefix(buf, []byte{0x1F, 0x8B, 0x08}), nil
 }
 
 // s3Metadata returns a map containing the selected S3 object metadata keys.

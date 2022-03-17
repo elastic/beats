@@ -7,7 +7,6 @@ package awss3
 import (
 	"context"
 	"net/url"
-	"strings"
 	"sync"
 	"time"
 
@@ -18,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/go-concert/timed"
 )
 
@@ -38,13 +38,15 @@ type s3ObjectPayload struct {
 	s3ObjectInfo    s3ObjectInfo
 	s3ObjectEvent   s3EventV2
 }
+
 type s3Poller struct {
 	numberOfWorkers      int
 	bucket               string
 	listPrefix           string
 	region               string
+	provider             string
 	bucketPollInterval   time.Duration
-	workerSem            *sem
+	workerSem            *awscommon.Sem
 	s3                   s3API
 	log                  *logp.Logger
 	metrics              *inputMetrics
@@ -64,6 +66,7 @@ func newS3Poller(log *logp.Logger,
 	bucket string,
 	listPrefix string,
 	awsRegion string,
+	provider string,
 	numberOfWorkers int,
 	bucketPollInterval time.Duration) *s3Poller {
 	if metrics == nil {
@@ -74,8 +77,9 @@ func newS3Poller(log *logp.Logger,
 		bucket:               bucket,
 		listPrefix:           listPrefix,
 		region:               awsRegion,
+		provider:             provider,
 		bucketPollInterval:   bucketPollInterval,
-		workerSem:            newSem(numberOfWorkers),
+		workerSem:            awscommon.NewSem(numberOfWorkers),
 		s3:                   s3,
 		log:                  log,
 		metrics:              metrics,
@@ -142,8 +146,7 @@ func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) er
 func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- *s3ObjectPayload) {
 	defer close(s3ObjectPayloadChan)
 
-	bucketMetadata := strings.Split(p.bucket, ":")
-	bucketName := bucketMetadata[len(bucketMetadata)-1]
+	bucketName := getBucketNameFromARN(p.bucket)
 
 	paginator := p.s3.ListObjectsPaginator(bucketName, p.listPrefix)
 	for paginator.Next(ctx) {
@@ -185,11 +188,12 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 
 			event := s3EventV2{}
 			event.AWSRegion = p.region
+			event.Provider = p.provider
 			event.S3.Bucket.Name = bucketName
 			event.S3.Bucket.ARN = p.bucket
 			event.S3.Object.Key = filename
 
-			acker := newEventACKTracker(ctx)
+			acker := awscommon.NewEventACKTracker(ctx)
 
 			s3Processor := p.s3ObjectHandler.Create(ctx, p.log, acker, event)
 			if s3Processor == nil {

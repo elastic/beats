@@ -15,8 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !netbsd
-// +build !netbsd
+//go:build linux
+// +build linux
 
 package service
 

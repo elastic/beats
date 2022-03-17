@@ -208,14 +208,15 @@ func (a *ActionSettings) String() string {
 
 // ActionApp is the application action request.
 type ActionApp struct {
-	ActionID    string          `json:"id" mapstructure:"id"`
-	ActionType  string          `json:"type" mapstructure:"type"`
-	InputType   string          `json:"input_type" mapstructure:"input_type"`
-	Timeout     int64           `json:"timeout,omitempty" mapstructure:"timeout,omitempty"`
-	Data        json.RawMessage `json:"data" mapstructure:"data"`
-	StartedAt   string          `json:"started_at,omitempty" mapstructure:"started_at,omitempty"`
-	CompletedAt string          `json:"completed_at,omitempty" mapstructure:"completed_at,omitempty"`
-	Error       string          `json:"error,omitempty" mapstructure:"error,omitempty"`
+	ActionID    string                 `json:"id" mapstructure:"id"`
+	ActionType  string                 `json:"type" mapstructure:"type"`
+	InputType   string                 `json:"input_type" mapstructure:"input_type"`
+	Timeout     int64                  `json:"timeout,omitempty" mapstructure:"timeout,omitempty"`
+	Data        json.RawMessage        `json:"data" mapstructure:"data"`
+	Response    map[string]interface{} `json:"response,omitempty" mapstructure:"response,omitempty"`
+	StartedAt   string                 `json:"started_at,omitempty" mapstructure:"started_at,omitempty"`
+	CompletedAt string                 `json:"completed_at,omitempty" mapstructure:"completed_at,omitempty"`
+	Error       string                 `json:"error,omitempty" mapstructure:"error,omitempty"`
 }
 
 func (a *ActionApp) String() string {
@@ -287,6 +288,7 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 				InputType:  response.InputType,
 				Timeout:    response.Timeout,
 				Data:       response.Data,
+				Response:   response.Response,
 			}
 		case ActionTypeUnenroll:
 			action = &ActionUnenroll{

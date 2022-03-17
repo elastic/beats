@@ -79,7 +79,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	if err = eventMapping(r, content, pipelinesContent, overrideClusterUUID); err != nil {
+	if err = eventMapping(r, content, pipelinesContent, overrideClusterUUID, m.XPackEnabled); err != nil {
 		return err
 	}
 

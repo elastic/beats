@@ -143,6 +143,21 @@ func TestExtraArgs(t *testing.T) {
 			[]string{"--sandbox"},
 		},
 		{
+			"throttling truthy",
+			&Config{Throttling: true},
+			nil,
+		},
+		{
+			"disable throttling",
+			&Config{Throttling: false},
+			[]string{"--no-throttling"},
+		},
+		{
+			"override throttling",
+			&Config{Throttling: "10d/3u/20l"},
+			[]string{"--throttling", "10d/3u/20l"},
+		},
+		{
 			"ignore_https_errors",
 			&Config{IgnoreHTTPSErrors: true},
 			[]string{"--ignore-https-errors"},

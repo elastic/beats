@@ -24,16 +24,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/layers"
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
 )
 
-type afpacketHandle struct {
-}
+type afpacketHandle struct{}
 
 func newAfpacketHandle(device string, snaplen int, blockSize int, numBlocks int,
-	timeout time.Duration, enableAutoPromiscMode bool) (*afpacketHandle, error) {
-
+	timeout time.Duration, enableAutoPromiscMode bool) (*afpacketHandle, error,
+) {
 	return nil, fmt.Errorf("Afpacket MMAP sniffing is only available on Linux")
 }
 

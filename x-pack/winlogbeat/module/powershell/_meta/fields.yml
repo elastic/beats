@@ -127,6 +127,14 @@
 
         - name: script_block_text
           type: text
+          analyzer:
+            winlogbeat_powershell_script_analyzer:
+              type: pattern
+              pattern: "[\\W&&[^-]]+"
+          search_analyzer:
+            winlogbeat_powershell_script_analyzer:
+              type: pattern
+              pattern: "[\\W&&[^-]]+"
           description: >
             Text of the executed script block.
           example: ".\\a_script.ps1"

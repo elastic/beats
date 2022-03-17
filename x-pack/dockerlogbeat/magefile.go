@@ -8,6 +8,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -22,7 +23,6 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
-	"github.com/docker/docker/pkg/archive"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
@@ -168,7 +168,7 @@ func BuildContainer(ctx context.Context) error {
 		}
 
 		// create the container that will become our rootfs
-		CreatedContainerBody, err := cli.ContainerCreate(ctx, &container.Config{Image: rootImageName}, nil, nil, "")
+		CreatedContainerBody, err := cli.ContainerCreate(ctx, &container.Config{Image: rootImageName}, nil, nil, nil, "")
 		if err != nil {
 			return errors.Wrap(err, "error creating container")
 		}
@@ -286,11 +286,7 @@ func Install(ctx context.Context) error {
 		return errors.Wrap(err, "error creating docker client")
 	}
 
-	archiveOpts := &archive.TarOptions{
-		Compression:  archive.Uncompressed,
-		IncludeFiles: []string{"rootfs", "config.json"},
-	}
-	archive, err := archive.TarWithOptions(buildDir, archiveOpts)
+	archive, err := tar(buildDir, "rootfs", "config.json")
 	if err != nil {
 		return errors.Wrap(err, "error creating archive of work dir")
 	}
@@ -306,6 +302,18 @@ func Install(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func tar(dir string, files ...string) (io.Reader, error) {
+	var archive bytes.Buffer
+	var stdErr bytes.Buffer
+	args := append([]string{"-C", dir, "-cf", "-"}, files...)
+	_, err := sh.Exec(nil, &archive, &stdErr, "tar", args...)
+	if err != nil {
+		return nil, errors.Wrap(err, stdErr.String())
+	}
+
+	return &archive, nil
 }
 
 // Export exports a "ready" root filesystem and config.json into a tarball

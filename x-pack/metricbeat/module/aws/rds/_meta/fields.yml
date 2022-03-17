@@ -68,7 +68,7 @@
       type: long
       description: >
         The lagging size of the replica lagging the most in terms of WAL data received. Applies to PostgreSQL.
-    - name: read_io.ops_per_sec
+    - name: read.iops
       type: float
       description: >
         The average number of disk read I/O operations per second.
@@ -86,7 +86,7 @@
       type: long
       description: >
         The disk space used by transaction logs. Applies to PostgreSQL.
-    - name: write_io.ops_per_sec
+    - name: write.iops
       type: float
       description: >
         The average number of disk write I/O operations per second.

@@ -25,19 +25,17 @@ import (
 )
 
 type config struct {
-	Path            string          `config:"path"`
-	Filename        string          `config:"filename"`
-	Suffix          file.SuffixType `config:"suffix"`
-	RotateEveryKb   uint            `config:"rotate_every_kb" validate:"min=1"`
-	NumberOfFiles   uint            `config:"number_of_files"`
-	Codec           codec.Config    `config:"codec"`
-	Permissions     uint32          `config:"permissions"`
-	RotateOnStartup bool            `config:"rotate_on_startup"`
+	Path            string       `config:"path"`
+	Filename        string       `config:"filename"`
+	RotateEveryKb   uint         `config:"rotate_every_kb" validate:"min=1"`
+	NumberOfFiles   uint         `config:"number_of_files"`
+	Codec           codec.Config `config:"codec"`
+	Permissions     uint32       `config:"permissions"`
+	RotateOnStartup bool         `config:"rotate_on_startup"`
 }
 
 func defaultConfig() config {
 	return config{
-		Suffix:          file.SuffixCount,
 		NumberOfFiles:   7,
 		RotateEveryKb:   10 * 1024,
 		Permissions:     0600,

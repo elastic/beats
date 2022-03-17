@@ -1,500 +1,142 @@
 {
-    "@timestamp": "2021-04-01T15:45:36.780Z",
-    "@metadata": {
-        "beat": "metricbeat",
-        "type": "_doc",
-        "version": "8.0.0"
-    },
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "beat": {
-        "type": "apm-server",
+        "id": "c4c9bc08-e990-4529-8bf5-715c00fa6615",
+        "elasticsearch": {
+            "cluster": {
+                "id": "foobar"
+            }
+        },
         "stats": {
-            "runtime": {
-                "goroutines": 38
-            },
-            "handles": {
-                "limit": {
-                    "hard": 524288,
-                    "soft": 1024
-                },
-                "open": 13
-            },
-            "info": {
-                "ephemeral_id": "dda08800-0daa-45b6-82dc-f8793d7b0a26",
-                "uptime": {
-                    "ms": 211012
-                }
-            },
             "beat": {
-                "type": "apm-server",
-                "uuid": "7a60d23c-9fca-4182-90c5-f71296212641",
-                "version": "7.12.0",
-                "name": "anonymous",
-                "host": "anonymous"
-            },
-            "cgroup": {
-                "cpu": {
-                    "cfs": {
-                        "quota": {
-                            "us": 0
-                        },
-                        "period": {
-                            "us": 100000
-                        }
-                    },
-                    "id": "user.slice",
-                    "stats": {
-                        "periods": 0,
-                        "throttled": {
-                            "ns": 0,
-                            "periods": 0
-                        }
-                    }
-                },
-                "cpuacct": {
-                    "total": {
-                        "ns": 7.052757783198e+12
-                    },
-                    "id": "user.slice"
-                },
-                "memory": {
-                    "mem": {
-                        "limit": {
-                            "bytes": 9.223372036854772e+18
-                        },
-                        "usage": {
-                            "bytes": 1.1569999872e+10
-                        }
-                    },
-                    "id": "user@1000.service"
-                }
-            },
-            "memstats": {
-                "gc_next": 10417888,
-                "memory": {
-                    "alloc": 7708704,
-                    "total": 20617352
-                },
-                "rss": 63864832
-            },
-            "apm_server": {
-                "acm": {
-                    "request": {
-                        "count": 0
-                    },
-                    "response": {
-                        "errors": {
-                            "notfound": 0,
-                            "decode": 0,
-                            "validate": 0,
-                            "toolarge": 0,
-                            "count": 0,
-                            "forbidden": 0,
-                            "queue": 0,
-                            "ratelimit": 0,
-                            "internal": 0,
-                            "unavailable": 0,
-                            "unauthorized": 0,
-                            "closed": 0,
-                            "method": 0,
-                            "invalidquery": 0
-                        },
-                        "valid": {
-                            "ok": 0,
-                            "accepted": 0,
-                            "count": 0,
-                            "notmodified": 0
-                        },
-                        "count": 0
-                    },
-                    "unset": 0
-                },
-                "decoder": {
-                    "reader": {
-                        "count": 0
-                    },
-                    "uncompressed": {
-                        "content-length": 0,
-                        "count": 0
-                    },
-                    "deflate": {
-                        "content-length": 0,
-                        "count": 0
-                    },
-                    "gzip": {
-                        "content-length": 0,
-                        "count": 0
-                    },
-                    "missing-content-length": {
-                        "count": 0
-                    }
-                },
-                "root": {
-                    "request": {
-                        "count": 0
-                    },
-                    "response": {
-                        "errors": {
-                            "validate": 0,
-                            "queue": 0,
-                            "toolarge": 0,
-                            "closed": 0,
-                            "forbidden": 0,
-                            "decode": 0,
-                            "count": 0,
-                            "invalidquery": 0,
-                            "method": 0,
-                            "unauthorized": 0,
-                            "internal": 0,
-                            "ratelimit": 0,
-                            "unavailable": 0,
-                            "notfound": 0
-                        },
-                        "valid": {
-                            "count": 0,
-                            "notmodified": 0,
-                            "ok": 0,
-                            "accepted": 0
-                        },
-                        "count": 0
-                    },
-                    "unset": 0
-                },
-                "otlp": {
-                    "grpc": {
-                        "traces": {
-                            "request": {
-                                "count": 0
-                            },
-                            "response": {
-                                "count": 0,
-                                "errors": {
-                                    "count": 0
-                                },
-                                "valid": {
-                                    "count": 0
-                                }
-                            }
-                        },
-                        "metrics": {
-                            "consumer": {
-                                "unsupported_dropped": 0
-                            },
-                            "request": {
-                                "count": 0
-                            },
-                            "response": {
-                                "count": 0,
-                                "errors": {
-                                    "count": 0
-                                },
-                                "valid": {
-                                    "count": 0
-                                }
-                            }
-                        }
-                    }
-                },
-                "processor": {
-                    "transaction": {
-                        "transformations": 0
-                    },
-                    "error": {
-                        "frames": 0,
-                        "stacktraces": 0,
-                        "transformations": 0
-                    },
-                    "metric": {
-                        "transformations": 0
-                    },
-                    "sourcemap": {
-                        "counter": 0
-                    },
-                    "span": {
-                        "stacktraces": 0,
-                        "transformations": 0,
-                        "frames": 0
-                    },
-                    "stream": {
-                        "accepted": 0,
-                        "errors": {
-                            "queue": 0,
-                            "server": 0,
-                            "toolarge": 0,
-                            "closed": 0,
-                            "invalid": 0
-                        }
-                    }
-                },
-                "server": {
-                    "request": {
-                        "count": 0
-                    },
-                    "response": {
-                        "count": 0,
-                        "errors": {
-                            "validate": 0,
-                            "closed": 0,
-                            "invalidquery": 0,
-                            "ratelimit": 0,
-                            "count": 0,
-                            "queue": 0,
-                            "notfound": 0,
-                            "forbidden": 0,
-                            "unavailable": 0,
-                            "unauthorized": 0,
-                            "decode": 0,
-                            "internal": 0,
-                            "method": 0,
-                            "toolarge": 0
-                        },
-                        "valid": {
-                            "accepted": 0,
-                            "count": 0,
-                            "notmodified": 0,
-                            "ok": 0
-                        }
-                    },
-                    "unset": 0
-                },
-                "sourcemap": {
-                    "validation": {
-                        "count": 0,
-                        "errors": 0
-                    },
-                    "decoding": {
-                        "count": 0,
-                        "errors": 0
-                    },
-                    "request": {
-                        "count": 0
-                    },
-                    "response": {
-                        "count": 0,
-                        "errors": {
-                            "ratelimit": 0,
-                            "unauthorized": 0,
-                            "notfound": 0,
-                            "unavailable": 0,
-                            "toolarge": 0,
-                            "validate": 0,
-                            "closed": 0,
-                            "queue": 0,
-                            "count": 0,
-                            "invalidquery": 0,
-                            "method": 0,
-                            "internal": 0,
-                            "decode": 0,
-                            "forbidden": 0
-                        },
-                        "valid": {
-                            "accepted": 0,
-                            "count": 0,
-                            "notmodified": 0,
-                            "ok": 0
-                        }
-                    },
-                    "unset": 0
-                },
-                "jaeger": {
-                    "grpc": {
-                        "collect": {
-                            "response": {
-                                "count": 0,
-                                "errors": {
-                                    "count": 0
-                                },
-                                "valid": {
-                                    "count": 0
-                                }
-                            },
-                            "event": {
-                                "dropped": {
-                                    "count": 0
-                                },
-                                "received": {
-                                    "count": 0
-                                }
-                            },
-                            "request": {
-                                "count": 0
-                            }
-                        },
-                        "sampling": {
-                            "request": {
-                                "count": 0
-                            },
-                            "response": {
-                                "count": 0,
-                                "errors": {
-                                    "count": 0
-                                },
-                                "valid": {
-                                    "count": 0
-                                }
-                            },
-                            "event": {
-                                "dropped": {
-                                    "count": 0
-                                },
-                                "received": {
-                                    "count": 0
-                                }
-                            }
-                        }
-                    },
-                    "http": {
-                        "response": {
-                            "errors": {
-                                "count": 0
-                            },
-                            "valid": {
-                                "count": 0
-                            },
-                            "count": 0
-                        },
-                        "event": {
-                            "received": {
-                                "count": 0
-                            },
-                            "dropped": {
-                                "count": 0
-                            }
-                        },
-                        "request": {
-                            "count": 0
-                        }
-                    }
-                },
-                "profile": {
-                    "response": {
-                        "valid": {
-                            "notmodified": 0,
-                            "ok": 0,
-                            "accepted": 0,
-                            "count": 0
-                        },
-                        "count": 0,
-                        "errors": {
-                            "count": 0,
-                            "decode": 0,
-                            "toolarge": 0,
-                            "closed": 0,
-                            "unauthorized": 0,
-                            "method": 0,
-                            "internal": 0,
-                            "queue": 0,
-                            "unavailable": 0,
-                            "notfound": 0,
-                            "validate": 0,
-                            "forbidden": 0,
-                            "ratelimit": 0,
-                            "invalidquery": 0
-                        }
-                    },
-                    "unset": 0,
-                    "request": {
-                        "count": 0
-                    }
-                },
-                "sampling": {
-                    "transactions_dropped": 0
-                }
+                "host": "2963d991095f",
+                "name": "2963d991095f",
+                "type": "metricbeat",
+                "uuid": "c4c9bc08-e990-4529-8bf5-715c00fa6615",
+                "version": "7.12.0"
             },
             "cpu": {
-                "user": {
-                    "ticks": 80,
-                    "time": {
-                        "ms": 85
-                    }
-                },
                 "system": {
-                    "ticks": 30,
+                    "ticks": 60,
                     "time": {
-                        "ms": 36
+                        "ms": 65
                     }
                 },
                 "total": {
-                    "value": 110,
+                    "ticks": 170,
+                    "time": {
+                        "ms": 178
+                    },
+                    "value": 170
+                },
+                "user": {
                     "ticks": 110,
                     "time": {
-                        "ms": 121
+                        "ms": 113
+                    }
+                }
+            },
+            "handles": {
+                "limit": {
+                    "hard": 1024,
+                    "soft": 1024
+                },
+                "open": 17
+            },
+            "info": {
+                "ephemeral_id": "16f5a19a-8ed6-4bfa-ae0a-85530262b63e",
+                "uptime": {
+                    "ms": 3260
+                }
+            },
+            "libbeat": {
+                "config": {
+                    "running": 3,
+                    "starts": 3,
+                    "stops": 0,
+                    "reloads": 1
+                },
+                "output": {
+                    "events": {
+                        "acked": 0,
+                        "active": 0,
+                        "batches": 0,
+                        "dropped": 0,
+                        "duplicates": 0,
+                        "failed": 0,
+                        "toomany": 0,
+                        "total": 0
+                    },
+                    "read": {
+                        "bytes": 0,
+                        "errors": 0
+                    },
+                    "type": "elasticsearch",
+                    "write": {
+                        "bytes": 0,
+                        "errors": 0
+                    }
+                },
+                "pipeline": {
+                    "clients": 10,
+                    "events": {
+                        "active": 11,
+                        "dropped": 0,
+                        "failed": 0,
+                        "filtered": 0,
+                        "published": 11,
+                        "retry": 0,
+                        "total": 11
+                    },
+                    "queue": {
+                        "acked": 0
+                    }
+                }
+            },
+            "memstats": {
+                "gc_next": 16263952,
+                "memory": {
+                    "alloc": 12278440,
+                    "total": 31749920
+                },
+                "rss": 83816448
+            },
+            "runtime": {
+                "goroutines": 63
+            },
+            "system": {
+                "cpu": {
+                    "cores": 12
+                },
+                "load": {
+                    "1": 2.14,
+                    "15": 1.5,
+                    "5": 1.44,
+                    "norm": {
+                        "1": 0.1783,
+                        "15": 0.125,
+                        "5": 0.12
                     }
                 }
             },
             "uptime": {
-                "ms": 211012
-            },
-            "libbeat": {
-                "pipeline": {
-                    "queue": {
-                        "acked": 1
-                    },
-                    "events": {
-                        "published": 1,
-                        "retry": 1,
-                        "total": 1,
-                        "active": 0,
-                        "dropped": 0,
-                        "failed": 0,
-                        "filtered": 0
-                    },
-                    "clients": 1
-                },
-                "config": {
-                    "starts": 0,
-                    "stops": 0,
-                    "running": 0
-                },
-                "output": {
-                    "read": {
-                        "bytes": 8533,
-                        "errors": 1
-                    },
-                    "write": {
-                        "bytes": 4309,
-                        "errors": 0
-                    },
-                    "type": "elasticsearch",
-                    "events": {
-                        "duplicates": 0,
-                        "failed": 0,
-                        "toomany": 0,
-                        "total": 1,
-                        "acked": 1,
-                        "active": 0,
-                        "batches": 1,
-                        "dropped": 0
-                    }
-                }
+                "ms": 3260
             }
         },
-        "id": "7a60d23c-9fca-4182-90c5-f71296212641"
-    },
-    "ecs": {
-        "version": "1.8.0"
-    },
-    "host": {
-        "name": "anonymous"
-    },
-    "agent": {
-        "name": "anonymous",
-        "type": "metricbeat",
-        "version": "8.0.0",
-        "ephemeral_id": "0d4eecfc-9661-4115-9f5e-72b7b5c720cd",
-        "id": "7a0a00bb-faa3-4b2b-9d92-4a0a17bcb8f3"
-    },
-    "service": {
-        "name": "beat",
-        "address": "http://localhost:5066/stats",
-        "type": "beat"
+        "type": "metricbeat"
     },
     "event": {
         "dataset": "beat.stats",
-        "module": "beat",
-        "duration": 3375001
+        "duration": 115000,
+        "module": "beat"
     },
     "metricset": {
-        "period": 10000,
-        "name": "stats"
+        "name": "stats",
+        "period": 10000
+    },
+    "service": {
+        "address": "172.19.0.2:5066",
+        "name": "beat",
+        "type": "beat"
     }
 }

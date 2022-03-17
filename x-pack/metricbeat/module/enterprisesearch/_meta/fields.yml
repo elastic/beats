@@ -1,5 +1,5 @@
 - key: enterprisesearch
-  title: "enterprisesearch"
+  title: "Enterprise Search"
   release: beta
   settings: ["ssl", "http"]
   description: >
@@ -10,3 +10,6 @@
       description: >
         `enterprisesearch` contains metrics and health information for Enterprise Search
       fields:
+        - name: cluster_uuid
+          type: keyword
+          description: Cluster UUID for the Elasticsearch cluster used as the data store for Enterprise Search.

@@ -30,7 +30,7 @@ request.transforms:
     value: items 0-10000
 - set:
     target: url.params.match[type]
-    value: {{ .types }}
+    value: indicator
 - set:
     target: url.params.added_after
     value: '[[.cursor.timestamp]]'
@@ -54,16 +54,18 @@ exclude_files: [".gz$"]
 
 {{ end }}
 
-tags: {{.tags | tojson}}
+tags:
+{{if .preserve_original_event}}
+  - preserve_original_event
+{{end}}
+{{range $val := .tags}}
+  - {{$val}}
+{{end}}
+
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
-  - decode_json_fields:
-      fields: [message]
-      target: json
-  - fingerprint:
-      fields: ["json.id"]
-      target_field: "@metadata._id"
+  - add_locale: ~
   - add_fields:
       target: ''
       fields:

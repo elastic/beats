@@ -94,7 +94,7 @@
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
-        "event.original": "example.com 10.0.0.2, 10.0.0.1, 85.181.35.98 - - [07/Dec/2016:11:05:07 +0100] \"GET /ocelot HTTP/1.1\" 200 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0\"",
+        "event.original": "example.com 10.0.0.2, 10.0.0.1, 81.2.69.143 - - [07/Dec/2016:11:05:07 +0100] \"GET /ocelot HTTP/1.1\" 200 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:49.0) Gecko/20100101 Firefox/49.0\"",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -110,24 +110,22 @@
         "nginx.access.remote_ip_list": [
             "10.0.0.1",
             "10.0.0.2",
-            "85.181.35.98"
+            "81.2.69.143"
         ],
         "related.ip": [
-            "85.181.35.98"
+            "81.2.69.143"
         ],
         "service.type": "nginx",
-        "source.address": "85.181.35.98",
-        "source.as.number": 6805,
-        "source.as.organization.name": "Telefonica Germany",
-        "source.geo.city_name": "Berlin",
+        "source.address": "81.2.69.143",
+        "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "DE",
-        "source.geo.country_name": "Germany",
-        "source.geo.location.lat": 52.4473,
-        "source.geo.location.lon": 13.4531,
-        "source.geo.region_iso_code": "DE-BE",
-        "source.geo.region_name": "Land Berlin",
-        "source.ip": "85.181.35.98",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5142,
+        "source.geo.location.lon": -0.0931,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "81.2.69.143",
         "url.domain": "example.com",
         "url.original": "/ocelot",
         "url.path": "/ocelot",
@@ -149,7 +147,7 @@
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
-        "event.original": "example.com:80 85.181.35.98 - - [07/Dec/2016:11:05:07 +0100] \"GET /ocelot HTTP/1.1\" 200 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36\"",
+        "event.original": "example.com:80 81.2.69.143 - - [07/Dec/2016:11:05:07 +0100] \"GET /ocelot HTTP/1.1\" 200 571 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36\"",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -161,26 +159,24 @@
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
-        "log.offset": 563,
+        "log.offset": 562,
         "nginx.access.remote_ip_list": [
-            "85.181.35.98"
+            "81.2.69.143"
         ],
         "related.ip": [
-            "85.181.35.98"
+            "81.2.69.143"
         ],
         "service.type": "nginx",
-        "source.address": "85.181.35.98",
-        "source.as.number": 6805,
-        "source.as.organization.name": "Telefonica Germany",
-        "source.geo.city_name": "Berlin",
+        "source.address": "81.2.69.143",
+        "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "DE",
-        "source.geo.country_name": "Germany",
-        "source.geo.location.lat": 52.4473,
-        "source.geo.location.lon": 13.4531,
-        "source.geo.region_iso_code": "DE-BE",
-        "source.geo.region_name": "Land Berlin",
-        "source.ip": "85.181.35.98",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5142,
+        "source.geo.location.lon": -0.0931,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "81.2.69.143",
         "url.domain": "example.com",
         "url.original": "/ocelot",
         "url.path": "/ocelot",
@@ -202,7 +198,7 @@
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
-        "event.original": "example.com:80 \"10.5.102.222, 199.96.1.1, 204.246.1.1\" 10.2.1.185 - - [22/Jan/2016:13:18:29 +0000] \"GET /assets/xxxx?q=100 HTTP/1.1\" 200 25507 \"-\" \"Amazon CloudFront\"",
+        "event.original": "example.com:80 \"10.5.102.222, 175.16.199.1, 204.246.1.1\" 10.2.1.185 - - [22/Jan/2016:13:18:29 +0000] \"GET /assets/xxxx?q=100 HTTP/1.1\" 200 25507 \"-\" \"Amazon CloudFront\"",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -214,29 +210,27 @@
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
-        "log.offset": 783,
+        "log.offset": 781,
         "nginx.access.remote_ip_list": [
             "10.2.1.185",
             "10.5.102.222",
-            "199.96.1.1",
+            "175.16.199.1",
             "204.246.1.1"
         ],
         "related.ip": [
-            "199.96.1.1"
+            "175.16.199.1"
         ],
         "service.type": "nginx",
-        "source.address": "199.96.1.1",
-        "source.as.number": 19065,
-        "source.as.organization.name": "Levi, Ray & Shoup, Inc.",
-        "source.geo.city_name": "Springfield",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 39.7647,
-        "source.geo.location.lon": -89.7379,
-        "source.geo.region_iso_code": "US-IL",
-        "source.geo.region_name": "Illinois",
-        "source.ip": "199.96.1.1",
+        "source.address": "175.16.199.1",
+        "source.geo.city_name": "Changchun",
+        "source.geo.continent_name": "Asia",
+        "source.geo.country_iso_code": "CN",
+        "source.geo.country_name": "China",
+        "source.geo.location.lat": 43.88,
+        "source.geo.location.lon": 125.3228,
+        "source.geo.region_iso_code": "CN-22",
+        "source.geo.region_name": "Jilin Sheng",
+        "source.ip": "175.16.199.1",
         "url.domain": "example.com",
         "url.original": "/assets/xxxx?q=100",
         "url.path": "/assets/xxxx",
@@ -247,14 +241,14 @@
     },
     {
         "@timestamp": "2016-12-30T06:47:09.000Z",
-        "destination.ip": "1.2.3.4",
+        "destination.ip": "1.128.3.4",
         "event.category": [
             "web"
         ],
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
-        "event.original": "1.2.3.4 2a03:0000:10ff:f00f:0000:0000:0:8000, 10.225.192.17 10.2.2.121 - - [30/Dec/2016:06:47:09 +0000] \"GET /test.html HTTP/1.1\" 404 8571 \"-\" \"Mozilla/5.0 (compatible; Facebot 1.0; https://developers.facebook.com/docs/sharing/webmasters/crawler)\"",
+        "event.original": "1.128.3.4 2a02:cf40:10ff:f00f:0000:0000:0:8000, 10.225.192.17 10.2.2.121 - - [30/Dec/2016:06:47:09 +0000] \"GET /test.html HTTP/1.1\" 404 8571 \"-\" \"Mozilla/5.0 (compatible; Facebot 1.0; https://developers.facebook.com/docs/sharing/webmasters/crawler)\"",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
@@ -270,20 +264,20 @@
         "nginx.access.remote_ip_list": [
             "10.2.2.121",
             "10.225.192.17",
-            "2a03:0000:10ff:f00f:0000:0000:0:8000"
+            "2a02:cf40:10ff:f00f:0000:0000:0:8000"
         ],
         "related.ip": [
-            "1.2.3.4",
-            "2a03:0000:10ff:f00f:0000:0000:0:8000"
+            "1.128.3.4",
+            "2a02:cf40:10ff:f00f:0000:0000:0:8000"
         ],
         "service.type": "nginx",
-        "source.address": "2a03:0000:10ff:f00f:0000:0000:0:8000",
+        "source.address": "2a02:cf40:10ff:f00f:0000:0000:0:8000",
         "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "PT",
-        "source.geo.country_name": "Portugal",
-        "source.geo.location.lat": 39.5,
-        "source.geo.location.lon": -8.0,
-        "source.ip": "2a03:0000:10ff:f00f:0000:0000:0:8000",
+        "source.geo.country_iso_code": "NO",
+        "source.geo.country_name": "Norway",
+        "source.geo.location.lat": 62.0,
+        "source.geo.location.lon": 10.0,
+        "source.ip": "2a02:cf40:10ff:f00f:0000:0000:0:8000",
         "url.extension": "html",
         "url.original": "/test.html",
         "url.path": "/test.html",
@@ -294,7 +288,7 @@
     },
     {
         "@timestamp": "2018-04-12T07:48:40.000Z",
-        "destination.ip": "1.2.3.4",
+        "destination.ip": "1.128.3.4",
         "destination.port": "80",
         "event.category": [
             "web"
@@ -302,7 +296,7 @@
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
-        "event.original": "1.2.3.4:80 127.0.0.1 - - [12/Apr/2018:09:48:40 +0200] \"\" 400 0 \"-\" \"-\"",
+        "event.original": "1.128.3.4:80 127.0.0.1 - - [12/Apr/2018:09:48:40 +0200] \"\" 400 0 \"-\" \"-\"",
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
@@ -312,12 +306,12 @@
         "http.response.body.bytes": 0,
         "http.response.status_code": 400,
         "input.type": "log",
-        "log.offset": 1198,
+        "log.offset": 1200,
         "nginx.access.remote_ip_list": [
             "127.0.0.1"
         ],
         "related.ip": [
-            "1.2.3.4",
+            "1.128.3.4",
             "127.0.0.1"
         ],
         "service.type": "nginx",
@@ -344,21 +338,21 @@
         "http.response.body.bytes": 173,
         "http.response.status_code": 400,
         "input.type": "log",
-        "log.offset": 1269,
+        "log.offset": 1273,
         "service.type": "nginx",
         "source.address": "unix:",
         "url.domain": "example.com"
     },
     {
         "@timestamp": "2017-05-29T19:02:48.000Z",
-        "destination.ip": "1.2.3.4",
+        "destination.ip": "1.128.3.4",
         "event.category": [
             "web"
         ],
         "event.dataset": "nginx.access",
         "event.kind": "event",
         "event.module": "nginx",
-        "event.original": "1.2.3.4 localhost - - [29/May/2017:19:02:48 +0000] \"GET /test2 HTTP/1.1\" 200 612 \"-\" \"Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2\" \"-\"",
+        "event.original": "1.128.3.4 localhost - - [29/May/2017:19:02:48 +0000] \"GET /test2 HTTP/1.1\" 200 612 \"-\" \"Mozilla/5.0 (Windows NT 6.1; rv:15.0) Gecko/20120716 Firefox/15.0a2\" \"-\"",
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
@@ -370,12 +364,12 @@
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
-        "log.offset": 1347,
+        "log.offset": 1351,
         "nginx.access.remote_ip_list": [
             "localhost"
         ],
         "related.ip": [
-            "1.2.3.4"
+            "1.128.3.4"
         ],
         "service.type": "nginx",
         "source.address": "localhost",
@@ -410,7 +404,7 @@
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
-        "log.offset": 1506,
+        "log.offset": 1512,
         "nginx.access.remote_ip_list": [
             "localhost",
             "localhost"

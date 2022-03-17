@@ -638,9 +638,7 @@
         "rsa.misc.client": "cli",
         "rsa.misc.severity": "low",
         "service.type": "bluecoat",
-        "source.ip": [
-            "10.2.53.125"
-        ],
+        "source.ip": "10.2.53.125",
         "tags": [
             "bluecoat.director",
             "forwarded"
@@ -1210,9 +1208,7 @@
         "rsa.misc.client": "cli",
         "rsa.misc.severity": "very-high",
         "service.type": "bluecoat",
-        "source.ip": [
-            "10.18.204.87"
-        ],
+        "source.ip": "10.18.204.87",
         "tags": [
             "bluecoat.director",
             "forwarded"

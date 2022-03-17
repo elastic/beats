@@ -3,10 +3,6 @@
   release: beta
   description: Enterprise Search health
   fields:
-    - name: cluster_uuid
-      type: keyword
-      description: Elasticsearch Cluster UUID used by Enterprise Search
-
     - name: name
       type: keyword
       description: Host name for the Enterprise Search node

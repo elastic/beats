@@ -45,7 +45,9 @@
       "executable": "/tmp/setuids",
       "name": "setuids",
       "pid": 19930,
-      "ppid": 1541,
+      "parent": {
+        "pid": 1541
+      },
       "title": "/tmp/setuids"
     },
     "service": {
@@ -144,7 +146,9 @@
       "executable": "/tmp/setuids",
       "name": "setuids",
       "pid": 19930,
-      "ppid": 1541,
+      "parent": {
+        "pid": 1541
+      },
       "title": "/tmp/setuids"
     },
     "service": {
@@ -235,7 +239,9 @@
       "executable": "/tmp/setuids",
       "name": "setuids",
       "pid": 19930,
-      "ppid": 1541,
+      "parent": {
+        "pid": 1541
+      },
       "title": "/tmp/setuids"
     },
     "service": {

@@ -18,6 +18,7 @@
 package mapping
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -58,7 +59,8 @@ func TestFieldsHasNode(t *testing.T) {
 				Field{Name: "a", Fields: Fields{
 					Field{Name: "b", Fields: Fields{
 						Field{Name: "c"},
-					}}}},
+					}},
+				}},
 			},
 			hasNode: true,
 		},
@@ -68,7 +70,8 @@ func TestFieldsHasNode(t *testing.T) {
 				Field{Name: "a", Fields: Fields{
 					Field{Name: "b", Fields: Fields{
 						Field{Name: "c"},
-					}}}},
+					}},
+				}},
 			},
 			hasNode: true,
 		},
@@ -181,6 +184,46 @@ func TestDynamicYaml(t *testing.T) {
 			} else {
 				assert.Equal(t, test.output.Dynamic, keys.Dynamic)
 			}
+		})
+	}
+}
+
+func TestAnalyzer(t *testing.T) {
+	tests := map[string]struct {
+		input  []byte
+		output Field
+		err    error
+	}{
+		"simple analyzer": {
+			input: []byte(`{name: test, analyzer: simple}`),
+			output: Field{
+				Name:     "test",
+				Analyzer: Analyzer{Name: "simple"},
+			},
+			err: nil,
+		},
+		"pattern analyzer": {
+			input: []byte(`{"name": "test", "analyzer": {"custom": {"type": "pattern", "pattern":"[\\W&&[^-]]+"}}}`),
+			output: Field{
+				Name:     "test",
+				Analyzer: Analyzer{Name: "custom", Definition: map[string]interface{}{"type": "pattern", "pattern": "[\\W\u0026\u0026[^-]]+"}},
+			},
+			err: nil,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			keys := Field{}
+
+			cfg, err := yaml.NewConfig(test.input)
+			assert.NoError(t, err)
+			err = cfg.Unpack(&keys)
+
+			if fmt.Sprint(err) != fmt.Sprint(test.err) {
+				t.Fatalf("unexpected error for %s: got:%v want:%v", name, err, test.err)
+			}
+			assert.Equal(t, test.output.Analyzer, keys.Analyzer)
 		})
 	}
 }

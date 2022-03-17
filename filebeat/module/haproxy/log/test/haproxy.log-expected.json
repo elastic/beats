@@ -42,19 +42,13 @@
         "process.name": "haproxy",
         "process.pid": 32450,
         "related.ip": [
-            "1.2.3.4"
+            "1.128.3.4"
         ],
         "service.type": "haproxy",
-        "source.address": "1.2.3.4",
-        "source.geo.city_name": "Moscow",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "RU",
-        "source.geo.country_name": "Russia",
-        "source.geo.location.lat": 55.7527,
-        "source.geo.location.lon": 37.6172,
-        "source.geo.region_iso_code": "RU-MOW",
-        "source.geo.region_name": "Moscow",
-        "source.ip": "1.2.3.4",
+        "source.address": "1.128.3.4",
+        "source.as.number": 1221,
+        "source.as.organization.name": "Telstra Pty Ltd",
+        "source.ip": "1.128.3.4",
         "source.port": 38862,
         "url.extension": "js",
         "url.original": "/component---src-pages-index-js-4b15624544f97cf0bb8f.js",
@@ -97,7 +91,7 @@
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
-        "log.offset": 260,
+        "log.offset": 262,
         "process.name": "haproxy",
         "process.pid": 5089,
         "related.hosts": [
@@ -145,7 +139,7 @@
         "http.response.status_code": 302,
         "http.version": "1.1",
         "input.type": "log",
-        "log.offset": 452,
+        "log.offset": 454,
         "process.name": "haproxy",
         "process.pid": 23034,
         "related.hosts": [
@@ -193,7 +187,7 @@
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
-        "log.offset": 625,
+        "log.offset": 627,
         "process.name": "haproxy",
         "process.pid": 23034,
         "related.hosts": [
@@ -241,7 +235,7 @@
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
-        "log.offset": 806,
+        "log.offset": 808,
         "process.name": "haproxy",
         "process.pid": 23034,
         "related.hosts": [
@@ -289,7 +283,7 @@
         "http.response.status_code": 403,
         "http.version": "1.1",
         "input.type": "log",
-        "log.offset": 983,
+        "log.offset": 985,
         "process.name": "haproxy",
         "process.pid": 23034,
         "related.hosts": [
@@ -337,7 +331,7 @@
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
-        "log.offset": 1163,
+        "log.offset": 1165,
         "process.name": "haproxy",
         "process.pid": 23034,
         "related.hosts": [
@@ -386,7 +380,7 @@
         "http.response.status_code": 404,
         "http.version": "1.1",
         "input.type": "log",
-        "log.offset": 1365,
+        "log.offset": 1367,
         "process.name": "haproxy",
         "process.pid": 23034,
         "related.hosts": [
@@ -435,7 +429,7 @@
         "http.response.status_code": 200,
         "http.version": "1.1",
         "input.type": "log",
-        "log.offset": 1545,
+        "log.offset": 1547,
         "process.name": "haproxy",
         "process.pid": 23034,
         "related.hosts": [
@@ -483,7 +477,7 @@
         "http.response.status_code": 404,
         "http.version": "1.1",
         "input.type": "log",
-        "log.offset": 1722,
+        "log.offset": 1724,
         "process.name": "haproxy",
         "process.pid": 23034,
         "related.hosts": [

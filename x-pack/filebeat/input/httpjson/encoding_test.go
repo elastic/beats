@@ -38,6 +38,51 @@ func TestDecodeNdjson(t *testing.T) {
 	}
 }
 
+func TestDecodeCSV(t *testing.T) {
+	tests := []struct {
+		body   string
+		result string
+		err    string
+	}{
+		{"", "", ""},
+		{
+			"EVENT_TYPE,TIMESTAMP,REQUEST_ID,ORGANIZATION_ID,USER_ID\n" +
+				"Login,20211018071353.465,id1,id2,user1\n" +
+				"Login,20211018071505.579,id4,id5,user2\n",
+			`[{"EVENT_TYPE":"Login","TIMESTAMP":"20211018071353.465","REQUEST_ID":"id1","ORGANIZATION_ID":"id2","USER_ID":"user1"},
+			{"EVENT_TYPE":"Login","TIMESTAMP":"20211018071505.579","REQUEST_ID":"id4","ORGANIZATION_ID":"id5","USER_ID":"user2"}]`,
+			"",
+		},
+		{
+			"EVENT_TYPE,TIMESTAMP,REQUEST_ID,ORGANIZATION_ID,USER_ID\n" +
+				"Login,20211018071505.579,id4,user2\n",
+			"",
+			"record on line 2: wrong number of fields",
+		},
+	}
+	for _, test := range tests {
+		resp := &response{}
+		err := decodeAsCSV([]byte(test.body), resp)
+		if test.err != "" {
+			assert.Error(t, err)
+			assert.EqualError(t, err, test.err)
+		} else {
+			assert.NoError(t, err)
+
+			var j []byte
+			if test.body != "" {
+				j, err = json.Marshal(resp.body)
+				if err != nil {
+					t.Fatalf("Marshal failed: %v", err)
+				}
+				assert.JSONEq(t, test.result, string(j))
+			} else {
+				assert.Equal(t, test.result, string(j))
+			}
+		}
+	}
+}
+
 func TestEncodeAsForm(t *testing.T) {
 	tests := []struct {
 		params map[string]string
@@ -60,6 +105,7 @@ func TestEncodeAsForm(t *testing.T) {
 		trReq := transformable{}
 		trReq.setURL(*u)
 		res, err := encodeAsForm(trReq)
+		assert.NoError(t, err)
 		assert.Equal(t, test.body, string(res))
 		assert.Equal(t, "application/x-www-form-urlencoded", trReq.header().Get("Content-Type"))
 	}

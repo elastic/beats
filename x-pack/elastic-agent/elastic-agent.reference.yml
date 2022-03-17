@@ -11,8 +11,9 @@ outputs:
   default:
     type: elasticsearch
     hosts: [127.0.0.1:9200]
-    username: elastic
-    password: changeme
+    api-key: "example-key"
+    # username: "elastic"
+    # password: "changeme"
 
 inputs:
   - type: system/metrics
@@ -49,8 +50,7 @@ inputs:
 
 #     # optional values
 #     #protocol: "https"
-#     #username: "elastic"
-#     #password: "changeme"
+#     #service_token: "example-token"
 #     #path: ""
 #     #ssl.verification_mode: full
 #     #ssl.supported_protocols: [TLSv1.0, TLSv1.1, TLSv1.2]
@@ -69,7 +69,7 @@ inputs:
 #   # path to the directory containing downloaded packages
 #   target_directory: "${path.data}/downloads"
 #   # timeout for downloading package
-#   timeout: 30s
+#   timeout: 120s
 #   # file path to a public key used for verifying downloaded artifacts
 #   # if not file is present agent will try to load public key from elastic.co website.
 #   pgpfile: "${path.data}/elastic.pgp"
@@ -113,6 +113,9 @@ inputs:
 #   logs: false
 #   # enables metrics monitoring
 #   metrics: false
+#   # exposes /debug/pprof/ endpoints
+#   # recommended that these endpoints are only enabled if the monitoring endpoint is set to localhost
+#   pprof.enabled: false
 #   # exposes agent metrics using http, by default sockets and named pipes are used
 #   http:
 #       # enables http endpoint
@@ -122,9 +125,11 @@ inputs:
 #       host: localhost
 #       # Port on which the HTTP endpoint will bind. Default is 0 meaning feature is disabled.
 #       port: 6791
+#       # Metrics buffer endpoint
+#       buffer.enabled: false
 
 # # Allow fleet to reload its configuration locally on disk.
-# # Notes: Only specific process configuration will be reloaded.
+# # Notes: Only specific process configuration and external input configurations will be reloaded.
 # agent.reload:
 #   # enabled configure the Elastic Agent to reload or not the local configuration.
 #   #
@@ -202,11 +207,6 @@ agent.logging.to_stderr: true
 
 # Set to true to log messages in JSON format.
 #agent.logging.json: false
-
-# Set to true, to log messages with minimal required Elastic Common Schema (ECS)
-# information. Recommended to use in combination with `logging.json=true`
-# Defaults to false.
-#agent.logging.ecs: false
 
 # Providers
 

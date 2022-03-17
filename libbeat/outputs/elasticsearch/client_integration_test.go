@@ -420,7 +420,8 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 	}
 
 	info := beat.Info{Beat: "libbeat"}
-	im, _ := idxmgmt.DefaultSupport(nil, info, nil)
+	// disable ILM if using specified index name
+	im, _ := idxmgmt.DefaultSupport(nil, info, common.MustNewConfigFrom(map[string]interface{}{"setup.ilm.enabled": "false"}))
 	output, err := makeES(im, info, stats, config)
 	if err != nil {
 		t.Fatal(err)

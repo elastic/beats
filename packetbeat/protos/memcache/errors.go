@@ -23,18 +23,12 @@ import (
 	"errors"
 )
 
-var (
-	errNotImplemented = errors.New("not implemented")
-)
-
 // memcache text parser errors
 var (
 	errParserCaughtInError  = errors.New("memcache parser caught in error loop")
 	errParserUnknownCommand = errors.New("unknown memcache command found")
 	errNoMoreArgument       = errors.New("no more command arguments")
-	errExpectedNumber       = errors.New("expected number value")
 	errExpectedNoReply      = errors.New("expected noreply in argument list")
-	errExpectedCRLF         = errors.New("expected CRLF")
 	errExpectedKeys         = errors.New("message has no keys")
 )
 
@@ -51,11 +45,10 @@ var (
 
 // memcache transaction/message errors
 var (
-	errInvalidMessage             = errors.New("message is invalid")
-	errMixOfBinaryAndText         = errors.New("mix of binary and text in one connection")
-	errResponseUnknownTransaction = errors.New("response from unknown transaction")
-	errExpectedValueForMerge      = errors.New("expected value to merge with")
-	errExpectedStatsForMerge      = errors.New("expected stat response to merge with")
+	errInvalidMessage        = errors.New("message is invalid")
+	errMixOfBinaryAndText    = errors.New("mix of binary and text in one connection")
+	errExpectedValueForMerge = errors.New("expected value to merge with")
+	errExpectedStatsForMerge = errors.New("expected stat response to merge with")
 )
 
 // internal notes to be published with transaction

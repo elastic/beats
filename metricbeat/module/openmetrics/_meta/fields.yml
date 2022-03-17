@@ -7,18 +7,41 @@
   fields:
     - name: openmetrics
       type: group
+      release: beta
       description: >
         `openmetrics` contains metrics from endpoints that are following Openmetrics format.
       fields:
         # Order is important here, labels will match first, the rest are double
+        - name: help
+          type: keyword
+          description: >
+            Brief description of the MetricFamily
+        - name: type
+          type: keyword
+          description: >
+            Metric type
+        - name: unit
+          type: keyword
+          description: >
+            Metric unit
         - name: labels.*
           type: object
           object_type: keyword
           description: >
-            Prometheus metric labels
+            Openmetrics metric labels
         - name: metrics.*
           type: object
           object_type: double
           object_type_mapping_type: "*"
           description: >
-            Prometheus metric
+            Openmetrics metric
+        - name: exemplar.*
+          type: object
+          object_type: keyword
+          description: >
+            Openmetrics exemplars
+        - name: exemplar.labels.*
+          type: object
+          object_type: keyword
+          description: >
+            Openmetrics metric exemplar labels

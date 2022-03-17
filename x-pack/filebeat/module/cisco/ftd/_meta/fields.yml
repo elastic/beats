@@ -46,7 +46,6 @@
 
   - name: mapped_source_host
     type: keyword
-    default_field: false
     description: >
       The translated source host.
 
@@ -62,7 +61,6 @@
 
   - name: mapped_destination_host
     type: keyword
-    default_field: false
     description: >
       The translated destination host.
 
@@ -105,30 +103,25 @@
 
   - name: connection_type
     type: keyword
-    default_field: false
     description: >
       The VPN connection type
 
   - name: dap_records
     type: keyword
-    default_field: false
     description: >
       The assigned DAP records
 
   - name: termination_user
     type: keyword
-    default_field: false
     description: >
       AAA name of user requesting termination
 
   - name: webvpn.group_name
     type: keyword
-    default_field: false
     description: >
       The WebVPN group name the user belongs to
 
   - name: termination_initiator
     type: keyword
-    default_field: false
     description: >
       Interface name of the side that initiated the teardown
