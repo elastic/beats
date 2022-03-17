@@ -95,6 +95,10 @@ pipeline {
           }
         }
         stage('Build Packages'){
+          when {
+            beforeAgent true
+            expression { return false }
+          }
           matrix {
             axes {
               axis {
@@ -191,6 +195,10 @@ pipeline {
           }
         }
         stage('Build Packages ARM'){
+          when {
+            beforeAgent true
+            expression { return false }
+          }
           matrix {
             axes {
               axis {
@@ -244,20 +252,24 @@ pipeline {
         stage('Run E2E Tests for Packages'){
           agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression { return false }
+          }
           steps {
             runE2ETests()
           }
         }
         stage('DRA') {
           environment {
-            URI_SUFFIX = "commits/${env.GIT_BASE_COMMIT}"
+            URI_SUFFIX = "commits/6a6b8f99b3293d0e31581fa7f7d2b798d2c60823"
             PATH_PREFIX = "${JOB_GCS_BUCKET.contains('/') ? JOB_GCS_BUCKET.substring(JOB_GCS_BUCKET.indexOf('/') + 1) + '/' + env.URI_SUFFIX : env.URI_SUFFIX}"
           }
           steps {
-            googleStorageDownload(bucketUri: "gs://${JOB_GCS_BUCKET}/${URI_SUFFIX}/*",
-                                  credentialsId: "${JOB_GCS_CREDENTIALS}",
-                                  localDirectory: "${BASE_DIR}/build/distributions",
-                                  pathPrefix: env.PATH_PREFIX)
+            googleStorageDownload(bucketUri: "gs://${env.JOB_GCS_BUCKET}/${env.URI_SUFFIX}/*",
+                                  credentialsId: "${env.JOB_GCS_CREDENTIALS}",
+                                  localDirectory: "${env.BASE_DIR}/build/distributions",
+                                  pathPrefix: "${env.PATH_PREFIX}")
             dir("${BASE_DIR}") {
               dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
               script {
