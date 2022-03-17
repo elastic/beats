@@ -53,7 +53,11 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
+<<<<<<< HEAD
         stage: mandatory
+=======
+        stage: extended_win
+>>>>>>> 9de4e99f15 (ci: extended meta-stage for ARM and extended_win for Windows-2019 (#30848))
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
