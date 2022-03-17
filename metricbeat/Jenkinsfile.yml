@@ -25,6 +25,7 @@ stages:
         mage: "mage build unitTest"
         stage: mandatory
     goIntegTest:
+        installK8s: true
         mage: "mage goIntegTest"
         withModule: true
         stage: mandatory
