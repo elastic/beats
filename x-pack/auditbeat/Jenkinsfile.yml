@@ -34,7 +34,7 @@ stages:
                 - "armTest"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
-        stage: mandatory
+        stage: extended
     build:
         mage: "mage update build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.
