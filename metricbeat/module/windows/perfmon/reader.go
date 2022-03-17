@@ -169,7 +169,7 @@ func randSeq(n int) string {
 
 // Close will close the PDH query for now.
 func (re *Reader) Close() error {
-	windows.CloseHandle(re.event)
+	defer windows.CloseHandle(re.event)
 	return re.query.Close()
 }
 
