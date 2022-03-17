@@ -111,7 +111,6 @@ pipeline {
                   'packetbeat',
                   'winlogbeat',
                   'x-pack/auditbeat',
-                  'x-pack/elastic-agent',
                   'x-pack/dockerlogbeat',
                   'x-pack/filebeat',
                   'x-pack/functionbeat',
@@ -211,7 +210,6 @@ pipeline {
                   'packetbeat',
                   'x-pack/auditbeat',
                   'x-pack/dockerlogbeat',
-                  'x-pack/elastic-agent',
                   'x-pack/filebeat',
                   'x-pack/heartbeat',
                   'x-pack/metricbeat',
@@ -312,9 +310,6 @@ def pushCIDockerImages(Map args = [:]) {
   def arch = args.get('arch', 'amd64')
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
     def defaultVariants = [ '' : 'beats', '-oss' : 'beats', '-ubi8' : 'beats' ]
-    def completeVariant = ['-complete' : 'beats']
-    // Cloud is not public available, therefore it should use the beats-ci namespace.
-    def cloudVariant = ['-cloud' : 'beats-ci']
     if (env?.BEATS_FOLDER?.endsWith('auditbeat')) {
       tagAndPush(beatName: 'auditbeat', arch: arch, variants: defaultVariants)
     } else if (env?.BEATS_FOLDER?.endsWith('filebeat')) {
@@ -326,9 +321,7 @@ def pushCIDockerImages(Map args = [:]) {
     } else if (env?.BEATS_FOLDER?.endsWith('osquerybeat')) {
       tagAndPush(beatName: 'osquerybeat', arch: arch, variants: defaultVariants)
     } else if ("${env.BEATS_FOLDER}" == "packetbeat"){
-      tagAndPush(beatName: 'packetbeat', arch: arch, variants: defaultVariants)
-    } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
-      tagAndPush(beatName: 'elastic-agent', arch: arch, variants: defaultVariants + completeVariant + cloudVariant)
+      tagAndPush(beatName: 'packetbeat', arch: arch)
     }
   }
 }
@@ -361,8 +354,6 @@ def prepareE2ETestForPackage(String beat){
   } else if ("${beat}" == "metricbeat" || "${beat}" == "x-pack/metricbeat") {
     e2eTestSuites.push('ALL')
     echo("${beat} adds all test suites to the E2E tests job.")
-  } else if ("${beat}" == "x-pack/elastic-agent") {
-    e2eTestSuites.push('fleet')
   } else {
     echo("${beat} does not add any test suite to the E2E tests job.")
     return
