@@ -41,6 +41,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Wildcard fields no longer have a default ignore_above setting of 1024. {issue}30096[30096] {pull}30668[30668]
 - Ensure that the Reloadable part of beats are initialized before the Manager is started. {issue}30533[30533]
 - Ignore bugfix version when running version compatibility check against Elasticsearch. {pull}30746[30746]
+- Fix dissect trim panics from DELETE (127)(\u007f) character {issue}30657[30657] {pull}30658[30658]
 
 *Auditbeat*
 
