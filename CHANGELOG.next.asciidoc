@@ -60,6 +60,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Packetbeat*
 
 - Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821]
+- Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821] {pull}30837[30837]
+- packetbeat: Fix timeout error in af_packet capture mode. {issue}30731[30731] {issue}30822[30822] {pull}30882[30882]
 
 *Winlogbeat*
 
