@@ -36,7 +36,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
 - Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
 - Fixes Beats crashing when glibc >= 2.35 is used {issue}30576[30576]
-
+- Fix dissect trim panics from DELETE (127)(\u007f) character {issue}30657[30657] {pull}30658[30658]
 
 *Auditbeat*
 
