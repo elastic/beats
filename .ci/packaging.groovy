@@ -263,10 +263,6 @@ pipeline {
             PATH_PREFIX = "${env.JOB_GCS_BUCKET.contains('/') ? env.JOB_GCS_BUCKET.substring(env.JOB_GCS_BUCKET.indexOf('/') + 1) + '/' + env.URI_SUFFIX : env.URI_SUFFIX}"
           }
           steps {
-            echo "bucketUri: gs://${env.JOB_GCS_BUCKET}/${env.URI_SUFFIX}/*"
-            echo "credentialsId: ${env.JOB_GCS_CREDENTIALS}"
-            echo "localDirectory: ${env.BASE_DIR}/build/distributions"
-            echo "pathPrefix: ${env.PATH_PREFIX}"
             googleStorageDownload(bucketUri: "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/${env.URI_SUFFIX}/*",
                                   credentialsId: "${env.JOB_GCS_CREDENTIALS}",
                                   localDirectory: "${env.BASE_DIR}/build/distributions",
