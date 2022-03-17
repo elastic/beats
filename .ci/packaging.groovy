@@ -153,7 +153,7 @@ def generateSteps() {
   beats.each { beat ->
     parallelTasks["linux-${beat}"] = generateStep(beat, 'linux')
     if (armBeats.contains(beat)) {
-      parallelTasks["linux-${beat}"] = generateStep(beat, 'arm')
+      parallelTasks["arm-${beat}"] = generateStep(beat, 'arm')
     }
   }
   parallel(parallelTasks)
