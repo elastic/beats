@@ -3187,11 +3187,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/cespare/xxhash/v2
-Version: v2.1.1
+Version: v2.1.2
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/cespare/xxhash/v2@v2.1.1/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/cespare/xxhash/v2@v2.1.2/LICENSE.txt:
 
 Copyright (c) 2016 Caleb Spare
 
@@ -10505,11 +10505,11 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/hashicorp/go-multierror
-Version: v1.1.0
+Version: v1.1.1
 Licence type (autodetected): MPL-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/hashicorp/go-multierror@v1.1.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/hashicorp/go-multierror@v1.1.1/LICENSE:
 
 Mozilla Public License, version 2.0
 
@@ -13721,11 +13721,11 @@ Contents of probable licence file $GOMODCACHE/github.com/prometheus/client_model
 
 --------------------------------------------------------------------------------
 Dependency : github.com/prometheus/common
-Version: v0.29.0
+Version: v0.30.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/prometheus/common@v0.29.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/prometheus/common@v0.30.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -13932,11 +13932,11 @@ Contents of probable licence file $GOMODCACHE/github.com/prometheus/common@v0.29
 
 --------------------------------------------------------------------------------
 Dependency : github.com/prometheus/procfs
-Version: v0.6.0
+Version: v0.7.3
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/prometheus/procfs@v0.6.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/prometheus/procfs@v0.7.3/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -14553,11 +14553,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/spf13/cobra
-Version: v1.0.0
+Version: v1.1.3
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/spf13/cobra@v1.0.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/spf13/cobra@v1.1.3/LICENSE.txt:
 
                                 Apache License
                            Version 2.0, January 2004
@@ -16598,11 +16598,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : go.uber.org/multierr
-Version: v1.5.0
+Version: v1.6.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.uber.org/multierr@v1.5.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/go.uber.org/multierr@v1.6.0/LICENSE.txt:
 
 Copyright (c) 2017 Uber Technologies, Inc.
 
@@ -16627,11 +16627,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : go.uber.org/zap
-Version: v1.14.1
+Version: v1.17.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.uber.org/zap@v1.14.1/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/go.uber.org/zap@v1.17.0/LICENSE.txt:
 
 Copyright (c) 2016-2017 Uber Technologies, Inc.
 
@@ -16767,11 +16767,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/net
-Version: v0.0.0-20211020060615-d418f374d309
+Version: v0.0.0-20211216030914-fe4d6282115f
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.0.0-20211020060615-d418f374d309/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.0.0-20211216030914-fe4d6282115f/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -16878,11 +16878,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sys
-Version: v0.0.0-20211102192858-4dd72447c267
+Version: v0.0.0-20211216021012-1d35b9e2eb4e
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.0.0-20211102192858-4dd72447c267/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.0.0-20211216021012-1d35b9e2eb4e/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -17063,11 +17063,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/genproto
-Version: v0.0.0-20211021150943-2b146023228c
+Version: v0.0.0-20211208223120-3a66f561d7aa
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/genproto@v0.0.0-20211021150943-2b146023228c/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/genproto@v0.0.0-20211208223120-3a66f561d7aa/LICENSE:
 
 
                                  Apache License
@@ -17275,11 +17275,11 @@ Contents of probable licence file $GOMODCACHE/google.golang.org/genproto@v0.0.0-
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/grpc
-Version: v1.41.0
+Version: v1.43.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/grpc@v1.41.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/grpc@v1.43.0/LICENSE:
 
 
                                  Apache License
@@ -20556,11 +20556,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/go-amqp@v0.16.0/
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/go-ansiterm
-Version: v0.0.0-20170929234023-d6e3b3328b78
+Version: v0.0.0-20210617225240-d185dfc1b5a1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/go-ansiterm@v0.0.0-20170929234023-d6e3b3328b78/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/go-ansiterm@v0.0.0-20210617225240-d185dfc1b5a1/LICENSE:
 
 The MIT License (MIT)
 
@@ -21993,37 +21993,6 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/trac
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/BurntSushi/toml
-Version: v0.3.1
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/!burnt!sushi/toml@v0.3.1/COPYING:
-
-The MIT License (MIT)
-
-Copyright (c) 2013 TOML authors
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-
---------------------------------------------------------------------------------
 Dependency : github.com/OneOfOne/xxhash
 Version: v1.2.2
 Licence type (autodetected): Apache-2.0
@@ -22782,11 +22751,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/containerd/containerd
-Version: v1.5.9
+Version: v1.6.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/containerd/containerd@v1.5.9/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/containerd/containerd@v1.6.1/LICENSE:
 
 
                                  Apache License
@@ -24714,11 +24683,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/go-logr/logr
-Version: v1.2.0
+Version: v1.2.2
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/go-logr/logr@v1.2.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/go-logr/logr@v1.2.2/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -25052,11 +25021,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/godbus/dbus/v5
-Version: v5.0.5
+Version: v5.0.6
 Licence type (autodetected): BSD-2-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/godbus/dbus/v5@v5.0.5/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/godbus/dbus/v5@v5.0.6/LICENSE:
 
 Copyright (c) 2013, Georg Reinke (<guelfey at gmail dot com>), Google
 All rights reserved.
@@ -25719,11 +25688,11 @@ third-party archives.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/google/gofuzz
-Version: v1.1.0
+Version: v1.2.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/google/gofuzz@v1.1.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/google/gofuzz@v1.2.0/LICENSE:
 
 
                                  Apache License
@@ -27307,11 +27276,11 @@ Contents of probable licence file $GOMODCACHE/github.com/hashicorp/cronexpr@v1.1
 
 --------------------------------------------------------------------------------
 Dependency : github.com/hashicorp/errwrap
-Version: v1.0.0
+Version: v1.1.0
 Licence type (autodetected): MPL-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/hashicorp/errwrap@v1.0.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/hashicorp/errwrap@v1.1.0/LICENSE:
 
 Mozilla Public License, version 2.0
 
@@ -31700,11 +31669,11 @@ Contents of probable licence file $GOMODCACHE/github.com/moby/spdystream@v0.2.0/
 
 --------------------------------------------------------------------------------
 Dependency : github.com/moby/term
-Version: v0.0.0-20201216013528-df9cb8a40635
+Version: v0.0.0-20210610120745-9d4ed1856297
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/moby/term@v0.0.0-20201216013528-df9cb8a40635/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/moby/term@v0.0.0-20210610120745-9d4ed1856297/LICENSE:
 
 
                                  Apache License
@@ -32354,11 +32323,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/nxadm/tail
-Version: v1.4.4
+Version: v1.4.8
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/nxadm/tail@v1.4.4/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/nxadm/tail@v1.4.8/LICENSE:
 
 # The MIT License (MIT)
 
@@ -32385,11 +32354,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/onsi/ginkgo
-Version: v1.14.0
+Version: v1.16.4
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/onsi/ginkgo@v1.14.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/onsi/ginkgo@v1.16.4/LICENSE:
 
 Copyright (c) 2013-2014 Onsi Fakhouri
 
@@ -32415,11 +32384,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/onsi/gomega
-Version: v1.10.3
+Version: v1.15.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/onsi/gomega@v1.10.3/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/onsi/gomega@v1.15.0/LICENSE:
 
 Copyright (c) 2013-2014 Onsi Fakhouri
 
@@ -34851,44 +34820,15 @@ Contents of probable licence file $GOMODCACHE/go.opencensus.io@v0.23.0/LICENSE:
 
 --------------------------------------------------------------------------------
 Dependency : go.uber.org/goleak
-Version: v1.1.10
+Version: v1.1.12
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.uber.org/goleak@v1.1.10/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.uber.org/goleak@v1.1.12/LICENSE:
 
 The MIT License (MIT)
 
 Copyright (c) 2018 Uber Technologies, Inc.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-
---------------------------------------------------------------------------------
-Dependency : go.uber.org/tools
-Version: v0.0.0-20190618225709-2cfd321de3ee
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/go.uber.org/tools@v0.0.0-20190618225709-2cfd321de3ee/LICENSE:
-
-Copyright (c) 2017 Uber Technologies, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36194,36 +36134,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-
---------------------------------------------------------------------------------
-Dependency : honnef.co/go/tools
-Version: v0.0.1-2020.1.4
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/honnef.co/go/tools@v0.0.1-2020.1.4/LICENSE:
-
-Copyright (c) 2016 Dominik Honnef
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 --------------------------------------------------------------------------------
