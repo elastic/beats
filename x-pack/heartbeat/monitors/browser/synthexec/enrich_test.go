@@ -272,7 +272,11 @@ func TestEnrichSynthEvent(t *testing.T) {
 			"cmd/status - without error",
 			&journeyEnricher{},
 			&SynthEvent{
+<<<<<<< HEAD
 				Type:  CmdStatus,
+=======
+				Type:  "cmd/status",
+>>>>>>> 912f8040e5 (fix: emit summaries when synthetics exits without emitting journey/end events [#30729] (#30825))
 				Error: nil,
 			},
 			true,
@@ -448,15 +452,26 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 	}
 
 	cmdStatus := &SynthEvent{
+<<<<<<< HEAD
 		Type:                 CmdStatus,
+=======
+		Type:                 "cmd/status",
+>>>>>>> 912f8040e5 (fix: emit summaries when synthetics exits without emitting journey/end events [#30729] (#30825))
 		Error:                nil,
 		TimestampEpochMicros: 3000,
 	}
 
+<<<<<<< HEAD
 	stepUrl := "http://example.net/url"
 	synthEvents := []*SynthEvent{
 		journeyStart,
 		makeStepEvent("step/end", 20, "Step1", 1, "", stepUrl, nil),
+=======
+	url1 := "http://example.net/url1"
+	synthEvents := []*SynthEvent{
+		journeyStart,
+		makeStepEvent("step/end", 20, "Step1", 1, "", url1, nil),
+>>>>>>> 912f8040e5 (fix: emit summaries when synthetics exits without emitting journey/end events [#30729] (#30825))
 		cmdStatus,
 	}
 
@@ -470,11 +485,19 @@ func TestSummaryWithoutJourneyEnd(t *testing.T) {
 		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
 			enrichErr := je.enrich(e, se, stdFields)
 
+<<<<<<< HEAD
 			if se != nil && se.Type == CmdStatus {
 				hasCmdStatus = true
 				require.Error(t, enrichErr, "journey did not finish executing, 1 steps ran")
 
 				u, _ := url.Parse(stepUrl)
+=======
+			if se != nil && se.Type == "cmd/status" {
+				hasCmdStatus = true
+				require.Error(t, enrichErr, "journey did not finish executing, 1 steps ran")
+
+				u, _ := url.Parse(url1)
+>>>>>>> 912f8040e5 (fix: emit summaries when synthetics exits without emitting journey/end events [#30729] (#30825))
 
 				v := lookslike.MustCompile(common.MapStr{
 					"synthetics.type":     "heartbeat/summary",
