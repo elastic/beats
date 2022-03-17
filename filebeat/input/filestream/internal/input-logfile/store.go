@@ -213,8 +213,8 @@ func (s *sourceStore) CleanIf(pred func(v Value) bool) {
 
 // FixUpIdentifiers copies an existing resource to a new ID and marks the previous one
 // for removal. This method does not check whether the resource belongs to this store
-// beause it is meant to migrate inputs without IDs to inputs with IDs without
-//  duplicating data.
+// because it is meant to migrate inputs without IDs to inputs with IDs without
+// duplicating data.
 func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface{})) {
 	s.store.ephemeralStore.mu.Lock()
 	defer s.store.ephemeralStore.mu.Unlock()
@@ -248,7 +248,7 @@ func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface
 			s.store.ephemeralStore.table[newKey] = r
 
 			// Remove the old key from the store
-			s.store.UpdateTTL(res, 0) // aka dekete. See store.remove for details
+			s.store.UpdateTTL(res, 0) // aka delete. See store.remove for details
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'", key, newKey)
 		}
 

@@ -26,11 +26,11 @@ class Test(BaseTest):
             path=testfile,
         )
         os.mkdir(os.path.join(self.working_dir, "log/"))
-        file = open(testfile, 'w')
-        offset = 0  # keep count of the bytes written
-        for n in range(0, 5):
-            offset += file.write("hello world\n")
-        file.close()
+
+        with open(testfile, 'w') as file:
+           offset = 0  # keep count of the bytes written
+           for n in range(0, 5):
+               offset += file.write("hello world\n")
 
         os.makedirs(self.registry.path)
         registry_file = os.path.join(self.registry.path, "log.json")
@@ -62,22 +62,12 @@ class Test(BaseTest):
         entries = [entry for entry in reg.load()]
 
         # We got the latest entry for each key in the registry,
-        # they're ordered by the time of creation, so we can be sure the
+        # this means 2 entries.
+        # They're ordered by the time of creation, so we can be sure the
         # first uses the old, '.global' ID, and the second is the 'fixed' one
-        try:
-            global_entry = entries[0]
-            fixed_entry = entries[1]
-        except Exception as e:
-            print("Entries returned by the registry: ", entries)
-            print("Raw registry file: ")
-            with open(reg._log_path) as f:
-                try:
-                    for line in f:
-                        print(line)
-                except Exception as open_e:
-                    raise open_e
-            print("end of raw registry file")
-            raise e
+        assert len(entries) == 2, "the registry must contain one entry with the '.globa' ID and another with the 'fixed' ID"
+        global_entry = entries[0]
+        fixed_entry = entries[1]
 
         # Compare the key excluding the inode and device ID bits
         assert global_entry['_key'].startswith('filestream::.global::native::'), "old key must contain '.global' ID"
