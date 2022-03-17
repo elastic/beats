@@ -437,9 +437,6 @@ def pushCIDockerImages(Map args = [:]) {
   def beatsFolder = args.beatsFolder
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
     def defaultVariants = [ '' : 'beats', '-oss' : 'beats', '-ubi8' : 'beats' ]
-    def completeVariant = ['-complete' : 'beats']
-    // Cloud is not public available, therefore it should use the beats-ci namespace.
-    def cloudVariant = ['-cloud' : 'beats-ci']
     if (beatsFolder.endsWith('auditbeat')) {
       tagAndPush(beatName: 'auditbeat', arch: arch, variants: defaultVariants)
     } else if (beatsFolder.endsWith('filebeat')) {

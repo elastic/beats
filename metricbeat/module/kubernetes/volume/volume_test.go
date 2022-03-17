@@ -54,6 +54,7 @@ func TestEventMapping(t *testing.T) {
 		"fs.inodes.used":     9,
 		"fs.inodes.free":     473551,
 		"fs.inodes.count":    473560,
+		"fs.inodes.pct":      float64(9) / float64(473560),
 	}
 
 	for k, v := range testCases {
