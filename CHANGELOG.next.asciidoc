@@ -32,9 +32,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
+- Fix field names with `add_network_direction` processor. {issue}29747[29747] {pull}29751[29751]
 - Fix the ability for subcommands to be ran properly from the beats containers. {pull}30452[30452]
 - Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
 - Ensure that the Reloadable part of beats are initialized before the Manager is started. {issue}30533[30533]
+- Fixes Beats crashing when glibc >= 2.35 is used {issue}30576[30576]
+- Fix dissect trim panics from DELETE (127)(\u007f) character {issue}30657[30657] {pull}30658[30658]
 
 *Auditbeat*
 
@@ -47,6 +50,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
 - Fix ECS version string in threatintel to be consistent with other modules and add event.timezone. {issue}30499[30499] {pull}30570[30570]
 - Add default paths value to MySQL Enterprise module to prevent issues with pipeline installations {pull}30598[30598]
+- Update documentation for accessing `last_response.url.params` in httpjson input. {pull}30739[30739]
 
 *Heartbeat*
 
@@ -76,9 +80,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Filebeat*
 
 - Remove beta flag for some filebeat modules. {pull}14374[14374]
+- Extend documentation about hints annotation for processors {pull}30561[30561]
 
 *Heartbeat*
-
 
 
 *Metricbeat*
