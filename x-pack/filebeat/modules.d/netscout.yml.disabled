@@ -1,5 +1,5 @@
 # Module: netscout
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-netscout.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.1/filebeat-module-netscout.html
 
 - module: netscout
   sightline:
