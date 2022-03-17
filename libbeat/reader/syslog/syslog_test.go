@@ -18,6 +18,7 @@
 package syslog
 
 import (
+	"errors"
 	"io"
 	"testing"
 	"time"
@@ -36,7 +37,7 @@ type testReader struct {
 	referenceTime time.Time
 }
 
-func (t *testReader) Close() error {
+func (*testReader) Close() error {
 	return nil
 }
 
@@ -161,7 +162,7 @@ func TestNewParser(t *testing.T) {
 			var msg reader.Message
 			for {
 				msg, err = parser.Next()
-				if err == io.EOF {
+				if errors.Is(err, io.EOF) {
 					break
 				}
 				assert.NoError(t, err)

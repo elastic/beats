@@ -108,12 +108,12 @@ func appendStringField(m common.MapStr, field, value string) {
 	v, _ := m.GetValue(field)
 	switch t := v.(type) {
 	case nil:
-		m.Put(field, value)
+		_, _ = m.Put(field, value)
 	case string:
-		m.Put(field, []string{t, value})
+		_, _ = m.Put(field, []string{t, value})
 	case []string:
-		m.Put(field, append(t, value))
+		_, _ = m.Put(field, append(t, value))
 	case []interface{}:
-		m.Put(field, append(t, value))
+		_, _ = m.Put(field, append(t, value))
 	}
 }

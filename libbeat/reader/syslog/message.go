@@ -177,37 +177,37 @@ func (m message) fields() common.MapStr {
 	f := common.MapStr{}
 
 	// Syslog fields.
-	f.Put("log.syslog.priority", m.priority)
-	f.Put("log.syslog.facility.code", m.facility)
-	f.Put("log.syslog.severity.code", m.severity)
+	_, _ = f.Put("log.syslog.priority", m.priority)
+	_, _ = f.Put("log.syslog.facility.code", m.facility)
+	_, _ = f.Put("log.syslog.severity.code", m.severity)
 	if v, ok := mapIndexToString(m.severity, severityLabels); ok {
-		f.Put("log.syslog.severity.name", v)
+		_, _ = f.Put("log.syslog.severity.name", v)
 	}
 	if v, ok := mapIndexToString(m.facility, facilityLabels); ok {
-		f.Put("log.syslog.facility.name", v)
+		_, _ = f.Put("log.syslog.facility.name", v)
 	}
 	if m.process != "" {
-		f.Put("log.syslog.appname", m.process)
+		_, _ = f.Put("log.syslog.appname", m.process)
 		if m.pid != "" {
-			f.Put("log.syslog.procid", m.pid)
+			_, _ = f.Put("log.syslog.procid", m.pid)
 		}
 	}
 	if m.hostname != "" {
-		f.Put("log.syslog.hostname", m.hostname)
+		_, _ = f.Put("log.syslog.hostname", m.hostname)
 	}
 	if m.msgID != "" {
-		f.Put("log.syslog.msgid", m.msgID)
+		_, _ = f.Put("log.syslog.msgid", m.msgID)
 	}
 	if m.version != 0 {
-		f.Put("log.syslog.version", m.version)
+		_, _ = f.Put("log.syslog.version", m.version)
 	}
 	if len(m.structuredData) > 0 {
-		f.Put("log.syslog.structured_data", m.structuredData)
+		_, _ = f.Put("log.syslog.structured_data", m.structuredData)
 	}
 
 	// Message field.
 	if m.msg != "" {
-		f.Put("message", m.msg)
+		_, _ = f.Put("message", m.msg)
 	}
 
 	return f

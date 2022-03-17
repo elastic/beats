@@ -151,7 +151,7 @@ func (p *Parser) Next() (reader.Message, error) {
 		return msg, nil
 	}
 
-	textValue, _ := fields["message"]
+	textValue := fields["message"]
 	if textString, _ := textValue.(string); textString != "" {
 		msg.Content = []byte(textString)
 	} else {
