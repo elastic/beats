@@ -27,7 +27,7 @@ pipeline {
     NOTIFY_TO = 'package+beats-beats-contrib@elastic.co'
   }
   options {
-    timeout(time: 3, unit: 'HOURS')
+    timeout(time: 4, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
@@ -405,12 +405,14 @@ def runE2ETests(){
         suites += "${suite},"
       };
     }
-
+    echo 'runE2E will run now in a sync mode to validate packages can be published.'
     runE2E(runTestsSuites: suites,
            beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
            gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
            gitHubCheckRepo: env.REPO,
-           gitHubCheckSha1: env.GIT_BASE_COMMIT)
+           gitHubCheckSha1: env.GIT_BASE_COMMIT,
+           propagate: true,
+           wait: true)
   }
 }
 
