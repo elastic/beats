@@ -219,7 +219,12 @@ def runLinting() {
       mapParallelTasks["${k}"] = v
     }
   }
-  mapParallelTasks['default'] = { cmd(label: 'make check-default', script: 'make check-default') }
+  mapParallelTasks['default'] = {
+    cmd(label: 'make check-default', script: 'make check-default')
+    cmd(label: 'Lint Last Change [Linux]', script: 'GOOS=linux mage llc')
+    cmd(label: 'Lint Last Change [Darwin]', script: 'GOOS=darwin mage llc')
+    cmd(label: 'Lint Last Change [Windows]', script: 'GOOS=windows mage llc')
+  }
   mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)
 }
@@ -974,8 +979,6 @@ def dumpVariables(){
   GOIMPORTS: ${env.GOIMPORTS}
   GOIMPORTS_REPO: ${env.GOIMPORTS_REPO}
   GOIMPORTS_LOCAL_PREFIX: ${env.GOIMPORTS_LOCAL_PREFIX}
-  GOLINT: ${env.GOLINT}
-  GOLINT_REPO: ${env.GOLINT_REPO}
   GOPACKAGES_COMMA_SEP: ${env.GOPACKAGES_COMMA_SEP}
   GOX_FLAGS: ${env.GOX_FLAGS}
   GOX_OS: ${env.GOX_OS}

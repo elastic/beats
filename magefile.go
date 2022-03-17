@@ -30,6 +30,10 @@ import (
 	"go.uber.org/multierr"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+
+	// mage:import
+	"github.com/elastic/elastic-agent-libs/dev-tools/mage"
+
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
@@ -44,6 +48,13 @@ var (
 		"x-pack/metricbeat",
 	}
 )
+
+// Aliases are shortcuts to long target names.
+// nolint: deadcode // it's used by `mage`.
+var Aliases = map[string]interface{}{
+	"llc":  mage.Linter.LastChange,
+	"lint": mage.Linter.All,
+}
 
 // PackageBeatDashboards packages the dashboards from all Beats into a zip
 // file. The dashboards must be generated first.
