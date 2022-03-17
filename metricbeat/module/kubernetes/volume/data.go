@@ -70,6 +70,9 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 			if volume.CapacityBytes > 0 {
 				volumeEvent.Put("fs.used.pct", float64(volume.UsedBytes)/float64(volume.CapacityBytes))
 			}
+			if volume.Inodes > 0 {
+				volumeEvent.Put("fs.inodes.pct", float64(volume.InodesUsed)/float64(volume.Inodes))
+			}
 			events = append(events, volumeEvent)
 		}
 
