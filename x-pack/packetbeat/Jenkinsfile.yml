@@ -39,6 +39,9 @@ stages:
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
+    systemTest:
+        mage: "mage testSystem"
+        stage: mandatory
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.

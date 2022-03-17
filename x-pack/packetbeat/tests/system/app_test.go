@@ -11,6 +11,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io/fs"
 	"net"
 	"os"
@@ -57,14 +58,17 @@ func TestWindowsNpcapInstaller(t *testing.T) {
 }
 
 func TestDevices(t *testing.T) {
-	t.Skip("needs test devices to be set up")
-
 	stdout, stderr, err := runPacketbeat(t, "devices")
 	require.NoError(t, err, stderr)
 	t.Log("Output:\n", stdout)
 
 	ifcs, err := net.Interfaces()
 	require.NoError(t, err)
+	var expected []string
+	for _, ifc := range ifcs {
+		expected = append(expected, fmt.Sprintf("%d:%s:%s", ifc.Index, ifc.Name, ifc.Flags))
+	}
+	t.Log("Expect interfaces:\n", expected)
 
 	for _, ifc := range ifcs {
 		assert.Contains(t, stdout, ifc.Name)
