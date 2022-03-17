@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Ensure that the Reloadable part of beats are initialized before the Manager is started. {issue}30533[30533]
 - Ignore bugfix version when running version compatibility check against Elasticsearch. {pull}30746[30746]
 - Add more descriptive error logs for common connection failures in Kafka inputs / outputs. {pull}30776[30776]
+- Fix dissect trim panics from DELETE (127)(\u007f) character {issue}30657[30657] {pull}30658[30658]
 
 *Auditbeat*
 
@@ -71,9 +72,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fixed missing ZooKeeper metrics due compatibility issues with versions >= 3.6.0 {pull}30068[30068]
 - Fix Docker module: rename fields on dashboards. {pull}30500[30500]
 - Add back missing metrics to system/linux. {pull}30774[30774]
+- GCP metrics query instances with aggregatedList API to improve efficiency. {pull}30154[#30153]
 
 *Packetbeat*
 
+- Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821] {pull}30837[30837]
 
 *Winlogbeat*
 
@@ -124,7 +127,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Heartbeat*
 
-
+- Generate summary documents for journeys which exit successfully, but do not emit `journey/end` events {pull}30825[30825]
 
 *Metricbeat*
 
@@ -132,7 +135,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
 - Fix overflow in `iostat` metrics {pull}30679[30679]
 - Add `commandstats` field to Redis module {pull}29662[29662]
-
+- Extend documentation about `kubernetes.node.network.*` fields {pull}30826[30826]
+- Add `kubernetes.volume.fs.inodes.pct` field. {pull}30785[30785]
 
 *Packetbeat*
 

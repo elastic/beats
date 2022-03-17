@@ -1,3 +1,0 @@
-agent.logging.level: debug
-agent.logging.metrics.enabled: false
-

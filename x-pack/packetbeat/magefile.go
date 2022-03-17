@@ -8,6 +8,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -19,14 +20,14 @@ import (
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	packetbeat "github.com/elastic/beats/v7/packetbeat/scripts/mage"
 
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
+	//mage:import
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 // NpcapVersion specifies the version of the OEM Npcap installer to bundle with
@@ -36,6 +37,8 @@ const NpcapVersion = "1.60"
 
 func init() {
 	common.RegisterCheckDeps(Update)
+
+	test.RegisterDeps(TestSystem)
 
 	devtools.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
 	devtools.BeatLicense = "Elastic License"
@@ -138,4 +141,12 @@ func Package() {
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
 	return devtools.TestPackages()
+}
+
+func TestSystem(ctx context.Context) error {
+	mg.Deps(devtools.BuildSystemTestBinary)
+
+	args := devtools.DefaultGoTestIntegrationArgs()
+	args.Packages = []string{"./tests/system/..."}
+	return devtools.GoTest(ctx, args)
 }
