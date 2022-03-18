@@ -78,7 +78,7 @@ func TestDevices(t *testing.T) {
 func runPacketbeat(t testing.TB, args ...string) (stdout, stderr string, err error) {
 	t.Helper()
 
-	packetbeatPath, err := filepath.Abs(exe("../../packetbeat.test"))
+	packetbeatPath, err := filepath.Abs("../../packetbeat.test")
 	require.NoError(t, err)
 
 	if _, err := os.Stat(packetbeatPath); err != nil {
@@ -100,11 +100,4 @@ func runPacketbeat(t testing.TB, args ...string) (stdout, stderr string, err err
 	err = cmd.Run()
 
 	return strings.TrimSpace(stdoutBuf.String()), strings.TrimSpace(stderrBuf.String()), err
-}
-
-func exe(path string) string {
-	if runtime.GOOS == "windows" {
-		return path + ".exe"
-	}
-	return path
 }
