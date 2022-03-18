@@ -1,5 +1,5 @@
 # Module: threatintel
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-threatintel.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.1/filebeat-module-threatintel.html
 
 - module: threatintel
   abuseurl:
@@ -140,32 +140,6 @@
     #
     # var.ssl_certificate: path/to/server_ssl_cert.pem
     # var.ssl_key: path/to/ssl_key.pem
-
-  recordedfuture:
-    enabled: false
-
-    # Input used for ingesting threat intel data
-    var.input: httpjson
-
-    # Set your API Token.
-    var.api_token: "<RF_TOKEN>"
-
-    # The interval to poll the API for updates
-    var.interval: 1h
-
-    # The kind of entity to fetch. One of domain, hash, ip or url.
-    var.entity: domain
-
-    # The list to fetch. See the Recorded Future API Explorer for
-    # valid lists for each kind of entity.
-    var.list: default
-
-    # Uncomment to use a different API endpoint.
-    # The API endpoint used for Recorded Future API calls.
-    # var.endpoint: "https://api.recordedfuture.com/v2"
-
-    # Uncomment to fetch a custom CSV file via URL. Useful for custom Fusion Files.
-    # var.custom_url: "https://api.recordedfuture.com/v2/fusion/files/?path=%2Fhome"
 
   threatq:
     enabled: false

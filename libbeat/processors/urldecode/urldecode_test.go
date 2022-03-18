@@ -211,4 +211,32 @@ func TestURLDecode(t *testing.T) {
 		})
 	}
 
+	t.Run("supports metadata as a target", func(t *testing.T) {
+		t.Parallel()
+
+		config := urlDecodeConfig{
+			Fields: []fromTo{{
+				From: "@metadata.field", To: "@metadata.target",
+			}},
+		}
+
+		f := &urlDecode{
+			log:    logp.NewLogger("urldecode"),
+			config: config,
+		}
+
+		event := &beat.Event{
+			Meta: common.MapStr{
+				"field": "correct%20data",
+			},
+		}
+		expMeta := common.MapStr{
+			"field":  "correct%20data",
+			"target": "correct data",
+		}
+		newEvent, err := f.Run(event)
+		assert.NoError(t, err)
+		assert.Equal(t, expMeta, newEvent.Meta)
+		assert.Equal(t, event.Fields, newEvent.Fields)
+	})
 }

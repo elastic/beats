@@ -21,8 +21,10 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
+	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
 	sysinfo "github.com/elastic/go-sysinfo"
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )
@@ -77,6 +79,21 @@ func FetchLinuxMemStats(baseMap common.MapStr, hostfs resolve.Resolver) error {
 			"fallback": vmstat.ThpSwpoutFallback,
 		},
 	}
+
+	// This is largely for convenience, and allows the swap.* metrics to more closely emulate how they're reported on system/memory
+	// This way very similar metrics aren't split across different modules, even though Linux reports them in different places.
+	eventRaw, err := metrics.Get(hostfs)
+	if err != nil {
+		return errors.Wrap(err, "error fetching memory metrics")
+	}
+	swap := common.MapStr{}
+	err = typeconv.Convert(&swap, &eventRaw.Swap)
+	swap.Put("in.pages", vmstat.Pswpin)
+	swap.Put("out.pages", vmstat.Pswpout)
+	swap.Put("readahead.pages", vmstat.SwapRa)
+	swap.Put("readahead.cached", vmstat.SwapRaHit)
+
+	baseMap["swap"] = swap
 
 	baseMap["hugepages"] = thp
 

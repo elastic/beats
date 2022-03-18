@@ -1,5 +1,5 @@
 # Module: airflow
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-airflow.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.1/metricbeat-module-airflow.html
 
 - module: airflow
   host: "localhost"

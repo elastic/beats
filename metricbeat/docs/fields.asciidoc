@@ -30340,6 +30340,13 @@ type: long
 
 --
 
+*`elasticsearch.index.shards.primaries`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.index.uuid`*::
 +
 --
@@ -30816,6 +30823,42 @@ type: long
 --
 
 *`elasticsearch.index.total.indexing.throttle_time_in_millis`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.index.total.bulk.total_size_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.bulk.avg_size_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.bulk.avg_time_in_millis`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.bulk.total_operations`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.total.bulk.total_time_in_millis`*::
 +
 --
 type: long
@@ -31488,6 +31531,53 @@ Statistics about each node in a Elasticsearch cluster
 
 
 
+
+
+
+*`elasticsearch.node.stats.indices.bulk.avg_time.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.bulk.avg_time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.bulk.total_time.ms`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.bulk.total_size.bytes`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.bulk.avg_size.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.bulk.operations.total.count`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.node.stats.indices.docs.count`*::
 +
@@ -46151,6 +46241,100 @@ Default size for huge pages.
 type: long
 
 format: bytes
+
+--
+
+[float]
+=== swap
+
+This group contains statistics related to the swap memory usage on the system.
+
+
+*`linux.memory.swap.total`*::
++
+--
+Total swap memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.swap.used.bytes`*::
++
+--
+Used swap memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.swap.free`*::
++
+--
+Available swap memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.swap.used.pct`*::
++
+--
+The percentage of used swap memory.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`linux.memory.swap.in.pages`*::
++
+--
+Pages swapped in.
+
+
+type: long
+
+--
+
+*`linux.memory.swap.out.pages`*::
++
+--
+Pages swapped out.
+
+
+type: long
+
+--
+
+*`linux.memory.swap.readahead.cached`*::
++
+--
+Swap readahead pages hit from swap_ra_hit.
+
+
+type: long
+
+--
+
+*`linux.memory.swap.readahead.pages`*::
++
+--
+Pages swapped based on readahead predictions.
+
+
+type: long
 
 --
 
@@ -63770,7 +63954,7 @@ type: long
 *`zookeeper.mntr.followers`*::
 +
 --
-Number of followers seen by the current host.
+Number of followers seen by the current host (Up to ZooKeeper 3.5.9).
 
 
 type: long
@@ -63913,6 +64097,16 @@ type: long
 +
 --
 Number of znodes reported by the local ZooKeeper process.
+
+
+type: long
+
+--
+
+*`zookeeper.mntr.learners`*::
++
+--
+Number of learners (either followers or observers) seen by the current host (From ZooKeeper 3.6.0)
 
 
 type: long

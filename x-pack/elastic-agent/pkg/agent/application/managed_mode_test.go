@@ -67,7 +67,7 @@ func TestManagedModeRouting(t *testing.T) {
 	actions, err := testActions()
 	require.NoError(t, err)
 
-	err = actionDispatcher.Dispatch(context.Background(), noopacker.NewAcker(), actions...)
+	err = actionDispatcher.Dispatch(noopacker.NewAcker(), actions...)
 	require.NoError(t, err)
 
 	// has 1 config request for fb, mb and monitoring?
@@ -101,7 +101,7 @@ func newMockStreamStore() *mockStreamStore {
 	}
 }
 
-func (m *mockStreamStore) Execute(_ context.Context, cr configrequest.Request) error {
+func (m *mockStreamStore) Execute(cr configrequest.Request) error {
 	m.store = append(m.store, cr)
 	return nil
 }

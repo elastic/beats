@@ -13,8 +13,6 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"go.elastic.co/apm"
-	"go.elastic.co/apm/module/apmgorilla"
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -30,7 +28,6 @@ func New(
 	ns func(string) *monitoring.Namespace,
 	routesFetchFn func() *sorted.Set,
 	enableProcessStats bool,
-	tracer *apm.Tracer,
 ) (*api.Server, error) {
 	if err := createAgentMonitoringDrop(endpointConfig.Host); err != nil {
 		// log but ignore
@@ -42,21 +39,11 @@ func New(
 		return nil, err
 	}
 
-	return exposeMetricsEndpoint(log, cfg, ns, routesFetchFn, enableProcessStats, tracer)
+	return exposeMetricsEndpoint(log, cfg, ns, routesFetchFn, enableProcessStats)
 }
 
-func exposeMetricsEndpoint(
-	log *logger.Logger,
-	config *common.Config,
-	ns func(string) *monitoring.Namespace,
-	routesFetchFn func() *sorted.Set,
-	enableProcessStats bool,
-	tracer *apm.Tracer,
-) (*api.Server, error) {
+func exposeMetricsEndpoint(log *logger.Logger, config *common.Config, ns func(string) *monitoring.Namespace, routesFetchFn func() *sorted.Set, enableProcessStats bool) (*api.Server, error) {
 	r := mux.NewRouter()
-	if tracer != nil {
-		r.Use(apmgorilla.Middleware(apmgorilla.WithTracer(tracer)))
-	}
 	statsHandler := statsHandler(ns("stats"))
 	r.Handle("/stats", createHandler(statsHandler))
 

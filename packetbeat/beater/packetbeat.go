@@ -90,6 +90,14 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		configurator = initialConfig().FromStatic
 	}
 
+	// Install Npcap if needed. This need to happen before any other
+	// work on Windows, including config checking, because that involves
+	// probing interfaces.
+	err := installNpcap(b)
+	if err != nil {
+		return nil, err
+	}
+
 	factory := newProcessorFactory(b.Info.Name, make(chan error, maxSniffers), b, configurator)
 	if err := factory.CheckConfig(rawConfig); err != nil {
 		return nil, err
@@ -110,12 +118,6 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 			logp.Debug("main", "Streams and transactions should all be expired now.")
 		}
 	}()
-
-	// Install Npcap if needed.
-	err := installNpcap(b)
-	if err != nil {
-		return err
-	}
 
 	if !b.Manager.Enabled() {
 		return pb.runStatic(b, pb.factory)
@@ -145,9 +147,18 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error {
 	runner := newReloader(management.DebugK, factory, b.Publisher)
 	reload.Register.MustRegisterList("inputs", runner)
-	defer runner.Stop()
-
 	logp.Debug("main", "Waiting for the runner to finish")
+
+	// Start the manager after all the hooks are registered and terminates when
+	// the function return.
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
+
+	defer func() {
+		runner.Stop()
+		b.Manager.Stop()
+	}()
 
 	for {
 		select {

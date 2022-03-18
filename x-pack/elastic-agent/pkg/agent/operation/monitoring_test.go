@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.elastic.co/apm"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 
@@ -165,8 +164,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	if err != nil {
 		t.Fatal(err)
 	}
-	tracer := apm.DefaultTracer
-	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{}, tracer)
+	srv, err := server.New(l, "localhost:0", &ApplicationStatusHandler{})
 	if err != nil {
 		t.Fatal(err)
 	}
