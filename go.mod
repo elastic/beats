@@ -62,7 +62,6 @@ require (
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/elastic/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6
-	github.com/elastic/elastic-agent-libs v0.1.0
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.2.0
 	github.com/elastic/go-licenser v0.4.0
@@ -189,7 +188,10 @@ require (
 	kernel.org/pub/linux/libs/security/libcap/cap v1.2.57
 )
 
-require github.com/shirou/gopsutil/v3 v3.21.12
+require (
+	github.com/elastic/elastic-agent-libs v0.1.0
+	github.com/shirou/gopsutil/v3 v3.21.12
+)
 
 require (
 	cloud.google.com/go v0.99.0 // indirect

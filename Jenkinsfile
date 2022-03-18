@@ -227,8 +227,6 @@ def runLinting() {
   }
   mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)
-
-
 }
 
 def runPreCommit() {
