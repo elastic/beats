@@ -82,10 +82,7 @@ func runPacketbeat(t testing.TB, args ...string) (stdout, stderr string, err err
 	require.NoError(t, err)
 
 	if _, err := os.Stat(packetbeatPath); err != nil {
-		if errors.Is(err, fs.ErrNotExist) {
-			t.Skipf("%v binary not found", filepath.Base(packetbeatPath))
-		}
-		t.Fatal(err)
+		t.Fatalf("%v binary not found: %v", filepath.Base(packetbeatPath), err)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
