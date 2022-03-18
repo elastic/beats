@@ -164,7 +164,7 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 	}
 
 	settings := struct {
-		ID             string        `config:"id" validate:"required"`
+		ID             string        `config:"id"`
 		CleanTimeout   time.Duration `config:"clean_timeout"`
 		HarvesterLimit uint64        `config:"harvester_limit"`
 	}{CleanTimeout: cim.DefaultCleanTimeout}
@@ -172,12 +172,14 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 		return nil, err
 	}
 
-	if settings.ID == globalInputID {
-		return nil, fmt.Errorf("filestream input ID '%s' is reserved for internal use", globalInputID)
+	if settings.ID == "" {
+		cim.Logger.Error("filestream input ID without ID might lead to data" +
+			" duplciation, please add an ID and restart Filebeat")
 	}
 
 	if _, exists := cim.ids[settings.ID]; exists {
-		return nil, fmt.Errorf("filestream input with ID '%s' already exists", settings.ID)
+		cim.Logger.Errorf("filestream input with ID '%s' already exists, this "+
+			"will lead to data duplication, please use a different ID", settings.ID)
 	}
 
 	cim.ids[settings.ID] = struct{}{}
@@ -200,9 +202,9 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 
 	prospectorStore := newSourceStore(pStore, sourceIdentifier)
 
-	// create a store with the deprecated global id. This will be used to
+	// create a store with the deprecated global ID. This will be used to
 	// migrate the entries in the registry to use the new input ID.
-	globalIdentifier, err := newSourceIdentifier(cim.Type, globalInputID)
+	globalIdentifier, err := newSourceIdentifier(cim.Type, "")
 	if err != nil {
 		return nil, fmt.Errorf("cannot create global identifier for input: %w", err)
 	}
@@ -236,8 +238,12 @@ type sourceIdentifier struct {
 }
 
 func newSourceIdentifier(pluginName, userID string) (*sourceIdentifier, error) {
+	if userID == globalInputID {
+		return nil, fmt.Errorf("invalid input ID: .global")
+	}
+
 	if userID == "" {
-		return nil, fmt.Errorf("userID is mandatory")
+		userID = globalInputID
 	}
 
 	return &sourceIdentifier{

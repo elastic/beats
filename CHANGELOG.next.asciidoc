@@ -16,7 +16,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 
 *Filebeat*
-- Filestream input ID is mandatory. {pull}30717[30717]
 
 *Heartbeat*
 
@@ -55,6 +54,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Filebeat*
 - Fixes data duplication on restart when filestream inputs did not have an ID set. {issue}30061[30061]
+- Update documentation for accessing `last_response.url.params` in httpjson input. {pull}30739[30739]
+- Mitigates data duplication on restart when filestream inputs did not have an ID set. Setting an ID for those
+  inputs will fix the problem without generating any data duplication{issue}30061[30061]
 
 *Heartbeat*
 

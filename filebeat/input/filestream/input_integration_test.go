@@ -26,7 +26,6 @@ import (
 	"os"
 	"runtime"
 	"strconv"
-	"strings"
 	"testing"
 	"time"
 
@@ -932,30 +931,6 @@ func TestFilestreamTruncate(t *testing.T) {
 	env.waitUntilInputStops()
 
 	env.requireRegistryEntryCount(1)
-}
-
-func TestInputIDMustBeUnique(t *testing.T) {
-	env := newInputTestingEnvironment(t)
-	testlogName := "test.log"
-	_, err := env.createInput(map[string]interface{}{
-		"id":    "id-1",
-		"paths": []string{env.abspath(testlogName) + "*"},
-	})
-	if err != nil {
-		t.Fatalf("first input must be created without problems, but got error: %v", err)
-	}
-
-	_, err = env.createInput(map[string]interface{}{
-		"id":    "id-1",
-		"paths": []string{env.abspath(testlogName) + "*"},
-	})
-	if err == nil {
-		t.Fatal("expecting an error because IDs must be unique")
-	}
-
-	if !strings.Contains(err.Error(), "'id-1'") {
-		t.Errorf("the provided input ID must be part of the error message and quoted. Err: %s", err.Error())
-	}
 }
 
 func TestGlobalIDCannotBeUsed(t *testing.T) {

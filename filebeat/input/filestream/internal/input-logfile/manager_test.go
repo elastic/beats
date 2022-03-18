@@ -33,11 +33,55 @@ func (s *testSource) Name() string {
 	return s.name
 }
 
+func TestSourceIdentifier_ID(t *testing.T) {
+	testCases := map[string]struct {
+		userID            string
+		sources           []*testSource
+		expectedSourceIDs []string
+	}{
+		"plugin with no user configured ID": {
+			sources: []*testSource{
+				{"unique_name"},
+				{"another_unique_name"},
+			},
+			expectedSourceIDs: []string{
+				testPluginName + "::.global::unique_name",
+				testPluginName + "::.global::another_unique_name",
+			},
+		},
+	}
+
+	for name, test := range testCases {
+		test := test
+
+		t.Run(name, func(t *testing.T) {
+			srcIdentifier, err := newSourceIdentifier(testPluginName, test.userID)
+			if err != nil {
+				t.Fatalf("cannot create identifier: %v", err)
+			}
+
+			for i, src := range test.sources {
+				t.Run(name+"_with_src: "+src.Name(), func(t *testing.T) {
+					srcID := srcIdentifier.ID(src)
+					assert.Equal(t, test.expectedSourceIDs[i], srcID)
+				})
+			}
+		})
+	}
+}
+
 func TestSourceIdentifier_MachesInput(t *testing.T) {
 	testCases := map[string]struct {
 		userID      string
 		matchingIDs []string
 	}{
+		"plugin with no user configured ID": {
+			matchingIDs: []string{
+				testPluginName + "::.global::my_id",
+				testPluginName + "::.global::path::my_id",
+				testPluginName + "::.global::" + testPluginName + "::my_id",
+			},
+		},
 		"plugin with user configured ID": {
 			userID: "my-id",
 			matchingIDs: []string{
@@ -95,7 +139,7 @@ func TestSourceIdentifier_NotMachesInput(t *testing.T) {
 }
 
 func TestSourceIdentifierNoAccidentalMatches(t *testing.T) {
-	noIDIdentifier, err := newSourceIdentifier(testPluginName, globalInputID)
+	noIDIdentifier, err := newSourceIdentifier(testPluginName, "")
 	if err != nil {
 		t.Fatalf("cannot create identifier: %v", err)
 	}
