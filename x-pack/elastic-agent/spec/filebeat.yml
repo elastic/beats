@@ -24,7 +24,7 @@ rules:
     - copy_all_to_list:
         to: streams
         on_conflict: noop
-        except: ["streams", "id", "enabled", "processors"]
+        except: ["streams", "enabled", "processors"]
     - copy_to_list:
         item: processors
         to: streams
