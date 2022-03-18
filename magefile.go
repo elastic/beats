@@ -31,7 +31,7 @@ import (
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 
-	// mage:import
+	//mage:import
 	"github.com/elastic/elastic-agent-libs/dev-tools/mage"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
@@ -50,7 +50,7 @@ var (
 )
 
 // Aliases are shortcuts to long target names.
-// nolint: deadcode // it's used by `mage`.
+//nolint: deadcode // it's used by `mage`.
 var Aliases = map[string]interface{}{
 	"llc":  mage.Linter.LastChange,
 	"lint": mage.Linter.All,
