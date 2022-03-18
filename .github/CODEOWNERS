@@ -18,7 +18,6 @@
 
 ### Deploy
 # All changes to the different deployments must be reviewed by data plane team.
-# TODO: This where k8s falls
 /deploy/ @elastic/elastic-agent-data-plane
 /deploy/kubernetes @elastic/elastic-agent-data-plane @elastic/obs-cloudnative-monitoring
 
@@ -31,7 +30,6 @@
 
 ### Filebeat
 # Filebeat is owned by the data plane team
-# TODO: CLEANUP, go into more details
 /filebeat @elastic/elastic-agent-data-plane
 /x-pack/filebeat @elastic/elastic-agent-data-plane
 
@@ -47,9 +45,21 @@
 # Security integrations modules
 /x-pack/filebeat/module/suricata/ @elastic/security-external-integrations
 
+# Security integrations inputs
+/filebeat/input/syslog/ @elastic/security-external-integrations
+/filebeat/input/winlog/ @elastic/security-external-integrations
+
+/x-pack/filebeat/input/gcppubsub/ @elastic/security-external-integrations
+/x-pack/filebeat/input/http_endpoint/ @elastic/security-external-integrations
+/x-pack/filebeat/input/httpjson/ @elastic/security-external-integrations
+/x-pack/filebeat/input/netflow/ @elastic/security-external-integrations
+/x-pack/filebeat/input/o365audit/ @elastic/security-external-integrations
+
+# Security integrations processors
+/x-pack/filebeat/processors/decode_cef/ @elastic/security-external-integrations
+
 
 ### Heartbeat
-# TODO: Is this team still accurate?
 /heartbeat/ @elastic/uptime
 /x-pack/heartbeat/ @elastic/uptime
 
@@ -60,6 +70,15 @@
 ### libbeat
 /libbeat/ @elastic/elastic-agent-data-plane
 /libbeat/management @elastic/elastic-agent-control-plane
+
+# Libbeat processors security integrations
+/libbeat/processors/community_id/ @elastic/security-external-integrations
+/libbeat/processors/decode_xml/ @elastic/security-external-integrations
+/libbeat/processors/decode_xml_wineventlog/ @elastic/security-external-integrations
+/libbeat/processors/dns/ @elastic/security-external-integrations
+/libbeat/processors/registered_domain/ @elastic/security-external-integrations
+/libbeat/processors/translate_sid/ @elastic/security-external-integrations
+
 
 ### licenses
 /licenses/ @elastic/elastic-agent-data-plane
