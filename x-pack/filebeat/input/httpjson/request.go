@@ -338,12 +338,13 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 		switch tresp := values.(type) {
 		case []interface{}:
 			for _, v := range tresp {
-				_, ok := v.(map[string]interface{})
-				if ok {
-					r.log.Errorf("events must be int, string or double, but got %T: skipping", v)
+				switch v.(type) {
+				case float64, string:
+					ids = append(ids, fmt.Sprintf("%v", v))
+				default:
+					r.log.Errorf("events must a number or string, but got %T: skipping", v)
 					continue
 				}
-				ids = append(ids, fmt.Sprintf("%v", v))
 			}
 		case float64, string:
 			ids = append(ids, fmt.Sprintf("%v", tresp))
