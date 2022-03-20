@@ -7,32 +7,6 @@
 === Beats version 8.1.1
 https://github.com/elastic/beats/compare/v8.1.0...v8.1.1[View commits]
 
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -43,98 +17,25 @@ https://github.com/elastic/beats/compare/v8.1.0...v8.1.1[View commits]
 - Ensure that the Reloadable part of beats are initialized before the Manager is started. {issue}30533[30533]
 - Ignore bugfix version when running version compatibility check against Elasticsearch. {pull}30746[30746]
 
-*Auditbeat*
-
-
 *Filebeat*
 
 - Fix compatibility with ECS by renaming `source` log key to `source_file` {issue}30667[30667]
 - Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
 - Update documentation for accessing `last_response.url.params` in httpjson input. {pull}30739[30739]
 
-*Heartbeat*
-
-*Metricbeat*
-
-
 *Packetbeat*
 
 - Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821]
 
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-
-*Elastic Logging Plugin*
-
-
 ==== Added
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - Extend documentation about hints annotation for processors {pull}30561[30561]
 
-*Heartbeat*
-
-
-
 *Metricbeat*
 
 - Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
-
 
 [[release-notes-8.1.0]]
 === Beats version 8.1.0
