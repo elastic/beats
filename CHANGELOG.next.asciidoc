@@ -36,6 +36,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
+- Fix dissect trim panics from DELETE (127)(\u007f) character {issue}30657[30657] {pull}30658[30658]
+
 
 *Auditbeat*
 
@@ -49,6 +51,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 
 *Packetbeat*
+
+- packetbeat: Fix timeout error in af_packet capture mode. {issue}30731[30731] {issue}30822[30822] {pull}30882[30882]
 
 
 *Winlogbeat*
