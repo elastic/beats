@@ -237,4 +237,3 @@ beats-dashboards: mage update
 build/distributions/dependencies.csv: $(PYTHON)
 	@mkdir -p build/distributions
 	$(PYTHON) dev-tools/dependencies-report --csv $@
-	@cd build/distributions && shasum -a 512 dependencies.csv > dependencies.csv.sha512
