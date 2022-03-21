@@ -154,9 +154,7 @@ pipeline {
         }
       }
       steps {
-        withGCPEnv(secret: 'secret/observability-team/ci/elastic-observability-account-auth'){
-          runBuildAndTest(filterStage: 'extended_win')
-        }
+        runBuildAndTest(filterStage: 'extended_win')
       }
     }
     stage('Packaging') {
@@ -244,19 +242,21 @@ def runBuildAndTest(Map args = [:]) {
   def filterStage = args.get('filterStage', 'mandatory')
   deleteDir()
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-  dir("${BASE_DIR}"){
-    def mapParallelTasks = [:]
-    def content = readYaml(file: 'Jenkinsfile.yml')
-    if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
-      error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
-    } else {
-      content['projects'].each { projectName ->
-        generateStages(project: projectName, changeset: content['changeset'], filterStage: filterStage).each { k,v ->
-          mapParallelTasks["${k}"] = v
+  withGCPEnv(secret: 'secret/observability-team/ci/elastic-observability-account-auth'){
+    dir("${BASE_DIR}"){
+      def mapParallelTasks = [:]
+      def content = readYaml(file: 'Jenkinsfile.yml')
+      if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
+        error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
+      } else {
+        content['projects'].each { projectName ->
+          generateStages(project: projectName, changeset: content['changeset'], filterStage: filterStage).each { k,v ->
+            mapParallelTasks["${k}"] = v
+          }
         }
+        notifyBuildReason()
+        parallel(mapParallelTasks)
       }
-      notifyBuildReason()
-      parallel(mapParallelTasks)
     }
   }
 }
