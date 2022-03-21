@@ -146,7 +146,8 @@ func (l Linter) All() error {
 func (l Linter) LastChange() error {
 	mg.Deps(l.Install, l.CheckConfig)
 
-	branch, err := sh.Output("git", "branch", "--show-current")
+	// get current branch name
+	branch, err := sh.Output("git", "rev-parse", "--abbrev-ref", "HEAD")
 	if err != nil {
 		return fmt.Errorf("failed to get the current branch: %w", err)
 	}
