@@ -73,10 +73,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fix Docker module: rename fields on dashboards. {pull}30500[30500]
 - Add back missing metrics to system/linux. {pull}30774[30774]
 - GCP metrics query instances with aggregatedList API to improve efficiency. {pull}30154[#30153]
+- Fix delay in perfmon counters collection {issue}30686[30686] {pull}30861[#30861]
 
 *Packetbeat*
 
 - Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821] {pull}30837[30837]
+- packetbeat: Fix timeout error in af_packet capture mode. {issue}30731[30731] {issue}30822[30822] {pull}30882[30882]
 
 *Winlogbeat*
 
@@ -96,6 +98,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add support for kafka message headers. {pull}29940[29940]
 - Add FIPS configuration option for all AWS API calls. {pull}[28899]
 - Add support for non-unique Kafka headers for output messages. {pull}30369[30369]
+- Add syslog parser and processor. {issue}30139[30139] {pull}30541[30541]
 - Add action_input_type for the .fleet-actions-results {pull}30562[30562]
 - Add cronjob metadata by default {pull}30637[30637]
 
