@@ -24,7 +24,6 @@ mv build/distributions/dependencies.csv \
 # TODO: this could be supported by the package system itself
 #       or the unified release process the one to do the transformation
 #       See https://github.com/elastic/beats/pull/30895
-
 find build/distributions -name '*linux-arm64.docker.tar.gz*' -print0 |
   while IFS= read -r -d '' file
   do

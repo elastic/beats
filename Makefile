@@ -233,8 +233,8 @@ release-manager-release:
 beats-dashboards: mage update
 	@mage packageBeatDashboards
 
-## build/dependencies.csv : Generates the dependencies file
-build/dependencies.csv: $(PYTHON)
-	@mkdir -p build
+## build/distributions/dependencies.csv : Generates the dependencies file
+build/distributions/dependencies.csv: $(PYTHON)
+	@mkdir -p build/distributions
 	$(PYTHON) dev-tools/dependencies-report --csv $@
-	@cd build && shasum -a 512 dependencies.csv > dependencies.csv.sha512
+	@cd build/distributions && shasum -a 512 dependencies.csv > dependencies.csv.sha512
