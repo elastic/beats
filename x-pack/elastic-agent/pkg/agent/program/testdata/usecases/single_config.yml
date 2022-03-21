@@ -53,6 +53,7 @@ inputs:
         dataset: ""
   hosts: ["http://127.0.0.1:8080"]
 - type: logfile
+  id: logfile-1
   use_output: default
   streams:
     - paths:
@@ -61,6 +62,7 @@ inputs:
   vars:
     var: value
 - type: logfile
+  id: logfile-2
   data_stream:
     type: testtype
   use_output: default
