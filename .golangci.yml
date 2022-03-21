@@ -36,7 +36,6 @@ linters:
     - goconst # finds repeated strings that could be replaced by a constant
     - dupl # tool for code clone detection
     - forbidigo # forbids identifiers	matched by reg exps
-    - gomoddirectives # manage the use of 'replace', 'retract', and 'excludes' directives in go.mod.
     - gosimple # linter for Go source code that specializes in simplifying a code
     - misspell # finds commonly misspelled English words in comments
     - nakedret # finds naked returns in functions greater than a specified function length
@@ -64,6 +63,7 @@ linters:
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
     - godox # tool for detection of FIXME, TODO and other comment keywords
+    - gomodguard # check for blocked dependencies
 
 # all available settings of specific linters
 linters-settings:
@@ -97,9 +97,20 @@ linters-settings:
     # Exclude godoc examples from forbidigo checks.  Default is true.
     exclude_godoc_examples: true
 
-  gomoddirectives:
-    # Allow local `replace` directives. Default is false.
-    replace-local: true
+  goimports:
+    local-prefixes: github.com/elastic
+
+  gomodguard:
+    blocked:
+      # List of blocked modules.
+      modules:
+        # Blocked module.
+        - github.com/pkg/errors:
+            # Recommended modules that should be used instead. (Optional)
+            recommendations:
+              - errors
+              - fmt
+            reason: "This package is deprecated, use `fmt.Errorf` with `%w` instead"
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
@@ -139,10 +150,12 @@ linters-settings:
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
     go: "1.17.6"
+    checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
     go: "1.17.6"
+    checks: ["all"]
 
   unparam:
     # Inspect exported functions, default is false. Set to true if no external program/library imports your code.
