@@ -140,9 +140,9 @@ You can run the pre-configured linter against your change:
 mage llc
 --------------------------------------------------------------------------------
 
-`lls` stands for `Lint Last Change` which includes all the Go files that were changed in either the last commit (if you're on the `main` branch) or in a difference between your feature branch and the `main` branch.
+`llc` stands for `Lint Last Change` which includes all the Go files that were changed in either the last commit (if you're on the `main` branch) or in a difference between your feature branch and the `main` branch.
 
-It's expected that sometimes a contributor can be asked to fix linter issues unrelated to their contribution since the linter might be introduced later than changes in some of the files a new change can uncover some old issues.
+It's expected that sometimes a contributor will be asked to fix linter issues unrelated to their contribution since the linter was introduced later than changes in some of the files.
 
 You would need https://github.com/magefile/mage[Mage] to run this task.
 
