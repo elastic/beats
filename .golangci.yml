@@ -64,7 +64,7 @@ linters:
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
     - godox # tool for detection of FIXME, TODO and other comment keywords
-    - revive # avoid bad imports
+    - gomodguard # check for blocked dependencies
 
 # all available settings of specific linters
 linters-settings:
@@ -137,22 +137,31 @@ linters-settings:
     # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
     require-specific: true
 
-  revive:
-    enable-all-rules: false
-    # https://github.com/mgechev/revive/blob/master/RULES_DESCRIPTIONS.md
-    rules:
-      - name: imports-blacklist
-        arguments:
-          - github.com/pkg/errors
-          - github.com/elastic/beats/v7
+  gomodguard:
+    blocked:
+      # List of blocked modules.
+      modules:
+        # Blocked module.
+        - github.com/pkg/errors:
+            # Recommended modules that should be used instead. (Optional)
+            recommendations:
+              - errors
+              - fmt
+            reason: "This package is deprecated"
+        - github.com/elastic/beats/v7:
+            reason: "There must be no Beats dependency"
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
     go: "1.17.6"
+    # https://staticcheck.io/docs/options#checks
+    checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
     go: "1.17.6"
+    # https://staticcheck.io/docs/options#checks
+    checks: ["all"]
 
   unparam:
     # Inspect exported functions, default is false. Set to true if no external program/library imports your code.
