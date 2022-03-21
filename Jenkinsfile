@@ -242,21 +242,19 @@ def runBuildAndTest(Map args = [:]) {
   def filterStage = args.get('filterStage', 'mandatory')
   deleteDir()
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-  withGCPEnv(secret: 'secret/observability-team/ci/elastic-observability-account-auth'){
-    dir("${BASE_DIR}"){
-      def mapParallelTasks = [:]
-      def content = readYaml(file: 'Jenkinsfile.yml')
-      if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
-        error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
-      } else {
-        content['projects'].each { projectName ->
-          generateStages(project: projectName, changeset: content['changeset'], filterStage: filterStage).each { k,v ->
-            mapParallelTasks["${k}"] = v
-          }
+  dir("${BASE_DIR}"){
+    def mapParallelTasks = [:]
+    def content = readYaml(file: 'Jenkinsfile.yml')
+    if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
+      error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
+    } else {
+      content['projects'].each { projectName ->
+        generateStages(project: projectName, changeset: content['changeset'], filterStage: filterStage).each { k,v ->
+          mapParallelTasks["${k}"] = v
         }
-        notifyBuildReason()
-        parallel(mapParallelTasks)
       }
+      notifyBuildReason()
+      parallel(mapParallelTasks)
     }
   }
 }
@@ -344,29 +342,45 @@ def k8sTest(Map args = [:]) {
 */
 def withTools(Map args = [:], Closure body) {
   if (args.get('k8s', false)) {
-    withEnv(["KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
-      retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
-      retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
-      try {
-        // Add some environmental resilience when setup does not work the very first time.
-        def i = 0
-        retryWithSleep(retries: 3, seconds: 5, backoff: true){
-          try {
-            sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
-          } catch(err) {
-            i++
-            sh(label: 'Delete cluster', script: 'kind delete cluster')
-            if (i > 2) {
-              error("Setup kind failed with error '${err.toString()}'")
-            }
-          }
-        }
-        body()
-      } finally {
-        sh(label: 'Delete cluster', script: 'kind delete cluster')
-      }
+    withK8s() {
+      body()
+    }
+  } else if (args.get('gcp', false)) {
+    withGCP() {
+      body()
     }
   } else {
+    body()
+  }
+}
+
+def withK8s(Closure body) {
+  withEnv(["KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
+    try {
+      // Add some environmental resilience when setup does not work the very first time.
+      def i = 0
+      retryWithSleep(retries: 3, seconds: 5, backoff: true){
+        try {
+          sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+        } catch(err) {
+          i++
+          sh(label: 'Delete cluster', script: 'kind delete cluster')
+          if (i > 2) {
+            error("Setup kind failed with error '${err.toString()}'")
+          }
+        }
+      }
+      body()
+    } finally {
+      sh(label: 'Delete cluster', script: 'kind delete cluster')
+    }
+  }
+}
+
+def withGCP(Closure body) {
+  withGCPEnv(secret: 'secret/observability-team/ci/elastic-observability-account-auth'){
     body()
   }
 }
@@ -556,11 +570,12 @@ def target(Map args = [:]) {
   def installK8s = args.get('installK8s', false)
   def dockerArch = args.get('dockerArch', 'amd64')
   def enableRetry = args.get('enableRetry', false)
+  def withGCP = args.get('withGCP', false)
   withNode(labels: args.label, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
         dumpVariables()
-        withTools(k8s: installK8s) {
+        withTools(k8s: installK8s, gcp: withGCP) {
           // make commands use -C <folder> while mage commands require the dir(folder)
           // let's support this scenario with the location variable.
           dir(isMage ? directory : '') {
@@ -1052,6 +1067,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
       def withModule = args.content.get('withModule', false)
       def installK8s = args.content.get('installK8s', false)
       def withAWS = args.content.get('withAWS', false)
+      def withGCP = args.content.get('withGCP', false)
       //
       // What's the retry policy for fighting the flakiness:
       //   1) Lint/Packaging/Cloud/k8sTest stages don't retry, since their failures are normally legitim
@@ -1081,6 +1097,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
                      installK8s: installK8s,
                      withModule: withModule,
                      isMage: true,
+                     withGCP: withGCP,
                      id: args.id,
                      enableRetry: enableRetry)
       }
