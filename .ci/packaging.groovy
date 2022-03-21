@@ -84,10 +84,8 @@ pipeline {
             setEnvVar("GO_VERSION", readFile("${BASE_DIR}/.go-version").trim())
             // Stash without any build/dependencies context to support different architectures.
             stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-            withMageEnv(){
-              dir("${BASE_DIR}"){
-                setEnvVar('BEAT_VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
-              }
+            dir("${BASE_DIR}"){
+              setEnvVar('BEAT_VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
             }
           }
         }
@@ -114,6 +112,7 @@ pipeline {
           }
           steps {
             dir("${BASE_DIR}") {
+              sh(label: 'make build/dependencies.csv', script: 'make build/dependencies.csv')
               // TODO: as long as googleStorageDownload does not support recursive copy with **/*
               dir("build/distributions") {
                 gsutil(command: "-m -q cp -r ${env.BUCKET_URI} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
