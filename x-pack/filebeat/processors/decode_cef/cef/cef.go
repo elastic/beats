@@ -12,16 +12,22 @@ import (
 )
 
 // Parser is generated from a ragel state machine using the following command:
-//go:generate ragel -Z -G1 cef.rl -o parser.go
+//go:generate ragel -Z -G1 parser.rl -o parser.go
 //go:generate goimports -l -w parser.go
+//go:generate ragel -Z -G1 parser_recover.rl -o parser_recover.go
+//go:generate goimports -l -w parser_recover.go
 //
 // Run go vet and remove any unreachable code in the generated parser.go.
 // The go generator outputs duplicated goto statements sometimes.
 //
 // An SVG rendering of the state machine can be viewed by opening cef.svg in
 // Chrome / Firefox.
-//go:generate ragel -V -p cef.rl -o cef.dot
+//go:generate ragel -V -p parser.rl -o cef.dot
 //go:generate dot -T svg cef.dot -o cef.svg
+//go:generate ragel -V -p parser_recover.rl -o cef_recover.dot
+//go:generate dot -T svg cef_recover.dot -o cef_recover.svg
+
+var errUnexpectedEndOfEvent = errors.New("unexpected end of CEF event")
 
 // Field is CEF extension field value.
 type Field struct {
@@ -124,6 +130,14 @@ func (e *Event) Unpack(data string, opts ...Option) error {
 	var err error
 	if err = e.unpack(data); err != nil {
 		errs = append(errs, err)
+		if len(e.Extensions) == 0 {
+			// We must have failed in the headers,
+			// so go back for the extensions.
+			err = e.recoverExtensions(data)
+			if err != nil {
+				errs = append(errs, err)
+			}
+		}
 	}
 
 	for key, field := range e.Extensions {
@@ -195,4 +209,22 @@ func replaceEscapes(v string, startOffset int, escapes []escapePosition) string 
 	buf.WriteString(v[prevEnd:])
 
 	return buf.String()
+}
+
+type cefState struct {
+	key        string           // Extension key.
+	valueStart int              // Start index of extension value.
+	valueEnd   int              // End index of extension value.
+	escapes    []escapePosition // Array of escapes indices within the current value.
+}
+
+func (s *cefState) reset() {
+	s.key = ""
+	s.valueStart = 0
+	s.valueEnd = 0
+	s.escapes = s.escapes[:0]
+}
+
+func (s *cefState) pushEscape(start, end int) {
+	s.escapes = append(s.escapes, escapePosition{start, end})
 }
