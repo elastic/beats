@@ -189,7 +189,7 @@ require (
 )
 
 require (
-	github.com/elastic/elastic-agent-libs v0.1.0
+	github.com/elastic/elastic-agent-libs v0.1.1
 	github.com/shirou/gopsutil/v3 v3.21.12
 )
 
