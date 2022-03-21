@@ -93,15 +93,7 @@ func TestReadSuccessfully(t *testing.T) {
 	//Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we call reader.Read() twice.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	events, err := reader.Read()
-<<<<<<< HEAD
-	assert.Nil(t, err)
-	assert.Nil(t, events)
-	assert.Zero(t, len(events))
-	events, err = reader.Read()
-	assert.Nil(t, err)
-=======
 	assert.NoError(t, err)
->>>>>>> e1ed659bdb (Adjust pdhcollectquerydataex sample interval (#30861))
 	assert.NotNil(t, events)
 	assert.NotZero(t, len(events))
 }
