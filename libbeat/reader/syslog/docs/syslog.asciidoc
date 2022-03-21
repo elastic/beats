@@ -47,6 +47,14 @@ The RFC 3164 format accepts the following forms of timestamps:
   ** `2003-10-11T22:14:15-06:00`
   ** `2003-10-11T22:14:15.123456-06:00`
 
+*Note*: The local timestamp (for example, `Jan 23 14:09:01`) that accompanies an
+RFC 3164 message lacks year and time zone information. The time zone will be enriched
+using the `timezone` configuration option, and the year will be enriched using the
+{beatname_uc} system's local time (accounting for time zones). Because of this, it is possible
+for messages to appear in the future. An example of when this might happen is logs
+generated on December 31 2021 are ingested on January 1 2022. The logs would be enriched
+with the year 2022 instead of 2021.
+
 The RFC 5424 format accepts the following forms of timestamps:
 
 * RFC-3339:
