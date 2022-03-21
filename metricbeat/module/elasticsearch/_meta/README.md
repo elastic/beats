@@ -23,7 +23,7 @@ Metricbeat will call the following Elasticsearch API endpoints corresponding to 
 - [api reference](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-stats.html)
 
 ### index_recovery
-- `/_recovery?active_only=`
+- `/_recovery?active_only=true` depending on [`index_recovery.active_only` setting](https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-elasticsearch-index_recovery.html)
 - [api reference](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-recovery.html)
 
 ### index_summary
