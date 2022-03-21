@@ -4,7 +4,7 @@
 # options for analysis running
 run:
   # timeout for analysis, e.g. 30s, 5m, default is 1m
-  timeout: 1m
+  timeout: 15m
 
 issues:
   # Maximum count of issues with the same text.
