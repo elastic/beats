@@ -154,7 +154,9 @@ pipeline {
         }
       }
       steps {
-        runBuildAndTest(filterStage: 'extended_win')
+        withGCPEnv(secret: 'secret/observability-team/ci/elastic-observability-account-auth'){
+          runBuildAndTest(filterStage: 'extended_win')
+        }
       }
     }
     stage('Packaging') {

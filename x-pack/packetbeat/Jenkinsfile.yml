@@ -60,11 +60,6 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-2022"
         stage: mandatory
-    windows-2022-system:
-        mage: "mage testSystem"
-        platforms:             ## override default labels in this specific stage.
-            - "windows-2022"
-        stage: mandatory
     windows-2019:
         mage: "mage build unitTest"
         withModule: true
@@ -85,6 +80,11 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
+        stage: extended_win
+    windows-2022-system:
+        mage: "mage testSystem"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-2022"
         stage: extended_win
     windows-10-system:
         mage: "mage testSystem"
