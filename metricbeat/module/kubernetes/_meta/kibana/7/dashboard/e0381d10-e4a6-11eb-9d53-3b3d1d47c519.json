@@ -32,7 +32,7 @@
                 "panelIndex": "1",
                 "panelRefName": "panel_1",
                 "type": "visualization",
-                "version": "7.11.0"
+                "version": "8.2.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -48,7 +48,7 @@
                 "panelIndex": "2",
                 "panelRefName": "panel_2",
                 "type": "visualization",
-                "version": "7.11.0"
+                "version": "8.2.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -64,7 +64,7 @@
                 "panelIndex": "5",
                 "panelRefName": "panel_5",
                 "type": "visualization",
-                "version": "7.11.0"
+                "version": "8.2.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -80,7 +80,7 @@
                 "panelIndex": "6",
                 "panelRefName": "panel_6",
                 "type": "visualization",
-                "version": "7.11.0"
+                "version": "8.2.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -96,7 +96,7 @@
                 "panelIndex": "7",
                 "panelRefName": "panel_7",
                 "type": "visualization",
-                "version": "7.11.0"
+                "version": "8.2.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -112,7 +112,7 @@
                 "panelIndex": "8",
                 "panelRefName": "panel_8",
                 "type": "visualization",
-                "version": "7.11.0"
+                "version": "8.2.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -128,7 +128,7 @@
                 "panelIndex": "9",
                 "panelRefName": "panel_9",
                 "type": "visualization",
-                "version": "7.11.0"
+                "version": "8.2.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -144,7 +144,7 @@
                 "panelIndex": "10",
                 "panelRefName": "panel_10",
                 "type": "visualization",
-                "version": "7.11.0"
+                "version": "8.2.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -160,7 +160,7 @@
                 "panelIndex": "11",
                 "panelRefName": "panel_11",
                 "type": "visualization",
-                "version": "7.11.0"
+                "version": "8.2.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -176,7 +176,7 @@
                 "panelIndex": "12",
                 "panelRefName": "panel_12",
                 "type": "visualization",
-                "version": "7.11.0"
+                "version": "8.2.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -192,7 +192,7 @@
                 "panelIndex": "13",
                 "panelRefName": "panel_13",
                 "type": "visualization",
-                "version": "7.11.0"
+                "version": "8.2.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -208,7 +208,7 @@
                 "panelIndex": "14",
                 "panelRefName": "panel_14",
                 "type": "visualization",
-                "version": "7.11.0"
+                "version": "8.2.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -224,7 +224,7 @@
                 "panelIndex": "15",
                 "panelRefName": "panel_15",
                 "type": "visualization",
-                "version": "7.11.0"
+                "version": "8.2.0-SNAPSHOT"
             },
             {
                 "embeddableConfig": {
@@ -240,17 +240,17 @@
                 "panelIndex": "43e2c937-a06e-4f6c-9e01-e2669110f160",
                 "panelRefName": "panel_43e2c937-a06e-4f6c-9e01-e2669110f160",
                 "type": "visualization",
-                "version": "7.11.0"
+                "version": "8.2.0-SNAPSHOT"
             }
         ],
         "timeRestore": false,
         "title": "[Metricbeat Kubernetes] Overview ECS",
         "version": 1
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "8.2.0",
     "id": "e0381d10-e4a6-11eb-9d53-3b3d1d47c519",
     "migrationVersion": {
-        "dashboard": "7.14.0"
+        "dashboard": "8.2.0"
     },
     "references": [
         {
@@ -325,6 +325,6 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2021-08-04T16:31:37.319Z",
-    "version": "WzQwMTIsMV0="
+    "updated_at": "2022-03-21T09:56:20.439Z",
+    "version": "WzI5MTEsMl0="
 }
