@@ -125,6 +125,28 @@ func TestLogsPathMatcher_InvalidVarLogPodSource(t *testing.T) {
 	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
 }
 
+func TestLogsPathMatcher_ValidVarLogPodSource(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+	sourcePath := "/var/log/pods/namespace_pod-name_%s/container/0.log.20220221-210912"
+
+	if runtime.GOOS == "windows" {
+		cfgLogsPath = "C:\\var\\log\\pods\\"
+		sourcePath = "C:\\var\\log\\pods\\namespace_pod-name_%s\\container\\0.log.20220221-210912"
+	}
+	source := fmt.Sprintf(sourcePath, puid)
+	expectedResult := puid
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+}
+
+func TestLogsPathMatcher_InvalidVarLogPodSource2(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+	source := fmt.Sprintf("/var/log/pods/namespace_pod-name_%s/container/0.log.20220221-210526.gz", puid)
+	expectedResult := ""
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+}
+
 func TestLogsPathMatcher_InvalidVarLogPodIDFormat(t *testing.T) {
 	cfgLogsPath := "/var/log/pods/"
 	cfgResourceType := "pod"
