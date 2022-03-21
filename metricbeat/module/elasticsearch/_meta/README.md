@@ -5,7 +5,7 @@
 
 ## Metricsets
 
-Metricbeat will call the following Elasticsearch API endpoints corresponding to each metricset.  The module stores all or a subset of the response in fields which can be found [here](https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-elasticsearch.html).
+Metricbeat will call the following Elasticsearch API endpoints corresponding to each metricset.  The module stores a subset of the response in fields which can be found [here](https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-elasticsearch.html).  The Metricbeat exported fields generally follw the same paths as the elasticsearch API response, but may differ somewhat according to the [schema in each metricset](https://github.com/elastic/beats/blob/main/metricbeat/module/elasticsearch/node/data.go#L36).  They are [namespaced with `{module}.{metricset}`](https://github.com/elastic/beats/blob/main/metricbeat/module/elasticsearch/cluster_stats/data.go#L39).
 ### ccr
 - `/_ccr/stats`
 - [api reference](https://www.elastic.co/guide/en/elasticsearch/reference/current/ccr-get-stats.html)
