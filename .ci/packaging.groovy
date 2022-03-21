@@ -113,6 +113,7 @@ pipeline {
           environment {
             // It uses the folder structure done in uploadPackagesToGoogleBucket
             BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/791027603a63c94a600afaa380992dc790de8bb9"
+            HOME = "${env.WORKSPACE}"
           }
           steps {
             dir("${BASE_DIR}") {
