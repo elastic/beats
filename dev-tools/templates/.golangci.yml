@@ -96,7 +96,7 @@ linters-settings:
 
   gomoddirectives:
     # Allow local `replace` directives. Default is false.
-    replace-local: false
+    replace-local: true
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
