@@ -125,6 +125,30 @@ func (opt Uint) ValueOr(i uint64) uint64 {
 	return i
 }
 
+// MultUint64OrNone or will multiply the existing Uint value by a supplied uint64, and return None if either the Uint is none, or the supplied uint64 is zero.
+func (opt Uint) MultUint64OrNone(i uint64) Uint {
+	if !opt.exists {
+		return opt
+	}
+	if i == 0 {
+		return Uint{exists: false}
+	}
+	return Uint{exists: true, value: opt.value * i}
+}
+
+// SubtractOrNone will subtract the existing uint with the supplied uint64 value. If this would result in a value invalid for a uint (ie, a negative number), return None
+func (opt Uint) SubtractOrNone(i Uint) Uint {
+	if !opt.exists || !i.Exists() {
+		return opt
+	}
+
+	if i.ValueOr(0) > opt.value {
+		return Uint{exists: false}
+	}
+
+	return Uint{exists: true, value: opt.value - i.ValueOr(0)}
+}
+
 // SumOptUint sums a list of OptUint values
 func SumOptUint(opts ...Uint) uint64 {
 	var sum uint64

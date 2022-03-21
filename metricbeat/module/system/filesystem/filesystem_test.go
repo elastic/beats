@@ -25,6 +25,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
@@ -33,13 +34,16 @@ import (
 func TestFetch(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
-
+	logp.DevelopmentSetup()
 	assert.Empty(t, errs)
 	if !assert.NotEmpty(t, events) {
 		t.FailNow()
 	}
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-		events[0].BeatEvent("system", "filesystem").Fields.StringToPrint())
+	for _, event := range events {
+		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+			event.BeatEvent("system", "filesystem").Fields.StringToPrint())
+	}
+
 }
 
 func TestData(t *testing.T) {

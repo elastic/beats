@@ -21,6 +21,7 @@
 package filesystem
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -73,7 +74,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "error getting filesystem list")
 
 	}
-
+	fmt.Printf("Ignoring: %#v\n", m.config.IgnoreTypes)
 	if len(m.config.IgnoreTypes) > 0 {
 		fss = Filter(fss, BuildTypeFilter(m.config.IgnoreTypes...))
 	}
