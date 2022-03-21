@@ -27,16 +27,6 @@ https://github.com/elastic/beats/compare/v8.1.0...v8.1.1[View commits]
 
 - Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821]
 
-==== Added
-
-*Filebeat*
-
-- Extend documentation about hints annotation for processors {pull}30561[30561]
-
-*Metricbeat*
-
-- Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
-
 [[release-notes-8.1.0]]
 === Beats version 8.1.0
 https://github.com/elastic/beats/compare/v8.0.1...v8.1.0[View commits]
