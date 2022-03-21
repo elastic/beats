@@ -62,12 +62,12 @@ func main() {
 	}
 
 	var user, pass string
+	user = "beats"
+	pass = "testing"
 	if u.User != nil {
 		user = u.User.Username()
 		pass, _ = u.User.Password()
 	}
-	user = "beats"
-	pass = "testing"
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = kibanaTimeout
 
