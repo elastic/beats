@@ -173,16 +173,6 @@ endif::[]
   either take `node` or `cluster` as values. `node` scope allows discovery of resources in
   the specified node. `cluster` scope allows cluster wide discovery. Only `pod` and `node` resources
   can be discovered at node scope.
-<<<<<<< HEAD
-`add_resource_metadata`:: (Optional) Specify labels and annotations filters for the extra metadata coming from Node and Namespace.
- `add_resource_metadata` can be done for `node` or `namespace`. By default all labels will be included
-  while annotations are not added by default. This settings are useful when labels' and annotations'
-  storing requires special handling to avoid overloading the storage output. The enrichment of `node` or `namespace` metadata
-  can be individually disabled by setting `enabled: false`. If resource is `pod` and it is created from a `deployment`, by default
-  the deployment name is added, this can be disabled by set to `false`.
-  Example:
-
-=======
 `add_resource_metadata`:: (Optional) Specify filters and configration for the extra metadata, that will be added to the event.
 Configuration parameters:
  * `node` or `namespace`: Specify labels and annotations filters for the extra metadata coming from node and namespace. By default all labels are included while annotations are not. To change default behaviour `include_labels`, `exclude_labels` and `include_annotations` can be defined. Those settings are useful when storing labels and annotations that require special handling to avoid overloading the storage output.
@@ -192,7 +182,6 @@ Configuration parameters:
  * `cronjob`: If resource is `pod` and it is created from a `cronjob`, by default the cronjob name is added, this can be disabled by setting `cronjob: false`.
 +
 Example:
->>>>>>> ae94fa9a7e (add explanation regarding add_resource_metadata; sync documentation for processor and audiscover (#30921))
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
       add_resource_metadata:
