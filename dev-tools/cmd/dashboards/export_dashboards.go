@@ -134,6 +134,6 @@ func exportSingleDashboard(client *kibana.Client, dashboard, folder string) erro
 	if err != nil {
 		return fmt.Errorf("failed to export the dashboard: %+v", err)
 	}
-
+	result = dashboards.DecodeExported(result)
 	return dashboards.SaveToFolder(result, folder, client.GetVersion())
 }
