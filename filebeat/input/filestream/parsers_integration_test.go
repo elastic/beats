@@ -325,7 +325,7 @@ func TestParsersMultilineMaxLines(t *testing.T) {
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
-	t.Logf("input: %#v", inp)
+
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
 
@@ -391,7 +391,6 @@ func TestParsersMultilineTimeout(t *testing.T) {
 	})
 
 	env.waitUntilEventCount(3)
-
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines)+len(moreLines))
 	env.requireEventsReceived([]string{
 		`[2015] hello world
@@ -499,7 +498,6 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 	})
 
 	env.waitUntilEventCount(3)
-
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines)+len(moreLines))
 	env.requireEventsReceived([]string{
 		`[2015] hello world

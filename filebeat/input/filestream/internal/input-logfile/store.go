@@ -212,9 +212,7 @@ func (s *sourceStore) CleanIf(pred func(v Value) bool) {
 }
 
 // FixUpIdentifiers copies an existing resource to a new ID and marks the previous one
-// for removal. This method does not check whether the resource belongs to this store
-// because it is meant to migrate inputs without IDs to inputs with IDs without
-// duplicating data.
+// for removal.
 func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface{})) {
 	s.store.ephemeralStore.mu.Lock()
 	defer s.store.ephemeralStore.mu.Unlock()
@@ -236,8 +234,9 @@ func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface
 			// Pending updates due to events that have not yet been ACKed
 			// are not included in the copy. Collection on
 			// the copy start from the last known ACKed position.
-			// This might lead to duplicates if configurations are adapted
-			// for inputs with the same ID are changed.
+			// This might lead to data duplication because the harvester
+			// will pickup from the last ACKed postion using the new key
+			// and the pending updates will affect the entry with the oldKey.
 			r := res.copyWithNewKey(newKey)
 			r.cursorMeta = updatedMeta
 			r.stored = false
@@ -281,8 +280,9 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 			// Pending updates due to events that have not yet been ACKed
 			// are not included in the copy. Collection on
 			// the copy start from the last known ACKed position.
-			// This might lead to duplicates if configurations are adapted
-			// for inputs with the same ID are changed.
+			// This might lead to data duplication because the harvester
+			// will pickup from the last ACKed postion using the new key
+			// and the pending updates will affect the entry with the oldKey.
 			r := res.copyWithNewKey(newKey)
 			r.cursorMeta = updatedMeta
 			r.stored = false
