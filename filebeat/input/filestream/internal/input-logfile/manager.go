@@ -174,7 +174,7 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 
 	if settings.ID == "" {
 		cim.Logger.Error("filestream input ID without ID might lead to data" +
-			" duplciation, please add an ID and restart Filebeat")
+			" duplication, please add an ID and restart Filebeat")
 	}
 
 	if _, exists := cim.ids[settings.ID]; exists {
