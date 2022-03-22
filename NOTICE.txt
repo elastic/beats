@@ -7792,11 +7792,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.7
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-ucfg
-Version: v0.8.4
+Version: v0.8.3
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-ucfg@v0.8.4/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-ucfg@v0.8.3/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
