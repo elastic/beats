@@ -127,9 +127,9 @@ class Test(WriteReadTest):
             "  - name: {}\n" +
             "    record_number: 1000\n" +
             "    timestamp: 2100-01-01T00:00:00Z\n" +
-            "    bookmark: \"<BookmarkList>\\r\\n  <Bookmark Channel='{}' RecordId='1000' IsCurrent='true'/>\\r\\n</BookmarkList>\"\n".
+            "    bookmark: \"<BookmarkList>\\r\\n  <Bookmark Channel='{}' RecordId='1000' IsCurrent='true'/>\\r\\n</BookmarkList>\"\n").
             format(self.providerName, self.providerName)
-        ))
+        )
         f.close()
 
         # remove the output file, otherwise there is a race condition
