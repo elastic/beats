@@ -6,12 +6,12 @@ package filesystem
 import (
 	"syscall"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/pkg/errors"
 )
 
-func (fs *FSStat) getUsage() error {
+// GetUsage returns the filesystem usage
+func (fs *FSStat) GetUsage() error {
 	stat := syscall.Statfs_t{}
 	err := syscall.Statfs(fs.Directory, &stat)
 	if err != nil {
@@ -24,15 +24,7 @@ func (fs *FSStat) getUsage() error {
 	fs.Files = opt.UintWith(stat.Files)
 	fs.FreeFiles = opt.UintWith(uint64(stat.Ffree))
 
-	fs.Used.Bytes = fs.Total.SubtractOrNone(fs.Free)
-
-	percTotal := fs.Used.Bytes.ValueOr(0) + fs.Avail.ValueOr(0)
-	if percTotal == 0 {
-		return nil
-	}
-	// I'm not sure why this does Used + avail instead of total, but I'm too afraid to change it
-	perc := float64(fs.Used.Bytes.ValueOr(0)) / float64(percTotal)
-	fs.Used.Pct = opt.FloatWith(common.Round(perc, common.DefaultDecimalPlacesCount))
+	fs.fillMetrics()
 
 	return nil
 }

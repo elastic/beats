@@ -22,7 +22,7 @@ func TestMountList(t *testing.T) {
 	t.Logf("Usage:")
 
 	for _, res := range result {
-		err := res.getUsage()
+		err := res.GetUsage()
 		assert.NoError(t, err, "getUsage")
 		out := common.MapStr{}
 		typeconv.Convert(&out, res)

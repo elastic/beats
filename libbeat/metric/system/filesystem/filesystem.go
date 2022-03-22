@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
@@ -35,6 +36,11 @@ type FSStat struct {
 type UsedVals struct {
 	Pct   opt.Float `struct:"pct,omitempty"`
 	Bytes opt.Uint  `struct:"bytes,omitempty"`
+}
+
+// IsZero implements the IsZero interface for go-structform
+func (u UsedVals) IsZero() bool {
+	return u.Pct.IsZero() && u.Bytes.IsZero()
 }
 
 var debugf = logp.MakeDebug("libbeat.filesystem")
@@ -75,9 +81,22 @@ func GetFilesystems(hostfs resolve.Resolver, filter func(FSStat) bool) ([]FSStat
 
 }
 
-// DefaultIgnoredTypes tries to guess a sane list of filesystem types that
+// Fill out computed stats after the platform-specific code fetches metrics from the OS
+func (fs *FSStat) fillMetrics() {
+	fs.Used.Bytes = fs.Total.SubtractOrNone(fs.Free)
+
+	percTotal := fs.Used.Bytes.ValueOr(0) + fs.Avail.ValueOr(0)
+	if percTotal == 0 {
+		return
+	}
+	// I'm not sure why this does Used + avail instead of total, but I'm too afraid to change it
+	perc := float64(fs.Used.Bytes.ValueOr(0)) / float64(percTotal)
+	fs.Used.Pct = opt.FloatWith(common.Round(perc, common.DefaultDecimalPlacesCount))
+}
+
+// defaultIgnoredTypes tries to guess a sane list of filesystem types that
 // could be ignored in the running system
-func DefaultIgnoredTypes(sys resolve.Resolver) (types []string) {
+func defaultIgnoredTypes(sys resolve.Resolver) (types []string) {
 	// If /proc/filesystems exist, default ignored types are all marked
 	// as nodev
 	fsListFile := sys.ResolveHostFS("/proc/filesystems")
@@ -93,10 +112,10 @@ func DefaultIgnoredTypes(sys resolve.Resolver) (types []string) {
 	return
 }
 
-func buildDefaultFilters(hostfs resolve.Resolver) func(FSStat) bool {
-	ignoreType := DefaultIgnoredTypes(hostfs)
+// BuildFilterWithList returns a filesystem filter with the given list of FS types
+func BuildFilterWithList(ignored []string) func(FSStat) bool {
 	return func(fs FSStat) bool {
-		for _, fsType := range ignoreType {
+		for _, fsType := range ignored {
 			// XXX (andrewkroh): SystemType appears to be used for non-Windows
 			// and Type is used exclusively for Windows.
 			if fs.Type == fsType {
@@ -105,6 +124,11 @@ func buildDefaultFilters(hostfs resolve.Resolver) func(FSStat) bool {
 		}
 		return true
 	}
+}
+
+func buildDefaultFilters(hostfs resolve.Resolver) func(FSStat) bool {
+	ignoreType := defaultIgnoredTypes(hostfs)
+	return BuildFilterWithList(ignoreType)
 }
 
 // If a block device is mounted multiple times (e.g. with some bind mounts),

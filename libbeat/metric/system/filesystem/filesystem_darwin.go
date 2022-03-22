@@ -21,14 +21,14 @@ import (
 func parseMounts(path string, filter func(FSStat) bool) ([]FSStat, error) {
 	num, err := syscall.Getfsstat(nil, C.MNT_NOWAIT)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	buf := make([]syscall.Statfs_t, num)
 
 	_, err = syscall.Getfsstat(buf, C.MNT_NOWAIT)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	fslist := make([]FSStat, 0, num)

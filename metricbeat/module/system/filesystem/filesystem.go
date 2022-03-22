@@ -21,14 +21,15 @@
 package filesystem
 
 import (
-	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	fs "github.com/elastic/beats/v7/libbeat/metric/system/filesystem"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-
 	"github.com/pkg/errors"
 )
 
@@ -44,6 +45,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	config Config
+	sys    resolve.Resolver
 }
 
 // New creates and returns a new instance of MetricSet.
@@ -53,50 +55,62 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	sys := base.Module().(resolve.Resolver)
+
 	if config.IgnoreTypes == nil {
 		config.IgnoreTypes = DefaultIgnoredTypes(sys)
 	}
 	if len(config.IgnoreTypes) > 0 {
 		logp.Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
 	}
-
 	return &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
+		sys:           sys,
 	}, nil
 }
 
 // Fetch fetches filesystem metrics for all mounted filesystems and returns
 // an event for each mount point.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	fss, err := GetFileSystemList()
+	// fss, err := GetFileSystemList()
+	// if err != nil {
+	// 	return errors.Wrap(err, "error getting filesystem list")
+
+	// }
+
+	// if len(m.config.IgnoreTypes) > 0 {
+	// 	fss = Filter(fss, BuildTypeFilter(m.config.IgnoreTypes...))
+	// }
+
+	fsList, err := fs.GetFilesystems(m.sys, fs.BuildFilterWithList(m.config.IgnoreTypes))
 	if err != nil {
-		return errors.Wrap(err, "error getting filesystem list")
-
-	}
-	fmt.Printf("Ignoring: %#v\n", m.config.IgnoreTypes)
-	if len(m.config.IgnoreTypes) > 0 {
-		fss = Filter(fss, BuildTypeFilter(m.config.IgnoreTypes...))
+		return errors.Wrap(err, "error fetching filesystems")
 	}
 
-	for _, fs := range fss {
-		stat, err := GetFileSystemStat(fs)
-		addStats := true
+	for _, fs := range fsList {
+		err := fs.GetUsage()
 		if err != nil {
-			addStats = false
-			m.Logger().Debugf("error fetching filesystem stats for '%s': %v", fs.DirName, err)
+			return errors.Wrap(err, "error")
 		}
-		fsStat := FSStat{
-			FileSystemUsage: stat,
-			DevName:         fs.DevName,
-			Mount:           fs.DirName,
-			SysTypeName:     fs.SysTypeName,
-		}
+		out := common.MapStr{}
+		typeconv.Convert(&out, fs)
+		// stat, err := GetFileSystemStat(fs)
+		// addStats := true
+		// if err != nil {
+		// 	addStats = false
+		// 	m.Logger().Debugf("error fetching filesystem stats for '%s': %v", fs.DirName, err)
+		// }
+		// fsStat := FSStat{
+		// 	FileSystemUsage: stat,
+		// 	DevName:         fs.DevName,
+		// 	Mount:           fs.DirName,
+		// 	SysTypeName:     fs.SysTypeName,
+		// }
 
-		AddFileSystemUsedPercentage(&fsStat)
+		// AddFileSystemUsedPercentage(&fsStat)
 
 		event := mb.Event{
-			MetricSetFields: GetFilesystemEvent(&fsStat, addStats),
+			MetricSetFields: out,
 		}
 		if !r.Event(event) {
 			return nil
