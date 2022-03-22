@@ -19,15 +19,20 @@ package wineventlog
 
 import (
 	"bytes"
+	"encoding/xml"
 	"flag"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
 var updateXML = flag.Bool("update", false, "update XML golden files from evtx files in testdata")
@@ -114,13 +119,20 @@ func TestWinEventLog(t *testing.T) {
 					}
 				}
 				if !*updateXML {
-					want, err := os.ReadFile(xmlPath)
+					f, err := os.Open(xmlPath)
 					if err != nil {
 						t.Fatalf("failed to read golden file: %v", err)
 					}
-					got := out.(*bytes.Buffer).Bytes()
-					if !bytes.Equal(want, got) {
-						t.Errorf("unexpected result for %s: want:\n%s", test.path, cmp.Diff(want, got))
+					want, err := unmarshalXMLEvents(f)
+					if err != nil {
+						t.Fatalf("failed to unmarshal golden events: %v", err)
+					}
+					got, err := unmarshalXMLEvents(out.(*bytes.Buffer))
+					if err != nil {
+						t.Fatalf("failed to unmarshal obtained events: %v", err)
+					}
+					if !reflect.DeepEqual(want, got) {
+						t.Errorf("unexpected result for %s: got:- want:+\n%s", test.path, cmp.Diff(want, got))
 					}
 				}
 
@@ -130,6 +142,37 @@ func TestWinEventLog(t *testing.T) {
 			})
 		})
 	}
+}
+
+// unmarshalXMLEvents unmarshals a complete set of events from the XML data
+// in the provided io.Reader. GUID values are canonicalised to lowercase.
+func unmarshalXMLEvents(r io.Reader) ([]winevent.Event, error) {
+	var events []winevent.Event
+	decoder := xml.NewDecoder(r)
+	for {
+		var e winevent.Event
+		err := decoder.Decode(&e)
+		if err != nil {
+			if err != io.EOF {
+				return nil, err
+			}
+			break
+		}
+		events = append(events, canonical(e))
+	}
+	return events, nil
+}
+
+// canonical return e with its GUID values canonicalised to lower case.
+// Different versions of Windows render these values in different cases; ¯\_(ツ)_/¯
+func canonical(e winevent.Event) winevent.Event {
+	e.Provider.GUID = strings.ToLower(e.Provider.GUID)
+	for i, kv := range e.EventData.Pairs {
+		if strings.Contains(strings.ToLower(kv.Key), "guid") {
+			e.EventData.Pairs[i].Value = strings.ToLower(kv.Value)
+		}
+	}
+	return e
 }
 
 func TestChannels(t *testing.T) {
