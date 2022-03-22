@@ -31,6 +31,7 @@ import (
 
 	"github.com/andrewkroh/sys/windows/svc/eventlog"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
@@ -188,6 +189,18 @@ func testWindowsEventLog(t *testing.T, api string) {
 	openLog := func(t testing.TB, config map[string]interface{}) EventLog {
 		return openLog(t, api, nil, config)
 	}
+
+	t.Run("has_message", func(t *testing.T) {
+		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1})
+		defer log.Close()
+
+		records, err := log.Read()
+		require.NotEmpty(t, records)
+		require.NoError(t, err)
+
+		r := records[0]
+		require.NotEmpty(t, r.Message, "message field is empty: errors:%v\nrecord:%#v", r.Event.RenderErr, r)
+	})
 
 	// Test reading from an event log using a custom XML query.
 	t.Run("custom_xml_query", func(t *testing.T) {
