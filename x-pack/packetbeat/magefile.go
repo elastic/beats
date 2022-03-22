@@ -149,7 +149,7 @@ func TestPackages() error {
 	return devtools.TestPackages()
 }
 
-func TestSystem(ctx context.Context) error {
+func SystemTest(ctx context.Context) error {
 	mg.SerialDeps(getNpcapInstaller, devtools.BuildSystemTestBinary)
 
 	args := devtools.DefaultGoTestIntegrationArgs()

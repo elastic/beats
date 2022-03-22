@@ -40,7 +40,7 @@ stages:
         mage: "mage build unitTest"
         stage: mandatory
     systemTest:
-        mage: "mage testSystem"
+        mage: "mage systemTest"
         stage: mandatory
         withGCP: true
     macos:
@@ -62,7 +62,7 @@ stages:
             - "windows-2022"
         stage: mandatory
     windows-2022-system:
-        mage: "mage testSystem"
+        mage: "mage systemTest"
         withGCP: true
         platforms:             ## override default labels in this specific stage.
             - "windows-2022"
@@ -89,7 +89,7 @@ stages:
             - "windows-10"
         stage: extended_win
     windows-10-system:
-        mage: "mage testSystem"
+        mage: "mage systemTest"
         withGCP: true
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
