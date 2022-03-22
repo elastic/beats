@@ -45,7 +45,7 @@ const (
 func init() {
 	common.RegisterCheckDeps(Update)
 
-	test.RegisterDeps(TestSystem)
+	test.RegisterDeps(SystemTest)
 
 	devtools.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
 	devtools.BeatLicense = "Elastic License"
