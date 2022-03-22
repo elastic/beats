@@ -153,7 +153,7 @@ func unmarshalXMLEvents(r io.Reader) ([]winevent.Event, error) {
 		var e winevent.Event
 		err := decoder.Decode(&e)
 		if err != nil {
-			if err != io.EOF { //nolint:errorlint This is never wrapped.
+			if err != io.EOF { //nolint:errorlint // This is never wrapped.
 				return nil, err
 			}
 			break
