@@ -94,7 +94,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 - Add FIPS configuration option for all AWS API calls. {pull}28899[28899]
 - Add support for kafka message headers. {pull}29940[29940]
-- Add FIPS configuration option for all AWS API calls. {pull}[28899]
 - Add support for non-unique Kafka headers for output messages. {pull}30369[30369]
 - Add syslog parser and processor. {issue}30139[30139] {pull}30541[30541]
 - Add action_input_type for the .fleet-actions-results {pull}30562[30562]
@@ -116,6 +115,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Improve recovery from corrupted registries. {issue}25135[25135] {pull}30994[30994]
 - Add support in httpjson input for chain calls. {pull}29816[29816]
 - checkpoint module: Add `network.transport` derived from IANA number. {pull}31076[31076]
+- Add URL Encode template function for httpjson input. {pull}[]
 
 *Auditbeat*
 
