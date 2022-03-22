@@ -18,4 +18,4 @@
 package ecs
 
 // Version is the Elastic Common Schema version from which this was generated.
-const Version = "8.0.0"
+const Version = "8.2.0"
