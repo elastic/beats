@@ -593,17 +593,11 @@ metricbeat.modules:
 
 - module: gcp
   metricsets:
-    - metrics
+    - gke
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
-  metrics:
-    - aligner: ALIGN_NONE
-      service: gke
-      service_metric_prefix: kubernetes.io/
-      metric_types:
-        - "container/cpu/core_usage_time"
 
 - module: gcp
   metricsets:
@@ -951,6 +945,7 @@ metricbeat.modules:
   #     include_labels: ["nodelabel2"]
   #     include_annotations: ["nodeannotation1"]
   #   deployment: false
+  #   cronjob: false
   # Kubernetes client QPS and burst can be configured additionally
   #kube_client_options:
   #  qps: 5

@@ -308,7 +308,7 @@ rotate files, make sure this option is enabled.
 
 [float]
 [id="{beatname_lc}-input-{type}-close-eof"]
-===== `close.reader.eof`
+===== `close.reader.on_eof`
 
 WARNING: Only use this option if you understand that data loss is a potential
 side effect.
