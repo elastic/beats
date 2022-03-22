@@ -138,6 +138,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Add `commandstats` field to Redis module {pull}29662[29662]
 - Extend documentation about `kubernetes.node.network.*` fields {pull}30826[30826]
 - Add `kubernetes.volume.fs.inodes.pct` field. {pull}30785[30785]
+- Improve Kubernetes dashboard. {pull}30913[30913]
 
 *Packetbeat*
 
