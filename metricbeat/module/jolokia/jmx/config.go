@@ -482,7 +482,7 @@ func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]common.MapStr, error) {
 	if logp.IsDebug(metricsetName) {
 		for _, r := range httpReqs {
 			m.log.Debugw("Jolokia request URI and body",
-				"httpMethod", r.HTTPMethod, "URI", m.BaseMetricSet.HostData().SanitizedURI+r.URI, "body", string(r.Body), "type", "request")
+				"httpMethod", r.HTTPMethod, "URI", m.http.GetURI(), "body", string(r.Body), "type", "request")
 		}
 	}
 
