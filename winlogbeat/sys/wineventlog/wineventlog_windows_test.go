@@ -19,78 +19,116 @@ package wineventlog
 
 import (
 	"bytes"
+	"flag"
+	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
-var sysmonEvtx string
+var updateXML = flag.Bool("update", false, "update XML golden files from evtx files in testdata")
 
-func init() {
-	var err error
-	sysmonEvtx, err = filepath.Abs("testdata/sysmon-9.01.evtx")
-	if err != nil {
-		panic(err)
-	}
-
-	if _, err = os.Lstat(sysmonEvtx); err != nil {
-		panic(err)
-	}
-}
-
-func TestEvtOpenLog(t *testing.T) {
-	h, err := EvtOpenLog(0, sysmonEvtx, EvtOpenFilePath)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer Close(h)
-}
-
-func TestEvtQuery(t *testing.T) {
-	h, err := EvtQuery(0, sysmonEvtx, "", EvtQueryFilePath)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer Close(h)
-}
-
-func TestReadEvtx(t *testing.T) {
-	// Open .evtx file.
-	h, err := EvtQuery(0, sysmonEvtx, "", EvtQueryFilePath|EvtQueryReverseDirection)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer Close(h)
-
-	// Get handles to events.
-	buf := make([]byte, 32*1024)
-	out := new(bytes.Buffer)
-	count := 0
-	for {
-		handles, err := EventHandles(h, 8)
-		if err == ERROR_NO_MORE_ITEMS {
-			t.Log(err)
-			break
-		}
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		// Read events.
-		for _, h := range handles {
-			out.Reset()
-			if err = RenderEventXML(h, buf, out); err != nil {
+func TestWinEventLog(t *testing.T) {
+	for _, test := range []struct {
+		path   string
+		events int
+	}{
+		{path: "sysmon-9.01.evtx", events: 32},
+		{path: "ec1.evtx", events: 1},     // eventcreate /id 1000 /t error /l application /d "My custom error event for the application log"
+		{path: "ec2.evtx", events: 1},     // eventcreate /id 999 /t error /l application /so WinWord /d "Winword event 999 happened due to low diskspace"
+		{path: "ec3.evtx", events: 1},     // eventcreate /id 5 /t error /l system /d "Catastrophe!"
+		{path: "ec4.evtx", events: 1},     // eventcreate /id 5 /t error /l system /so Backup /d "Backup failure"
+		{path: "ec3and4.evtx", events: 2}, // ec3 and ec3 exported as a single evtx.
+	} {
+		t.Run(test.path, func(t *testing.T) {
+			evtx, err := filepath.Abs(filepath.Join("testdata", test.path))
+			if err != nil {
 				t.Fatal(err)
 			}
-			Close(h)
-			count++
-		}
-	}
+			xmlPath := evtx[:len(evtx)-len("evtx")] + "xml"
 
-	if count != 32 {
-		t.Fatal("expected to read 32 events but got", count, "from", sysmonEvtx)
+			if _, err = os.Lstat(evtx); err != nil {
+				t.Fatal(err)
+			}
+
+			t.Run("EvtOpenLog", func(t *testing.T) {
+				h, err := EvtOpenLog(0, evtx, EvtOpenFilePath)
+				if err != nil {
+					t.Fatal(err)
+				}
+				defer Close(h)
+			})
+
+			t.Run("EvtQuery", func(t *testing.T) {
+				h, err := EvtQuery(0, evtx, "", EvtQueryFilePath)
+				if err != nil {
+					t.Fatal(err)
+				}
+				defer Close(h)
+			})
+
+			t.Run("ReadEvtx", func(t *testing.T) {
+				// Open .evtx file.
+				h, err := EvtQuery(0, evtx, "", EvtQueryFilePath|EvtQueryReverseDirection)
+				if err != nil {
+					t.Fatal(err)
+				}
+				defer Close(h)
+
+				// Get handles to events.
+				buf := make([]byte, 32*1024)
+				var out io.Writer
+				if *updateXML {
+					f, err := os.Create(xmlPath)
+					if err != nil {
+						t.Fatalf("failed to create golden file: %v", err)
+					}
+					defer f.Close()
+					out = f
+				} else {
+					out = &bytes.Buffer{}
+				}
+				var count int
+				for {
+					handles, err := EventHandles(h, 8)
+					if err == ERROR_NO_MORE_ITEMS {
+						t.Log(err)
+						break
+					}
+					if err != nil {
+						t.Fatal(err)
+					}
+
+					// Read events.
+					for _, h := range handles {
+						if err = RenderEventXML(h, buf, out); err != nil {
+							t.Fatal(err)
+						}
+						Close(h)
+						fmt.Fprintln(out)
+						count++
+					}
+				}
+				if !*updateXML {
+					want, err := os.ReadFile(xmlPath)
+					if err != nil {
+						t.Fatalf("failed to read golden file: %v", err)
+					}
+					got := out.(*bytes.Buffer).Bytes()
+					if !bytes.Equal(want, got) {
+						t.Errorf("unexpected result for %s: want:\n%s", test.path, cmp.Diff(want, got))
+					}
+				}
+
+				if count != test.events {
+					t.Errorf("expected to read %d events but got %d from %s", test.events, count, test.path)
+				}
+			})
+		})
 	}
 }
 

@@ -89,16 +89,17 @@ func evtFormatMessage(metadataHandle EvtHandle, eventHandle EvtHandle, messageID
 	defer bb.Free()
 	bb.Reserve(int(bufferUsed * 2))
 
-	err = _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, uint32(bb.Len()/2), bb.PtrAt(0), &bufferUsed)
-	if err != nil {
-		switch err {
-		// Ignore some errors so it can tolerate missing or mismatched parameter values.
-		case windows.ERROR_EVT_UNRESOLVED_VALUE_INSERT:
-		case windows.ERROR_EVT_UNRESOLVED_PARAMETER_INSERT:
-		case windows.ERROR_EVT_MAX_INSERTS_REACHED:
-		default:
-			return "", errors.Wrap(err, "failed in EvtFormatMessage")
-		}
+	err = _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, uint32(bb.Len()), bb.PtrAt(0), &bufferUsed)
+	switch err {
+	case nil: // OK
+
+	// Ignore some errors so it can tolerate missing or mismatched parameter values.
+	case windows.ERROR_EVT_UNRESOLVED_VALUE_INSERT,
+		windows.ERROR_EVT_UNRESOLVED_PARAMETER_INSERT,
+		windows.ERROR_EVT_MAX_INSERTS_REACHED:
+
+	default:
+		return "", errors.Wrap(err, "failed in EvtFormatMessage")
 	}
 
 	return sys.UTF16BytesToString(bb.Bytes())
