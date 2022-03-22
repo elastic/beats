@@ -261,8 +261,6 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
-<<<<<<< HEAD
-=======
   # Set the namespace to watch for resources
   #namespace: staging
   # To configure additionally node and namespace metadata, added to pod, service and container resource types,
@@ -280,7 +278,6 @@ metricbeat.modules:
   #kube_client_options:
   #  qps: 5
   #  burst: 10
->>>>>>> ae94fa9a7e (add explanation regarding add_resource_metadata; sync documentation for processor and audiscover (#30921))
 
 # Kubernetes Events
 - module: kubernetes
