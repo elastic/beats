@@ -191,6 +191,7 @@ Example:
           include_labels: ["nodelabel2"]
           include_annotations: ["nodeannotation1"]
         deployment: false
+        cronjob: false
 -------------------------------------------------------------------------------------
 
 `unique`:: (Optional) Defaults to `false`. Marking an autodiscover provider as unique results into
