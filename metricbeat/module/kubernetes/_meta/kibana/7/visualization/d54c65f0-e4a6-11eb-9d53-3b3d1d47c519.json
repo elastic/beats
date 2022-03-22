@@ -41,10 +41,10 @@
             "type": "input_control_vis"
         }
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "8.2.0",
     "id": "d54c65f0-e4a6-11eb-9d53-3b3d1d47c519",
     "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "8.1.0"
     },
     "references": [
         {
@@ -54,6 +54,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-08-04T16:31:37.319Z",
-    "version": "WzQwMjYsMV0="
+    "updated_at": "2022-03-18T11:52:30.304Z",
+    "version": "WzI3MTUsMl0="
 }
