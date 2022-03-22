@@ -8,8 +8,6 @@ PYTHON_EXE?=python3
 PYTHON_ENV_EXE=${PYTHON_ENV}/bin/$(notdir ${PYTHON_EXE})
 VENV_PARAMS?=
 FIND=find . -type f -not -path "*/build/*" -not -path "*/.git/*"
-GOLINT=golint
-GOLINT_REPO=golang.org/x/lint/golint
 XPACK_SUFFIX=x-pack/
 
 # PROJECTS_XPACK_PKG is a list of Beats that have independent packaging support
