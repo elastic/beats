@@ -126,13 +126,14 @@ level. Possible values are `node` and `cluster`. Scope is `node` by default.
 `namespace`:: (Optional) Select the namespace from which to collect the
 metadata. If it is not set, the processor collects metadata from all namespaces.
 It is unset by default.
-`add_resource_metadata`:: (Optional) Specify labels and annotations filters for the extra metadata coming from node and namespace.
- `add_resource_metadata` can be done for `node` or `namespace`. By default all labels are included
-while annotations are not. These settings are useful when storing labels and annotations
-that require special handling to avoid overloading the storage output. The enrichment of `node` or `namespace` metadata
-can be individually disabled by setting `enabled: false`.
+`add_resource_metadata`:: (Optional) Specify filters and configuration for the extra metadata, that will be added to the event. Configuration parameters:
+ - `node` or `namespace`: Specify labels and annotations filters for the extra metadata coming from node and namespace. By default all labels are included while annotations are not. To change default behaviour `include_labels`, `exclude_labels` and `include_annotations` can be defined. Those settings are useful when storing labels and annotations that require special handling to avoid overloading the storage output.
+ Note: wildcards are not supported for those settings.
+ The enrichment of `node` or `namespace` metadata can be individually disabled by setting `enabled: false`.
+ - `deployment`: If resource is `pod` and it is created from a `deployment`, by default the deployment name is added, this can be disabled by setting `deployment: false`.
+ - `cronjob`: If resource is `pod` and it is created from a `cronjob`, by default the cronjob name is added, this can be disabled by setting `cronjob: false`.
++
 Example:
-
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
       add_resource_metadata:
@@ -145,6 +146,8 @@ Example:
           include_annotations: ["nodeannotation1"]
           #labels.dedot: true
           #annotations.dedot: true
+        deployment: false
+        cronjob: false
 -------------------------------------------------------------------------------------
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
 client. It defaults to `KUBECONFIG` environment variable if present.

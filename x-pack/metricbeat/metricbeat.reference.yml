@@ -902,6 +902,23 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  # Set the namespace to watch for resources
+  #namespace: staging
+  # To configure additionally node and namespace metadata, added to pod, service and container resource types,
+  # `add_resource_metadata` can be defined.
+  # By default all labels will be included while annotations are not added by default.
+  # add_resource_metadata:
+  #   namespace:
+  #     include_labels: ["namespacelabel1"]
+  #   node:
+  #     include_labels: ["nodelabel2"]
+  #     include_annotations: ["nodeannotation1"]
+  #   deployment: false
+  #   cronjob: false
+  # Kubernetes client QPS and burst can be configured additionally
+  #kube_client_options:
+  #  qps: 5
+  #  burst: 10
 
 # Kubernetes Events
 - module: kubernetes
