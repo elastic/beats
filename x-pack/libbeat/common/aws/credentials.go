@@ -45,6 +45,7 @@ type ConfigAWS struct {
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
 func InitializeAWSConfig(config ConfigAWS) (awssdk.Config, error) {
+	logger := logp.NewLogger("InitializeAWSConfig")
 	AWSConfig, _ := GetAWSCredentials(config)
 	if AWSConfig.Region == "" {
 		if config.DefaultRegion != "" {
@@ -53,6 +54,13 @@ func InitializeAWSConfig(config ConfigAWS) (awssdk.Config, error) {
 			AWSConfig.Region = "us-east-1"
 		}
 	}
+
+	// Assume IAM role if iam_role config parameter is given
+	if config.RoleArn != "" {
+		logger.Debug("Switching credentials provider to AssumeRoleProvider")
+		AWSConfig = switchToAssumeRoleProvider(config, AWSConfig)
+	}
+
 	var proxy func(*http.Request) (*url.URL, error)
 	if config.ProxyUrl != "" {
 		proxyUrl, err := httpcommon.NewProxyURIFromString(config.ProxyUrl)
@@ -90,7 +98,7 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 }
 
 func getAccessKeys(config ConfigAWS) awssdk.Config {
-	logger := logp.NewLogger("getAccessKeys")
+	//logger := logp.NewLogger("getAccessKeys")
 	awsConfig := defaults.Config()
 	awsCredentials := awssdk.Credentials{
 		AccessKeyID:     config.AccessKeyID,
@@ -103,12 +111,6 @@ func getAccessKeys(config ConfigAWS) awssdk.Config {
 
 	awsConfig.Credentials = awssdk.StaticCredentialsProvider{
 		Value: awsCredentials,
-	}
-
-	// Assume IAM role if iam_role config parameter is given
-	if config.RoleArn != "" {
-		logger.Debug("Using role arn and access keys for AWS credential")
-		return getRoleArn(config, awsConfig)
 	}
 
 	return awsConfig
@@ -138,17 +140,12 @@ func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 		return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed with shared credential profile given")
 	}
 
-	// Assume IAM role if iam_role config parameter is given
-	if config.RoleArn != "" {
-		logger.Debug("Using role arn and shared credential profile for AWS credential")
-		return getRoleArn(config, awsConfig), nil
-	}
-
 	logger.Debug("Using shared credential profile for AWS credential")
 	return awsConfig, nil
 }
 
-func getRoleArn(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
+// switchToAssumeRoleProvider switches the credentials provider in the awsConfig to the `AssumeRoleProvider`.
+func switchToAssumeRoleProvider(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
 	stsSvc := sts.New(awsConfig)
 	stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
 	awsConfig.Credentials = stsCredProvider
