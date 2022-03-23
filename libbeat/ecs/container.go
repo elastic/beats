@@ -40,7 +40,7 @@ type Container struct {
 	// Percent CPU used which is normalized by the number of CPU cores
 	// and it ranges from 0 to 1. Scaling factor: 1000.
 	// Scaling factor: 1000.
-	CpuUsage float64 `ecs:"cpu.usage"`
+	CPUUsage float64 `ecs:"cpu.usage"`
 
 	// The total number of bytes (gauge) read successfully (aggregated
 	// from all disks) since the last metric collection.

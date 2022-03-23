@@ -107,7 +107,7 @@ type Log struct {
 	// Structured data expressed in RFC 5424 messages, if available. These
 	// are key-value pairs formed from the structured data portion of the syslog
 	// message, as defined in RFC 5424 Section 6.3.
-	SyslogStructured_data map[string]interface{} `ecs:"syslog.syslog.structured_data"`
+	SyslogStructuredData map[string]interface{} `ecs:"syslog.syslog.structured_data"`
 
 	// The version of the Syslog protocol specification. Only applicable
 	// for RFC 5424 messages.
