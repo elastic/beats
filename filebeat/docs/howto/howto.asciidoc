@@ -15,6 +15,7 @@ Learn how to perform common {beatname_uc} configuration tasks.
 * <<configuring-ingest-node>>
 * <<using-environ-vars>>
 * <<yaml-tips>>
+* <<migrate-to-filestream>>
 
 
 --

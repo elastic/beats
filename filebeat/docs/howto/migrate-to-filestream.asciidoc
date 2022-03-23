@@ -1,0 +1,243 @@
+[[migrate-to-filestream]]
+== Migrate log input configurations to filestream
+
+Filestream input is generally available since 7.14. So it is high time you
+migrate your existing log input configurations.  It comes with many
+improvements over the old input like configurable order for parsers and more.
+
+While we do not plan to remove the log input from Filebeat, we are not fixing
+new issues or adding any enhancements to the input. Our focus is on filestream.
+
+In this guide, we are leading you through the migration of an existing log input configuration.
+Let's say you are collecting the list of files above with the following three log inputs:
+
+[source,yaml]
+----
+filebeat.inputs:
+ - type: log
+   enabled: true
+   paths:
+     - /var/log/java-exceptions*.log
+   multiline:
+    pattern: '^\['
+    negate: true
+    match: after
+  close_removed: true
+  close_renamed: true
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/my-application*.json
+  scan_frequency: 1m
+  json.keys_under_root: true
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/my-old-files*.log
+  tail_files: true
+----
+
+The list of the collected files and the progress of data collection with the log input:
+["source","sh",subs="attributes"]
+----
+/var/log/java-exceptions1.log (100%)
+/var/log/java-exceptions2.log (100%)
+/var/log/java-exceptions3.log (75%)
+/var/log/java-exceptions4.log (0%)
+/var/log/java-exceptions5.log (0%)
+/var/log/my-application1.json (100%)
+/var/log/my-application2.json (5%)
+/var/log/my-application3.json (0%)
+/var/log/my-old-files1.json (0%)
+----
+
+=== 1. Set an identifier for each filestream input
+
+All filestream inputs require an ID. So make sure you set a unique identifier for every input. 
+
+Warning: Never change the ID of an input otherwise you will end up with duplicate events.
+
+[source,yaml]
+----
+filebeat.inputs:
+- type: filestream
+  enabled: true
+  id: my-java-collector
+  paths:
+    - /var/log/java-exceptions*.log
+
+- type: filestream
+  enabled: true
+  id: my-application-input
+  paths:
+    - /var/log/my-application*.json
+
+- type: filestream
+  enabled: true
+  id: my-old-files
+  paths:
+    - /var/log/my-old-files*.log
+----
+
+=== 2. Exclude all processed files
+
+Filebeat does not provide access to the state information of different inputs.
+Hence, filestream cannot access the state information of a log input in the
+registry of Filebeat. You have to exclude the files the log input has processed
+or is processing. If you do not exclude those files, you will end up with
+duplicate events in the output.
+
+Given the file list above with their ingestion progress, you
+should run log input and filestream input simultaneously until everything
+collected by the log input has made it to the output.
+Once the files collected by the log input are shipped, you can delete log
+inputs and the exlude_files settings from filestream input.
+
+[source,yaml]
+----
+filebeat.inputs:
+ - type: log
+   enabled: true
+   paths:
+     - /var/log/java-exceptions*.log
+   multiline:
+    pattern: '^\['
+    negate: true
+    match: after
+  close_removed: true
+  close_renamed: true
+  exclude_files: java-exceptions.[4-5].log
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/my-application*.json
+  scan_frequency: 1m
+  json.keys_under_root: true
+  exclude_files: my-application3.log
+
+- type: filestream
+  enabled: true
+  id: my-java-collector
+  paths:
+    - /var/log/java-exceptions*.log
+  prospector.scanner.exclude_files: java-exceptions.[1-3].log
+
+- type: filestream
+  enabled: true
+  id: my-application-input
+  paths:
+    - /var/log/my-application*.json
+  prospector.scanner.exclude_files: my-application.[1-2].log
+
+- type: filestream
+  enabled: true
+  id: my-old-files
+  paths:
+    - /var/log/my-old-files*.log
+----
+
+
+=== 3. Use new option names
+
+Several options are renamed in filestream. You can find a table with all of the
+changed configuration names at the end of this guide.
+
+The most significant change you have to know about is in parsers. The configuration of
+multiline, json and other parsers has changed. Now the ordering is
+configurable, so filestream expects a list of parsers. Furthermore, the json
+parser was renamed to ndjson.
+
+The example configuration we presented has to be adjusted as well:
+
+[source,yaml]
+----
+- type: filestream
+  enabled: true
+  id: my-java-collector
+  paths:
+    - /var/log/java-exceptions*.log
+  parsers:
+    - multiline:
+        pattern: '^\['
+        negate: true
+        match: after
+  close.on_state_change.removed: true
+  close.on_state_change.renamed: true
+
+- type: filestream
+  enabled: true
+  id: my-application-input
+  paths:
+    - /var/log/my-application*.json
+  prospector.scanner.check_interval: 1m
+  parsers:
+    - ndjson:
+        keys_under_root: true
+
+- type: filestream
+  enabled: true
+  id: my-old-files
+  paths:
+    - /var/log/my-old-files*.log
+  ignore_inactive: since_last_start
+----
+
+[cols="1,1"]
+|===
+|Option name in log input
+|Option name in filestream input
+
+|recursive_glob.enabled
+|prospector.scanner.recursive_glob
+
+|harvester_buffer_size
+|buffer_size
+
+|max_bytes
+|message_max_bytes
+
+|json
+|parsers.n.ndjson
+
+|multiline
+|parsers.n.mutiline
+
+|exclude_files
+|prospector.scanner.exclude_files
+
+|close_inactive
+|close.on_state_change.inactive
+
+|close_removed
+|close.on_state_change.removed
+
+|close_eof
+|close.reader.on_eof
+
+|close_timeout
+|close.reader.after_interval
+
+|close_inactive
+|close.on_state_change.inactive
+
+|scan_frequency
+|prospector.scanner.check_interval
+
+|tail_files
+|ignore_inactive.since_last_start
+
+|symlinks
+|prospector.scanner.symlinks
+
+|backoff
+|backoff.init
+
+|backoff_max
+|backoff.max
+|===
+
+
+
