@@ -40,6 +40,9 @@ actually happened.
 The file integrity module should not be used to monitor paths on network file
 systems.
 
+NOTE: On Linux, this module only monitors traditional UNIX permissions. It doesn't
+report changes to a file's extended ACL permissions.
+
 [float]
 === Configuration options
 
