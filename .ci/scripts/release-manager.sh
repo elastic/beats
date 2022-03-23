@@ -54,4 +54,5 @@ docker run --rm \
       --branch "main" \
       --commit "$(git rev-parse HEAD)" \
       --workflow "snapshot" \
-      --artifact-set main
+      --artifact-set main \
+      --version "${VERSION}"
