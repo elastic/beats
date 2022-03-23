@@ -30,14 +30,14 @@ const (
 	osqueryDarwinPath      = "opt/osquery/lib/" + osqueryDarwinApp
 
 	osqueryLinuxPath = "opt/osquery/bin"
-	osqueryVersion   = "5.0.1"
+	osqueryVersion   = "5.2.2"
 	osqueryMSIExt    = ".msi"
 	osqueryPkgExt    = ".pkg"
 
-	osqueryDistroDarwinSHA256   = "ec58996e64637d861ccead8dc6bc8865662728f6e5bc2694a3c92f0f4a371095"
-	osqueryDistroLinuxSHA256    = "acac95714d388f02d5f417b0aaf86de7dbb8f6b3788340a6f8517ee2cd314235"
-	osqueryDistroLinuxARMSHA256 = "712b704036929df14cbe5d3e41bd4e0ae325e698296691763af46dc0d6e77394"
-	osqueryDistroWindowsSHA256  = "e0d01f56e0739a0ce2b3beb03ecea277ed146754884e225cba45083043442acc"
+	osqueryDistroDarwinSHA256   = "c1db00554f65a1f240e9c827c73e0a768fbda66475b18bd68786b3a12e04200f"
+	osqueryDistroLinuxSHA256    = "e86e4cec2f941782a6223a09c2e9d7bdc6cfea0e30ba9792056749b0e79f4576"
+	osqueryDistroLinuxARMSHA256 = "799f4851adeafd251aa57a91e20a9180c5b0c5e0d06cfc12815a1eaf631aaaa1"
+	osqueryDistroWindowsSHA256  = "d784b9c114ae2f5216dc5aa6bf311863c2db8fdaca31085e38a51b35eefa6c50"
 )
 
 type OSArch struct {
@@ -138,6 +138,7 @@ var specs = map[OSArch]Spec{
 	{"linux", "amd64"}:   {"_1.linux_x86_64.tar.gz", osqueryDistroLinuxSHA256, true},
 	{"linux", "arm64"}:   {"_1.linux_aarch64.tar.gz", osqueryDistroLinuxARMSHA256, true},
 	{"darwin", "amd64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, false},
+	{"darwin", "arm64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, false},
 	{"windows", "amd64"}: {osqueryMSIExt, osqueryDistroWindowsSHA256, false},
 }
 

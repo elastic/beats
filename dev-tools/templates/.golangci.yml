@@ -1,0 +1,166 @@
+# options for analysis running
+run:
+  # timeout for analysis, e.g. 30s, 5m, default is 1m
+  timeout: 15m
+
+issues:
+  # Maximum count of issues with the same text.
+  # Set to 0 to disable.
+  # Default: 3
+  max-same-issues: 3
+  # Maximum issues count per one linter.
+  # Set to 0 to disable.
+  # Default: 50
+  max-issues-per-linter: 50
+
+output:
+  sort-results: true
+
+# Uncomment and add a path if needed to exclude
+# skip-dirs:
+#   - some/path
+# skip-files:
+#   - ".*\\.my\\.go$"
+#   - lib/bad.go
+
+# Find the whole list here https://golangci-lint.run/usage/linters/
+linters:
+  disable-all: true
+  enable:
+    - deadcode # finds unused code
+    - errcheck # checking for unchecked errors in go programs
+    - errorlint # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
+    - goconst # finds repeated strings that could be replaced by a constant
+    - dupl # tool for code clone detection
+    - forbidigo # forbids identifiers	matched by reg exps
+    - gosimple # linter for Go source code that specializes in simplifying a code
+    - misspell # finds commonly misspelled English words in comments
+    - nakedret # finds naked returns in functions greater than a specified function length
+    - prealloc # finds slice declarations that could potentially be preallocated
+    - nolintlint # reports ill-formed or insufficient nolint directives
+    - staticcheck # Staticcheck is a go vet on steroids, applying a ton of static analysis checks
+    - stylecheck # a replacement for golint
+    - unparam # reports unused function parameters
+    - unused # checks Go code for unused constants, variables, functions and types
+
+    - govet # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
+    - ineffassign # detects when assignments to existing variables are not used
+    - structcheck # finds unused struct fields
+    - typecheck # Like the front-end of a Go compiler, parses and type-checks Go code
+    - varcheck # Finds unused global variables and constants
+    - asciicheck # simple linter to check that your code does not contain non-ASCII identifiers
+    - bodyclose # checks whether HTTP response body is closed successfully
+    - durationcheck # check for two durations multiplied together
+    - exportloopref # checks for pointers to enclosing loop variables
+    - goimports # Goimports does everything that gofmt does. Additionally it checks unused imports
+    - gosec # inspects source code for security problems
+    - importas # enforces consistent import aliases
+    - nilerr # finds the code that returns nil even if it checks that the error is not nil.
+    - noctx # noctx finds sending http request without context.Context
+    - unconvert # Remove unnecessary type conversions
+    - wastedassign # wastedassign finds wasted assignment statements.
+    - godox # tool for detection of FIXME, TODO and other comment keywords
+    - gomodguard # check for blocked dependencies
+
+# all available settings of specific linters
+linters-settings:
+  errcheck:
+    # report about not checking of errors in type assertions: `a := b.(MyStruct)`;
+    # default is false: such cases aren't reported by default.
+    check-type-assertions: true
+
+  errorlint:
+    # Check whether fmt.Errorf uses the %w verb for formatting errors. See the readme for caveats
+    errorf: true
+    # Check for plain type assertions and type switches
+    asserts: true
+    # Check for plain error comparisons
+    comparison: true
+
+  goconst:
+    # minimal length of string constant, 3 by default
+    min-len: 3
+    # minimal occurrences count to trigger, 3 by default
+    min-occurrences: 2
+
+  dupl:
+    # tokens count to trigger issue, 150 by default
+    threshold: 100
+
+  forbidigo:
+    # Forbid the following identifiers
+    forbid:
+      - fmt.Print.* # too much log noise
+    # Exclude godoc examples from forbidigo checks.  Default is true.
+    exclude_godoc_examples: true
+
+  goimports:
+    local-prefixes: github.com/elastic
+
+  gomodguard:
+    blocked:
+      # List of blocked modules.
+      modules:
+        # Blocked module.
+        - github.com/pkg/errors:
+            # Recommended modules that should be used instead. (Optional)
+            recommendations:
+              - errors
+              - fmt
+            reason: "This package is deprecated, use `fmt.Errorf` with `%w` instead"
+
+  gosimple:
+    # Select the Go version to target. The default is '1.13'.
+    go: "{{.GoVersion}}"
+
+  misspell:
+    # Correct spellings using locale preferences for US or UK.
+    # Default is to use a neutral variety of English.
+    # Setting locale to US will correct the British spelling of 'colour' to 'color'.
+    # locale: US
+    # ignore-words:
+    #   - IdP
+
+  nakedret:
+    # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
+    max-func-lines: 0
+
+  prealloc:
+    # Report preallocation suggestions only on simple loops that have no returns/breaks/continues/gotos in them.
+    # True by default.
+    simple: true
+    range-loops: true # Report preallocation suggestions on range loops, true by default
+    for-loops: false # Report preallocation suggestions on for loops, false by default
+
+  nolintlint:
+    # Enable to ensure that nolint directives are all used. Default is true.
+    allow-unused: false
+    # Disable to ensure that nolint directives don't have a leading space. Default is true.
+    allow-leading-space: false
+    # Exclude following linters from requiring an explanation.  Default is [].
+    allow-no-explanation: []
+    # Enable to require an explanation of nonzero length after each nolint directive. Default is false.
+    require-explanation: true
+    # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
+    require-specific: true
+
+  staticcheck:
+    # Select the Go version to target. The default is '1.13'.
+    go: "{{.GoVersion}}"
+    checks: ["all"]
+
+  stylecheck:
+    # Select the Go version to target. The default is '1.13'.
+    go: "{{.GoVersion}}"
+    checks: ["all"]
+
+  unparam:
+    # Inspect exported functions, default is false. Set to true if no external program/library imports your code.
+    # XXX: if you enable this setting, unparam will report a lot of false-positives in text editors:
+    # if it's called for subdir of a project it can't find external interfaces. All text editor integrations
+    # with golangci-lint call it on a directory with the changed file.
+    check-exported: false
+
+  unused:
+    # Select the Go version to target. The default is '1.13'.
+    go: "{{.GoVersion}}"
