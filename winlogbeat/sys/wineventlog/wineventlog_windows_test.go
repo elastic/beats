@@ -67,7 +67,7 @@ func TestWinEventLog(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				defer Close(h)
+				defer Close(h) //nolint:errcheck // This is just a resource release.
 			})
 
 			t.Run("EvtQuery", func(t *testing.T) {
@@ -75,7 +75,7 @@ func TestWinEventLog(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				defer Close(h)
+				defer Close(h) //nolint:errcheck // This is just a resource release.
 			})
 
 			t.Run("ReadEvtx", func(t *testing.T) {
@@ -84,7 +84,7 @@ func TestWinEventLog(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				defer Close(h)
+				defer Close(h) //nolint:errcheck // This is just a resource release.
 
 				// Get handles to events.
 				buf := make([]byte, 32*1024)
@@ -102,7 +102,7 @@ func TestWinEventLog(t *testing.T) {
 				var count int
 				for {
 					handles, err := EventHandles(h, 8)
-					if err == ERROR_NO_MORE_ITEMS {
+					if err == ERROR_NO_MORE_ITEMS { //nolint:errorlint // This is never wrapped.
 						t.Log(err)
 						break
 					}

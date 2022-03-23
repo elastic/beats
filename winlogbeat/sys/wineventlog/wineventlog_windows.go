@@ -490,7 +490,7 @@ func offset(buffer []byte, reader io.Reader) (uint64, error) {
 
 	if offset > uint64(len(buffer)) {
 		return 0, fmt.Errorf("invalid pointer %x: cannot dereference an "+
-			"address outside of the buffer [%x:%x].", dataPtr, bufferPtr,
+			"address outside of the buffer [%x:%x]", dataPtr, bufferPtr,
 			bufferPtr+uint64(len(buffer)))
 	}
 
@@ -517,7 +517,7 @@ func evtRenderProviderName(renderBuf []byte, eventHandle EvtHandle) (string, err
 	var bufferUsed, propertyCount uint32
 	err := _EvtRender(providerNameContext, eventHandle, EvtRenderEventValues,
 		uint32(len(renderBuf)), &renderBuf[0], &bufferUsed, &propertyCount)
-	if err == ERROR_INSUFFICIENT_BUFFER {
+	if err == ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
 		return "", sys.InsufficientBufferError{Cause: err, RequiredSize: int(bufferUsed)}
 	}
 	if err != nil {
@@ -532,7 +532,7 @@ func renderXML(eventHandle EvtHandle, flag EvtRenderFlag, renderBuf []byte, out 
 	var bufferUsed, propertyCount uint32
 	err := _EvtRender(0, eventHandle, flag, uint32(len(renderBuf)),
 		&renderBuf[0], &bufferUsed, &propertyCount)
-	if err == ERROR_INSUFFICIENT_BUFFER {
+	if err == ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
 		return sys.InsufficientBufferError{Cause: err, RequiredSize: int(bufferUsed)}
 	}
 	if err != nil {
@@ -540,9 +540,10 @@ func renderXML(eventHandle EvtHandle, flag EvtRenderFlag, renderBuf []byte, out 
 	}
 
 	if int(bufferUsed) > len(renderBuf) {
+		//nolint:stylecheck // These are proper nouns.
 		return fmt.Errorf("Windows EvtRender reported that wrote %d bytes "+
 			"to the buffer, but the buffer can only hold %d bytes",
-			bufferUsed, len(renderBuf)) //nolint:stylecheck // These are proper nouns.
+			bufferUsed, len(renderBuf))
 	}
 	return common.UTF16ToUTF8Bytes(renderBuf[:bufferUsed], out)
 }
