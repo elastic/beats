@@ -43331,7 +43331,7 @@ type: double
 *`kubernetes.node.network.rx.bytes`*::
 +
 --
-Received bytes
+Received bytes on the default interface. If default interface is not defined, will be reported not correct value `0`
 
 
 type: double
@@ -43343,7 +43343,7 @@ format: bytes
 *`kubernetes.node.network.rx.errors`*::
 +
 --
-Rx errors
+Rx errors on the default interface. If default interface is not defined, will be reported not correct value `0`
 
 
 type: double
@@ -43354,7 +43354,7 @@ type: double
 *`kubernetes.node.network.tx.bytes`*::
 +
 --
-Transmitted bytes
+Transmitted bytes on the default interface. If default interface is not defined, will be reported not correct value `0`
 
 
 type: double
@@ -43366,7 +43366,7 @@ format: bytes
 *`kubernetes.node.network.tx.errors`*::
 +
 --
-Tx errors
+Tx errors on the default interface. If default interface is not defined, will be reported not correct value `0`
 
 
 type: double
@@ -46241,6 +46241,100 @@ Default size for huge pages.
 type: long
 
 format: bytes
+
+--
+
+[float]
+=== swap
+
+This group contains statistics related to the swap memory usage on the system.
+
+
+*`linux.memory.swap.total`*::
++
+--
+Total swap memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.swap.used.bytes`*::
++
+--
+Used swap memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.swap.free`*::
++
+--
+Available swap memory.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`linux.memory.swap.used.pct`*::
++
+--
+The percentage of used swap memory.
+
+
+type: scaled_float
+
+format: percent
+
+--
+
+*`linux.memory.swap.in.pages`*::
++
+--
+Pages swapped in.
+
+
+type: long
+
+--
+
+*`linux.memory.swap.out.pages`*::
++
+--
+Pages swapped out.
+
+
+type: long
+
+--
+
+*`linux.memory.swap.readahead.cached`*::
++
+--
+Swap readahead pages hit from swap_ra_hit.
+
+
+type: long
+
+--
+
+*`linux.memory.swap.readahead.pages`*::
++
+--
+Pages swapped based on readahead predictions.
+
+
+type: long
 
 --
 

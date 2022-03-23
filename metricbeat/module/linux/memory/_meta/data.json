@@ -26,25 +26,43 @@
             },
             "page_stats": {
                 "direct_efficiency": {
-                    "pct": 0.9839
+                    "pct": 0.3419
                 },
                 "kswapd_efficiency": {
-                    "pct": 0.7739
+                    "pct": 0.8922
                 },
                 "pgfree": {
-                    "pages": 40941189636
+                    "pages": 16341381567
                 },
                 "pgscan_direct": {
-                    "pages": 1199988
+                    "pages": 21037589
                 },
                 "pgscan_kswapd": {
-                    "pages": 19970993
+                    "pages": 49831
                 },
                 "pgsteal_direct": {
-                    "pages": 1180686
+                    "pages": 7193725
                 },
                 "pgsteal_kswapd": {
-                    "pages": 15456470
+                    "pages": 44459
+                }
+            },
+            "swap": {
+                "free": 8586252288,
+                "in": {
+                    "pages": 72435
+                },
+                "out": {
+                    "pages": 2032475
+                },
+                "readahead": {
+                    "cached": 5,
+                    "pages": 29
+                },
+                "total": 8589930496,
+                "used": {
+                    "bytes": 3678208,
+                    "pct": 0.0004
                 }
             }
         }

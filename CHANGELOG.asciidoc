@@ -3,6 +3,30 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.1.1]]
+=== Beats version 8.1.1
+https://github.com/elastic/beats/compare/v8.1.0...v8.1.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fixes Beats crashing when glibc >= 2.35 is used {issue}30576[30576]
+- Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
+- Wildcard fields no longer have a default ignore_above setting of 1024. {issue}30096[30096] {pull}30668[30668]
+- Ensure that the Reloadable part of beats are initialized before the Manager is started. {issue}30533[30533]
+- Ignore bugfix version when running version compatibility check against Elasticsearch. {pull}30746[30746]
+
+*Filebeat*
+
+- Fix compatibility with ECS by renaming `source` log key to `source_file` {issue}30667[30667]
+- Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
+- Update documentation for accessing `last_response.url.params` in httpjson input. {pull}30739[30739]
+
+*Packetbeat*
+
+- Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821]
+
 [[release-notes-8.1.0]]
 === Beats version 8.1.0
 https://github.com/elastic/beats/compare/v8.0.1...v8.1.0[View commits]
