@@ -167379,26 +167379,6 @@ Threat intelligence Filebeat Module.
 
 
 
-*`threat.indicator.file.hash.tlsh`*::
-+
---
-The file's import tlsh, if available.
-
-
-type: keyword
-
---
-
-*`threat.indicator.file.hash.sha384`*::
-+
---
-The file's sha384 hash, if available.
-
-
-type: keyword
-
---
-
 *`threat.feed.name`*::
 +
 --

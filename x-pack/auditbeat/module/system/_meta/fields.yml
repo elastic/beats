@@ -53,10 +53,6 @@
         type: keyword
         description: SHA224 hash of the executable.
 
-      - name: sha384
-        type: keyword
-        description: SHA384 hash of the executable.
-
       - name: sha3_224
         type: keyword
         description: SHA3_224 hash of the executable.

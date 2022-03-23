@@ -34576,46 +34576,10 @@ type: keyword
 
 --
 
-*`hash.md5`*::
-+
---
-MD5 hash of the file.
-
-type: keyword
-
---
-
-*`hash.sha1`*::
-+
---
-SHA1 hash of the file.
-
-type: keyword
-
---
-
 *`hash.sha224`*::
 +
 --
 SHA224 hash of the file.
-
-type: keyword
-
---
-
-*`hash.sha256`*::
-+
---
-SHA256 hash of the file.
-
-type: keyword
-
---
-
-*`hash.sha384`*::
-+
---
-SHA384 hash of the file.
 
 type: keyword
 
@@ -34652,15 +34616,6 @@ type: keyword
 +
 --
 SHA3_512 hash of the file.
-
-type: keyword
-
---
-
-*`hash.sha512`*::
-+
---
-SHA512 hash of the file.
 
 type: keyword
 
@@ -35078,15 +35033,6 @@ type: keyword
 +
 --
 SHA224 hash of the executable.
-
-type: keyword
-
---
-
-*`process.hash.sha384`*::
-+
---
-SHA384 hash of the executable.
 
 type: keyword
 

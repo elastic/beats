@@ -7,16 +7,6 @@
     - name: ""
       type: group
       fields:
-        - name: threat.indicator.file.hash.tlsh
-          type: keyword
-          description: >
-            The file's import tlsh, if available.
-
-        - name: threat.indicator.file.hash.sha384
-          type: keyword
-          description: >
-            The file's sha384 hash, if available.
-
         - name: threat.feed.name
           type: keyword
 
