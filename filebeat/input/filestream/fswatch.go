@@ -23,14 +23,15 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/elastic/go-concert/timed"
+	"github.com/elastic/go-concert/unison"
+
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common"
 	file_helper "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/go-concert/timed"
-	"github.com/elastic/go-concert/unison"
 )
 
 const (
@@ -133,8 +134,6 @@ func (w *fileWatcher) Run(ctx unison.Canceler) {
 }
 
 func (w *fileWatcher) watch(ctx unison.Canceler) {
-	w.log.Info("Start next scan")
-
 	paths := w.scanner.GetFiles()
 
 	newFiles := make(map[string]os.FileInfo)
