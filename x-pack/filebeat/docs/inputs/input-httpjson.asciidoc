@@ -936,49 +936,47 @@ This will output:
 [float]
 === `chain`
 
-Chain is a list of calls to be made after the first call.
-
-chain list option: [`step`].
+A chain is a list of requests to be made after the first one.
 
 [float]
 ==== `chain[].step`
 
-chain[].step will contain basic request and response configurations for chain calls.
+Contains basic request and response configuration for chained calls.
 
 [float]
 ==== `chain[].step.request`
 
-Please refer <<request-parameters,request parameters>>. also place same replace string in url where collected values from previous call should be place. Required. 
+Please refer <<request-parameters,request parameters>>. Required. 
 
 Example:
 
-first call: https://example.com/services/data/v1.0/
+First call: https://example.com/services/data/v1.0/
 
-second call: https://example.com/services/data/v1.0/1/export_ids
+Second call: https://example.com/services/data/v1.0/1/export_ids
 
-third call: https://example.com/services/data/v1.0/export_ids/file_1/info
+Third call: https://example.com/services/data/v1.0/export_ids/file_1/info
 
 [float]
-==== `chain[].step.respose.split`
+==== `chain[].step.response.split`
 
-Please refer <<response-split,response split parameter>>. Required.
+Please refer <<response-split,response split parameter>>.
 
 [float]
 ==== `chain[].step.replace`
 
-replace is JSONPath string to parse values from response JSONs, collected from previous chain calls. Please look at the official doc of https://goessner.net/articles/JsonPath/index.html#e2[JSONPath]. Required.
+A [JSONPath](https://goessner.net/articles/JsonPath/index.html#e2[JSONPath]) string to parse values from responses JSON, collected from previous chain steps. Place same replace string in url where collected values from previous call should be placed. Required.
 
 Example:
 
-- first call: https://example.com/services/data/v1.0/
+- First call: https://example.com/services/data/v1.0/
 +
 <<response-json1,response>>
 
-- second call: https://example.com/services/data/v1.0/`$.records[:].id`/export_ids
+- Second call: https://example.com/services/data/v1.0/`$.records[:].id`/export_ids
 +
 <<response-json2,response>>
 
-third call: https://example.com/services/data/v1.0/export_ids`/`$.file_name`/info
+- Third call: https://example.com/services/data/v1.0/export_ids`/`$.file_name`/info
 
 ["source","yaml",subs="attributes"]
 ----
@@ -1072,8 +1070,7 @@ request_url using file_name as 'file_2': https://example.com/services/data/v1.0/
 +
 Collect and make events from response in any format supported by httpjson for all calls.
 
-NOTE: httpjson chain will only create and ingest events from last call on chain configurations.
-httpjson chain will also 
+NOTE: httpjson chain will only create and ingest events from last call on chain configurations. 
 
 [[cursor]]
 [float]

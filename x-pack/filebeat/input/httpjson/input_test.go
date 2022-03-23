@@ -14,6 +14,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
 
@@ -382,6 +383,76 @@ func TestInput(t *testing.T) {
 						"set": map[string]interface{}{
 							"target": "body.bar",
 							"value":  `[[.header.Get "X-Foo"]]`,
+						},
+					},
+				},
+			},
+			handler:  defaultHandler("GET", ""),
+			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+		},
+		{
+			name: "Test simple Chain GET request",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				r := mux.NewRouter()
+				r.HandleFunc("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					fmt.Fprintln(w, `{"records":[{"id":1}]}`)
+				}))
+				r.HandleFunc("/1", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
+				}))
+				server := httptest.NewServer(r)
+				config["request.url"] = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       10,
+				"request.method": "GET",
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": "GET",
+							"replace":        "$.records[:].id",
+						},
+					},
+				},
+			},
+			handler:  defaultHandler("GET", ""),
+			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+		},
+		{
+			name: "Test multiple Chain GET request",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				r := mux.NewRouter()
+				r.HandleFunc("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					fmt.Fprintln(w, `{"records":[{"id":1}]}`)
+				}))
+				r.HandleFunc("/1", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					fmt.Fprintln(w, `{"file_name": "file_1"}`)
+				}))
+				r.HandleFunc("/file_1", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
+				}))
+				server := httptest.NewServer(r)
+				config["request.url"] = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
+				config["chain.1.step.request.url"] = server.URL + "/$.file_name"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       10,
+				"request.method": "GET",
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": "GET",
+							"replace":        "$.records[:].id",
+						},
+					},
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": "GET",
+							"replace":        "$.file_name",
 						},
 					},
 				},

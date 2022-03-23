@@ -215,7 +215,6 @@ func generateNewUrl(replacement, oldUrl, id string) (url.URL, error) {
 		return url.URL{}, fmt.Errorf("failed to replace value in url: %w", err)
 	}
 	return *newUrl, nil
-
 }
 
 func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher) error {
@@ -231,6 +230,8 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		finalResps        []*http.Response
 	)
 	for i, rf := range r.requestFactories {
+		finalResps = nil
+		intermediateResps = nil
 		// iterate over collected ids from last response
 		if i == 0 {
 			// perform and store regular call responses
@@ -285,7 +286,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			rf.url = urlCopy
 
 			var resps []*http.Response
-			if i < len(r.requestFactories) {
+			if i == len(r.requestFactories)-1 {
 				resps = finalResps
 			} else {
 				// The if comdition (i < len(r.requestFactories)) ensures this branch never runs to the last element
