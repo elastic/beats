@@ -160,6 +160,7 @@ type winEventLog struct {
 	lastRead     checkpoint.EventLogState // Record number of the last read event.
 
 	render    func(event win.EvtHandle, out io.Writer) error // Function for rendering the event to XML.
+	message   func(event win.EvtHandle) (string, error)      // Message fallback function.
 	renderBuf []byte                                         // Buffer used for rendering event.
 	outputBuf *sys.ByteBuffer                                // Buffer for receiving XML
 	cache     *messageFilesCache                             // Cached mapping of source name to event message file handles.
@@ -313,6 +314,12 @@ func (l *winEventLog) Read() ([]Record, error) {
 		}
 		if r.Offset.Bookmark, err = l.createBookmarkFromEvent(h); err != nil {
 			logp.Warn("%s failed creating bookmark: %v", l.logPrefix, err)
+		}
+		if r.Message == "" {
+			r.Message, err = l.message(h)
+			if err != nil {
+				logp.Err("%s error salvaging message: %v", l.logPrefix, err)
+			}
 		}
 		records = append(records, r)
 		l.lastRead = r.Offset
@@ -488,6 +495,9 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 		l.render = func(event win.EvtHandle, out io.Writer) error {
 			return win.RenderEvent(event, c.EventLanguage, l.renderBuf, l.cache.get, out)
 		}
+	}
+	l.message = func(event win.EvtHandle) (string, error) {
+		return win.Message(event, l.renderBuf, l.cache.get)
 	}
 
 	return l, nil

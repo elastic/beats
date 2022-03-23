@@ -194,12 +194,19 @@ func testWindowsEventLog(t *testing.T, api string) {
 		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1})
 		defer log.Close()
 
-		records, err := log.Read()
-		require.NotEmpty(t, records)
-		require.NoError(t, err)
+		for i := 0; i < 10; i++ {
+			records, err := log.Read()
+			require.NotEmpty(t, records)
+			require.NoError(t, err)
+			if i == 0 {
+				// The first event in a collection of events created by eventcreate
+				// appear to be broken, so skip this one. The remaining events pass.
+				continue
+			}
 
-		r := records[0]
-		require.NotEmpty(t, r.Message, "message field is empty: errors:%v\nrecord:%#v", r.Event.RenderErr, r)
+			r := records[0]
+			require.NotEmpty(t, r.Message, "message field is empty: errors:%v\nrecord:%#v", r.Event.RenderErr, r)
+		}
 	})
 
 	// Test reading from an event log using a custom XML query.

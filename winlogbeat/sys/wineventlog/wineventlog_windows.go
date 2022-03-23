@@ -255,6 +255,26 @@ func RenderEvent(
 	return err
 }
 
+// Message reads the event data associated with the EvtHandle and renders
+// and returns the message only.
+func Message(h EvtHandle, buf []byte, pubHandleProvider func(string) sys.MessageFiles) (message string, err error) {
+	providerName, err := evtRenderProviderName(buf, h)
+	if err != nil {
+		return "", err
+	}
+
+	var pub EvtHandle
+	if pubHandleProvider != nil {
+		messageFiles := pubHandleProvider(providerName)
+		if messageFiles.Err == nil {
+			// There is only ever a single handle when using the Windows Event
+			// Log API.
+			pub = EvtHandle(messageFiles.Handles[0].Handle)
+		}
+	}
+	return getMessageStringFromHandle(&PublisherMetadata{Handle: pub}, h, nil)
+}
+
 // RenderEventXML renders the event as XML. If the event is already rendered, as
 // in a forwarded event whose content type is "RenderedText", then the XML will
 // include the RenderingInfo (message). If the event is not rendered then the
