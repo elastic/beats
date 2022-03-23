@@ -43,11 +43,13 @@ func TestWinEventLog(t *testing.T) {
 		events int
 	}{
 		{path: "sysmon-9.01.evtx", events: 32},
-		{path: "ec1.evtx", events: 1},     // eventcreate /id 1000 /t error /l application /d "My custom error event for the application log"
-		{path: "ec2.evtx", events: 1},     // eventcreate /id 999 /t error /l application /so WinWord /d "Winword event 999 happened due to low diskspace"
-		{path: "ec3.evtx", events: 1},     // eventcreate /id 5 /t error /l system /d "Catastrophe!"
-		{path: "ec4.evtx", events: 1},     // eventcreate /id 5 /t error /l system /so Backup /d "Backup failure"
-		{path: "ec3and4.evtx", events: 2}, // ec3 and ec3 exported as a single evtx.
+		{path: "ec1.evtx", events: 1},          // eventcreate /id 1000 /t error /l application /d "My custom error event for the application log"
+		{path: "ec2.evtx", events: 1},          // eventcreate /id 999 /t error /l application /so WinWord /d "Winword event 999 happened due to low diskspace"
+		{path: "ec3.evtx", events: 1},          // eventcreate /id 5 /t error /l system /d "Catastrophe!"
+		{path: "ec4.evtx", events: 1},          // eventcreate /id 5 /t error /l system /so Backup /d "Backup failure"
+		{path: "ec3and4.evtx", events: 2},      // ec3 and ec3 exported as a single evtx.
+		{path: "original.evtx", events: 5},     // a capture from a short generation of the eventlog WindowsEventLogAPI test.
+		{path: "experimental.evtx", events: 5}, // a capture from a short generation of the eventlog WindowsEventLogAPIExperimental test.
 	} {
 		t.Run(test.path, func(t *testing.T) {
 			evtx, err := filepath.Abs(filepath.Join("testdata", test.path))
