@@ -199,7 +199,7 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 	if err != nil {
 		return err
 	}
-	defer func() { _ = windows.CloseHandle(signalEvent) }()
+	defer windows.CloseHandle(signalEvent) //nolint:errcheck // This is just a resource release.
 
 	var flags win.EvtSubscribeFlag
 	if bookmark > 0 {
@@ -287,13 +287,12 @@ func (l *winEventLog) Read() ([]Record, error) {
 	}()
 	detailf("%s EventHandles returned %d handles", l.logPrefix, len(handles))
 
-	//nolint: prealloc // some handles can be skipped, the final size is unknown
-	var records []Record
+	var records []Record //nolint:prealloc // This linter gives bad advice and does not take into account conditionals in loops.
 	for _, h := range handles {
 		l.outputBuf.Reset()
 		err := l.render(h, l.outputBuf)
 		var bufErr sys.InsufficientBufferError
-		if ok := errors.As(err, &bufErr); ok {
+		if errors.As(err, &bufErr) {
 			detailf("%s Increasing render buffer size to %d", l.logPrefix,
 				bufErr.RequiredSize)
 			l.renderBuf = make([]byte, bufErr.RequiredSize)
@@ -336,20 +335,20 @@ func (l *winEventLog) Close() error {
 
 func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 	handles, err := win.EventHandles(l.subscription, maxRead)
-	switch {
-	case err == nil:
+	switch err { //nolint:errorlint // This is an errno or nil.
+	case nil:
 		if l.maxRead > maxRead {
 			debugf("%s Recovered from RPC_S_INVALID_BOUND error (errno 1734) "+
 				"by decreasing batch_read_size to %v", l.logPrefix, maxRead)
 		}
 		return handles, maxRead, nil
-	case errors.Is(err, win.ERROR_NO_MORE_ITEMS):
+	case win.ERROR_NO_MORE_ITEMS:
 		detailf("%s No more events", l.logPrefix)
 		if l.config.NoMoreEvents == Stop {
 			return nil, maxRead, io.EOF
 		}
 		return nil, maxRead, nil
-	case errors.Is(err, win.RPC_S_INVALID_BOUND):
+	case win.RPC_S_INVALID_BOUND:
 		incrementMetric(readErrors, err)
 		if err := l.Close(); err != nil {
 			return nil, 0, fmt.Errorf("failed to recover from RPC_S_INVALID_BOUND: %w", err)
