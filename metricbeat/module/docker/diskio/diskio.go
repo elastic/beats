@@ -24,6 +24,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
 )
@@ -72,7 +73,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if config.SkipMajor == nil {
 		config.SkipMajor = defaultMajorDev
 	}
-
+	logp.L().Debugf("Skipping major devices: %v", config.SkipMajor)
 	client, err := docker.NewDockerClient(base.HostData().URI, docker.Config{TLS: config.TLS, DeDot: config.DeDot})
 	if err != nil {
 		return nil, err

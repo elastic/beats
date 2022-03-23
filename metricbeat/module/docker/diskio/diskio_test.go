@@ -137,7 +137,7 @@ func TestBlkIOSkip(t *testing.T) {
 		{
 			Major: 8,
 			Minor: 0,
-			Op:    "Write",
+			Op:    "write",
 			Value: writeVal,
 		},
 		{
