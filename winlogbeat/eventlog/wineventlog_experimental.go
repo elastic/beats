@@ -213,6 +213,7 @@ func (l *winEventLogExp) processHandle(h win.EvtHandle) (*Record, error) {
 		evt.RenderErr = append(evt.RenderErr, err.Error())
 	}
 
+	//nolint: godox // keep to have a record of feature disparity between non-experimental vs experimental
 	// TODO: Need to add XML when configured.
 
 	r := &Record{

@@ -1,0 +1,756 @@
+[
+{
+    "name": "Running test_export_config",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0xbcf4f3d8f1dcc84c",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:36:49.204029Z",
+    "end_time": "2022-03-23T12:36:49.521000Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_export_config",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_export_ilm_policy",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x37d2b3b8c268bc86",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:36:49.531801Z",
+    "end_time": "2022-03-23T12:36:49.834603Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_export_ilm_policy",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_export_index_pattern",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x89fb803a894de568",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:36:49.834603Z",
+    "end_time": "2022-03-23T12:36:50.254463Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_export_index_pattern",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_export_index_pattern_migration",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0xa6bc5c3ccf7ae880",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:36:50.270791Z",
+    "end_time": "2022-03-23T12:36:50.724272Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_export_index_pattern_migration",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_export_template",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0xd57ae95f3f181ba4",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:36:50.724272Z",
+    "end_time": "2022-03-23T12:36:51.120956Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_export_template",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_invalid_api",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x881ff22fc1791ac3",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:36:51.120956Z",
+    "end_time": "2022-03-23T12:36:51.339364Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_invalid_api",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_invalid_ignore_older",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x5befab4507e0cba3",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:36:51.339364Z",
+    "end_time": "2022-03-23T12:36:51.544704Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_invalid_ignore_older",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_invalid_level",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0xb1bf90afa43b7870",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:36:51.544704Z",
+    "end_time": "2022-03-23T12:36:51.753733Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_invalid_level",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_valid_config",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0xdf28e1ca8d76eeb8",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:36:51.753733Z",
+    "end_time": "2022-03-23T12:36:52.046478Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_valid_config",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_bad_bookmark_restart",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x6ec03a39611b2d36",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:36:52.046478Z",
+    "end_time": "2022-03-23T12:36:54.774526Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_bad_bookmark_restart",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_cleared_channel_restarts",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x3f64091ed2c542ec",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:36:54.790339Z",
+    "end_time": "2022-03-23T12:36:57.467809Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_cleared_channel_restarts",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_fields_not_under_root",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x1b7f94f0ab8b80a2",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:36:57.467809Z",
+    "end_time": "2022-03-23T12:36:58.857444Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_fields_not_under_root",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_fields_under_root",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x8f342c40096c1504",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:36:58.857444Z",
+    "end_time": "2022-03-23T12:37:00.324289Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_fields_under_root",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_include_xml",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x1292c4fe460f344a",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:37:00.324289Z",
+    "end_time": "2022-03-23T12:37:01.760355Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_include_xml",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_multiline_events",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0xbec736fb2bc3f2cc",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:37:01.775998Z",
+    "end_time": "2022-03-23T12:37:03.195942Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_multiline_events",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_processors",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0xa670db76a3f8cf5f",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:37:03.195942Z",
+    "end_time": "2022-03-23T12:37:04.754737Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_processors",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_query_event_id",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0xa287e6014648f90f",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:37:04.754737Z",
+    "end_time": "2022-03-23T12:37:06.202740Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_query_event_id",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_query_ignore_older",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x83363b163520c9b0",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:37:06.218595Z",
+    "end_time": "2022-03-23T12:37:09.742570Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_query_ignore_older",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_query_level_multiple",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x0f2b3f76be206eae",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:37:09.742570Z",
+    "end_time": "2022-03-23T12:37:11.363439Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_query_level_multiple",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_query_level_single",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x5d0dc699d3f500ac",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:37:11.363439Z",
+    "end_time": "2022-03-23T12:37:12.828319Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_query_level_single",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_query_multi_param",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0xb23f96d7697114e7",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:37:12.828319Z",
+    "end_time": "2022-03-23T12:37:14.264143Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_query_multi_param",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_query_provider",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x1aec82a2ffb2ac90",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:37:14.264143Z",
+    "end_time": "2022-03-23T12:37:15.704906Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_query_provider",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_read_one_event",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x69aa7f4cb5ec06b7",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:37:15.704906Z",
+    "end_time": "2022-03-23T12:37:17.279540Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_read_one_event",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_read_unknown_event_id",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x012b50f168466d1e",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:37:17.279540Z",
+    "end_time": "2022-03-23T12:37:18.725329Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_read_unknown_event_id",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_read_unknown_sid",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x2662986a03b06f37",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:37:18.725329Z",
+    "end_time": "2022-03-23T12:37:20.176606Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_read_unknown_sid",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_registry_data",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x2ffbb69a185150fc",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:37:20.176606Z",
+    "end_time": "2022-03-23T12:37:21.712136Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_registry_data",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_resume_reading_events",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0xbd9f3078c0fc9938",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:37:21.712136Z",
+    "end_time": "2022-03-23T12:37:24.592393Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_resume_reading_events",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Running test_utf16_characters",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0xc0b28fd79a9a52d6",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.INTERNAL",
+    "parent_id": "0x110549fce80548cb",
+    "start_time": "2022-03-23T12:37:24.592393Z",
+    "end_time": "2022-03-23T12:37:26.051373Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.name": "test_utf16_characters",
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+},{
+    "name": "Test Suite",
+    "context": {
+        "trace_id": "0xab96c7926910a8880585c50b272a5395",
+        "span_id": "0x110549fce80548cb",
+        "trace_state": "[]"
+    },
+    "kind": "SpanKind.SERVER",
+    "parent_id": null,
+    "start_time": "2022-03-23T12:36:48.744519Z",
+    "end_time": "2022-03-23T12:37:26.067179Z",
+    "status": {
+        "status_code": "OK"
+    },
+    "attributes": {
+        "tests.status": "passed"
+    },
+    "events": [],
+    "links": [],
+    "resource": {
+        "telemetry.sdk.language": "python",
+        "telemetry.sdk.name": "opentelemetry",
+        "telemetry.sdk.version": "1.5.0",
+        "service.name": "Pytest_Otel_reporter"
+    }
+}
+]
