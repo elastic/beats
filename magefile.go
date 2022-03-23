@@ -36,6 +36,6 @@ var Aliases = map[string]interface{}{
 // Check runs all the checks
 // nolint: deadcode,unparam // it's used as a `mage` target and requires returning an error
 func Check() error {
-	mg.Deps(mage.Deps.CheckModuleTidy, mage.Linter.LastChange)
+	mg.Deps(mage.Deps.CheckModuleTidy)
 	return nil
 }
