@@ -35003,7 +35003,7 @@ type: long
 --
 The time jobs took to complete from the time the user submits a job to the time Dataproc reports it is completed.
 
-type: long
+type: keyword
 
 --
 
@@ -35012,7 +35012,7 @@ type: long
 --
 The time jobs have spent in a given state.
 
-type: long
+type: keyword
 
 --
 
@@ -35048,7 +35048,7 @@ type: long
 --
 The time operations took to complete from the time the user submits a operation to the time Dataproc reports it is completed.
 
-type: long
+type: keyword
 
 --
 
@@ -35057,7 +35057,7 @@ type: long
 --
 The time operations have spent in a given state.
 
-type: long
+type: keyword
 
 --
 

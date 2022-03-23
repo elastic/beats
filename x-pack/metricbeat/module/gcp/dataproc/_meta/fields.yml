@@ -19,10 +19,10 @@
       type: long
       description: Indicates the number of unhealthy blocks inside the cluster.
     - name: cluster.job.completion_time.value
-      type: long
+      type: keyword
       description: The time jobs took to complete from the time the user submits a job to the time Dataproc reports it is completed.
     - name: cluster.job.duration.value
-      type: long
+      type: keyword
       description: The time jobs have spent in a given state.
     - name: cluster.job.failed.count
       type: long
@@ -34,10 +34,10 @@
       type: long
       description: Indicates the number of jobs that have been submitted to a cluster.
     - name: cluster.operation.completion_time.value
-      type: long
+      type: keyword
       description: The time operations took to complete from the time the user submits a operation to the time Dataproc reports it is completed.
     - name: cluster.operation.duration.value
-      type: long
+      type: keyword
       description: The time operations have spent in a given state.
     - name: cluster.operation.failed.count
       type: long
