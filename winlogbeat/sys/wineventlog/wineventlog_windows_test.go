@@ -115,7 +115,7 @@ func TestWinEventLog(t *testing.T) {
 						if err = RenderEventXML(h, buf, out); err != nil {
 							t.Fatal(err)
 						}
-						Close(h)
+						Close(h) //nolint:errcheck // This is just a resource release.
 						fmt.Fprintln(out)
 						count++
 					}
