@@ -82,9 +82,9 @@ func (io *BlkioService) getBlkioStatsList(rawStats []docker.Stat, dedot bool, sk
 	formattedStats := []BlkioStats{}
 
 	statsPerContainer := make(map[string]BlkioRaw)
-	for _, myRawStats := range rawStats {
-		stats := io.getBlkioStats(&myRawStats, dedot, skipDev)
-		storageStats := io.getStorageStats(&myRawStats, dedot)
+	for i := range rawStats {
+		stats := io.getBlkioStats(&rawStats[i], dedot, skipDev)
+		storageStats := io.getStorageStats(&rawStats[i], dedot)
 		stats.Add(&storageStats)
 
 		oldStats, exist := io.lastStatsPerContainer[stats.Container.ID]

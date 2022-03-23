@@ -215,7 +215,7 @@ func TestDeltaOneContainer(t *testing.T) {
 
 }
 
-func TestWritePs(t *testing.T) {
+func TestWritePs(t *testing.T) { // nolint: dupl
 	oldWritePs := []uint64{220, 951, 0}
 	newWritePs := []uint64{120, 2951, 0}
 	for index := range oldBlkioRaw {
@@ -240,7 +240,7 @@ func TestWritePs(t *testing.T) {
 	}
 }
 
-func TestReadPS(t *testing.T) {
+func TestReadPS(t *testing.T) { // nolint: dupl
 	oldReasPs := []uint64{0, 951, 235}
 	newReadPs := []uint64{120, 3951, 62}
 	for index := range oldBlkioRaw {
@@ -265,7 +265,7 @@ func TestReadPS(t *testing.T) {
 	}
 }
 
-func TestBlkioTotal(t *testing.T) {
+func TestBlkioTotal(t *testing.T) { // nolint: dupl
 	oldTotal := []uint64{40, 1954, 235}
 	newTotal := []uint64{120, 1964, 62}
 	for index := range oldBlkioRaw {
