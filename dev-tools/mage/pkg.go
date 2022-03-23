@@ -43,8 +43,10 @@ func Package() error {
 			"UseCommunityBeatPackaging, UseElasticBeatPackaging or USeElasticBeatWithoutXPackPackaging first.")
 	}
 
+	platforms := updateWithDarwinUniversal(Platforms)
+
 	var tasks []interface{}
-	for _, target := range Platforms {
+	for _, target := range platforms {
 		for _, pkg := range Packages {
 			if pkg.OS != target.GOOS() || pkg.Arch != "" && pkg.Arch != target.Arch() {
 				continue
@@ -110,6 +112,20 @@ func Package() error {
 
 	Parallel(tasks...)
 	return nil
+}
+
+// updateWithDarwinUniversal checks if darwin/amd64 and darwin/arm64, are listed
+// if so, the universal binary was built, then we need to package it as well.
+func updateWithDarwinUniversal(platforms BuildPlatformList) BuildPlatformList {
+	if IsDarwinUniversal() {
+		platforms = append(platforms,
+			BuildPlatform{
+				Name:  "darwin/universal",
+				Flags: CGOSupported | CrossBuildSupported | Default,
+			})
+	}
+
+	return platforms
 }
 
 // isPackageTypeSelected returns true if SelectedPackageTypes is empty or if
