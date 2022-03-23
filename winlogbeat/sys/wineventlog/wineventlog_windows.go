@@ -521,7 +521,7 @@ func evtRenderProviderName(renderBuf []byte, eventHandle EvtHandle) (string, err
 		return "", sys.InsufficientBufferError{Cause: err, RequiredSize: int(bufferUsed)}
 	}
 	if err != nil {
-		return "", fmt.Errorf("evtRenderProviderName %v", err)
+		return "", fmt.Errorf("evtRenderProviderName: %w", err)
 	}
 
 	reader := bytes.NewReader(renderBuf)

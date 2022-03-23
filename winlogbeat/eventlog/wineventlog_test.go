@@ -315,16 +315,18 @@ func createLog(t testing.TB, messageFiles ...string) (log *eventlog.Log, tearDow
 	}
 
 	if existed {
-		wineventlog.EvtClearLog(wineventlog.NilHandle, name, "")
+		wineventlog.EvtClearLog(wineventlog.NilHandle, name, "") //nolint:errcheck // This is just a resource release.
 	}
 
 	log, err = eventlog.Open(source)
+	//nolint:errcheck // This is just a resource release.
 	if err != nil {
 		eventlog.RemoveSource(name, source)
 		eventlog.RemoveProvider(name)
 		t.Fatal(err)
 	}
 
+	//nolint:errcheck // This is just a resource release.
 	tearDown = func() {
 		log.Close()
 		wineventlog.EvtClearLog(wineventlog.NilHandle, name, "")
@@ -351,7 +353,7 @@ func safeWriteEvent(t testing.TB, log *eventlog.Log, etype uint16, eid uint32, m
 
 // setLogSize set the maximum number of bytes that an event log can hold.
 func setLogSize(t testing.TB, provider string, sizeBytes int) {
-	output, err := exec.Command("wevtutil.exe", "sl", "/ms:"+strconv.Itoa(sizeBytes), provider).CombinedOutput()
+	output, err := exec.Command("wevtutil.exe", "sl", "/ms:"+strconv.Itoa(sizeBytes), provider).CombinedOutput() //nolint:gosec // No possibility of command injection.
 	if err != nil {
 		t.Fatal("Failed to set log size", err, string(output))
 	}
