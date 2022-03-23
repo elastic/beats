@@ -44,4 +44,10 @@ type Pe struct {
 
 	// CPU architecture target for the file.
 	Architecture string `ecs:"architecture"`
+
+	// A hash of the PE header and data from one or more PE sections.
+	// An pehash can be used to cluster files by transforming structural information
+	// about a file into a hash value.
+	// Learn more at https://www.usenix.org/legacy/events/leet09/tech/full_papers/wicherski/wicherski_html/index.html.
+	Pehash string `ecs:"pehash"`
 }

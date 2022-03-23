@@ -36,6 +36,31 @@ type Container struct {
 	// Container name.
 	Name string `ecs:"name"`
 
+	// Container cpu usage
+	// Percent CPU used which is normalized by the number of CPU cores
+	// and it ranges from 0 to 1. Scaling factor: 1000.
+	// Scaling factor: 1000.
+	CpuUsage float64 `ecs:"cpu.usage"`
+
+	// The total number of bytes (gauge) read successfully (aggregated
+	// from all disks) since the last metric collection.
+	DiskReadBytes int64 `ecs:"disk.read.bytes"`
+
+	// The total number of bytes (gauge) written successfully (aggregated from
+	// all disks) since the last metric collection.
+	DiskWriteBytes int64 `ecs:"disk.write.bytes"`
+
+	// Memory usage percentage and it ranges from 0 to 1. Scaling factor: 1000.
+	MemoryUsage float64 `ecs:"memory.usage"`
+
+	// The number of bytes received (gauge) on all network interfaces by the
+	// container since the last metric collection.
+	NetworkIngressBytes int64 `ecs:"network.ingress.bytes"`
+
+	// The number of bytes (gauge) sent out on all network interfaces by the
+	// container since the last metric collection.
+	NetworkEgressBytes int64 `ecs:"network.egress.bytes"`
+
 	// Image labels.
 	Labels map[string]interface{} `ecs:"labels"`
 }

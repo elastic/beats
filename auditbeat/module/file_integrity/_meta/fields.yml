@@ -41,6 +41,7 @@
       description: SHA256 hash of the file.
 
     - name: sha384
+      overwrite: true
       type: keyword
       description: SHA384 hash of the file.
 
