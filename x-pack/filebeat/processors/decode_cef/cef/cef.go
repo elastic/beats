@@ -5,9 +5,10 @@
 package cef
 
 import (
+	"errors"
+	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 )
 
@@ -156,7 +157,7 @@ func (e *Event) Unpack(data string, opts ...Option) error {
 		if err != nil {
 			// Drop the key because the field value is invalid.
 			delete(e.Extensions, key)
-			errs = append(errs, errors.Wrapf(err, "error in field '%v'", key))
+			errs = append(errs, fmt.Errorf("error in field '%v': %w", key, err))
 			continue
 		}
 
