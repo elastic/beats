@@ -52,7 +52,7 @@ jobs:
           # which can lead to some frustration from developers who would like to
           # fix a single line in an existing codebase and the linter would force them
           # into fixing all linting issues in the whole file instead
-          args: --timeout=5m --whole-files
+          args: --timeout=30m --whole-files
 
           # Optional: if set to true then the action will use pre-installed Go.
           skip-go-installation: true
