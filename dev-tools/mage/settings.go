@@ -63,8 +63,8 @@ var (
 	PLATFORMS    = EnvOr("PLATFORMS", "")
 	PACKAGES     = EnvOr("PACKAGES", "")
 
-	// CrossBuildMountModcache mounts $GOPATH/pkg/mod into
-	// the crossbuild images at /go/pkg/mod, read-only,  when set to true.
+	// CrossBuildMountModcache, if true, mounts $GOPATH/pkg/mod into
+	// the crossbuild images at /go/pkg/mod, read-only.
 	CrossBuildMountModcache = true
 
 	BeatName        = EnvOr("BEAT_NAME", filepath.Base(CWD()))

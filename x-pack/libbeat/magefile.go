@@ -9,7 +9,6 @@ package main
 
 import (
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
@@ -33,11 +32,4 @@ func Build() error {
 // Fields generates a fields.yml for the Beat.
 func Fields() error {
 	return devtools.GenerateFieldsYAML()
-}
-
-// AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
-// universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
-// were built and only performs the merge.
-func AssembleDarwinUniversal() error {
-	return build.AssembleDarwinUniversal()
 }

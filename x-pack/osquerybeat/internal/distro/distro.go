@@ -138,7 +138,6 @@ var specs = map[OSArch]Spec{
 	{"linux", "amd64"}:   {"_1.linux_x86_64.tar.gz", osqueryDistroLinuxSHA256, true},
 	{"linux", "arm64"}:   {"_1.linux_aarch64.tar.gz", osqueryDistroLinuxARMSHA256, true},
 	{"darwin", "amd64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, false},
-	{"darwin", "arm64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, false},
 	{"windows", "amd64"}: {osqueryMSIExt, osqueryDistroWindowsSHA256, false},
 }
 

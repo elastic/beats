@@ -211,8 +211,6 @@ def linuxPlatforms() {
             'windows/amd64',
             'windows/386',
             'darwin/amd64'
-            // TODO(AndersonQ): comment in after the tests pass
-            // 'darwin/arm64'
           ].join(' ')
 }
 

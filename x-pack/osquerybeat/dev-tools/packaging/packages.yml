@@ -91,14 +91,6 @@ specs:
             source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
     - os: darwin
-      arch: amd64
-      types: [tgz]
-      spec:
-        <<: *unix_binary_spec
-        <<: *elastic_license_for_binaries
-
-    - os: darwin
-      arch: arm64
       types: [tgz]
       spec:
         <<: *unix_binary_spec
