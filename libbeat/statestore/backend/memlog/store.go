@@ -18,6 +18,7 @@
 package memlog
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -112,11 +113,20 @@ func openStore(log *logp.Logger, home string, mode os.FileMode, bufSz uint, igno
 		active := dataFiles[L-1]
 		txid = active.txid
 		if err := loadDataFile(active.path, tbl); err != nil {
-			return nil, err
+			if errors.Is(err, ErrCorruptStore) {
+				corruptFilePath := active.path + ".corrupted"
+				err := os.Rename(active.path, corruptFilePath)
+				if err != nil {
+					logp.Debug("Failed to backup corrupt data file '%s': %+v", active.path, err)
+				}
+				logp.Warn("Data file is corrupt. It has been renamed to %s. Attempting to restore partial state from log file.", corruptFilePath)
+			} else {
+				return nil, err
+			}
+		} else {
+			logp.Info("Loading data file of '%v' succeeded. Active transaction id=%v", home, txid)
 		}
 	}
-
-	logp.Info("Loading data file of '%v' succeeded. Active transaction id=%v", home, txid)
 
 	var entries uint
 	memstore := memstore{tbl}
