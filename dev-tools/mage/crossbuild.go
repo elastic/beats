@@ -195,10 +195,10 @@ func CrossBuild(options ...CrossBuildOption) error {
 	// Each build runs in parallel.
 	Parallel(deps...)
 
-	// It needs to run after all the builds, as it needs the darwin binaries.
-	if err := assembleDarwinUniversal(params); err != nil {
-		return err
-	}
+	// // It needs to run after all the builds, as it needs the darwin binaries.
+	// if err := assembleDarwinUniversal(params); err != nil {
+	// 	return err
+	// }
 
 	return nil
 }
