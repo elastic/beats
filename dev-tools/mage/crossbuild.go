@@ -177,12 +177,17 @@ func CrossBuild(options ...CrossBuildOption) error {
 
 	params.Serial = true
 	log.Println("crossBuild: Platform list =", params.Platforms)
+	fmt.Println("crossBuild: Platform list =", params.Platforms)
 	var deps []interface{}
 	for _, buildPlatform := range params.Platforms {
 		if !buildPlatform.Flags.CanCrossBuild() {
 			return fmt.Errorf("unsupported cross build platform %v", buildPlatform.Name)
 		}
-		builder := GolangCrossBuilder{buildPlatform.Name, params.Target, params.InDir, params.ImageSelector}
+		builder := GolangCrossBuilder{
+			Platform:      buildPlatform.Name,
+			Target:        params.Target,
+			InDir:         params.InDir,
+			ImageSelector: params.ImageSelector}
 		if params.Serial {
 			if err := builder.Build(); err != nil {
 				return errors.Wrapf(err, "failed cross-building target=%s for platform=%s",
@@ -212,15 +217,15 @@ func assembleDarwinUniversal(params crossBuildParams) error {
 	}
 
 	fmt.Println("-----------------------------------------")
-	fmt.Println(">> assembleDarwinUniversal DEBUG")
+	fmt.Println(">> assembleDarwinUniversal DEBUG for", BeatName)
 	out, err := sh.Output("pwd")
-	fmt.Println(">> assembleDarwinUniversal on:", out, err)
+	fmt.Println(">>:", "pwd:\n", out, err)
 	fmt.Println("-----------------------------------------")
 	out, err = sh.Output("ls", "build")
-	fmt.Println(">> assembleDarwinUniversal:", "ls", "build:", out, err)
+	fmt.Println(">>", "ls", "build:\n", out, err)
 	fmt.Println("-----------------------------------------")
 	out, err = sh.Output("ls", "build/golang-crossbuild")
-	fmt.Println(">> assembleDarwinUniversal debug:", out, err)
+	fmt.Println(">>", "ls", "build/golang-crossbuild:\n", out, err)
 	fmt.Println("-----------------------------------------")
 	fmt.Println(">> assembleDarwinUniversal DEBUG END")
 	fmt.Println("-----------------------------------------")
@@ -372,7 +377,11 @@ func (b GolangCrossBuilder) Build() error {
 		"--platforms", b.Platform,
 	)
 
-	return dockerRun(args...)
+	err = dockerRun(args...)
+
+	fmt.Printf(">> %v: Building for %v DONE, error: %v\n",
+		b.Target, b.Platform, err)
+	return err
 }
 
 // DockerChown chowns files generated during build. EXEC_UID and EXEC_GID must
