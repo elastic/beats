@@ -240,7 +240,6 @@ func assembleDarwinUniversal(params crossBuildParams) error {
 		"failed merging darwin/amd64 and darwin/arm64 into darwin/universal target=%v for platform=%v",
 		builder.Target,
 		builder.Platform)
-
 }
 
 // CrossBuildXPack executes the 'golangCrossBuild' target in the Beat's
@@ -315,7 +314,7 @@ type GolangCrossBuilder struct {
 // Build executes the build inside of Docker.
 func (b GolangCrossBuilder) Build() error {
 	fmt.Printf(">> %v: Building %s for %v\n",
-		BeatName, b.Target, b.Platform)
+		b.Target, BeatName, b.Platform)
 
 	repoInfo, err := GetProjectRepoInfo()
 	if err != nil {
@@ -379,9 +378,9 @@ func (b GolangCrossBuilder) Build() error {
 	)
 
 	err = dockerRun(args...)
+	fmt.Printf(">> %s: Building %s for %s DONE, dockerRun err: %v\n",
+		b.Target, BeatName, b.Platform, err)
 
-	fmt.Printf(">> %s: Building %s for %s DONE, error: %v\n",
-		BeatName, b.Target, b.Platform, err)
 	return err
 }
 
