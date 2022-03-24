@@ -228,7 +228,6 @@ func assembleDarwinUniversal(params crossBuildParams) error {
 		// the docker image for darwin/arm64 is the one capable of merging the binaries.
 		Platform:      "darwin/arm64",
 		Target:        "assembleDarwinUniversal",
-		DropParh:      DropPath,
 		InDir:         params.InDir,
 		ImageSelector: params.ImageSelector}
 	return errors.Wrapf(builder.Build(),
