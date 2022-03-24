@@ -175,6 +175,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 	// Build the magefile for Linux, so we can run it inside the container.
 	mg.Deps(buildMage)
 
+	params.Serial = true
 	log.Println("crossBuild: Platform list =", params.Platforms)
 	var deps []interface{}
 	for _, buildPlatform := range params.Platforms {
