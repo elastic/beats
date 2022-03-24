@@ -12,6 +12,12 @@ issues:
   # Set to 0 to disable.
   # Default: 50
   max-issues-per-linter: 50
+  exclude-rules:
+    # Exclude package name contains '-' issue because we have at least one package with
+    # it on its name.
+    - linters:
+        - stylecheck
+      text: "ST1003:"
 
 output:
   sort-results: true
@@ -142,7 +148,7 @@ linters-settings:
     # Enable to require an explanation of nonzero length after each nolint directive. Default is false.
     require-explanation: true
     # Enable to require nolint directives to mention the specific linter being suppressed. Default is false.
-    require-specific: true
+    require-specific: false
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
