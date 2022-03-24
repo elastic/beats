@@ -135,7 +135,6 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Added TESTING_FILEBEAT_FILEPATTERN option for filebeat module pytests {pull}30103[30103]
 - Add gcp dataproc metricset. {pull}30008[30008]
 - Add Github action for linting
-- Update ECS version to 8.2.
 - Update ECS version to 8.2. {pull}30958[30958]
 
 ==== Deprecated
