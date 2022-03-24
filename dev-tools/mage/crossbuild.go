@@ -206,22 +206,35 @@ func CrossBuild(options ...CrossBuildOption) error {
 // assembleDarwinUniversal checks if darwin/amd64 and darwin/arm64 were build,
 // if so, it generates a darwin/universal binary that is the merge fo them two.
 func assembleDarwinUniversal(params crossBuildParams) error {
-	if IsDarwinUniversal() {
-		builder := GolangCrossBuilder{
-			// the docker image for darwin/arm64 is the one capable of merging the binaries.
-			Platform:      "darwin/arm64",
-			Target:        "assembleDarwinUniversal",
-			InDir:         params.InDir,
-			ImageSelector: params.ImageSelector}
-		if err := builder.Build(); err != nil {
-			return errors.Wrapf(err,
-				"failed merging darwin/amd64 and darwin/arm64 into darwin/universal target=%v for platform=%v",
-				builder.Target,
-				builder.Platform)
-		}
+	if !IsDarwinUniversal() {
+		return nil // nothing to do
 	}
 
-	return nil
+	fmt.Println("-----------------------------------------")
+	fmt.Println(">> assembleDarwinUniversal DEBUG")
+	out, err := sh.Output("pwd")
+	fmt.Println(">> assembleDarwinUniversal on:", out, err)
+	fmt.Println("-----------------------------------------")
+	out, err = sh.Output("ls", "build")
+	fmt.Println(">> assembleDarwinUniversal:", "ls", "build:", out, err)
+	fmt.Println("-----------------------------------------")
+	out, err = sh.Output("ls", "build/golang-crossbuild")
+	fmt.Println(">> assembleDarwinUniversal debug:", out, err)
+	fmt.Println("-----------------------------------------")
+	fmt.Println(">> assembleDarwinUniversal DEBUG END")
+	fmt.Println("-----------------------------------------")
+
+	builder := GolangCrossBuilder{
+		// the docker image for darwin/arm64 is the one capable of merging the binaries.
+		Platform:      "darwin/arm64",
+		Target:        "assembleDarwinUniversal",
+		InDir:         params.InDir,
+		ImageSelector: params.ImageSelector}
+	return errors.Wrapf(builder.Build(),
+		"failed merging darwin/amd64 and darwin/arm64 into darwin/universal target=%v for platform=%v",
+		builder.Target,
+		builder.Platform)
+
 }
 
 // CrossBuildXPack executes the 'golangCrossBuild' target in the Beat's
