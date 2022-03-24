@@ -122,7 +122,6 @@ pipeline {
                 sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
               }
               sh(label: "Debug package", script: 'find build/distributions -type f -ls || true')
-              sh(label: "Debug package", script: 'tree build/distributions || true')
               dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
               script {
                 getVaultSecret.readSecretWrapper {
@@ -317,14 +316,15 @@ def release(){
       dir("${env.BEATS_FOLDER}") {
         sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
         sh(label: "Debug package", script: 'find build/distributions -type f -ls || true')
-        sh(label: "Debug package", script: 'tree build/distributions || true')
+        def folder = getBeatsName(env.BEATS_FOLDER)
         uploadPackagesToGoogleBucket(
           credentialsId: env.JOB_GCS_EXT_CREDENTIALS,
           repo: env.REPO,
           bucket: env.JOB_GCS_BUCKET,
-          folder: getBeatsName(env.BEATS_FOLDER),
+          folder: folder,
           pattern: "build/distributions/**/*"
         )
+        gsutil(command: "-m -q list -r ${env.BUCKET_URI}/${folder}", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
       }
     }
   }
