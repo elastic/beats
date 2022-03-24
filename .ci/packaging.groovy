@@ -91,10 +91,6 @@ pipeline {
         }
         stage('Build Packages'){
           options { skipDefaultCheckout() }
-          when {
-            beforeAgent true
-            expression { return false }
-          }
           steps {
             generateSteps()
           }
@@ -112,7 +108,7 @@ pipeline {
         stage('DRA') {
           environment {
             // It uses the folder structure done in uploadPackagesToGoogleBucket
-            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/791027603a63c94a600afaa380992dc790de8bb9"
+            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
             HOME = "${env.WORKSPACE}"
           }
           steps {
@@ -123,7 +119,7 @@ pipeline {
               // TODO: as long as googleStorageDownload does not support recursive copy with **/*
               dir("build/distributions") {
                 gsutil(command: "-m -q cp -r ${env.BUCKET_URI} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
-                sh(label: 'move one level up', script: "mv 791027603a63c94a600afaa380992dc790de8bb9/** .")
+                sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
               }
               dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
               script {
