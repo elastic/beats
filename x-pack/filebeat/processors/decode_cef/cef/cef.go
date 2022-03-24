@@ -27,7 +27,10 @@ import (
 //go:generate ragel -V -p parser_recover.rl -o cef_recover.dot
 //go:generate dot -T svg cef_recover.dot -o cef_recover.svg
 
-var errUnexpectedEndOfEvent = errors.New("unexpected end of CEF event")
+var (
+	errUnexpectedEndOfEvent = errors.New("unexpected end of CEF event")
+	errIncompleteHeader     = errors.New("incomplete CEF header")
+)
 
 // Field is CEF extension field value.
 type Field struct {
@@ -131,6 +134,7 @@ func (e *Event) Unpack(data string, opts ...Option) error {
 	if err = e.unpack(data); err != nil {
 		errs = append(errs, err)
 		if len(e.Extensions) == 0 {
+			errs = append(errs, errIncompleteHeader)
 			// We must have failed in the headers,
 			// so go back for the extensions.
 			err = e.recoverExtensions(data)

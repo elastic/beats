@@ -8,12 +8,13 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"flag"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/multierr"
 )
 
 var generateCorpus = flag.Bool("corpus", false, "generate fuzz corpus from test cases")
@@ -88,7 +89,10 @@ func TestGenerateFuzzCorpus(t *testing.T) {
 		h.Write([]byte(m))
 		name := hex.EncodeToString(h.Sum(nil))
 
-		ioutil.WriteFile(filepath.Join("fuzz/corpus", name), []byte(m), 0o644)
+		err := os.WriteFile(filepath.Join("fuzz/corpus", name), []byte(m), 0o644)
+		if err != nil {
+			t.Fatalf("failed to write fuzzing corpus: %v", err)
+		}
 	}
 }
 
@@ -407,7 +411,7 @@ func TestEventUnpack(t *testing.T) {
 	t.Run("truncatedHeader", func(t *testing.T) {
 		var e Event
 		err := e.Unpack(truncatedHeader)
-		assert.Equal(t, errUnexpectedEndOfEvent, err)
+		assert.Equal(t, multierr.Combine(errUnexpectedEndOfEvent, errIncompleteHeader), err)
 		assert.Equal(t, 0, e.Version)
 		assert.Equal(t, "SentinelOne", e.DeviceVendor)
 		assert.Equal(t, "Mgmt", e.DeviceProduct)
@@ -443,7 +447,7 @@ func BenchmarkEventUnpack(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		var e Event
-		e.Unpack(messages[i%len(messages)])
+		_ = e.Unpack(messages[i%len(messages)])
 	}
 }
 
