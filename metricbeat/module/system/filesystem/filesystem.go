@@ -21,6 +21,7 @@
 package filesystem
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -30,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/pkg/errors"
 )
 
 var debugf = logp.MakeDebug("system.filesystem")
@@ -39,6 +39,11 @@ func init() {
 	mb.Registry.MustAddMetricSet("system", "filesystem", New,
 		mb.WithHostParser(parse.EmptyHostParser),
 	)
+}
+
+// Config stores the metricset-local config
+type Config struct {
+	IgnoreTypes []string `config:"filesystem.ignore_types"`
 }
 
 // MetricSet for fetching filesystem metrics.
@@ -57,7 +62,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	sys := base.Module().(resolve.Resolver)
 
 	if config.IgnoreTypes == nil {
-		config.IgnoreTypes = DefaultIgnoredTypes(sys)
+		config.IgnoreTypes = fs.DefaultIgnoredTypes(sys)
 	}
 	if len(config.IgnoreTypes) > 0 {
 		logp.Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
@@ -72,42 +77,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches filesystem metrics for all mounted filesystems and returns
 // an event for each mount point.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	// fss, err := GetFileSystemList()
-	// if err != nil {
-	// 	return errors.Wrap(err, "error getting filesystem list")
-
-	// }
-
-	// if len(m.config.IgnoreTypes) > 0 {
-	// 	fss = Filter(fss, BuildTypeFilter(m.config.IgnoreTypes...))
-	// }
 
 	fsList, err := fs.GetFilesystems(m.sys, fs.BuildFilterWithList(m.config.IgnoreTypes))
 	if err != nil {
-		return errors.Wrap(err, "error fetching filesystems")
+		return fmt.Errorf("error fetching filesystem list: %w", err)
 	}
 
 	for _, fs := range fsList {
 		err := fs.GetUsage()
 		if err != nil {
-			return errors.Wrap(err, "error")
+			return fmt.Errorf("error getting filesystem usage for %s: %w", fs.Directory, err)
 		}
 		out := common.MapStr{}
 		typeconv.Convert(&out, fs)
-		// stat, err := GetFileSystemStat(fs)
-		// addStats := true
-		// if err != nil {
-		// 	addStats = false
-		// 	m.Logger().Debugf("error fetching filesystem stats for '%s': %v", fs.DirName, err)
-		// }
-		// fsStat := FSStat{
-		// 	FileSystemUsage: stat,
-		// 	DevName:         fs.DevName,
-		// 	Mount:           fs.DirName,
-		// 	SysTypeName:     fs.SysTypeName,
-		// }
-
-		// AddFileSystemUsedPercentage(&fsStat)
 
 		event := mb.Event{
 			MetricSetFields: out,

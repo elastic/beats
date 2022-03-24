@@ -1,6 +1,10 @@
 package filesystem
 
 import (
+	"fmt"
+	"io/ioutil"
+	"os"
+	"runtime"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -15,10 +19,6 @@ func TestMountList(t *testing.T) {
 	result, err := GetFilesystems(hostfs, nil)
 	assert.NoError(t, err, "GetFilesystems")
 
-	// for _, res := range result {
-	// 	t.Logf("FS: %#v\n", res)
-	// }
-
 	t.Logf("Usage:")
 
 	for _, res := range result {
@@ -27,5 +27,164 @@ func TestMountList(t *testing.T) {
 		out := common.MapStr{}
 		typeconv.Convert(&out, res)
 		t.Logf("Usage: %s", out.StringToPrint())
+	}
+}
+
+func TestFileSystemList(t *testing.T) {
+	if runtime.GOOS == "darwin" && os.Getenv("TRAVIS") == "true" {
+		t.Skip("FileSystem test fails on Travis/OSX with i/o error")
+	}
+	hostfs := resolve.NewTestResolver("/")
+	fss, err := GetFilesystems(hostfs, nil)
+	if err != nil {
+		t.Fatal("GetFileSystemList", err)
+	}
+	assert.True(t, (len(fss) > 0))
+
+	for _, fs := range fss {
+		if fs.Type == "cdrom" {
+			continue
+		}
+
+		err := fs.GetUsage()
+
+		if assert.NoError(t, err, "filesystem=%v: %v", fs, err) {
+			assert.True(t, (fs.Total.ValueOr(0) >= 0))
+			assert.True(t, (fs.Free.ValueOr(0) >= 0))
+			assert.True(t, (fs.Avail.ValueOr(0) >= 0))
+			assert.True(t, (fs.Used.Bytes.ValueOr(0) >= 0))
+
+		}
+	}
+}
+
+func TestFileSystemListFiltering(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("These cases don't need to work on Windows")
+	}
+
+	fakeDevDir, err := ioutil.TempDir(os.TempDir(), "dir")
+	assert.Empty(t, err)
+	defer os.RemoveAll(fakeDevDir)
+
+	cases := []struct {
+		description   string
+		fss, expected []FSStat
+	}{
+		{
+			fss: []FSStat{
+				{Directory: "/", Device: "/dev/sda1"},
+				{Directory: "/", Device: "/dev/sda1"},
+			},
+			expected: []FSStat{
+				{Directory: "/", Device: "/dev/sda1"},
+			},
+		},
+		{
+			description: "Don't repeat devices, shortest of dir names should be used",
+			fss: []FSStat{
+				{Directory: "/", Device: "/dev/sda1"},
+				{Directory: "/bind", Device: "/dev/sda1"},
+			},
+			expected: []FSStat{
+				{Directory: "/", Device: "/dev/sda1"},
+			},
+		},
+		{
+			description: "Don't repeat devices, shortest of dir names should be used",
+			fss: []FSStat{
+				{Directory: "/bind", Device: "/dev/sda1"},
+				{Directory: "/", Device: "/dev/sda1"},
+			},
+			expected: []FSStat{
+				{Directory: "/", Device: "/dev/sda1"},
+			},
+		},
+		{
+			description: "Keep tmpfs",
+			fss: []FSStat{
+				{Directory: "/run", Device: "tmpfs"},
+				{Directory: "/tmp", Device: "tmpfs"},
+			},
+			expected: []FSStat{
+				{Directory: "/run", Device: "tmpfs"},
+				{Directory: "/tmp", Device: "tmpfs"},
+			},
+		},
+		{
+			description: "Don't repeat devices, shortest of dir names should be used, keep tmpfs",
+			fss: []FSStat{
+				{Directory: "/", Device: "/dev/sda1"},
+				{Directory: "/bind", Device: "/dev/sda1"},
+				{Directory: "/run", Device: "tmpfs"},
+			},
+			expected: []FSStat{
+				{Directory: "/", Device: "/dev/sda1"},
+				{Directory: "/run", Device: "tmpfs"},
+			},
+		},
+		{
+			description: "Don't keep the fs if the device is a directory (it'd be a bind mount)",
+			fss: []FSStat{
+				{Directory: "/", Device: "/dev/sda1"},
+				{Directory: "/bind", Device: fakeDevDir},
+			},
+			expected: []FSStat{
+				{Directory: "/", Device: "/dev/sda1"},
+			},
+		},
+		{
+			description: "Don't filter out NFS",
+			fss: []FSStat{
+				{Directory: "/srv/data", Device: "192.168.42.42:/exports/nfs1"},
+			},
+			expected: []FSStat{
+				{Directory: "/srv/data", Device: "192.168.42.42:/exports/nfs1"},
+			},
+		},
+	}
+
+	for _, c := range cases {
+
+		filtered := filterFileSystemList(c.fss)
+		ok := assert.ElementsMatch(t, c.expected, filtered, c.description)
+		if !ok {
+			t.FailNow()
+		}
+	}
+}
+
+// Emulate the filtering process that would normally happen inside the callbacks from platform-specific code
+func filterFileSystemList(stats []FSStat) []FSStat {
+	hostfs := resolve.NewTestResolver("/")
+	filtered := []FSStat{}
+	for _, stat := range stats {
+		if avoidFileSystem(stat) && buildDefaultFilters(hostfs)(stat) {
+			fmt.Printf("Appending %#v\n", stat.Directory)
+			filtered = append(filtered, stat)
+		}
+
+	}
+
+	return filterDuplicates(filtered)
+}
+
+func TestFilter(t *testing.T) {
+	in := []FSStat{
+		{Type: "nfs"},
+		{Type: "ext4"},
+		{Type: "proc"},
+		{Type: "smb"},
+	}
+	filter := BuildFilterWithList([]string{"nfs", "smb", "proc"})
+	out := []FSStat{}
+	for _, fs := range in {
+		if filter(fs) {
+			out = append(out, fs)
+		}
+	}
+
+	if assert.Len(t, out, 1) {
+		assert.Equal(t, "ext4", out[0].Type)
 	}
 }

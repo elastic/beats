@@ -1,22 +1,23 @@
 package filesystem
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/gosigar/sys/windows"
-	"github.com/pkg/errors"
 )
 
 func parseMounts(_ string, filter func(FSStat) bool) ([]FSStat, error) {
 	drives, err := windows.GetAccessPaths()
 	if err != nil {
-		return nil, errors.Wrap(err, "GetAccessPaths failed")
+		return nil, fmt.Errorf("GetAccessPaths failed: %w", err)
 	}
 
 	driveList := []FSStat{}
 	for _, drive := range drives {
 		fsType, err := windows.GetFilesystemType(drive)
 		if err != nil {
-			return nil, errors.Wrapf(err, "GetFilesystemType failed")
+			return nil, fmt.Errorf("GetFilesystemType failed: %w", err)
 		}
 		if fsType != "" {
 			driveList = append(driveList, FSStat{

@@ -4,10 +4,10 @@
 package filesystem
 
 import (
+	"fmt"
 	"syscall"
 
 	"github.com/elastic/beats/v7/libbeat/opt"
-	"github.com/pkg/errors"
 )
 
 // GetUsage returns the filesystem usage
@@ -15,7 +15,7 @@ func (fs *FSStat) GetUsage() error {
 	stat := syscall.Statfs_t{}
 	err := syscall.Statfs(fs.Directory, &stat)
 	if err != nil {
-		return errors.Wrap(err, "error in Statfs syscall")
+		return fmt.Errorf("error in Statfs syscall: %w", err)
 	}
 
 	fs.Total = opt.UintWith(uint64(stat.Blocks)).MultUint64OrNone(uint64(stat.Bsize))

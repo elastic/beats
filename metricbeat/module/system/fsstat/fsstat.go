@@ -21,16 +21,16 @@
 package fsstat
 
 import (
+	"fmt"
 	"runtime"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	fs "github.com/elastic/beats/v7/libbeat/metric/system/filesystem"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/system/filesystem"
-
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -43,6 +43,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	config filesystem.Config
+	sys    resolve.Resolver
 }
 
 // New creates and returns a new instance of MetricSet.
@@ -53,7 +54,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	sys := base.Module().(resolve.Resolver)
 	if config.IgnoreTypes == nil {
-		config.IgnoreTypes = filesystem.DefaultIgnoredTypes(sys)
+		config.IgnoreTypes = fs.DefaultIgnoredTypes(sys)
 	}
 	if len(config.IgnoreTypes) > 0 {
 		base.Logger().Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
@@ -62,36 +63,33 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
+		sys:           sys,
 	}, nil
 }
 
 // Fetch fetches filesystem metrics for all mounted filesystems and returns
 // a single event containing aggregated data.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	fss, err := filesystem.GetFileSystemList()
+	fsList, err := fs.GetFilesystems(m.sys, fs.BuildFilterWithList(m.config.IgnoreTypes))
 	if err != nil {
-		return errors.Wrap(err, "filesystem list")
-	}
-
-	if len(m.config.IgnoreTypes) > 0 {
-		fss = filesystem.Filter(fss, filesystem.BuildTypeFilter(m.config.IgnoreTypes...))
+		return fmt.Errorf("error fetching filesystem list: %w", err)
 	}
 
 	// These values are optional and could also be calculated by Kibana
 	var totalFiles, totalSize, totalSizeFree, totalSizeUsed uint64
 
-	for _, fs := range fss {
-		stat, err := filesystem.GetFileSystemStat(fs)
+	for _, fs := range fsList {
+		err := fs.GetUsage()
 		if err != nil {
-			m.Logger().Debugf("error fetching filesystem stats for '%s': %v", fs.DirName, err)
+			m.Logger().Debugf("error fetching filesystem stats for '%s': %v", fs.Directory, err)
 			continue
 		}
-		m.Logger().Debugf("filesystem: %s total=%d, used=%d, free=%d", fs.DirName, stat.Total, stat.Used, stat.Free)
+		m.Logger().Debugf("filesystem: %s total=%d, used=%d, free=%d", fs.Directory, fs.Total, fs.Used.Bytes.ValueOr(0), fs.Free)
 
-		totalFiles += stat.Files
-		totalSize += stat.Total
-		totalSizeFree += stat.Free
-		totalSizeUsed += stat.Used
+		totalFiles += fs.Files.ValueOr(0)
+		totalSize += fs.Total.ValueOr(0)
+		totalSizeFree += fs.Free.ValueOr(0)
+		totalSizeUsed += fs.Used.Bytes.ValueOr(0)
 	}
 
 	event := common.MapStr{
@@ -100,7 +98,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			"used":  totalSizeUsed,
 			"total": totalSize,
 		},
-		"count":       len(fss),
+		"count":       len(fsList),
 		"total_files": totalFiles,
 	}
 

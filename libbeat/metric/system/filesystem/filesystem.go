@@ -5,6 +5,7 @@ package filesystem
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -13,7 +14,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/opt"
-	"github.com/pkg/errors"
 )
 
 //FSStat carries the metadata for a given filesystem
@@ -74,7 +74,7 @@ func GetFilesystems(hostfs resolve.Resolver, filter func(FSStat) bool) ([]FSStat
 
 	mounts, err := parseMounts(fs, filterFunc)
 	if err != nil {
-		return nil, errors.Wrap(err, "error reading mounts")
+		return nil, fmt.Errorf("error reading mounts: %w", err)
 	}
 
 	return filterDuplicates(mounts), nil
@@ -94,9 +94,9 @@ func (fs *FSStat) fillMetrics() {
 	fs.Used.Pct = opt.FloatWith(common.Round(perc, common.DefaultDecimalPlacesCount))
 }
 
-// defaultIgnoredTypes tries to guess a sane list of filesystem types that
+// DefaultIgnoredTypes tries to guess a sane list of filesystem types that
 // could be ignored in the running system
-func defaultIgnoredTypes(sys resolve.Resolver) (types []string) {
+func DefaultIgnoredTypes(sys resolve.Resolver) (types []string) {
 	// If /proc/filesystems exist, default ignored types are all marked
 	// as nodev
 	fsListFile := sys.ResolveHostFS("/proc/filesystems")
@@ -127,7 +127,7 @@ func BuildFilterWithList(ignored []string) func(FSStat) bool {
 }
 
 func buildDefaultFilters(hostfs resolve.Resolver) func(FSStat) bool {
-	ignoreType := defaultIgnoredTypes(hostfs)
+	ignoreType := DefaultIgnoredTypes(hostfs)
 	return BuildFilterWithList(ignoreType)
 }
 
@@ -138,17 +138,27 @@ func filterDuplicates(fsList []FSStat) []FSStat {
 	var filtered []FSStat
 
 	for _, fs := range fsList {
+		// Don't do any further checks on block devices
+		if !filepath.IsAbs(fs.Device) {
+
+			filtered = append(filtered, fs)
+			continue
+		}
+
 		if seen, found := devices[fs.Device]; found {
+
 			if len(fs.Directory) < len(seen.Directory) {
 				devices[fs.Device] = fs
 			}
 			continue
-		} else {
-			devices[fs.Device] = fs
 		}
+
+		devices[fs.Device] = fs
+
 	}
 
 	for _, fs := range devices {
+
 		filtered = append(filtered, fs)
 
 	}
