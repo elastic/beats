@@ -16,7 +16,8 @@ This metricset is available on:
 not be collected from filesystems matching these types. This setting also
 affects the `fsstats` metricset. If this option is not set, metricbeat ignores
 all types for virtual devices in systems where this information is available (e.g.
-all types marked as `nodev` in `/proc/filesystems` in Linux systems).
+all types marked as `nodev` in `/proc/filesystems` in Linux systems). This can be set to an empty list (`[]`)
+to make filebeat report all filesystems, regardless of type.
 
 [float]
 === Filtering
