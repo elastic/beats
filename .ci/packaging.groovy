@@ -324,9 +324,9 @@ def release(){
           folder: folder,
           pattern: "build/distributions/**/*"
         )
-        sh(label: "Debug package", script: 'ls -ltra build/distributions/**/* || true')
         sh(label: "Debug package", script: 'ls -ltra build/distributions/* || true')
-        gsutil(command: "-m -q list -r ${env.BUCKET_URI}/${folder}", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
+        def uri = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
+        gsutil(command: "-m -q list -r ${uri}/${folder}", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
       }
     }
   }
