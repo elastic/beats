@@ -391,14 +391,9 @@ func TestParsersMultilineTimeout(t *testing.T) {
 	})
 
 	env.waitUntilEventCount(3)
-<<<<<<< HEAD
-	env.requireOffsetInRegistry(testlogName, len(testlines)+len(moreLines))
-	env.requireEventsReceived([]string{`[2015] hello world
-=======
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines)+len(moreLines))
 	env.requireEventsReceived([]string{
 		`[2015] hello world
->>>>>>> c61b21920e (filebeat: Migrates registry entries from filestream input without ID (#30717))
   First Line
   Second Line`,
 		`  This should not be third
@@ -503,14 +498,9 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 	})
 
 	env.waitUntilEventCount(3)
-<<<<<<< HEAD
-	env.requireOffsetInRegistry(testlogName, len(testlines)+len(moreLines))
-	env.requireEventsReceived([]string{`[2015] hello world
-=======
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines)+len(moreLines))
 	env.requireEventsReceived([]string{
 		`[2015] hello world
->>>>>>> c61b21920e (filebeat: Migrates registry entries from filestream input without ID (#30717))
   First Line
   Second Line`,
 		`  This should not be third

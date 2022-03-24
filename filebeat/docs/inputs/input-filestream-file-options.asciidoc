@@ -15,8 +15,6 @@ in the `paths` option. At the moment only simple file system scanning is
 supported.
 
 [float]
-<<<<<<< HEAD
-=======
 [[filestream-input-id]]
 ===== `id`
 
@@ -28,7 +26,6 @@ state of the files will be lost and they will be read from the
 beginning again.
 
 [float]
->>>>>>> c61b21920e (filebeat: Migrates registry entries from filestream input without ID (#30717))
 [[filestream-input-paths]]
 ===== `paths`
 
