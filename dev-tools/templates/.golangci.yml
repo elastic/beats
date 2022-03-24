@@ -15,9 +15,9 @@ issues:
   exclude-rules:
     # Exclude package name contains '-' issue because we have at least one package with
     # it on its name.
-    - linters:
+    - text: "ST1003:"
+      linters:
         - stylecheck
-      text: "ST1003:"
 
 output:
   sort-results: true
