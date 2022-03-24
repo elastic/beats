@@ -30,6 +30,7 @@ import (
 const testFile = "_meta/test/metrics"
 
 func TestEventMapping(t *testing.T) {
+	t.Skip("Failing/flaky test: https://github.com/elastic/beats/issues/30973")
 	ptest.TestMetricSet(t, "kubernetes", "scheduler",
 		ptest.TestCases{
 			{
