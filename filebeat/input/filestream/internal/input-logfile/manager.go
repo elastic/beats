@@ -29,7 +29,6 @@ import (
 
 	"github.com/elastic/go-concert/unison"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -158,7 +157,7 @@ func (cim *InputManager) shutdown() {
 
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
-func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
+func (cim *InputManager) Create(config *common.Config) (v2.Input, error) {
 	if err := cim.init(); err != nil {
 		return nil, err
 	}
@@ -194,7 +193,7 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 
 	sourceIdentifier, err := newSourceIdentifier(cim.Type, settings.ID)
 	if err != nil {
-		return nil, fmt.Errorf("error while creating source identifier for input: %v", err)
+		return nil, fmt.Errorf("error while creating source identifier for input: %w", err)
 	}
 
 	pStore := cim.getRetainedStore()

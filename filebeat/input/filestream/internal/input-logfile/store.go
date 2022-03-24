@@ -235,7 +235,7 @@ func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface
 			// are not included in the copy. Collection on
 			// the copy start from the last known ACKed position.
 			// This might lead to data duplication because the harvester
-			// will pickup from the last ACKed postion using the new key
+			// will pickup from the last ACKed position using the new key
 			// and the pending updates will affect the entry with the oldKey.
 			r := res.copyWithNewKey(newKey)
 			r.cursorMeta = updatedMeta
@@ -281,7 +281,7 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 			// are not included in the copy. Collection on
 			// the copy start from the last known ACKed position.
 			// This might lead to data duplication because the harvester
-			// will pickup from the last ACKed postion using the new key
+			// will pickup from the last ACKed position using the new key
 			// and the pending updates will affect the entry with the oldKey.
 			r := res.copyWithNewKey(newKey)
 			r.cursorMeta = updatedMeta
@@ -366,7 +366,7 @@ func (s *store) resetCursor(key string, cur interface{}) error {
 	r.activeCursorOperations = 0
 	r.pendingCursorValue = nil
 	r.pendingUpdate = nil
-	typeconv.Convert(&r.cursor, cur)
+	typeconv.Convert(&r.cursor, cur) //nolint: errcheck // not changing behaviour on this commit
 
 	s.writeState(r)
 
@@ -535,6 +535,7 @@ func (r *resource) copyWithNewKey(key string) *resource {
 // pendingCursor returns the current published cursor state not yet ACKed.
 //
 // Note: The stateMutex must be locked when calling pendingCursor.
+//nolint: errcheck // not changing behaviour on this commit
 func (r *resource) pendingCursor() interface{} {
 	if r.pendingUpdate != nil {
 		var tmp interface{}
@@ -572,7 +573,7 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 	}
 
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
-		if !strings.HasPrefix(string(key), keyPrefix) {
+		if !strings.HasPrefix(key, keyPrefix) {
 			return true, nil
 		}
 

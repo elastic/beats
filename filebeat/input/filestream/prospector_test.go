@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//nolint: errcheck // It's a test file
 package filestream
 
 import (
@@ -451,7 +452,7 @@ func (m *mockFileWatcher) Event() loginp.FSEvent {
 	return evt
 }
 
-func (m *mockFileWatcher) Run(_ unison.Canceler) { return }
+func (m *mockFileWatcher) Run(_ unison.Canceler) {}
 
 func (m *mockFileWatcher) GetFiles() map[string]os.FileInfo { return m.filesOnDisk }
 
@@ -473,7 +474,7 @@ func (mu *mockMetadataUpdater) has(id string) bool {
 }
 
 func (mu *mockMetadataUpdater) FindCursorMeta(s loginp.Source, v interface{}) error {
-	v, ok := mu.table[s.Name()]
+	_, ok := mu.table[s.Name()]
 	if !ok {
 		return fmt.Errorf("no such id")
 	}
