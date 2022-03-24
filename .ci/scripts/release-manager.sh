@@ -27,7 +27,7 @@ mv build/distributions/dependencies.csv \
 find build/distributions -name '*linux-arm64.docker.tar.gz*' -print0 |
   while IFS= read -r -d '' file
   do
-    mv "$file" "${file/linux-arm64.docker.tar.gz/docker-image-arm64.tar.gz}"
+    mv "$file" "${file/linux-arm64.docker.tar.gz/docker-image-linux-arm64.tar.gz}"
   done
 
 find build/distributions -name '*linux-amd64.docker.tar.gz*' -print0 |
