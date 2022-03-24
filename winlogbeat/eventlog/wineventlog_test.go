@@ -183,7 +183,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 	const messageSize = 256 // Originally 31800, such a large value resulted in an empty eventlog under Win10.
 	const totalEvents = 1000
 	for i := 0; i < totalEvents; i++ {
-		safeWriteEvent(t, writer, eventlog.Info, uint32(i%1000), []string{strconv.Itoa(i) + " " + randomSentence(messageSize)})
+		safeWriteEvent(t, writer, eventlog.Info, uint32(i%1000)+1, []string{strconv.Itoa(i) + " " + randomSentence(messageSize)})
 	}
 
 	openLog := func(t testing.TB, config map[string]interface{}) EventLog {
@@ -198,11 +198,6 @@ func testWindowsEventLog(t *testing.T, api string) {
 			records, err := log.Read()
 			require.NotEmpty(t, records)
 			require.NoError(t, err)
-			if i == 0 {
-				// The first event in a collection of events created by eventcreate
-				// appear to be broken, so skip this one. The remaining events pass.
-				continue
-			}
 
 			r := records[0]
 			require.NotEmpty(t, r.Message, "message field is empty: errors:%v\nrecord:%#v", r.Event.RenderErr, r)
