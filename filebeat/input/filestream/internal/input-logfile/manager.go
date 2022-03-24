@@ -172,8 +172,6 @@ func (cim *InputManager) Create(config *common.Config) (v2.Input, error) {
 		return nil, err
 	}
 
-<<<<<<< HEAD
-=======
 	if settings.ID == "" {
 		cim.Logger.Error("filestream input ID without ID might lead to data" +
 			" duplication, please add an ID and restart Filebeat")
@@ -186,7 +184,6 @@ func (cim *InputManager) Create(config *common.Config) (v2.Input, error) {
 
 	cim.ids[settings.ID] = struct{}{}
 
->>>>>>> c61b21920e (filebeat: Migrates registry entries from filestream input without ID (#30717))
 	prospector, harvester, err := cim.Configure(config)
 	if err != nil {
 		return nil, err
