@@ -176,7 +176,7 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 	}
 	defer bb.Free()
 
-	for i := 0; i < int(propertyCount); i++ {
+	for i := 0; i < propertyCount; i++ {
 		property := EvtSystemPropertyID(i)
 		offset := i * int(sizeofEvtVariant)
 		evtVar := (*EvtVariant)(unsafe.Pointer(bb.PtrAt(offset)))
@@ -186,6 +186,7 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 			continue
 		}
 
+		//nolint:errcheck // Bad linter!
 		switch property {
 		case EvtSystemProviderName:
 			event.Provider.Name = data.(string)
@@ -259,7 +260,7 @@ func (r *Renderer) renderUser(handle EvtHandle, event *winevent.Event) (values [
 	for i := 0; i < propertyCount; i++ {
 		offset := i * int(sizeofEvtVariant)
 		evtVar := (*EvtVariant)(unsafe.Pointer(bb.PtrAt(offset)))
-		binary.Write(argumentHash, binary.LittleEndian, uint32(evtVar.Type))
+		binary.Write(argumentHash, binary.LittleEndian, uint32(evtVar.Type)) //nolint:errcheck // Hash writes never fail.
 
 		values[i], err = evtVar.Data(bb.Bytes())
 		if err != nil {
@@ -282,7 +283,7 @@ func (r *Renderer) render(context EvtHandle, eventHandle EvtHandle) (*sys.Pooled
 	var bufferUsed, propertyCount uint32
 
 	err := _EvtRender(context, eventHandle, EvtRenderEventValues, 0, nil, &bufferUsed, &propertyCount)
-	if err != nil && err != windows.ERROR_INSUFFICIENT_BUFFER {
+	if err != nil && err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno or nil.
 		return nil, 0, fmt.Errorf("failed in EvtRender: %w", err)
 	}
 
