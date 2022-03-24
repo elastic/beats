@@ -16,7 +16,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Filebeat*
 
-
 *Heartbeat*
 
 
@@ -49,6 +48,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Filebeat*
 
 - Fix add_kubernetes_metadata matcher: support rotated logs when `resource_type: pod` {pull}30720[30720]
+
+*Filebeat*
+- Fixes data duplication on restart when filestream inputs did not have an ID set. {issue}30061[30061]
+- Update documentation for accessing `last_response.url.params` in httpjson input. {pull}30739[30739]
+- Allow fixing data duplication on restart when filestream inputs did not have an ID set. Setting an ID for filestream
+  inputs will fix the problem without generating any data duplication{issue}30061[30061]
 
 *Heartbeat*
 
