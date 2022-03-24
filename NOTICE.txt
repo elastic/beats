@@ -1832,11 +1832,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/sarama
-Version: v1.19.1-0.20210823122811-11c3ef800752
+Version: v1.19.1-0.20220310193331-ebc2b0d8eef3
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/sarama@v1.19.1-0.20210823122811-11c3ef800752/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/sarama@v1.19.1-0.20220310193331-ebc2b0d8eef3/LICENSE:
 
 Copyright (c) 2013 Shopify
 

@@ -36,8 +36,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Affecting all Beats*
 
+- Fixes Beats crashing when glibc >= 2.35 is used {issue}30576[30576]
+- Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
+- Wildcard fields no longer have a default ignore_above setting of 1024. {issue}30096[30096] {pull}30668[30668]
+- Ignore bugfix version when running version compatibility check against Elasticsearch. {pull}30746[30746]
+- Add more descriptive error logs for common connection failures in Kafka inputs / outputs. {pull}30776[30776]
 - Fix dissect trim panics from DELETE (127)(\u007f) character {issue}30657[30657] {pull}30658[30658]
-
 
 *Auditbeat*
 
