@@ -19,6 +19,7 @@ package build
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 
 	"github.com/magefile/mage/sh"
@@ -74,5 +75,28 @@ func AssembleDarwinUniversal() error {
 	}
 
 	lipo := sh.RunCmd(cmd, "-create", "-output")
-	return lipo(lipoArgs...)
+	if err := lipo(lipoArgs...); err != nil {
+		out, _ := sh.Output("which", "ls")
+		fmt.Fprintln(os.Stderr, "which", "ls"+":", out)
+		fmt.Println("-----------------------------------------------------")
+
+		out, _ = sh.Output("pwd")
+		fmt.Fprintln(os.Stderr, "pwd", ":", out)
+		fmt.Println("-----------------------------------------------------")
+
+		out, _ = sh.Output("ls")
+		fmt.Fprintln(os.Stderr, "ls", ":", out)
+		fmt.Println("-----------------------------------------------------")
+
+		out, _ = sh.Output("ls", "build")
+		fmt.Fprintln(os.Stderr, "ls", "build", ":", out)
+		fmt.Println("-----------------------------------------------------")
+
+		out, _ = sh.Output("ls", "build/golang-crossbuild/")
+		fmt.Fprintln(os.Stderr, "ls", "build/golang-crossbuild/"+":", out)
+		fmt.Println("-----------------------------------------------------")
+
+		return err
+	}
+	return nil
 }
