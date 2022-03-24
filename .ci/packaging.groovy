@@ -121,7 +121,8 @@ pipeline {
                 gsutil(command: "-m -q cp -r ${env.BUCKET_URI} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
                 sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
               }
-              sh(label: "Debug packages", script: 'ls -ltrah build/distributions/**/*')
+              sh(label: "Debug package", script: 'find build/distributions -type f -ls || true')
+              sh(label: "Debug package", script: 'tree build/distributions || true')
               dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
               script {
                 getVaultSecret.readSecretWrapper {
@@ -315,7 +316,8 @@ def release(){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dir("${env.BEATS_FOLDER}") {
         sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
-        sh(label: "Debug package", script: 'ls -ltrah build/distributions/**/*')
+        sh(label: "Debug package", script: 'find build/distributions -type f -ls || true')
+        sh(label: "Debug package", script: 'tree build/distributions || true')
         uploadPackagesToGoogleBucket(
           credentialsId: env.JOB_GCS_EXT_CREDENTIALS,
           repo: env.REPO,
