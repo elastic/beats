@@ -1,6 +1,6 @@
 name: Add QA labels to Elastic Agent issues
 on:
-  pull_request:
+  pull_request_target:
     types:
       - closed
 
