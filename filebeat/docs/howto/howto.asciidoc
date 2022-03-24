@@ -44,5 +44,6 @@ include::{libbeat-dir}/shared-env-vars.asciidoc[]
 include::{libbeat-dir}/yaml.asciidoc[]
 :standalone!:
 
+include::migrate-to-filestream.asciidoc[]
 
 
