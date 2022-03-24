@@ -227,7 +227,7 @@ func assembleDarwinUniversal(params crossBuildParams) error {
 	out, err = sh.Output("ls", "build/golang-crossbuild")
 	fmt.Println(">>", "ls", "build/golang-crossbuild:\n", out, err)
 	fmt.Println("-----------------------------------------")
-	fmt.Println(">> assembleDarwinUniversal DEBUG END")
+	fmt.Println(">> assembleDarwinUniversal DEBUG for", " END")
 	fmt.Println("-----------------------------------------")
 
 	builder := GolangCrossBuilder{
@@ -314,7 +314,8 @@ type GolangCrossBuilder struct {
 
 // Build executes the build inside of Docker.
 func (b GolangCrossBuilder) Build() error {
-	fmt.Printf(">> %v: Building for %v\n", b.Target, b.Platform)
+	fmt.Printf(">> %v: Building %s for %v\n",
+		BeatName, b.Target, b.Platform)
 
 	repoInfo, err := GetProjectRepoInfo()
 	if err != nil {
@@ -379,8 +380,8 @@ func (b GolangCrossBuilder) Build() error {
 
 	err = dockerRun(args...)
 
-	fmt.Printf(">> %v: Building for %v DONE, error: %v\n",
-		b.Target, b.Platform, err)
+	fmt.Printf(">> %s: Building %s for %s DONE, error: %v\n",
+		BeatName, b.Target, b.Platform, err)
 	return err
 }
 
