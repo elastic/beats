@@ -30,6 +30,7 @@ import (
 )
 
 func TestFetchMetricset(t *testing.T) {
+	t.Skip("Failing/flaky test: https://github.com/elastic/beats/issues/30973")
 	config := test.GetSchedulerConfig(t, "scheduler")
 	metricSet := mbtest.NewFetcher(t, config)
 	events, errs := metricSet.FetchEvents()
