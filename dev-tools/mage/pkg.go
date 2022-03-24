@@ -43,7 +43,8 @@ func Package() error {
 			"UseCommunityBeatPackaging, UseElasticBeatPackaging or USeElasticBeatWithoutXPackPackaging first.")
 	}
 
-	platforms := updateWithDarwinUniversal(Platforms)
+	// platforms := updateWithDarwinUniversal(Platforms)
+	platforms := Platforms
 
 	var tasks []interface{}
 	for _, target := range platforms {
