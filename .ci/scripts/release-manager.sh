@@ -33,7 +33,7 @@ find build/distributions -name '*linux-arm64.docker.tar.gz*' -print0 |
 find build/distributions -name '*linux-amd64.docker.tar.gz*' -print0 |
   while IFS= read -r -d '' file
   do
-    mv "$file" "${file/linux-amd64.docker.tar.gz/docker-image.tar.gz}"
+    mv "$file" "${file/linux-amd64.docker.tar.gz/docker-image-linux-amd64.tar.gz}"
   done
 
 # ensure the latest image has been pulled
