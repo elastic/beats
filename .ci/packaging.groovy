@@ -324,6 +324,8 @@ def release(){
           folder: folder,
           pattern: "build/distributions/**/*"
         )
+        sh(label: "Debug package", script: 'ls -ltra build/distributions/**/* || true')
+        sh(label: "Debug package", script: 'ls -ltra build/distributions/* || true')
         gsutil(command: "-m -q list -r ${env.BUCKET_URI}/${folder}", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
       }
     }
