@@ -24,6 +24,9 @@ func (e *Event) unpack(data string) error {
     // state related to CEF values.
     var state cefState
 
+    // flag for completion of CEF header.
+    complete := false
+
     // recoveredErrs are problems with the message that the parser was able to
     // recover from (though the parsing might not be "correct").
     var recoveredErrs []error
@@ -43,7 +46,7 @@ func (e *Event) unpack(data string) error {
                  severity pipe;
 
         # CEF message.
-        cef = header extensions?;
+        cef = header %complete_header extensions?;
 
         main := cef;
         write init;
@@ -54,7 +57,10 @@ func (e *Event) unpack(data string) error {
     if cs < cef_first_final {
         // Reached an early end.
         if p == pe {
-            return multierr.Append(multierr.Combine(recoveredErrs...), errUnexpectedEndOfEvent)
+            if complete {
+                return multierr.Append(multierr.Combine(recoveredErrs...), errUnexpectedEndOfEvent)
+            }
+            return multierr.Append(multierr.Combine(recoveredErrs...), multierr.Combine(errUnexpectedEndOfEvent, errIncompleteHeader))
         }
 
         // Encountered invalid input.

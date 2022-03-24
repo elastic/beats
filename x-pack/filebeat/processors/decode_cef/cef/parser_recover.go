@@ -4661,7 +4661,7 @@ func (e *Event) recoverExtensions(data string) error {
 
 		goto _again
 	f15:
-//line cef_actions.rl:44
+//line cef_actions.rl:47
 
 		// A new extension key marks the end of the last extension value.
 		if len(state.key) > 0 && state.valueStart <= mark-1 {
@@ -4672,20 +4672,20 @@ func (e *Event) recoverExtensions(data string) error {
 
 		goto _again
 	f29:
-//line cef_actions.rl:52
+//line cef_actions.rl:55
 
 		state.valueStart = p
 		state.valueEnd = p
 
 		goto _again
 	f17:
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
 		goto _again
 	f16:
-//line cef_actions.rl:66
+//line cef_actions.rl:69
 
 		recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
 		(p)--
@@ -4693,7 +4693,7 @@ func (e *Event) recoverExtensions(data string) error {
 
 		goto _again
 	f19:
-//line cef_actions.rl:70
+//line cef_actions.rl:73
 
 		state.reset()
 		// Resume processing at p, the start of the next extension key.
@@ -4781,7 +4781,7 @@ func (e *Event) recoverExtensions(data string) error {
 
 		mark = p
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -4791,7 +4791,7 @@ func (e *Event) recoverExtensions(data string) error {
 
 		mark_slash = p
 
-//line cef_actions.rl:52
+//line cef_actions.rl:55
 
 		state.valueStart = p
 		state.valueEnd = p
@@ -4867,7 +4867,7 @@ func (e *Event) recoverExtensions(data string) error {
 
 		state.pushEscape(mark_slash, p)
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -4878,7 +4878,7 @@ func (e *Event) recoverExtensions(data string) error {
 		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -4889,7 +4889,7 @@ func (e *Event) recoverExtensions(data string) error {
 		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -4900,7 +4900,7 @@ func (e *Event) recoverExtensions(data string) error {
 		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -4911,7 +4911,7 @@ func (e *Event) recoverExtensions(data string) error {
 		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -4922,7 +4922,7 @@ func (e *Event) recoverExtensions(data string) error {
 		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -4932,13 +4932,13 @@ func (e *Event) recoverExtensions(data string) error {
 
 		e.Severity = data[mark:p]
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
 		goto _again
 	f30:
-//line cef_actions.rl:52
+//line cef_actions.rl:55
 
 		state.valueStart = p
 		state.valueEnd = p
@@ -4949,18 +4949,18 @@ func (e *Event) recoverExtensions(data string) error {
 
 		goto _again
 	f28:
-//line cef_actions.rl:52
+//line cef_actions.rl:55
 
 		state.valueStart = p
 		state.valueEnd = p
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
 		goto _again
 	f32:
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -4979,7 +4979,7 @@ func (e *Event) recoverExtensions(data string) error {
 		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -4994,7 +4994,7 @@ func (e *Event) recoverExtensions(data string) error {
 		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -5009,7 +5009,7 @@ func (e *Event) recoverExtensions(data string) error {
 		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -5024,7 +5024,7 @@ func (e *Event) recoverExtensions(data string) error {
 		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -5038,7 +5038,7 @@ func (e *Event) recoverExtensions(data string) error {
 
 		e.Severity = data[mark:p]
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -5053,7 +5053,7 @@ func (e *Event) recoverExtensions(data string) error {
 		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -5068,7 +5068,7 @@ func (e *Event) recoverExtensions(data string) error {
 		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -5083,7 +5083,7 @@ func (e *Event) recoverExtensions(data string) error {
 		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -5098,7 +5098,7 @@ func (e *Event) recoverExtensions(data string) error {
 		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -5113,7 +5113,7 @@ func (e *Event) recoverExtensions(data string) error {
 		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -5124,12 +5124,12 @@ func (e *Event) recoverExtensions(data string) error {
 		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:52
+//line cef_actions.rl:55
 
 		state.valueStart = p
 		state.valueEnd = p
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -5140,12 +5140,12 @@ func (e *Event) recoverExtensions(data string) error {
 		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:52
+//line cef_actions.rl:55
 
 		state.valueStart = p
 		state.valueEnd = p
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -5156,12 +5156,12 @@ func (e *Event) recoverExtensions(data string) error {
 		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:52
+//line cef_actions.rl:55
 
 		state.valueStart = p
 		state.valueEnd = p
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -5172,12 +5172,12 @@ func (e *Event) recoverExtensions(data string) error {
 		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:52
+//line cef_actions.rl:55
 
 		state.valueStart = p
 		state.valueEnd = p
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -5188,12 +5188,12 @@ func (e *Event) recoverExtensions(data string) error {
 		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
 		state.reset()
 
-//line cef_actions.rl:52
+//line cef_actions.rl:55
 
 		state.valueStart = p
 		state.valueEnd = p
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -5212,7 +5212,7 @@ func (e *Event) recoverExtensions(data string) error {
 		if (p) == eof {
 			switch _cef_recover_eof_actions[cs] {
 			case 32:
-//line cef_actions.rl:59
+//line cef_actions.rl:62
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(state.key) > 0 && state.valueStart <= state.valueEnd {
@@ -5221,7 +5221,7 @@ func (e *Event) recoverExtensions(data string) error {
 				}
 
 			case 17:
-//line cef_actions.rl:66
+//line cef_actions.rl:69
 
 				recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
 				(p)--
@@ -5232,7 +5232,7 @@ func (e *Event) recoverExtensions(data string) error {
 
 				state.pushEscape(mark_slash, p)
 
-//line cef_actions.rl:59
+//line cef_actions.rl:62
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(state.key) > 0 && state.valueStart <= state.valueEnd {
@@ -5241,12 +5241,12 @@ func (e *Event) recoverExtensions(data string) error {
 				}
 
 			case 28:
-//line cef_actions.rl:52
+//line cef_actions.rl:55
 
 				state.valueStart = p
 				state.valueEnd = p
 
-//line cef_actions.rl:59
+//line cef_actions.rl:62
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(state.key) > 0 && state.valueStart <= state.valueEnd {

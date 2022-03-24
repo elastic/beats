@@ -41,6 +41,9 @@
     action severity {
         e.Severity = data[mark:p]
     }
+    action complete_header {
+        complete = true
+    }
     action extension_key {
         // A new extension key marks the end of the last extension value.
         if len(state.key) > 0 && state.valueStart <= mark - 1 {

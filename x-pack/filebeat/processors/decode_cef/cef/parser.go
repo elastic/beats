@@ -20,8 +20,8 @@ var _cef_eof_actions []byte = []byte{
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 25,
-	25, 0, 0, 0, 0, 28, 32, 32,
-	32, 28, 32, 32, 32, 35, 35, 0,
+	25, 0, 0, 0, 28, 30, 34, 34,
+	34, 30, 34, 34, 34, 37, 37, 0,
 }
 
 const cef_start int = 1
@@ -42,18 +42,21 @@ func (e *Event) unpack(data string) error {
 	// state related to CEF values.
 	var state cefState
 
+	// flag for completion of CEF header.
+	complete := false
+
 	// recoveredErrs are problems with the message that the parser was able to
 	// recover from (though the parsing might not be "correct").
 	var recoveredErrs []error
 
 	e.init(data)
 
-//line parser.go:53
+//line parser.go:56
 	{
 		cs = cef_start
 	}
 
-//line parser.go:58
+//line parser.go:61
 	{
 		if (p) == (pe) {
 			goto _test_eof
@@ -301,21 +304,21 @@ func (e *Event) unpack(data string) error {
 		case 36:
 			switch data[(p)] {
 			case 32:
-				goto tr62
+				goto tr73
 			case 95:
-				goto tr63
+				goto tr74
 			}
 			switch {
 			case data[(p)] < 65:
 				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr63
+					goto tr74
 				}
 			case data[(p)] > 90:
 				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr63
+					goto tr74
 				}
 			default:
-				goto tr63
+				goto tr74
 			}
 			goto tr1
 		case 29:
@@ -367,179 +370,179 @@ func (e *Event) unpack(data string) error {
 		case 37:
 			switch data[(p)] {
 			case 32:
-				goto tr75
+				goto tr77
 			case 61:
 				goto tr66
 			case 92:
-				goto tr76
+				goto tr78
 			}
 			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr74
+				goto tr76
 			}
-			goto tr73
+			goto tr75
 		case 38:
 			switch data[(p)] {
 			case 32:
-				goto tr79
+				goto tr81
 			case 61:
 				goto tr66
 			case 92:
-				goto tr80
+				goto tr82
 			}
 			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr78
+				goto tr80
 			}
-			goto tr77
+			goto tr79
 		case 39:
 			switch data[(p)] {
 			case 32:
-				goto tr79
+				goto tr81
 			case 61:
 				goto tr66
 			case 92:
-				goto tr80
+				goto tr82
 			case 95:
-				goto tr81
+				goto tr83
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr78
+					goto tr80
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 90:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr81
+						goto tr83
 					}
 				case data[(p)] >= 65:
-					goto tr81
+					goto tr83
 				}
 			default:
-				goto tr81
+				goto tr83
 			}
-			goto tr77
+			goto tr79
 		case 40:
 			switch data[(p)] {
 			case 32:
-				goto tr79
+				goto tr81
 			case 44:
-				goto tr82
+				goto tr84
 			case 46:
-				goto tr82
+				goto tr84
 			case 61:
-				goto tr83
+				goto tr85
 			case 92:
-				goto tr80
-			case 95:
 				goto tr82
+			case 95:
+				goto tr84
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr78
+					goto tr80
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 93:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr82
+						goto tr84
 					}
 				case data[(p)] >= 65:
-					goto tr82
+					goto tr84
 				}
 			default:
-				goto tr82
+				goto tr84
 			}
-			goto tr77
+			goto tr79
 		case 41:
 			switch data[(p)] {
 			case 32:
-				goto tr86
+				goto tr88
 			case 61:
 				goto tr66
 			case 92:
-				goto tr87
+				goto tr89
 			}
 			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr85
+				goto tr87
 			}
-			goto tr84
+			goto tr86
 		case 42:
 			switch data[(p)] {
 			case 32:
-				goto tr90
+				goto tr92
 			case 61:
 				goto tr66
 			case 92:
-				goto tr91
+				goto tr93
 			}
 			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr89
+				goto tr91
 			}
-			goto tr88
+			goto tr90
 		case 43:
 			switch data[(p)] {
 			case 32:
-				goto tr90
+				goto tr92
 			case 61:
 				goto tr66
 			case 92:
-				goto tr91
+				goto tr93
 			case 95:
-				goto tr92
+				goto tr94
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr89
+					goto tr91
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 90:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr92
+						goto tr94
 					}
 				case data[(p)] >= 65:
-					goto tr92
+					goto tr94
 				}
 			default:
-				goto tr92
+				goto tr94
 			}
-			goto tr88
+			goto tr90
 		case 44:
 			switch data[(p)] {
 			case 32:
-				goto tr90
+				goto tr92
 			case 44:
-				goto tr93
+				goto tr95
 			case 46:
-				goto tr93
+				goto tr95
 			case 61:
-				goto tr83
+				goto tr85
 			case 92:
-				goto tr91
-			case 95:
 				goto tr93
+			case 95:
+				goto tr95
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr89
+					goto tr91
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 93:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr93
+						goto tr95
 					}
 				case data[(p)] >= 65:
-					goto tr93
+					goto tr95
 				}
 			default:
-				goto tr93
+				goto tr95
 			}
-			goto tr88
+			goto tr90
 		case 31:
 			switch data[(p)] {
 			case 61:
@@ -555,16 +558,16 @@ func (e *Event) unpack(data string) error {
 		case 45:
 			switch data[(p)] {
 			case 32:
-				goto tr96
+				goto tr98
 			case 61:
 				goto tr66
 			case 92:
-				goto tr97
+				goto tr99
 			}
 			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr95
+				goto tr97
 			}
-			goto tr94
+			goto tr96
 		case 32:
 			switch data[(p)] {
 			case 61:
@@ -580,16 +583,16 @@ func (e *Event) unpack(data string) error {
 		case 46:
 			switch data[(p)] {
 			case 32:
-				goto tr100
+				goto tr102
 			case 61:
 				goto tr66
 			case 92:
-				goto tr101
+				goto tr103
 			}
 			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr99
+				goto tr101
 			}
-			goto tr98
+			goto tr100
 		case 33:
 			if data[(p)] == 32 {
 				goto tr70
@@ -836,30 +839,36 @@ func (e *Event) unpack(data string) error {
 	tr62:
 		cs = 29
 		goto _again
+	tr73:
+		cs = 29
+		goto f27
 	tr64:
 		cs = 30
 		goto _again
 	tr63:
 		cs = 30
 		goto f0
-	tr91:
+	tr74:
+		cs = 30
+		goto f28
+	tr93:
 		cs = 31
 		goto f4
-	tr97:
+	tr99:
 		cs = 31
 		goto f7
-	tr87:
+	tr89:
 		cs = 31
-		goto f30
-	tr80:
+		goto f32
+	tr82:
 		cs = 32
 		goto f4
-	tr101:
+	tr103:
 		cs = 32
 		goto f7
-	tr76:
+	tr78:
 		cs = 32
-		goto f30
+		goto f32
 	tr69:
 		cs = 33
 		goto _again
@@ -878,75 +887,75 @@ func (e *Event) unpack(data string) error {
 	tr65:
 		cs = 37
 		goto f23
-	tr78:
+	tr80:
 		cs = 38
 		goto _again
-	tr99:
+	tr101:
 		cs = 38
+		goto f6
+	tr79:
+		cs = 38
+		goto f25
+	tr75:
+		cs = 38
+		goto f30
+	tr76:
+		cs = 38
+		goto f31
+	tr100:
+		cs = 38
+		goto f37
+	tr81:
+		cs = 39
+		goto _again
+	tr102:
+		cs = 39
 		goto f6
 	tr77:
-		cs = 38
-		goto f25
-	tr73:
-		cs = 38
-		goto f28
-	tr74:
-		cs = 38
-		goto f29
-	tr98:
-		cs = 38
-		goto f35
-	tr79:
 		cs = 39
-		goto _again
-	tr100:
-		cs = 39
-		goto f6
-	tr75:
-		cs = 39
-		goto f29
-	tr82:
+		goto f31
+	tr84:
 		cs = 40
 		goto f25
-	tr81:
-		cs = 40
-		goto f32
 	tr83:
+		cs = 40
+		goto f34
+	tr85:
 		cs = 41
 		goto f23
-	tr89:
+	tr91:
 		cs = 42
 		goto _again
-	tr95:
+	tr97:
 		cs = 42
+		goto f6
+	tr90:
+		cs = 42
+		goto f25
+	tr86:
+		cs = 42
+		goto f30
+	tr87:
+		cs = 42
+		goto f31
+	tr96:
+		cs = 42
+		goto f37
+	tr92:
+		cs = 43
+		goto _again
+	tr98:
+		cs = 43
 		goto f6
 	tr88:
-		cs = 42
+		cs = 43
+		goto f31
+	tr95:
+		cs = 44
 		goto f25
-	tr84:
-		cs = 42
-		goto f28
-	tr85:
-		cs = 42
-		goto f29
 	tr94:
-		cs = 42
+		cs = 44
 		goto f35
-	tr90:
-		cs = 43
-		goto _again
-	tr96:
-		cs = 43
-		goto f6
-	tr86:
-		cs = 43
-		goto f29
-	tr93:
-		cs = 44
-		goto f25
-	tr92:
-		cs = 44
-		goto f33
 	tr67:
 		cs = 45
 		goto f25
@@ -1022,8 +1031,14 @@ func (e *Event) unpack(data string) error {
 		e.Severity = data[mark:p]
 
 		goto _again
-	f23:
+	f27:
 //line cef_actions.rl:44
+
+		complete = true
+
+		goto _again
+	f23:
+//line cef_actions.rl:47
 
 		// A new extension key marks the end of the last extension value.
 		if len(state.key) > 0 && state.valueStart <= mark-1 {
@@ -1033,21 +1048,21 @@ func (e *Event) unpack(data string) error {
 		state.key = data[mark:p]
 
 		goto _again
-	f29:
-//line cef_actions.rl:52
+	f31:
+//line cef_actions.rl:55
 
 		state.valueStart = p
 		state.valueEnd = p
 
 		goto _again
 	f25:
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
 		goto _again
 	f24:
-//line cef_actions.rl:66
+//line cef_actions.rl:69
 
 		recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
 		(p)--
@@ -1055,7 +1070,7 @@ func (e *Event) unpack(data string) error {
 
 		goto _again
 	f26:
-//line cef_actions.rl:70
+//line cef_actions.rl:73
 
 		state.reset()
 		// Resume processing at p, the start of the next extension key.
@@ -1138,12 +1153,12 @@ func (e *Event) unpack(data string) error {
 		e.Severity = data[mark:p]
 
 		goto _again
-	f33:
+	f35:
 //line cef_actions.rl:9
 
 		mark = p
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -1213,18 +1228,28 @@ func (e *Event) unpack(data string) error {
 		state.reset()
 
 		goto _again
-	f35:
+	f37:
 //line cef_actions.rl:15
 
 		state.pushEscape(mark_slash, p)
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
 		goto _again
-	f30:
-//line cef_actions.rl:52
+	f28:
+//line cef_actions.rl:44
+
+		complete = true
+
+//line cef_actions.rl:9
+
+		mark = p
+
+		goto _again
+	f32:
+//line cef_actions.rl:55
 
 		state.valueStart = p
 		state.valueEnd = p
@@ -1234,19 +1259,19 @@ func (e *Event) unpack(data string) error {
 		mark_slash = p
 
 		goto _again
-	f28:
-//line cef_actions.rl:52
+	f30:
+//line cef_actions.rl:55
 
 		state.valueStart = p
 		state.valueEnd = p
 
-//line cef_actions.rl:56
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
 		goto _again
-	f32:
-//line cef_actions.rl:56
+	f34:
+//line cef_actions.rl:59
 
 		state.valueEnd = p + 1
 
@@ -1268,8 +1293,13 @@ func (e *Event) unpack(data string) error {
 		}
 		if (p) == eof {
 			switch _cef_eof_actions[cs] {
-			case 32:
-//line cef_actions.rl:59
+			case 28:
+//line cef_actions.rl:44
+
+				complete = true
+
+			case 34:
+//line cef_actions.rl:62
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(state.key) > 0 && state.valueStart <= state.valueEnd {
@@ -1278,18 +1308,18 @@ func (e *Event) unpack(data string) error {
 				}
 
 			case 25:
-//line cef_actions.rl:66
+//line cef_actions.rl:69
 
 				recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
 				(p)--
 				cs = 33
 
-			case 35:
+			case 37:
 //line cef_actions.rl:15
 
 				state.pushEscape(mark_slash, p)
 
-//line cef_actions.rl:59
+//line cef_actions.rl:62
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(state.key) > 0 && state.valueStart <= state.valueEnd {
@@ -1297,13 +1327,13 @@ func (e *Event) unpack(data string) error {
 					state.reset()
 				}
 
-			case 28:
-//line cef_actions.rl:52
+			case 30:
+//line cef_actions.rl:55
 
 				state.valueStart = p
 				state.valueEnd = p
 
-//line cef_actions.rl:59
+//line cef_actions.rl:62
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(state.key) > 0 && state.valueStart <= state.valueEnd {
@@ -1311,7 +1341,7 @@ func (e *Event) unpack(data string) error {
 					state.reset()
 				}
 
-//line parser.go:1113
+//line parser.go:1139
 			}
 		}
 
@@ -1320,13 +1350,16 @@ func (e *Event) unpack(data string) error {
 		}
 	}
 
-//line parser.rl:51
+//line parser.rl:54
 
 	// Check if state machine completed.
 	if cs < cef_first_final {
 		// Reached an early end.
 		if p == pe {
-			return multierr.Append(multierr.Combine(recoveredErrs...), errUnexpectedEndOfEvent)
+			if complete {
+				return multierr.Append(multierr.Combine(recoveredErrs...), errUnexpectedEndOfEvent)
+			}
+			return multierr.Append(multierr.Combine(recoveredErrs...), multierr.Combine(errUnexpectedEndOfEvent, errIncompleteHeader))
 		}
 
 		// Encountered invalid input.
