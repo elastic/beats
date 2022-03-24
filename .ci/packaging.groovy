@@ -121,6 +121,7 @@ pipeline {
                 gsutil(command: "-m -q cp -r ${env.BUCKET_URI} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
                 sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
               }
+              sh(label: "Debug packages", script: 'ls -ltrah build/distributions/**/*')
               dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
               script {
                 getVaultSecret.readSecretWrapper {
