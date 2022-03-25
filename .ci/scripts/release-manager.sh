@@ -7,7 +7,7 @@
 # - VAULT_ROLE_ID
 # - VAULT_SECRET_ID
 #
-set -uexo pipefail
+set -ueo pipefail
 
 source /usr/local/bin/bash_standard_lib.sh
 
@@ -27,12 +27,14 @@ mv build/distributions/dependencies.csv \
 find build/distributions -name '*linux-arm64.docker.tar.gz*' -print0 |
   while IFS= read -r -d '' file
   do
+    echo "Rename file $file"
     mv "$file" "${file/linux-arm64.docker.tar.gz/docker-image-linux-arm64.tar.gz}"
   done
 
 find build/distributions -name '*linux-amd64.docker.tar.gz*' -print0 |
   while IFS= read -r -d '' file
   do
+    echo "Rename file $file"
     mv "$file" "${file/linux-amd64.docker.tar.gz/docker-image-linux-amd64.tar.gz}"
   done
 
@@ -40,6 +42,8 @@ find build/distributions -name '*linux-amd64.docker.tar.gz*' -print0 |
 IMAGE=docker.elastic.co/infra/release-manager:latest
 (retry 3 docker pull --quiet "${IMAGE}") || echo "Error pulling ${IMAGE} Docker image, we continue"
 docker images --filter=reference=$IMAGE
+
+set -x
 
 # Generate checksum files and upload to GCS
 docker run --rm \
@@ -55,4 +59,4 @@ docker run --rm \
       --commit "$(git rev-parse HEAD)" \
       --workflow "snapshot" \
       --artifact-set main \
-      --version "${VERSION}"
+      --version "${VERSION}" | tee release-manager-report.out

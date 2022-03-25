@@ -132,6 +132,10 @@ pipeline {
           }
           post {
             failure {
+              dir("${BASE_DIR}") {
+                sh(label: 'release-manager-report.sh', script: '.ci/scripts/release-manager-report.sh')
+                setEnvVar('DIGESTED_MESSAGE', "${readFile(file: 'release-manager-report.out')}")
+              }
               echo 'disabled'
             // notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}] DRA failed", body: "Build: (<${env.RUN_DISPLAY_URL}|here>)")
             }
