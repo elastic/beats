@@ -262,6 +262,10 @@ func startEchoServer(t *testing.T) (host string, port uint16, ip string, close f
 	}()
 
 	ip, portStr, err := net.SplitHostPort(listener.Addr().String())
+	if err != nil {
+		listener.Close()
+		return "", 0, "", nil, err
+	}
 	portUint64, err := strconv.ParseUint(portStr, 10, 16)
 	if err != nil {
 		listener.Close()
