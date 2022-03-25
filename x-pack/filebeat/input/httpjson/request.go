@@ -34,7 +34,7 @@ type httpClient struct {
 	limiter *rateLimiter
 }
 
-func (c *httpClient) do(stdCtx context.Context, trCtx *transformContext, req *http.Request) (*http.Response, error) {
+func (c *httpClient) do(stdCtx context.Context, req *http.Request) (*http.Response, error) {
 	resp, err := c.limiter.execute(stdCtx, func() (*http.Response, error) {
 		return c.client.Do(req)
 	})
@@ -43,8 +43,8 @@ func (c *httpClient) do(stdCtx context.Context, trCtx *transformContext, req *ht
 	}
 	defer resp.Body.Close()
 
-	// Read the whole resp.Body so we can release the conneciton.
-	// This implementaion is inspired by httputil.DumpResponse
+	// Read the whole resp.Body so we can release the connection.
+	// This implementation is inspired by httputil.DumpResponse
 	resp.Body, err = drainBody(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response body: %w", err)
@@ -201,7 +201,7 @@ func (rf *requestFactory) collectResponse(stdCtx context.Context, trCtx *transfo
 	if err != nil {
 		return nil, fmt.Errorf("failed to create http request: %w", err)
 	}
-	httpResp, err := r.client.do(stdCtx, trCtx, req)
+	httpResp, err := r.client.do(stdCtx, req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute http client.Do: %w", err)
 	}
@@ -358,10 +358,7 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 
 // processAndPublishEvents process and publish events based on response type
 func (r *requester) processAndPublishEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, finalResps []*http.Response, publish bool) (int, error) {
-	eventsCh, err := r.responseProcessor.startProcessing(stdCtx, trCtx, finalResps)
-	if err != nil {
-		return 0, fmt.Errorf("error starting response processor: %w", err)
-	}
+	eventsCh := r.responseProcessor.startProcessing(stdCtx, trCtx, finalResps)
 
 	trCtx.clearIntervalData()
 

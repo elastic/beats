@@ -6,6 +6,7 @@ package httpjson
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
 
@@ -74,7 +75,7 @@ func newResponseProcessor(config *responseConfig, pagination *pagination, log *l
 	return rp
 }
 
-func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response) (<-chan maybeMsg, error) {
+func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response) <-chan maybeMsg {
 	ch := make(chan maybeMsg)
 
 	go func() {
@@ -121,15 +122,14 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 						continue
 					}
 
-					switch err = rp.split.run(trCtx, tr, ch); err {
-					case nil:
-					case errEmptyField:
+					err = rp.split.run(trCtx, tr, ch)
+					if errors.Is(err, errEmptyField) {
 						// nothing else to send for this page
 						rp.log.Debug("split operation finished")
-					case errEmptyRootField:
+					} else if errors.Is(err, errEmptyRootField) {
 						// root field not found, most likely the response is empty
 						rp.log.Debug(err)
-					default:
+					} else if err != nil {
 						rp.log.Debug("split operation failed")
 						ch <- maybeMsg{err: err}
 						return
@@ -139,7 +139,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 		}
 	}()
 
-	return ch, nil
+	return ch
 }
 
 func (resp *response) asTransformables(log *logp.Logger) []transformable {

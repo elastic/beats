@@ -23,6 +23,8 @@ import (
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 )
 
+const barConst = "bar"
+
 func TestInput(t *testing.T) {
 	testCases := []struct {
 		name        string
@@ -390,21 +392,8 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
-			name: "Test simple Chain GET request",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
-				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					switch r.URL.Path {
-					case "/":
-						fmt.Fprintln(w, `{"records":[{"id":1}]}`)
-					case "/1":
-						fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
-					}
-				})
-				server := httptest.NewServer(r)
-				config["request.url"] = server.URL
-				config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
-				t.Cleanup(server.Close)
-			},
+			name:        "Test simple Chain GET request",
+			setupServer: newChainTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       10,
 				"request.method": "GET",
@@ -515,21 +504,8 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
-			name: "Test split by json objects array in chain",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
-				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					switch r.URL.Path {
-					case "/":
-						fmt.Fprintln(w, `{"records":[{"id":1}]}`)
-					case "/1":
-						fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
-					}
-				})
-				server := httptest.NewServer(r)
-				config["request.url"] = server.URL
-				config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
-				t.Cleanup(server.Close)
-			},
+			name:        "Test split by json objects array in chain",
+			setupServer: newChainTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
 				"request.method": "GET",
@@ -549,21 +525,8 @@ func TestInput(t *testing.T) {
 			expected: []string{`{"world":"moon"}`, `{"space":[{"cake":"pumpkin"}]}`},
 		},
 		{
-			name: "Test split by json objects array with keep parent in chain",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
-				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					switch r.URL.Path {
-					case "/":
-						fmt.Fprintln(w, `{"records":[{"id":1}]}`)
-					case "/1":
-						fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
-					}
-				})
-				server := httptest.NewServer(r)
-				config["request.url"] = server.URL
-				config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
-				t.Cleanup(server.Close)
-			},
+			name:        "Test split by json objects array with keep parent in chain",
+			setupServer: newChainTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
 				"request.method": "GET",
@@ -587,21 +550,8 @@ func TestInput(t *testing.T) {
 			},
 		},
 		{
-			name: "Test nested split in chain",
-			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
-				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					switch r.URL.Path {
-					case "/":
-						fmt.Fprintln(w, `{"records":[{"id":1}]}`)
-					case "/1":
-						fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
-					}
-				})
-				server := httptest.NewServer(r)
-				config["request.url"] = server.URL
-				config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
-				t.Cleanup(server.Close)
-			},
+			name:        "Test nested split in chain",
+			setupServer: newChainTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
 				"request.method": "GET",
@@ -698,6 +648,25 @@ func newTestServer(
 	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 		server := newServer(h)
 		config["request.url"] = server.URL
+		t.Cleanup(server.Close)
+	}
+}
+
+func newChainTestServer(
+	newServer func(http.Handler) *httptest.Server,
+) func(*testing.T, http.HandlerFunc, map[string]interface{}) {
+	return func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+		r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			switch r.URL.Path {
+			case "/":
+				fmt.Fprintln(w, `{"records":[{"id":1}]}`)
+			case "/1":
+				fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
+			}
+		})
+		server := httptest.NewServer(r)
+		config["request.url"] = server.URL
+		config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
 		t.Cleanup(server.Close)
 	}
 }
@@ -847,7 +816,7 @@ func paginationHandler() http.HandlerFunc {
 		case 0:
 			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:00Z","nextPageToken":"bar","items":[{"foo":"a"}]}`))
 		case 1:
-			if r.URL.Query().Get("page") != "bar" {
+			if r.URL.Query().Get("page") != barConst {
 				w.WriteHeader(http.StatusBadRequest)
 				_, _ = w.Write([]byte(`{"error":"wrong page token value"}`))
 				return
@@ -870,7 +839,7 @@ func paginationArrayHandler() http.HandlerFunc {
 		case 0:
 			_, _ = w.Write([]byte(`[{"nextPageToken":"bar","foo":"bar"},{"foo":"bar"}]`))
 		case 1:
-			if r.URL.Query().Get("page") != "bar" {
+			if r.URL.Query().Get("page") != barConst {
 				w.WriteHeader(http.StatusBadRequest)
 				_, _ = w.Write([]byte(`{"error":"wrong page token value"}`))
 				return

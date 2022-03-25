@@ -135,7 +135,7 @@ func (iter *pageIterator) next() (*response, bool, error) {
 		return nil, false, err
 	}
 
-	resp, err := iter.pagination.httpClient.do(iter.stdCtx, iter.trCtx, httpReq)
+	resp, err := iter.pagination.httpClient.do(iter.stdCtx, httpReq)
 	if err != nil {
 		return nil, false, err
 	}
