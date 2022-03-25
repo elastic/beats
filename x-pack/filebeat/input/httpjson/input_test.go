@@ -14,7 +14,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
 
@@ -393,13 +392,14 @@ func TestInput(t *testing.T) {
 		{
 			name: "Test simple Chain GET request",
 			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
-				r := mux.NewRouter()
-				r.HandleFunc("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					fmt.Fprintln(w, `{"records":[{"id":1}]}`)
-				}))
-				r.HandleFunc("/1", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
-				}))
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintln(w, `{"records":[{"id":1}]}`)
+					case "/1":
+						fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
+					}
+				})
 				server := httptest.NewServer(r)
 				config["request.url"] = server.URL
 				config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
@@ -423,16 +423,16 @@ func TestInput(t *testing.T) {
 		{
 			name: "Test multiple Chain GET request",
 			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
-				r := mux.NewRouter()
-				r.HandleFunc("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					fmt.Fprintln(w, `{"records":[{"id":1}]}`)
-				}))
-				r.HandleFunc("/1", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					fmt.Fprintln(w, `{"file_name": "file_1"}`)
-				}))
-				r.HandleFunc("/file_1", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
-				}))
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintln(w, `{"records":[{"id":1}]}`)
+					case "/1":
+						fmt.Fprintln(w, `{"file_name": "file_1"}`)
+					case "/file_1":
+						fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
+					}
+				})
 				server := httptest.NewServer(r)
 				config["request.url"] = server.URL
 				config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
@@ -459,6 +459,176 @@ func TestInput(t *testing.T) {
 			},
 			handler:  defaultHandler("GET", ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+		},
+		{
+			name: "Test date cursor while using chain",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				registerRequestTransforms()
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				// mock timeNow func to return a fixed value
+				timeNow = func() time.Time {
+					t, _ := time.Parse(time.RFC3339, "2002-10-02T15:00:00Z")
+					return t
+				}
+
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintln(w, `{"records":[{"id":1}]}`)
+					case "/1":
+						fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				config["request.url"] = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
+				t.Cleanup(server.Close)
+				t.Cleanup(func() { timeNow = time.Now })
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": "GET",
+				"request.transforms": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target":  "url.params.$filter",
+							"value":   "alertCreationTime ge [[.cursor.timestamp]]",
+							"default": `alertCreationTime ge [[formatDate (now (parseDuration "-10m")) "2006-01-02T15:04:05Z"]]`,
+						},
+					},
+				},
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": "GET",
+							"replace":        "$.records[:].id",
+						},
+					},
+				},
+				"cursor": map[string]interface{}{
+					"timestamp": map[string]interface{}{
+						"value": `[[index .last_response.body "@timestamp"]]`,
+					},
+				},
+			},
+			handler:  dateCursorHandler(),
+			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+		},
+		{
+			name: "Test split by json objects array in chain",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintln(w, `{"records":[{"id":1}]}`)
+					case "/1":
+						fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				config["request.url"] = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": "GET",
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": "GET",
+							"replace":        "$.records[:].id",
+							"response.split": map[string]interface{}{
+								"target": "body.hello",
+							},
+						},
+					},
+				},
+			},
+			handler:  defaultHandler("GET", ""),
+			expected: []string{`{"world":"moon"}`, `{"space":[{"cake":"pumpkin"}]}`},
+		},
+		{
+			name: "Test split by json objects array with keep parent in chain",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintln(w, `{"records":[{"id":1}]}`)
+					case "/1":
+						fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				config["request.url"] = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": "GET",
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": "GET",
+							"replace":        "$.records[:].id",
+							"response.split": map[string]interface{}{
+								"target":      "body.hello",
+								"keep_parent": true,
+							},
+						},
+					},
+				},
+			},
+			handler: defaultHandler("GET", ""),
+			expected: []string{
+				`{"hello":{"world":"moon"}}`,
+				`{"hello":{"space":[{"cake":"pumpkin"}]}}`,
+			},
+		},
+		{
+			name: "Test nested split in chain",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					switch r.URL.Path {
+					case "/":
+						fmt.Fprintln(w, `{"records":[{"id":1}]}`)
+					case "/1":
+						fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
+					}
+				})
+				server := httptest.NewServer(r)
+				config["request.url"] = server.URL
+				config["chain.0.step.request.url"] = server.URL + "/$.records[:].id"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": "GET",
+				"response.split": map[string]interface{}{
+					"target": "body.hello",
+				},
+				"chain": []interface{}{
+					map[string]interface{}{
+						"step": map[string]interface{}{
+							"request.method": "GET",
+							"replace":        "$.records[:].id",
+							"response.split": map[string]interface{}{
+								"target": "body.hello",
+								"split": map[string]interface{}{
+									"target":      "body.space",
+									"keep_parent": true,
+								},
+							},
+						},
+					},
+				},
+			},
+			handler: defaultHandler("GET", ""),
+			expected: []string{
+				`{"world":"moon"}`,
+				`{"space":{"cake":"pumpkin"}}`,
+			},
 		},
 	}
 
