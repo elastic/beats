@@ -33,7 +33,7 @@ type Int struct {
 	value  int
 }
 
-// NewUintNone returns a new OptUint wrapper
+// NewIntNone returns a new OptUint wrapper
 func NewIntNone() Int {
 	return Int{
 		exists: false,
@@ -41,7 +41,7 @@ func NewIntNone() Int {
 	}
 }
 
-// UintWith returns a new OptUint wrapper with a given int
+// IntWith returns a new OptUint wrapper with a given int
 func IntWith(i int) Int {
 	return Int{
 		exists: true,
@@ -70,12 +70,18 @@ func (opt Int) ValueOr(i int) int {
 }
 
 // Fold implements the folder interface for OptUint
-func (in *Int) Fold(v structform.ExtVisitor) error {
-	if in.exists {
-		value := in.value
-		v.OnInt(value)
+func (opt *Int) Fold(v structform.ExtVisitor) error {
+	if opt.exists {
+		value := opt.value
+		err := v.OnInt(value)
+		if err != nil {
+			return err
+		}
 	} else {
-		v.OnNil()
+		err := v.OnNil()
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -159,12 +165,18 @@ func SumOptUint(opts ...Uint) uint64 {
 }
 
 // Fold implements the folder interface for OptUint
-func (in *Uint) Fold(v structform.ExtVisitor) error {
-	if in.exists {
-		value := in.value
-		v.OnUint64(value)
+func (opt *Uint) Fold(v structform.ExtVisitor) error {
+	if opt.exists {
+		value := opt.value
+		err := v.OnUint64(value)
+		if err != nil {
+			return err
+		}
 	} else {
-		v.OnNil()
+		err := v.OnNil()
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -215,12 +227,18 @@ func (opt Float) ValueOr(f float64) float64 {
 }
 
 // Fold implements the folder interface for OptUint
-func (in *Float) Fold(v structform.ExtVisitor) error {
-	if in.exists {
-		value := in.value
-		v.OnFloat64(value)
+func (opt *Float) Fold(v structform.ExtVisitor) error {
+	if opt.exists {
+		value := opt.value
+		err := v.OnFloat64(value)
+		if err != nil {
+			return err
+		}
 	} else {
-		v.OnNil()
+		err := v.OnNil()
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
