@@ -23,8 +23,8 @@ pipeline {
     GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
     SNAPSHOT = "true"
     PIPELINE_LOG_LEVEL = "INFO"
-    SLACK_CHANNEL = '#beats'
-    NOTIFY_TO = 'package+beats-beats-contrib@elastic.co'
+    SLACK_CHANNEL = '#observablt-bots'
+    NOTIFY_TO = 'package+beats-victor.martinez@elastic.co'
   }
   options {
     timeout(time: 4, unit: 'HOURS')
