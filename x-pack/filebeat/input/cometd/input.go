@@ -48,7 +48,6 @@ func (in *cometdInput) Run() {
 }
 
 func (in *cometdInput) run() error {
-
 	b := bay.Bayeux{}
 	creds := bay.GetSalesforceCredentials()
 	in.out = b.Channel(in.out, "-1", creds, in.config.ChannelName)

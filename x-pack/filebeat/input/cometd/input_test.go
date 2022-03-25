@@ -6,9 +6,12 @@ package cometd
 
 import (
 	"testing"
+	"time"
 
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewInputDone(t *testing.T) {
@@ -21,4 +24,19 @@ func TestNewInputDone(t *testing.T) {
 		"auth.oauth2.token_url":     "https://login.salesforce.com/services/oauth2/token",
 	}
 	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
+}
+
+func TestMakeEventFailure(t *testing.T) {
+	event := beat.Event{
+		Timestamp: time.Now().UTC(),
+		Fields: common.MapStr{
+			"event": common.MapStr{
+				"id":      "DEMOID",
+				"created": time.Now().UTC(),
+			},
+			"message": "DEMOBODYFAIL",
+		},
+		Private: "DEMOBODYFAIL",
+	}
+	assert.NotEqual(t, event, makeEvent("DEMOID", "DEMOBODY"))
 }

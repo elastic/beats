@@ -17,3 +17,9 @@ func TestConfigValidate(t *testing.T) {
 	c := defaultConfig()
 	assert.NoError(t, c.Validate())
 }
+
+func TestConfigValidateFailure(t *testing.T) {
+	var c config
+	c.ChannelName = ""
+	assert.Error(t, c.Validate())
+}
