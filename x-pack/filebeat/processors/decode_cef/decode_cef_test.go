@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package decode_cef //nolint:stylecheck // We are not changing this now.
+package decode_cef
 
 import (
 	"bufio"
