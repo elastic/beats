@@ -322,7 +322,7 @@ def release(){
           repo: env.REPO,
           bucket: env.JOB_GCS_BUCKET,
           folder: folder,
-          pattern: "build/distributions/**/*"
+          pattern: "build/distributions/*"
         )
         sh(label: "Debug package", script: 'ls -ltra build/distributions/* || true')
         def uri = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
