@@ -24,7 +24,7 @@ stages:
     crosscompile:
         make: "make -C winlogbeat crosscompile"
         stage: mandatory
-    windows:
+    windows-2019:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
@@ -33,22 +33,22 @@ stages:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2016"
-        stage: extended
+        stage: mandatory
     windows-2012:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-2012-r2"
-        stage: extended
+        stage: extended_win
     windows-10:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-10"
-        stage: extended
+        stage: extended_win
     windows-8:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.
             - "windows-8"
-        stage: extended
+        stage: extended_win
     packaging-linux:
         packaging-linux: "mage package"
         e2e:

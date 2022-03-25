@@ -703,8 +703,7 @@ rules:
   - apiGroups: ["batch"]
     resources:
       - jobs
-      # Uncomment if need metadata for cronjob objects in versions >= v1.21
-      #- cronjobs
+      - cronjobs
     verbs: ["get", "list", "watch"]
   - apiGroups:
       - ""
