@@ -19,32 +19,32 @@ var _cef_recover_eof_actions []byte = []byte{
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0,
-	17, 17, 0, 0, 0, 0, 17, 17,
-	0, 0, 17, 17, 0, 0, 17, 17,
-	0, 0, 17, 17, 0, 0, 17, 17,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 28, 32, 32, 32, 28, 32, 32,
-	32, 35, 35, 0, 28, 32, 32, 32,
-	28, 32, 32, 32, 35, 32, 32, 32,
-	32, 32, 35, 32, 32, 32, 32, 32,
-	28, 32, 32, 32, 28, 32, 32, 32,
-	35, 32, 32, 32, 35, 32, 32, 32,
-	28, 32, 32, 32, 28, 32, 32, 32,
-	35, 32, 32, 32, 35, 32, 32, 32,
-	28, 32, 32, 32, 28, 32, 32, 32,
-	35, 32, 32, 32, 35, 32, 32, 32,
-	28, 32, 32, 32, 28, 32, 32, 32,
-	35, 32, 32, 32, 35, 32, 32, 32,
-	0,
+	0, 0, 0, 0, 0, 0, 9, 9,
+	0, 0, 0, 0, 0, 9, 9, 0,
+	0, 9, 9, 0, 0, 9, 9, 0,
+	0, 9, 9, 0, 0, 9, 9, 0,
+	0, 0, 12, 16, 16, 16, 12, 16,
+	16, 16, 19, 19, 12, 16, 16, 16,
+	12, 16, 16, 16, 19, 16, 16, 16,
+	16, 16, 16, 19, 16, 16, 16, 16,
+	16, 16, 12, 16, 16, 16, 12, 16,
+	16, 16, 19, 16, 16, 16, 19, 16,
+	16, 16, 12, 16, 16, 16, 12, 16,
+	16, 16, 19, 16, 16, 16, 19, 16,
+	16, 16, 12, 16, 16, 16, 12, 16,
+	16, 16, 19, 16, 16, 16, 19, 16,
+	16, 16, 12, 16, 16, 16, 12, 16,
+	16, 16, 19, 16, 16, 16, 19, 16,
+	16, 16, 0,
 }
 
 const cef_recover_start int = 1
-const cef_recover_first_final int = 51
+const cef_recover_first_final int = 58
 const cef_recover_error int = 0
 
-const cef_recover_en_gobble_extension int = 48
+const cef_recover_en_gobble_extension int = 55
 const cef_recover_en_main int = 1
-const cef_recover_en_main_cef_extensions int = 22
+const cef_recover_en_main_cef_extensions int = 28
 
 //line parser_recover.rl:17
 
@@ -115,35 +115,27 @@ func (e *Event) recoverExtensions(data string) error {
 				goto tr6
 			}
 			goto tr1
-		case 51:
+		case 7:
 			switch data[(p)] {
 			case 32:
-				goto tr88
+				goto tr9
 			case 92:
-				goto tr89
+				goto tr11
 			case 95:
-				goto tr78
+				goto tr10
 			case 124:
-				goto tr90
+				goto tr12
 			}
 			switch {
 			case data[(p)] < 65:
 				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr78
+					goto tr10
 				}
 			case data[(p)] > 90:
 				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr78
+					goto tr10
 				}
 			default:
-				goto tr78
-			}
-			goto tr87
-		case 7:
-			switch data[(p)] {
-			case 92:
-				goto tr9
-			case 124:
 				goto tr10
 			}
 			goto tr8
@@ -152,57 +144,49 @@ func (e *Event) recoverExtensions(data string) error {
 			case 92:
 				goto tr11
 			case 124:
-				goto tr11
+				goto tr12
 			}
-			goto tr1
+			goto tr8
 		case 9:
 			switch data[(p)] {
 			case 92:
 				goto tr13
 			case 124:
-				goto tr14
+				goto tr13
 			}
-			goto tr12
-		case 52:
+			goto tr1
+		case 10:
+			switch data[(p)] {
+			case 92:
+				goto tr15
+			case 124:
+				goto tr16
+			}
+			goto tr14
+		case 11:
 			switch data[(p)] {
 			case 32:
-				goto tr92
+				goto tr18
 			case 92:
-				goto tr93
+				goto tr20
 			case 95:
-				goto tr72
+				goto tr19
 			case 124:
-				goto tr94
+				goto tr21
 			}
 			switch {
 			case data[(p)] < 65:
 				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr72
+					goto tr19
 				}
 			case data[(p)] > 90:
 				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr72
+					goto tr19
 				}
 			default:
-				goto tr72
+				goto tr19
 			}
-			goto tr91
-		case 10:
-			switch data[(p)] {
-			case 92:
-				goto tr16
-			case 124:
-				goto tr17
-			}
-			goto tr15
-		case 11:
-			switch data[(p)] {
-			case 92:
-				goto tr18
-			case 124:
-				goto tr18
-			}
-			goto tr1
+			goto tr17
 		case 12:
 			switch data[(p)] {
 			case 92:
@@ -210,299 +194,370 @@ func (e *Event) recoverExtensions(data string) error {
 			case 124:
 				goto tr21
 			}
-			goto tr19
-		case 53:
-			switch data[(p)] {
-			case 32:
-				goto tr96
-			case 92:
-				goto tr97
-			case 95:
-				goto tr66
-			case 124:
-				goto tr98
-			}
-			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr66
-				}
-			case data[(p)] > 90:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr66
-				}
-			default:
-				goto tr66
-			}
-			goto tr95
+			goto tr17
 		case 13:
 			switch data[(p)] {
 			case 92:
-				goto tr23
+				goto tr22
 			case 124:
-				goto tr24
+				goto tr22
 			}
-			goto tr22
+			goto tr1
 		case 14:
 			switch data[(p)] {
 			case 92:
-				goto tr25
+				goto tr24
 			case 124:
 				goto tr25
 			}
-			goto tr1
+			goto tr23
 		case 15:
 			switch data[(p)] {
-			case 92:
-				goto tr27
-			case 124:
-				goto tr28
-			}
-			goto tr26
-		case 54:
-			switch data[(p)] {
 			case 32:
-				goto tr100
+				goto tr27
 			case 92:
-				goto tr101
+				goto tr29
 			case 95:
-				goto tr60
+				goto tr28
 			case 124:
-				goto tr102
+				goto tr30
 			}
 			switch {
 			case data[(p)] < 65:
 				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr60
+					goto tr28
 				}
 			case data[(p)] > 90:
 				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr60
+					goto tr28
 				}
 			default:
-				goto tr60
+				goto tr28
 			}
-			goto tr99
+			goto tr26
 		case 16:
 			switch data[(p)] {
 			case 92:
-				goto tr30
+				goto tr29
 			case 124:
-				goto tr31
+				goto tr30
 			}
-			goto tr29
+			goto tr26
 		case 17:
 			switch data[(p)] {
 			case 92:
-				goto tr32
+				goto tr31
 			case 124:
-				goto tr32
+				goto tr31
 			}
 			goto tr1
 		case 18:
 			switch data[(p)] {
 			case 92:
-				goto tr34
+				goto tr33
 			case 124:
-				goto tr35
+				goto tr34
 			}
-			goto tr33
-		case 55:
+			goto tr32
+		case 19:
 			switch data[(p)] {
 			case 32:
-				goto tr104
+				goto tr36
 			case 92:
-				goto tr105
+				goto tr38
 			case 95:
-				goto tr54
+				goto tr37
 			case 124:
-				goto tr106
+				goto tr39
 			}
 			switch {
 			case data[(p)] < 65:
 				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr54
+					goto tr37
 				}
 			case data[(p)] > 90:
 				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr54
+					goto tr37
 				}
 			default:
-				goto tr54
-			}
-			goto tr103
-		case 19:
-			switch data[(p)] {
-			case 92:
 				goto tr37
-			case 124:
-				goto tr38
 			}
-			goto tr36
+			goto tr35
 		case 20:
 			switch data[(p)] {
 			case 92:
-				goto tr39
+				goto tr38
 			case 124:
 				goto tr39
 			}
-			goto tr1
+			goto tr35
 		case 21:
 			switch data[(p)] {
 			case 92:
-				goto tr41
+				goto tr40
 			case 124:
-				goto tr42
-			}
-			goto tr40
-		case 56:
-			switch data[(p)] {
-			case 32:
-				goto tr43
-			case 45:
-				goto tr107
-			case 95:
-				goto tr44
-			case 124:
-				goto tr109
-			}
-			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr108
-				}
-			case data[(p)] > 90:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr108
-				}
-			default:
-				goto tr108
+				goto tr40
 			}
 			goto tr1
 		case 22:
 			switch data[(p)] {
-			case 32:
+			case 92:
+				goto tr42
+			case 124:
 				goto tr43
+			}
+			goto tr41
+		case 23:
+			switch data[(p)] {
+			case 32:
+				goto tr45
+			case 92:
+				goto tr47
 			case 95:
-				goto tr44
+				goto tr46
+			case 124:
+				goto tr48
 			}
 			switch {
 			case data[(p)] < 65:
 				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr44
+					goto tr46
 				}
 			case data[(p)] > 90:
 				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr44
+					goto tr46
 				}
 			default:
-				goto tr44
+				goto tr46
+			}
+			goto tr44
+		case 24:
+			switch data[(p)] {
+			case 92:
+				goto tr47
+			case 124:
+				goto tr48
+			}
+			goto tr44
+		case 25:
+			switch data[(p)] {
+			case 92:
+				goto tr49
+			case 124:
+				goto tr49
 			}
 			goto tr1
-		case 23:
+		case 26:
 			switch data[(p)] {
-			case 44:
-				goto tr45
-			case 46:
-				goto tr45
-			case 61:
-				goto tr46
-			case 93:
-				goto tr45
+			case 92:
+				goto tr51
+			case 124:
+				goto tr52
+			}
+			goto tr50
+		case 27:
+			switch data[(p)] {
+			case 32:
+				goto tr53
+			case 45:
+				goto tr54
 			case 95:
-				goto tr45
+				goto tr56
+			case 124:
+				goto tr57
 			}
 			switch {
 			case data[(p)] < 65:
 				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr45
+					goto tr55
+				}
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr55
+				}
+			default:
+				goto tr55
+			}
+			goto tr1
+		case 28:
+			switch data[(p)] {
+			case 32:
+				goto tr58
+			case 95:
+				goto tr59
+			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr59
+				}
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr59
+				}
+			default:
+				goto tr59
+			}
+			goto tr1
+		case 29:
+			switch data[(p)] {
+			case 44:
+				goto tr60
+			case 46:
+				goto tr60
+			case 61:
+				goto tr61
+			case 93:
+				goto tr60
+			case 95:
+				goto tr60
+			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr60
 				}
 			case data[(p)] > 91:
 				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr45
+					goto tr60
 				}
 			default:
-				goto tr45
+				goto tr60
 			}
 			goto tr1
-		case 57:
-			switch data[(p)] {
-			case 32:
-				goto tr112
-			case 61:
-				goto tr47
-			case 92:
-				goto tr113
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr111
-			}
-			goto tr110
 		case 58:
 			switch data[(p)] {
 			case 32:
-				goto tr116
+				goto tr102
 			case 61:
-				goto tr47
+				goto tr62
 			case 92:
-				goto tr117
+				goto tr103
 			}
 			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr115
+				goto tr101
 			}
-			goto tr114
+			goto tr100
 		case 59:
 			switch data[(p)] {
 			case 32:
-				goto tr116
+				goto tr106
 			case 61:
-				goto tr47
+				goto tr62
 			case 92:
-				goto tr117
+				goto tr107
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr105
+			}
+			goto tr104
+		case 60:
+			switch data[(p)] {
+			case 32:
+				goto tr106
+			case 61:
+				goto tr62
+			case 92:
+				goto tr107
 			case 95:
-				goto tr118
+				goto tr108
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr115
+					goto tr105
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 90:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr118
+						goto tr108
 					}
 				case data[(p)] >= 65:
-					goto tr118
+					goto tr108
 				}
 			default:
-				goto tr118
+				goto tr108
 			}
-			goto tr114
-		case 60:
+			goto tr104
+		case 61:
 			switch data[(p)] {
 			case 32:
-				goto tr116
+				goto tr106
 			case 44:
-				goto tr119
+				goto tr109
 			case 46:
-				goto tr119
+				goto tr109
 			case 61:
-				goto tr120
+				goto tr110
 			case 92:
+				goto tr107
+			case 95:
+				goto tr109
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr105
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr109
+					}
+				case data[(p)] >= 65:
+					goto tr109
+				}
+			default:
+				goto tr109
+			}
+			goto tr104
+		case 62:
+			switch data[(p)] {
+			case 32:
+				goto tr113
+			case 61:
+				goto tr62
+			case 92:
+				goto tr114
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr112
+			}
+			goto tr111
+		case 63:
+			switch data[(p)] {
+			case 32:
 				goto tr117
+			case 61:
+				goto tr62
+			case 92:
+				goto tr118
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr116
+			}
+			goto tr115
+		case 64:
+			switch data[(p)] {
+			case 32:
+				goto tr117
+			case 61:
+				goto tr62
+			case 92:
+				goto tr118
 			case 95:
 				goto tr119
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr115
+					goto tr116
 				}
 			case data[(p)] > 57:
 				switch {
-				case data[(p)] > 93:
+				case data[(p)] > 90:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
 						goto tr119
 					}
@@ -512,13 +567,58 @@ func (e *Event) recoverExtensions(data string) error {
 			default:
 				goto tr119
 			}
-			goto tr114
-		case 61:
+			goto tr115
+		case 65:
+			switch data[(p)] {
+			case 32:
+				goto tr117
+			case 44:
+				goto tr120
+			case 46:
+				goto tr120
+			case 61:
+				goto tr110
+			case 92:
+				goto tr118
+			case 95:
+				goto tr120
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr116
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr120
+					}
+				case data[(p)] >= 65:
+					goto tr120
+				}
+			default:
+				goto tr120
+			}
+			goto tr115
+		case 30:
+			switch data[(p)] {
+			case 61:
+				goto tr63
+			case 92:
+				goto tr63
+			case 110:
+				goto tr63
+			case 114:
+				goto tr63
+			}
+			goto tr62
+		case 66:
 			switch data[(p)] {
 			case 32:
 				goto tr123
 			case 61:
-				goto tr47
+				goto tr62
 			case 92:
 				goto tr124
 			}
@@ -526,12 +626,24 @@ func (e *Event) recoverExtensions(data string) error {
 				goto tr122
 			}
 			goto tr121
-		case 62:
+		case 31:
+			switch data[(p)] {
+			case 61:
+				goto tr64
+			case 92:
+				goto tr64
+			case 110:
+				goto tr64
+			case 114:
+				goto tr64
+			}
+			goto tr62
+		case 67:
 			switch data[(p)] {
 			case 32:
 				goto tr127
 			case 61:
-				goto tr47
+				goto tr62
 			case 92:
 				goto tr128
 			}
@@ -539,386 +651,493 @@ func (e *Event) recoverExtensions(data string) error {
 				goto tr126
 			}
 			goto tr125
-		case 63:
-			switch data[(p)] {
-			case 32:
-				goto tr127
-			case 61:
-				goto tr47
-			case 92:
-				goto tr128
-			case 95:
-				goto tr129
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr126
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr129
-					}
-				case data[(p)] >= 65:
-					goto tr129
-				}
-			default:
-				goto tr129
-			}
-			goto tr125
-		case 64:
-			switch data[(p)] {
-			case 32:
-				goto tr127
-			case 44:
-				goto tr130
-			case 46:
-				goto tr130
-			case 61:
-				goto tr120
-			case 92:
-				goto tr128
-			case 95:
-				goto tr130
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr126
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 93:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr130
-					}
-				case data[(p)] >= 65:
-					goto tr130
-				}
-			default:
-				goto tr130
-			}
-			goto tr125
-		case 24:
-			switch data[(p)] {
-			case 61:
-				goto tr48
-			case 92:
-				goto tr48
-			case 110:
-				goto tr48
-			case 114:
-				goto tr48
-			}
-			goto tr47
-		case 65:
-			switch data[(p)] {
-			case 32:
-				goto tr133
-			case 61:
-				goto tr47
-			case 92:
-				goto tr134
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr132
-			}
-			goto tr131
-		case 25:
-			switch data[(p)] {
-			case 61:
-				goto tr49
-			case 92:
-				goto tr49
-			case 110:
-				goto tr49
-			case 114:
-				goto tr49
-			}
-			goto tr47
-		case 66:
-			switch data[(p)] {
-			case 32:
-				goto tr137
-			case 61:
-				goto tr47
-			case 92:
-				goto tr138
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr136
-			}
-			goto tr135
-		case 26:
+		case 32:
 			switch data[(p)] {
 			case 45:
-				goto tr50
+				goto tr54
 			case 124:
-				goto tr51
+				goto tr57
 			}
 			switch {
 			case data[(p)] < 65:
 				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr50
+					goto tr54
 				}
 			case data[(p)] > 90:
 				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr50
+					goto tr54
 				}
 			default:
-				goto tr50
+				goto tr54
 			}
 			goto tr1
-		case 67:
+		case 33:
 			switch data[(p)] {
 			case 32:
-				goto tr43
+				goto tr53
 			case 95:
-				goto tr44
+				goto tr56
 			}
 			switch {
 			case data[(p)] < 65:
 				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr44
+					goto tr56
 				}
 			case data[(p)] > 90:
 				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr44
+					goto tr56
 				}
 			default:
-				goto tr44
+				goto tr56
 			}
 			goto tr1
-		case 27:
+		case 34:
 			switch data[(p)] {
 			case 45:
-				goto tr50
+				goto tr54
 			case 61:
-				goto tr46
+				goto tr61
 			case 91:
-				goto tr45
+				goto tr60
 			case 93:
-				goto tr45
+				goto tr60
 			case 95:
-				goto tr45
+				goto tr60
 			case 124:
-				goto tr51
+				goto tr57
 			}
 			switch {
 			case data[(p)] < 48:
 				if 44 <= data[(p)] && data[(p)] <= 46 {
-					goto tr45
+					goto tr60
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 90:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr52
+						goto tr65
 					}
 				case data[(p)] >= 65:
-					goto tr52
+					goto tr65
 				}
 			default:
-				goto tr52
+				goto tr65
 			}
 			goto tr1
-		case 28:
+		case 35:
 			switch data[(p)] {
 			case 32:
-				goto tr53
+				goto tr66
 			case 92:
-				goto tr37
+				goto tr47
 			case 95:
-				goto tr54
+				goto tr67
 			case 124:
-				goto tr38
+				goto tr48
 			}
 			switch {
 			case data[(p)] < 65:
 				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr54
+					goto tr67
 				}
 			case data[(p)] > 90:
 				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr54
+					goto tr67
 				}
 			default:
-				goto tr54
+				goto tr67
 			}
-			goto tr36
-		case 29:
+			goto tr44
+		case 36:
 			switch data[(p)] {
 			case 44:
-				goto tr55
+				goto tr68
 			case 46:
-				goto tr55
+				goto tr68
 			case 61:
-				goto tr56
+				goto tr69
 			case 92:
-				goto tr37
+				goto tr47
 			case 95:
-				goto tr55
+				goto tr68
 			case 124:
-				goto tr38
+				goto tr48
 			}
 			switch {
 			case data[(p)] < 65:
 				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr55
+					goto tr68
 				}
 			case data[(p)] > 93:
 				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr55
+					goto tr68
 				}
 			default:
-				goto tr55
+				goto tr68
 			}
-			goto tr36
+			goto tr44
 		case 68:
 			switch data[(p)] {
 			case 32:
-				goto tr141
+				goto tr131
 			case 61:
-				goto tr36
+				goto tr44
 			case 92:
-				goto tr142
+				goto tr132
 			case 124:
-				goto tr143
+				goto tr133
 			}
 			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr140
+				goto tr130
 			}
-			goto tr139
+			goto tr129
 		case 69:
 			switch data[(p)] {
 			case 32:
-				goto tr146
+				goto tr136
 			case 61:
-				goto tr36
+				goto tr44
 			case 92:
-				goto tr147
+				goto tr137
 			case 124:
-				goto tr148
+				goto tr138
 			}
 			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr145
+				goto tr135
 			}
-			goto tr144
+			goto tr134
 		case 70:
 			switch data[(p)] {
 			case 32:
-				goto tr146
+				goto tr136
 			case 61:
-				goto tr36
+				goto tr44
 			case 92:
-				goto tr147
+				goto tr137
 			case 95:
-				goto tr149
+				goto tr139
 			case 124:
-				goto tr148
+				goto tr138
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr145
+					goto tr135
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 90:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr149
+						goto tr139
 					}
 				case data[(p)] >= 65:
-					goto tr149
+					goto tr139
 				}
 			default:
-				goto tr149
+				goto tr139
 			}
-			goto tr144
+			goto tr134
 		case 71:
 			switch data[(p)] {
 			case 32:
-				goto tr146
+				goto tr136
 			case 44:
-				goto tr150
+				goto tr140
 			case 46:
-				goto tr150
+				goto tr140
 			case 61:
-				goto tr151
+				goto tr141
 			case 92:
-				goto tr147
+				goto tr137
 			case 95:
-				goto tr150
+				goto tr140
 			case 124:
-				goto tr148
+				goto tr138
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr145
+					goto tr135
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 93:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr150
+						goto tr140
 					}
 				case data[(p)] >= 65:
-					goto tr150
+					goto tr140
 				}
 			default:
-				goto tr150
+				goto tr140
 			}
-			goto tr144
+			goto tr134
 		case 72:
 			switch data[(p)] {
 			case 32:
-				goto tr154
+				goto tr144
 			case 61:
-				goto tr36
+				goto tr44
 			case 92:
-				goto tr155
+				goto tr145
 			case 124:
-				goto tr156
+				goto tr146
 			}
 			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr153
+				goto tr143
 			}
-			goto tr152
+			goto tr142
 		case 73:
 			switch data[(p)] {
 			case 32:
-				goto tr159
+				goto tr149
 			case 61:
-				goto tr36
+				goto tr44
 			case 92:
-				goto tr160
+				goto tr150
 			case 124:
-				goto tr161
+				goto tr151
 			}
 			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr158
+				goto tr148
 			}
-			goto tr157
+			goto tr147
 		case 74:
 			switch data[(p)] {
 			case 32:
-				goto tr159
+				goto tr149
 			case 61:
-				goto tr36
+				goto tr44
 			case 92:
-				goto tr160
+				goto tr150
 			case 95:
-				goto tr162
+				goto tr152
 			case 124:
-				goto tr161
+				goto tr151
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr158
+					goto tr148
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr152
+					}
+				case data[(p)] >= 65:
+					goto tr152
+				}
+			default:
+				goto tr152
+			}
+			goto tr147
+		case 75:
+			switch data[(p)] {
+			case 32:
+				goto tr149
+			case 44:
+				goto tr153
+			case 46:
+				goto tr153
+			case 61:
+				goto tr141
+			case 92:
+				goto tr150
+			case 95:
+				goto tr153
+			case 124:
+				goto tr151
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr148
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr153
+					}
+				case data[(p)] >= 65:
+					goto tr153
+				}
+			default:
+				goto tr153
+			}
+			goto tr147
+		case 37:
+			switch data[(p)] {
+			case 61:
+				goto tr63
+			case 92:
+				goto tr70
+			case 110:
+				goto tr63
+			case 114:
+				goto tr63
+			case 124:
+				goto tr49
+			}
+			goto tr62
+		case 76:
+			switch data[(p)] {
+			case 32:
+				goto tr156
+			case 61:
+				goto tr50
+			case 92:
+				goto tr157
+			case 124:
+				goto tr158
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr155
+			}
+			goto tr154
+		case 77:
+			switch data[(p)] {
+			case 32:
+				goto tr159
+			case 45:
+				goto tr160
+			case 61:
+				goto tr62
+			case 92:
+				goto tr118
+			case 95:
+				goto tr162
+			case 124:
+				goto tr163
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr116
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr161
+					}
+				case data[(p)] >= 65:
+					goto tr161
+				}
+			default:
+				goto tr161
+			}
+			goto tr115
+		case 78:
+			switch data[(p)] {
+			case 32:
+				goto tr164
+			case 61:
+				goto tr62
+			case 92:
+				goto tr118
+			case 95:
+				goto tr165
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr116
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr165
+					}
+				case data[(p)] >= 65:
+					goto tr165
+				}
+			default:
+				goto tr165
+			}
+			goto tr115
+		case 79:
+			switch data[(p)] {
+			case 32:
+				goto tr117
+			case 44:
+				goto tr166
+			case 46:
+				goto tr166
+			case 61:
+				goto tr61
+			case 92:
+				goto tr118
+			case 95:
+				goto tr166
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr116
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr166
+					}
+				case data[(p)] >= 65:
+					goto tr166
+				}
+			default:
+				goto tr166
+			}
+			goto tr115
+		case 80:
+			switch data[(p)] {
+			case 32:
+				goto tr117
+			case 45:
+				goto tr160
+			case 61:
+				goto tr62
+			case 92:
+				goto tr118
+			case 124:
+				goto tr163
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr116
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr160
+					}
+				case data[(p)] >= 65:
+					goto tr160
+				}
+			default:
+				goto tr160
+			}
+			goto tr115
+		case 81:
+			switch data[(p)] {
+			case 32:
+				goto tr159
+			case 61:
+				goto tr62
+			case 92:
+				goto tr118
+			case 95:
+				goto tr162
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr116
 				}
 			case data[(p)] > 57:
 				switch {
@@ -932,183 +1151,97 @@ func (e *Event) recoverExtensions(data string) error {
 			default:
 				goto tr162
 			}
-			goto tr157
-		case 75:
+			goto tr115
+		case 82:
 			switch data[(p)] {
 			case 32:
-				goto tr159
-			case 44:
-				goto tr163
-			case 46:
-				goto tr163
-			case 61:
-				goto tr151
-			case 92:
+				goto tr117
+			case 45:
 				goto tr160
+			case 61:
+				goto tr61
+			case 92:
+				goto tr118
 			case 95:
-				goto tr163
+				goto tr166
 			case 124:
-				goto tr161
+				goto tr163
 			}
 			switch {
 			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr158
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr166
+					}
+				case data[(p)] >= 9:
+					goto tr116
 				}
 			case data[(p)] > 57:
 				switch {
+				case data[(p)] < 91:
+					if 65 <= data[(p)] && data[(p)] <= 90 {
+						goto tr167
+					}
 				case data[(p)] > 93:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr163
+						goto tr167
 					}
-				case data[(p)] >= 65:
-					goto tr163
+				default:
+					goto tr166
 				}
 			default:
-				goto tr163
-			}
-			goto tr157
-		case 30:
-			switch data[(p)] {
-			case 61:
-				goto tr48
-			case 92:
-				goto tr57
-			case 110:
-				goto tr48
-			case 114:
-				goto tr48
-			case 124:
-				goto tr39
-			}
-			goto tr47
-		case 76:
-			switch data[(p)] {
-			case 32:
-				goto tr166
-			case 61:
-				goto tr40
-			case 92:
 				goto tr167
+			}
+			goto tr115
+		case 38:
+			switch data[(p)] {
+			case 61:
+				goto tr64
+			case 92:
+				goto tr71
+			case 110:
+				goto tr64
+			case 114:
+				goto tr64
 			case 124:
-				goto tr168
+				goto tr49
 			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr165
-			}
-			goto tr164
-		case 77:
+			goto tr62
+		case 83:
 			switch data[(p)] {
 			case 32:
-				goto tr169
-			case 45:
 				goto tr170
 			case 61:
-				goto tr47
+				goto tr50
 			case 92:
-				goto tr128
-			case 95:
-				goto tr172
-			case 124:
-				goto tr173
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr126
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr171
-					}
-				case data[(p)] >= 65:
-					goto tr171
-				}
-			default:
 				goto tr171
-			}
-			goto tr125
-		case 78:
-			switch data[(p)] {
-			case 32:
-				goto tr169
-			case 61:
-				goto tr47
-			case 92:
-				goto tr128
-			case 95:
-				goto tr172
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr126
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr172
-					}
-				case data[(p)] >= 65:
-					goto tr172
-				}
-			default:
-				goto tr172
-			}
-			goto tr125
-		case 79:
-			switch data[(p)] {
-			case 32:
-				goto tr127
-			case 44:
-				goto tr174
-			case 46:
-				goto tr174
-			case 61:
-				goto tr46
-			case 92:
-				goto tr128
-			case 95:
-				goto tr174
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr126
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 93:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr174
-					}
-				case data[(p)] >= 65:
-					goto tr174
-				}
-			default:
-				goto tr174
-			}
-			goto tr125
-		case 80:
-			switch data[(p)] {
-			case 32:
-				goto tr127
-			case 45:
-				goto tr175
-			case 61:
-				goto tr47
-			case 92:
-				goto tr128
 			case 124:
+				goto tr172
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr169
+			}
+			goto tr168
+		case 84:
+			switch data[(p)] {
+			case 32:
+				goto tr173
+			case 45:
+				goto tr174
+			case 61:
+				goto tr62
+			case 92:
+				goto tr107
+			case 95:
 				goto tr176
+			case 124:
+				goto tr177
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr126
+					goto tr105
 				}
 			case data[(p)] > 57:
 				switch {
@@ -1122,441 +1255,492 @@ func (e *Event) recoverExtensions(data string) error {
 			default:
 				goto tr175
 			}
-			goto tr125
-		case 81:
+			goto tr104
+		case 85:
 			switch data[(p)] {
 			case 32:
-				goto tr127
-			case 45:
-				goto tr175
+				goto tr178
 			case 61:
-				goto tr46
+				goto tr62
 			case 92:
-				goto tr128
+				goto tr107
 			case 95:
+				goto tr179
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr105
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr179
+					}
+				case data[(p)] >= 65:
+					goto tr179
+				}
+			default:
+				goto tr179
+			}
+			goto tr104
+		case 86:
+			switch data[(p)] {
+			case 32:
+				goto tr106
+			case 44:
+				goto tr180
+			case 46:
+				goto tr180
+			case 61:
+				goto tr61
+			case 92:
+				goto tr107
+			case 95:
+				goto tr180
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr105
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr180
+					}
+				case data[(p)] >= 65:
+					goto tr180
+				}
+			default:
+				goto tr180
+			}
+			goto tr104
+		case 87:
+			switch data[(p)] {
+			case 32:
+				goto tr106
+			case 45:
 				goto tr174
+			case 61:
+				goto tr62
+			case 92:
+				goto tr107
 			case 124:
+				goto tr177
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr105
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr174
+					}
+				case data[(p)] >= 65:
+					goto tr174
+				}
+			default:
+				goto tr174
+			}
+			goto tr104
+		case 88:
+			switch data[(p)] {
+			case 32:
+				goto tr173
+			case 61:
+				goto tr62
+			case 92:
+				goto tr107
+			case 95:
 				goto tr176
 			}
 			switch {
 			case data[(p)] < 48:
-				switch {
-				case data[(p)] > 13:
-					if 44 <= data[(p)] && data[(p)] <= 46 {
-						goto tr174
-					}
-				case data[(p)] >= 9:
-					goto tr126
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] < 91:
-					if 65 <= data[(p)] && data[(p)] <= 90 {
-						goto tr177
-					}
-				case data[(p)] > 93:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr177
-					}
-				default:
-					goto tr174
-				}
-			default:
-				goto tr177
-			}
-			goto tr125
-		case 31:
-			switch data[(p)] {
-			case 61:
-				goto tr49
-			case 92:
-				goto tr58
-			case 110:
-				goto tr49
-			case 114:
-				goto tr49
-			case 124:
-				goto tr39
-			}
-			goto tr47
-		case 82:
-			switch data[(p)] {
-			case 32:
-				goto tr180
-			case 61:
-				goto tr40
-			case 92:
-				goto tr181
-			case 124:
-				goto tr182
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr179
-			}
-			goto tr178
-		case 83:
-			switch data[(p)] {
-			case 32:
-				goto tr183
-			case 45:
-				goto tr184
-			case 61:
-				goto tr47
-			case 92:
-				goto tr117
-			case 95:
-				goto tr186
-			case 124:
-				goto tr187
-			}
-			switch {
-			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr115
+					goto tr105
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 90:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr185
+						goto tr176
 					}
 				case data[(p)] >= 65:
-					goto tr185
+					goto tr176
 				}
 			default:
-				goto tr185
+				goto tr176
 			}
-			goto tr114
-		case 84:
-			switch data[(p)] {
-			case 32:
-				goto tr183
-			case 61:
-				goto tr47
-			case 92:
-				goto tr117
-			case 95:
-				goto tr186
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr115
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr186
-					}
-				case data[(p)] >= 65:
-					goto tr186
-				}
-			default:
-				goto tr186
-			}
-			goto tr114
-		case 85:
-			switch data[(p)] {
-			case 32:
-				goto tr116
-			case 44:
-				goto tr188
-			case 46:
-				goto tr188
-			case 61:
-				goto tr46
-			case 92:
-				goto tr117
-			case 95:
-				goto tr188
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr115
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 93:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr188
-					}
-				case data[(p)] >= 65:
-					goto tr188
-				}
-			default:
-				goto tr188
-			}
-			goto tr114
-		case 86:
-			switch data[(p)] {
-			case 32:
-				goto tr116
-			case 45:
-				goto tr189
-			case 61:
-				goto tr47
-			case 92:
-				goto tr117
-			case 124:
-				goto tr190
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr115
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr189
-					}
-				case data[(p)] >= 65:
-					goto tr189
-				}
-			default:
-				goto tr189
-			}
-			goto tr114
-		case 87:
-			switch data[(p)] {
-			case 32:
-				goto tr116
-			case 45:
-				goto tr189
-			case 61:
-				goto tr46
-			case 92:
-				goto tr117
-			case 95:
-				goto tr188
-			case 124:
-				goto tr190
-			}
-			switch {
-			case data[(p)] < 48:
-				switch {
-				case data[(p)] > 13:
-					if 44 <= data[(p)] && data[(p)] <= 46 {
-						goto tr188
-					}
-				case data[(p)] >= 9:
-					goto tr115
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] < 91:
-					if 65 <= data[(p)] && data[(p)] <= 90 {
-						goto tr191
-					}
-				case data[(p)] > 93:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr191
-					}
-				default:
-					goto tr188
-				}
-			default:
-				goto tr191
-			}
-			goto tr114
-		case 32:
-			switch data[(p)] {
-			case 32:
-				goto tr59
-			case 92:
-				goto tr30
-			case 95:
-				goto tr60
-			case 124:
-				goto tr31
-			}
-			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr60
-				}
-			case data[(p)] > 90:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr60
-				}
-			default:
-				goto tr60
-			}
-			goto tr29
-		case 33:
-			switch data[(p)] {
-			case 44:
-				goto tr61
-			case 46:
-				goto tr61
-			case 61:
-				goto tr62
-			case 92:
-				goto tr30
-			case 95:
-				goto tr61
-			case 124:
-				goto tr31
-			}
-			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr61
-				}
-			case data[(p)] > 93:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr61
-				}
-			default:
-				goto tr61
-			}
-			goto tr29
-		case 88:
-			switch data[(p)] {
-			case 32:
-				goto tr194
-			case 61:
-				goto tr29
-			case 92:
-				goto tr195
-			case 124:
-				goto tr196
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr193
-			}
-			goto tr192
+			goto tr104
 		case 89:
 			switch data[(p)] {
 			case 32:
-				goto tr199
+				goto tr106
+			case 45:
+				goto tr174
 			case 61:
-				goto tr29
+				goto tr61
 			case 92:
-				goto tr200
+				goto tr107
+			case 95:
+				goto tr180
 			case 124:
-				goto tr201
+				goto tr177
 			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr198
+			switch {
+			case data[(p)] < 48:
+				switch {
+				case data[(p)] > 13:
+					if 44 <= data[(p)] && data[(p)] <= 46 {
+						goto tr180
+					}
+				case data[(p)] >= 9:
+					goto tr105
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] < 91:
+					if 65 <= data[(p)] && data[(p)] <= 90 {
+						goto tr181
+					}
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr181
+					}
+				default:
+					goto tr180
+				}
+			default:
+				goto tr181
 			}
-			goto tr197
+			goto tr104
+		case 39:
+			switch data[(p)] {
+			case 32:
+				goto tr72
+			case 92:
+				goto tr38
+			case 95:
+				goto tr73
+			case 124:
+				goto tr39
+			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr73
+				}
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr73
+				}
+			default:
+				goto tr73
+			}
+			goto tr35
+		case 40:
+			switch data[(p)] {
+			case 44:
+				goto tr74
+			case 46:
+				goto tr74
+			case 61:
+				goto tr75
+			case 92:
+				goto tr38
+			case 95:
+				goto tr74
+			case 124:
+				goto tr39
+			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr74
+				}
+			case data[(p)] > 93:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr74
+				}
+			default:
+				goto tr74
+			}
+			goto tr35
 		case 90:
 			switch data[(p)] {
 			case 32:
-				goto tr199
+				goto tr184
 			case 61:
-				goto tr29
+				goto tr35
 			case 92:
-				goto tr200
-			case 95:
-				goto tr202
+				goto tr185
 			case 124:
-				goto tr201
+				goto tr186
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr183
+			}
+			goto tr182
+		case 91:
+			switch data[(p)] {
+			case 32:
+				goto tr189
+			case 61:
+				goto tr35
+			case 92:
+				goto tr190
+			case 124:
+				goto tr191
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr188
+			}
+			goto tr187
+		case 92:
+			switch data[(p)] {
+			case 32:
+				goto tr189
+			case 61:
+				goto tr35
+			case 92:
+				goto tr190
+			case 95:
+				goto tr192
+			case 124:
+				goto tr191
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr198
+					goto tr188
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 90:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr202
+						goto tr192
 					}
 				case data[(p)] >= 65:
-					goto tr202
+					goto tr192
 				}
 			default:
-				goto tr202
+				goto tr192
 			}
-			goto tr197
-		case 91:
+			goto tr187
+		case 93:
 			switch data[(p)] {
 			case 32:
-				goto tr199
+				goto tr189
 			case 44:
-				goto tr203
+				goto tr193
 			case 46:
-				goto tr203
+				goto tr193
 			case 61:
-				goto tr204
+				goto tr194
 			case 92:
-				goto tr200
+				goto tr190
 			case 95:
-				goto tr203
+				goto tr193
 			case 124:
-				goto tr201
+				goto tr191
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr198
+					goto tr188
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 93:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr203
+						goto tr193
 					}
 				case data[(p)] >= 65:
-					goto tr203
+					goto tr193
 				}
 			default:
-				goto tr203
+				goto tr193
 			}
-			goto tr197
-		case 92:
-			switch data[(p)] {
-			case 32:
-				goto tr207
-			case 61:
-				goto tr29
-			case 92:
-				goto tr208
-			case 124:
-				goto tr209
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr206
-			}
-			goto tr205
-		case 93:
-			switch data[(p)] {
-			case 32:
-				goto tr212
-			case 61:
-				goto tr29
-			case 92:
-				goto tr213
-			case 124:
-				goto tr214
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr211
-			}
-			goto tr210
+			goto tr187
 		case 94:
 			switch data[(p)] {
 			case 32:
-				goto tr212
+				goto tr197
 			case 61:
-				goto tr29
+				goto tr35
 			case 92:
-				goto tr213
-			case 95:
-				goto tr215
+				goto tr198
 			case 124:
-				goto tr214
+				goto tr199
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr196
+			}
+			goto tr195
+		case 95:
+			switch data[(p)] {
+			case 32:
+				goto tr202
+			case 61:
+				goto tr35
+			case 92:
+				goto tr203
+			case 124:
+				goto tr204
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr201
+			}
+			goto tr200
+		case 96:
+			switch data[(p)] {
+			case 32:
+				goto tr202
+			case 61:
+				goto tr35
+			case 92:
+				goto tr203
+			case 95:
+				goto tr205
+			case 124:
+				goto tr204
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr211
+					goto tr201
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr205
+					}
+				case data[(p)] >= 65:
+					goto tr205
+				}
+			default:
+				goto tr205
+			}
+			goto tr200
+		case 97:
+			switch data[(p)] {
+			case 32:
+				goto tr202
+			case 44:
+				goto tr206
+			case 46:
+				goto tr206
+			case 61:
+				goto tr194
+			case 92:
+				goto tr203
+			case 95:
+				goto tr206
+			case 124:
+				goto tr204
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr201
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr206
+					}
+				case data[(p)] >= 65:
+					goto tr206
+				}
+			default:
+				goto tr206
+			}
+			goto tr200
+		case 41:
+			switch data[(p)] {
+			case 61:
+				goto tr63
+			case 92:
+				goto tr76
+			case 110:
+				goto tr63
+			case 114:
+				goto tr63
+			case 124:
+				goto tr40
+			}
+			goto tr62
+		case 98:
+			switch data[(p)] {
+			case 32:
+				goto tr209
+			case 61:
+				goto tr41
+			case 92:
+				goto tr210
+			case 124:
+				goto tr211
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr208
+			}
+			goto tr207
+		case 99:
+			switch data[(p)] {
+			case 32:
+				goto tr212
+			case 61:
+				goto tr44
+			case 92:
+				goto tr150
+			case 95:
+				goto tr213
+			case 124:
+				goto tr151
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr148
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr213
+					}
+				case data[(p)] >= 65:
+					goto tr213
+				}
+			default:
+				goto tr213
+			}
+			goto tr147
+		case 100:
+			switch data[(p)] {
+			case 32:
+				goto tr214
+			case 61:
+				goto tr44
+			case 92:
+				goto tr150
+			case 95:
+				goto tr215
+			case 124:
+				goto tr151
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr148
 				}
 			case data[(p)] > 57:
 				switch {
@@ -1570,28 +1754,28 @@ func (e *Event) recoverExtensions(data string) error {
 			default:
 				goto tr215
 			}
-			goto tr210
-		case 95:
+			goto tr147
+		case 101:
 			switch data[(p)] {
 			case 32:
-				goto tr212
+				goto tr149
 			case 44:
 				goto tr216
 			case 46:
 				goto tr216
 			case 61:
-				goto tr204
+				goto tr69
 			case 92:
-				goto tr213
+				goto tr150
 			case 95:
 				goto tr216
 			case 124:
-				goto tr214
+				goto tr151
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr211
+					goto tr148
 				}
 			case data[(p)] > 57:
 				switch {
@@ -1605,27 +1789,27 @@ func (e *Event) recoverExtensions(data string) error {
 			default:
 				goto tr216
 			}
-			goto tr210
-		case 34:
+			goto tr147
+		case 42:
 			switch data[(p)] {
 			case 61:
-				goto tr48
+				goto tr64
 			case 92:
-				goto tr63
+				goto tr77
 			case 110:
-				goto tr48
+				goto tr64
 			case 114:
-				goto tr48
+				goto tr64
 			case 124:
-				goto tr32
+				goto tr40
 			}
-			goto tr47
-		case 96:
+			goto tr62
+		case 102:
 			switch data[(p)] {
 			case 32:
 				goto tr219
 			case 61:
-				goto tr33
+				goto tr41
 			case 92:
 				goto tr220
 			case 124:
@@ -1635,23 +1819,54 @@ func (e *Event) recoverExtensions(data string) error {
 				goto tr218
 			}
 			goto tr217
-		case 97:
+		case 103:
+			switch data[(p)] {
+			case 32:
+				goto tr222
+			case 61:
+				goto tr44
+			case 92:
+				goto tr137
+			case 95:
+				goto tr223
+			case 124:
+				goto tr138
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr135
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr223
+					}
+				case data[(p)] >= 65:
+					goto tr223
+				}
+			default:
+				goto tr223
+			}
+			goto tr134
+		case 104:
 			switch data[(p)] {
 			case 32:
 				goto tr224
 			case 61:
-				goto tr103
+				goto tr44
 			case 92:
-				goto tr226
+				goto tr137
 			case 95:
 				goto tr225
 			case 124:
-				goto tr227
+				goto tr138
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr223
+					goto tr135
 				}
 			case data[(p)] > 57:
 				switch {
@@ -1665,833 +1880,863 @@ func (e *Event) recoverExtensions(data string) error {
 			default:
 				goto tr225
 			}
-			goto tr222
-		case 98:
-			switch data[(p)] {
-			case 32:
-				goto tr228
-			case 61:
-				goto tr36
-			case 92:
-				goto tr160
-			case 95:
-				goto tr225
-			case 124:
-				goto tr161
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr158
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr225
-					}
-				case data[(p)] >= 65:
-					goto tr225
-				}
-			default:
-				goto tr225
-			}
-			goto tr157
-		case 99:
-			switch data[(p)] {
-			case 32:
-				goto tr159
-			case 44:
-				goto tr229
-			case 46:
-				goto tr229
-			case 61:
-				goto tr56
-			case 92:
-				goto tr160
-			case 95:
-				goto tr229
-			case 124:
-				goto tr161
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr158
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 93:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr229
-					}
-				case data[(p)] >= 65:
-					goto tr229
-				}
-			default:
-				goto tr229
-			}
-			goto tr157
-		case 35:
-			switch data[(p)] {
-			case 61:
-				goto tr49
-			case 92:
-				goto tr64
-			case 110:
-				goto tr49
-			case 114:
-				goto tr49
-			case 124:
-				goto tr32
-			}
-			goto tr47
-		case 100:
-			switch data[(p)] {
-			case 32:
-				goto tr232
-			case 61:
-				goto tr33
-			case 92:
-				goto tr233
-			case 124:
-				goto tr234
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr231
-			}
-			goto tr230
-		case 101:
-			switch data[(p)] {
-			case 32:
-				goto tr237
-			case 61:
-				goto tr103
-			case 92:
-				goto tr239
-			case 95:
-				goto tr238
-			case 124:
-				goto tr240
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr236
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr238
-					}
-				case data[(p)] >= 65:
-					goto tr238
-				}
-			default:
-				goto tr238
-			}
-			goto tr235
-		case 102:
-			switch data[(p)] {
-			case 32:
-				goto tr241
-			case 61:
-				goto tr36
-			case 92:
-				goto tr147
-			case 95:
-				goto tr238
-			case 124:
-				goto tr148
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr145
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr238
-					}
-				case data[(p)] >= 65:
-					goto tr238
-				}
-			default:
-				goto tr238
-			}
-			goto tr144
-		case 103:
-			switch data[(p)] {
-			case 32:
-				goto tr146
-			case 44:
-				goto tr242
-			case 46:
-				goto tr242
-			case 61:
-				goto tr56
-			case 92:
-				goto tr147
-			case 95:
-				goto tr242
-			case 124:
-				goto tr148
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr145
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 93:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr242
-					}
-				case data[(p)] >= 65:
-					goto tr242
-				}
-			default:
-				goto tr242
-			}
-			goto tr144
-		case 36:
-			switch data[(p)] {
-			case 32:
-				goto tr65
-			case 92:
-				goto tr23
-			case 95:
-				goto tr66
-			case 124:
-				goto tr24
-			}
-			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr66
-				}
-			case data[(p)] > 90:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr66
-				}
-			default:
-				goto tr66
-			}
-			goto tr22
-		case 37:
-			switch data[(p)] {
-			case 44:
-				goto tr67
-			case 46:
-				goto tr67
-			case 61:
-				goto tr68
-			case 92:
-				goto tr23
-			case 95:
-				goto tr67
-			case 124:
-				goto tr24
-			}
-			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr67
-				}
-			case data[(p)] > 93:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr67
-				}
-			default:
-				goto tr67
-			}
-			goto tr22
-		case 104:
-			switch data[(p)] {
-			case 32:
-				goto tr245
-			case 61:
-				goto tr22
-			case 92:
-				goto tr246
-			case 124:
-				goto tr247
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr244
-			}
-			goto tr243
+			goto tr134
 		case 105:
 			switch data[(p)] {
 			case 32:
-				goto tr250
+				goto tr136
+			case 44:
+				goto tr226
+			case 46:
+				goto tr226
 			case 61:
-				goto tr22
+				goto tr69
 			case 92:
-				goto tr251
+				goto tr137
+			case 95:
+				goto tr226
 			case 124:
-				goto tr252
+				goto tr138
 			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr249
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr135
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr226
+					}
+				case data[(p)] >= 65:
+					goto tr226
+				}
+			default:
+				goto tr226
 			}
-			goto tr248
+			goto tr134
+		case 43:
+			switch data[(p)] {
+			case 32:
+				goto tr78
+			case 92:
+				goto tr29
+			case 95:
+				goto tr79
+			case 124:
+				goto tr30
+			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr79
+				}
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr79
+				}
+			default:
+				goto tr79
+			}
+			goto tr26
+		case 44:
+			switch data[(p)] {
+			case 44:
+				goto tr80
+			case 46:
+				goto tr80
+			case 61:
+				goto tr81
+			case 92:
+				goto tr29
+			case 95:
+				goto tr80
+			case 124:
+				goto tr30
+			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr80
+				}
+			case data[(p)] > 93:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr80
+				}
+			default:
+				goto tr80
+			}
+			goto tr26
 		case 106:
 			switch data[(p)] {
 			case 32:
-				goto tr250
-			case 61:
-				goto tr22
-			case 92:
-				goto tr251
-			case 95:
-				goto tr253
-			case 124:
-				goto tr252
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr249
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr253
-					}
-				case data[(p)] >= 65:
-					goto tr253
-				}
-			default:
-				goto tr253
-			}
-			goto tr248
-		case 107:
-			switch data[(p)] {
-			case 32:
-				goto tr250
-			case 44:
-				goto tr254
-			case 46:
-				goto tr254
-			case 61:
-				goto tr255
-			case 92:
-				goto tr251
-			case 95:
-				goto tr254
-			case 124:
-				goto tr252
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr249
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 93:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr254
-					}
-				case data[(p)] >= 65:
-					goto tr254
-				}
-			default:
-				goto tr254
-			}
-			goto tr248
-		case 108:
-			switch data[(p)] {
-			case 32:
-				goto tr258
-			case 61:
-				goto tr22
-			case 92:
-				goto tr259
-			case 124:
-				goto tr260
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr257
-			}
-			goto tr256
-		case 109:
-			switch data[(p)] {
-			case 32:
-				goto tr263
-			case 61:
-				goto tr22
-			case 92:
-				goto tr264
-			case 124:
-				goto tr265
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr262
-			}
-			goto tr261
-		case 110:
-			switch data[(p)] {
-			case 32:
-				goto tr263
-			case 61:
-				goto tr22
-			case 92:
-				goto tr264
-			case 95:
-				goto tr266
-			case 124:
-				goto tr265
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr262
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr266
-					}
-				case data[(p)] >= 65:
-					goto tr266
-				}
-			default:
-				goto tr266
-			}
-			goto tr261
-		case 111:
-			switch data[(p)] {
-			case 32:
-				goto tr263
-			case 44:
-				goto tr267
-			case 46:
-				goto tr267
-			case 61:
-				goto tr255
-			case 92:
-				goto tr264
-			case 95:
-				goto tr267
-			case 124:
-				goto tr265
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr262
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 93:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr267
-					}
-				case data[(p)] >= 65:
-					goto tr267
-				}
-			default:
-				goto tr267
-			}
-			goto tr261
-		case 38:
-			switch data[(p)] {
-			case 61:
-				goto tr48
-			case 92:
-				goto tr69
-			case 110:
-				goto tr48
-			case 114:
-				goto tr48
-			case 124:
-				goto tr25
-			}
-			goto tr47
-		case 112:
-			switch data[(p)] {
-			case 32:
-				goto tr270
+				goto tr229
 			case 61:
 				goto tr26
 			case 92:
-				goto tr271
+				goto tr230
 			case 124:
-				goto tr272
+				goto tr231
 			}
 			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr269
+				goto tr228
 			}
-			goto tr268
-		case 113:
+			goto tr227
+		case 107:
 			switch data[(p)] {
 			case 32:
-				goto tr275
+				goto tr234
 			case 61:
-				goto tr99
+				goto tr26
 			case 92:
-				goto tr277
-			case 95:
-				goto tr276
+				goto tr235
 			case 124:
-				goto tr278
+				goto tr236
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr233
+			}
+			goto tr232
+		case 108:
+			switch data[(p)] {
+			case 32:
+				goto tr234
+			case 61:
+				goto tr26
+			case 92:
+				goto tr235
+			case 95:
+				goto tr237
+			case 124:
+				goto tr236
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr274
+					goto tr233
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 90:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr276
+						goto tr237
 					}
 				case data[(p)] >= 65:
-					goto tr276
+					goto tr237
 				}
 			default:
+				goto tr237
+			}
+			goto tr232
+		case 109:
+			switch data[(p)] {
+			case 32:
+				goto tr234
+			case 44:
+				goto tr238
+			case 46:
+				goto tr238
+			case 61:
+				goto tr239
+			case 92:
+				goto tr235
+			case 95:
+				goto tr238
+			case 124:
+				goto tr236
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr233
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr238
+					}
+				case data[(p)] >= 65:
+					goto tr238
+				}
+			default:
+				goto tr238
+			}
+			goto tr232
+		case 110:
+			switch data[(p)] {
+			case 32:
+				goto tr242
+			case 61:
+				goto tr26
+			case 92:
+				goto tr243
+			case 124:
+				goto tr244
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr241
+			}
+			goto tr240
+		case 111:
+			switch data[(p)] {
+			case 32:
+				goto tr247
+			case 61:
+				goto tr26
+			case 92:
+				goto tr248
+			case 124:
+				goto tr249
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr246
+			}
+			goto tr245
+		case 112:
+			switch data[(p)] {
+			case 32:
+				goto tr247
+			case 61:
+				goto tr26
+			case 92:
+				goto tr248
+			case 95:
+				goto tr250
+			case 124:
+				goto tr249
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr246
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr250
+					}
+				case data[(p)] >= 65:
+					goto tr250
+				}
+			default:
+				goto tr250
+			}
+			goto tr245
+		case 113:
+			switch data[(p)] {
+			case 32:
+				goto tr247
+			case 44:
+				goto tr251
+			case 46:
+				goto tr251
+			case 61:
+				goto tr239
+			case 92:
+				goto tr248
+			case 95:
+				goto tr251
+			case 124:
+				goto tr249
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr246
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr251
+					}
+				case data[(p)] >= 65:
+					goto tr251
+				}
+			default:
+				goto tr251
+			}
+			goto tr245
+		case 45:
+			switch data[(p)] {
+			case 61:
+				goto tr63
+			case 92:
+				goto tr82
+			case 110:
+				goto tr63
+			case 114:
+				goto tr63
+			case 124:
+				goto tr31
+			}
+			goto tr62
+		case 114:
+			switch data[(p)] {
+			case 32:
+				goto tr254
+			case 61:
+				goto tr32
+			case 92:
+				goto tr255
+			case 124:
+				goto tr256
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr253
+			}
+			goto tr252
+		case 115:
+			switch data[(p)] {
+			case 32:
+				goto tr257
+			case 61:
+				goto tr35
+			case 92:
+				goto tr203
+			case 95:
+				goto tr258
+			case 124:
+				goto tr204
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr201
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr258
+					}
+				case data[(p)] >= 65:
+					goto tr258
+				}
+			default:
+				goto tr258
+			}
+			goto tr200
+		case 116:
+			switch data[(p)] {
+			case 32:
+				goto tr259
+			case 61:
+				goto tr35
+			case 92:
+				goto tr203
+			case 95:
+				goto tr260
+			case 124:
+				goto tr204
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr201
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr260
+					}
+				case data[(p)] >= 65:
+					goto tr260
+				}
+			default:
+				goto tr260
+			}
+			goto tr200
+		case 117:
+			switch data[(p)] {
+			case 32:
+				goto tr202
+			case 44:
+				goto tr261
+			case 46:
+				goto tr261
+			case 61:
+				goto tr75
+			case 92:
+				goto tr203
+			case 95:
+				goto tr261
+			case 124:
+				goto tr204
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr201
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr261
+					}
+				case data[(p)] >= 65:
+					goto tr261
+				}
+			default:
+				goto tr261
+			}
+			goto tr200
+		case 46:
+			switch data[(p)] {
+			case 61:
+				goto tr64
+			case 92:
+				goto tr83
+			case 110:
+				goto tr64
+			case 114:
+				goto tr64
+			case 124:
+				goto tr31
+			}
+			goto tr62
+		case 118:
+			switch data[(p)] {
+			case 32:
+				goto tr264
+			case 61:
+				goto tr32
+			case 92:
+				goto tr265
+			case 124:
+				goto tr266
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr263
+			}
+			goto tr262
+		case 119:
+			switch data[(p)] {
+			case 32:
+				goto tr267
+			case 61:
+				goto tr35
+			case 92:
+				goto tr190
+			case 95:
+				goto tr268
+			case 124:
+				goto tr191
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr188
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr268
+					}
+				case data[(p)] >= 65:
+					goto tr268
+				}
+			default:
+				goto tr268
+			}
+			goto tr187
+		case 120:
+			switch data[(p)] {
+			case 32:
+				goto tr269
+			case 61:
+				goto tr35
+			case 92:
+				goto tr190
+			case 95:
+				goto tr270
+			case 124:
+				goto tr191
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr188
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr270
+					}
+				case data[(p)] >= 65:
+					goto tr270
+				}
+			default:
+				goto tr270
+			}
+			goto tr187
+		case 121:
+			switch data[(p)] {
+			case 32:
+				goto tr189
+			case 44:
+				goto tr271
+			case 46:
+				goto tr271
+			case 61:
+				goto tr75
+			case 92:
+				goto tr190
+			case 95:
+				goto tr271
+			case 124:
+				goto tr191
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr188
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr271
+					}
+				case data[(p)] >= 65:
+					goto tr271
+				}
+			default:
+				goto tr271
+			}
+			goto tr187
+		case 47:
+			switch data[(p)] {
+			case 32:
+				goto tr84
+			case 92:
+				goto tr20
+			case 95:
+				goto tr85
+			case 124:
+				goto tr21
+			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr85
+				}
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr85
+				}
+			default:
+				goto tr85
+			}
+			goto tr17
+		case 48:
+			switch data[(p)] {
+			case 44:
+				goto tr86
+			case 46:
+				goto tr86
+			case 61:
+				goto tr87
+			case 92:
+				goto tr20
+			case 95:
+				goto tr86
+			case 124:
+				goto tr21
+			}
+			switch {
+			case data[(p)] < 65:
+				if 48 <= data[(p)] && data[(p)] <= 57 {
+					goto tr86
+				}
+			case data[(p)] > 93:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto tr86
+				}
+			default:
+				goto tr86
+			}
+			goto tr17
+		case 122:
+			switch data[(p)] {
+			case 32:
+				goto tr274
+			case 61:
+				goto tr17
+			case 92:
+				goto tr275
+			case 124:
 				goto tr276
 			}
-			goto tr273
-		case 114:
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr273
+			}
+			goto tr272
+		case 123:
 			switch data[(p)] {
 			case 32:
 				goto tr279
 			case 61:
-				goto tr29
+				goto tr17
 			case 92:
-				goto tr213
-			case 95:
-				goto tr276
+				goto tr280
 			case 124:
-				goto tr214
+				goto tr281
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr278
+			}
+			goto tr277
+		case 124:
+			switch data[(p)] {
+			case 32:
+				goto tr279
+			case 61:
+				goto tr17
+			case 92:
+				goto tr280
+			case 95:
+				goto tr282
+			case 124:
+				goto tr281
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr211
+					goto tr278
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 90:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr276
+						goto tr282
 					}
 				case data[(p)] >= 65:
-					goto tr276
+					goto tr282
 				}
 			default:
-				goto tr276
+				goto tr282
 			}
-			goto tr210
-		case 115:
+			goto tr277
+		case 125:
 			switch data[(p)] {
 			case 32:
-				goto tr212
+				goto tr279
 			case 44:
-				goto tr280
+				goto tr283
 			case 46:
-				goto tr280
+				goto tr283
 			case 61:
-				goto tr62
+				goto tr284
 			case 92:
-				goto tr213
-			case 95:
 				goto tr280
+			case 95:
+				goto tr283
 			case 124:
-				goto tr214
+				goto tr281
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr211
+					goto tr278
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 93:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr280
+						goto tr283
 					}
 				case data[(p)] >= 65:
-					goto tr280
+					goto tr283
 				}
 			default:
-				goto tr280
+				goto tr283
 			}
-			goto tr210
-		case 39:
-			switch data[(p)] {
-			case 61:
-				goto tr49
-			case 92:
-				goto tr70
-			case 110:
-				goto tr49
-			case 114:
-				goto tr49
-			case 124:
-				goto tr25
-			}
-			goto tr47
-		case 116:
+			goto tr277
+		case 126:
 			switch data[(p)] {
 			case 32:
-				goto tr283
+				goto tr287
 			case 61:
-				goto tr26
+				goto tr17
 			case 92:
-				goto tr284
+				goto tr288
 			case 124:
-				goto tr285
+				goto tr289
 			}
 			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr282
+				goto tr286
 			}
-			goto tr281
-		case 117:
-			switch data[(p)] {
-			case 32:
-				goto tr288
-			case 61:
-				goto tr99
-			case 92:
-				goto tr290
-			case 95:
-				goto tr289
-			case 124:
-				goto tr291
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr287
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr289
-					}
-				case data[(p)] >= 65:
-					goto tr289
-				}
-			default:
-				goto tr289
-			}
-			goto tr286
-		case 118:
+			goto tr285
+		case 127:
 			switch data[(p)] {
 			case 32:
 				goto tr292
 			case 61:
-				goto tr29
+				goto tr17
 			case 92:
-				goto tr200
-			case 95:
-				goto tr289
+				goto tr293
 			case 124:
-				goto tr201
+				goto tr294
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr291
+			}
+			goto tr290
+		case 128:
+			switch data[(p)] {
+			case 32:
+				goto tr292
+			case 61:
+				goto tr17
+			case 92:
+				goto tr293
+			case 95:
+				goto tr295
+			case 124:
+				goto tr294
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr198
+					goto tr291
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 90:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr289
+						goto tr295
 					}
 				case data[(p)] >= 65:
-					goto tr289
+					goto tr295
 				}
 			default:
-				goto tr289
-			}
-			goto tr197
-		case 119:
-			switch data[(p)] {
-			case 32:
-				goto tr199
-			case 44:
-				goto tr293
-			case 46:
-				goto tr293
-			case 61:
-				goto tr62
-			case 92:
-				goto tr200
-			case 95:
-				goto tr293
-			case 124:
-				goto tr201
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr198
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 93:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr293
-					}
-				case data[(p)] >= 65:
-					goto tr293
-				}
-			default:
-				goto tr293
-			}
-			goto tr197
-		case 40:
-			switch data[(p)] {
-			case 32:
-				goto tr71
-			case 92:
-				goto tr16
-			case 95:
-				goto tr72
-			case 124:
-				goto tr17
-			}
-			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr72
-				}
-			case data[(p)] > 90:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr72
-				}
-			default:
-				goto tr72
-			}
-			goto tr15
-		case 41:
-			switch data[(p)] {
-			case 44:
-				goto tr73
-			case 46:
-				goto tr73
-			case 61:
-				goto tr74
-			case 92:
-				goto tr16
-			case 95:
-				goto tr73
-			case 124:
-				goto tr17
-			}
-			switch {
-			case data[(p)] < 65:
-				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr73
-				}
-			case data[(p)] > 93:
-				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr73
-				}
-			default:
-				goto tr73
-			}
-			goto tr15
-		case 120:
-			switch data[(p)] {
-			case 32:
-				goto tr296
-			case 61:
-				goto tr15
-			case 92:
-				goto tr297
-			case 124:
-				goto tr298
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
 				goto tr295
 			}
-			goto tr294
-		case 121:
+			goto tr290
+		case 129:
 			switch data[(p)] {
 			case 32:
-				goto tr301
+				goto tr292
+			case 44:
+				goto tr296
+			case 46:
+				goto tr296
 			case 61:
-				goto tr15
+				goto tr284
 			case 92:
-				goto tr302
-			case 124:
-				goto tr303
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr300
-			}
-			goto tr299
-		case 122:
-			switch data[(p)] {
-			case 32:
-				goto tr301
-			case 61:
-				goto tr15
-			case 92:
-				goto tr302
+				goto tr293
 			case 95:
-				goto tr304
+				goto tr296
 			case 124:
-				goto tr303
+				goto tr294
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr300
+					goto tr291
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr296
+					}
+				case data[(p)] >= 65:
+					goto tr296
+				}
+			default:
+				goto tr296
+			}
+			goto tr290
+		case 49:
+			switch data[(p)] {
+			case 61:
+				goto tr63
+			case 92:
+				goto tr88
+			case 110:
+				goto tr63
+			case 114:
+				goto tr63
+			case 124:
+				goto tr22
+			}
+			goto tr62
+		case 130:
+			switch data[(p)] {
+			case 32:
+				goto tr299
+			case 61:
+				goto tr23
+			case 92:
+				goto tr300
+			case 124:
+				goto tr301
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr298
+			}
+			goto tr297
+		case 131:
+			switch data[(p)] {
+			case 32:
+				goto tr302
+			case 61:
+				goto tr26
+			case 92:
+				goto tr248
+			case 95:
+				goto tr303
+			case 124:
+				goto tr249
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr246
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 90:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr304
+						goto tr303
 					}
 				case data[(p)] >= 65:
-					goto tr304
+					goto tr303
 				}
 			default:
-				goto tr304
+				goto tr303
 			}
-			goto tr299
-		case 123:
+			goto tr245
+		case 132:
 			switch data[(p)] {
 			case 32:
-				goto tr301
-			case 44:
-				goto tr305
-			case 46:
-				goto tr305
+				goto tr304
 			case 61:
-				goto tr306
+				goto tr26
 			case 92:
-				goto tr302
+				goto tr248
 			case 95:
 				goto tr305
 			case 124:
-				goto tr303
+				goto tr249
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr300
+					goto tr246
 				}
 			case data[(p)] > 57:
 				switch {
-				case data[(p)] > 93:
+				case data[(p)] > 90:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
 						goto tr305
 					}
@@ -2501,13 +2746,62 @@ func (e *Event) recoverExtensions(data string) error {
 			default:
 				goto tr305
 			}
-			goto tr299
-		case 124:
+			goto tr245
+		case 133:
+			switch data[(p)] {
+			case 32:
+				goto tr247
+			case 44:
+				goto tr306
+			case 46:
+				goto tr306
+			case 61:
+				goto tr81
+			case 92:
+				goto tr248
+			case 95:
+				goto tr306
+			case 124:
+				goto tr249
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr246
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr306
+					}
+				case data[(p)] >= 65:
+					goto tr306
+				}
+			default:
+				goto tr306
+			}
+			goto tr245
+		case 50:
+			switch data[(p)] {
+			case 61:
+				goto tr64
+			case 92:
+				goto tr89
+			case 110:
+				goto tr64
+			case 114:
+				goto tr64
+			case 124:
+				goto tr22
+			}
+			goto tr62
+		case 134:
 			switch data[(p)] {
 			case 32:
 				goto tr309
 			case 61:
-				goto tr15
+				goto tr23
 			case 92:
 				goto tr310
 			case 124:
@@ -2517,901 +2811,665 @@ func (e *Event) recoverExtensions(data string) error {
 				goto tr308
 			}
 			goto tr307
-		case 125:
-			switch data[(p)] {
-			case 32:
-				goto tr314
-			case 61:
-				goto tr15
-			case 92:
-				goto tr315
-			case 124:
-				goto tr316
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr313
-			}
-			goto tr312
-		case 126:
-			switch data[(p)] {
-			case 32:
-				goto tr314
-			case 61:
-				goto tr15
-			case 92:
-				goto tr315
-			case 95:
-				goto tr317
-			case 124:
-				goto tr316
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr313
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr317
-					}
-				case data[(p)] >= 65:
-					goto tr317
-				}
-			default:
-				goto tr317
-			}
-			goto tr312
-		case 127:
-			switch data[(p)] {
-			case 32:
-				goto tr314
-			case 44:
-				goto tr318
-			case 46:
-				goto tr318
-			case 61:
-				goto tr306
-			case 92:
-				goto tr315
-			case 95:
-				goto tr318
-			case 124:
-				goto tr316
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr313
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 93:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr318
-					}
-				case data[(p)] >= 65:
-					goto tr318
-				}
-			default:
-				goto tr318
-			}
-			goto tr312
-		case 42:
-			switch data[(p)] {
-			case 61:
-				goto tr48
-			case 92:
-				goto tr75
-			case 110:
-				goto tr48
-			case 114:
-				goto tr48
-			case 124:
-				goto tr18
-			}
-			goto tr47
-		case 128:
-			switch data[(p)] {
-			case 32:
-				goto tr321
-			case 61:
-				goto tr19
-			case 92:
-				goto tr322
-			case 124:
-				goto tr323
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr320
-			}
-			goto tr319
-		case 129:
-			switch data[(p)] {
-			case 32:
-				goto tr326
-			case 61:
-				goto tr95
-			case 92:
-				goto tr328
-			case 95:
-				goto tr327
-			case 124:
-				goto tr329
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr325
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr327
-					}
-				case data[(p)] >= 65:
-					goto tr327
-				}
-			default:
-				goto tr327
-			}
-			goto tr324
-		case 130:
-			switch data[(p)] {
-			case 32:
-				goto tr330
-			case 61:
-				goto tr22
-			case 92:
-				goto tr264
-			case 95:
-				goto tr327
-			case 124:
-				goto tr265
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr262
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr327
-					}
-				case data[(p)] >= 65:
-					goto tr327
-				}
-			default:
-				goto tr327
-			}
-			goto tr261
-		case 131:
-			switch data[(p)] {
-			case 32:
-				goto tr263
-			case 44:
-				goto tr331
-			case 46:
-				goto tr331
-			case 61:
-				goto tr68
-			case 92:
-				goto tr264
-			case 95:
-				goto tr331
-			case 124:
-				goto tr265
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr262
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 93:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr331
-					}
-				case data[(p)] >= 65:
-					goto tr331
-				}
-			default:
-				goto tr331
-			}
-			goto tr261
-		case 43:
-			switch data[(p)] {
-			case 61:
-				goto tr49
-			case 92:
-				goto tr76
-			case 110:
-				goto tr49
-			case 114:
-				goto tr49
-			case 124:
-				goto tr18
-			}
-			goto tr47
-		case 132:
-			switch data[(p)] {
-			case 32:
-				goto tr334
-			case 61:
-				goto tr19
-			case 92:
-				goto tr335
-			case 124:
-				goto tr336
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr333
-			}
-			goto tr332
-		case 133:
-			switch data[(p)] {
-			case 32:
-				goto tr339
-			case 61:
-				goto tr95
-			case 92:
-				goto tr341
-			case 95:
-				goto tr340
-			case 124:
-				goto tr342
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr338
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr340
-					}
-				case data[(p)] >= 65:
-					goto tr340
-				}
-			default:
-				goto tr340
-			}
-			goto tr337
-		case 134:
-			switch data[(p)] {
-			case 32:
-				goto tr343
-			case 61:
-				goto tr22
-			case 92:
-				goto tr251
-			case 95:
-				goto tr340
-			case 124:
-				goto tr252
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr249
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr340
-					}
-				case data[(p)] >= 65:
-					goto tr340
-				}
-			default:
-				goto tr340
-			}
-			goto tr248
 		case 135:
 			switch data[(p)] {
 			case 32:
-				goto tr250
-			case 44:
-				goto tr344
-			case 46:
-				goto tr344
+				goto tr312
 			case 61:
-				goto tr68
+				goto tr26
 			case 92:
-				goto tr251
+				goto tr235
 			case 95:
-				goto tr344
+				goto tr313
 			case 124:
-				goto tr252
+				goto tr236
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr249
+					goto tr233
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr313
+					}
+				case data[(p)] >= 65:
+					goto tr313
+				}
+			default:
+				goto tr313
+			}
+			goto tr232
+		case 136:
+			switch data[(p)] {
+			case 32:
+				goto tr314
+			case 61:
+				goto tr26
+			case 92:
+				goto tr235
+			case 95:
+				goto tr315
+			case 124:
+				goto tr236
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr233
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr315
+					}
+				case data[(p)] >= 65:
+					goto tr315
+				}
+			default:
+				goto tr315
+			}
+			goto tr232
+		case 137:
+			switch data[(p)] {
+			case 32:
+				goto tr234
+			case 44:
+				goto tr316
+			case 46:
+				goto tr316
+			case 61:
+				goto tr81
+			case 92:
+				goto tr235
+			case 95:
+				goto tr316
+			case 124:
+				goto tr236
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr233
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 93:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr344
+						goto tr316
 					}
 				case data[(p)] >= 65:
-					goto tr344
+					goto tr316
 				}
 			default:
-				goto tr344
+				goto tr316
 			}
-			goto tr248
-		case 44:
+			goto tr232
+		case 51:
 			switch data[(p)] {
 			case 32:
-				goto tr77
+				goto tr90
 			case 92:
-				goto tr9
+				goto tr11
 			case 95:
-				goto tr78
+				goto tr91
 			case 124:
-				goto tr10
+				goto tr12
 			}
 			switch {
 			case data[(p)] < 65:
 				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr78
+					goto tr91
 				}
 			case data[(p)] > 90:
 				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr78
+					goto tr91
 				}
 			default:
-				goto tr78
+				goto tr91
 			}
 			goto tr8
-		case 45:
+		case 52:
 			switch data[(p)] {
 			case 44:
-				goto tr79
+				goto tr92
 			case 46:
-				goto tr79
+				goto tr92
 			case 61:
-				goto tr80
+				goto tr93
 			case 92:
-				goto tr9
+				goto tr11
 			case 95:
-				goto tr79
+				goto tr92
 			case 124:
-				goto tr10
+				goto tr12
 			}
 			switch {
 			case data[(p)] < 65:
 				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr79
+					goto tr92
 				}
 			case data[(p)] > 93:
 				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr79
+					goto tr92
 				}
 			default:
-				goto tr79
+				goto tr92
 			}
 			goto tr8
-		case 136:
+		case 138:
+			switch data[(p)] {
+			case 32:
+				goto tr319
+			case 61:
+				goto tr8
+			case 92:
+				goto tr320
+			case 124:
+				goto tr321
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr318
+			}
+			goto tr317
+		case 139:
+			switch data[(p)] {
+			case 32:
+				goto tr324
+			case 61:
+				goto tr8
+			case 92:
+				goto tr325
+			case 124:
+				goto tr326
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr323
+			}
+			goto tr322
+		case 140:
+			switch data[(p)] {
+			case 32:
+				goto tr324
+			case 61:
+				goto tr8
+			case 92:
+				goto tr325
+			case 95:
+				goto tr327
+			case 124:
+				goto tr326
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr323
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr327
+					}
+				case data[(p)] >= 65:
+					goto tr327
+				}
+			default:
+				goto tr327
+			}
+			goto tr322
+		case 141:
+			switch data[(p)] {
+			case 32:
+				goto tr324
+			case 44:
+				goto tr328
+			case 46:
+				goto tr328
+			case 61:
+				goto tr329
+			case 92:
+				goto tr325
+			case 95:
+				goto tr328
+			case 124:
+				goto tr326
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr323
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr328
+					}
+				case data[(p)] >= 65:
+					goto tr328
+				}
+			default:
+				goto tr328
+			}
+			goto tr322
+		case 142:
+			switch data[(p)] {
+			case 32:
+				goto tr332
+			case 61:
+				goto tr8
+			case 92:
+				goto tr333
+			case 124:
+				goto tr334
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr331
+			}
+			goto tr330
+		case 143:
+			switch data[(p)] {
+			case 32:
+				goto tr337
+			case 61:
+				goto tr8
+			case 92:
+				goto tr338
+			case 124:
+				goto tr339
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr336
+			}
+			goto tr335
+		case 144:
+			switch data[(p)] {
+			case 32:
+				goto tr337
+			case 61:
+				goto tr8
+			case 92:
+				goto tr338
+			case 95:
+				goto tr340
+			case 124:
+				goto tr339
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr336
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr340
+					}
+				case data[(p)] >= 65:
+					goto tr340
+				}
+			default:
+				goto tr340
+			}
+			goto tr335
+		case 145:
+			switch data[(p)] {
+			case 32:
+				goto tr337
+			case 44:
+				goto tr341
+			case 46:
+				goto tr341
+			case 61:
+				goto tr329
+			case 92:
+				goto tr338
+			case 95:
+				goto tr341
+			case 124:
+				goto tr339
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr336
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr341
+					}
+				case data[(p)] >= 65:
+					goto tr341
+				}
+			default:
+				goto tr341
+			}
+			goto tr335
+		case 53:
+			switch data[(p)] {
+			case 61:
+				goto tr63
+			case 92:
+				goto tr94
+			case 110:
+				goto tr63
+			case 114:
+				goto tr63
+			case 124:
+				goto tr13
+			}
+			goto tr62
+		case 146:
+			switch data[(p)] {
+			case 32:
+				goto tr344
+			case 61:
+				goto tr14
+			case 92:
+				goto tr345
+			case 124:
+				goto tr346
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr343
+			}
+			goto tr342
+		case 147:
 			switch data[(p)] {
 			case 32:
 				goto tr347
 			case 61:
-				goto tr8
+				goto tr17
 			case 92:
+				goto tr293
+			case 95:
 				goto tr348
 			case 124:
-				goto tr349
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr346
-			}
-			goto tr345
-		case 137:
-			switch data[(p)] {
-			case 32:
-				goto tr352
-			case 61:
-				goto tr8
-			case 92:
-				goto tr353
-			case 124:
-				goto tr354
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr351
-			}
-			goto tr350
-		case 138:
-			switch data[(p)] {
-			case 32:
-				goto tr352
-			case 61:
-				goto tr8
-			case 92:
-				goto tr353
-			case 95:
-				goto tr355
-			case 124:
-				goto tr354
+				goto tr294
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr351
+					goto tr291
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 90:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr355
+						goto tr348
 					}
 				case data[(p)] >= 65:
-					goto tr355
+					goto tr348
 				}
 			default:
-				goto tr355
+				goto tr348
 			}
-			goto tr350
-		case 139:
-			switch data[(p)] {
-			case 32:
-				goto tr352
-			case 44:
-				goto tr356
-			case 46:
-				goto tr356
-			case 61:
-				goto tr357
-			case 92:
-				goto tr353
-			case 95:
-				goto tr356
-			case 124:
-				goto tr354
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr351
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 93:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr356
-					}
-				case data[(p)] >= 65:
-					goto tr356
-				}
-			default:
-				goto tr356
-			}
-			goto tr350
-		case 140:
-			switch data[(p)] {
-			case 32:
-				goto tr360
-			case 61:
-				goto tr8
-			case 92:
-				goto tr361
-			case 124:
-				goto tr362
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr359
-			}
-			goto tr358
-		case 141:
-			switch data[(p)] {
-			case 32:
-				goto tr365
-			case 61:
-				goto tr8
-			case 92:
-				goto tr366
-			case 124:
-				goto tr367
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr364
-			}
-			goto tr363
-		case 142:
-			switch data[(p)] {
-			case 32:
-				goto tr365
-			case 61:
-				goto tr8
-			case 92:
-				goto tr366
-			case 95:
-				goto tr368
-			case 124:
-				goto tr367
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr364
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr368
-					}
-				case data[(p)] >= 65:
-					goto tr368
-				}
-			default:
-				goto tr368
-			}
-			goto tr363
-		case 143:
-			switch data[(p)] {
-			case 32:
-				goto tr365
-			case 44:
-				goto tr369
-			case 46:
-				goto tr369
-			case 61:
-				goto tr357
-			case 92:
-				goto tr366
-			case 95:
-				goto tr369
-			case 124:
-				goto tr367
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr364
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 93:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr369
-					}
-				case data[(p)] >= 65:
-					goto tr369
-				}
-			default:
-				goto tr369
-			}
-			goto tr363
-		case 46:
-			switch data[(p)] {
-			case 61:
-				goto tr48
-			case 92:
-				goto tr81
-			case 110:
-				goto tr48
-			case 114:
-				goto tr48
-			case 124:
-				goto tr11
-			}
-			goto tr47
-		case 144:
-			switch data[(p)] {
-			case 32:
-				goto tr372
-			case 61:
-				goto tr12
-			case 92:
-				goto tr373
-			case 124:
-				goto tr374
-			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr371
-			}
-			goto tr370
-		case 145:
-			switch data[(p)] {
-			case 32:
-				goto tr377
-			case 61:
-				goto tr91
-			case 92:
-				goto tr379
-			case 95:
-				goto tr378
-			case 124:
-				goto tr380
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr376
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr378
-					}
-				case data[(p)] >= 65:
-					goto tr378
-				}
-			default:
-				goto tr378
-			}
-			goto tr375
-		case 146:
-			switch data[(p)] {
-			case 32:
-				goto tr381
-			case 61:
-				goto tr15
-			case 92:
-				goto tr315
-			case 95:
-				goto tr378
-			case 124:
-				goto tr316
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr313
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr378
-					}
-				case data[(p)] >= 65:
-					goto tr378
-				}
-			default:
-				goto tr378
-			}
-			goto tr312
-		case 147:
-			switch data[(p)] {
-			case 32:
-				goto tr314
-			case 44:
-				goto tr382
-			case 46:
-				goto tr382
-			case 61:
-				goto tr74
-			case 92:
-				goto tr315
-			case 95:
-				goto tr382
-			case 124:
-				goto tr316
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr313
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 93:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr382
-					}
-				case data[(p)] >= 65:
-					goto tr382
-				}
-			default:
-				goto tr382
-			}
-			goto tr312
-		case 47:
-			switch data[(p)] {
-			case 61:
-				goto tr49
-			case 92:
-				goto tr82
-			case 110:
-				goto tr49
-			case 114:
-				goto tr49
-			case 124:
-				goto tr11
-			}
-			goto tr47
+			goto tr290
 		case 148:
 			switch data[(p)] {
 			case 32:
-				goto tr385
+				goto tr349
 			case 61:
-				goto tr12
+				goto tr17
 			case 92:
-				goto tr386
+				goto tr293
+			case 95:
+				goto tr350
 			case 124:
-				goto tr387
+				goto tr294
 			}
-			if 9 <= data[(p)] && data[(p)] <= 13 {
-				goto tr384
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr291
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr350
+					}
+				case data[(p)] >= 65:
+					goto tr350
+				}
+			default:
+				goto tr350
 			}
-			goto tr383
+			goto tr290
 		case 149:
 			switch data[(p)] {
 			case 32:
-				goto tr390
-			case 61:
-				goto tr91
-			case 92:
-				goto tr392
-			case 95:
-				goto tr391
-			case 124:
-				goto tr393
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr389
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr391
-					}
-				case data[(p)] >= 65:
-					goto tr391
-				}
-			default:
-				goto tr391
-			}
-			goto tr388
-		case 150:
-			switch data[(p)] {
-			case 32:
-				goto tr394
-			case 61:
-				goto tr15
-			case 92:
-				goto tr302
-			case 95:
-				goto tr391
-			case 124:
-				goto tr303
-			}
-			switch {
-			case data[(p)] < 48:
-				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr300
-				}
-			case data[(p)] > 57:
-				switch {
-				case data[(p)] > 90:
-					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr391
-					}
-				case data[(p)] >= 65:
-					goto tr391
-				}
-			default:
-				goto tr391
-			}
-			goto tr299
-		case 151:
-			switch data[(p)] {
-			case 32:
-				goto tr301
+				goto tr292
 			case 44:
-				goto tr395
+				goto tr351
 			case 46:
-				goto tr395
+				goto tr351
 			case 61:
-				goto tr74
+				goto tr87
 			case 92:
-				goto tr302
+				goto tr293
 			case 95:
-				goto tr395
+				goto tr351
 			case 124:
-				goto tr303
+				goto tr294
 			}
 			switch {
 			case data[(p)] < 48:
 				if 9 <= data[(p)] && data[(p)] <= 13 {
-					goto tr300
+					goto tr291
 				}
 			case data[(p)] > 57:
 				switch {
 				case data[(p)] > 93:
 					if 97 <= data[(p)] && data[(p)] <= 122 {
-						goto tr395
+						goto tr351
 					}
 				case data[(p)] >= 65:
-					goto tr395
+					goto tr351
 				}
 			default:
-				goto tr395
+				goto tr351
 			}
-			goto tr299
-		case 48:
-			if data[(p)] == 32 {
-				goto tr84
+			goto tr290
+		case 54:
+			switch data[(p)] {
+			case 61:
+				goto tr64
+			case 92:
+				goto tr95
+			case 110:
+				goto tr64
+			case 114:
+				goto tr64
+			case 124:
+				goto tr13
 			}
-			goto tr83
-		case 49:
+			goto tr62
+		case 150:
 			switch data[(p)] {
 			case 32:
-				goto tr84
+				goto tr354
+			case 61:
+				goto tr14
+			case 92:
+				goto tr355
+			case 124:
+				goto tr356
+			}
+			if 9 <= data[(p)] && data[(p)] <= 13 {
+				goto tr353
+			}
+			goto tr352
+		case 151:
+			switch data[(p)] {
+			case 32:
+				goto tr357
+			case 61:
+				goto tr17
+			case 92:
+				goto tr280
 			case 95:
-				goto tr85
+				goto tr358
+			case 124:
+				goto tr281
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr278
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr358
+					}
+				case data[(p)] >= 65:
+					goto tr358
+				}
+			default:
+				goto tr358
+			}
+			goto tr277
+		case 152:
+			switch data[(p)] {
+			case 32:
+				goto tr359
+			case 61:
+				goto tr17
+			case 92:
+				goto tr280
+			case 95:
+				goto tr360
+			case 124:
+				goto tr281
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr278
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 90:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr360
+					}
+				case data[(p)] >= 65:
+					goto tr360
+				}
+			default:
+				goto tr360
+			}
+			goto tr277
+		case 153:
+			switch data[(p)] {
+			case 32:
+				goto tr279
+			case 44:
+				goto tr361
+			case 46:
+				goto tr361
+			case 61:
+				goto tr87
+			case 92:
+				goto tr280
+			case 95:
+				goto tr361
+			case 124:
+				goto tr281
+			}
+			switch {
+			case data[(p)] < 48:
+				if 9 <= data[(p)] && data[(p)] <= 13 {
+					goto tr278
+				}
+			case data[(p)] > 57:
+				switch {
+				case data[(p)] > 93:
+					if 97 <= data[(p)] && data[(p)] <= 122 {
+						goto tr361
+					}
+				case data[(p)] >= 65:
+					goto tr361
+				}
+			default:
+				goto tr361
+			}
+			goto tr277
+		case 55:
+			if data[(p)] == 32 {
+				goto tr97
+			}
+			goto tr96
+		case 56:
+			switch data[(p)] {
+			case 32:
+				goto tr97
+			case 95:
+				goto tr98
 			}
 			switch {
 			case data[(p)] < 65:
 				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr85
+					goto tr98
 				}
 			case data[(p)] > 90:
 				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr85
+					goto tr98
 				}
 			default:
-				goto tr85
+				goto tr98
 			}
-			goto tr83
-		case 50:
+			goto tr96
+		case 57:
 			switch data[(p)] {
 			case 32:
-				goto tr84
+				goto tr97
 			case 44:
-				goto tr85
+				goto tr98
 			case 46:
-				goto tr85
+				goto tr98
 			case 61:
-				goto tr86
+				goto tr99
 			case 93:
-				goto tr85
+				goto tr98
 			case 95:
-				goto tr85
+				goto tr98
 			}
 			switch {
 			case data[(p)] < 65:
 				if 48 <= data[(p)] && data[(p)] <= 57 {
-					goto tr85
+					goto tr98
 				}
 			case data[(p)] > 91:
 				if 97 <= data[(p)] && data[(p)] <= 122 {
-					goto tr85
+					goto tr98
 				}
 			default:
-				goto tr85
+				goto tr98
 			}
-			goto tr83
-		case 152:
+			goto tr96
+		case 154:
 			if data[(p)] == 32 {
-				goto tr84
+				goto tr97
 			}
-			goto tr83
+			goto tr96
 		}
 
 	tr1:
 		cs = 0
 		goto _again
-	tr47:
+	tr62:
 		cs = 0
-		goto f16
+		goto f8
 	tr0:
 		cs = 2
 		goto _again
@@ -3430,1170 +3488,1068 @@ func (e *Event) recoverExtensions(data string) error {
 	tr5:
 		cs = 6
 		goto f0
+	tr7:
+		cs = 7
+		goto f1
 	tr8:
-		cs = 7
-		goto _again
-	tr87:
-		cs = 7
-		goto f0
-	tr12:
-		cs = 7
-		goto f4
-	tr9:
 		cs = 8
-		goto f2
-	tr13:
+		goto _again
+	tr14:
 		cs = 8
 		goto f5
-	tr89:
-		cs = 8
-		goto f20
 	tr11:
 		cs = 9
-		goto _again
-	tr15:
-		cs = 10
-		goto _again
-	tr91:
-		cs = 10
-		goto f0
-	tr19:
-		cs = 10
 		goto f4
+	tr15:
+		cs = 9
+		goto f6
+	tr13:
+		cs = 10
+		goto _again
+	tr12:
+		cs = 11
+		goto _again
 	tr16:
 		cs = 11
-		goto f2
-	tr20:
-		cs = 11
 		goto f5
-	tr93:
-		cs = 11
-		goto f20
-	tr18:
+	tr17:
 		cs = 12
 		goto _again
-	tr22:
-		cs = 13
-		goto _again
-	tr95:
-		cs = 13
-		goto f0
-	tr26:
+	tr23:
+		cs = 12
+		goto f5
+	tr20:
 		cs = 13
 		goto f4
-	tr23:
+	tr24:
+		cs = 13
+		goto f6
+	tr22:
 		cs = 14
-		goto f2
-	tr27:
-		cs = 14
-		goto f5
-	tr97:
-		cs = 14
-		goto f20
-	tr25:
+		goto _again
+	tr21:
 		cs = 15
 		goto _again
-	tr29:
+	tr25:
+		cs = 15
+		goto f5
+	tr26:
 		cs = 16
 		goto _again
-	tr99:
-		cs = 16
-		goto f0
-	tr33:
-		cs = 16
-		goto f4
-	tr30:
-		cs = 17
-		goto f2
-	tr34:
-		cs = 17
-		goto f5
-	tr101:
-		cs = 17
-		goto f20
 	tr32:
+		cs = 16
+		goto f5
+	tr29:
+		cs = 17
+		goto f4
+	tr33:
+		cs = 17
+		goto f6
+	tr31:
 		cs = 18
 		goto _again
-	tr36:
+	tr30:
 		cs = 19
 		goto _again
-	tr103:
+	tr34:
 		cs = 19
-		goto f0
-	tr40:
-		cs = 19
-		goto f4
-	tr37:
+		goto f5
+	tr35:
 		cs = 20
-		goto f2
+		goto _again
 	tr41:
 		cs = 20
 		goto f5
-	tr105:
-		cs = 20
-		goto f20
-	tr39:
+	tr38:
 		cs = 21
-		goto _again
-	tr43:
+		goto f4
+	tr42:
+		cs = 21
+		goto f6
+	tr40:
 		cs = 22
 		goto _again
-	tr45:
+	tr39:
 		cs = 23
 		goto _again
+	tr43:
+		cs = 23
+		goto f5
 	tr44:
-		cs = 23
-		goto f0
-	tr128:
 		cs = 24
-		goto f2
-	tr134:
-		cs = 24
-		goto f5
-	tr124:
-		cs = 24
-		goto f30
-	tr117:
-		cs = 25
-		goto f2
-	tr138:
-		cs = 25
-		goto f5
-	tr113:
-		cs = 25
-		goto f30
+		goto _again
 	tr50:
+		cs = 24
+		goto f5
+	tr47:
+		cs = 25
+		goto f4
+	tr51:
+		cs = 25
+		goto f6
+	tr49:
 		cs = 26
 		goto _again
-	tr107:
-		cs = 26
-		goto f0
+	tr48:
+		cs = 27
+		goto _again
 	tr52:
 		cs = 27
+		goto f5
+	tr58:
+		cs = 28
 		goto _again
-	tr108:
-		cs = 27
-		goto f0
 	tr53:
 		cs = 28
-		goto _again
-	tr104:
-		cs = 28
-		goto f0
-	tr55:
-		cs = 29
-		goto _again
-	tr54:
-		cs = 29
-		goto f0
-	tr160:
-		cs = 30
 		goto f2
-	tr167:
-		cs = 30
-		goto f5
-	tr226:
-		cs = 30
-		goto f20
-	tr155:
-		cs = 30
-		goto f36
-	tr147:
-		cs = 31
-		goto f2
-	tr181:
-		cs = 31
-		goto f5
-	tr239:
-		cs = 31
-		goto f20
-	tr142:
-		cs = 31
-		goto f36
-	tr59:
-		cs = 32
-		goto _again
-	tr100:
-		cs = 32
-		goto f0
-	tr61:
-		cs = 33
-		goto _again
 	tr60:
+		cs = 29
+		goto _again
+	tr59:
+		cs = 29
+		goto f0
+	tr56:
+		cs = 29
+		goto f3
+	tr118:
+		cs = 30
+		goto f4
+	tr124:
+		cs = 30
+		goto f6
+	tr114:
+		cs = 30
+		goto f14
+	tr107:
+		cs = 31
+		goto f4
+	tr128:
+		cs = 31
+		goto f6
+	tr103:
+		cs = 31
+		goto f14
+	tr54:
+		cs = 32
+		goto _again
+	tr57:
 		cs = 33
-		goto f0
-	tr213:
-		cs = 34
-		goto f2
-	tr220:
-		cs = 34
-		goto f5
-	tr277:
-		cs = 34
-		goto f20
-	tr208:
-		cs = 34
-		goto f36
-	tr200:
-		cs = 35
-		goto f2
-	tr233:
-		cs = 35
-		goto f5
-	tr290:
-		cs = 35
-		goto f20
-	tr195:
-		cs = 35
-		goto f36
+		goto _again
 	tr65:
-		cs = 36
+		cs = 34
 		goto _again
-	tr96:
-		cs = 36
-		goto f0
-	tr67:
-		cs = 37
-		goto _again
+	tr55:
+		cs = 34
+		goto f3
 	tr66:
+		cs = 35
+		goto _again
+	tr45:
+		cs = 35
+		goto f2
+	tr68:
+		cs = 36
+		goto _again
+	tr67:
+		cs = 36
+		goto f0
+	tr46:
+		cs = 36
+		goto f3
+	tr150:
 		cs = 37
-		goto f0
-	tr264:
+		goto f4
+	tr157:
+		cs = 37
+		goto f6
+	tr145:
+		cs = 37
+		goto f20
+	tr137:
 		cs = 38
-		goto f2
-	tr271:
+		goto f4
+	tr171:
 		cs = 38
-		goto f5
-	tr328:
+		goto f6
+	tr132:
 		cs = 38
 		goto f20
-	tr259:
-		cs = 38
-		goto f36
-	tr251:
-		cs = 39
-		goto f2
-	tr284:
-		cs = 39
-		goto f5
-	tr341:
-		cs = 39
-		goto f20
-	tr246:
-		cs = 39
-		goto f36
-	tr71:
-		cs = 40
-		goto _again
-	tr92:
-		cs = 40
-		goto f0
-	tr73:
-		cs = 41
-		goto _again
 	tr72:
+		cs = 39
+		goto _again
+	tr36:
+		cs = 39
+		goto f2
+	tr74:
+		cs = 40
+		goto _again
+	tr73:
+		cs = 40
+		goto f0
+	tr37:
+		cs = 40
+		goto f3
+	tr203:
 		cs = 41
-		goto f0
-	tr315:
+		goto f4
+	tr210:
+		cs = 41
+		goto f6
+	tr198:
+		cs = 41
+		goto f20
+	tr190:
 		cs = 42
-		goto f2
-	tr322:
+		goto f4
+	tr220:
 		cs = 42
-		goto f5
-	tr379:
+		goto f6
+	tr185:
 		cs = 42
 		goto f20
-	tr310:
-		cs = 42
-		goto f36
-	tr302:
-		cs = 43
-		goto f2
-	tr335:
-		cs = 43
-		goto f5
-	tr392:
-		cs = 43
-		goto f20
-	tr297:
-		cs = 43
-		goto f36
-	tr77:
-		cs = 44
-		goto _again
-	tr88:
-		cs = 44
-		goto f0
-	tr79:
-		cs = 45
-		goto _again
 	tr78:
-		cs = 45
+		cs = 43
+		goto _again
+	tr27:
+		cs = 43
+		goto f2
+	tr80:
+		cs = 44
+		goto _again
+	tr79:
+		cs = 44
 		goto f0
-	tr366:
+	tr28:
+		cs = 44
+		goto f3
+	tr248:
+		cs = 45
+		goto f4
+	tr255:
+		cs = 45
+		goto f6
+	tr243:
+		cs = 45
+		goto f20
+	tr235:
 		cs = 46
-		goto f2
-	tr373:
+		goto f4
+	tr265:
 		cs = 46
-		goto f5
-	tr361:
+		goto f6
+	tr230:
 		cs = 46
-		goto f36
-	tr353:
+		goto f20
+	tr84:
+		cs = 47
+		goto _again
+	tr18:
 		cs = 47
 		goto f2
-	tr386:
-		cs = 47
-		goto f5
-	tr348:
-		cs = 47
-		goto f36
-	tr83:
+	tr86:
 		cs = 48
 		goto _again
-	tr84:
-		cs = 49
-		goto f0
 	tr85:
+		cs = 48
+		goto f0
+	tr19:
+		cs = 48
+		goto f3
+	tr293:
+		cs = 49
+		goto f4
+	tr300:
+		cs = 49
+		goto f6
+	tr288:
+		cs = 49
+		goto f20
+	tr280:
 		cs = 50
-		goto _again
-	tr7:
+		goto f4
+	tr310:
+		cs = 50
+		goto f6
+	tr275:
+		cs = 50
+		goto f20
+	tr90:
 		cs = 51
-		goto f1
+		goto _again
+	tr9:
+		cs = 51
+		goto f2
+	tr92:
+		cs = 52
+		goto _again
+	tr91:
+		cs = 52
+		goto f0
 	tr10:
 		cs = 52
 		goto f3
-	tr14:
-		cs = 52
+	tr338:
+		cs = 53
+		goto f4
+	tr345:
+		cs = 53
 		goto f6
-	tr90:
-		cs = 52
-		goto f21
-	tr17:
+	tr333:
 		cs = 53
-		goto f7
-	tr21:
-		cs = 53
-		goto f8
-	tr94:
-		cs = 53
-		goto f22
-	tr24:
+		goto f20
+	tr325:
 		cs = 54
-		goto f9
-	tr28:
+		goto f4
+	tr355:
 		cs = 54
-		goto f10
+		goto f6
+	tr320:
+		cs = 54
+		goto f20
+	tr96:
+		cs = 55
+		goto _again
+	tr97:
+		cs = 56
+		goto f0
 	tr98:
-		cs = 54
-		goto f23
-	tr31:
-		cs = 55
-		goto f11
-	tr35:
-		cs = 55
-		goto f12
-	tr102:
-		cs = 55
-		goto f24
-	tr38:
-		cs = 56
-		goto f13
-	tr42:
-		cs = 56
-		goto f14
-	tr106:
-		cs = 56
-		goto f25
-	tr46:
 		cs = 57
-		goto f15
-	tr115:
-		cs = 58
 		goto _again
-	tr136:
+	tr61:
 		cs = 58
-		goto f4
-	tr114:
-		cs = 58
-		goto f17
-	tr110:
-		cs = 58
-		goto f28
-	tr111:
-		cs = 58
-		goto f29
-	tr135:
-		cs = 58
-		goto f35
-	tr116:
+		goto f7
+	tr105:
 		cs = 59
 		goto _again
-	tr137:
-		cs = 59
-		goto f4
-	tr112:
-		cs = 59
-		goto f29
-	tr119:
-		cs = 60
-		goto f17
-	tr118:
-		cs = 60
-		goto f32
-	tr120:
-		cs = 61
-		goto f15
 	tr126:
-		cs = 62
-		goto _again
-	tr132:
-		cs = 62
-		goto f4
+		cs = 59
+		goto f5
+	tr104:
+		cs = 59
+		goto f9
+	tr100:
+		cs = 59
+		goto f12
+	tr101:
+		cs = 59
+		goto f13
 	tr125:
-		cs = 62
-		goto f17
-	tr121:
-		cs = 62
-		goto f28
-	tr122:
-		cs = 62
-		goto f29
-	tr131:
-		cs = 62
-		goto f35
+		cs = 59
+		goto f19
+	tr106:
+		cs = 60
+		goto _again
 	tr127:
+		cs = 60
+		goto f5
+	tr102:
+		cs = 60
+		goto f13
+	tr109:
+		cs = 61
+		goto f9
+	tr108:
+		cs = 61
+		goto f16
+	tr110:
+		cs = 62
+		goto f7
+	tr116:
 		cs = 63
 		goto _again
-	tr133:
+	tr122:
 		cs = 63
-		goto f4
+		goto f5
+	tr115:
+		cs = 63
+		goto f9
+	tr111:
+		cs = 63
+		goto f12
+	tr112:
+		cs = 63
+		goto f13
+	tr121:
+		cs = 63
+		goto f19
+	tr117:
+		cs = 64
+		goto _again
 	tr123:
-		cs = 63
-		goto f29
-	tr130:
 		cs = 64
-		goto f17
-	tr129:
+		goto f5
+	tr113:
 		cs = 64
-		goto f33
-	tr48:
+		goto f13
+	tr120:
+		cs = 65
+		goto f9
+	tr119:
 		cs = 65
 		goto f17
-	tr49:
+	tr63:
 		cs = 66
-		goto f17
-	tr51:
+		goto f9
+	tr64:
 		cs = 67
-		goto f18
-	tr109:
-		cs = 67
-		goto f26
-	tr56:
+		goto f9
+	tr69:
 		cs = 68
-		goto f15
-	tr145:
+		goto f7
+	tr135:
 		cs = 69
 		goto _again
-	tr236:
+	tr169:
 		cs = 69
-		goto f0
-	tr179:
+		goto f5
+	tr134:
 		cs = 69
-		goto f4
-	tr144:
+		goto f9
+	tr129:
 		cs = 69
-		goto f17
-	tr139:
+		goto f12
+	tr130:
 		cs = 69
-		goto f28
+		goto f13
+	tr168:
+		cs = 69
+		goto f19
+	tr136:
+		cs = 70
+		goto _again
+	tr170:
+		cs = 70
+		goto f5
+	tr131:
+		cs = 70
+		goto f13
 	tr140:
-		cs = 69
-		goto f29
-	tr235:
-		cs = 69
-		goto f33
-	tr178:
-		cs = 69
-		goto f35
-	tr146:
-		cs = 70
-		goto _again
-	tr180:
-		cs = 70
-		goto f4
+		cs = 71
+		goto f9
+	tr139:
+		cs = 71
+		goto f16
 	tr141:
-		cs = 70
-		goto f29
-	tr150:
-		cs = 71
-		goto f17
-	tr149:
-		cs = 71
-		goto f32
-	tr151:
 		cs = 72
-		goto f15
-	tr158:
+		goto f7
+	tr148:
 		cs = 73
 		goto _again
-	tr223:
+	tr155:
 		cs = 73
-		goto f0
-	tr165:
+		goto f5
+	tr147:
 		cs = 73
-		goto f4
-	tr157:
+		goto f9
+	tr142:
 		cs = 73
-		goto f17
-	tr152:
+		goto f12
+	tr143:
 		cs = 73
-		goto f28
-	tr153:
-		cs = 73
-		goto f29
-	tr222:
-		cs = 73
-		goto f33
-	tr164:
-		cs = 73
-		goto f35
-	tr159:
-		cs = 74
-		goto _again
-	tr166:
-		cs = 74
-		goto f4
+		goto f13
 	tr154:
+		cs = 73
+		goto f19
+	tr149:
 		cs = 74
-		goto f29
-	tr163:
+		goto _again
+	tr156:
+		cs = 74
+		goto f5
+	tr144:
+		cs = 74
+		goto f13
+	tr153:
 		cs = 75
+		goto f9
+	tr152:
+		cs = 75
+		goto f17
+	tr70:
+		cs = 76
+		goto f9
+	tr151:
+		cs = 77
+		goto f9
+	tr146:
+		cs = 77
+		goto f12
+	tr158:
+		cs = 77
+		goto f19
+	tr164:
+		cs = 78
+		goto _again
+	tr159:
+		cs = 78
+		goto f2
+	tr166:
+		cs = 79
+		goto f9
+	tr165:
+		cs = 79
 		goto f17
 	tr162:
-		cs = 75
-		goto f33
-	tr57:
-		cs = 76
-		goto f17
-	tr156:
-		cs = 77
-		goto f37
+		cs = 79
+		goto f21
+	tr160:
+		cs = 80
+		goto f9
+	tr163:
+		cs = 81
+		goto f9
+	tr167:
+		cs = 82
+		goto f9
 	tr161:
-		cs = 77
-		goto f38
-	tr168:
-		cs = 77
-		goto f39
-	tr227:
-		cs = 77
-		goto f45
-	tr169:
-		cs = 78
+		cs = 82
+		goto f21
+	tr71:
+		cs = 83
+		goto f9
+	tr138:
+		cs = 84
+		goto f9
+	tr133:
+		cs = 84
+		goto f12
+	tr172:
+		cs = 84
+		goto f19
+	tr178:
+		cs = 85
 		goto _again
 	tr173:
-		cs = 78
-		goto f40
+		cs = 85
+		goto f2
+	tr180:
+		cs = 86
+		goto f9
+	tr179:
+		cs = 86
+		goto f17
 	tr176:
-		cs = 78
-		goto f41
+		cs = 86
+		goto f21
 	tr174:
-		cs = 79
-		goto f17
-	tr172:
-		cs = 79
-		goto f33
-	tr175:
-		cs = 80
-		goto f17
-	tr170:
-		cs = 80
-		goto f33
+		cs = 87
+		goto f9
 	tr177:
-		cs = 81
-		goto f17
-	tr171:
-		cs = 81
-		goto f33
-	tr58:
-		cs = 82
-		goto f17
-	tr143:
-		cs = 83
-		goto f37
-	tr148:
-		cs = 83
-		goto f38
-	tr182:
-		cs = 83
-		goto f39
-	tr240:
-		cs = 83
-		goto f45
-	tr183:
-		cs = 84
-		goto _again
-	tr187:
-		cs = 84
-		goto f40
-	tr190:
-		cs = 84
-		goto f41
-	tr188:
-		cs = 85
-		goto f17
-	tr186:
-		cs = 85
-		goto f33
-	tr189:
-		cs = 86
-		goto f17
-	tr184:
-		cs = 86
-		goto f33
-	tr191:
-		cs = 87
-		goto f17
-	tr185:
-		cs = 87
-		goto f33
-	tr62:
 		cs = 88
-		goto f15
-	tr198:
+		goto f9
+	tr181:
 		cs = 89
-		goto _again
-	tr287:
+		goto f9
+	tr175:
 		cs = 89
-		goto f0
-	tr231:
-		cs = 89
-		goto f4
-	tr197:
-		cs = 89
-		goto f17
-	tr192:
-		cs = 89
-		goto f28
-	tr193:
-		cs = 89
-		goto f29
-	tr286:
-		cs = 89
-		goto f33
-	tr230:
-		cs = 89
-		goto f35
-	tr199:
+		goto f21
+	tr75:
 		cs = 90
-		goto _again
-	tr232:
-		cs = 90
-		goto f4
-	tr194:
-		cs = 90
-		goto f29
-	tr203:
+		goto f7
+	tr188:
 		cs = 91
-		goto f17
-	tr202:
-		cs = 91
-		goto f32
-	tr204:
-		cs = 92
-		goto f15
-	tr211:
-		cs = 93
 		goto _again
-	tr274:
-		cs = 93
-		goto f0
 	tr218:
-		cs = 93
-		goto f4
-	tr210:
-		cs = 93
-		goto f17
-	tr205:
-		cs = 93
-		goto f28
-	tr206:
-		cs = 93
-		goto f29
-	tr273:
-		cs = 93
-		goto f33
+		cs = 91
+		goto f5
+	tr187:
+		cs = 91
+		goto f9
+	tr182:
+		cs = 91
+		goto f12
+	tr183:
+		cs = 91
+		goto f13
 	tr217:
-		cs = 93
-		goto f35
-	tr212:
-		cs = 94
+		cs = 91
+		goto f19
+	tr189:
+		cs = 92
 		goto _again
 	tr219:
+		cs = 92
+		goto f5
+	tr184:
+		cs = 92
+		goto f13
+	tr193:
+		cs = 93
+		goto f9
+	tr192:
+		cs = 93
+		goto f16
+	tr194:
 		cs = 94
-		goto f4
-	tr207:
-		cs = 94
-		goto f29
-	tr216:
-		cs = 95
-		goto f17
-	tr215:
-		cs = 95
-		goto f33
-	tr63:
-		cs = 96
-		goto f17
-	tr209:
-		cs = 97
-		goto f42
-	tr214:
-		cs = 97
-		goto f43
-	tr221:
-		cs = 97
-		goto f44
-	tr278:
-		cs = 97
-		goto f49
-	tr228:
-		cs = 98
-		goto _again
-	tr224:
-		cs = 98
-		goto f0
-	tr229:
-		cs = 99
-		goto f17
-	tr225:
-		cs = 99
-		goto f33
-	tr64:
-		cs = 100
-		goto f17
-	tr196:
-		cs = 101
-		goto f42
+		goto f7
 	tr201:
-		cs = 101
-		goto f43
-	tr234:
-		cs = 101
-		goto f44
-	tr291:
-		cs = 101
-		goto f49
-	tr241:
-		cs = 102
+		cs = 95
 		goto _again
-	tr237:
-		cs = 102
-		goto f0
-	tr242:
-		cs = 103
-		goto f17
-	tr238:
-		cs = 103
-		goto f33
-	tr68:
-		cs = 104
-		goto f15
-	tr249:
-		cs = 105
+	tr208:
+		cs = 95
+		goto f5
+	tr200:
+		cs = 95
+		goto f9
+	tr195:
+		cs = 95
+		goto f12
+	tr196:
+		cs = 95
+		goto f13
+	tr207:
+		cs = 95
+		goto f19
+	tr202:
+		cs = 96
 		goto _again
-	tr338:
-		cs = 105
-		goto f0
-	tr282:
-		cs = 105
-		goto f4
-	tr248:
-		cs = 105
+	tr209:
+		cs = 96
+		goto f5
+	tr197:
+		cs = 96
+		goto f13
+	tr206:
+		cs = 97
+		goto f9
+	tr205:
+		cs = 97
 		goto f17
-	tr243:
-		cs = 105
-		goto f28
-	tr244:
-		cs = 105
-		goto f29
-	tr337:
-		cs = 105
-		goto f33
-	tr281:
-		cs = 105
-		goto f35
-	tr250:
-		cs = 106
-		goto _again
-	tr283:
-		cs = 106
-		goto f4
-	tr245:
-		cs = 106
-		goto f29
-	tr254:
-		cs = 107
-		goto f17
-	tr253:
-		cs = 107
-		goto f32
-	tr255:
-		cs = 108
-		goto f15
-	tr262:
-		cs = 109
-		goto _again
-	tr325:
-		cs = 109
-		goto f0
-	tr269:
-		cs = 109
-		goto f4
-	tr261:
-		cs = 109
-		goto f17
-	tr256:
-		cs = 109
-		goto f28
-	tr257:
-		cs = 109
-		goto f29
-	tr324:
-		cs = 109
-		goto f33
-	tr268:
-		cs = 109
-		goto f35
-	tr263:
-		cs = 110
-		goto _again
-	tr270:
-		cs = 110
-		goto f4
-	tr258:
-		cs = 110
-		goto f29
-	tr267:
-		cs = 111
-		goto f17
-	tr266:
-		cs = 111
-		goto f33
-	tr69:
-		cs = 112
-		goto f17
-	tr260:
-		cs = 113
-		goto f46
-	tr265:
-		cs = 113
-		goto f47
-	tr272:
-		cs = 113
-		goto f48
-	tr329:
-		cs = 113
-		goto f53
-	tr279:
-		cs = 114
-		goto _again
-	tr275:
-		cs = 114
-		goto f0
-	tr280:
-		cs = 115
-		goto f17
-	tr276:
-		cs = 115
-		goto f33
-	tr70:
-		cs = 116
-		goto f17
-	tr247:
-		cs = 117
-		goto f46
-	tr252:
-		cs = 117
-		goto f47
-	tr285:
-		cs = 117
-		goto f48
-	tr342:
-		cs = 117
-		goto f53
-	tr292:
-		cs = 118
-		goto _again
-	tr288:
-		cs = 118
-		goto f0
-	tr293:
-		cs = 119
-		goto f17
-	tr289:
-		cs = 119
-		goto f33
-	tr74:
-		cs = 120
-		goto f15
-	tr300:
-		cs = 121
-		goto _again
-	tr389:
-		cs = 121
-		goto f0
-	tr333:
-		cs = 121
-		goto f4
-	tr299:
-		cs = 121
-		goto f17
-	tr294:
-		cs = 121
-		goto f28
-	tr295:
-		cs = 121
-		goto f29
-	tr388:
-		cs = 121
-		goto f33
-	tr332:
-		cs = 121
-		goto f35
-	tr301:
-		cs = 122
-		goto _again
-	tr334:
-		cs = 122
-		goto f4
-	tr296:
-		cs = 122
-		goto f29
-	tr305:
-		cs = 123
-		goto f17
-	tr304:
-		cs = 123
-		goto f32
-	tr306:
-		cs = 124
-		goto f15
-	tr313:
-		cs = 125
-		goto _again
-	tr376:
-		cs = 125
-		goto f0
-	tr320:
-		cs = 125
-		goto f4
-	tr312:
-		cs = 125
-		goto f17
-	tr307:
-		cs = 125
-		goto f28
-	tr308:
-		cs = 125
-		goto f29
-	tr375:
-		cs = 125
-		goto f33
-	tr319:
-		cs = 125
-		goto f35
-	tr314:
-		cs = 126
-		goto _again
-	tr321:
-		cs = 126
-		goto f4
-	tr309:
-		cs = 126
-		goto f29
-	tr318:
-		cs = 127
-		goto f17
-	tr317:
-		cs = 127
-		goto f33
-	tr75:
-		cs = 128
-		goto f17
-	tr311:
-		cs = 129
-		goto f50
-	tr316:
-		cs = 129
-		goto f51
-	tr323:
-		cs = 129
-		goto f52
-	tr380:
-		cs = 129
-		goto f57
-	tr330:
-		cs = 130
-		goto _again
-	tr326:
-		cs = 130
-		goto f0
-	tr331:
-		cs = 131
-		goto f17
-	tr327:
-		cs = 131
-		goto f33
 	tr76:
-		cs = 132
+		cs = 98
+		goto f9
+	tr204:
+		cs = 99
+		goto f9
+	tr199:
+		cs = 99
+		goto f12
+	tr211:
+		cs = 99
+		goto f19
+	tr214:
+		cs = 100
+		goto _again
+	tr212:
+		cs = 100
+		goto f2
+	tr216:
+		cs = 101
+		goto f9
+	tr215:
+		cs = 101
 		goto f17
+	tr213:
+		cs = 101
+		goto f21
+	tr77:
+		cs = 102
+		goto f9
+	tr191:
+		cs = 103
+		goto f9
+	tr186:
+		cs = 103
+		goto f12
+	tr221:
+		cs = 103
+		goto f19
+	tr224:
+		cs = 104
+		goto _again
+	tr222:
+		cs = 104
+		goto f2
+	tr226:
+		cs = 105
+		goto f9
+	tr225:
+		cs = 105
+		goto f17
+	tr223:
+		cs = 105
+		goto f21
+	tr81:
+		cs = 106
+		goto f7
+	tr233:
+		cs = 107
+		goto _again
+	tr263:
+		cs = 107
+		goto f5
+	tr232:
+		cs = 107
+		goto f9
+	tr227:
+		cs = 107
+		goto f12
+	tr228:
+		cs = 107
+		goto f13
+	tr262:
+		cs = 107
+		goto f19
+	tr234:
+		cs = 108
+		goto _again
+	tr264:
+		cs = 108
+		goto f5
+	tr229:
+		cs = 108
+		goto f13
+	tr238:
+		cs = 109
+		goto f9
+	tr237:
+		cs = 109
+		goto f16
+	tr239:
+		cs = 110
+		goto f7
+	tr246:
+		cs = 111
+		goto _again
+	tr253:
+		cs = 111
+		goto f5
+	tr245:
+		cs = 111
+		goto f9
+	tr240:
+		cs = 111
+		goto f12
+	tr241:
+		cs = 111
+		goto f13
+	tr252:
+		cs = 111
+		goto f19
+	tr247:
+		cs = 112
+		goto _again
+	tr254:
+		cs = 112
+		goto f5
+	tr242:
+		cs = 112
+		goto f13
+	tr251:
+		cs = 113
+		goto f9
+	tr250:
+		cs = 113
+		goto f17
+	tr82:
+		cs = 114
+		goto f9
+	tr249:
+		cs = 115
+		goto f9
+	tr244:
+		cs = 115
+		goto f12
+	tr256:
+		cs = 115
+		goto f19
+	tr259:
+		cs = 116
+		goto _again
+	tr257:
+		cs = 116
+		goto f2
+	tr261:
+		cs = 117
+		goto f9
+	tr260:
+		cs = 117
+		goto f17
+	tr258:
+		cs = 117
+		goto f21
+	tr83:
+		cs = 118
+		goto f9
+	tr236:
+		cs = 119
+		goto f9
+	tr231:
+		cs = 119
+		goto f12
+	tr266:
+		cs = 119
+		goto f19
+	tr269:
+		cs = 120
+		goto _again
+	tr267:
+		cs = 120
+		goto f2
+	tr271:
+		cs = 121
+		goto f9
+	tr270:
+		cs = 121
+		goto f17
+	tr268:
+		cs = 121
+		goto f21
+	tr87:
+		cs = 122
+		goto f7
+	tr278:
+		cs = 123
+		goto _again
+	tr308:
+		cs = 123
+		goto f5
+	tr277:
+		cs = 123
+		goto f9
+	tr272:
+		cs = 123
+		goto f12
+	tr273:
+		cs = 123
+		goto f13
+	tr307:
+		cs = 123
+		goto f19
+	tr279:
+		cs = 124
+		goto _again
+	tr309:
+		cs = 124
+		goto f5
+	tr274:
+		cs = 124
+		goto f13
+	tr283:
+		cs = 125
+		goto f9
+	tr282:
+		cs = 125
+		goto f16
+	tr284:
+		cs = 126
+		goto f7
+	tr291:
+		cs = 127
+		goto _again
 	tr298:
+		cs = 127
+		goto f5
+	tr290:
+		cs = 127
+		goto f9
+	tr285:
+		cs = 127
+		goto f12
+	tr286:
+		cs = 127
+		goto f13
+	tr297:
+		cs = 127
+		goto f19
+	tr292:
+		cs = 128
+		goto _again
+	tr299:
+		cs = 128
+		goto f5
+	tr287:
+		cs = 128
+		goto f13
+	tr296:
+		cs = 129
+		goto f9
+	tr295:
+		cs = 129
+		goto f17
+	tr88:
+		cs = 130
+		goto f9
+	tr294:
+		cs = 131
+		goto f9
+	tr289:
+		cs = 131
+		goto f12
+	tr301:
+		cs = 131
+		goto f19
+	tr304:
+		cs = 132
+		goto _again
+	tr302:
+		cs = 132
+		goto f2
+	tr306:
 		cs = 133
-		goto f50
+		goto f9
+	tr305:
+		cs = 133
+		goto f17
 	tr303:
 		cs = 133
-		goto f51
-	tr336:
-		cs = 133
-		goto f52
-	tr393:
-		cs = 133
-		goto f57
-	tr343:
+		goto f21
+	tr89:
 		cs = 134
-		goto _again
-	tr339:
-		cs = 134
-		goto f0
-	tr344:
+		goto f9
+	tr281:
 		cs = 135
-		goto f17
-	tr340:
+		goto f9
+	tr276:
 		cs = 135
-		goto f33
-	tr80:
+		goto f12
+	tr311:
+		cs = 135
+		goto f19
+	tr314:
 		cs = 136
-		goto f15
-	tr351:
-		cs = 137
 		goto _again
-	tr384:
+	tr312:
+		cs = 136
+		goto f2
+	tr316:
 		cs = 137
-		goto f4
-	tr350:
+		goto f9
+	tr315:
 		cs = 137
 		goto f17
-	tr345:
+	tr313:
 		cs = 137
-		goto f28
-	tr346:
-		cs = 137
-		goto f29
-	tr383:
-		cs = 137
-		goto f35
+		goto f21
+	tr93:
+		cs = 138
+		goto f7
+	tr323:
+		cs = 139
+		goto _again
+	tr353:
+		cs = 139
+		goto f5
+	tr322:
+		cs = 139
+		goto f9
+	tr317:
+		cs = 139
+		goto f12
+	tr318:
+		cs = 139
+		goto f13
 	tr352:
-		cs = 138
-		goto _again
-	tr385:
-		cs = 138
-		goto f4
-	tr347:
-		cs = 138
-		goto f29
-	tr356:
 		cs = 139
-		goto f17
-	tr355:
-		cs = 139
-		goto f32
-	tr357:
+		goto f19
+	tr324:
 		cs = 140
-		goto f15
-	tr364:
-		cs = 141
 		goto _again
-	tr371:
+	tr354:
+		cs = 140
+		goto f5
+	tr319:
+		cs = 140
+		goto f13
+	tr328:
 		cs = 141
-		goto f4
-	tr363:
+		goto f9
+	tr327:
 		cs = 141
+		goto f16
+	tr329:
+		cs = 142
+		goto f7
+	tr336:
+		cs = 143
+		goto _again
+	tr343:
+		cs = 143
+		goto f5
+	tr335:
+		cs = 143
+		goto f9
+	tr330:
+		cs = 143
+		goto f12
+	tr331:
+		cs = 143
+		goto f13
+	tr342:
+		cs = 143
+		goto f19
+	tr337:
+		cs = 144
+		goto _again
+	tr344:
+		cs = 144
+		goto f5
+	tr332:
+		cs = 144
+		goto f13
+	tr341:
+		cs = 145
+		goto f9
+	tr340:
+		cs = 145
+		goto f17
+	tr94:
+		cs = 146
+		goto f9
+	tr339:
+		cs = 147
+		goto f9
+	tr334:
+		cs = 147
+		goto f12
+	tr346:
+		cs = 147
+		goto f19
+	tr349:
+		cs = 148
+		goto _again
+	tr347:
+		cs = 148
+		goto f2
+	tr351:
+		cs = 149
+		goto f9
+	tr350:
+		cs = 149
+		goto f17
+	tr348:
+		cs = 149
+		goto f21
+	tr95:
+		cs = 150
+		goto f9
+	tr326:
+		cs = 151
+		goto f9
+	tr321:
+		cs = 151
+		goto f12
+	tr356:
+		cs = 151
+		goto f19
+	tr359:
+		cs = 152
+		goto _again
+	tr357:
+		cs = 152
+		goto f2
+	tr361:
+		cs = 153
+		goto f9
+	tr360:
+		cs = 153
 		goto f17
 	tr358:
-		cs = 141
-		goto f28
-	tr359:
-		cs = 141
-		goto f29
-	tr370:
-		cs = 141
-		goto f35
-	tr365:
-		cs = 142
-		goto _again
-	tr372:
-		cs = 142
-		goto f4
-	tr360:
-		cs = 142
-		goto f29
-	tr369:
-		cs = 143
-		goto f17
-	tr368:
-		cs = 143
-		goto f33
-	tr81:
-		cs = 144
-		goto f17
-	tr362:
-		cs = 145
-		goto f54
-	tr367:
-		cs = 145
-		goto f55
-	tr374:
-		cs = 145
-		goto f56
-	tr381:
-		cs = 146
-		goto _again
-	tr377:
-		cs = 146
-		goto f0
-	tr382:
-		cs = 147
-		goto f17
-	tr378:
-		cs = 147
-		goto f33
-	tr82:
-		cs = 148
-		goto f17
-	tr349:
-		cs = 149
-		goto f54
-	tr354:
-		cs = 149
-		goto f55
-	tr387:
-		cs = 149
-		goto f56
-	tr394:
-		cs = 150
-		goto _again
-	tr390:
-		cs = 150
-		goto f0
-	tr395:
-		cs = 151
-		goto f17
-	tr391:
-		cs = 151
-		goto f33
-	tr86:
-		cs = 152
-		goto f19
+		cs = 153
+		goto f21
+	tr99:
+		cs = 154
+		goto f10
 
 	f0:
 //line cef_actions.rl:9
@@ -4601,13 +4557,13 @@ func (e *Event) recoverExtensions(data string) error {
 		mark = p
 
 		goto _again
-	f2:
+	f4:
 //line cef_actions.rl:12
 
 		mark_slash = p
 
 		goto _again
-	f4:
+	f5:
 //line cef_actions.rl:15
 
 		state.pushEscape(mark_slash, p)
@@ -4619,192 +4575,82 @@ func (e *Event) recoverExtensions(data string) error {
 		e.Version, _ = strconv.Atoi(data[mark:p])
 
 		goto _again
-	f3:
-//line cef_actions.rl:21
+	f2:
+//line cef_actions.rl:47
 
-		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
+		mark = p
 		state.reset()
 
 		goto _again
 	f7:
-//line cef_actions.rl:25
-
-		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-		goto _again
-	f9:
-//line cef_actions.rl:29
-
-		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-		goto _again
-	f11:
-//line cef_actions.rl:33
-
-		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-		goto _again
-	f13:
-//line cef_actions.rl:37
-
-		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-		goto _again
-	f18:
-//line cef_actions.rl:41
-
-		e.Severity = data[mark:p]
-
-		goto _again
-	f15:
-//line cef_actions.rl:47
+//line cef_actions.rl:51
 
 		// A new extension key marks the end of the last extension value.
-		if len(state.key) > 0 && state.valueStart <= mark-1 {
+		if len(state.key) != 0 && state.valueStart < mark {
+			// We should not be here, but purge the escapes and handle them.
 			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:mark-1], state.valueStart, state.escapes))
 			state.reset()
 		}
 		state.key = data[mark:p]
 
 		goto _again
-	f29:
-//line cef_actions.rl:55
+	f13:
+//line cef_actions.rl:60
 
+		if len(state.escapes) != 0 {
+			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+			state.reset()
+		}
 		state.valueStart = p
 		state.valueEnd = p
 
 		goto _again
-	f17:
-//line cef_actions.rl:59
+	f9:
+//line cef_actions.rl:68
 
 		state.valueEnd = p + 1
 
 		goto _again
-	f16:
-//line cef_actions.rl:69
+	f8:
+//line cef_actions.rl:78
 
 		recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
 		(p)--
-		cs = 48
+		cs = 55
 
 		goto _again
-	f19:
-//line cef_actions.rl:73
+	f10:
+//line cef_actions.rl:82
 
 		state.reset()
 		// Resume processing at p, the start of the next extension key.
 		p = mark
-		cs = 22
+		cs = 28
 
 		goto _again
-	f20:
+	f17:
 //line cef_actions.rl:9
 
 		mark = p
 
-//line cef_actions.rl:12
-
-		mark_slash = p
-
-		goto _again
-	f21:
-//line cef_actions.rl:9
-
-		mark = p
-
-//line cef_actions.rl:21
-
-		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-		goto _again
-	f22:
-//line cef_actions.rl:9
-
-		mark = p
-
-//line cef_actions.rl:25
-
-		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-		goto _again
-	f23:
-//line cef_actions.rl:9
-
-		mark = p
-
-//line cef_actions.rl:29
-
-		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-		goto _again
-	f24:
-//line cef_actions.rl:9
-
-		mark = p
-
-//line cef_actions.rl:33
-
-		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-		goto _again
-	f25:
-//line cef_actions.rl:9
-
-		mark = p
-
-//line cef_actions.rl:37
-
-		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-		goto _again
-	f26:
-//line cef_actions.rl:9
-
-		mark = p
-
-//line cef_actions.rl:41
-
-		e.Severity = data[mark:p]
-
-		goto _again
-	f33:
-//line cef_actions.rl:9
-
-		mark = p
-
-//line cef_actions.rl:59
+//line cef_actions.rl:68
 
 		state.valueEnd = p + 1
 
 		goto _again
-	f36:
+	f20:
 //line cef_actions.rl:12
 
 		mark_slash = p
 
-//line cef_actions.rl:55
+//line cef_actions.rl:60
 
+		if len(state.escapes) != 0 {
+			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+			state.reset()
+		}
 		state.valueStart = p
 		state.valueEnd = p
-
-		goto _again
-	f5:
-//line cef_actions.rl:15
-
-		state.pushEscape(mark_slash, p)
-
-//line cef_actions.rl:12
-
-		mark_slash = p
 
 		goto _again
 	f6:
@@ -4812,134 +4658,39 @@ func (e *Event) recoverExtensions(data string) error {
 
 		state.pushEscape(mark_slash, p)
 
-//line cef_actions.rl:21
+//line cef_actions.rl:12
 
-		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
+		mark_slash = p
 
 		goto _again
-	f8:
+	f19:
 //line cef_actions.rl:15
 
 		state.pushEscape(mark_slash, p)
 
-//line cef_actions.rl:25
+//line cef_actions.rl:68
 
-		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-		goto _again
-	f10:
-//line cef_actions.rl:15
-
-		state.pushEscape(mark_slash, p)
-
-//line cef_actions.rl:29
-
-		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
+		state.valueEnd = p + 1
 
 		goto _again
-	f12:
-//line cef_actions.rl:15
+	f3:
+//line cef_actions.rl:47
 
-		state.pushEscape(mark_slash, p)
-
-//line cef_actions.rl:33
-
-		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
+		mark = p
 		state.reset()
+
+//line cef_actions.rl:9
+
+		mark = p
 
 		goto _again
 	f14:
-//line cef_actions.rl:15
+//line cef_actions.rl:60
 
-		state.pushEscape(mark_slash, p)
-
-//line cef_actions.rl:37
-
-		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-		goto _again
-	f35:
-//line cef_actions.rl:15
-
-		state.pushEscape(mark_slash, p)
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f55:
-//line cef_actions.rl:21
-
-		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f51:
-//line cef_actions.rl:25
-
-		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f47:
-//line cef_actions.rl:29
-
-		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f43:
-//line cef_actions.rl:33
-
-		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f38:
-//line cef_actions.rl:37
-
-		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f41:
-//line cef_actions.rl:41
-
-		e.Severity = data[mark:p]
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f30:
-//line cef_actions.rl:55
-
+		if len(state.escapes) != 0 {
+			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+			state.reset()
+		}
 		state.valueStart = p
 		state.valueEnd = p
 
@@ -4948,19 +4699,23 @@ func (e *Event) recoverExtensions(data string) error {
 		mark_slash = p
 
 		goto _again
-	f28:
-//line cef_actions.rl:55
+	f12:
+//line cef_actions.rl:60
 
+		if len(state.escapes) != 0 {
+			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+			state.reset()
+		}
 		state.valueStart = p
 		state.valueEnd = p
 
-//line cef_actions.rl:59
+//line cef_actions.rl:68
 
 		state.valueEnd = p + 1
 
 		goto _again
-	f32:
-//line cef_actions.rl:59
+	f16:
+//line cef_actions.rl:68
 
 		state.valueEnd = p + 1
 
@@ -4969,231 +4724,17 @@ func (e *Event) recoverExtensions(data string) error {
 		mark = p
 
 		goto _again
-	f57:
+	f21:
+//line cef_actions.rl:47
+
+		mark = p
+		state.reset()
+
 //line cef_actions.rl:9
 
 		mark = p
 
-//line cef_actions.rl:25
-
-		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f53:
-//line cef_actions.rl:9
-
-		mark = p
-
-//line cef_actions.rl:29
-
-		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f49:
-//line cef_actions.rl:9
-
-		mark = p
-
-//line cef_actions.rl:33
-
-		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f45:
-//line cef_actions.rl:9
-
-		mark = p
-
-//line cef_actions.rl:37
-
-		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f40:
-//line cef_actions.rl:9
-
-		mark = p
-
-//line cef_actions.rl:41
-
-		e.Severity = data[mark:p]
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f56:
-//line cef_actions.rl:15
-
-		state.pushEscape(mark_slash, p)
-
-//line cef_actions.rl:21
-
-		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f52:
-//line cef_actions.rl:15
-
-		state.pushEscape(mark_slash, p)
-
-//line cef_actions.rl:25
-
-		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f48:
-//line cef_actions.rl:15
-
-		state.pushEscape(mark_slash, p)
-
-//line cef_actions.rl:29
-
-		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f44:
-//line cef_actions.rl:15
-
-		state.pushEscape(mark_slash, p)
-
-//line cef_actions.rl:33
-
-		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f39:
-//line cef_actions.rl:15
-
-		state.pushEscape(mark_slash, p)
-
-//line cef_actions.rl:37
-
-		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f54:
-//line cef_actions.rl:21
-
-		e.DeviceVendor = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:55
-
-		state.valueStart = p
-		state.valueEnd = p
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f50:
-//line cef_actions.rl:25
-
-		e.DeviceProduct = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:55
-
-		state.valueStart = p
-		state.valueEnd = p
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f46:
-//line cef_actions.rl:29
-
-		e.DeviceVersion = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:55
-
-		state.valueStart = p
-		state.valueEnd = p
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f42:
-//line cef_actions.rl:33
-
-		e.DeviceEventClassID = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:55
-
-		state.valueStart = p
-		state.valueEnd = p
-
-//line cef_actions.rl:59
-
-		state.valueEnd = p + 1
-
-		goto _again
-	f37:
-//line cef_actions.rl:37
-
-		e.Name = replaceEscapes(data[mark:p], mark, state.escapes)
-		state.reset()
-
-//line cef_actions.rl:55
-
-		state.valueStart = p
-		state.valueEnd = p
-
-//line cef_actions.rl:59
+//line cef_actions.rl:68
 
 		state.valueEnd = p + 1
 
@@ -5211,50 +4752,54 @@ func (e *Event) recoverExtensions(data string) error {
 		}
 		if (p) == eof {
 			switch _cef_recover_eof_actions[cs] {
-			case 32:
-//line cef_actions.rl:62
+			case 16:
+//line cef_actions.rl:71
 
 				// Reaching the EOF marks the end of the final extension value.
-				if len(state.key) > 0 && state.valueStart <= state.valueEnd {
+				if len(state.key) != 0 && state.valueStart < state.valueEnd {
 					e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
 					state.reset()
 				}
 
-			case 17:
-//line cef_actions.rl:69
+			case 9:
+//line cef_actions.rl:78
 
 				recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
 				(p)--
-				cs = 48
+				cs = 55
 
-			case 35:
+			case 19:
 //line cef_actions.rl:15
 
 				state.pushEscape(mark_slash, p)
 
-//line cef_actions.rl:62
+//line cef_actions.rl:71
 
 				// Reaching the EOF marks the end of the final extension value.
-				if len(state.key) > 0 && state.valueStart <= state.valueEnd {
+				if len(state.key) != 0 && state.valueStart < state.valueEnd {
 					e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
 					state.reset()
 				}
 
-			case 28:
-//line cef_actions.rl:55
+			case 12:
+//line cef_actions.rl:60
 
+				if len(state.escapes) != 0 {
+					e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+					state.reset()
+				}
 				state.valueStart = p
 				state.valueEnd = p
 
-//line cef_actions.rl:62
+//line cef_actions.rl:71
 
 				// Reaching the EOF marks the end of the final extension value.
-				if len(state.key) > 0 && state.valueStart <= state.valueEnd {
+				if len(state.key) != 0 && state.valueStart < state.valueEnd {
 					e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
 					state.reset()
 				}
 
-//line parser_recover.go:4468
+//line parser_recover.go:4081
 			}
 		}
 

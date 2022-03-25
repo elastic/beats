@@ -16,12 +16,12 @@
 
     # Header fields.
     version = "CEF:" digit+ >mark %version;
-    device_vendor = device_chars* >mark %device_vendor;
-    device_product = device_chars* >mark %device_product;
-    device_version = device_chars* >mark %device_version;
-    device_event_class_id = device_chars* >mark %device_event_class_id;
-    name = device_chars* >mark %name;
-    severity = severity_chars* >mark %severity;
+    device_vendor = device_chars*;
+    device_product = device_chars*;
+    device_version = device_chars*;
+    device_event_class_id = device_chars*;
+    name = device_chars*;
+    severity = severity_chars*;
 
     # Define what extension characters are allowed.
     equal = "=";

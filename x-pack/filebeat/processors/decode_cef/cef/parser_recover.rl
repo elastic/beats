@@ -47,7 +47,7 @@ func (e *Event) recoverExtensions(data string) error {
                 (severity pipe)?)?)?)?)?)?;
 
         # CEF message.
-        cef = header extensions?;
+        cef = header %incomplete_header extensions;
 
         main := cef;
         write init;

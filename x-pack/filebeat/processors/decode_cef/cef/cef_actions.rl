@@ -44,15 +44,24 @@
     action complete_header {
         complete = true
     }
+    action incomplete_header {
+        mark = p
+        state.reset()
+    }
     action extension_key {
         // A new extension key marks the end of the last extension value.
-        if len(state.key) > 0 && state.valueStart <= mark - 1 {
+        if len(state.key) != 0 && state.valueStart < mark {
+            // We should not be here, but purge the escapes and handle them.
             e.pushExtension(state.key, replaceEscapes(data[state.valueStart:mark-1], state.valueStart, state.escapes))
             state.reset()
         }
         state.key = data[mark:p]
     }
     action extension_value_start {
+        if len(state.escapes) != 0 {
+            e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
+            state.reset()
+        }
         state.valueStart = p;
         state.valueEnd = p
     }
@@ -61,7 +70,7 @@
     }
     action extension_eof {
         // Reaching the EOF marks the end of the final extension value.
-        if len(state.key) > 0 && state.valueStart <= state.valueEnd {
+        if len(state.key) != 0 && state.valueStart < state.valueEnd {
             e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
             state.reset()
         }

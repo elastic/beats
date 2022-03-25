@@ -58,6 +58,12 @@ const (
 	escapedMessage = `CEF:0|security\\compliance|threat\|->manager|1.0|100|message contains escapes|10|spt=1232 msg=Newlines in messages\nare allowed.\r\nAnd so are carriage feeds\\newlines\\\=.`
 
 	truncatedHeader = "CEF:0|SentinelOne|Mgmt|activityID=1111111111111111111 activityType=3505 siteId=None siteName=None accountId=1222222222222222222 accountName=foo-bar mdr notificationScope=ACCOUNT"
+
+	// Found by fuzzing but minimised by hand.
+	fuzz0 = `CEF:0|a=\\ b|`
+	fuzz1 = `CEF:0|\|a=|b=`
+	fuzz2 = `CEF:0|\||a=b`
+	fuzz3 = `CEF:0|a=|b\\ c=d`
 )
 
 var testMessages = []string{
@@ -78,6 +84,11 @@ var testMessages = []string{
 	crlfMessage,
 	tabMessage,
 	escapedMessage,
+	truncatedHeader,
+	fuzz0,
+	fuzz1,
+	fuzz2,
+	fuzz3,
 }
 
 func TestGenerateFuzzCorpus(t *testing.T) {

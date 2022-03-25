@@ -38,12 +38,12 @@ func (e *Event) unpack(data string) error {
         include cef "cef.rl";
 
         header = version pipe
-                 device_vendor pipe
-                 device_product pipe
-                 device_version pipe
-                 device_event_class_id pipe
-                 name pipe
-                 severity pipe;
+                 device_vendor >mark %device_vendor pipe
+                 device_product >mark %device_product pipe
+                 device_version >mark %device_version pipe
+                 device_event_class_id >mark %device_event_class_id pipe
+                 name >mark %name pipe
+                 severity >mark %severity pipe;
 
         # CEF message.
         cef = header %complete_header extensions?;
