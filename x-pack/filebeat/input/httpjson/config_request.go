@@ -102,7 +102,7 @@ type requestConfig struct {
 func (c *requestConfig) Validate() error {
 	c.Method = strings.ToUpper(c.Method)
 	switch c.Method {
-	case "POST":
+	case "POST": ///nolint:goconst // Bad linter! These constant literals are far more meaningful than any label.
 	case "GET":
 		if c.Body != nil {
 			return errors.New("body can't be used with method: \"GET\"")

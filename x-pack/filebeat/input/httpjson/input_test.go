@@ -401,9 +401,8 @@ func TestInput(t *testing.T) {
 			conf := defaultConfig()
 			assert.NoError(t, cfg.Unpack(&conf))
 
-			input, err := newStatelessInput(conf)
+			input := newStatelessInput(conf)
 
-			assert.NoError(t, err)
 			assert.Equal(t, "httpjson-stateless", input.Name())
 			assert.NoError(t, input.Test(v2.TestContext{}))
 
@@ -516,7 +515,7 @@ func retryHandler() http.HandlerFunc {
 			_, _ = w.Write([]byte(`{"hello":"world"}`))
 			return
 		}
-		w.WriteHeader(rand.Intn(100) + 500)
+		w.WriteHeader(rand.Intn(100) + 500) //nolint:gosec // Bad linter! Not a crypto context.
 		count += 1
 	}
 }
@@ -606,7 +605,7 @@ func paginationHandler() http.HandlerFunc {
 		case 0:
 			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:00Z","nextPageToken":"bar","items":[{"foo":"a"}]}`))
 		case 1:
-			if r.URL.Query().Get("page") != "bar" {
+			if r.URL.Query().Get("page") != "bar" { //nolint:goconst // Bad linter! Tests should be explicit and local.
 				w.WriteHeader(http.StatusBadRequest)
 				_, _ = w.Write([]byte(`{"error":"wrong page token value"}`))
 				return

@@ -176,7 +176,7 @@ func TestDifferentSetValueTypes(t *testing.T) {
 	transform, err := newSetResponse(cfg, logp.NewLogger("test"))
 	require.NoError(t, err)
 
-	testAppend := transform.(*set)
+	testAppend := transform.(*set) //nolint:errcheck // Bad linter! Panic is a check.
 
 	trCtx := emptyTransformContext()
 	tr := transformable{}
@@ -204,7 +204,7 @@ func TestDifferentSetValueTypes(t *testing.T) {
 	transform, err = newSetResponse(cfg, logp.NewLogger("test"))
 	require.NoError(t, err)
 
-	testAppend = transform.(*set)
+	testAppend = transform.(*set) //nolint:errcheck // Bad linter! Panic is a check.
 
 	tr = transformable{}
 
@@ -225,7 +225,7 @@ func TestDifferentSetValueTypes(t *testing.T) {
 	transform, err = newSetResponse(cfg, logp.NewLogger("test"))
 	require.NoError(t, err)
 
-	testAppend = transform.(*set)
+	testAppend = transform.(*set) //nolint:errcheck // Bad linter! Panic is a check.
 
 	tr = transformable{}
 
