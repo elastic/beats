@@ -23,3 +23,43 @@ func TestConfigValidateFailure(t *testing.T) {
 	c.ChannelName = ""
 	assert.Error(t, c.Validate())
 }
+
+func TestConfigAuthValidate(t *testing.T) {
+	var o oAuth2Config
+	o.ClientID = "DEMOCLIENTID"
+	o.ClientSecret = "DEMOCLIENTSECRET"
+	o.User = "salesforce_user"
+	o.Password = "P@$$w0₹D"
+	o.TokenURL = "https://login.salesforce.com/services/oauth2/token"
+
+	assert.NoError(t, o.Validate())
+}
+
+func TestConfigAuthValidateFailure_MissingTokenURL(t *testing.T) {
+	var o oAuth2Config
+	o.ClientID = "DEMOCLIENTID"
+	o.ClientSecret = "DEMOCLIENTSECRET"
+	o.User = "salesforce_user"
+	o.Password = "P@$$w0₹D"
+
+	assert.Error(t, o.Validate())
+}
+
+func TestConfigAuthValidateFailure_MissingClientCredentials(t *testing.T) {
+	var o oAuth2Config
+	o.ClientSecret = "DEMOCLIENTSECRET"
+	o.User = "salesforce_user"
+	o.Password = "P@$$w0₹D"
+	o.TokenURL = "https://login.salesforce.com/services/oauth2/token"
+
+	assert.Error(t, o.Validate())
+}
+
+func TestConfigAuthValidateFailure_MissingUsernamePassword(t *testing.T) {
+	var o oAuth2Config
+	o.ClientID = "DEMOCLIENTID"
+	o.ClientSecret = "DEMOCLIENTSECRET"
+	o.TokenURL = "https://login.salesforce.com/services/oauth2/token"
+
+	assert.Error(t, o.Validate())
+}
