@@ -23,8 +23,8 @@ pipeline {
     GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
     SNAPSHOT = "true"
     PIPELINE_LOG_LEVEL = "INFO"
-    SLACK_CHANNEL = '#observablt-bots'
-    NOTIFY_TO = 'package+beats-victor.martinez@elastic.co'
+    SLACK_CHANNEL = '#beats'
+    NOTIFY_TO = 'package+beats-beats-contrib@elastic.co'
   }
   options {
     timeout(time: 4, unit: 'HOURS')
@@ -42,7 +42,7 @@ pipeline {
   }
   stages {
     stage('Filter build') {
-      agent { label 'ubuntu-18 && immutable' }
+      agent { label 'ubuntu-20 && immutable' }
       when {
         beforeAgent true
         anyOf {
@@ -90,6 +90,7 @@ pipeline {
             dir("${BASE_DIR}"){
               setEnvVar('BEAT_VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
             }
+            setEnvVar('IS_BRANCH_AVAILABLE', isBranchUnifiedReleaseAvailable(env.BRANCH_NAME))
           }
         }
         stage('Build Packages'){
@@ -100,15 +101,17 @@ pipeline {
         }
         stage('Run E2E Tests for Packages'){
           options { skipDefaultCheckout() }
-          when {
-            beforeAgent true
-            expression { return false }
-          }
           steps {
             runE2ETests()
           }
         }
         stage('DRA') {
+          // The Unified Release process keeps moving branches as soon as a new
+          // minor version is created, therefore old release branches won't be able
+          // to use the release manager as their definition is removed.
+          when {
+            expression { return env.IS_BRANCH_AVAILABLE == "true" }
+          }
           environment {
             // It uses the folder structure done in uploadPackagesToGoogleBucket
             BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
@@ -120,7 +123,7 @@ pipeline {
                 gsutil(command: "-m -q cp -r ${env.BUCKET_URI} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
                 sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
               }
-              sh(label: "Debug package", script: 'find build/distributions -type f -ls || true')
+              sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
               dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
               script {
                 getVaultSecret.readSecretWrapper {
@@ -131,12 +134,7 @@ pipeline {
           }
           post {
             failure {
-              dir("${BASE_DIR}") {
-                sh(label: 'release-manager-report.sh', script: '.ci/scripts/release-manager-report.sh')
-                setEnvVar('DIGESTED_MESSAGE', "${readFile(file: 'release-manager-report.out')}")
-              }
-              echo 'disabled'
-            // notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}] DRA failed", body: "Build: (<${env.RUN_DISPLAY_URL}|here>)")
+              notifyStatus(slackStatus: 'danger', subject: "[${env.REPO}@${env.BRANCH_NAME}] DRA failed", body: "Build: (<${env.RUN_DISPLAY_URL}|here>)")
             }
           }
         }
@@ -228,7 +226,7 @@ def generateArmStep(beat) {
 
 def generateLinuxStep(beat) {
   return {
-    withNode(labels: 'ubuntu-18.04 && immutable') {
+    withNode(labels: 'ubuntu-20.04 && immutable') {
       withEnv(["HOME=${env.WORKSPACE}", "PLATFORMS=${linuxPlatforms()}", "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Linux ${beat}") {
           deleteDir()
