@@ -67,6 +67,8 @@ ifndef::kubernetes_default_indexers[]
       #  - fields:
       #      lookup_fields: ["metricset.host"]
 endif::kubernetes_default_indexers[]
+      #labels.dedot: true
+      #annotations.dedot: true
 -------------------------------------------------------------------------------
 
 The configuration below enables the processor on a Beat running as a process on
@@ -88,6 +90,8 @@ ifndef::kubernetes_default_indexers[]
       #  - fields:
       #      lookup_fields: ["metricset.host"]
 endif::kubernetes_default_indexers[]
+      #labels.dedot: true
+      #annotations.dedot: true
 -------------------------------------------------------------------------------
 
 The configuration below has the default indexers and matchers disabled and
@@ -108,6 +112,8 @@ processors:
       matchers:
         - fields:
             lookup_fields: ["metricset.host"]
+      #labels.dedot: true
+      #annotations.dedot: true
 -------------------------------------------------------------------------------
 
 The `add_kubernetes_metadata` processor has the following configuration settings:
@@ -120,21 +126,28 @@ level. Possible values are `node` and `cluster`. Scope is `node` by default.
 `namespace`:: (Optional) Select the namespace from which to collect the
 metadata. If it is not set, the processor collects metadata from all namespaces.
 It is unset by default.
-`add_resource_metadata`:: (Optional) Specify labels and annotations filters for the extra metadata coming from node and namespace.
- `add_resource_metadata` can be done for `node` or `namespace`. By default all labels are included
-while annotations are not. These settings are useful when storing labels and annotations
-that require special handling to avoid overloading the storage output. The enrichment of `node` or `namespace` metadata
-can be individually disabled by setting `enabled: false`.
+`add_resource_metadata`:: (Optional) Specify filters and configuration for the extra metadata, that will be added to the event. Configuration parameters:
+ - `node` or `namespace`: Specify labels and annotations filters for the extra metadata coming from node and namespace. By default all labels are included while annotations are not. To change default behaviour `include_labels`, `exclude_labels` and `include_annotations` can be defined. Those settings are useful when storing labels and annotations that require special handling to avoid overloading the storage output.
+ Note: wildcards are not supported for those settings.
+ The enrichment of `node` or `namespace` metadata can be individually disabled by setting `enabled: false`.
+ - `deployment`: If resource is `pod` and it is created from a `deployment`, by default the deployment name is added, this can be disabled by setting `deployment: false`.
+ - `cronjob`: If resource is `pod` and it is created from a `cronjob`, by default the cronjob name is added, this can be disabled by setting `cronjob: false`.
++
 Example:
-
 ["source","yaml",subs="attributes"]
 -------------------------------------------------------------------------------------
       add_resource_metadata:
         namespace:
           include_labels: ["namespacelabel1"]
+          #labels.dedot: true
+          #annotations.dedot: true
         node:
           include_labels: ["nodelabel2"]
           include_annotations: ["nodeannotation1"]
+          #labels.dedot: true
+          #annotations.dedot: true
+        deployment: false
+        cronjob: false
 -------------------------------------------------------------------------------------
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
 client. It defaults to `KUBECONFIG` environment variable if present.
@@ -154,3 +167,5 @@ running configuration for a container. This is `60s` by default.
 `sync_period`:: (Optional) Specify the timeout for listing historical resources.
 `default_indexers.enabled`:: (Optional) Enable or disable default pod indexers when you want to specify your own.
 `default_matchers.enabled`:: (Optional) Enable or disable default pod matchers when you want to specify your own.
+`labels.dedot`:: (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.
+`annotations.dedot`:: (Optional) Default to be true. If set to true, then `.` in labels will be replaced with `_`.

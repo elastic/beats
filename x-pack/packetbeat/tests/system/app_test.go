@@ -9,8 +9,8 @@ package system
 
 import (
 	"bytes"
+	"context"
 	"errors"
-	"fmt"
 	"io/fs"
 	"net"
 	"os"
@@ -19,6 +19,7 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -26,31 +27,38 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/npcap"
 )
 
+// Keep in sync with NpcapVersion in magefile.go.
+const NpcapVersion = "1.60"
+
 func TestWindowsNpcapInstaller(t *testing.T) {
 	if runtime.GOOS != "windows" {
 		t.Skipf("skipping non-Windows GOOS: %s", runtime.GOOS)
 	}
 
-	stdout, stderr, err := runPacketbeat(t, "devices")
-	require.NoError(t, err, stderr)
-	t.Log("Output:\n", stdout)
-
-	b, err := os.ReadFile(`C:\Program Files\Npcap\install.log`)
-	if err != nil {
-		return fmt.Errorf("could not read install.log: %w", err)
+	// Ignore error since what we care about is whether the install
+	// succeeded and we do not want to fail out for irrelevant errors.
+	stdout, stderr, _ := runPacketbeat(t)
+	if stdout != "" {
+		t.Log("Output:\n", stdout)
 	}
-	// From inspection we expect a line "DetailPrint: Starting the npcap driver".
-	if !bytes.Contains(b, []byte("Starting the npcap driver")) {
-		return errors.New("install log does not include npcap drives start line")
+	if stderr != "" {
+		t.Log("Error:\n", stderr)
+	}
+
+	_, err := os.Stat(`C:\Program Files\Npcap\install.log`)
+	if errors.Is(err, fs.ErrNotExist) {
+		t.Errorf("could not stat install.log: %v", err)
 	}
 
 	installedNpcapVersion := npcap.Version()
 	if !strings.Contains(installedNpcapVersion, NpcapVersion) {
-		return fmt.Errorf("unexpected npcap version installed: want:%s have:%s", NpcapVersion, installedNpcapVersion)
+		t.Errorf("unexpected npcap version installed: want:%s have:%s", NpcapVersion, installedNpcapVersion)
 	}
 }
 
 func TestDevices(t *testing.T) {
+	t.Skip("needs test devices to be set up")
+
 	stdout, stderr, err := runPacketbeat(t, "devices")
 	require.NoError(t, err, stderr)
 	t.Log("Output:\n", stdout)
@@ -76,7 +84,14 @@ func runPacketbeat(t testing.TB, args ...string) (stdout, stderr string, err err
 		t.Fatal(err)
 	}
 
-	cmd := exec.Command(packetbeatPath, append([]string{"-systemTest"}, args...)...)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+	conf, err := filepath.Abs("../../packetbeat.yml")
+	if err != nil {
+		return "", "", err
+	}
+	cmd := exec.CommandContext(ctx, packetbeatPath, append([]string{"-systemTest", "-c", conf}, args...)...)
 	cmd.Dir = t.TempDir()
 	var stdoutBuf, stderrBuf bytes.Buffer
 	cmd.Stdout = &stdoutBuf

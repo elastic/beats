@@ -35626,9 +35626,35 @@ example: true
 [float]
 === container
 
-Container fields are used for meta information about the specific container that is the source of information.
-These fields help correlate data based containers from any runtime.
+Container fields are used for meta information about the specific container that is the source of information. These fields help correlate data based containers from any runtime.
 
+
+*`container.cpu.usage`*::
++
+--
+Percent CPU used which is normalized by the number of CPU cores and it ranges from 0 to 1. Scaling factor: 1000.
+
+type: scaled_float
+
+--
+
+*`container.disk.read.bytes`*::
++
+--
+The total number of bytes (gauge) read successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
+
+*`container.disk.write.bytes`*::
++
+--
+The total number of bytes (gauge) written successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
 
 *`container.id`*::
 +
@@ -35666,12 +35692,39 @@ type: object
 
 --
 
+*`container.memory.usage`*::
++
+--
+Memory usage percentage and it ranges from 0 to 1. Scaling factor: 1000.
+
+type: scaled_float
+
+--
+
 *`container.name`*::
 +
 --
 Container name.
 
 type: keyword
+
+--
+
+*`container.network.egress.bytes`*::
++
+--
+The number of bytes (gauge) sent out on all network interfaces by the container since the last metric collection.
+
+type: long
+
+--
+
+*`container.network.ingress.bytes`*::
++
+--
+The number of bytes received (gauge) on all network interfaces by the container since the last metric collection.
+
+type: long
 
 --
 

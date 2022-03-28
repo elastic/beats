@@ -30,6 +30,7 @@ stages:
                 - "arm"
             parameters:
                 - "armTest"
+        stage: extended
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory

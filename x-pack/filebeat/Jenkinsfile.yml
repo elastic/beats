@@ -34,7 +34,7 @@ stages:
                 - "armTest"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
-        stage: mandatory
+        stage: extended
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
@@ -44,15 +44,6 @@ stages:
     pythonIntegTest:
         mage: "mage pythonIntegTest"       ## run the ITs only if the changeset affects a specific module.
         stage: mandatory
-    module-compat-prev-minor:
-      mage: >-                 ## Run module integration tests under previous minor of ES to ensure ingest pipeline compatibility.
-        STACK_ENVIRONMENT=prev-minor
-        TESTING_FILEBEAT_SKIP_DIFF=1
-        TESTING_FILEBEAT_ALLOW_OLDER=1
-        PYTEST_ADDOPTS='-k test_xpack_modules'
-        mage pythonIntegTest
-      withModule: true
-      stage: mandatory
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.

@@ -28,7 +28,6 @@ import (
 	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
@@ -118,7 +117,7 @@ func createContainer(ctx context.Context, cli *client.Client, arch string) error
 		Tags:       []string{rootImageName},
 		Dockerfile: dockerfile,
 	}
-	//build, wait for output
+	// build, wait for output
 	buildResp, err := cli.ImageBuild(ctx, buildContext, buildOpts)
 	if err != nil {
 		return errors.Wrap(err, "error building final container image")
@@ -201,7 +200,7 @@ func BuildContainer(ctx context.Context) error {
 			return errors.Wrap(err, "error writing exported container")
 		}
 
-		//misc prepare operations
+		// misc prepare operations
 
 		err = devtools.Copy("config.json", filepath.Join(buildDir, "config.json"))
 		if err != nil {
@@ -240,7 +239,7 @@ func Uninstall(ctx context.Context) error {
 		return errors.Wrap(err, "error creating docker client")
 	}
 
-	//check to see if we have a plugin we need to remove
+	// check to see if we have a plugin we need to remove
 	plugins, err := cli.PluginList(ctx, filters.Args{})
 	if err != nil {
 		return errors.Wrap(err, "error getting list of plugins")
@@ -359,7 +358,7 @@ func Build() {
 	mg.SerialDeps(CrossBuild, BuildContainer)
 }
 
-// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// GolangCrossBuild build the Beat binary inside the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
 	buildArgs := devtools.DefaultBuildArgs()

@@ -219,7 +219,9 @@ def runLinting() {
       mapParallelTasks["${k}"] = v
     }
   }
-  mapParallelTasks['default'] = { cmd(label: 'make check-default', script: 'make check-default') }
+  mapParallelTasks['default'] = {
+    cmd(label: 'make check-default', script: 'make check-default')
+  }
   mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)
 }
@@ -416,32 +418,14 @@ def packagingLinux(Map args = [:]) {
 * @param beatsFolder beats folder
 */
 def publishPackages(beatsFolder){
-  def bucketUri = "gs://beats-ci-artifacts/snapshots"
-  if (isPR()) {
-    bucketUri = "gs://beats-ci-artifacts/pull-requests/pr-${env.CHANGE_ID}"
-  }
-  def beatsFolderName = getBeatsName(beatsFolder)
-  uploadPackages("${bucketUri}/${beatsFolderName}", beatsFolder)
-
-  // Copy those files to another location with the sha commit to test them
-  // afterward.
-  bucketUri = "gs://beats-ci-artifacts/commits/${env.GIT_BASE_COMMIT}"
-  uploadPackages("${bucketUri}/${beatsFolderName}", beatsFolder)
-}
-
-/**
-* Upload the distribution files to google cloud.
-* TODO: There is a known issue with Google Storage plugin.
-* @param bucketUri the buckets URI.
-* @param beatsFolder the beats folder.
-*/
-def uploadPackages(bucketUri, beatsFolder){
-  // sometimes google storage reports ResumableUploadException: 503 Server Error
-  retryWithSleep(retries: 3, seconds: 5, backoff: true) {
-    googleStorageUploadExt(bucket: bucketUri,
-      credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-      pattern: "${beatsFolder}/build/distributions/**/*",
-      sharedPublicly: true)
+  dir(beatsFolder) {
+    uploadPackagesToGoogleBucket(
+      credentialsId: env.JOB_GCS_EXT_CREDENTIALS,
+      repo: env.REPO,
+      bucket: env.JOB_GCS_BUCKET,
+      folder: getBeatsName(beatsFolder),
+      pattern: "build/distributions/**/*"
+    )
   }
 }
 
@@ -454,91 +438,42 @@ def pushCIDockerImages(Map args = [:]) {
   def arch = args.get('arch', 'amd64')
   def beatsFolder = args.beatsFolder
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
+    def defaultVariants = [ '' : 'beats', '-oss' : 'beats', '-ubi8' : 'beats' ]
     if (beatsFolder.endsWith('auditbeat')) {
-      tagAndPush(beatName: 'auditbeat', arch: arch)
+      tagAndPush(beatName: 'auditbeat', arch: arch, variants: defaultVariants)
     } else if (beatsFolder.endsWith('filebeat')) {
-      tagAndPush(beatName: 'filebeat', arch: arch)
+      tagAndPush(beatName: 'filebeat', arch: arch, variants: defaultVariants)
     } else if (beatsFolder.endsWith('heartbeat')) {
-      tagAndPush(beatName: 'heartbeat', arch: arch)
+      tagAndPush(beatName: 'heartbeat', arch: arch, variants: defaultVariants)
     } else if (beatsFolder.endsWith('metricbeat')) {
-      tagAndPush(beatName: 'metricbeat', arch: arch)
+      tagAndPush(beatName: 'metricbeat', arch: arch, variants: defaultVariants)
+    } else if (beatsFolder.endsWith('osquerybeat')) {
+      tagAndPush(beatName: 'osquerybeat', arch: arch, variants: defaultVariants)
     } else if ("${beatsFolder}" == "packetbeat"){
-      tagAndPush(beatName: 'packetbeat', arch: arch)
-    } else if ("${beatsFolder}" == "x-pack/elastic-agent") {
-      tagAndPush(beatName: 'elastic-agent', arch: arch)
+      tagAndPush(beatName: 'packetbeat', arch: arch, variants: defaultVariants)
     }
   }
 }
 
 /**
-* Tag and push all the docker images for the given beat.
 * @param beatName name of the Beat
+* @param arch what architecture
+* @param variants list of docker variants
 */
 def tagAndPush(Map args = [:]) {
-  def beatName = args.beatName
-  def arch = args.get('arch', 'amd64')
-  def libbetaVer = env.VERSION
-  if("${env?.SNAPSHOT.trim()}" == "true"){
-    aliasVersion = libbetaVer.substring(0, libbetaVer.lastIndexOf(".")) // remove third number in version
-
-    libbetaVer += "-SNAPSHOT"
-    aliasVersion += "-SNAPSHOT"
+  def images = [ ]
+  args.variants.each { variant, sourceNamespace ->
+    images += [ source: "${sourceNamespace}/${args.beatName}${variant}",
+                target: "observability-ci/${args.beatName}",
+                arch: args.arch ]
   }
-
-  def tagName = "${libbetaVer}"
-  if (isPR()) {
-    tagName = "pr-${env.CHANGE_ID}"
-  }
-
-  // supported tags
-  def tags = [tagName, "${env.GIT_BASE_COMMIT}"]
-  if (!isPR() && aliasVersion != "") {
-    tags << aliasVersion
-  }
-  // supported image flavours
-  def variants = ["", "-oss", "-ubi8"]
-
-  if(beatName == 'elastic-agent'){
-    variants.add("-complete")
-    variants.add("-cloud")
-  }
-
-  variants.each { variant ->
-    // cloud docker images are stored in the private docker namespace.
-    def sourceNamespace = variant.equals('-cloud') ? 'beats-ci' : 'beats'
-    tags.each { tag ->
-      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}", sourceNamespace: sourceNamespace)
-    }
-  }
-}
-
-/**
-* @param beatName name of the Beat
-* @param variant name of the variant used to build the docker image name
-* @param sourceTag tag to be used as source for the docker tag command, usually under the 'beats' namespace
-* @param targetTag tag to be used as target for the docker tag command, usually under the 'observability-ci' namespace
-*/
-def doTagAndPush(Map args = [:]) {
-  def beatName = args.beatName
-  def variant = args.variant
-  def sourceTag = args.sourceTag
-  def targetTag = args.targetTag
-  def sourceNamespace = args.sourceNamespace
-  def sourceName = "${DOCKER_REGISTRY}/${sourceNamespace}/${beatName}${variant}:${sourceTag}"
-  def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
-
-  def iterations = 0
-  retryWithSleep(retries: 3, seconds: 5, backoff: true) {
-    iterations++
-    def status = sh(label: "Change tag and push ${targetName}",
-                    script: ".ci/scripts/docker-tag-push.sh ${sourceName} ${targetName}",
-                    returnStatus: true)
-    if ( status > 0 && iterations < 3) {
-      error("tag and push failed for ${beatName}, retry")
-    } else if ( status > 0 ) {
-      log(level: 'WARN', text: "${beatName} doesn't have ${variant} docker images. See https://github.com/elastic/beats/pull/21621")
-    }
-  }
+  pushDockerImages(
+    registry: env.DOCKER_REGISTRY,
+    secret: env.DOCKER_ELASTIC_SECRET,
+    snapshot: env.SNAPSHOT,
+    version: env.VERSION,
+    images: images
+  )
 }
 
 /**
@@ -727,7 +662,9 @@ def withBeatsEnv(Map args = [:], Closure body) {
           if (cmd(label: 'Download modules to local cache', script: 'go mod download', returnStatus: true) > 0) {
             cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
           }
-          body()
+          withOtelEnv() {
+            body()
+          }
         } catch(err) {
           // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
           upload = true
@@ -1041,8 +978,6 @@ def dumpVariables(){
   GOIMPORTS: ${env.GOIMPORTS}
   GOIMPORTS_REPO: ${env.GOIMPORTS_REPO}
   GOIMPORTS_LOCAL_PREFIX: ${env.GOIMPORTS_LOCAL_PREFIX}
-  GOLINT: ${env.GOLINT}
-  GOLINT_REPO: ${env.GOLINT_REPO}
   GOPACKAGES_COMMA_SEP: ${env.GOPACKAGES_COMMA_SEP}
   GOX_FLAGS: ${env.GOX_FLAGS}
   GOX_OS: ${env.GOX_OS}
