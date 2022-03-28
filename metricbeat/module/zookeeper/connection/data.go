@@ -45,7 +45,7 @@ func (m *MetricSet) parseCons(i io.Reader) ([]mb.Event, error) {
 		oneParsingIsCorrect := false
 		keyMap, err := lineToMap(line)
 		if err != nil {
-			m.Logger().Debugf(err.Error())
+			m.Logger().Errorf(err.Error())
 			continue
 		}
 
