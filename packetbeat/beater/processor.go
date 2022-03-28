@@ -154,6 +154,9 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *common.C
 	return newProcessor(config.ShutdownTimeout, publisher, flows, sniffer, p.err), nil
 }
 
+// CheckConfig performs a dry-run creation of a Packetbeat pipeline based
+// on the provided configuration. This will involve setting up some dummy
+// sniffers and so will need libpcap to be loaded.
 func (p *processorFactory) CheckConfig(config *common.Config) error {
 	runner, err := p.Create(pipeline.NewNilPipeline(), config)
 	if err != nil {
