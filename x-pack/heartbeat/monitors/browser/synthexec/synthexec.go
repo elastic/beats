@@ -204,15 +204,20 @@ func runCmd(
 		jsonWriter.Close()
 		jsonReader.Close()
 		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), loggableCmd.String())
+
+		var cmdError *SynthError = nil
 		if err != nil {
-			str := fmt.Sprintf("command exited with status %d: %s", cmd.ProcessState.ExitCode(), err)
-			mpx.writeSynthEvent(&SynthEvent{
-				Type:                 "cmd/status",
-				Error:                &SynthError{Name: "cmdexit", Message: str},
-				TimestampEpochMicros: float64(time.Now().UnixMicro()),
-			})
+			errMessage := fmt.Sprintf("command exited with status %d: %s", cmd.ProcessState.ExitCode(), err)
+			cmdError = &SynthError{Name: "cmdexit", Message: errMessage}
 			logp.Warn("Error executing command '%s' (%d): %s", loggableCmd.String(), cmd.ProcessState.ExitCode(), err)
 		}
+
+		mpx.writeSynthEvent(&SynthEvent{
+			Type:                 "cmd/status",
+			Error:                cmdError,
+			TimestampEpochMicros: float64(time.Now().UnixMicro()),
+		})
+
 		wg.Wait()
 		mpx.Close()
 	}()

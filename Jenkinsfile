@@ -219,7 +219,9 @@ def runLinting() {
       mapParallelTasks["${k}"] = v
     }
   }
-  mapParallelTasks['default'] = { cmd(label: 'make check-default', script: 'make check-default') }
+  mapParallelTasks['default'] = {
+    cmd(label: 'make check-default', script: 'make check-default')
+  }
   mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)
 }
@@ -437,9 +439,6 @@ def pushCIDockerImages(Map args = [:]) {
   def beatsFolder = args.beatsFolder
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
     def defaultVariants = [ '' : 'beats', '-oss' : 'beats', '-ubi8' : 'beats' ]
-    def completeVariant = ['-complete' : 'beats']
-    // Cloud is not public available, therefore it should use the beats-ci namespace.
-    def cloudVariant = ['-cloud' : 'beats-ci']
     if (beatsFolder.endsWith('auditbeat')) {
       tagAndPush(beatName: 'auditbeat', arch: arch, variants: defaultVariants)
     } else if (beatsFolder.endsWith('filebeat')) {
@@ -452,8 +451,6 @@ def pushCIDockerImages(Map args = [:]) {
       tagAndPush(beatName: 'osquerybeat', arch: arch, variants: defaultVariants)
     } else if ("${beatsFolder}" == "packetbeat"){
       tagAndPush(beatName: 'packetbeat', arch: arch, variants: defaultVariants)
-    } else if ("${beatsFolder}" == "x-pack/elastic-agent") {
-      tagAndPush(beatName: 'elastic-agent', arch: arch, variants: defaultVariants + completeVariant + cloudVariant)
     }
   }
 }
@@ -665,7 +662,9 @@ def withBeatsEnv(Map args = [:], Closure body) {
           if (cmd(label: 'Download modules to local cache', script: 'go mod download', returnStatus: true) > 0) {
             cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
           }
-          body()
+          withOtelEnv() {
+            body()
+          }
         } catch(err) {
           // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
           upload = true
@@ -979,8 +978,6 @@ def dumpVariables(){
   GOIMPORTS: ${env.GOIMPORTS}
   GOIMPORTS_REPO: ${env.GOIMPORTS_REPO}
   GOIMPORTS_LOCAL_PREFIX: ${env.GOIMPORTS_LOCAL_PREFIX}
-  GOLINT: ${env.GOLINT}
-  GOLINT_REPO: ${env.GOLINT_REPO}
   GOPACKAGES_COMMA_SEP: ${env.GOPACKAGES_COMMA_SEP}
   GOX_FLAGS: ${env.GOX_FLAGS}
   GOX_OS: ${env.GOX_OS}
