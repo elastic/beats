@@ -195,6 +195,22 @@ available partitions only.
 
 NOTE: Publishing to a subset of available partitions potentially increases resource usage because events may become unevenly distributed.
 
+===== `headers`
+
+A header is a key-value pair, and multiple headers can be included with the same `key`. Only string values are supported. These headers will be included in each produced Kafka message.
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.kafka:
+  hosts: ["localhost:9092"]
+  topic: "logs-%{[agent.version]}"
+  headers:
+    - key: "some-key"
+      value: "some value"
+    - key: "another-key"
+      value: "another value"
+------------------------------------------------------------------------------
+
 ===== `client_id`
 
 The configurable ClientID used for logging, debugging, and auditing purposes. The default is "beats".

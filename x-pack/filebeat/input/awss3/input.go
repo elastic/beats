@@ -293,7 +293,7 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 		return "aws"
 	}
 	// List of popular S3 SaaS providers
-	var providers = map[string]string{
+	providers := map[string]string{
 		"amazonaws.com":          "aws",
 		"c2s.sgov.gov":           "aws",
 		"c2s.ic.gov":             "aws",
