@@ -44,12 +44,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix handling of execve call events which have no argument. {issue}30585[30585] {pull}30586[30586]
 
 *Filebeat*
-
+- Fix broken Kafka input {issue}29746[29746] {pull}30277[30277]
 - Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
 - auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
 - elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
 - Fix ECS version string in threatintel to be consistent with other modules and add event.timezone. {issue}30499[30499] {pull}30570[30570]
 - Add default paths value to MySQL Enterprise module to prevent issues with pipeline installations {pull}30598[30598]
+- Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
 - Update documentation for accessing `last_response.url.params` in httpjson input. {pull}30739[30739]
 - Fix add_kubernetes_metadata matcher: support rotated logs when `resource_type: pod` {pull}30720[30720]
 - Allow fixing data duplication on restart when filestream inputs did not have an ID set. Setting an ID for filestream
