@@ -33,7 +33,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 	var summary kubernetes.Summary
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
-		return nil, fmt.Errorf("cannot unmarshal json response: %w", err)
+		return nil, fmt.Errorf("cannot unmarshal json response: %s", err)
 	}
 
 	node := summary.Node

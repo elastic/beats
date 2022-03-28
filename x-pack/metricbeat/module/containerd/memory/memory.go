@@ -9,8 +9,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
@@ -106,11 +104,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 	families, _, err := m.mod.GetContainerdMetricsFamilies(m.prometheusClient)
 	if err != nil {
-		return errors.Wrap(err, "error getting families")
+		return fmt.Errorf("error getting families: %w", err)
 	}
 	events, err := m.prometheusClient.ProcessMetrics(families, mapping)
 	if err != nil {
-		return errors.Wrap(err, "error getting events")
+		return fmt.Errorf("error getting events: %w", err)
 	}
 
 	for _, event := range events {
@@ -123,9 +121,9 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 		cID := containerd.GetAndDeleteCid(event)
 		namespace := containerd.GetAndDeleteNamespace(event)
 
-		containerFields.Put("id", cID)
-		rootFields.Put("container", containerFields)
-		moduleFields.Put("namespace", namespace)
+		_, _ = containerFields.Put("id", cID)
+		_, _ = rootFields.Put("container", containerFields)
+		_, _ = moduleFields.Put("namespace", namespace)
 
 		// Calculate memory total usage percentage
 		if m.calcPct {
@@ -149,12 +147,12 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 				// calculate working set memory usage
 				workingSetUsage := usageTotal.(float64) - inactiveFiles.(float64)
 				workingSetUsagePct := workingSetUsage / mLfloat
-				event.Put("workingset.pct", workingSetUsagePct)
+				_, _ = event.Put("workingset.pct", workingSetUsagePct)
 
 				memoryUsagePct := usageTotal.(float64) / mLfloat
-				event.Put("usage.pct", memoryUsagePct)
+				_, _ = event.Put("usage.pct", memoryUsagePct)
 				// Update container.memory.usage ECS field
-				containerFields.Put("memory.usage", memoryUsagePct)
+				_, _ = containerFields.Put("memory.usage", memoryUsagePct)
 				m.Logger().Debugf("memoryUsagePct for %+v is %+v", cID, memoryUsagePct)
 			}
 		}

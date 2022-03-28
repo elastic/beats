@@ -86,16 +86,6 @@ func TestEventMapping(t *testing.T) {
 	for k, v := range testCases {
 		testValue(t, events[0], k, v)
 	}
-
-	containerEcsFields := ecsfields(events[0])
-	testEcs := map[string]interface{}{
-		"cpu.usage":    0.005631997,
-		"memory.usage": 0.01,
-		"name":         "nginx",
-	}
-	for k, v := range testEcs {
-		testValue(t, containerEcsFields, k, v)
-	}
 }
 
 func testValue(t *testing.T, event common.MapStr, field string, value interface{}) {

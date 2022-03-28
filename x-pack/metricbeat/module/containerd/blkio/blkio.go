@@ -9,8 +9,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/containerd"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -100,11 +98,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 	families, _, err := m.mod.GetContainerdMetricsFamilies(m.prometheusClient)
 	if err != nil {
-		return errors.Wrap(err, "error getting families")
+		return fmt.Errorf("error getting families: %w", err)
 	}
 	events, err := m.prometheusClient.ProcessMetrics(families, mapping)
 	if err != nil {
-		return errors.Wrap(err, "error getting events")
+		return fmt.Errorf("error getting events: %w", err)
 	}
 	for _, event := range events {
 		// setting ECS container.id and module field containerd.namespace
@@ -116,20 +114,20 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 		namespace := containerd.GetAndDeleteNamespace(event)
 
 		// Add container.id ECS field
-		containerFields.Put("id", cID)
+		_, _ = containerFields.Put("id", cID)
 		// Add disk.read.bytes ECS field
 		diskReadBytes, err := event.GetValue("read.bytes")
 		if err == nil {
-			containerFields.Put("disk.read.bytes", diskReadBytes)
+			_, _ = containerFields.Put("disk.read.bytes", diskReadBytes)
 		}
 		// Add disk.write.bytes ECS field
 		diskWriteBytes, err := event.GetValue("write.bytes")
 		if err == nil {
-			containerFields.Put("disk.write.bytes", diskWriteBytes)
+			_, _ = containerFields.Put("disk.write.bytes", diskWriteBytes)
 		}
 
-		rootFields.Put("container", containerFields)
-		moduleFields.Put("namespace", namespace)
+		_, _ = rootFields.Put("container", containerFields)
+		_, _ = moduleFields.Put("namespace", namespace)
 
 		reporter.Event(mb.Event{
 			RootFields:      rootFields,
