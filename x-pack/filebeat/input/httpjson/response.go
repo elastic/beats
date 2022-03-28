@@ -58,7 +58,7 @@ type responseProcessor struct {
 }
 
 func newResponseProcessor(config config, pagination *pagination, log *logp.Logger) []*responseProcessor {
-	var rps []*responseProcessor
+	rps := make([]*responseProcessor, 0, len(config.Chain) + 1)
 
 	rp := &responseProcessor{
 		pagination: pagination,

@@ -6,9 +6,10 @@ package httpjson
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"io/ioutil"
-	"math/rand"
+	"math/big"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -726,7 +727,11 @@ func retryHandler() http.HandlerFunc {
 			_, _ = w.Write([]byte(`{"hello":"world"}`))
 			return
 		}
-		w.WriteHeader(rand.Intn(100) + 500)
+		n, err := rand.Int(rand.Reader, big.NewInt(100))
+		if err != nil {
+			return
+		}
+		w.WriteHeader(int(n.Int64()) + 500)
 		count += 1
 	}
 }

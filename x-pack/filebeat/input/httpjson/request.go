@@ -105,7 +105,7 @@ type requestFactory struct {
 
 func newRequestFactory(config config, log *logp.Logger) []*requestFactory {
 	// config validation already checked for errors here
-	var rfs []*requestFactory
+	rfs := make([]*requestFactory, 0, len(config.Chain) + 1)
 	ts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
 	// regular call requestFactory object
 	rf := &requestFactory{
@@ -305,6 +305,7 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 	var err error
 	// collect ids from all responses
 	for _, resp := range intermediateResps {
+		defer resp.Body.Close()
 		if resp.Body != nil {
 			b, err = io.ReadAll(resp.Body)
 			if err != nil {
