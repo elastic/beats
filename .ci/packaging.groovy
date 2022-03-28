@@ -94,10 +94,6 @@ pipeline {
         }
         stage('Build Packages'){
           options { skipDefaultCheckout() }
-          when {
-            beforeAgent true
-            expression { return false }
-          }
           steps {
             generateSteps()
           }
@@ -115,18 +111,14 @@ pipeline {
         stage('DRA') {
           environment {
             // It uses the folder structure done in uploadPackagesToGoogleBucket
-            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/561d0a3809d492fb55a72bf7fbe4f60bbd4dc9e9"
+            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
           }
           steps {
             dir("${BASE_DIR}") {
-              withMageEnv(){
-                sh(label: 'make build/distributions/dependencies.csv', script: 'make build/distributions/dependencies.csv')
-                sh(label: 'make beats-dashboards', script: 'make beats-dashboards')
-              }
               // TODO: as long as googleStorageDownload does not support recursive copy with **/*
               dir("build/distributions") {
                 gsutil(command: "-m -q cp -r ${env.BUCKET_URI} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
-                sh(label: 'move one level up', script: "mv 561d0a3809d492fb55a72bf7fbe4f60bbd4dc9e9/** .")
+                sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
               }
               sh(label: "Debug package", script: 'find build/distributions -type f -ls || true')
               dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
