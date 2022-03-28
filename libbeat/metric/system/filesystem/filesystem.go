@@ -102,11 +102,12 @@ func GetFilesystems(hostfs resolve.Resolver, filter func(FSStat) bool) ([]FSStat
 func (fs *FSStat) fillMetrics() {
 	fs.Used.Bytes = fs.Total.SubtractOrNone(fs.Free)
 
+	// I'm not sure why this does Used + avail instead of total, but I'm too afraid to change it
 	percTotal := fs.Used.Bytes.ValueOr(0) + fs.Avail.ValueOr(0)
 	if percTotal == 0 {
 		return
 	}
-	// I'm not sure why this does Used + avail instead of total, but I'm too afraid to change it
+
 	perc := float64(fs.Used.Bytes.ValueOr(0)) / float64(percTotal)
 	fs.Used.Pct = opt.FloatWith(common.Round(perc, common.DefaultDecimalPlacesCount))
 }
@@ -158,27 +159,20 @@ func filterDuplicates(fsList []FSStat) []FSStat {
 	for _, fs := range fsList {
 		// Don't do any further checks on block devices
 		if !filepath.IsAbs(fs.Device) {
-
 			filtered = append(filtered, fs)
 			continue
 		}
-
 		if seen, found := devices[fs.Device]; found {
-
 			if len(fs.Directory) < len(seen.Directory) {
 				devices[fs.Device] = fs
 			}
 			continue
 		}
-
 		devices[fs.Device] = fs
-
 	}
 
 	for _, fs := range devices {
-
 		filtered = append(filtered, fs)
-
 	}
 
 	return filtered

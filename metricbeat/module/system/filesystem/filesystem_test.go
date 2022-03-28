@@ -26,6 +26,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	fs "github.com/elastic/beats/v7/libbeat/metric/system/filesystem"
+	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 )
@@ -54,10 +56,10 @@ func TestData(t *testing.T) {
 }
 
 func getConfig() map[string]interface{} {
-	//ignoreTypes := append(fs.DefaultIgnoredTypes(resolve.NewTestResolver("")), "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs")
+	ignoreTypes := append(fs.DefaultIgnoredTypes(resolve.NewTestResolver("")), "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs")
 	return map[string]interface{}{
-		"module":     "system",
-		"metricsets": []string{"filesystem"},
-		//"filesystem.ignore_types": []string{},
+		"module":                  "system",
+		"metricsets":              []string{"filesystem"},
+		"filesystem.ignore_types": ignoreTypes,
 	}
 }
