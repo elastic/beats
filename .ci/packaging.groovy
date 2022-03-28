@@ -115,6 +115,7 @@ pipeline {
             dir("${BASE_DIR}") {
               withMageEnv(){
                 sh(label: 'make build/distributions/dependencies.csv', script: 'make build/distributions/dependencies.csv')
+                sh(label: 'make beats-dashboards', script: 'make beats-dashboards')
               }
               // TODO: as long as googleStorageDownload does not support recursive copy with **/*
               dir("build/distributions") {
