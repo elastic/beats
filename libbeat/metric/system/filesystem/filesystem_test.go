@@ -42,7 +42,8 @@ func TestMountList(t *testing.T) {
 		err := res.GetUsage()
 		assert.NoError(t, err, "getUsage")
 		out := common.MapStr{}
-		typeconv.Convert(&out, res)
+		err = typeconv.Convert(&out, res)
+		assert.NoError(t, err, "typeconv")
 		t.Logf("Usage: %s", out.StringToPrint())
 	}
 }

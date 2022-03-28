@@ -20,8 +20,6 @@ package filesystem
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/opt"
 	"github.com/elastic/gosigar/sys/windows"
 )
@@ -53,7 +51,7 @@ func parseMounts(_ string, filter func(FSStat) bool) ([]FSStat, error) {
 func (fs *FSStat) GetUsage() error {
 	freeBytesAvailable, totalNumberOfBytes, totalNumberOfFreeBytes, err := windows.GetDiskFreeSpaceEx(fs.Directory)
 	if err != nil {
-		return errors.Wrap(err, "GetDiskFreeSpaceEx failed")
+		return fmt.Errorf("GetDiskFreeSpaceEx failed: %w", err)
 	}
 
 	fs.Total = opt.UintWith(totalNumberOfBytes)

@@ -89,7 +89,7 @@ func GetFilesystems(hostfs resolve.Resolver, filter func(FSStat) bool) ([]FSStat
 		return avoidFileSystem(fs) && filter(fs)
 	}
 
-	mounts, err := parseMounts(fs, filterFunc) //nolint: typecheck //I don't think the linter likes platform-specific code
+	mounts, err := parseMounts(fs, filterFunc) //nolint: typecheck // I don't think the linter likes platform-specific code
 	if err != nil {
 		return nil, fmt.Errorf("error reading mounts: %w", err)
 	}
