@@ -64,7 +64,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "'cons' command failed")
 	}
 
-	events, err := m.parseCons(outputReader)
+	events := m.parseCons(outputReader)
 	if err != nil {
 		return errors.Wrap(err, "error parsing response from zookeeper")
 	}

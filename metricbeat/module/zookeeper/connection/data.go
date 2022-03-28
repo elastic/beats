@@ -31,7 +31,7 @@ import (
 
 var capturer = regexp.MustCompile(`/(?P<ip>.*):(?P<port>\d+)\[(?P<interest_ops>\d*)]\(queued=(?P<queued>\d*),recved=(?P<received>\d*),sent=(?P<sent>\d*)\)`)
 
-func (m *MetricSet) parseCons(i io.Reader) ([]mb.Event, error) {
+func (m *MetricSet) parseCons(i io.Reader) []mb.Event {
 	scanner := bufio.NewScanner(i)
 
 	result := make([]mb.Event, 0)
@@ -69,7 +69,7 @@ func (m *MetricSet) parseCons(i io.Reader) ([]mb.Event, error) {
 		}
 	}
 
-	return result, nil
+	return result
 }
 
 func lineToMap(line string) (map[string]string, error) {
