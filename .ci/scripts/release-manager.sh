@@ -55,8 +55,8 @@ docker run --rm \
   "$IMAGE" \
     cli collect \
       --project beats \
-      --branch "main" \
+      --branch "$BRANCH_NAME" \
       --commit "$(git rev-parse HEAD)" \
       --workflow "snapshot" \
       --artifact-set main \
-      --version "${VERSION}" | tee release-manager-report.out
+      --version "${VERSION}"
