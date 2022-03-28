@@ -19,11 +19,10 @@ package connection
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"regexp"
 	"strconv"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 
@@ -45,7 +44,7 @@ func (m *MetricSet) parseCons(i io.Reader) ([]mb.Event, error) {
 		oneParsingIsCorrect := false
 		keyMap, err := lineToMap(line)
 		if err != nil {
-			m.Logger().Errorf(err.Error())
+			m.Logger().Errorf("Error while parsing zookeeper  `cons' command %v", err.Error())
 			continue
 		}
 
@@ -77,7 +76,7 @@ func lineToMap(line string) (map[string]string, error) {
 	capturedPatterns := capturer.FindStringSubmatch(line)
 	if len(capturedPatterns) < 1 {
 		//Nothing captured
-		return nil, errors.Errorf("no data captured in '%s'", line)
+		return nil, fmt.Errorf("no data captured in '%s'", line)
 	}
 
 	keyMap := make(map[string]string)
@@ -105,6 +104,4 @@ func (m *MetricSet) checkRegexAndSetInt(output common.MapStr, capturedData strin
 	} else {
 		m.Logger().Errorf("parse error: empty data for key '%s'", key)
 	}
-
-	return
 }
