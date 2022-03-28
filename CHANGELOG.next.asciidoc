@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Update docker/distribution dependency library to fix a security issues concerning OCI Manifest Type Confusion Issue. {pull}30462[30462]
 - Add more descriptive error logs for common connection failures in Kafka inputs / outputs. {pull}30776[30776]
 - Fix dissect trim panics from DELETE (127)(\u007f) character {issue}30657[30657] {pull}30658[30658]
+- Add ecs container fields {pull}31020[31020]
 
 *Auditbeat*
 
