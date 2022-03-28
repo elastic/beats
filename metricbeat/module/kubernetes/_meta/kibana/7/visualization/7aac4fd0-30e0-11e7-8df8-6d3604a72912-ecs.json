@@ -12,6 +12,7 @@
             "params": {
                 "axis_formatter": "number",
                 "axis_position": "left",
+                "drop_last_bucket": 1,
                 "filter": {
                     "language": "lucene",
                     "query": "event.module:kubernetes AND metricset.name:state_deployment"
@@ -61,13 +62,13 @@
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "8.2.0",
     "id": "7aac4fd0-30e0-11e7-8df8-6d3604a72912-ecs",
     "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "8.1.0"
     },
     "references": [],
     "type": "visualization",
-    "updated_at": "2021-08-04T16:31:37.319Z",
-    "version": "WzQwMjQsMV0="
+    "updated_at": "2022-03-18T11:52:30.304Z",
+    "version": "WzI3MTQsMl0="
 }

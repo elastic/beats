@@ -182,6 +182,15 @@ func CollectDocs() error {
 	return metricbeat.CollectDocs()
 }
 
+// ExportDashboard exports a dashboard and writes it into the correct directory.
+//
+// Required environment variables:
+// - MODULE: Name of the module
+// - ID:     Dashboard id
+func ExportDashboard() error {
+	return devtools.ExportDashboard()
+}
+
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
