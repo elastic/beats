@@ -5,7 +5,7 @@
 #
 set -uo pipefail
 set +e
-if [ -e release-manager-report.out ] ; then
+if [ -f release-manager-report.out ] ; then
     echo "There are some errors, let's guess what they are about:" > release-manager-report.txt
     if grep 'Vault responded with HTTP status code' release-manager-report.out ; then
         echo 'Environmental issue with Vault. Try again' >> release-manager-report.txt
@@ -16,4 +16,6 @@ if [ -e release-manager-report.out ] ; then
     if grep 'does not exist' release-manager-report.out ; then
         echo 'Build file does not exist in the unified release. Likely the branch is not supported yet. Contact the release platform team' >> release-manager-report.txt
     fi
+else
+    echo 'WARN: release-manager-report.out does not exist'
 fi
