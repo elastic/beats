@@ -108,7 +108,7 @@ pipeline {
         stage('DRA') {
           environment {
             // It uses the folder structure done in uploadPackagesToGoogleBucket
-            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
+            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/561d0a3809d492fb55a72bf7fbe4f60bbd4dc9e9"
             HOME = "${env.WORKSPACE}"
           }
           steps {
@@ -120,7 +120,7 @@ pipeline {
               // TODO: as long as googleStorageDownload does not support recursive copy with **/*
               dir("build/distributions") {
                 gsutil(command: "-m -q cp -r ${env.BUCKET_URI} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
-                sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
+                sh(label: 'move one level up', script: "mv 561d0a3809d492fb55a72bf7fbe4f60bbd4dc9e9/** .")
               }
               sh(label: "Debug package", script: 'find build/distributions -type f -ls || true')
               dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
@@ -320,7 +320,6 @@ def release(){
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dir("${env.BEATS_FOLDER}") {
         sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
-        sh(label: "Debug package", script: 'find build/distributions -type f -ls || true')
         def folder = getBeatsName(env.BEATS_FOLDER)
         uploadPackagesToGoogleBucket(
           credentialsId: env.JOB_GCS_EXT_CREDENTIALS,
@@ -329,9 +328,6 @@ def release(){
           folder: folder,
           pattern: "build/distributions/*"
         )
-        sh(label: "Debug package", script: 'ls -ltra build/distributions/* || true')
-        def uri = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
-        gsutil(command: "-m -q list -r ${uri}/${folder}", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
       }
     }
   }
