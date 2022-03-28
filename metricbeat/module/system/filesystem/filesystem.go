@@ -57,7 +57,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-	sys := base.Module().(resolve.Resolver)
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, fmt.Errorf("resolver cannot be cast from the module")
+	}
 
 	if config.IgnoreTypes == nil {
 		config.IgnoreTypes = fs.DefaultIgnoredTypes(sys)

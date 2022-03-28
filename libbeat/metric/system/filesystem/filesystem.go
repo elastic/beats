@@ -89,7 +89,7 @@ func GetFilesystems(hostfs resolve.Resolver, filter func(FSStat) bool) ([]FSStat
 		return avoidFileSystem(fs) && filter(fs)
 	}
 
-	mounts, err := parseMounts(fs, filterFunc) //nolint: typecheck // I don't think the linter likes platform-specific code
+	mounts, err := parseMounts(fs, filterFunc)
 	if err != nil {
 		return nil, fmt.Errorf("error reading mounts: %w", err)
 	}
@@ -154,7 +154,7 @@ func buildDefaultFilters(hostfs resolve.Resolver) func(FSStat) bool {
 // store it only once, and use the shorter mount point path.
 func filterDuplicates(fsList []FSStat) []FSStat {
 	devices := make(map[string]FSStat)
-	var filtered []FSStat
+	filtered := []FSStat{}
 
 	for _, fs := range fsList {
 		// Don't do any further checks on block devices
