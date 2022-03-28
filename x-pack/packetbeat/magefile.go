@@ -161,7 +161,7 @@ func SystemTest(ctx context.Context) error {
 //
 // On Windows platforms, if getNpcapInstaller is invoked with the environment variables
 // CI or NPCAP_LOCAL set to "true" and the OEM Npcap installer is not available it is
-// obtained from the cloud storage. This behaviour requires access to the private image.
+// obtained from the cloud storage. This behaviour requires access to the private store.
 // If NPCAP_LOCAL is set to "true" and the file is in the npcap/installer directory, no
 // fetch will be made.
 func getNpcapInstaller() error {
