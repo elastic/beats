@@ -24,7 +24,7 @@ pipeline {
     SNAPSHOT = "true"
     PIPELINE_LOG_LEVEL = "INFO"
     SLACK_CHANNEL = '#beats'
-    NOTIFY_TO = 'package-beats+beats-contrib@elastic.co'
+    NOTIFY_TO = 'beats-contrib+package-beats@elastic.co'
   }
   options {
     timeout(time: 4, unit: 'HOURS')
