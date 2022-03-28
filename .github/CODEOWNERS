@@ -29,6 +29,7 @@
 /docs/ @elastic/elastic-agent-data-plane
 
 ### Filebeat
+
 # Filebeat is owned by the data plane team
 /filebeat @elastic/elastic-agent-data-plane
 /x-pack/filebeat @elastic/elastic-agent-data-plane
@@ -37,13 +38,88 @@
 /filebeat/module/ @elastic/integrations
 /x-pack/filebeat/module/ @elastic/integrations
 
+# Modules owned by the data plane team
+/filebeat/module/system @elastic/elastic-agent-data-plane
+
+# Modules owned by integrations team
+/filebeat/module/apache @elastic/integrations
+/filebeat/module/haproxy @elastic/integrations
+/filebeat/module/icinga @elastic/integrations
+/filebeat/module/iis @elastic/integrations
+/filebeat/module/kafka @elastic/integrations
+/filebeat/module/kibana @elastic/integrations
+/filebeat/module/logstash @elastic/integrations
+/filebeat/module/mongodb @elastic/integrations
+/filebeat/module/nats @elastic/integrations
+/filebeat/module/nginx @elastic/integrations
+/filebeat/module/postgresql @elastic/integrations
+/filebeat/module/redis @elastic/integrations
+/filebeat/module/traefik @elastic/integrations
+
+/x-pack/filebeat/module/activemq @elastic/integrations
+/x-pack/filebeat/module/ibmmq @elastic/integrations
+/x-pack/filebeat/module/mssql @elastic/integrations
+/x-pack/filebeat/module/rabbitmq @elastic/integrations
+/x-pack/filebeat/module/zookeeper @elastic/integrations
+
+# Modules owned by cloud-monitoring
+/x-pack/filebeat/module/aws @elastic/obs-cloud-monitoring
+/x-pack/filebeat/module/awsfargate @elastic/obs-cloud-monitoring
+/x-pack/filebeat/module/azure @elastic/obs-cloud-monitoring
+
 # Infra UI modules
 /filebeat/module/elasticsearch/ @elastic/infra-monitoring-ui
 /filebeat/module/kibana/ @elastic/infra-monitoring-ui
 /filebeat/module/logstash/ @elastic/infra-monitoring-ui
 
 # Security integrations modules
-/x-pack/filebeat/module/suricata/ @elastic/security-external-integrations
+/filebeat/module/auditd @elastic/security-external-integrations
+/filebeat/module/mysql @elastic/security-external-integrations
+/filebeat/module/pensando @elastic/security-external-integrations
+/filebeat/module/santa @elastic/security-external-integrations
+/x-pack/filebeat/module/barracuda @elastic/security-external-integrations
+/x-pack/filebeat/module/bluecoat @elastic/security-external-integrations
+/x-pack/filebeat/module/cef @elastic/security-external-integrations
+/x-pack/filebeat/module/checkpoint @elastic/security-external-integrations
+/x-pack/filebeat/module/cisco @elastic/security-external-integrations
+/x-pack/filebeat/module/coredns @elastic/security-external-integrations
+/x-pack/filebeat/module/crowdstrike @elastic/security-external-integrations
+/x-pack/filebeat/module/cyberarkpas @elastic/security-external-integrations
+/x-pack/filebeat/module/cylance @elastic/security-external-integrations
+/x-pack/filebeat/module/envoyproxy @elastic/security-external-integrations
+/x-pack/filebeat/module/f5 @elastic/security-external-integrations
+/x-pack/filebeat/module/fortinet @elastic/security-external-integrations
+/x-pack/filebeat/module/gcp @elastic/security-external-integrations
+/x-pack/filebeat/module/google_workspace @elastic/security-external-integrations
+/x-pack/filebeat/module/imperva @elastic/security-external-integrations
+/x-pack/filebeat/module/infoblox @elastic/security-external-integrations
+/x-pack/filebeat/module/iptables @elastic/security-external-integrations
+/x-pack/filebeat/module/juniper @elastic/security-external-integrations
+/x-pack/filebeat/module/microsoft @elastic/security-external-integrations
+/x-pack/filebeat/module/misp @elastic/security-external-integrations
+/x-pack/filebeat/module/mysqlenterprise @elastic/security-external-integrations
+/x-pack/filebeat/module/netflow @elastic/security-external-integrations
+/x-pack/filebeat/module/netscout @elastic/security-external-integrations
+/x-pack/filebeat/module/o365 @elastic/security-external-integrations
+/x-pack/filebeat/module/okta @elastic/security-external-integrations
+/x-pack/filebeat/module/oracle @elastic/security-external-integrations
+/x-pack/filebeat/module/panw @elastic/security-external-integrations
+/x-pack/filebeat/module/proofpoint @elastic/security-external-integrations
+/x-pack/filebeat/module/radware @elastic/security-external-integrations
+/x-pack/filebeat/module/snort @elastic/security-external-integrations
+/x-pack/filebeat/module/snyk @elastic/security-external-integrations
+/x-pack/filebeat/module/sonicwall @elastic/security-external-integrations
+/x-pack/filebeat/module/sophos @elastic/security-external-integrations
+/x-pack/filebeat/module/squid @elastic/security-external-integrations
+/x-pack/filebeat/module/suricata @elastic/security-external-integrations
+/x-pack/filebeat/module/threatintel @elastic/security-external-integrations
+/x-pack/filebeat/module/tomcat @elastic/security-external-integrations
+/x-pack/filebeat/module/zeek @elastic/security-external-integrations
+/x-pack/filebeat/module/zoom @elastic/security-external-integrations
+/x-pack/filebeat/module/zscaler @elastic/security-external-integrations
+
+# Security asset management modules
+/filebeat/module/osquery @elastic/security-asset-management
 
 # Security integrations inputs
 /filebeat/input/syslog/ @elastic/security-external-integrations
