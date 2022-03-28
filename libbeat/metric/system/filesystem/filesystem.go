@@ -113,9 +113,10 @@ func (fs *FSStat) fillMetrics() {
 
 // DefaultIgnoredTypes tries to guess a sane list of filesystem types that
 // could be ignored in the running system
-func DefaultIgnoredTypes(sys resolve.Resolver) (types []string) {
+func DefaultIgnoredTypes(sys resolve.Resolver) []string {
 	// If /proc/filesystems exist, default ignored types are all marked
 	// as nodev
+	types := []string{}
 	fsListFile := sys.ResolveHostFS("/proc/filesystems")
 	if f, err := os.Open(fsListFile); err == nil {
 		scanner := bufio.NewScanner(f)
@@ -126,7 +127,7 @@ func DefaultIgnoredTypes(sys resolve.Resolver) (types []string) {
 			}
 		}
 	}
-	return
+	return types
 }
 
 // BuildFilterWithList returns a filesystem filter with the given list of FS types
