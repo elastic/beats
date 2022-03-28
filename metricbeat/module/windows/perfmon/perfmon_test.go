@@ -194,7 +194,7 @@ func TestExistingCounter(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer handle.query.Close()
+	defer handle.Close()
 
 	values, err := handle.Read()
 	if err != nil {
@@ -242,7 +242,7 @@ func TestNonExistingCounter(t *testing.T) {
 	}
 
 	if handle != nil {
-		err = handle.query.Close()
+		err = handle.Close()
 		assert.NoError(t, err)
 	}
 }
@@ -287,7 +287,7 @@ func TestIgnoreNonExistentCounter(t *testing.T) {
 	}
 
 	if handle != nil {
-		err = handle.query.Close()
+		err = handle.Close()
 		assert.NoError(t, err)
 	}
 
@@ -336,7 +336,7 @@ func TestNonExistingObject(t *testing.T) {
 	}
 
 	if handle != nil {
-		err = handle.query.Close()
+		err = handle.Close()
 		assert.NoError(t, err)
 	}
 }
@@ -454,7 +454,7 @@ func TestWildcardQuery(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer handle.query.Close()
+	defer handle.Close()
 
 	values, _ := handle.Read()
 
@@ -490,7 +490,7 @@ func TestWildcardQueryNoInstanceName(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer handle.query.Close()
+	defer handle.Close()
 
 	values, _ := handle.Read()
 
@@ -541,7 +541,7 @@ func TestGroupByInstance(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer handle.query.Close()
+	defer handle.Close()
 
 	values, _ := handle.Read()
 
