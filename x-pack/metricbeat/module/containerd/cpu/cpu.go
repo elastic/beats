@@ -153,7 +153,7 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 				// Update container.cpu.usage ECS field
 				_, _ = containerFields.Put("cpu.usage", cpuUsageTotalPct)
 				// Update values
-				m.preContainerCpuTotalUsage[cID] = cpuUsageTotal.(float64)
+				m.preContainerCpuTotalUsage[cID], _ = cpuUsageTotal.(float64)
 			}
 
 			// Calculate cpu kernel usage percentage
@@ -165,7 +165,7 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 				m.Logger().Debugf("cpuUsageKernelPct for %+v is %+v", cID, cpuUsageKernelPct)
 				_, _ = event.Put("usage.kernel.pct", cpuUsageKernelPct)
 				// Update values
-				m.preContainerCpuKernelUsage[cID] = cpuUsageKernel.(float64)
+				m.preContainerCpuKernelUsage[cID], _ = cpuUsageKernel.(float64)
 			}
 
 			// Calculate cpu user usage percentage
@@ -176,7 +176,7 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 				m.Logger().Debugf("cpuUsageUserPct for %+v is %+v", cID, cpuUsageUserPct)
 				_, _ = event.Put("usage.user.pct", cpuUsageUserPct)
 				// Update values
-				m.preContainerCpuUserUsage[cID] = cpuUsageUser.(float64)
+				m.preContainerCpuUserUsage[cID], _ = cpuUsageUser.(float64)
 			}
 		}
 		if cpuId, err := event.GetValue("cpu"); err == nil {
@@ -206,7 +206,7 @@ func setContCpus(event common.MapStr, perContainerCpus map[string]int) {
 	if err != nil {
 		return
 	}
-	cid := val.(string)
+	cid, _ := val.(string)
 	_, err = event.GetValue("usage.percpu.ns")
 	if err != nil {
 		return
