@@ -101,7 +101,6 @@ type requestFactory struct {
 	log        *logp.Logger
 	encoder    encoderFunc
 	replace    string
-	split      *split
 }
 
 func newRequestFactory(config config, log *logp.Logger) []*requestFactory {
@@ -124,7 +123,7 @@ func newRequestFactory(config config, log *logp.Logger) []*requestFactory {
 	rfs = append(rfs, rf)
 	for _, ch := range config.Chain {
 		// chain calls requestFactory object
-		split, _ := newSplitResponse(ch.Step.Response.Split, log)
+		ts, _ := newBasicTransformsFromConfig(ch.Step.Request.Transforms, requestNamespace, log)
 		rf := &requestFactory{
 			url:        *ch.Step.Request.URL.URL,
 			method:     ch.Step.Request.Method,
@@ -133,7 +132,6 @@ func newRequestFactory(config config, log *logp.Logger) []*requestFactory {
 			log:        log,
 			encoder:    registeredEncoders[config.Request.EncodeAs],
 			replace:    ch.Step.Replace,
-			split:      split,
 		}
 		rfs = append(rfs, rf)
 	}
@@ -176,22 +174,22 @@ func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx *transfor
 }
 
 type requester struct {
-	log               *logp.Logger
-	client            *httpClient
-	requestFactories  []*requestFactory
-	responseProcessor *responseProcessor
+	log                *logp.Logger
+	client             *httpClient
+	requestFactories   []*requestFactory
+	responseProcessors []*responseProcessor
 }
 
 func newRequester(
 	client *httpClient,
 	requestFactory []*requestFactory,
-	responseProcessor *responseProcessor,
+	responseProcessor []*responseProcessor,
 	log *logp.Logger) *requester {
 	return &requester{
-		log:               log,
-		client:            client,
-		requestFactories:  requestFactory,
-		responseProcessor: responseProcessor,
+		log:                log,
+		client:             client,
+		requestFactories:   requestFactory,
+		responseProcessors: responseProcessor,
 	}
 }
 
@@ -222,7 +220,6 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		n                 int
 		ids               []string
 		err               error
-		split             *split
 		urlCopy           url.URL
 		urlString         string
 		httpResp          *http.Response
@@ -241,10 +238,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			}
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
-				n, err = r.processAndPublishEvents(stdCtx, trCtx, publisher, finalResps, true)
-				if err != nil {
-					return err
-				}
+				n = r.processAndPublishEvents(stdCtx, trCtx, publisher, finalResps, true, i)
 				continue
 			}
 			intermediateResps = append(intermediateResps, httpResp)
@@ -252,10 +246,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 			if err != nil {
 				return err
 			}
-			n, err = r.processAndPublishEvents(stdCtx, trCtx, publisher, intermediateResps, false)
-			if err != nil {
-				return err
-			}
+			n = r.processAndPublishEvents(stdCtx, trCtx, publisher, intermediateResps, false, i)
 		} else {
 			if len(ids) == 0 {
 				n = 0
@@ -297,16 +288,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				}
 				resps = intermediateResps
 			}
-			split = r.responseProcessor.split
-			r.responseProcessor.split = rf.split
-			n, err = r.processAndPublishEvents(stdCtx, trCtx, publisher, resps, i < len(r.requestFactories))
-			if err != nil {
-				return err
-			}
-			r.responseProcessor.split = split
+			n = r.processAndPublishEvents(stdCtx, trCtx, publisher, resps, i < len(r.requestFactories), i)
 		}
 	}
 
+	defer httpResp.Body.Close()
 	r.log.Infof("request finished: %d events published", n)
 
 	return nil
@@ -357,8 +343,8 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 }
 
 // processAndPublishEvents process and publish events based on response type
-func (r *requester) processAndPublishEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, finalResps []*http.Response, publish bool) (int, error) {
-	eventsCh := r.responseProcessor.startProcessing(stdCtx, trCtx, finalResps)
+func (r *requester) processAndPublishEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, finalResps []*http.Response, publish bool, i int) int {
+	eventsCh := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps)
 
 	trCtx.clearIntervalData()
 
@@ -388,7 +374,7 @@ func (r *requester) processAndPublishEvents(stdCtx context.Context, trCtx *trans
 		trCtx.updateCursor()
 		n++
 	}
-	return n, nil
+	return n
 }
 
 // drainBody reads all of b to memory and then returns a equivalent

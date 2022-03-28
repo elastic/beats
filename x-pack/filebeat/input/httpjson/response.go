@@ -57,22 +57,39 @@ type responseProcessor struct {
 	pagination *pagination
 }
 
-func newResponseProcessor(config *responseConfig, pagination *pagination, log *logp.Logger) *responseProcessor {
+func newResponseProcessor(config config, pagination *pagination, log *logp.Logger) []*responseProcessor {
+	var rps []*responseProcessor
+
 	rp := &responseProcessor{
 		pagination: pagination,
 		log:        log,
 	}
-	if config == nil {
-		return rp
+	if config.Response == nil {
+		rps = append(rps, rp)
+		return rps
 	}
-	ts, _ := newBasicTransformsFromConfig(config.Transforms, responseNamespace, log)
+	ts, _ := newBasicTransformsFromConfig(config.Response.Transforms, responseNamespace, log)
 	rp.transforms = ts
 
-	split, _ := newSplitResponse(config.Split, log)
+	split, _ := newSplitResponse(config.Response.Split, log)
 
 	rp.split = split
 
-	return rp
+	rps = append(rps, rp)
+	for _, ch := range config.Chain {
+		rp := &responseProcessor{
+			pagination: pagination,
+			log:        log,
+		}
+		// chain calls responseProcessor object
+		split, _ := newSplitResponse(ch.Step.Response.Split, log)
+
+		rp.split = split
+
+		rps = append(rps, rp)
+	}
+
+	return rps
 }
 
 func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response) <-chan maybeMsg {

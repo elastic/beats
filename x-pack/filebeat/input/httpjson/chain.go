@@ -56,6 +56,11 @@
 
 package httpjson
 
+import (
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+)
+
 // chainConfig for chain request.
 // Following contains basic call structure for each call after normal httpjson
 // call.
@@ -68,7 +73,21 @@ type chainConfig struct {
 // will contain replace string with original URL to make a skeleton for the
 // call request.
 type stepConfig struct {
-	Request  requestConfig  `config:"request"`
-	Response responseConfig `config:"response,omitempty"`
-	Replace  string         `config:"replace,omitempty"`
+	Request  requestChainConfig  `config:"request"`
+	Response responseChainConfig `config:"response,omitempty"`
+	Replace  string              `config:"replace,omitempty"`
+}
+
+type requestChainConfig struct {
+	URL        *urlConfig       `config:"url" validate:"required"`
+	Method     string           `config:"method" validate:"required"`
+	Body       *common.MapStr   `config:"body"`
+	Transforms transformsConfig `config:"transforms"`
+
+	Transport httpcommon.HTTPTransportSettings `config:",inline"`
+}
+
+type responseChainConfig struct {
+	Transforms transformsConfig `config:"transforms"`
+	Split      *splitConfig     `config:"split"`
 }

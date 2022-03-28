@@ -1070,7 +1070,7 @@ request_url using file_name as 'file_2': https://example.com/services/data/v1.0/
 +
 Collect and make events from response in any format supported by httpjson for all calls.
 
-NOTE: httpjson chain will only create and ingest events from last call on chain configurations. 
+NOTE: httpjson chain will only create and ingest events from last call on chained configurations. Also, the current chain only supports the following: `request.url`, `request.method`, `request.transforms`, `request.body`, `response.transforms` and `response.split`.
 
 [[cursor]]
 [float]
@@ -1117,8 +1117,11 @@ image:images/input-httpjson-lifecycle.png[Request lifecycle]
 . The resulting transformed request is executed.
 . The server responds (here is where any retry or rate limit policy takes place when configured).
 . The response is transformed using the configured `response.transforms` and `response.split`.
+. If chain step is configured. step will generate new requests based on collected ids from responses. the requests will be transformed using configured `request.transforms`. resulting generated transformed requests will be executed. this process will happen for all the steps mentioned in chain.
 . Each resulting event is published to the output.
 . If a `response.pagination` is configured and there are more pages, a new request is created using it, otherwise the process ends until the next interval.
+
+image:images/input-httpjson-chain-lifecycle.png[Chain Request lifecycle]
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]

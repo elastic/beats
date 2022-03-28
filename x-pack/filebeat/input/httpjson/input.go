@@ -113,7 +113,7 @@ func run(
 
 	requestFactory := newRequestFactory(config, log)
 	pagination := newPagination(config, httpClient, log)
-	responseProcessor := newResponseProcessor(config.Response, pagination, log)
+	responseProcessor := newResponseProcessor(config, pagination, log)
 	requester := newRequester(httpClient, requestFactory, responseProcessor, log)
 
 	trCtx := emptyTransformContext()
