@@ -59,6 +59,9 @@ pipeline {
           }
         }
       }
+      environment {
+        HOME = "${env.WORKSPACE}"
+      }
       stages {
         stage('Checkout') {
           options { skipDefaultCheckout() }
@@ -109,7 +112,6 @@ pipeline {
           environment {
             // It uses the folder structure done in uploadPackagesToGoogleBucket
             BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/561d0a3809d492fb55a72bf7fbe4f60bbd4dc9e9"
-            HOME = "${env.WORKSPACE}"
           }
           steps {
             dir("${BASE_DIR}") {
@@ -195,6 +197,18 @@ def generateSteps() {
     parallelTasks["linux-${beat}"] = generateLinuxStep(beat)
     if (armBeats.contains(beat)) {
       parallelTasks["arm-${beat}"] =  generateArmStep(beat)
+    }
+  }
+
+  // enable beats-dashboards within the existing worker
+  parallelTasks["beats-dashboards"] = {
+    withGithubNotify(context: "beats-dashboards") {
+      withEnv(["HOME=${env.WORKSPACE}"]) {
+        withBeatsEnv() {
+          sh(label: 'make dependencies.csv', script: 'make build/distributions/dependencies.csv')
+          sh(label: 'make beats-dashboards', script: 'make beats-dashboards')
+        }
+      }
     }
   }
   parallel(parallelTasks)
