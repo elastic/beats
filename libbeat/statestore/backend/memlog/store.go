@@ -225,8 +225,8 @@ func (s *store) logOperation(op op) error {
 		if err != nil {
 			// if writing the new checkpoint file failed we try to fallback to
 			// appending the log operation.
-			// TODO: make append configurable and retry checkpointing with backoff.
-			s.disk.LogOperation(op)
+			// idea: make append configurable and retry checkpointing with backoff.
+			_ = s.disk.LogOperation(op)
 		}
 
 		return err
