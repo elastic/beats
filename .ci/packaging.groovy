@@ -94,6 +94,10 @@ pipeline {
         }
         stage('Build Packages'){
           options { skipDefaultCheckout() }
+          when {
+            beforeAgent true
+            expression { return false }
+          }
           steps {
             generateSteps()
           }
