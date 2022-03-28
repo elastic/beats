@@ -115,7 +115,19 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 		cID := containerd.GetAndDeleteCid(event)
 		namespace := containerd.GetAndDeleteNamespace(event)
 
+		// Add container.id ECS field
 		containerFields.Put("id", cID)
+		// Add disk.read.bytes ECS field
+		diskReadBytes, err := event.GetValue("read.bytes")
+		if err == nil {
+			containerFields.Put("disk.read.bytes", diskReadBytes)
+		}
+		// Add disk.write.bytes ECS field
+		diskWriteBytes, err := event.GetValue("write.bytes")
+		if err == nil {
+			containerFields.Put("disk.write.bytes", diskWriteBytes)
+		}
+
 		rootFields.Put("container", containerFields)
 		moduleFields.Put("namespace", namespace)
 

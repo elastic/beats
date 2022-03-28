@@ -152,6 +152,8 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 					float64(contCpus), cID, m.preContainerCpuTotalUsage)
 				m.Logger().Debugf("cpuUsageTotalPct for %+v is %+v", cID, cpuUsageTotalPct)
 				event.Put("usage.total.pct", cpuUsageTotalPct)
+				// Update container.cpu.usage ECS field
+				containerFields.Put("cpu.usage", cpuUsageTotalPct)
 				// Update values
 				m.preContainerCpuTotalUsage[cID] = cpuUsageTotal.(float64)
 			}
