@@ -18,7 +18,6 @@
 package filesystem
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"runtime"
@@ -53,26 +52,19 @@ func TestFileSystemList(t *testing.T) {
 		t.Skip("FileSystem test fails on Travis/OSX with i/o error")
 	}
 	hostfs := resolve.NewTestResolver("/")
-	fss, err := GetFilesystems(hostfs, nil)
+	//Exclude FS types that will give us a permission error
+	fss, err := GetFilesystems(hostfs, BuildFilterWithList([]string{"cdrom", "tracefs", "overlay", "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs"}))
 	if err != nil {
 		t.Fatal("GetFileSystemList", err)
 	}
 	assert.True(t, (len(fss) > 0))
 
 	for _, fs := range fss {
-		if fs.Type == "cdrom" {
-			continue
-		}
 
 		err := fs.GetUsage()
 
-		if assert.NoError(t, err, "filesystem=%v: %v", fs, err) {
-			assert.True(t, (fs.Total.ValueOr(0) >= 0))
-			assert.True(t, (fs.Free.ValueOr(0) >= 0))
-			assert.True(t, (fs.Avail.ValueOr(0) >= 0))
-			assert.True(t, (fs.Used.Bytes.ValueOr(0) >= 0))
+		assert.NoError(t, err, "filesystem=%v: %v", fs, err)
 
-		}
 	}
 }
 
@@ -178,7 +170,6 @@ func filterFileSystemList(stats []FSStat) []FSStat {
 	filtered := []FSStat{}
 	for _, stat := range stats {
 		if avoidFileSystem(stat) && buildDefaultFilters(hostfs)(stat) {
-			fmt.Printf("Appending %#v\n", stat.Directory)
 			filtered = append(filtered, stat)
 		}
 

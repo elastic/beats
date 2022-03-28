@@ -33,8 +33,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
-var debugf = logp.MakeDebug("system.filesystem")
-
 func init() {
 	mb.Registry.MustAddMetricSet("system", "filesystem", New,
 		mb.WithHostParser(parse.EmptyHostParser),
@@ -89,7 +87,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			return fmt.Errorf("error getting filesystem usage for %s: %w", fs.Directory, err)
 		}
 		out := common.MapStr{}
-		typeconv.Convert(&out, fs)
+		err = typeconv.Convert(&out, fs)
+		if err != nil {
+			return fmt.Errorf("error converting event %s: %w", fs.Device, err)
+		}
 
 		event := mb.Event{
 			MetricSetFields: out,

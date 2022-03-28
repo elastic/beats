@@ -35,7 +35,8 @@ import (
 func TestFetch(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
-	logp.DevelopmentSetup()
+	err := logp.DevelopmentSetup()
+	assert.NoError(t, err)
 	assert.Empty(t, errs)
 	if !assert.NotEmpty(t, events) {
 		t.FailNow()
