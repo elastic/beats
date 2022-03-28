@@ -6,6 +6,7 @@ package aws
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -15,7 +16,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/aws/stscreds"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
@@ -98,7 +98,6 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 }
 
 func getAccessKeys(config ConfigAWS) awssdk.Config {
-	//logger := logp.NewLogger("getAccessKeys")
 	awsConfig := defaults.Config()
 	awsCredentials := awssdk.Credentials{
 		AccessKeyID:     config.AccessKeyID,
@@ -137,7 +136,7 @@ func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 
 	awsConfig, err := external.LoadDefaultAWSConfig(options...)
 	if err != nil {
-		return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed with shared credential profile given")
+		return awsConfig, fmt.Errorf("external.LoadDefaultAWSConfig failed with shared credential profile given: %w", err)
 	}
 
 	logger.Debug("Using shared credential profile for AWS credential")
