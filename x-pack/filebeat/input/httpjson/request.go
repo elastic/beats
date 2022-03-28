@@ -74,7 +74,7 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 		}
 	}
 
-	if rf.method == "POST" {
+	if rf.method == http.MethodPost {
 		header = req.header()
 		if header.Get("Content-Type") == "" {
 			header.Set("Content-Type", "application/json")
@@ -123,7 +123,7 @@ func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx *transfor
 	}
 
 	var body []byte
-	if rf.method == "POST" {
+	if rf.method == http.MethodPost {
 		if rf.encoder != nil {
 			body, err = rf.encoder(trReq)
 		} else {
