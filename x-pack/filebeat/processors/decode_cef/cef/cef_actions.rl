@@ -59,6 +59,9 @@
     }
     action extension_value_start {
         if len(state.escapes) != 0 {
+            // If we are here we must have been in a syntactically incorrect extension that failed to
+            // satisfy the machine and so did not trigger extension_eof and consume the escapes.
+            // This consumes them so we can move on.
             e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
             state.reset()
         }

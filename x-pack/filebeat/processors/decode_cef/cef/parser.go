@@ -1053,6 +1053,9 @@ func (e *Event) unpack(data string) error {
 //line cef_actions.rl:60
 
 		if len(state.escapes) != 0 {
+			// If we are here we must have been in a syntactically incorrect extension that failed to
+			// satisfy the machine and so did not trigger extension_eof and consume the escapes.
+			// This consumes them so we can move on.
 			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
 			state.reset()
 		}
@@ -1061,13 +1064,13 @@ func (e *Event) unpack(data string) error {
 
 		goto _again
 	f25:
-//line cef_actions.rl:68
+//line cef_actions.rl:71
 
 		state.valueEnd = p + 1
 
 		goto _again
 	f24:
-//line cef_actions.rl:78
+//line cef_actions.rl:81
 
 		recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
 		(p)--
@@ -1075,7 +1078,7 @@ func (e *Event) unpack(data string) error {
 
 		goto _again
 	f26:
-//line cef_actions.rl:82
+//line cef_actions.rl:85
 
 		state.reset()
 		// Resume processing at p, the start of the next extension key.
@@ -1163,7 +1166,7 @@ func (e *Event) unpack(data string) error {
 
 		mark = p
 
-//line cef_actions.rl:68
+//line cef_actions.rl:71
 
 		state.valueEnd = p + 1
 
@@ -1238,7 +1241,7 @@ func (e *Event) unpack(data string) error {
 
 		state.pushEscape(mark_slash, p)
 
-//line cef_actions.rl:68
+//line cef_actions.rl:71
 
 		state.valueEnd = p + 1
 
@@ -1257,6 +1260,9 @@ func (e *Event) unpack(data string) error {
 //line cef_actions.rl:60
 
 		if len(state.escapes) != 0 {
+			// If we are here we must have been in a syntactically incorrect extension that failed to
+			// satisfy the machine and so did not trigger extension_eof and consume the escapes.
+			// This consumes them so we can move on.
 			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
 			state.reset()
 		}
@@ -1272,19 +1278,22 @@ func (e *Event) unpack(data string) error {
 //line cef_actions.rl:60
 
 		if len(state.escapes) != 0 {
+			// If we are here we must have been in a syntactically incorrect extension that failed to
+			// satisfy the machine and so did not trigger extension_eof and consume the escapes.
+			// This consumes them so we can move on.
 			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
 			state.reset()
 		}
 		state.valueStart = p
 		state.valueEnd = p
 
-//line cef_actions.rl:68
+//line cef_actions.rl:71
 
 		state.valueEnd = p + 1
 
 		goto _again
 	f34:
-//line cef_actions.rl:68
+//line cef_actions.rl:71
 
 		state.valueEnd = p + 1
 
@@ -1312,7 +1321,7 @@ func (e *Event) unpack(data string) error {
 				complete = true
 
 			case 34:
-//line cef_actions.rl:71
+//line cef_actions.rl:74
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(state.key) != 0 && state.valueStart < state.valueEnd {
@@ -1321,7 +1330,7 @@ func (e *Event) unpack(data string) error {
 				}
 
 			case 25:
-//line cef_actions.rl:78
+//line cef_actions.rl:81
 
 				recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
 				(p)--
@@ -1332,7 +1341,7 @@ func (e *Event) unpack(data string) error {
 
 				state.pushEscape(mark_slash, p)
 
-//line cef_actions.rl:71
+//line cef_actions.rl:74
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(state.key) != 0 && state.valueStart < state.valueEnd {
@@ -1344,13 +1353,16 @@ func (e *Event) unpack(data string) error {
 //line cef_actions.rl:60
 
 				if len(state.escapes) != 0 {
+					// If we are here we must have been in a syntactically incorrect extension that failed to
+					// satisfy the machine and so did not trigger extension_eof and consume the escapes.
+					// This consumes them so we can move on.
 					e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
 					state.reset()
 				}
 				state.valueStart = p
 				state.valueEnd = p
 
-//line cef_actions.rl:71
+//line cef_actions.rl:74
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(state.key) != 0 && state.valueStart < state.valueEnd {
@@ -1358,7 +1370,7 @@ func (e *Event) unpack(data string) error {
 					state.reset()
 				}
 
-//line parser.go:1156
+//line parser.go:1168
 			}
 		}
 
