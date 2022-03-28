@@ -33,7 +33,11 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
+<<<<<<< HEAD
 		return nil, fmt.Errorf("cannot unmarshal json response: %w", err)
+=======
+		return nil, fmt.Errorf("Cannot unmarshal json response: %w", err)
+>>>>>>> 4dab6063df (fix linting errors)
 	}
 
 	node := summary.Node
