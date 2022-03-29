@@ -1117,7 +1117,7 @@ image:images/input-httpjson-lifecycle.png[Request lifecycle]
 . The resulting transformed request is executed.
 . The server responds (here is where any retry or rate limit policy takes place when configured).
 . The response is transformed using the configured `response.transforms` and `response.split`.
-. If chain step is configured. step will generate new requests based on collected ids from responses. the requests will be transformed using configured `request.transforms`. resulting generated transformed requests will be executed. this process will happen for all the steps mentioned in chain.
+. If a chain step is configured. Each step will generate new requests based on collected IDs from responses. The requests will be transformed using configured `request.transforms` and the resulting generated transformed requests will be executed. This process will happen for all the steps mentioned in the chain.
 . Each resulting event is published to the output.
 . If a `response.pagination` is configured and there are more pages, a new request is created using it, otherwise the process ends until the next interval.
 
@@ -1126,8 +1126,8 @@ image:images/input-httpjson-chain-lifecycle.png[Chain Request lifecycle]
 . Response from regular call will be processed.
 . Extract data from response and generate new requests from responses.
 . Process generated requests and collect responses from server.
-. go back to step-2 for the next step.
-. publish collected responses from the last chain step.
+. Go back to step-2 for the next step.
+. Publish collected responses from the last chain step.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]

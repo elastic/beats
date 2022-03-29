@@ -394,11 +394,11 @@ func TestInput(t *testing.T) {
 			setupServer: newChainTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       10,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{
-							"request.method": "GET",
+							"request.method": http.MethodGet,
 							"replace":        "$.records[:].id",
 						},
 					},
@@ -428,17 +428,17 @@ func TestInput(t *testing.T) {
 			},
 			baseConfig: map[string]interface{}{
 				"interval":       10,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{
-							"request.method": "GET",
+							"request.method": http.MethodGet,
 							"replace":        "$.records[:].id",
 						},
 					},
 					map[string]interface{}{
 						"step": map[string]interface{}{
-							"request.method": "GET",
+							"request.method": http.MethodGet,
 							"replace":        "$.file_name",
 						},
 					},
@@ -474,7 +474,7 @@ func TestInput(t *testing.T) {
 			},
 			baseConfig: map[string]interface{}{
 				"interval":       1,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 				"request.transforms": []interface{}{
 					map[string]interface{}{
 						"set": map[string]interface{}{
@@ -487,7 +487,7 @@ func TestInput(t *testing.T) {
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{
-							"request.method": "GET",
+							"request.method": http.MethodGet,
 							"replace":        "$.records[:].id",
 						},
 					},
@@ -506,11 +506,11 @@ func TestInput(t *testing.T) {
 			setupServer: newChainTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{
-							"request.method": "GET",
+							"request.method": http.MethodGet,
 							"replace":        "$.records[:].id",
 							"response.split": map[string]interface{}{
 								"target": "body.hello",
@@ -527,11 +527,11 @@ func TestInput(t *testing.T) {
 			setupServer: newChainTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{
-							"request.method": "GET",
+							"request.method": http.MethodGet,
 							"replace":        "$.records[:].id",
 							"response.split": map[string]interface{}{
 								"target":      "body.hello",
@@ -552,14 +552,14 @@ func TestInput(t *testing.T) {
 			setupServer: newChainTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 				"response.split": map[string]interface{}{
 					"target": "body.hello",
 				},
 				"chain": []interface{}{
 					map[string]interface{}{
 						"step": map[string]interface{}{
-							"request.method": "GET",
+							"request.method": http.MethodGet,
 							"replace":        "$.records[:].id",
 							"response.split": map[string]interface{}{
 								"target": "body.hello",
