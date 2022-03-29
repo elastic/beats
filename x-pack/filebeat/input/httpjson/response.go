@@ -74,7 +74,7 @@ func newResponseProcessor(config *responseConfig, pagination *pagination, log *l
 	return rp
 }
 
-func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resp *http.Response) (<-chan maybeMsg, error) {
+func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resp *http.Response) <-chan maybeMsg {
 	ch := make(chan maybeMsg)
 
 	go func() {
@@ -118,7 +118,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 				}
 
 				if err := rp.split.run(trCtx, tr, ch); err != nil {
-					switch err {
+					switch err { //nolint:errorlint // run never returns a wrapped error.
 					case errEmptyField:
 						// nothing else to send for this page
 						rp.log.Debug("split operation finished")
@@ -137,7 +137,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 		}
 	}()
 
-	return ch, nil
+	return ch
 }
 
 func (resp *response) asTransformables(log *logp.Logger) []transformable {
