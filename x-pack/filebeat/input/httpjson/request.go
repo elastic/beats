@@ -232,16 +232,16 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		// iterate over collected ids from last response
 		if i == 0 {
 			// perform and store regular call responses
-			httpResp, err = rf.collectResponse(stdCtx, trCtx, r)
+			httpResp, err = rf.collectResponse(stdCtx, trCtx, r) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
 			if err != nil {
 				return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 			}
 			if len(r.requestFactories) == 1 {
-				finalResps = append(finalResps, httpResp)
+				finalResps = append(finalResps, httpResp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
 				n = r.processAndPublishEvents(stdCtx, trCtx, publisher, finalResps, true, i)
 				continue
 			}
-			intermediateResps = append(intermediateResps, httpResp)
+			intermediateResps = append(intermediateResps, httpResp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
 			ids, err = r.getIdsFromResponses(intermediateResps, r.requestFactories[i+1].replace)
 			if err != nil {
 				return err
@@ -263,15 +263,15 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 				}
 
 				// collect data from new urls
-				httpResp, err = rf.collectResponse(stdCtx, trCtx, r)
+				httpResp, err = rf.collectResponse(stdCtx, trCtx, r) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
 				if err != nil {
 					return fmt.Errorf("failed to execute rf.collectResponse: %w", err)
 				}
 				// store data according to response type
 				if i == len(r.requestFactories)-1 && len(ids) != 0 {
-					finalResps = append(finalResps, httpResp)
+					finalResps = append(finalResps, httpResp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
 				} else {
-					intermediateResps = append(intermediateResps, httpResp)
+					intermediateResps = append(intermediateResps, httpResp) //nolint:bodyclose // Bad linter! The response body will always be closed by drainBody function.
 				}
 			}
 			rf.url = urlCopy

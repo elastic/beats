@@ -140,7 +140,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 					}
 
 					if err := rp.split.run(trCtx, tr, ch); err != nil {
-						switch err {
+						switch err { //nolint:errorlint // run never returns a wrapped error.
 						case errEmptyField:
 							// nothing else to send for this page
 							rp.log.Debug("split operation finished")

@@ -23,8 +23,6 @@ import (
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 )
 
-const barConst = "bar"
-
 func TestInput(t *testing.T) {
 	testCases := []struct {
 		name        string
@@ -838,7 +836,7 @@ func paginationArrayHandler() http.HandlerFunc {
 		case 0:
 			_, _ = w.Write([]byte(`[{"nextPageToken":"bar","foo":"bar"},{"foo":"bar"}]`))
 		case 1:
-			if r.URL.Query().Get("page") != "bar" { //nolint:goconst // Bad linter! Tests should be explicit and local.
+			if r.URL.Query().Get("page") != "bar" {
 				w.WriteHeader(http.StatusBadRequest)
 				_, _ = w.Write([]byte(`{"error":"wrong page token value"}`))
 				return
