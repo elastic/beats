@@ -38,9 +38,9 @@ func TestInput(t *testing.T) {
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 			},
-			handler:  defaultHandler("GET", ""),
+			handler:  defaultHandler(http.MethodGet, ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -48,10 +48,10 @@ func TestInput(t *testing.T) {
 			setupServer: newTestServer(httptest.NewTLSServer),
 			baseConfig: map[string]interface{}{
 				"interval":                      1,
-				"request.method":                "GET",
+				"request.method":                http.MethodGet,
 				"request.ssl.verification_mode": "none",
 			},
-			handler:  defaultHandler("GET", ""),
+			handler:  defaultHandler(http.MethodGet, ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -59,7 +59,7 @@ func TestInput(t *testing.T) {
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":                     1,
-				"http_method":                  "GET",
+				"http_method":                  http.MethodGet,
 				"request.rate_limit.limit":     `[[.last_response.header.Get "X-Rate-Limit-Limit"]]`,
 				"request.rate_limit.remaining": `[[.last_response.header.Get "X-Rate-Limit-Remaining"]]`,
 				"request.rate_limit.reset":     `[[.last_response.header.Get "X-Rate-Limit-Reset"]]`,
@@ -72,7 +72,7 @@ func TestInput(t *testing.T) {
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 			},
 			handler:  retryHandler(),
 			expected: []string{`{"hello":"world"}`},
@@ -82,12 +82,12 @@ func TestInput(t *testing.T) {
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
-				"request.method": "POST",
+				"request.method": http.MethodPost,
 				"request.body": map[string]interface{}{
 					"test": "abc",
 				},
 			},
-			handler:  defaultHandler("POST", `{"test":"abc"}`),
+			handler:  defaultHandler(http.MethodPost, `{"test":"abc"}`),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -95,9 +95,9 @@ func TestInput(t *testing.T) {
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       "100ms",
-				"request.method": "POST",
+				"request.method": http.MethodPost,
 			},
-			handler: defaultHandler("POST", ""),
+			handler: defaultHandler(http.MethodPost, ""),
 			expected: []string{
 				`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`,
 				`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`,
@@ -108,12 +108,12 @@ func TestInput(t *testing.T) {
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 				"response.split": map[string]interface{}{
 					"target": "body.hello",
 				},
 			},
-			handler:  defaultHandler("GET", ""),
+			handler:  defaultHandler(http.MethodGet, ""),
 			expected: []string{`{"world":"moon"}`, `{"space":[{"cake":"pumpkin"}]}`},
 		},
 		{
@@ -121,13 +121,13 @@ func TestInput(t *testing.T) {
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 				"response.split": map[string]interface{}{
 					"target":      "body.hello",
 					"keep_parent": true,
 				},
 			},
-			handler: defaultHandler("GET", ""),
+			handler: defaultHandler(http.MethodGet, ""),
 			expected: []string{
 				`{"hello":{"world":"moon"}}`,
 				`{"hello":{"space":[{"cake":"pumpkin"}]}}`,
@@ -138,7 +138,7 @@ func TestInput(t *testing.T) {
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 				"response.split": map[string]interface{}{
 					"target": "body.hello",
 					"split": map[string]interface{}{
@@ -147,7 +147,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler: defaultHandler("GET", ""),
+			handler: defaultHandler(http.MethodGet, ""),
 			expected: []string{
 				`{"world":"moon"}`,
 				`{"space":{"cake":"pumpkin"}}`,
@@ -158,12 +158,12 @@ func TestInput(t *testing.T) {
 			setupServer: newTestServer(httptest.NewServer),
 			baseConfig: map[string]interface{}{
 				"interval":       1,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 				"response.split": map[string]interface{}{
 					"target": "body.unknown",
 				},
 			},
-			handler:  defaultHandler("GET", ""),
+			handler:  defaultHandler(http.MethodGet, ""),
 			expected: []string{},
 		},
 		{
@@ -184,7 +184,7 @@ func TestInput(t *testing.T) {
 			},
 			baseConfig: map[string]interface{}{
 				"interval":       1,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 				"request.transforms": []interface{}{
 					map[string]interface{}{
 						"set": map[string]interface{}{
@@ -218,7 +218,7 @@ func TestInput(t *testing.T) {
 			},
 			baseConfig: map[string]interface{}{
 				"interval":       time.Second,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 				"response.split": map[string]interface{}{
 					"target": "body.items",
 				},
@@ -246,7 +246,7 @@ func TestInput(t *testing.T) {
 			},
 			baseConfig: map[string]interface{}{
 				"interval":       1,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 				"response.split": map[string]interface{}{
 					"target": "body.items",
 					"transforms": []interface{}{
@@ -288,7 +288,7 @@ func TestInput(t *testing.T) {
 			},
 			baseConfig: map[string]interface{}{
 				"interval":       1,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 				"response.pagination": []interface{}{
 					map[string]interface{}{
 						"set": map[string]interface{}{
@@ -311,7 +311,7 @@ func TestInput(t *testing.T) {
 			},
 			baseConfig: map[string]interface{}{
 				"interval":                  1,
-				"request.method":            "POST",
+				"request.method":            http.MethodPost,
 				"auth.oauth2.client.id":     "a_client_id",
 				"auth.oauth2.client.secret": "a_client_secret",
 				"auth.oauth2.endpoint_params": map[string]interface{}{
@@ -333,7 +333,7 @@ func TestInput(t *testing.T) {
 			},
 			baseConfig: map[string]interface{}{
 				"interval":       1,
-				"request.method": "POST",
+				"request.method": http.MethodPost,
 				"request.transforms": []interface{}{
 					map[string]interface{}{
 						"set": map[string]interface{}{
@@ -355,7 +355,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler:  defaultHandler("POST", `{"bar":"foo","url":{"path":"/test-path"}}`),
+			handler:  defaultHandler(http.MethodPost, `{"bar":"foo","url":{"path":"/test-path"}}`),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -370,7 +370,7 @@ func TestInput(t *testing.T) {
 			},
 			baseConfig: map[string]interface{}{
 				"interval":       10,
-				"request.method": "GET",
+				"request.method": http.MethodGet,
 				"request.transforms": []interface{}{
 					map[string]interface{}{
 						"set": map[string]interface{}{
@@ -388,7 +388,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler:  defaultHandler("GET", ""),
+			handler:  defaultHandler(http.MethodGet, ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -592,9 +592,8 @@ func TestInput(t *testing.T) {
 			conf := defaultConfig()
 			assert.NoError(t, cfg.Unpack(&conf))
 
-			input, err := newStatelessInput(conf)
+			input := newStatelessInput(conf)
 
-			assert.NoError(t, err)
 			assert.Equal(t, "httpjson-stateless", input.Name())
 			assert.NoError(t, input.Test(v2.TestContext{}))
 
@@ -726,7 +725,7 @@ func retryHandler() http.HandlerFunc {
 			_, _ = w.Write([]byte(`{"hello":"world"}`))
 			return
 		}
-		w.WriteHeader(rand.Intn(100) + 500)
+		w.WriteHeader(rand.Intn(100) + 500) //nolint:gosec // Bad linter! Not a crypto context.
 		count += 1
 	}
 }
@@ -735,7 +734,7 @@ func oauth2TokenHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	_ = r.ParseForm()
 	switch {
-	case r.Method != "POST":
+	case r.Method != http.MethodPost:
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
 	case r.FormValue("grant_type") != "client_credentials":
@@ -766,7 +765,7 @@ func oauth2Handler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("content-type", "application/json")
 	switch {
-	case r.Method != "POST":
+	case r.Method != http.MethodPost:
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = w.Write([]byte(`{"error":"wrong method"}`))
 	case r.Header.Get("Authorization") != "Bearer abcd":
@@ -816,7 +815,7 @@ func paginationHandler() http.HandlerFunc {
 		case 0:
 			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:00Z","nextPageToken":"bar","items":[{"foo":"a"}]}`))
 		case 1:
-			if r.URL.Query().Get("page") != barConst {
+			if r.URL.Query().Get("page") != "bar" { //nolint:goconst // Bad linter! Tests should be explicit and local.
 				w.WriteHeader(http.StatusBadRequest)
 				_, _ = w.Write([]byte(`{"error":"wrong page token value"}`))
 				return
@@ -839,7 +838,7 @@ func paginationArrayHandler() http.HandlerFunc {
 		case 0:
 			_, _ = w.Write([]byte(`[{"nextPageToken":"bar","foo":"bar"},{"foo":"bar"}]`))
 		case 1:
-			if r.URL.Query().Get("page") != barConst {
+			if r.URL.Query().Get("page") != "bar" { //nolint:goconst // Bad linter! Tests should be explicit and local.
 				w.WriteHeader(http.StatusBadRequest)
 				_, _ = w.Write([]byte(`{"error":"wrong page token value"}`))
 				return

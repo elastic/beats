@@ -78,7 +78,7 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 		}
 	}
 
-	if rf.method == "POST" {
+	if rf.method == http.MethodPost {
 		header = req.header()
 		if header.Get("Content-Type") == "" {
 			header.Set("Content-Type", "application/json")
@@ -145,7 +145,7 @@ func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx *transfor
 	}
 
 	var body []byte
-	if rf.method == "POST" {
+	if rf.method == http.MethodPost {
 		if rf.encoder != nil {
 			body, err = rf.encoder(trReq)
 		} else {
@@ -347,10 +347,9 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 func (r *requester) processAndPublishEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, finalResps []*http.Response, publish bool, i int) int {
 	eventsCh := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps)
 
-	trCtx.clearIntervalData()
-
 	var n int
-	for maybeMsg := range eventsCh {
+	events := r.responseProcessor.startProcessing(stdCtx, trCtx, httpResp)
+	for maybeMsg := range events {
 		if maybeMsg.failed() {
 			r.log.Errorf("error processing response: %v", maybeMsg)
 			continue
