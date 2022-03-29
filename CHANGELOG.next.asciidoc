@@ -61,7 +61,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
   inputs will fix the problem without generating any data duplication{issue}30061[30061]
 
 - Recover CEF extensions from messages with invalid/incomplete headers. {issue}30757[30757] {pull}30938[30938]
-- Fix panic in the filestream harvester {issue}29024[29024] {pull}31041[31041]
+- Fix panic in filestream input when `copy_truncate` log rotation strategy is used {issue}29024[29024] {pull}31041[31041]
 
 *Heartbeat*
 
