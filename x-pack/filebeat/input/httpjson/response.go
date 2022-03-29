@@ -75,8 +75,9 @@ func newResponseProcessor(config *responseConfig, pagination *pagination, log *l
 }
 
 func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resp *http.Response) <-chan maybeMsg {
-	ch := make(chan maybeMsg)
+	trCtx.clearIntervalData()
 
+	ch := make(chan maybeMsg)
 	go func() {
 		defer close(ch)
 
