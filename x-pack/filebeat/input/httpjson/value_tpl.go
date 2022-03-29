@@ -7,7 +7,7 @@ package httpjson
 import (
 	"bytes"
 	"crypto/hmac"
-	"crypto/sha1"
+	"crypto/sha1" //nolint:gosec // Bad linter!
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -120,6 +120,8 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal
 	return val, nil
 }
 
+const defaultTimeLayout = "RFC3339"
+
 var predefinedLayouts = map[string]string{
 	"ANSIC":       time.ANSIC,
 	"UnixDate":    time.UnixDate,
@@ -150,7 +152,7 @@ func parseDuration(s string) time.Duration {
 func parseDate(date string, layout ...string) time.Time {
 	var ly string
 	if len(layout) == 0 {
-		ly = "RFC3339"
+		ly = defaultTimeLayout
 	} else {
 		ly = layout[0]
 	}
@@ -170,7 +172,7 @@ func formatDate(date time.Time, layouttz ...string) string {
 	var layout, tz string
 	switch {
 	case len(layouttz) == 0:
-		layout = "RFC3339"
+		layout = defaultTimeLayout
 	case len(layouttz) == 1:
 		layout = layouttz[0]
 	case len(layouttz) > 1:
@@ -229,7 +231,7 @@ func toInt(v interface{}) int64 {
 	vv := reflect.ValueOf(v)
 	switch vv.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return int64(vv.Int())
+		return vv.Int()
 	case reflect.Float32, reflect.Float64:
 		return int64(vv.Float())
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
