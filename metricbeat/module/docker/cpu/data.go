@@ -23,8 +23,8 @@ import (
 )
 
 func eventsMapping(r mb.ReporterV2, cpuStatsList []CPUStats) {
-	for _, cpuStats := range cpuStatsList {
-		eventMapping(r, &cpuStats)
+	for i := range cpuStatsList {
+		eventMapping(r, &cpuStatsList[i])
 	}
 }
 
@@ -60,8 +60,12 @@ func eventMapping(r mb.ReporterV2, stats *CPUStats) {
 		},
 	}
 
+	rootFields := stats.Container.ToMapStr()
+	// Add container ECS fields
+	_, _ = rootFields.Put("container.cpu.usage", stats.TotalUsageNormalized)
+
 	r.Event(mb.Event{
-		RootFields:      stats.Container.ToMapStr(),
+		RootFields:      rootFields,
 		MetricSetFields: fields,
 	})
 }

@@ -23,8 +23,8 @@ import (
 )
 
 func eventsMapping(r mb.ReporterV2, blkioStatsList []BlkioStats) {
-	for _, blkioStats := range blkioStatsList {
-		eventMapping(r, &blkioStats)
+	for i := range blkioStatsList {
+		eventMapping(r, &blkioStatsList[i])
 	}
 }
 
@@ -56,8 +56,13 @@ func eventMapping(r mb.ReporterV2, stats *BlkioStats) {
 		},
 	}
 
+	rootFields := stats.Container.ToMapStr()
+	// Add container ECS fields
+	_, _ = rootFields.Put("container.disk.read.bytes", stats.servicedBytes.reads)
+	_, _ = rootFields.Put("container.disk.write.bytes", stats.servicedBytes.writes)
+
 	r.Event(mb.Event{
-		RootFields:      stats.Container.ToMapStr(),
+		RootFields:      rootFields,
 		MetricSetFields: fields,
 	})
 }
