@@ -58,10 +58,7 @@
         state.key = data[mark:p]
     }
     action extension_value_start {
-        if len(state.escapes) != 0 {
-            // If we are here we must have been in a syntactically incorrect extension that failed to
-            // satisfy the machine and so did not trigger extension_eof and consume the escapes.
-            // This consumes them so we can move on.
+        if len(state.escapes) != 0 { // See ragel comment below.
             e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
             state.reset()
         }
@@ -88,4 +85,19 @@
         p = mark;
         fnext extensions;
     }
+
+    # Note for extension_value_start
+    #
+    # There is a conditional execution there that depends only on the length of state.escapes.
+    # This is explained by the following:
+    #
+    # // If we are here we must have been in a syntactically incorrect extension that failed to
+    # // satisfy the machine and so did not trigger extension_eof and consume the escapes.
+    # // This consumes them so we can move on.
+    #
+    # This comment is placed here because it causes confusion to go tool cover if it is placed
+    # in the expected location due to //line directives emitted by ragel.
+    # See https://go.dev/issue/35781 for a related issue. When that is resolved the Go comment
+    # section of this should be moved to the line following `if len(state.escapes) != 0 {` in
+    # extension_value_start and the remainder of this comment can then be deleted.
 }%%

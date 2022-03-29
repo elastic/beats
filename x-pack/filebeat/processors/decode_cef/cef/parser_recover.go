@@ -4597,10 +4597,7 @@ func (e *Event) recoverExtensions(data string) error {
 	f13:
 //line cef_actions.rl:60
 
-		if len(state.escapes) != 0 {
-			// If we are here we must have been in a syntactically incorrect extension that failed to
-			// satisfy the machine and so did not trigger extension_eof and consume the escapes.
-			// This consumes them so we can move on.
+		if len(state.escapes) != 0 { // See ragel comment below.
 			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
 			state.reset()
 		}
@@ -4609,13 +4606,13 @@ func (e *Event) recoverExtensions(data string) error {
 
 		goto _again
 	f9:
-//line cef_actions.rl:71
+//line cef_actions.rl:68
 
 		state.valueEnd = p + 1
 
 		goto _again
 	f8:
-//line cef_actions.rl:81
+//line cef_actions.rl:78
 
 		recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
 		(p)--
@@ -4623,7 +4620,7 @@ func (e *Event) recoverExtensions(data string) error {
 
 		goto _again
 	f10:
-//line cef_actions.rl:85
+//line cef_actions.rl:82
 
 		state.reset()
 		// Resume processing at p, the start of the next extension key.
@@ -4636,7 +4633,7 @@ func (e *Event) recoverExtensions(data string) error {
 
 		mark = p
 
-//line cef_actions.rl:71
+//line cef_actions.rl:68
 
 		state.valueEnd = p + 1
 
@@ -4648,10 +4645,7 @@ func (e *Event) recoverExtensions(data string) error {
 
 //line cef_actions.rl:60
 
-		if len(state.escapes) != 0 {
-			// If we are here we must have been in a syntactically incorrect extension that failed to
-			// satisfy the machine and so did not trigger extension_eof and consume the escapes.
-			// This consumes them so we can move on.
+		if len(state.escapes) != 0 { // See ragel comment below.
 			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
 			state.reset()
 		}
@@ -4674,7 +4668,7 @@ func (e *Event) recoverExtensions(data string) error {
 
 		state.pushEscape(mark_slash, p)
 
-//line cef_actions.rl:71
+//line cef_actions.rl:68
 
 		state.valueEnd = p + 1
 
@@ -4693,10 +4687,7 @@ func (e *Event) recoverExtensions(data string) error {
 	f14:
 //line cef_actions.rl:60
 
-		if len(state.escapes) != 0 {
-			// If we are here we must have been in a syntactically incorrect extension that failed to
-			// satisfy the machine and so did not trigger extension_eof and consume the escapes.
-			// This consumes them so we can move on.
+		if len(state.escapes) != 0 { // See ragel comment below.
 			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
 			state.reset()
 		}
@@ -4711,23 +4702,20 @@ func (e *Event) recoverExtensions(data string) error {
 	f12:
 //line cef_actions.rl:60
 
-		if len(state.escapes) != 0 {
-			// If we are here we must have been in a syntactically incorrect extension that failed to
-			// satisfy the machine and so did not trigger extension_eof and consume the escapes.
-			// This consumes them so we can move on.
+		if len(state.escapes) != 0 { // See ragel comment below.
 			e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
 			state.reset()
 		}
 		state.valueStart = p
 		state.valueEnd = p
 
-//line cef_actions.rl:71
+//line cef_actions.rl:68
 
 		state.valueEnd = p + 1
 
 		goto _again
 	f16:
-//line cef_actions.rl:71
+//line cef_actions.rl:68
 
 		state.valueEnd = p + 1
 
@@ -4746,7 +4734,7 @@ func (e *Event) recoverExtensions(data string) error {
 
 		mark = p
 
-//line cef_actions.rl:71
+//line cef_actions.rl:68
 
 		state.valueEnd = p + 1
 
@@ -4765,7 +4753,7 @@ func (e *Event) recoverExtensions(data string) error {
 		if (p) == eof {
 			switch _cef_recover_eof_actions[cs] {
 			case 16:
-//line cef_actions.rl:74
+//line cef_actions.rl:71
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(state.key) != 0 && state.valueStart < state.valueEnd {
@@ -4774,7 +4762,7 @@ func (e *Event) recoverExtensions(data string) error {
 				}
 
 			case 9:
-//line cef_actions.rl:81
+//line cef_actions.rl:78
 
 				recoveredErrs = append(recoveredErrs, fmt.Errorf("malformed value for %s at pos %d", state.key, p+1))
 				(p)--
@@ -4785,7 +4773,7 @@ func (e *Event) recoverExtensions(data string) error {
 
 				state.pushEscape(mark_slash, p)
 
-//line cef_actions.rl:74
+//line cef_actions.rl:71
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(state.key) != 0 && state.valueStart < state.valueEnd {
@@ -4796,17 +4784,14 @@ func (e *Event) recoverExtensions(data string) error {
 			case 12:
 //line cef_actions.rl:60
 
-				if len(state.escapes) != 0 {
-					// If we are here we must have been in a syntactically incorrect extension that failed to
-					// satisfy the machine and so did not trigger extension_eof and consume the escapes.
-					// This consumes them so we can move on.
+				if len(state.escapes) != 0 { // See ragel comment below.
 					e.pushExtension(state.key, replaceEscapes(data[state.valueStart:state.valueEnd], state.valueStart, state.escapes))
 					state.reset()
 				}
 				state.valueStart = p
 				state.valueEnd = p
 
-//line cef_actions.rl:74
+//line cef_actions.rl:71
 
 				// Reaching the EOF marks the end of the final extension value.
 				if len(state.key) != 0 && state.valueStart < state.valueEnd {
@@ -4814,7 +4799,7 @@ func (e *Event) recoverExtensions(data string) error {
 					state.reset()
 				}
 
-//line parser_recover.go:4096
+//line parser_recover.go:4081
 			}
 		}
 
