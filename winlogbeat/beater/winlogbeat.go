@@ -98,7 +98,7 @@ func (eb *Winlogbeat) init(b *beat.Beat) error {
 		if err != nil {
 			return fmt.Errorf("failed to create new event log: %w", err)
 		}
-		eb.log.Debugf("Initialized EventLog]", eventLog.Name())
+		eb.log.Debugw("Initialized EventLog", "id", eventLog.Name())
 
 		logger, err := newEventLogger(b.Info, eventLog, config, eb.log)
 		if err != nil {
