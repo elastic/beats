@@ -7,8 +7,6 @@ package httpjson
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -86,7 +84,7 @@ func newDeletePagination(cfg *common.Config, _ *logp.Logger) (transform, error) 
 func newDelete(cfg *common.Config) (delete, error) {
 	c := &deleteConfig{}
 	if err := cfg.Unpack(c); err != nil {
-		return delete{}, errors.Wrap(err, "fail to unpack the delete configuration")
+		return delete{}, fmt.Errorf("fail to unpack the delete configuration: %w", err)
 	}
 
 	ti, err := getTargetInfo(c.Target)
@@ -107,7 +105,7 @@ func (delete *delete) run(ctx *transformContext, tr transformable) (transformabl
 }
 
 func deleteFromCommonMap(m common.MapStr, key string) error {
-	if err := m.Delete(key); err != common.ErrKeyNotFound {
+	if err := m.Delete(key); err != common.ErrKeyNotFound { //nolint:errorlint // common.ErrKeyNotFound is never wrapped by Delete.
 		return err
 	}
 	return nil
