@@ -31,11 +31,26 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	"github.com/elastic/go-concert/unison"
 )
 
 type testStateStore struct {
 	Store    *statestore.Store
 	GCPeriod time.Duration
+}
+
+func TestResource_CopyInto(t *testing.T) {
+	src := resource{lock: unison.MakeMutex()}
+	dst := resource{lock: unison.MakeMutex()}
+	src.lock.Lock()
+	dst.lock.Lock()
+
+	src.copyInto(&dst)
+
+	require.NotPanics(t, func() {
+		src.lock.Unlock()
+		dst.lock.Unlock()
+	}, "perhaps `lock` field was replaced during the copy")
 }
 
 func TestStore_OpenClose(t *testing.T) {
