@@ -1123,6 +1123,12 @@ image:images/input-httpjson-lifecycle.png[Request lifecycle]
 
 image:images/input-httpjson-chain-lifecycle.png[Chain Request lifecycle]
 
+. Response from regular call will be processed.
+. Extract data from response and generate new requests from responses.
+. Process generated requests and collect responses from server.
+. go back to step-2 for the next step.
+. publish collected responses from the last chain step.
+
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 

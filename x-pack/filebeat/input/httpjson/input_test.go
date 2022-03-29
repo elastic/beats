@@ -404,7 +404,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler:  defaultHandler("GET", ""),
+			handler:  defaultHandler(http.MethodGet, ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -444,7 +444,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler:  defaultHandler("GET", ""),
+			handler:  defaultHandler(http.MethodGet, ""),
 			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 		{
@@ -519,7 +519,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler:  defaultHandler("GET", ""),
+			handler:  defaultHandler(http.MethodGet, ""),
 			expected: []string{`{"world":"moon"}`, `{"space":[{"cake":"pumpkin"}]}`},
 		},
 		{
@@ -541,7 +541,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler: defaultHandler("GET", ""),
+			handler: defaultHandler(http.MethodGet, ""),
 			expected: []string{
 				`{"hello":{"world":"moon"}}`,
 				`{"hello":{"space":[{"cake":"pumpkin"}]}}`,
@@ -572,7 +572,7 @@ func TestInput(t *testing.T) {
 					},
 				},
 			},
-			handler: defaultHandler("GET", ""),
+			handler: defaultHandler(http.MethodGet, ""),
 			expected: []string{
 				`{"world":"moon"}`,
 				`{"space":{"cake":"pumpkin"}}`,
