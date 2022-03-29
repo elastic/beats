@@ -132,6 +132,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Extend documentation about `kubernetes.node.network.*` fields {pull}30826[30826]
 - Add `kubernetes.volume.fs.inodes.pct` field. {pull}30785[30785]
 - Improve Kubernetes dashboard. {pull}30913[30913]
+- Populate new container ECS fields in Kubernetes module. {pull}30181[30181]
 
 *Packetbeat*
 
