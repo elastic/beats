@@ -36,6 +36,9 @@ TEST_BOXES = [
   {:name => "centos7", :box => "bento/centos-7", :platform => "centos"},
   {:name => "centos8", :box => "bento/centos-7", :platform => "centos"},
 
+  {:name => "rhel7", :box => "generic/rhel7", :platform => "redhat" },
+  {:name => "rhel8", :box => "generic/rhel8", :platform => "redhat" },
+
   {:name => "win2012", :box => "https://s3.amazonaws.com/beats-files/vagrant/beats-win2012-r2-virtualbox-2016-10-28_1224.box", :platform => "windows"},
   {:name => "win2016", :box => "StefanScherer/windows_2016", :platform => "windows"},
   {:name => "win2019", :box => "StefanScherer/windows_2019", :platform => "windows"},
@@ -112,7 +115,7 @@ Vagrant.configure("2") do |config|
       end
 
       # gvm install
-      if [:centos, :ubuntu, :debian, :archlinux, :opensuse, :sles].include?(node[:platform].to_sym)
+      if [:centos, :ubuntu, :debian, :archlinux, :opensuse, :sles, :redhat].include?(node[:platform].to_sym)
         nodeconfig.vm.provision "shell", type: "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
       end
 

@@ -21,11 +21,9 @@ supported.
 A unique identifier for this filestream input. Each filestream input
 must have a unique ID.
 
-WARNING: If there are multiple inputs without an ID, there will be
-data duplication when {beatname_lc} is restarted.
-
-WARNING: Adding an ID to an existing configuration will read the files
-from the beginning.
+WARNING: Changing input ID may cause data duplication because the
+state of the files will be lost and they will be read from the
+beginning again.
 
 [float]
 [[filestream-input-paths]]
