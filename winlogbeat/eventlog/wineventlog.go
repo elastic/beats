@@ -22,6 +22,7 @@ package eventlog
 
 import (
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -30,7 +31,6 @@ import (
 	"time"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -90,7 +90,7 @@ func (a *NoMoreEventsAction) Unpack(v string) error {
 			return nil
 		}
 	}
-	return errors.Errorf("invalid no_more_events action: %v", v)
+	return fmt.Errorf("invalid no_more_events action: %v", v)
 }
 
 // String returns the name of the action.
@@ -196,13 +196,15 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
 	signalEvent, err := windows.CreateEvent(nil, 0, 0, nil)
 	if err != nil {
-		return nil
+		return err
 	}
-	defer windows.CloseHandle(signalEvent)
+	defer func() { _ = windows.CloseHandle(signalEvent) }()
 
 	var flags win.EvtSubscribeFlag
 	if bookmark > 0 {
-		flags = win.EvtSubscribeStartAfterBookmark
+		// Use EvtSubscribeStrict to detect when the bookmark is missing and be able to
+		// subscribe again from the beginning.
+		flags = win.EvtSubscribeStartAfterBookmark | win.EvtSubscribeStrict
 	} else {
 		flags = win.EvtSubscribeStartAtOldestRecord
 	}
@@ -215,7 +217,18 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 		l.query,  // Query - nil means all events
 		bookmark, // Bookmark - for resuming from a specific event
 		flags)
+
+	switch {
+	case errors.Is(err, win.ERROR_NOT_FOUND), errors.Is(err, win.ERROR_EVT_QUERY_RESULT_STALE),
+		errors.Is(err, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION):
+		debugf("%s error subscribing (first chance): %v", l.logPrefix, err)
+		// The bookmarked event was not found, we retry the subscription from the start.
+		incrementMetric(readErrors, err)
+		subscriptionHandle, err = win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
+	}
+
 	if err != nil {
+		debugf("%s error subscribing (final): %v", l.logPrefix, err)
 		return err
 	}
 
@@ -228,7 +241,7 @@ func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.EvtH
 
 	h, err := win.EvtQuery(0, path, "", win.EvtQueryFilePath|win.EvtQueryForwardDirection)
 	if err != nil {
-		return errors.Wrapf(err, "failed to get handle to event log file %v", path)
+		return fmt.Errorf("failed to get handle to event log file %v: %w", path, err)
 	}
 
 	if bookmark > 0 {
@@ -240,16 +253,16 @@ func (l *winEventLog) openFile(state checkpoint.EventLogState, bookmark win.EvtH
 		if err = win.EvtSeek(h, 0, bookmark, win.EvtSeekRelativeToBookmark|win.EvtSeekStrict); err == nil {
 			// Then we advance past the last read event to avoid sending that
 			// event again. This won't fail if we're at the end of the file.
-			err = errors.Wrap(
-				win.EvtSeek(h, 1, bookmark, win.EvtSeekRelativeToBookmark),
-				"failed to seek past bookmarked position")
+			if seekErr := win.EvtSeek(h, 1, bookmark, win.EvtSeekRelativeToBookmark); seekErr != nil {
+				err = fmt.Errorf("failed to seek past bookmarked position: %w", seekErr)
+			}
 		} else {
 			logp.Warn("%s Failed to seek to bookmarked location in %v (error: %v). "+
 				"Recovering by reading the log from the beginning. (Did the file "+
 				"change since it was last read?)", l.logPrefix, path, err)
-			err = errors.Wrap(
-				win.EvtSeek(h, 0, 0, win.EvtSeekRelativeToFirst),
-				"failed to seek to beginning of log")
+			if seekErr := win.EvtSeek(h, 0, 0, win.EvtSeekRelativeToFirst); seekErr != nil {
+				err = fmt.Errorf("failed to seek to beginning of log: %w", seekErr)
+			}
 		}
 
 		if err != nil {
@@ -273,11 +286,13 @@ func (l *winEventLog) Read() ([]Record, error) {
 	}()
 	detailf("%s EventHandles returned %d handles", l.logPrefix, len(handles))
 
+	//nolint: prealloc // some handles can be skipped, the final size is unknown
 	var records []Record
 	for _, h := range handles {
 		l.outputBuf.Reset()
 		err := l.render(h, l.outputBuf)
-		if bufErr, ok := err.(sys.InsufficientBufferError); ok {
+		var bufErr sys.InsufficientBufferError
+		if ok := errors.As(err, &bufErr); ok {
 			detailf("%s Increasing render buffer size to %d", l.logPrefix,
 				bufErr.RequiredSize)
 			l.renderBuf = make([]byte, bufErr.RequiredSize)
@@ -290,7 +305,7 @@ func (l *winEventLog) Read() ([]Record, error) {
 			continue
 		}
 
-		r, _ := l.buildRecordFromXML(l.outputBuf.Bytes(), err)
+		r := l.buildRecordFromXML(l.outputBuf.Bytes(), err)
 		r.Offset = checkpoint.EventLogState{
 			Name:         l.id,
 			RecordNumber: r.RecordID,
@@ -314,26 +329,26 @@ func (l *winEventLog) Close() error {
 
 func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 	handles, err := win.EventHandles(l.subscription, maxRead)
-	switch err {
-	case nil:
+	switch {
+	case err == nil:
 		if l.maxRead > maxRead {
 			debugf("%s Recovered from RPC_S_INVALID_BOUND error (errno 1734) "+
 				"by decreasing batch_read_size to %v", l.logPrefix, maxRead)
 		}
 		return handles, maxRead, nil
-	case win.ERROR_NO_MORE_ITEMS:
+	case errors.Is(err, win.ERROR_NO_MORE_ITEMS):
 		detailf("%s No more events", l.logPrefix)
 		if l.config.NoMoreEvents == Stop {
 			return nil, maxRead, io.EOF
 		}
 		return nil, maxRead, nil
-	case win.RPC_S_INVALID_BOUND:
+	case errors.Is(err, win.RPC_S_INVALID_BOUND):
 		incrementMetric(readErrors, err)
 		if err := l.Close(); err != nil {
-			return nil, 0, errors.Wrap(err, "failed to recover from RPC_S_INVALID_BOUND")
+			return nil, 0, fmt.Errorf("failed to recover from RPC_S_INVALID_BOUND: %w", err)
 		}
 		if err := l.Open(l.lastRead); err != nil {
-			return nil, 0, errors.Wrap(err, "failed to recover from RPC_S_INVALID_BOUND")
+			return nil, 0, fmt.Errorf("failed to recover from RPC_S_INVALID_BOUND: %w", err)
 		}
 		return l.eventHandles(maxRead / 2)
 	default:
@@ -343,7 +358,7 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 	}
 }
 
-func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, error) {
+func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) Record {
 	includeXML := l.config.IncludeXML
 	e, err := winevent.UnmarshalXML(x)
 	if err != nil {
@@ -388,7 +403,7 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 		r.XML = string(x)
 	}
 
-	return r, nil
+	return r
 }
 
 func newEventLogging(options *common.Config) (EventLog, error) {
