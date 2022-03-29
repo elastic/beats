@@ -56,82 +56,102 @@ type responseProcessor struct {
 	pagination *pagination
 }
 
-func newResponseProcessor(config *responseConfig, pagination *pagination, log *logp.Logger) *responseProcessor {
+func newResponseProcessor(config config, pagination *pagination, log *logp.Logger) []*responseProcessor {
+	rps := make([]*responseProcessor, 0, len(config.Chain)+1)
+
 	rp := &responseProcessor{
 		pagination: pagination,
 		log:        log,
 	}
-	if config == nil {
-		return rp
+	if config.Response == nil {
+		rps = append(rps, rp)
+		return rps
 	}
-	ts, _ := newBasicTransformsFromConfig(config.Transforms, responseNamespace, log)
+	ts, _ := newBasicTransformsFromConfig(config.Response.Transforms, responseNamespace, log)
 	rp.transforms = ts
 
-	split, _ := newSplitResponse(config.Split, log)
+	split, _ := newSplitResponse(config.Response.Split, log)
 
 	rp.split = split
 
-	return rp
+	rps = append(rps, rp)
+	for _, ch := range config.Chain {
+		rp := &responseProcessor{
+			pagination: pagination,
+			log:        log,
+		}
+		// chain calls responseProcessor object
+		split, _ := newSplitResponse(ch.Step.Response.Split, log)
+
+		rp.split = split
+
+		rps = append(rps, rp)
+	}
+
+	return rps
 }
 
-func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resp *http.Response) <-chan maybeMsg {
+func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resps []*http.Response) <-chan maybeMsg {
 	trCtx.clearIntervalData()
 
 	ch := make(chan maybeMsg)
 	go func() {
 		defer close(ch)
 
-		iter := rp.pagination.newPageIterator(stdCtx, trCtx, resp)
-		for {
-			page, hasNext, err := iter.next()
-			if err != nil {
-				ch <- maybeMsg{err: err}
-				return
-			}
+		for i, httpResp := range resps {
+			iter := rp.pagination.newPageIterator(stdCtx, trCtx, httpResp)
+			for {
+				page, hasNext, err := iter.next()
+				if err != nil {
+					ch <- maybeMsg{err: err}
+					return
+				}
 
-			if !hasNext {
-				return
-			}
-
-			respTrs := page.asTransformables(rp.log)
-
-			if len(respTrs) == 0 {
-				return
-			}
-
-			trCtx.updateLastResponse(*page)
-
-			rp.log.Debugf("last received page: %#v", trCtx.lastResponse)
-
-			for _, tr := range respTrs {
-				for _, t := range rp.transforms {
-					tr, err = t.run(trCtx, tr)
-					if err != nil {
-						ch <- maybeMsg{err: err}
-						return
+				if !hasNext {
+					if i+1 != len(resps) {
+						break
 					}
+					return
 				}
 
-				if rp.split == nil {
-					ch <- maybeMsg{msg: tr.body()}
-					rp.log.Debug("no split found: continuing")
-					continue
+				respTrs := page.asTransformables(rp.log)
+
+				if len(respTrs) == 0 {
+					return
 				}
 
-				if err := rp.split.run(trCtx, tr, ch); err != nil {
-					switch err { //nolint:errorlint // run never returns a wrapped error.
-					case errEmptyField:
-						// nothing else to send for this page
-						rp.log.Debug("split operation finished")
+				trCtx.updateLastResponse(*page)
+
+				rp.log.Debugf("last received page: %#v", trCtx.lastResponse)
+
+				for _, tr := range respTrs {
+					for _, t := range rp.transforms {
+						tr, err = t.run(trCtx, tr)
+						if err != nil {
+							ch <- maybeMsg{err: err}
+							return
+						}
+					}
+
+					if rp.split == nil {
+						ch <- maybeMsg{msg: tr.body()}
+						rp.log.Debug("no split found: continuing")
 						continue
-					case errEmptyRootField:
-						// root field not found, most likely the response is empty
-						rp.log.Debug(err)
-						return
-					default:
-						rp.log.Debug("split operation failed")
-						ch <- maybeMsg{err: err}
-						return
+					}
+
+					if err := rp.split.run(trCtx, tr, ch); err != nil {
+						switch err { //nolint:errorlint // run never returns a wrapped error.
+						case errEmptyField:
+							// nothing else to send for this page
+							rp.log.Debug("split operation finished")
+						case errEmptyRootField:
+							// root field not found, most likely the response is empty
+							rp.log.Debug(err)
+						default:
+							rp.log.Debug("split operation failed")
+							ch <- maybeMsg{err: err}
+							return
+						}
 					}
 				}
 			}
