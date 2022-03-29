@@ -125,15 +125,21 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 	}
 	l.log.Infof("Template with name %q loaded.", templateName)
 
-	// if template exists and it has to be overriden
-	// data stream should not be deleted and recreated.
-	if exists {
-		return nil
-	}
-
 	// if JSON template is loaded and it is not a data stream
 	// we are done with loading.
 	if config.JSON.Enabled && !config.JSON.IsDataStream {
+		return nil
+	}
+
+	// If a data stream already exists, we do not attempt to delete or overwrite
+	// it becaues it would delete all backing indices, and the user would lose all
+	// their documents.
+	dataStreamExist, err := l.checkExistsDatastream(templateName)
+	if err != nil {
+		return fmt.Errorf("failed to check data stream: %w", err)
+	}
+	if dataStreamExist {
+		l.log.Infof("Data stream with name %q already exists.", templateName)
 		return nil
 	}
 
@@ -159,6 +165,18 @@ func (l *ESLoader) loadTemplate(templateName string, template map[string]interfa
 		return fmt.Errorf("couldn't load json. Status: %v", status)
 	}
 	return nil
+}
+
+func (l *ESLoader) checkExistsDatastream(name string) (bool, error) {
+	status, _, err := l.client.Request("GET", "/_data_stream/"+name, "", nil, nil)
+	if status == http.StatusNotFound {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (l *ESLoader) putDataStream(name string) error {
