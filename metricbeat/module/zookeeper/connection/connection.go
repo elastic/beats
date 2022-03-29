@@ -18,7 +18,10 @@
 package connection
 
 import (
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
+
+	//"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -61,17 +64,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	outputReader, err := zookeeper.RunCommand("cons", m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "'cons' command failed")
+		return errors.Unwrap(fmt.Errorf(err.Error(), "'cons' command failed: %v"))
 	}
 
 	events := m.parseCons(outputReader)
 	if err != nil {
-		return errors.Wrap(err, "error parsing response from zookeeper")
+		return errors.Unwrap(fmt.Errorf(err.Error(), "error parsing response from zookeeper: %v"))
 	}
 
 	serverID, err := zookeeper.ServerID(m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "error obtaining server id")
+		return errors.Unwrap(fmt.Errorf(err.Error(), "%v :error obtaining server id"))
 	}
 
 	for _, event := range events {
