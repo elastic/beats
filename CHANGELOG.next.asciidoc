@@ -139,6 +139,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Improve Kubernetes dashboard. {pull}30913[30913]
 - Populate new container ECS fields in Docker module. {pull}30399[30399]
 - Populate new container ECS fields in Kubernetes module. {pull}30181[30181]
+- Populate ecs container fields in Containerd module. {pull}31025[31025]
 
 *Packetbeat*
 
