@@ -105,7 +105,7 @@ type requestFactory struct {
 
 func newRequestFactory(config config, log *logp.Logger) []*requestFactory {
 	// config validation already checked for errors here
-	rfs := make([]*requestFactory, 0, len(config.Chain) + 1)
+	rfs := make([]*requestFactory, 0, len(config.Chain)+1)
 	ts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
 	// regular call requestFactory object
 	rf := &requestFactory{
@@ -345,10 +345,9 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 
 // processAndPublishEvents process and publish events based on response type
 func (r *requester) processAndPublishEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, finalResps []*http.Response, publish bool, i int) int {
-	eventsCh := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps)
+	events := r.responseProcessors[i].startProcessing(stdCtx, trCtx, finalResps)
 
 	var n int
-	events := r.responseProcessor.startProcessing(stdCtx, trCtx, httpResp)
 	for maybeMsg := range events {
 		if maybeMsg.failed() {
 			r.log.Errorf("error processing response: %v", maybeMsg)
