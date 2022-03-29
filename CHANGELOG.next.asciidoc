@@ -53,6 +53,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Allow fixing data duplication on restart when filestream inputs did not have an ID set. Setting an ID for filestream
   inputs will fix the problem without generating any data duplication{issue}30061[30061]
 
+- Recover CEF extensions from messages with invalid/incomplete headers. {issue}30757[30757] {pull}30938[30938]
+
 *Heartbeat*
 
 *Metricbeat*

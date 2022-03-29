@@ -9,7 +9,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"log"
 	"os"
 
@@ -59,6 +58,8 @@ func main() {
 			continue
 		}
 
-		fmt.Println(string(jsonData))
+		// Written as writes to avoid forbidigo.
+		os.Stdout.Write(jsonData)
+		os.Stdout.Write([]byte{'\n'})
 	}
 }
