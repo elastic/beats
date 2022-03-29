@@ -111,7 +111,7 @@ The state has the following elements:
 - `last_response.body`: A map containing the parsed JSON body from the last successful response. This is the response as it comes from the remote server.
 - `last_response.page`: A number indicating the page number of the last response.
 - `first_event`: A map representing the first event sent to the output (result from applying transforms to `last_response.body`).
-- `last_event`: A map representing the last event of the specific call (result from applying transforms to `last_response.body`)
+- `last_event`: A map representing the last event of the current request in the requests chain (result from applying transforms to `last_response.body`).
 - `url`: The last requested URL as a raw https://pkg.go.dev/net/url#URL[`url.URL`] Go type.
 - `header`: A map containing the headers. References the next request headers when used in <<request-transforms>> or <<response-pagination>> configuration sections, and to the last response headers when used in <<response-transforms>>, <<response-split>>, or <<request-rate-limit>> configuration sections.
 - `body`: A map containing the body. References the next request body when used in <<request-transforms>> or <<response-pagination>> configuration sections, and to the last response body when used in <<response-transforms>> or <<response-split>> configuration sections.
