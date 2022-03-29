@@ -104,6 +104,31 @@ func TestProcessorRun(t *testing.T) {
 				"message":                       "CEF:0|Trend Micro|Deep Security Manager|1.2.3|600|User Signed In|3|src=10.52.116.160 suser=admin target=admin msg=User signed in from 2001:db8::5",
 			},
 		},
+		"truncated_header": {
+			config: func() config {
+				c := defaultConfig()
+				c.ECS = false
+				return c
+			},
+			message: "CEF:0|SentinelOne|Mgmt|activityID=1111111111111111111 activityType=3505 siteId=None siteName=None accountId=1222222222222222222 accountName=foo-bar mdr notificationScope=ACCOUNT",
+			fields: common.MapStr{
+				"cef.version":                      "0",
+				"cef.device.product":               "Mgmt",
+				"cef.device.vendor":                "SentinelOne",
+				"cef.extensions.accountId":         "1222222222222222222",
+				"cef.extensions.accountName":       "foo-bar mdr",
+				"cef.extensions.activityID":        "1111111111111111111",
+				"cef.extensions.activityType":      "3505",
+				"cef.extensions.notificationScope": "ACCOUNT",
+				"cef.extensions.siteId":            "None",
+				"cef.extensions.siteName":          "None",
+				"message":                          "CEF:0|SentinelOne|Mgmt|activityID=1111111111111111111 activityType=3505 siteId=None siteName=None accountId=1222222222222222222 accountName=foo-bar mdr notificationScope=ACCOUNT",
+				"error.message": []string{
+					"unexpected end of CEF event",
+					"incomplete CEF header",
+				},
+			},
+		},
 	}
 
 	dec, err := newDecodeCEF(defaultConfig())
@@ -280,7 +305,7 @@ func normalize(t testing.TB, m common.MapStr) common.MapStr {
 
 // assertEqual asserts that the two objects are deeply equal. If not it will
 // error the test and output a diff of the two objects' JSON representation.
-func assertEqual(t testing.TB, expected, actual interface{}) bool {
+func assertEqual(t testing.TB, expected, actual interface{}) bool { //nolint:unparam // Bad linter!
 	t.Helper()
 
 	if reflect.DeepEqual(expected, actual) {
