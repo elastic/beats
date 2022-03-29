@@ -101,14 +101,10 @@ func TestGenerateFuzzCorpus(t *testing.T) {
 		h.Write([]byte(m))
 		name := hex.EncodeToString(h.Sum(nil))
 
-<<<<<<< HEAD
-		ioutil.WriteFile(filepath.Join("fuzz/corpus", name), []byte(m), 0644)
-=======
 		err := os.WriteFile(filepath.Join("fuzz/corpus", name), []byte(m), 0o644)
 		if err != nil {
 			t.Fatalf("failed to write fuzzing corpus: %v", err)
 		}
->>>>>>> c193dded3a (x-pack/filebeat/processors/decode_cef/cef: allow (*Event).Unpack to attempt to recover extensions (#30938))
 	}
 }
 
@@ -472,6 +468,7 @@ func StringField(v string) *Field { return &Field{String: v, Type: StringType, I
 func IntegerField(v int32) *Field {
 	return &Field{String: strconv.Itoa(int(v)), Type: IntegerType, Interface: v}
 }
+
 func LongField(v int64) *Field {
 	return &Field{String: strconv.Itoa(int(v)), Type: LongType, Interface: v}
 }
