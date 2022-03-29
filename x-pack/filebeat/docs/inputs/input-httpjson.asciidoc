@@ -1037,7 +1037,7 @@ request_url using id as '1': https://example.com/services/data/v1.0/1/export_ids
 response_json using id as '1':
 
 +
-[[response-json1]]
+[[response-json2]]
 ["source","json",subs="attributes"]
 ----
 {
