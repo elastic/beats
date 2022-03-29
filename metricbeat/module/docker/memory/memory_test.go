@@ -18,7 +18,6 @@
 package memory
 
 import (
-	"reflect"
 	"testing"
 	"time"
 
@@ -174,7 +173,4 @@ func getMemoryStats(read time.Time, number uint64) types.StatsJSON {
 	myMemoryStats.MemoryStats.Stats["total_rss"] = number * 5
 
 	return myMemoryStats
-}
-func equalEvent(expectedEvent common.MapStr, event common.MapStr) bool {
-	return reflect.DeepEqual(expectedEvent, event)
 }
