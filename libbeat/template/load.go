@@ -124,6 +124,18 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 		return fmt.Errorf("failed to load template: %w", err)
 	}
 	l.log.Infof("Template with name %q loaded.", templateName)
+
+	// if JSON template is loaded and it is not a data stream
+	// we are done with loading.
+	if config.JSON.Enabled && !config.JSON.IsDataStream {
+		return nil
+	}
+
+	if err := l.putDataStream(templateName); err != nil {
+		return fmt.Errorf("failed to put data stream: %w", err)
+	}
+	l.log.Infof("Data stream with name %q loaded.", templateName)
+
 	return nil
 }
 
@@ -139,6 +151,16 @@ func (l *ESLoader) loadTemplate(templateName string, template map[string]interfa
 	}
 	if status > http.StatusMultipleChoices { //http status 300
 		return fmt.Errorf("couldn't load json. Status: %v", status)
+	}
+	return nil
+}
+
+func (l *ESLoader) putDataStream(name string) error {
+	l.log.Infof("Try loading data stream %s to Elasticsearch", name)
+	path := "/_data_stream/" + name
+	_, body, err := l.client.Request("PUT", path, "", nil, nil)
+	if err != nil {
+		return fmt.Errorf("couldn't put data stream: %w. Response body: %s", err, body)
 	}
 	return nil
 }
