@@ -150,16 +150,16 @@ func (l *winEventLogExp) openFile(state checkpoint.EventLogState, bookmark win.B
 		if err = win.EvtSeek(h, 0, win.EvtHandle(bookmark), win.EvtSeekRelativeToBookmark|win.EvtSeekStrict); err == nil {
 			// Then we advance past the last read event to avoid sending that
 			// event again. This won't fail if we're at the end of the file.
-			err = fmt.Errorf(
-				"failed to seek past bookmarked position: %w",
-				win.EvtSeek(h, 1, win.EvtHandle(bookmark), win.EvtSeekRelativeToBookmark))
+			if seekErr := win.EvtSeek(h, 1, win.EvtHandle(bookmark), win.EvtSeekRelativeToBookmark); seekErr != nil {
+				err = fmt.Errorf("failed to seek past bookmarked position: %w", seekErr)
+			}
 		} else {
 			l.log.Warnf("s Failed to seek to bookmarked location in %v (error: %v). "+
 				"Recovering by reading the log from the beginning. (Did the file "+
 				"change since it was last read?)", path, err)
-			err = fmt.Errorf(
-				"failed to seek to beginning of log: %w",
-				win.EvtSeek(h, 0, 0, win.EvtSeekRelativeToFirst))
+			if seekErr := win.EvtSeek(h, 0, 0, win.EvtSeekRelativeToFirst); seekErr != nil {
+				err = fmt.Errorf("failed to seek to beginning of log: %w", seekErr)
+			}
 		}
 
 		if err != nil {
