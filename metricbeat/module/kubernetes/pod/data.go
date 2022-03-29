@@ -103,7 +103,7 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 		}
 
 		if pod.StartTime != "" {
-			_, _ = podEvent.Put("start_time", pod.StartTime)
+			podEvent.Put("start_time", pod.StartTime)
 		}
 
 		if coresLimit > nodeCores {
@@ -115,54 +115,35 @@ func eventMapping(content []byte, perfMetrics *util.PerfMetricsCache) ([]common.
 		}
 
 		if nodeCores > 0 {
-			_, _ = podEvent.Put("cpu.usage.node.pct", float64(usageNanoCores)/1e9/nodeCores)
+			podEvent.Put("cpu.usage.node.pct", float64(usageNanoCores)/1e9/nodeCores)
 		}
 
 		if coresLimit > 0 {
-			_, _ = podEvent.Put("cpu.usage.limit.pct", float64(usageNanoCores)/1e9/coresLimit)
+			podEvent.Put("cpu.usage.limit.pct", float64(usageNanoCores)/1e9/coresLimit)
 		}
 
 		if usageMem > 0 {
 			if nodeMem > 0 {
-				_, _ = podEvent.Put("memory.usage.node.pct", float64(usageMem)/nodeMem)
+				podEvent.Put("memory.usage.node.pct", float64(usageMem)/nodeMem)
 			}
 			if memLimit > 0 {
-				_, _ = podEvent.Put("memory.usage.limit.pct", float64(usageMem)/memLimit)
-				_, _ = podEvent.Put("memory.working_set.limit.pct", float64(workingSet)/memLimit)
+				podEvent.Put("memory.usage.limit.pct", float64(usageMem)/memLimit)
+				podEvent.Put("memory.working_set.limit.pct", float64(workingSet)/memLimit)
 
 			}
 		}
 
 		if workingSet > 0 && usageMem == 0 {
 			if nodeMem > 0 {
-				_, _ = podEvent.Put("memory.usage.node.pct", float64(workingSet)/nodeMem)
+				podEvent.Put("memory.usage.node.pct", float64(workingSet)/nodeMem)
 			}
 			if memLimit > 0 {
-				_, _ = podEvent.Put("memory.usage.limit.pct", float64(workingSet)/memLimit)
-				_, _ = podEvent.Put("memory.working_set.limit.pct", float64(workingSet)/memLimit)
+				podEvent.Put("memory.usage.limit.pct", float64(workingSet)/memLimit)
+				podEvent.Put("memory.working_set.limit.pct", float64(workingSet)/memLimit)
 			}
 		}
 
 		events = append(events, podEvent)
 	}
 	return events, nil
-}
-
-// ecsfields maps pod events fields to container ecs fields
-func ecsfields(podEvent common.MapStr) common.MapStr {
-	ecsfields := common.MapStr{}
-
-	egressBytes, err := podEvent.GetValue("network.tx.bytes")
-	if err == nil {
-		_, _ = ecsfields.Put("network.egress.bytes", egressBytes)
-
-	}
-
-	ingressBytes, err := podEvent.GetValue("network.rx.bytes")
-	if err == nil {
-		_, _ = ecsfields.Put("network.ingress.bytes", ingressBytes)
-
-	}
-
-	return ecsfields
 }

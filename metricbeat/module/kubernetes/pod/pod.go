@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -38,6 +39,8 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
+
+	logger = logp.NewLogger("kubernetes.pod")
 )
 
 // init registers the MetricSet with the central registry.
