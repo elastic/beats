@@ -1,8 +1,10 @@
 # GitHub CODEOWNERS definition
 # See: https://help.github.com/articles/about-codeowners/
 
-# * @elastic/beats
+# The beats repository is owned by the @elastic/elastic-agent-data-plane Many teams contribute to it. The goal
+# is to cover all directories in the CODEOWNERS file. The list is sorted alphabetically by directory and sub directories.
 
+<<<<<<< HEAD
 # libbeat
 # /libbeat/ @elastic/beats
 # /auditbeat/ @elastic/beats
@@ -35,13 +37,203 @@
 # /metricbeat/module/logstash/ @elastic/stack-monitoring
 # /metricbeat/module/beat/ @elastic/stack-monitoring
 # /x-pack/metricbeat/module/ @elastic/integrations
+=======
+* @elastic/elastic-agent-data-plane
 
-# Heartbeat
+
+### Private directories
+# Any changes to the CI system or .github must be reviewed by the data plane team.
+/.ci/ @elastic/elastic-agent-data-plane
+/.github/ @elastic/elastic-agent-data-plane
+
+### Auditbeat
+/auditbeat/ @elastic/security-external-integrations
+/x-pack/auditbeat/ @elastic/security-external-integrations
+
+### Deploy
+# All changes to the different deployments must be reviewed by data plane team.
+/deploy/ @elastic/elastic-agent-data-plane
+/deploy/kubernetes @elastic/elastic-agent-data-plane @elastic/obs-cloudnative-monitoring
+
+
+# Beats Build Specific
+/dev-tools/ @elastic/elastic-agent-data-plane
+
+# Most docs change are inside each beat / module. For global docs, data plane team should review.
+/docs/ @elastic/elastic-agent-data-plane
+
+### Filebeat
+
+# Filebeat is owned by the data plane team
+/filebeat @elastic/elastic-agent-data-plane
+/x-pack/filebeat @elastic/elastic-agent-data-plane
+
+# Modules are by default owned by the integrations team
+/filebeat/module/ @elastic/integrations
+/x-pack/filebeat/module/ @elastic/integrations
+
+# Modules owned by the data plane team
+/filebeat/module/system @elastic/elastic-agent-data-plane
+
+# Modules owned by integrations team
+/filebeat/module/apache @elastic/integrations
+/filebeat/module/haproxy @elastic/integrations
+/filebeat/module/icinga @elastic/integrations
+/filebeat/module/iis @elastic/integrations
+/filebeat/module/kafka @elastic/integrations
+/filebeat/module/kibana @elastic/integrations
+/filebeat/module/logstash @elastic/integrations
+/filebeat/module/mongodb @elastic/integrations
+/filebeat/module/nats @elastic/integrations
+/filebeat/module/nginx @elastic/integrations
+/filebeat/module/postgresql @elastic/integrations
+/filebeat/module/redis @elastic/integrations
+/filebeat/module/traefik @elastic/integrations
+
+/x-pack/filebeat/module/activemq @elastic/integrations
+/x-pack/filebeat/module/ibmmq @elastic/integrations
+/x-pack/filebeat/module/mssql @elastic/integrations
+/x-pack/filebeat/module/rabbitmq @elastic/integrations
+/x-pack/filebeat/module/zookeeper @elastic/integrations
+
+# Modules owned by cloud-monitoring
+/x-pack/filebeat/module/aws @elastic/obs-cloud-monitoring
+/x-pack/filebeat/module/awsfargate @elastic/obs-cloud-monitoring
+/x-pack/filebeat/module/azure @elastic/obs-cloud-monitoring
+
+# Infra UI modules
+/filebeat/module/elasticsearch/ @elastic/infra-monitoring-ui
+/filebeat/module/kibana/ @elastic/infra-monitoring-ui
+/filebeat/module/logstash/ @elastic/infra-monitoring-ui
+
+# Security integrations modules
+/filebeat/module/auditd @elastic/security-external-integrations
+/filebeat/module/mysql @elastic/security-external-integrations
+/filebeat/module/pensando @elastic/security-external-integrations
+/filebeat/module/santa @elastic/security-external-integrations
+/x-pack/filebeat/module/barracuda @elastic/security-external-integrations
+/x-pack/filebeat/module/bluecoat @elastic/security-external-integrations
+/x-pack/filebeat/module/cef @elastic/security-external-integrations
+/x-pack/filebeat/module/checkpoint @elastic/security-external-integrations
+/x-pack/filebeat/module/cisco @elastic/security-external-integrations
+/x-pack/filebeat/module/coredns @elastic/security-external-integrations
+/x-pack/filebeat/module/crowdstrike @elastic/security-external-integrations
+/x-pack/filebeat/module/cyberarkpas @elastic/security-external-integrations
+/x-pack/filebeat/module/cylance @elastic/security-external-integrations
+/x-pack/filebeat/module/envoyproxy @elastic/security-external-integrations
+/x-pack/filebeat/module/f5 @elastic/security-external-integrations
+/x-pack/filebeat/module/fortinet @elastic/security-external-integrations
+/x-pack/filebeat/module/gcp @elastic/security-external-integrations
+/x-pack/filebeat/module/google_workspace @elastic/security-external-integrations
+/x-pack/filebeat/module/imperva @elastic/security-external-integrations
+/x-pack/filebeat/module/infoblox @elastic/security-external-integrations
+/x-pack/filebeat/module/iptables @elastic/security-external-integrations
+/x-pack/filebeat/module/juniper @elastic/security-external-integrations
+/x-pack/filebeat/module/microsoft @elastic/security-external-integrations
+/x-pack/filebeat/module/misp @elastic/security-external-integrations
+/x-pack/filebeat/module/mysqlenterprise @elastic/security-external-integrations
+/x-pack/filebeat/module/netflow @elastic/security-external-integrations
+/x-pack/filebeat/module/netscout @elastic/security-external-integrations
+/x-pack/filebeat/module/o365 @elastic/security-external-integrations
+/x-pack/filebeat/module/okta @elastic/security-external-integrations
+/x-pack/filebeat/module/oracle @elastic/security-external-integrations
+/x-pack/filebeat/module/panw @elastic/security-external-integrations
+/x-pack/filebeat/module/proofpoint @elastic/security-external-integrations
+/x-pack/filebeat/module/radware @elastic/security-external-integrations
+/x-pack/filebeat/module/snort @elastic/security-external-integrations
+/x-pack/filebeat/module/snyk @elastic/security-external-integrations
+/x-pack/filebeat/module/sonicwall @elastic/security-external-integrations
+/x-pack/filebeat/module/sophos @elastic/security-external-integrations
+/x-pack/filebeat/module/squid @elastic/security-external-integrations
+/x-pack/filebeat/module/suricata @elastic/security-external-integrations
+/x-pack/filebeat/module/threatintel @elastic/security-external-integrations
+/x-pack/filebeat/module/tomcat @elastic/security-external-integrations
+/x-pack/filebeat/module/zeek @elastic/security-external-integrations
+/x-pack/filebeat/module/zoom @elastic/security-external-integrations
+/x-pack/filebeat/module/zscaler @elastic/security-external-integrations
+
+# Security asset management modules
+/filebeat/module/osquery @elastic/security-asset-management
+
+# Security integrations inputs
+/filebeat/input/syslog/ @elastic/security-external-integrations
+/filebeat/input/winlog/ @elastic/security-external-integrations
+
+/x-pack/filebeat/input/gcppubsub/ @elastic/security-external-integrations
+/x-pack/filebeat/input/http_endpoint/ @elastic/security-external-integrations
+/x-pack/filebeat/input/httpjson/ @elastic/security-external-integrations
+/x-pack/filebeat/input/netflow/ @elastic/security-external-integrations
+/x-pack/filebeat/input/o365audit/ @elastic/security-external-integrations
+
+# Security integrations processors
+/x-pack/filebeat/processors/decode_cef/ @elastic/security-external-integrations
+
+
+### Heartbeat
 /heartbeat/ @elastic/uptime
+/x-pack/heartbeat/ @elastic/uptime
 
-# Winlogbeat
+### Journalbeat
+# Journalbeat is owned by the data plane team
+/journalbeat @elastic/elastic-agent-data-plane
+
+### libbeat
+/libbeat/ @elastic/elastic-agent-data-plane
+/libbeat/management @elastic/elastic-agent-control-plane
+
+# Libbeat processors security integrations
+/libbeat/processors/community_id/ @elastic/security-external-integrations
+/libbeat/processors/decode_xml/ @elastic/security-external-integrations
+/libbeat/processors/decode_xml_wineventlog/ @elastic/security-external-integrations
+/libbeat/processors/dns/ @elastic/security-external-integrations
+/libbeat/processors/registered_domain/ @elastic/security-external-integrations
+/libbeat/processors/translate_sid/ @elastic/security-external-integrations
+
+
+### licenses
+/licenses/ @elastic/elastic-agent-data-plane
+
+### Metricbeat
+# The core of metricbeat is owned by the data plane team. Bits inside are owned by different teams.
+/metricbeat/ @elastic/elastic-agent-data-plane
+/x-pack/metricbeat/ @elastic/elastic-agent-data-plane
+
+# Modules are owned by the integrations team by default
+/metricbeat/module/ @elastic/integrations
+/x-pack/metricbeat/module/ @elastic/integrations
+
+# Modules owned by the data plane team
+/metricbeat/module/system/ @elastic/elastic-agent-data-plane
+
+# Infra UI modules
+/metricbeat/module/elasticsearch/ @elastic/infra-monitoring-ui
+/metricbeat/module/kibana/ @elastic/infra-monitoring-ui
+/metricbeat/module/logstash/ @elastic/infra-monitoring-ui
+/metricbeat/module/beat/ @elastic/infra-monitoring-ui
+>>>>>>> 5a8abbab40 ([Discuss] Update Codeowners file (#30793))
+
+#### monitors.d
+# TODO: Does this belong to synthetics? Why is this in the top dir?
+/monitors.d/ @elastic/uptime
+
+#### Packetbeat
+/packetbeat/ @elastic/security-external-integrations
+/x-pack/packetbeat/ @elastic/security-external-integrations
+
+### script
+/script/ @elastic/elastic-agent-data-plane
+
+### testing
+/testing/ @elastic/elastic-agent-data-plane
+
+### tools
+/tools/ @elastic/elastic-agent-data-plane
+
+### Winlogbeat
+/winlogbeat/ @elastic/security-external-integrations
 /x-pack/winlogbeat/ @elastic/security-external-integrations
 
+<<<<<<< HEAD
 # Beats Build Specific
 /dev-tools/mage/ @elastic/beats
 /dev-tools/make/ @elastic/beats 
@@ -50,3 +242,8 @@
 # CI Specific
 /.ci/ @elastic/observablt-robots
 /Jenkinsfile @elastic/observablt-robots
+=======
+# Elastic Agent
+/x-pack/elastic-agent/ @elastic/elastic-agent-control-plane
+
+>>>>>>> 5a8abbab40 ([Discuss] Update Codeowners file (#30793))
