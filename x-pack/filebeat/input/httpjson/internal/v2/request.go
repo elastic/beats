@@ -175,6 +175,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 	}
 	defer httpResp.Body.Close()
 
+<<<<<<< HEAD:x-pack/filebeat/input/httpjson/internal/v2/request.go
 	eventsCh, err := r.responseProcessor.startProcessing(stdCtx, trCtx, httpResp)
 	if err != nil {
 		return err
@@ -182,8 +183,11 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 
 	trCtx.clearIntervalData()
 
+=======
+>>>>>>> 043cab99de (x-pack/filebeat/input/httpjson: make sure interval data clearing happens before processing (#30730)):x-pack/filebeat/input/httpjson/request.go
 	var n int
-	for maybeMsg := range eventsCh {
+	events := r.responseProcessor.startProcessing(stdCtx, trCtx, httpResp)
+	for maybeMsg := range events {
 		if maybeMsg.failed() {
 			r.log.Errorf("error processing response: %v", maybeMsg)
 			continue
