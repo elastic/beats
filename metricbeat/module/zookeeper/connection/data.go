@@ -44,7 +44,7 @@ func (m *MetricSet) parseCons(i io.Reader) []mb.Event {
 		oneParsingIsCorrect := false
 		keyMap, err := lineToMap(line)
 		if err != nil {
-			m.Logger().Errorf("Error while parsing zookeeper  `cons' command %v", err.Error())
+			m.Logger().Errorf("Error while parsing zookeeper 'cons' command %s", err.Error())
 			continue
 		}
 

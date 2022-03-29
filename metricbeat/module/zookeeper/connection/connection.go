@@ -61,17 +61,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	outputReader, err := zookeeper.RunCommand("cons", m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return fmt.Errorf("'cons' command failed: %v", err.Error())
+		return fmt.Errorf("'cons' command failed: %s", err.Error())
 	}
 
 	events := m.parseCons(outputReader)
 	if err != nil {
-		return fmt.Errorf("error parsing response from zookeeper: %v", err.Error())
+		return fmt.Errorf("error parsing response from zookeeper: %s", err.Error())
 	}
 
 	serverID, err := zookeeper.ServerID(m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return fmt.Errorf("error obtaining server id %v", err.Error())
+		return fmt.Errorf("error obtaining server id %s", err.Error())
 	}
 
 	for _, event := range events {
