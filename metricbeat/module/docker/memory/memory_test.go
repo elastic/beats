@@ -65,6 +65,9 @@ func TestMemoryService_GetMemoryStats(t *testing.T) {
 				"name": "image",
 			},
 			"runtime": "docker",
+			"memory": common.MapStr{
+				"usage": 0.5,
+			},
 		},
 		"docker": common.MapStr{
 			"container": common.MapStr{
