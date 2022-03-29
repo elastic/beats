@@ -5,14 +5,20 @@
 package http_endpoint
 
 import (
+	"bytes"
+	"compress/gzip"
 	"encoding/json"
+	"io"
 	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_httpReadJSON(t *testing.T) {
@@ -136,4 +142,77 @@ func Test_httpReadJSON(t *testing.T) {
 			assert.Equal(t, len(gotObjs), len(rawMessages))
 		})
 	}
+}
+
+type publisher struct {
+	events []beat.Event
+}
+
+func (p *publisher) Publish(event beat.Event) {
+	p.events = append(p.events, event)
+}
+
+func Test_apiResponse(t *testing.T) {
+	pub := new(publisher)
+	conf := defaultConfig()
+	apiHandler := newHandler(conf, pub, logp.NewLogger("http_endpoint.test"))
+
+	const singleObjectJSON = `{"id":0}`
+
+	t.Run("json object", func(t *testing.T) {
+		pub.events = pub.events[:0]
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(singleObjectJSON))
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		apiHandler(respRec, req)
+
+		assert.Equal(t, http.StatusOK, respRec.Code)
+		assert.Equal(t, conf.ResponseBody, respRec.Body.String())
+		assert.Len(t, pub.events, 1)
+	})
+
+	t.Run("gzip json object", func(t *testing.T) {
+		pub.events = pub.events[:0]
+
+		buf := new(bytes.Buffer)
+		b := gzip.NewWriter(buf)
+		_, _ = io.WriteString(b, singleObjectJSON)
+		b.Close()
+
+		req := httptest.NewRequest(http.MethodPost, "/", buf)
+		req.Header.Set("Content-Encoding", "gzip")
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		apiHandler(respRec, req)
+
+		assert.Equal(t, http.StatusOK, respRec.Code)
+		assert.Equal(t, conf.ResponseBody, respRec.Body.String())
+		assert.Len(t, pub.events, 1)
+	})
+
+	t.Run("gzip json objects", func(t *testing.T) {
+		pub.events = pub.events[:0]
+
+		const multipleObjectsJSON = `{"id":0}` + "\n" + `{"id":1}`
+		buf := new(bytes.Buffer)
+		b := gzip.NewWriter(buf)
+		_, _ = io.WriteString(b, multipleObjectsJSON)
+		b.Close()
+
+		req := httptest.NewRequest(http.MethodPost, "/", buf)
+		req.Header.Set("Content-Encoding", "gzip")
+		req.Header.Set("Content-Type", "application/json")
+		respRec := httptest.NewRecorder()
+		apiHandler(respRec, req)
+
+		assert.Equal(t, http.StatusOK, respRec.Code)
+		assert.Equal(t, conf.ResponseBody, respRec.Body.String())
+		assert.Len(t, pub.events, 2)
+
+		for i, evt := range pub.events {
+			id, _ := evt.GetValue("json.id")
+			assert.EqualValues(t, i, id)
+		}
+	})
 }

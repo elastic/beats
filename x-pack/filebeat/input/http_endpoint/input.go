@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -82,32 +83,8 @@ func (e *httpEndpoint) Test(_ v2.TestContext) error {
 func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error {
 	log := ctx.Logger.With("address", e.addr)
 
-	validator := &apiValidator{
-		basicAuth:    e.config.BasicAuth,
-		username:     e.config.Username,
-		password:     e.config.Password,
-		method:       http.MethodPost,
-		contentType:  e.config.ContentType,
-		secretHeader: e.config.SecretHeader,
-		secretValue:  e.config.SecretValue,
-		hmacHeader:   e.config.HMACHeader,
-		hmacKey:      e.config.HMACKey,
-		hmacType:     e.config.HMACType,
-		hmacPrefix:   e.config.HMACPrefix,
-	}
-
-	handler := &httpHandler{
-		log:                   log,
-		publisher:             publisher,
-		messageField:          e.config.Prefix,
-		responseCode:          e.config.ResponseCode,
-		responseBody:          e.config.ResponseBody,
-		includeHeaders:        canonicalizeHeaders(e.config.IncludeHeaders),
-		preserveOriginalEvent: e.config.PreserveOriginalEvent,
-	}
-
 	mux := http.NewServeMux()
-	mux.HandleFunc(e.config.URL, withValidator(validator, handler.apiResponse))
+	mux.HandleFunc(e.config.URL, newHandler(e.config, publisher, log))
 	server := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux}
 	_, cancel := ctxtool.WithFunc(ctx.Cancelation, func() { server.Close() })
 	defer cancel()
@@ -126,4 +103,32 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 		return fmt.Errorf("unable to start server due to error: %w", err)
 	}
 	return nil
+}
+
+func newHandler(c config, pub stateless.Publisher, log *logp.Logger) http.HandlerFunc {
+	validator := &apiValidator{
+		basicAuth:    c.BasicAuth,
+		username:     c.Username,
+		password:     c.Password,
+		method:       http.MethodPost,
+		contentType:  c.ContentType,
+		secretHeader: c.SecretHeader,
+		secretValue:  c.SecretValue,
+		hmacHeader:   c.HMACHeader,
+		hmacKey:      c.HMACKey,
+		hmacType:     c.HMACType,
+		hmacPrefix:   c.HMACPrefix,
+	}
+
+	handler := &httpHandler{
+		log:                   log,
+		publisher:             pub,
+		messageField:          c.Prefix,
+		responseCode:          c.ResponseCode,
+		responseBody:          c.ResponseBody,
+		includeHeaders:        canonicalizeHeaders(c.IncludeHeaders),
+		preserveOriginalEvent: c.PreserveOriginalEvent,
+	}
+
+	return withValidator(validator, handler.apiResponse)
 }
