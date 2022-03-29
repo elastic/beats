@@ -6,7 +6,6 @@ package httpjson
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"net/url"
 
@@ -58,7 +57,7 @@ type responseProcessor struct {
 }
 
 func newResponseProcessor(config config, pagination *pagination, log *logp.Logger) []*responseProcessor {
-	rps := make([]*responseProcessor, 0, len(config.Chain) + 1)
+	rps := make([]*responseProcessor, 0, len(config.Chain)+1)
 
 	rp := &responseProcessor{
 		pagination: pagination,
@@ -139,17 +138,19 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 						continue
 					}
 
-					err = rp.split.run(trCtx, tr, ch)
-					if errors.Is(err, errEmptyField) {
-						// nothing else to send for this page
-						rp.log.Debug("split operation finished")
-					} else if errors.Is(err, errEmptyRootField) {
-						// root field not found, most likely the response is empty
-						rp.log.Debug(err)
-					} else if err != nil {
-						rp.log.Debug("split operation failed")
-						ch <- maybeMsg{err: err}
-						return
+					if err := rp.split.run(trCtx, tr, ch); err != nil {
+						switch err {
+						case errEmptyField:
+							// nothing else to send for this page
+							rp.log.Debug("split operation finished")
+						case errEmptyRootField:
+							// root field not found, most likely the response is empty
+							rp.log.Debug(err)
+						default:
+							rp.log.Debug("split operation failed")
+							ch <- maybeMsg{err: err}
+							return
+						}
 					}
 				}
 			}

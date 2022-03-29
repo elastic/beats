@@ -6,7 +6,6 @@ package httpjson
 
 import (
 	"context"
-	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -125,7 +124,9 @@ func (iter *pageIterator) next() (*response, bool, error) {
 
 	httpReq, err := iter.pagination.requestFactory.newHTTPRequest(iter.stdCtx, iter.trCtx)
 	if err != nil {
-		if errors.Is(err, errNewURLValueNotSet) || errors.Is(err, errEmptyTemplateResult) || errors.Is(err, errExecutingTemplate) {
+		if err == errNewURLValueNotSet ||
+			err == errEmptyTemplateResult ||
+			err == errExecutingTemplate {
 			// if this error happens here it means a transform
 			// did not find any new value and we can stop paginating without error
 			iter.done = true
