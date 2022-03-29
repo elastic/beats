@@ -125,6 +125,12 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 	}
 	l.log.Infof("Template with name %q loaded.", templateName)
 
+	// if template exists and it has to be overriden
+	// data stream should not be deleted and recreated.
+	if exists {
+		return nil
+	}
+
 	// if JSON template is loaded and it is not a data stream
 	// we are done with loading.
 	if config.JSON.Enabled && !config.JSON.IsDataStream {
@@ -147,7 +153,7 @@ func (l *ESLoader) loadTemplate(templateName string, template map[string]interfa
 	path := "/_index_template/" + templateName
 	status, body, err := l.client.Request("PUT", path, "", nil, template)
 	if err != nil {
-		return fmt.Errorf("couldn't load template: %v. Response body: %s", err, body)
+		return fmt.Errorf("couldn't load template: %w. Response body: %s", err, body)
 	}
 	if status > http.StatusMultipleChoices { //http status 300
 		return fmt.Errorf("couldn't load json. Status: %v", status)
@@ -198,7 +204,7 @@ func (l *FileLoader) Load(config TemplateConfig, info beat.Info, fields []byte, 
 
 	str := fmt.Sprintf("%s\n", body.StringToPrint())
 	if err := l.client.Write("template", tmpl.name, str); err != nil {
-		return fmt.Errorf("error printing template: %v", err)
+		return fmt.Errorf("error printing template: %w", err)
 	}
 	return nil
 }
@@ -210,7 +216,7 @@ func (b *templateBuilder) template(config TemplateConfig, info beat.Info, esVers
 	}
 	tmpl, err := New(info.Version, info.IndexPrefix, info.ElasticLicensed, esVersion, config, migration)
 	if err != nil {
-		return nil, fmt.Errorf("error creating template instance: %v", err)
+		return nil, fmt.Errorf("error creating template instance: %w", err)
 	}
 	return tmpl, nil
 }
@@ -236,18 +242,18 @@ func (b *templateBuilder) buildBody(tmpl *Template, config TemplateConfig, field
 func (b *templateBuilder) buildBodyFromJSON(config TemplateConfig) (common.MapStr, error) {
 	jsonPath := paths.Resolve(paths.Config, config.JSON.Path)
 	if _, err := os.Stat(jsonPath); err != nil {
-		return nil, fmt.Errorf("error checking json file %s for template: %v", jsonPath, err)
+		return nil, fmt.Errorf("error checking json file %s for template: %w", jsonPath, err)
 	}
 	b.log.Debugf("Loading json template from file %s", jsonPath)
 	content, err := ioutil.ReadFile(jsonPath)
 	if err != nil {
-		return nil, fmt.Errorf("error reading file %s for template: %v", jsonPath, err)
+		return nil, fmt.Errorf("error reading file %s for template: %w", jsonPath, err)
 
 	}
 	var body map[string]interface{}
 	err = json.Unmarshal(content, &body)
 	if err != nil {
-		return nil, fmt.Errorf("could not unmarshal json template: %s", err)
+		return nil, fmt.Errorf("could not unmarshal json template: %w", err)
 	}
 	return body, nil
 }
@@ -257,7 +263,7 @@ func (b *templateBuilder) buildBodyFromFile(tmpl *Template, config TemplateConfi
 	fieldsPath := paths.Resolve(paths.Config, config.Fields)
 	body, err := tmpl.LoadFile(fieldsPath)
 	if err != nil {
-		return nil, fmt.Errorf("error creating template from file %s: %v", fieldsPath, err)
+		return nil, fmt.Errorf("error creating template from file %s: %w", fieldsPath, err)
 	}
 	return body, nil
 }
@@ -266,7 +272,7 @@ func (b *templateBuilder) buildBodyFromFields(tmpl *Template, fields []byte) (co
 	b.log.Debug("Load default fields")
 	body, err := tmpl.LoadBytes(fields)
 	if err != nil {
-		return nil, fmt.Errorf("error creating template: %v", err)
+		return nil, fmt.Errorf("error creating template: %w", err)
 	}
 	return body, nil
 }
