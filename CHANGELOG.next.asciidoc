@@ -110,6 +110,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Winlogbeat*
 
+- Retry EvtSubscribe from start if fails with strict mode. {issue}29793[29793] {pull}30155[30155]
+
 
 *Elastic Log Driver*
 
