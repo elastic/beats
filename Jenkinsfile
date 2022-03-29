@@ -221,9 +221,6 @@ def runLinting() {
   }
   mapParallelTasks['default'] = {
     cmd(label: 'make check-default', script: 'make check-default')
-    cmd(label: 'Lint Last Change [Linux]', script: 'GOOS=linux mage -v llc')
-    cmd(label: 'Lint Last Change [Darwin]', script: 'GOOS=darwin mage -v llc')
-    cmd(label: 'Lint Last Change [Windows]', script: 'GOOS=windows mage -v llc')
   }
   mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)

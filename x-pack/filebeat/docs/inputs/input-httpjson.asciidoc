@@ -370,6 +370,7 @@ NOTE: Only one of the credentials settings can be set at once. If none is provid
 default credentials from the environment will be attempted via ADC. For more information about
 how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
 
+[[request-parameters]]
 [float]
 ==== `request.url`
 
@@ -931,6 +932,146 @@ This will output:
 ]
 ----
 
+[[chain]]
+[float]
+=== `chain`
+
+A chain is a list of requests to be made after the first one.
+
+[float]
+==== `chain[].step`
+
+Contains basic request and response configuration for chained calls.
+
+[float]
+==== `chain[].step.request`
+
+Please refer <<request-parameters,request parameters>>. Required. 
+
+Example:
+
+First call: https://example.com/services/data/v1.0/
+
+Second call: https://example.com/services/data/v1.0/1/export_ids
+
+Third call: https://example.com/services/data/v1.0/export_ids/file_1/info
+
+[float]
+==== `chain[].step.response.split`
+
+Please refer <<response-split,response split parameter>>.
+
+[float]
+==== `chain[].step.replace`
+
+A [JSONPath](https://goessner.net/articles/JsonPath/index.html#e2[JSONPath]) string to parse values from responses JSON, collected from previous chain steps. Place same replace string in url where collected values from previous call should be placed. Required.
+
+Example:
+
+- First call: https://example.com/services/data/v1.0/
++
+<<response-json1,response>>
+
+- Second call: https://example.com/services/data/v1.0/`$.records[:].id`/export_ids
++
+<<response-json2,response>>
+
+- Third call: https://example.com/services/data/v1.0/export_ids`/`$.file_name`/info
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  enabled: true
+  # first call
+  request.url: https://example.com/services/data/v1.0/records
+  interval: 1h
+  chain:
+    # second call
+    - step:
+      request.url: https://example.com/services/data/v1.0/$.records[:].id/export_ids
+      request.method: GET
+      replace: $.records[:].id
+    # third call
+    - step:
+      request.url: https://example.com/services/data/v1.0/export_ids/$.file_name/info
+      request.method: GET
+      replace: $.file_name
+----
+
+Example:
+
+- First call to collect record ids
+
++
+request_url: https://example.com/services/data/v1.0/records
+
++
+response_json:
+
++
+[[response-json1]]
+["source","json",subs="attributes"]
+----
+{
+    "records": [
+        {
+            "id": 1,
+        },
+        {
+            "id": 2,
+        },
+        {
+            "id": 3,
+        },
+    ]
+}
+----
+
+- Second call to collect `file_name` using collected ids from first call.
+
++
+request_url using id as '1': https://example.com/services/data/v1.0/1/export_ids
+
++
+response_json using id as '1':
+
++
+[[response-json2]]
+["source","json",subs="attributes"]
+----
+{
+    "file_name": "file_1"
+}
+----
+
++
+request_url using id as '2': https://example.com/services/data/v1.0/2/export_ids
+
++
+response_json using id as '2':
+
++
+["source","json",subs="attributes"]
+----
+{
+    "file_name": "file_2"
+}
+----
+
+- Third call to collect `files` using collected `file_name` from second call.
+
++
+request_url using file_name as 'file_1': https://example.com/services/data/v1.0/export_ids/file_1/info
+
++
+request_url using file_name as 'file_2': https://example.com/services/data/v1.0/export_ids/file_2/info
+
++
+Collect and make events from response in any format supported by httpjson for all calls.
+
+NOTE: httpjson chain will only create and ingest events from last call on chained configurations. Also, the current chain only supports the following: `request.url`, `request.method`, `request.transforms`, `request.body`, `response.transforms` and `response.split`.
+
 [[cursor]]
 [float]
 ==== `cursor`
@@ -976,8 +1117,17 @@ image:images/input-httpjson-lifecycle.png[Request lifecycle]
 . The resulting transformed request is executed.
 . The server responds (here is where any retry or rate limit policy takes place when configured).
 . The response is transformed using the configured `response.transforms` and `response.split`.
+. If a chain step is configured. Each step will generate new requests based on collected IDs from responses. The requests will be transformed using configured `request.transforms` and the resulting generated transformed requests will be executed. This process will happen for all the steps mentioned in the chain.
 . Each resulting event is published to the output.
 . If a `response.pagination` is configured and there are more pages, a new request is created using it, otherwise the process ends until the next interval.
+
+image:images/input-httpjson-chain-lifecycle.png[Chain Request lifecycle]
+
+. Response from regular call will be processed.
+. Extract data from response and generate new requests from responses.
+. Process generated requests and collect responses from server.
+. Go back to step-2 for the next step.
+. Publish collected responses from the last chain step.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
