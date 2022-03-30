@@ -129,6 +129,13 @@ pipeline {
             DRA_OUTPUT = 'release-manager.out'
           }
           steps {
+            //TODO: for testing purposes
+            withEnv(["HOME=${env.WORKSPACE}"]) {
+              withBeatsEnv() {
+                sh(label: 'make dependencies.csv', script: 'make build/distributions/dependencies.csv')
+                sh(label: 'make beats-dashboards', script: 'make beats-dashboards')
+              }
+            }
             dir("${BASE_DIR}") {
               // TODO: as long as googleStorageDownload does not support recursive copy with **/*
               dir("build/distributions") {
@@ -136,13 +143,6 @@ pipeline {
                 //TODO: test
                 //sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
                 sh(label: 'move one level up', script: "mv 96c74deb83b115f8a77715c7b901a4e27b6369d8/** .")
-              }
-              //TODO: for testing purposes
-              withEnv(["HOME=${env.WORKSPACE}"]) {
-                withBeatsEnv() {
-                  sh(label: 'make dependencies.csv', script: 'make build/distributions/dependencies.csv')
-                  sh(label: 'make beats-dashboards', script: 'make beats-dashboards')
-                }
               }
               sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
               sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh")
