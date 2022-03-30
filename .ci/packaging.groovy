@@ -23,8 +23,8 @@ pipeline {
     GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
     SNAPSHOT = "true"
     PIPELINE_LOG_LEVEL = "DEBUG"
-    SLACK_CHANNEL = '#beats'
-    NOTIFY_TO = 'beats-contrib+package-beats@elastic.co'
+    SLACK_CHANNEL = 'UJ2J1AZV2'
+    NOTIFY_TO = 'victor.martinez+package-beats@elastic.co'
   }
   options {
     timeout(time: 4, unit: 'HOURS')
@@ -136,6 +136,13 @@ pipeline {
                 //TODO: test
                 //sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
                 sh(label: 'move one level up', script: "mv 96c74deb83b115f8a77715c7b901a4e27b6369d8/** .")
+              }
+              //TODO: for testing purposes
+              withEnv(["HOME=${env.WORKSPACE}"]) {
+                withBeatsEnv() {
+                  sh(label: 'make dependencies.csv', script: 'make build/distributions/dependencies.csv')
+                  sh(label: 'make beats-dashboards', script: 'make beats-dashboards')
+                }
               }
               sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
               sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh")
