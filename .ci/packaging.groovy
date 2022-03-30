@@ -22,7 +22,7 @@ pipeline {
     DOCKER_REGISTRY = 'docker.elastic.co'
     GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
     SNAPSHOT = "true"
-    PIPELINE_LOG_LEVEL = "INFO"
+    PIPELINE_LOG_LEVEL = "DEBUG"
     SLACK_CHANNEL = '#beats'
     NOTIFY_TO = 'beats-contrib+package-beats@elastic.co'
   }
@@ -99,6 +99,7 @@ pipeline {
           }
         }
         stage('Build Packages'){
+          when { expression { return false } }
           options { skipDefaultCheckout() }
           steps {
             generateSteps()
@@ -122,7 +123,9 @@ pipeline {
           }
           environment {
             // It uses the folder structure done in uploadPackagesToGoogleBucket
-            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
+            //TODO: test
+            //BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
+            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/96c74deb83b115f8a77715c7b901a4e27b6369d8"
             DRA_OUTPUT = 'release-manager.out'
           }
           steps {
@@ -130,7 +133,9 @@ pipeline {
               // TODO: as long as googleStorageDownload does not support recursive copy with **/*
               dir("build/distributions") {
                 gsutil(command: "-m -q cp -r ${env.BUCKET_URI} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
-                sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
+                //TODO: test
+                //sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
+                sh(label: 'move one level up', script: "mv 96c74deb83b115f8a77715c7b901a4e27b6369d8/** .")
               }
               sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
               sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh")
