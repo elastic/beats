@@ -43,6 +43,14 @@ const (
 	winEventLogExpAPIName = "wineventlog-experimental"
 )
 
+func init() {
+	// Register wineventlog API if it is available.
+	available, _ := win.IsAvailable()
+	if available {
+		Register(winEventLogExpAPIName, 10, newWinEventLogExp, win.Channels)
+	}
+}
+
 // winEventLogExp implements the EventLog interface for reading from the Windows
 // Event Log API.
 type winEventLogExp struct {
@@ -320,12 +328,4 @@ func newWinEventLogExp(options *common.Config) (EventLog, error) {
 	}
 
 	return l, nil
-}
-
-func init() {
-	// Register wineventlog API if it is available.
-	available, _ := win.IsAvailable()
-	if available {
-		Register(winEventLogExpAPIName, 10, newWinEventLogExp, win.Channels)
-	}
 }

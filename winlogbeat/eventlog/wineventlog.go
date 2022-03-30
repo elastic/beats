@@ -55,6 +55,15 @@ const (
 	eventLoggingAPIName = "eventlogging"
 )
 
+func init() {
+	// Register wineventlog API if it is available.
+	available, _ := win.IsAvailable()
+	if available {
+		Register(winEventLogAPIName, 0, newWinEventLog, win.Channels)
+		Register(eventLoggingAPIName, 1, newEventLogging, win.Channels)
+	}
+}
+
 type winEventLogConfig struct {
 	ConfigCommon  `config:",inline"`
 	BatchReadSize int                `config:"batch_read_size"` // Maximum number of events that Read will return.
@@ -513,13 +522,4 @@ func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, 
 	err = win.RenderBookmarkXML(bmHandle, l.renderBuf, l.outputBuf)
 	win.Close(bmHandle)
 	return string(l.outputBuf.Bytes()), err
-}
-
-func init() {
-	// Register wineventlog API if it is available.
-	available, _ := win.IsAvailable()
-	if available {
-		Register(winEventLogAPIName, 0, newWinEventLog, win.Channels)
-		Register(eventLoggingAPIName, 1, newEventLogging, win.Channels)
-	}
 }
