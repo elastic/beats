@@ -21,6 +21,10 @@
 package eventlog
 
 import (
+<<<<<<< HEAD
+=======
+	"fmt"
+>>>>>>> 34bdc3d468 (winlogbeat: fix event handling for Windows 2022 (#30942))
 	"io"
 	"os"
 	"path/filepath"
@@ -41,6 +45,14 @@ const (
 	// as both an event type and an API.
 	winEventLogExpAPIName = "wineventlog-experimental"
 )
+
+func init() {
+	// Register wineventlog API if it is available.
+	available, _ := win.IsAvailable()
+	if available {
+		Register(winEventLogExpAPIName, 10, newWinEventLogExp, win.Channels)
+	}
+}
 
 // winEventLogExp implements the EventLog interface for reading from the Windows
 // Event Log API.
@@ -99,7 +111,11 @@ func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, erro
 	if err != nil {
 		return win.NilHandle, err
 	}
+<<<<<<< HEAD
 	defer windows.CloseHandle(signalEvent)
+=======
+	defer windows.CloseHandle(signalEvent) //nolint:errcheck // This is just a resource release.
+>>>>>>> 34bdc3d468 (winlogbeat: fix event handling for Windows 2022 (#30942))
 
 	var flags win.EvtSubscribeFlag
 	if bookmark > 0 {
@@ -116,6 +132,20 @@ func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, erro
 		l.query,                 // Query - nil means all events
 		win.EvtHandle(bookmark), // Bookmark - for resuming from a specific event
 		flags)
+<<<<<<< HEAD
+=======
+
+	switch err { //nolint:errorlint // This is an errno or nil.
+	case nil:
+		return h, nil
+	case win.ERROR_NOT_FOUND, win.ERROR_EVT_QUERY_RESULT_STALE, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION:
+		// The bookmarked event was not found, we retry the subscription from the start.
+		incrementMetric(readErrors, err)
+		return win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
+	default:
+		return 0, err
+	}
+>>>>>>> 34bdc3d468 (winlogbeat: fix event handling for Windows 2022 (#30942))
 }
 
 func (l *winEventLogExp) openFile(state checkpoint.EventLogState, bookmark win.Bookmark) (win.EvtHandle, error) {
@@ -198,6 +228,10 @@ func (l *winEventLogExp) processHandle(h win.EvtHandle) (*Record, error) {
 		evt.RenderErr = append(evt.RenderErr, err.Error())
 	}
 
+<<<<<<< HEAD
+=======
+	//nolint:godox // Bad linter! Keep to have a record of feature disparity between non-experimental vs experimental.
+>>>>>>> 34bdc3d468 (winlogbeat: fix event handling for Windows 2022 (#30942))
 	// TODO: Need to add XML when configured.
 
 	r := &Record{
@@ -304,12 +338,4 @@ func newWinEventLogExp(options *common.Config) (EventLog, error) {
 	}
 
 	return l, nil
-}
-
-func init() {
-	// Register wineventlog API if it is available.
-	available, _ := win.IsAvailable()
-	if available {
-		Register(winEventLogExpAPIName, 10, newWinEventLogExp, win.Channels)
-	}
 }
