@@ -1,5 +1,5 @@
 # Module: tomcat
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-tomcat.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.2/filebeat-module-tomcat.html
 
 - module: tomcat
   log:

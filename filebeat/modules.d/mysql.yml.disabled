@@ -1,5 +1,5 @@
 # Module: mysql
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-mysql.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.2/filebeat-module-mysql.html
 
 - module: mysql
   # Error logs

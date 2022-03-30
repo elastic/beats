@@ -1,5 +1,5 @@
 # Module: coredns
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-coredns.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.2/metricbeat-module-coredns.html
 
 - module: coredns
   metricsets: ["stats"]

@@ -1,5 +1,5 @@
 # Module: kafka
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-kafka.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.2/metricbeat-module-kafka.html
 
 # Kafka metrics collected using the Kafka protocol
 - module: kafka

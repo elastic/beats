@@ -1,5 +1,5 @@
 # Module: redis
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-redis.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.2/metricbeat-module-redis.html
 
 - module: redis
   #metricsets:

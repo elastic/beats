@@ -1,5 +1,5 @@
 # Module: etcd
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-etcd.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.2/metricbeat-module-etcd.html
 
 - module: etcd
   #metricsets:

@@ -1,5 +1,5 @@
 # Module: redis
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-redis.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.2/filebeat-module-redis.html
 
 - module: redis
   # Main logs

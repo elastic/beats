@@ -1,5 +1,5 @@
 # Module: memcached
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-memcached.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.2/metricbeat-module-memcached.html
 
 - module: memcached
 #  metricsets: ["stats"]

@@ -1,5 +1,5 @@
 # Module: kibana
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-kibana.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.2/filebeat-module-kibana.html
 
 - module: kibana
   # Server logs
