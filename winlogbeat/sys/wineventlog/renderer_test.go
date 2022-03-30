@@ -86,7 +86,8 @@ func TestRenderer(t *testing.T) {
 
 		assert.Equal(t, e.Keywords, []string{"Audit Success"})
 
-		assert.EqualValues(t, 0, e.OpcodeRaw)
+		assert.NotNil(t, 0, e.OpcodeRaw)
+		assert.EqualValues(t, 0, *e.OpcodeRaw)
 		assert.Equal(t, "Info", e.Opcode)
 
 		assert.EqualValues(t, 0, e.LevelRaw)
@@ -131,7 +132,7 @@ func TestRenderer(t *testing.T) {
 
 		assert.Equal(t, e.Keywords, []string{"Classic"})
 
-		assert.EqualValues(t, 0, e.OpcodeRaw)
+		assert.EqualValues(t, (*uint8)(nil), e.OpcodeRaw)
 		assert.Equal(t, "", e.Opcode)
 
 		assert.EqualValues(t, 4, e.LevelRaw)

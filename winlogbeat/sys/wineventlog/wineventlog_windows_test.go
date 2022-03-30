@@ -42,6 +42,7 @@ func TestWinEventLog(t *testing.T) {
 		path   string
 		events int
 	}{
+		{path: "application-windows-error-reporting.evtx", events: 1},
 		{path: "sysmon-9.01.evtx", events: 32},
 		{path: "ec1.evtx", events: 1},          // eventcreate /id 1000 /t error /l application /d "My custom error event for the application log"
 		{path: "ec2.evtx", events: 1},          // eventcreate /id 999 /t error /l application /so WinWord /d "Winword event 999 happened due to low diskspace"

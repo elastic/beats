@@ -201,7 +201,10 @@ func (r *Renderer) renderSystem(handle EvtHandle, event *winevent.Event) error {
 		case EvtSystemTask:
 			event.TaskRaw = data.(uint16)
 		case EvtSystemOpcode:
-			event.OpcodeRaw = data.(uint8)
+			if event.OpcodeRaw == nil {
+				event.OpcodeRaw = new(uint8)
+			}
+			*event.OpcodeRaw = data.(uint8)
 		case EvtSystemKeywords:
 			event.KeywordsRaw = winevent.HexInt64(data.(hexInt64))
 		case EvtSystemTimeCreated:
