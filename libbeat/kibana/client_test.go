@@ -116,19 +116,21 @@ func TestServiceToken(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestNewKibanaClient(t *testing.T) {
+func TestNewKibanaClientWithSpace(t *testing.T) {
 	var requests []*http.Request
 	kibanaTs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requests = append(requests, r)
-		if r.URL.Path == "/api/status" {
+		if r.URL.Path == "/s/test-space/api/status" {
 			w.Write([]byte(`{"version":{"number":"1.2.3-beta","build_snapshot":true}}`))
 		}
 	}))
 	defer kibanaTs.Close()
 
+	// Configure an arbitrary test space to ensure the space URL prefix is added.
 	client, err := NewKibanaClient(common.MustNewConfigFrom(fmt.Sprintf(`
 protocol: http
 host: %s
+space.id: test-space
 headers:
   key: value
   content-type: text/plain
@@ -142,14 +144,14 @@ headers:
 
 	// NewKibanaClient issues a request to /api/status to fetch the version.
 	require.Len(t, requests, 2)
-	assert.Equal(t, "/api/status", requests[0].URL.Path)
+	assert.Equal(t, "/s/test-space/api/status", requests[0].URL.Path)
 	assert.Equal(t, []string{"value"}, requests[0].Header.Values("key"))
 	assert.Equal(t, "1.2.3-beta-SNAPSHOT", client.Version.String())
 
 	// Headers specified in cient.Request are added to those defined in config.
 	//
 	// Content-Type, Accept, and kbn-xsrf cannot be overridden.
-	assert.Equal(t, "/foo", requests[1].URL.Path)
+	assert.Equal(t, "/s/test-space/foo", requests[1].URL.Path)
 	assert.Equal(t, []string{"value", "another_value"}, requests[1].Header.Values("key"))
 	assert.Equal(t, []string{"application/json"}, requests[1].Header.Values("Content-Type"))
 	assert.Equal(t, []string{"application/json"}, requests[1].Header.Values("Accept"))
@@ -167,6 +169,7 @@ func TestNewKibanaClientWithMultipartData(t *testing.T) {
 	}))
 	defer kibanaTs.Close()
 
+	// Don't configure a space to ensure the space URL prefix is not added.
 	client, err := NewKibanaClient(common.MustNewConfigFrom(fmt.Sprintf(`
 protocol: http
 host: %s
