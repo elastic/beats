@@ -204,7 +204,7 @@ func TestFileLoader_Load(t *testing.T) {
       type: text
       analyzer: simple
 `),
-			wantErr: errors.New(`error creating template: inconsistent definitions for analyzers with the name "test_powershell"`),
+			wantErr: fmt.Errorf(`error creating template: %w`, errors.New(`inconsistent definitions for analyzers with the name "test_powershell"`)),
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
