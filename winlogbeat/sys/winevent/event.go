@@ -258,7 +258,10 @@ func (u *UserData) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 
 			u.Name = se.Name
 			u.Pairs = in.Pairs
-			d.Skip()
+			err = d.Skip()
+			if err != nil {
+				return err
+			}
 			break
 		}
 	}
@@ -309,8 +312,7 @@ func (v *Version) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 
 	version, err := strconv.ParseUint(s, 10, 8)
 	if err != nil {
-		// Ignore invalid version values.
-		return nil
+		return nil //nolint:nilerr // Ignore invalid version values.
 	}
 
 	*v = Version(version)

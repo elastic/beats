@@ -21,7 +21,6 @@
 package eventlog
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -108,7 +107,7 @@ func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, erro
 	if err != nil {
 		return win.NilHandle, err
 	}
-	defer func() { _ = windows.CloseHandle(signalEvent) }()
+	defer windows.CloseHandle(signalEvent) //nolint:errcheck // This is just a resource release.
 
 	var flags win.EvtSubscribeFlag
 	if bookmark > 0 {
@@ -128,11 +127,10 @@ func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, erro
 		win.EvtHandle(bookmark), // Bookmark - for resuming from a specific event
 		flags)
 
-	switch {
-	case err == nil:
+	switch err { //nolint:errorlint // This is an errno or nil.
+	case nil:
 		return h, nil
-	case errors.Is(err, win.ERROR_NOT_FOUND), errors.Is(err, win.ERROR_EVT_QUERY_RESULT_STALE),
-		errors.Is(err, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION):
+	case win.ERROR_NOT_FOUND, win.ERROR_EVT_QUERY_RESULT_STALE, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION:
 		// The bookmarked event was not found, we retry the subscription from the start.
 		incrementMetric(readErrors, err)
 		return win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
@@ -221,7 +219,7 @@ func (l *winEventLogExp) processHandle(h win.EvtHandle) (*Record, error) {
 		evt.RenderErr = append(evt.RenderErr, err.Error())
 	}
 
-	//nolint: godox // keep to have a record of feature disparity between non-experimental vs experimental
+	//nolint:godox // Bad linter! Keep to have a record of feature disparity between non-experimental vs experimental.
 	// TODO: Need to add XML when configured.
 
 	r := &Record{
