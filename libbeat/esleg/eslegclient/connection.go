@@ -27,7 +27,7 @@ import (
 	"net/url"
 	"time"
 
-	"go.elastic.co/apm/module/apmelasticsearch"
+	"go.elastic.co/apm/module/apmelasticsearch/v2"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
