@@ -6,7 +6,6 @@ package http_endpoint
 
 import (
 	"bytes"
-	"compress/gzip"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -201,9 +200,8 @@ func newJSONDecoder(r io.Reader) *json.Decoder {
 // getBodyReader returns a reader that decodes the specified Content-Encoding.
 func getBodyReader(r *http.Request) (body io.ReadCloser, status int, err error) {
 	switch enc := r.Header.Get(headerContentEncoding); enc {
-	case "gzip":
-		gzipReader, err := gzip.NewReader(r.Body)
 	case "gzip", "x-gzip":
+		gzipReader, err := newPooledGzipReader(r.Body)
 		if err != nil {
 			return nil, http.StatusInternalServerError, fmt.Errorf("failed to create gzip reader: %w", err)
 		}
