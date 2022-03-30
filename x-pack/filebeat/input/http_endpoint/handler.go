@@ -203,6 +203,7 @@ func getBodyReader(r *http.Request) (body io.ReadCloser, status int, err error) 
 	switch enc := r.Header.Get(headerContentEncoding); enc {
 	case "gzip":
 		gzipReader, err := gzip.NewReader(r.Body)
+	case "gzip", "x-gzip":
 		if err != nil {
 			return nil, http.StatusInternalServerError, fmt.Errorf("failed to create gzip reader: %w", err)
 		}
