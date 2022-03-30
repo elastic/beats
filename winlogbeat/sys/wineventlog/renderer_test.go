@@ -41,7 +41,7 @@ import (
 )
 
 func TestRenderer(t *testing.T) {
-	logp.TestingSetup()
+	logp.TestingSetup() //nolint:errcheck // Bad linter! Never returns a non-nil error when called without options.
 
 	t.Run(filepath.Base(sysmon9File), func(t *testing.T) {
 		log := openLog(t, sysmon9File)
@@ -198,7 +198,7 @@ func renderAllEvents(t *testing.T, log EvtHandle, renderer *Renderer, ignoreMiss
 
 // setLogSize set the maximum number of bytes that an event log can hold.
 func setLogSize(t testing.TB, provider string, sizeBytes int) {
-	output, err := exec.Command("wevtutil.exe", "sl", "/ms:"+strconv.Itoa(sizeBytes), provider).CombinedOutput()
+	output, err := exec.Command("wevtutil.exe", "sl", "/ms:"+strconv.Itoa(sizeBytes), provider).CombinedOutput() //nolint:gosec // No possibility of command injection.
 	if err != nil {
 		t.Fatal("failed to set log size", err, string(output))
 	}

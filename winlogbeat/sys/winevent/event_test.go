@@ -20,7 +20,6 @@ package winevent
 import (
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -181,7 +180,7 @@ func TestXML(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			fmt.Println(string(json))
+			t.Logf("%s", json)
 		}
 	}
 }
