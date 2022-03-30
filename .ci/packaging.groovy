@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+@Library('apm@test/releaseManager') _
 
 import groovy.transform.Field
 
@@ -49,6 +49,8 @@ pipeline {
         anyOf {
           triggeredBy cause: "IssueCommentCause"
           expression {
+            // TODO: for testing purposes
+            return true
             def ret = isUserTrigger() || isUpstreamTrigger()
             if(!ret){
               currentBuild.result = 'NOT_BUILT'
@@ -91,7 +93,9 @@ pipeline {
             dir("${BASE_DIR}"){
               setEnvVar('BEAT_VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
             }
-            setEnvVar('IS_BRANCH_AVAILABLE', isBranchUnifiedReleaseAvailable(env.BRANCH_NAME))
+            //TODO: for testing purposes
+            //setEnvVar('IS_BRANCH_AVAILABLE', isBranchUnifiedReleaseAvailable(env.BRANCH_NAME))
+            setEnvVar('IS_BRANCH_AVAILABLE', isBranchUnifiedReleaseAvailable('main'))
           }
         }
         stage('Build Packages'){
@@ -101,6 +105,8 @@ pipeline {
           }
         }
         stage('Run E2E Tests for Packages'){
+          // TODO: for testing purposes
+          when { expression { return true } }
           options { skipDefaultCheckout() }
           steps {
             runE2ETests()
@@ -129,11 +135,14 @@ pipeline {
               sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
               sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh")
               dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
+              //TODO: for testing purposes
+              withEnv(["BRANCH_NAME=main"]){
               releaseManager(project: 'beats',
                              version: env.BEAT_VERSION,
                              type: 'snapshot',
                              artifactsFolder: 'build/distributions',
                              outputFile: env.DRA_OUTPUT)
+              }
             }
           }
           post {
