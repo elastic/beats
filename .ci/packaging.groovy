@@ -162,7 +162,7 @@ pipeline {
               notifyStatus(analyse: true,
                            file: "${BASE_DIR}/${env.DRA_OUTPUT}",
                            subject: "[${env.REPO}@${env.BRANCH_NAME}] DRA failed.",
-                           body: 'Contact the Release Platform team [#platform-release].')
+                           body: 'Contact the Release Platform team [#platform-release]')
             }
           }
         }
@@ -423,10 +423,16 @@ def withBeatsEnv(Closure body) {
 }
 
 def notifyStatus(def args = [:]) {
-  releaseNotification(slackChannel: "${env.SLACK_CHANNEL}",
-                      slackColor: args.slackStatus,
-                      slackCredentialsId: 'jenkins-slack-integration-token',
-                      to: "${env.NOTIFY_TO}",
-                      subject: args.subject,
-                      body: args.body)
+  def releaseManagerFile = args.get('file', '')
+  def analyse = args.get('analyse', false)
+  def subject = args.get('subject', '')
+  def body = args.get('body', '')
+  releaseManagerNotification(file: releaseManagerFile,
+                             analyse: analyse,
+                             slackChannel: "${env.SLACK_CHANNEL}",
+                             slackColor: 'danger',
+                             slackCredentialsId: 'jenkins-slack-integration-token',
+                             to: "${env.NOTIFY_TO}",
+                             subject: subject,
+                             body: "Build: (<${env.RUN_DISPLAY_URL}|here>).\n ${body}")
 }
