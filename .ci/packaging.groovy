@@ -42,6 +42,7 @@ pipeline {
   }
   stages {
     stage('Filter build') {
+      options { skipDefaultCheckout() }
       agent { label 'ubuntu-20 && immutable' }
       when {
         beforeAgent true
@@ -106,6 +107,7 @@ pipeline {
           }
         }
         stage('DRA') {
+          options { skipDefaultCheckout() }
           // The Unified Release process keeps moving branches as soon as a new
           // minor version is created, therefore old release branches won't be able
           // to use the release manager as their definition is removed.
