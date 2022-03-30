@@ -29,6 +29,19 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-2019"
         stage: mandatory
+<<<<<<< HEAD
+=======
+    windows-2022:
+      mage: "mage build unitTest"
+      platforms: ## override default labels in this specific stage.
+        - "windows-2022"
+      stage: mandatory
+    windows-2019:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "windows-2019"
+        stage: extended_win
+>>>>>>> 34bdc3d468 (winlogbeat: fix event handling for Windows 2022 (#30942))
     windows-2016:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.

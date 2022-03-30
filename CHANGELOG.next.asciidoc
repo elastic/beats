@@ -64,6 +64,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Winlogbeat*
 
+- Fix evtx parsing failures. {issue}30621[30621] {pull}30942[30942]
+
 
 *Functionbeat*
 
