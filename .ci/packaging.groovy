@@ -122,9 +122,7 @@ pipeline {
           }
           environment {
             // It uses the folder structure done in uploadPackagesToGoogleBucket
-            // TODO: testing purposes
-            // BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
-            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/"
+            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
             DRA_OUTPUT = 'release-manager.out'
           }
           steps {
@@ -132,9 +130,7 @@ pipeline {
               // TODO: as long as googleStorageDownload does not support recursive copy with **/*
               dir("build/distributions") {
                 gsutil(command: "-m -q cp -r ${env.BUCKET_URI} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
-                // TODO: testing purposes
-                //sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
-                sh(label: 'move one level up', script: "mv 70b2e9169d4cad86da90742eb0ae431d60ec7792/** .")
+                sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
               }
               sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
               sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh")
@@ -279,9 +275,8 @@ def linuxPlatforms() {
             //'linux/s390x',
             'windows/amd64',
             'windows/386',
-            'darwin/amd64'
-            // TODO(AndersonQ): comment in after the tests pass
-            // 'darwin/arm64'
+            'darwin/amd64',
+            'darwin/arm64'
           ].join(' ')
 }
 
