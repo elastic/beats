@@ -130,7 +130,7 @@ pipeline {
               sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh")
               dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
               releaseManager(project: 'beats',
-                             version: env.VERSION,
+                             version: env.BEAT_VERSION,
                              type: 'snapshot',
                              artifactsFolder: 'build/distributions',
                              outputFile: env.DRA_OUTPUT)
