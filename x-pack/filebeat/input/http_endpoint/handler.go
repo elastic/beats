@@ -21,8 +21,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-const (
-	headerContentEncoding = "Content-Encoding"
+const headerContentEncoding = "Content-Encoding"
+
+var (
+	errBodyEmpty       = errors.New("body cannot be empty")
+	errUnsupportedType = errors.New("only JSON objects are accepted")
 )
 
 type httpHandler struct {
@@ -36,23 +39,18 @@ type httpHandler struct {
 	preserveOriginalEvent bool
 }
 
-var (
-	errBodyEmpty       = errors.New("body cannot be empty")
-	errUnsupportedType = errors.New("only JSON objects are accepted")
-)
-
 // Triggers if middleware validation returns successful
 func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 	body, status, err := getBodyReader(r)
 	if err != nil {
-		sendErrorResponse(w, status, err)
+		sendAPIErrorResponse(w, r, h.log, status, err)
 		return
 	}
 	defer body.Close()
 
 	objs, _, status, err := httpReadJSON(body)
 	if err != nil {
-		sendErrorResponse(w, status, err)
+		sendAPIErrorResponse(w, r, h.log, status, err)
 		return
 	}
 
@@ -62,50 +60,43 @@ func (h *httpHandler) apiResponse(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, obj := range objs {
-		h.publishEvent(obj, headers)
+		if err = h.publishEvent(obj, headers); err != nil {
+			sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
+			return
+		}
 	}
+
 	h.sendResponse(w, h.responseCode, h.responseBody)
 }
 
 func (h *httpHandler) sendResponse(w http.ResponseWriter, status int, message string) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
-	_, _ = io.WriteString(w, message)
+	if _, err := io.WriteString(w, message); err != nil {
+		h.log.Debugw("Failed writing response to client.", "error", err)
+	}
 }
 
-func (h *httpHandler) publishEvent(obj common.MapStr, headers common.MapStr) {
+func (h *httpHandler) publishEvent(obj, headers common.MapStr) error {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
-		Fields: common.MapStr{
-			h.messageField: obj,
-		},
+		Fields:    common.MapStr{},
 	}
 	if h.preserveOriginalEvent {
-		_, _ = event.PutValue("event.original", obj.String())
+		event.Fields["event"] = common.MapStr{
+			"original": obj.String(),
+		}
 	}
 	if len(headers) > 0 {
-		_, _ = event.PutValue("headers", headers)
+		event.Fields["headers"] = headers
+	}
+
+	if _, err := event.PutValue(h.messageField, obj); err != nil {
+		return fmt.Errorf("failed to put data into event key %q: %w", h.messageField, err)
 	}
 
 	h.publisher.Publish(event)
-}
-
-func withValidator(v validator, handler http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if status, err := v.ValidateHeader(r); status != 0 && err != nil {
-			sendErrorResponse(w, status, err)
-		} else {
-			handler(w, r)
-		}
-	}
-}
-
-func sendErrorResponse(w http.ResponseWriter, status int, err error) {
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(status)
-	e := json.NewEncoder(w)
-	e.SetEscapeHTML(false)
-	_ = e.Encode(common.MapStr{"message": err.Error()})
+	return nil
 }
 
 func httpReadJSON(body io.Reader) (objs []common.MapStr, rawMessages []json.RawMessage, status int, err error) {
@@ -194,9 +185,8 @@ func decodeJSONArray(raw *bytes.Reader) (objs []common.MapStr, rawMessages []jso
 func getIncludedHeaders(r *http.Request, headerConf []string) (includedHeaders common.MapStr) {
 	includedHeaders = common.MapStr{}
 	for _, header := range headerConf {
-		h, found := r.Header[header]
-		if found {
-			_, _ = includedHeaders.Put(header, h)
+		if value, found := r.Header[header]; found {
+			includedHeaders[common.DeDot(header)] = value
 		}
 	}
 	return includedHeaders
