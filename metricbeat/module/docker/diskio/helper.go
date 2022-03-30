@@ -18,6 +18,7 @@
 package diskio
 
 import (
+	"strings"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -81,9 +82,9 @@ func (io *BlkioService) getBlkioStatsList(rawStats []docker.Stat, dedot bool, sk
 	formattedStats := []BlkioStats{}
 
 	statsPerContainer := make(map[string]BlkioRaw)
-	for _, myRawStats := range rawStats {
-		stats := io.getBlkioStats(&myRawStats, dedot, skipDev)
-		storageStats := io.getStorageStats(&myRawStats, dedot)
+	for i := range rawStats {
+		stats := io.getBlkioStats(&rawStats[i], dedot, skipDev)
+		storageStats := io.getStorageStats(&rawStats[i], dedot)
 		stats.Add(&storageStats)
 
 		oldStats, exist := io.lastStatsPerContainer[stats.Container.ID]
@@ -161,20 +162,23 @@ func getNewStats(skip []uint64, time time.Time, blkioEntry []types.BlkioStatEntr
 	}
 
 	for _, myEntry := range blkioEntry {
+
 		// certain devices, like software raid and device-mapper devices, will just control and re-report the disks
 		// under them in the hierarchy. We want to skip them, lest we merely duplicate the metrics.
 		if skipDev(myEntry.Major, skip) {
 			continue
 		}
-		switch myEntry.Op {
-		case "Write":
+		// These op value strings can either be Capitalized or lowercase, depending on the platform.
+		switch strings.ToLower(myEntry.Op) {
+		case "write":
 			stats.writes += myEntry.Value
-		case "Read":
+		case "read":
 			stats.reads += myEntry.Value
-		case "Total":
+		case "total":
 			stats.totals += myEntry.Value
 		}
 	}
+
 	return stats
 }
 
