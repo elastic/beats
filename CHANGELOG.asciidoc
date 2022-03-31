@@ -48,9 +48,6 @@ https://github.com/elastic/beats/compare/v8.1.1...v8.1.2[View commits]
 *Filebeat*
 - Allow fixing data duplication on restart when filestream inputs did not have an ID set. Setting an ID for filestream
 
-- Recover CEF extensions from messages with invalid/incomplete headers. {issue}30757[30757] {pull}30938[30938]
-- Fix panic in filestream input when `copy_truncate` log rotation strategy is used {issue}29024[29024] {pull}31041[31041]
-
 *Heartbeat*
 
 *Metricbeat*
