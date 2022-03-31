@@ -114,7 +114,7 @@ func decodeJSON(body io.Reader) (objs []common.MapStr, rawMessages []json.RawMes
 	for decoder.More() {
 		var raw json.RawMessage
 		if err := decoder.Decode(&raw); err != nil {
-			if errors.Is(err, io.EOF) {
+			if err == io.EOF { //nolint:errorlint // This will never be a wrapped error.
 				break
 			}
 			return nil, nil, fmt.Errorf("malformed JSON object at stream position %d: %w", decoder.InputOffset(), err)
@@ -149,7 +149,7 @@ func decodeJSONArray(raw *bytes.Reader) (objs []common.MapStr, rawMessages []jso
 	dec := newJSONDecoder(raw)
 	token, err := dec.Token()
 	if err != nil {
-		if errors.Is(err, io.EOF) {
+		if err == io.EOF { //nolint:errorlint // This will never be a wrapped error.
 			return nil, nil, nil
 		}
 		return nil, nil, fmt.Errorf("failed reading JSON array: %w", err)
@@ -161,7 +161,7 @@ func decodeJSONArray(raw *bytes.Reader) (objs []common.MapStr, rawMessages []jso
 	for dec.More() {
 		var raw json.RawMessage
 		if err := dec.Decode(&raw); err != nil {
-			if errors.Is(err, io.EOF) {
+			if err == io.EOF { //nolint:errorlint // This will never be a wrapped error.
 				break
 			}
 			return nil, nil, fmt.Errorf("malformed JSON object at stream position %d: %w", dec.InputOffset(), err)
