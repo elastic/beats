@@ -166,6 +166,7 @@ def runReleaseManager(def args = [:]) {
   deleteDir()
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
   dir("${BASE_DIR}") {
+    unstash "dependencies-${type}"
     // TODO: as long as googleStorageDownload does not support recursive copy with **/*
     dir("build/distributions") {
       gsutil(command: "-m -q cp -r ${bucketUri} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
