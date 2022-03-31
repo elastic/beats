@@ -1,6 +1,7 @@
 filebeat:
   inputs:
-  - index: logs-generic-default
+  - id: logfile-1
+    index: logs-generic-default
     paths:
     - /var/log/hello1.log
     - /var/log/hello2.log
@@ -28,7 +29,8 @@ filebeat:
     type: log
     vars:
       var: value
-  - index: testtype-generic-default
+  - id: logfile-2
+    index: testtype-generic-default
     paths:
     - /var/log/hello3.log
     - /var/log/hello4.log

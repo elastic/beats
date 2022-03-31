@@ -162,3 +162,8 @@ func setPromiscMode(device string, enabled bool) error {
 	// TODO: replace with x/net/bpf or pcap
 	return syscall.SetLsfPromisc(device, enabled)
 }
+
+// isAfpacketErrTimeout returns whether err is afpacket.ErrTimeout.
+func isAfpacketErrTimeout(err error) bool {
+	return err == afpacket.ErrTimeout
+}

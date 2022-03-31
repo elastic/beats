@@ -24,6 +24,8 @@ pipeline {
     SNAPSHOT = 'true'
     TERRAFORM_VERSION = "0.13.7"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
+    KIND_VERSION = 'v0.12.0'
+    K8S_VERSION = 'v1.23.4'
   }
   options {
     timeout(time: 6, unit: 'HOURS')
@@ -318,35 +320,52 @@ def k8sTest(Map args = [:]) {
   versions.each{ v ->
     withNode(labels: args.label, forceWorkspace: true){
       stage("${args.context} ${v}"){
-        withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.11.1", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
+        withEnv(["K8S_VERSION=${v}"]){
           withGithubNotify(context: "${args.context} ${v}") {
             withBeatsEnv(archive: false, withModule: false) {
-              retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
-              retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
-              try {
-                // Add some environmental resilience when setup does not work the very first time.
-                def i = 0
-                retryWithSleep(retries: 3, seconds: 5, backoff: true){
-                  try {
-                    sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
-                  } catch(err) {
-                    i++
-                    sh(label: 'Delete cluster', script: 'kind delete cluster')
-                    if (i > 2) {
-                      error("Setup kind failed with error '${err.toString()}'")
-                    }
-                  }
-                }
+              withTools(k8s: true) {
                 sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
                 sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")
-              } finally {
-                sh(label: 'Delete cluster', script: 'kind delete cluster')
               }
             }
           }
         }
       }
     }
+  }
+}
+
+/**
+* It relies on:
+* - KIND_VERSION which it's defined in the top-level environment section.
+* - K8S_VERSION which it's defined by default in the top-level environment section or set in the withEnv.
+*/
+def withTools(Map args = [:], Closure body) {
+  if (args.get('k8s', false)) {
+    withEnv(["KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
+      retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
+      retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
+      try {
+        // Add some environmental resilience when setup does not work the very first time.
+        def i = 0
+        retryWithSleep(retries: 3, seconds: 5, backoff: true){
+          try {
+            sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+          } catch(err) {
+            i++
+            sh(label: 'Delete cluster', script: 'kind delete cluster')
+            if (i > 2) {
+              error("Setup kind failed with error '${err.toString()}'")
+            }
+          }
+        }
+        body()
+      } finally {
+        sh(label: 'Delete cluster', script: 'kind delete cluster')
+      }
+    }
+  } else {
+    body()
   }
 }
 
@@ -537,23 +556,26 @@ def target(Map args = [:]) {
   def isMage = args.get('isMage', false)
   def isE2E = args.e2e?.get('enabled', false)
   def isPackaging = args.get('package', false)
+  def installK8s = args.get('installK8s', false)
   def dockerArch = args.get('dockerArch', 'amd64')
   def enableRetry = args.get('enableRetry', false)
   withNode(labels: args.label, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
         dumpVariables()
-        // make commands use -C <folder> while mage commands require the dir(folder)
-        // let's support this scenario with the location variable.
-        dir(isMage ? directory : '') {
-          if (enableRetry) {
-            // Retry the same command to bypass any kind of flakiness.
-            // Downside: genuine failures will be repeated.
-            retry(3) {
+        withTools(k8s: installK8s) {
+          // make commands use -C <folder> while mage commands require the dir(folder)
+          // let's support this scenario with the location variable.
+          dir(isMage ? directory : '') {
+            if (enableRetry) {
+              // Retry the same command to bypass any kind of flakiness.
+              // Downside: genuine failures will be repeated.
+              retry(3) {
+                cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
+              }
+            } else {
               cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
             }
-          } else {
-            cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
           }
         }
         // Publish packages should happen always to easily consume those artifacts if the
@@ -643,7 +665,9 @@ def withBeatsEnv(Map args = [:], Closure body) {
           if (cmd(label: 'Download modules to local cache', script: 'go mod download', returnStatus: true) > 0) {
             cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
           }
-          body()
+          withOtelEnv() {
+            body()
+          }
         } catch(err) {
           // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
           upload = true
@@ -1031,6 +1055,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
   public run(Map args = [:]){
     steps.stageStatusCache(args){
       def withModule = args.content.get('withModule', false)
+      def installK8s = args.content.get('installK8s', false)
       def withAWS = args.content.get('withAWS', false)
       //
       // What's the retry policy for fighting the flakiness:
@@ -1048,6 +1073,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
                      directory: args.project,
                      label: args.label,
                      withModule: withModule,
+                     installK8s: installK8s,
                      isMage: false,
                      id: args.id,
                      enableRetry: enableRetry)
@@ -1057,6 +1083,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
                      command: args.content.mage,
                      directory: args.project,
                      label: args.label,
+                     installK8s: installK8s,
                      withModule: withModule,
                      isMage: true,
                      id: args.id,

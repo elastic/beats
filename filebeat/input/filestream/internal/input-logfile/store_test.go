@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//nolint: errcheck // Some errors are not checked on tests/helper functions
 package input_logfile
 
 import (
@@ -30,11 +31,26 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	"github.com/elastic/go-concert/unison"
 )
 
 type testStateStore struct {
 	Store    *statestore.Store
 	GCPeriod time.Duration
+}
+
+func TestResource_CopyInto(t *testing.T) {
+	src := resource{lock: unison.MakeMutex()}
+	dst := resource{lock: unison.MakeMutex()}
+	src.lock.Lock()
+	dst.lock.Lock()
+
+	src.copyInto(&dst)
+
+	require.NotPanics(t, func() {
+		src.lock.Unlock()
+		dst.lock.Unlock()
+	}, "perhaps `lock` field was replaced during the copy")
 }
 
 func TestStore_OpenClose(t *testing.T) {
@@ -298,6 +314,7 @@ func TestStore_ResetCursor(t *testing.T) {
 		}))
 		defer store.Release()
 
+		//nolint // Tests won't be refactored on this commit
 		res := store.Get("test::key")
 
 		// lock before creating a new update operation
@@ -341,7 +358,7 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test", true}, s}
+		store := &sourceStore{&sourceIdentifier{"test"}, s}
 
 		store.UpdateIdentifiers(func(v Value) (string, interface{}) {
 			var m testMeta
@@ -382,8 +399,9 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 	})
 }
 
+//nolint: dupl // Test code won't be refactored on this commit
 func TestSourceStore_CleanIf(t *testing.T) {
-	t.Run("entries are cleaned when funtion returns true", func(t *testing.T) {
+	t.Run("entries are cleaned when function returns true", func(t *testing.T) {
 		backend := createSampleStore(t, map[string]state{
 			"test::key1": state{
 				TTL: 60 * time.Second,
@@ -394,7 +412,7 @@ func TestSourceStore_CleanIf(t *testing.T) {
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test", true}, s}
+		store := &sourceStore{&sourceIdentifier{"test"}, s}
 
 		store.CleanIf(func(_ Value) bool {
 			return true
@@ -415,7 +433,7 @@ func TestSourceStore_CleanIf(t *testing.T) {
 		checkEqualStoreState(t, want, storeInSyncSnapshot(s))
 	})
 
-	t.Run("entries are left alone when funtion returns false", func(t *testing.T) {
+	t.Run("entries are left alone when function returns false", func(t *testing.T) {
 		backend := createSampleStore(t, map[string]state{
 			"test::key1": state{
 				TTL: 60 * time.Second,
@@ -426,7 +444,7 @@ func TestSourceStore_CleanIf(t *testing.T) {
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test", true}, s}
+		store := &sourceStore{&sourceIdentifier{"test"}, s}
 
 		store.CleanIf(func(v Value) bool {
 			return false
@@ -456,6 +474,7 @@ func closeStoreWith(fn func(s *store)) func() {
 	}
 }
 
+//nolint: unparam // It's a test helper
 func testOpenStore(t *testing.T, prefix string, persistentStore StateStore) *store {
 	if persistentStore == nil {
 		persistentStore = createSampleStore(t, nil)
@@ -551,7 +570,9 @@ func storeInSyncSnapshot(store *store) map[string]state {
 // fails with Errorf if the state differ.
 //
 // Note: testify is too strict when comparing timestamp, better use checkEqualStoreState.
+//nolint: unparam // It's a test helper
 func checkEqualStoreState(t *testing.T, want, got map[string]state) bool {
+	t.Helper()
 	if d := cmp.Diff(want, got); d != "" {
 		t.Errorf("store state mismatch (-want +got):\n%s", d)
 		return false

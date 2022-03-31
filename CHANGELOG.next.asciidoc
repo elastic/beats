@@ -16,7 +16,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Filebeat*
 
-
 *Heartbeat*
 
 
@@ -39,17 +38,23 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 - Fixes Beats crashing when glibc >= 2.35 is used {issue}30576[30576]
 - Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
 - Wildcard fields no longer have a default ignore_above setting of 1024. {issue}30096[30096] {pull}30668[30668]
-- Ensure that the Reloadable part of beats are initialized before the Manager is started. {issue}30533[30533]
 - Ignore bugfix version when running version compatibility check against Elasticsearch. {pull}30746[30746]
+- Add more descriptive error logs for common connection failures in Kafka inputs / outputs. {pull}30776[30776]
+- Fix dissect trim panics from DELETE (127)(\u007f) character {issue}30657[30657] {pull}30658[30658]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Fix compatibility with ECS by renaming `source` log key to `source_file` {issue}30667[30667]
-- Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
-- Update documentation for accessing `last_response.url.params` in httpjson input. {pull}30739[30739]
+- Fix add_kubernetes_metadata matcher: support rotated logs when `resource_type: pod` {pull}30720[30720]
+
+*Filebeat*
+- Allow fixing data duplication on restart when filestream inputs did not have an ID set. Setting an ID for filestream
+  inputs will fix the problem without generating any data duplication{issue}30061[30061]
+
+- Recover CEF extensions from messages with invalid/incomplete headers. {issue}30757[30757] {pull}30938[30938]
+- Fix panic in filestream input when `copy_truncate` log rotation strategy is used {issue}29024[29024] {pull}31041[31041]
 
 *Heartbeat*
 
@@ -59,6 +64,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Packetbeat*
 
 - Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821] {pull}30837[30837]
+- packetbeat: Fix timeout error in af_packet capture mode. {issue}30731[30731] {issue}30822[30822] {pull}30882[30882]
 
 *Winlogbeat*
 
@@ -86,15 +92,14 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Filebeat*
 
-- Extend documentation about hints annotation for processors {pull}30561[30561]
 
 *Heartbeat*
 
-
+- Generate summary documents for journeys which exit successfully, but do not emit `journey/end` events {pull}30825[30825]
 
 *Metricbeat*
 
-- Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
+- Extend documentation about `kubernetes.node.network.*` fields {pull}30826[30826]
 
 *Packetbeat*
 
