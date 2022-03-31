@@ -166,7 +166,8 @@ def getBucketUri(type) {
 }
 
 def runReleaseManager(def args = [:]) {
-  def bucketUri = getBucketUri(args.get('type', 'snapshot'))
+  def type = args.get('type', 'snapshot')
+  def bucketUri = getBucketUri(type)
   deleteDir()
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
   dir("${BASE_DIR}") {
@@ -181,7 +182,7 @@ def runReleaseManager(def args = [:]) {
     dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
     releaseManager(project: 'beats',
                    version: env.BEAT_VERSION,
-                   type: args.type,
+                   type: type,
                    artifactsFolder: 'build/distributions',
                    outputFile: args.outputFile)
   }
@@ -393,6 +394,7 @@ def release(type){
         if (type.equals('staging')) {
           dir("build/distributions") {
             def bucketUri = getBucketUri(type)
+            echo "Copy files to ${bucketUri} if staging"
             googleStorageUploadExt(bucket: "${bucketUri}/${folder}",
                                    credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
                                    pattern: "*",
