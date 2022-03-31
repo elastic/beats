@@ -37,7 +37,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 *Filebeat*
-inputs will fix the problem without generating any data duplication{issue}30061[30061]
+
+- Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
+
 
 *Heartbeat*
 
