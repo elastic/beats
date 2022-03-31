@@ -48,6 +48,8 @@ pipeline {
         anyOf {
           triggeredBy cause: "IssueCommentCause"
           expression {
+            // TODO
+            return true
             def ret = isUserTrigger() || isUpstreamTrigger()
             if(!ret){
               currentBuild.result = 'NOT_BUILT'
@@ -90,7 +92,9 @@ pipeline {
             dir("${BASE_DIR}"){
               setEnvVar('BEAT_VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
             }
-            setEnvVar('IS_BRANCH_AVAILABLE', isBranchUnifiedReleaseAvailable(env.BRANCH_NAME))
+            // TODO
+            //setEnvVar('IS_BRANCH_AVAILABLE', isBranchUnifiedReleaseAvailable(env.BRANCH_NAME))
+            setEnvVar('IS_BRANCH_AVAILABLE', true)
           }
         }
         stage('Build Packages'){
@@ -101,6 +105,10 @@ pipeline {
         }
         stage('Run E2E Tests for Packages'){
           options { skipDefaultCheckout() }
+          // TODO
+          when {
+            expression { return false }
+          }
           steps {
             runE2ETests()
           }
@@ -118,7 +126,9 @@ pipeline {
           }
           steps {
             runReleaseManager(type: 'snapshot', outputFile: env.DRA_OUTPUT)
-            whenFalse(env.BRANCH_NAME.equals('main')) {
+            //TODO
+            //whenFalse(env.BRANCH_NAME.equals('main')) {
+            whenTrue(env.BRANCH_NAME.equals('main')) {
               runReleaseManager(type: 'staging', outputFile: env.DRA_OUTPUT)
             }
           }
