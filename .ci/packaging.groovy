@@ -134,7 +134,6 @@ pipeline {
                              type: 'snapshot',
                              artifactsFolder: 'build/distributions',
                              outputFile: env.DRA_OUTPUT)
-              }
             }
           }
           post {
