@@ -99,7 +99,6 @@ pipeline {
           }
         }
         stage('Build Packages'){
-          when { expression { return false } }
           options { skipDefaultCheckout() }
           steps {
             generateSteps()
@@ -123,26 +122,15 @@ pipeline {
           }
           environment {
             // It uses the folder structure done in uploadPackagesToGoogleBucket
-            //TODO: test
-            //BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
-            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/96c74deb83b115f8a77715c7b901a4e27b6369d8"
+            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
             DRA_OUTPUT = 'release-manager.out'
           }
           steps {
-            //TODO: for testing purposes
-            withEnv(["HOME=${env.WORKSPACE}"]) {
-              withBeatsEnv() {
-                sh(label: 'make dependencies.csv', script: 'make build/distributions/dependencies.csv')
-                sh(label: 'make beats-dashboards', script: 'make beats-dashboards')
-              }
-            }
             dir("${BASE_DIR}") {
               // TODO: as long as googleStorageDownload does not support recursive copy with **/*
               dir("build/distributions") {
                 gsutil(command: "-m -q cp -r ${env.BUCKET_URI} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
-                //TODO: test
-                //sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
-                sh(label: 'move one level up', script: "mv 96c74deb83b115f8a77715c7b901a4e27b6369d8/** .")
+                sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
               }
               sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
               sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh")
