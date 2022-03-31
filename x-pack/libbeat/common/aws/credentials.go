@@ -45,7 +45,6 @@ type ConfigAWS struct {
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
 func InitializeAWSConfig(config ConfigAWS) (awssdk.Config, error) {
-	logger := logp.NewLogger("InitializeAWSConfig")
 	AWSConfig, _ := GetAWSCredentials(config)
 	if AWSConfig.Region == "" {
 		if config.DefaultRegion != "" {
@@ -57,7 +56,6 @@ func InitializeAWSConfig(config ConfigAWS) (awssdk.Config, error) {
 
 	// Assume IAM role if iam_role config parameter is given
 	if config.RoleArn != "" {
-		logger.Debug("Switching credentials provider to AssumeRoleProvider")
 		AWSConfig = switchToAssumeRoleProvider(config, AWSConfig)
 	}
 
@@ -145,6 +143,8 @@ func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 
 // switchToAssumeRoleProvider switches the credentials provider in the awsConfig to the `AssumeRoleProvider`.
 func switchToAssumeRoleProvider(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
+	logger := logp.NewLogger("switchToAssumeRoleProvider")
+	logger.Debug("Switching credentials provider to AssumeRoleProvider")
 	stsSvc := sts.New(awsConfig)
 	stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
 	awsConfig.Credentials = stsCredProvider
