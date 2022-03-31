@@ -167,8 +167,8 @@ class Test(BaseTest):
         command = "go run " + command + " -dashboard Metricbeat-system-overview -folder " + folder_name
 
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        content, err = p.communicate()
-        assert p.returncode == 0
+        _, stderr = p.communicate()
+        assert p.returncode == 0, stderr
 
         self._check_if_dashboard_exported(folder_name)
 
@@ -184,9 +184,9 @@ class Test(BaseTest):
         command = "go run " + command + " -dashboard No-such-dashboard"
 
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        content, err = p.communicate()
+        _, stderr = p.communicate()
 
-        assert p.returncode != 0
+        assert p.returncode != 0, stderr
 
     def _check_if_dashboard_exported(self, folder_name):
         kibana_semver = semver.VersionInfo.parse(self.get_version())
