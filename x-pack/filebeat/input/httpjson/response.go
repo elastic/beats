@@ -74,13 +74,8 @@ func newResponseProcessor(config *responseConfig, pagination *pagination, log *l
 	return rp
 }
 
-<<<<<<< HEAD
-func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resp *http.Response) (<-chan maybeMsg, error) {
-	ch := make(chan maybeMsg)
-=======
 func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *transformContext, resp *http.Response) <-chan maybeMsg {
 	trCtx.clearIntervalData()
->>>>>>> 043cab99de (x-pack/filebeat/input/httpjson: make sure interval data clearing happens before processing (#30730))
 
 	ch := make(chan maybeMsg)
 	go func() {
@@ -143,7 +138,7 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 		}
 	}()
 
-	return ch, nil
+	return ch
 }
 
 func (resp *response) asTransformables(log *logp.Logger) []transformable {

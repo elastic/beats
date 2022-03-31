@@ -175,16 +175,6 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 	}
 	defer httpResp.Body.Close()
 
-<<<<<<< HEAD
-	eventsCh, err := r.responseProcessor.startProcessing(stdCtx, trCtx, httpResp)
-	if err != nil {
-		return err
-	}
-
-	trCtx.clearIntervalData()
-
-=======
->>>>>>> 043cab99de (x-pack/filebeat/input/httpjson: make sure interval data clearing happens before processing (#30730))
 	var n int
 	events := r.responseProcessor.startProcessing(stdCtx, trCtx, httpResp)
 	for maybeMsg := range events {
