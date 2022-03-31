@@ -278,8 +278,17 @@ def generateLinuxStep(beat) {
           }
         }
         prepareE2ETestForPackage("${beat}")
-        deleteDir()
-        release('staging')
+        // As long as we reuse the same worker to package more than
+        // once, the workspace gets corrupted with some permissions
+        // therefore let's reset the workspace to a new location
+        // in order to reuse the worker and successfully run the package
+        def work = "workspace/${env.JOB_BASE_NAME}-${env.BUILD_NUMBER}-staging"
+        ws(work) {
+          withEnv(["HOME=${env.WORKSPACE}"]) {
+            deleteDir()
+            release('staging')
+          }
+        }
       }
     }
   }
