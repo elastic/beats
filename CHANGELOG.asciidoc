@@ -3,6 +3,138 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.1.2]]
+=== Beats version 8.1.2
+https://github.com/elastic/beats/compare/v8.1.1...v8.1.2[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Add more descriptive error logs for common connection failures in Kafka inputs / outputs. {pull}30776[30776]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Fix add_kubernetes_metadata matcher: support rotated logs when `resource_type: pod` {pull}30720[30720]
+
+*Filebeat*
+- Allow fixing data duplication on restart when filestream inputs did not have an ID set. Setting an ID for filestream
+
+- Recover CEF extensions from messages with invalid/incomplete headers. {issue}30757[30757] {pull}30938[30938]
+- Fix panic in filestream input when `copy_truncate` log rotation strategy is used {issue}29024[29024] {pull}31041[31041]
+
+*Heartbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+- packetbeat: Fix timeout error in af_packet capture mode. {issue}30731[30731] {issue}30822[30822] {pull}30882[30882]
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+- Generate summary documents for journeys which exit successfully, but do not emit `journey/end` events {pull}30825[30825]
+
+*Metricbeat*
+
+- Extend documentation about `kubernetes.node.network.*` fields {pull}30826[30826]
+
+*Packetbeat*
+
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+
+
+
+
+
+
 [[release-notes-8.1.1]]
 === Beats version 8.1.1
 https://github.com/elastic/beats/compare/v8.1.0...v8.1.1[View commits]
