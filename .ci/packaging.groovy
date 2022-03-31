@@ -99,6 +99,10 @@ pipeline {
         }
         stage('Build Packages'){
           options { skipDefaultCheckout() }
+          // TODO
+          when {
+            expression { return false }
+          }
           steps {
             generateSteps()
           }
