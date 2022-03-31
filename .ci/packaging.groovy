@@ -268,12 +268,7 @@ def linuxPlatforms() {
             //'linux/s390x',
             'windows/amd64',
             'windows/386',
-<<<<<<< HEAD
             'darwin/amd64'
-=======
-            'darwin/amd64',
-            'darwin/arm64'
->>>>>>> 376a87f3bb (ci: DRA enhancements (#31073))
           ].join(' ')
 }
 

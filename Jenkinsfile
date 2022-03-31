@@ -393,8 +393,7 @@ def packagingLinux(Map args = [:]) {
                 //'linux/s390x',
                 'windows/amd64',
                 'windows/386',
-                'darwin/amd64',
-                'darwin/arm64'
+                (params.macos ? '' : 'darwin/amd64'),
               ].join(' ')
   withEnv([
     "PLATFORMS=${PLATFORMS}"
