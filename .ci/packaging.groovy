@@ -224,11 +224,12 @@ def generateSteps() {
   }
 
   // enable beats-dashboards within the existing worker
-  ['snapshot', 'staging'].each { type ->
-    parallelTasks["beats-dashboards-${type}"] = {
-      withGithubNotify(context: "beats-dashboards-${type}") {
-        deleteDir()
-        withEnv(["HOME=${env.WORKSPACE}"]) {
+
+  parallelTasks["beats-dashboards"] = {
+    withGithubNotify(context: "beats-dashboards") {
+      withEnv(["HOME=${env.WORKSPACE}"]) {
+        ['snapshot', 'staging'].each { type ->
+          deleteDir()
           withBeatsEnv(type) {
             sh(label: 'make dependencies.csv', script: 'make build/distributions/dependencies.csv')
             sh(label: 'make beats-dashboards', script: 'make beats-dashboards')
@@ -376,7 +377,7 @@ def release(type){
           folder: folder,
           pattern: "build/distributions/*"
         )
-        if (type.equals('stating')) {
+        if (type.equals('staging')) {
           echo 'TBD: Upload to a different bucket location'
         }
       }
