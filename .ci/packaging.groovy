@@ -149,7 +149,7 @@ pipeline {
             failure {
               notifyStatus(analyse: true,
                            file: "${BASE_DIR}/${env.DRA_OUTPUT}",
-                           subject: "[${env.REPO}@${env.BRANCH_NAME}] DRA failed.",
+                           subject: "[${env.REPO}@${env.BRANCH_NAME}] The Daily releasable artifact failed.",
                            body: 'Contact the Release Platform team [#platform-release]')
             }
           }
