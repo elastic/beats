@@ -55,6 +55,9 @@ pipeline {
               currentBuild.displayName = "#${BUILD_NUMBER}-(Skipped)"
               echo("the build has been skipped due the trigger is a branch scan and the allow ones are manual, GitHub comment, and upstream job")
             }
+            if(env.JOB_BASE_NAME.equals('7.17')) {
+              return false
+            }
             return ret
           }
         }
