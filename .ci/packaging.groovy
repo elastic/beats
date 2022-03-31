@@ -110,7 +110,10 @@ pipeline {
           // minor version is created, therefore old release branches won't be able
           // to use the release manager as their definition is removed.
           when {
-            expression { return env.IS_BRANCH_AVAILABLE == "true" }
+            allOf {
+              expression { return env.IS_BRANCH_AVAILABLE == "true" }
+              not { branch '7.17 '}
+            }
           }
           environment {
             // It uses the folder structure done in uploadPackagesToGoogleBucket
