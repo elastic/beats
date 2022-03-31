@@ -55,6 +55,15 @@ const (
 	eventLoggingAPIName = "eventlogging"
 )
 
+func init() {
+	// Register wineventlog API if it is available.
+	available, _ := win.IsAvailable()
+	if available {
+		Register(winEventLogAPIName, 0, newWinEventLog, win.Channels)
+		Register(eventLoggingAPIName, 1, newEventLogging, win.Channels)
+	}
+}
+
 type winEventLogConfig struct {
 	ConfigCommon  `config:",inline"`
 	BatchReadSize int                `config:"batch_read_size"` // Maximum number of events that Read will return.
@@ -160,6 +169,7 @@ type winEventLog struct {
 	lastRead     checkpoint.EventLogState // Record number of the last read event.
 
 	render    func(event win.EvtHandle, out io.Writer) error // Function for rendering the event to XML.
+	message   func(event win.EvtHandle) (string, error)      // Message fallback function.
 	renderBuf []byte                                         // Buffer used for rendering event.
 	outputBuf *sys.ByteBuffer                                // Buffer for receiving XML
 	cache     *messageFilesCache                             // Cached mapping of source name to event message file handles.
@@ -198,7 +208,7 @@ func (l *winEventLog) openChannel(bookmark win.EvtHandle) error {
 	if err != nil {
 		return err
 	}
-	defer func() { _ = windows.CloseHandle(signalEvent) }()
+	defer windows.CloseHandle(signalEvent) //nolint:errcheck // This is just a resource release.
 
 	var flags win.EvtSubscribeFlag
 	if bookmark > 0 {
@@ -286,13 +296,12 @@ func (l *winEventLog) Read() ([]Record, error) {
 	}()
 	detailf("%s EventHandles returned %d handles", l.logPrefix, len(handles))
 
-	//nolint: prealloc // some handles can be skipped, the final size is unknown
-	var records []Record
+	var records []Record //nolint:prealloc // This linter gives bad advice and does not take into account conditionals in loops.
 	for _, h := range handles {
 		l.outputBuf.Reset()
 		err := l.render(h, l.outputBuf)
 		var bufErr sys.InsufficientBufferError
-		if ok := errors.As(err, &bufErr); ok {
+		if errors.As(err, &bufErr) {
 			detailf("%s Increasing render buffer size to %d", l.logPrefix,
 				bufErr.RequiredSize)
 			l.renderBuf = make([]byte, bufErr.RequiredSize)
@@ -314,6 +323,12 @@ func (l *winEventLog) Read() ([]Record, error) {
 		if r.Offset.Bookmark, err = l.createBookmarkFromEvent(h); err != nil {
 			logp.Warn("%s failed creating bookmark: %v", l.logPrefix, err)
 		}
+		if r.Message == "" {
+			r.Message, err = l.message(h)
+			if err != nil {
+				logp.Err("%s error salvaging message: %v", l.logPrefix, err)
+			}
+		}
 		records = append(records, r)
 		l.lastRead = r.Offset
 	}
@@ -329,20 +344,20 @@ func (l *winEventLog) Close() error {
 
 func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 	handles, err := win.EventHandles(l.subscription, maxRead)
-	switch {
-	case err == nil:
+	switch err { //nolint:errorlint // This is an errno or nil.
+	case nil:
 		if l.maxRead > maxRead {
 			debugf("%s Recovered from RPC_S_INVALID_BOUND error (errno 1734) "+
 				"by decreasing batch_read_size to %v", l.logPrefix, maxRead)
 		}
 		return handles, maxRead, nil
-	case errors.Is(err, win.ERROR_NO_MORE_ITEMS):
+	case win.ERROR_NO_MORE_ITEMS:
 		detailf("%s No more events", l.logPrefix)
 		if l.config.NoMoreEvents == Stop {
 			return nil, maxRead, io.EOF
 		}
 		return nil, maxRead, nil
-	case errors.Is(err, win.RPC_S_INVALID_BOUND):
+	case win.RPC_S_INVALID_BOUND:
 		incrementMetric(readErrors, err)
 		if err := l.Close(); err != nil {
 			return nil, 0, fmt.Errorf("failed to recover from RPC_S_INVALID_BOUND: %w", err)
@@ -381,13 +396,15 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) Record {
 		e.RenderErr = append(e.RenderErr, recoveredErr.Error())
 	}
 
+	// Get basic string values for raw fields.
+	winevent.EnrichRawValuesWithNames(nil, &e)
 	if e.Level == "" {
 		// Fallback on LevelRaw if the Level is not set in the RenderingInfo.
 		e.Level = win.EventLevel(e.LevelRaw).String()
 	}
 
 	if logp.IsDebug(detailSelector) {
-		detailf("%s XML=%s Event=%+v", l.logPrefix, string(x), e)
+		detailf("%s XML=%s Event=%+v", l.logPrefix, x, e)
 	}
 
 	r := Record{
@@ -489,6 +506,9 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 			return win.RenderEvent(event, c.EventLanguage, l.renderBuf, l.cache.get, out)
 		}
 	}
+	l.message = func(event win.EvtHandle) (string, error) {
+		return win.Message(event, l.renderBuf, l.cache.get)
+	}
 
 	return l, nil
 }
@@ -502,13 +522,4 @@ func (l *winEventLog) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, 
 	err = win.RenderBookmarkXML(bmHandle, l.renderBuf, l.outputBuf)
 	win.Close(bmHandle)
 	return string(l.outputBuf.Bytes()), err
-}
-
-func init() {
-	// Register wineventlog API if it is available.
-	available, _ := win.IsAvailable()
-	if available {
-		Register(winEventLogAPIName, 0, newWinEventLog, win.Channels)
-		Register(eventLoggingAPIName, 1, newEventLogging, win.Channels)
-	}
 }
