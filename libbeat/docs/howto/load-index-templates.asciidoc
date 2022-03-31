@@ -313,7 +313,9 @@ PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile {beat
 ----
 endif::win_os[]
 
-Once you loaded the index template, load the data stream as well.
+Once you have loaded the index template, load the data stream as well. If you
+do not load it, you have to give the publisher user `manage` permission on
+{beatname_lc}-{version} index.
 
 ifdef::deb_os,rpm_os[]
 *deb and rpm:*
