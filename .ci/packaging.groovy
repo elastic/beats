@@ -382,7 +382,13 @@ def release(type){
           pattern: "build/distributions/*"
         )
         if (type.equals('staging')) {
-          echo 'TBD: Upload to a different bucket location'
+          dir("build/distributions") {
+            def bucketUri = getBucketUri(type)
+            googleStorageUploadExt(bucket: "${bucketUri}/${folder}",
+                                   credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+                                   pattern: "*",
+                                   sharedPublicly: true)
+          }
         }
       }
     }
