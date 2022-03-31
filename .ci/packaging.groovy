@@ -55,9 +55,6 @@ pipeline {
               currentBuild.displayName = "#${BUILD_NUMBER}-(Skipped)"
               echo("the build has been skipped due the trigger is a branch scan and the allow ones are manual, GitHub comment, and upstream job")
             }
-            if(env.JOB_BASE_NAME.equals('7.17')) {
-              return false
-            }
             return ret
           }
         }
@@ -113,7 +110,10 @@ pipeline {
           // minor version is created, therefore old release branches won't be able
           // to use the release manager as their definition is removed.
           when {
-            expression { return env.IS_BRANCH_AVAILABLE == "true" }
+            allOf {
+              expression { return env.IS_BRANCH_AVAILABLE == "true" }
+              not { branch '7.17 '}
+            }
           }
           environment {
             // It uses the folder structure done in uploadPackagesToGoogleBucket
