@@ -175,15 +175,9 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 	}
 	defer httpResp.Body.Close()
 
-	eventsCh, err := r.responseProcessor.startProcessing(stdCtx, trCtx, httpResp)
-	if err != nil {
-		return err
-	}
-
-	trCtx.clearIntervalData()
-
 	var n int
-	for maybeMsg := range eventsCh {
+	events := r.responseProcessor.startProcessing(stdCtx, trCtx, httpResp)
+	for maybeMsg := range events {
 		if maybeMsg.failed() {
 			r.log.Errorf("error processing response: %v", maybeMsg)
 			continue
