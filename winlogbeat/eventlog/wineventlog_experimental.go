@@ -21,11 +21,12 @@
 package eventlog
 
 import (
+	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 
-	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 	"golang.org/x/sys/windows"
 
@@ -99,23 +100,37 @@ func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, erro
 	if err != nil {
 		return win.NilHandle, err
 	}
-	defer windows.CloseHandle(signalEvent)
+	defer func() { _ = windows.CloseHandle(signalEvent) }()
 
 	var flags win.EvtSubscribeFlag
 	if bookmark > 0 {
-		flags = win.EvtSubscribeStartAfterBookmark
+		// Use EvtSubscribeStrict to detect when the bookmark is missing and be able to
+		// subscribe again from the beginning.
+		flags = win.EvtSubscribeStartAfterBookmark | win.EvtSubscribeStrict
 	} else {
 		flags = win.EvtSubscribeStartAtOldestRecord
 	}
 
 	l.log.Debugw("Using subscription query.", "winlog.query", l.query)
-	return win.Subscribe(
+	h, err := win.Subscribe(
 		0, // Session - nil for localhost
 		signalEvent,
 		"",                      // Channel - empty b/c channel is in the query
 		l.query,                 // Query - nil means all events
 		win.EvtHandle(bookmark), // Bookmark - for resuming from a specific event
 		flags)
+
+	switch {
+	case err == nil:
+		return h, nil
+	case errors.Is(err, win.ERROR_NOT_FOUND), errors.Is(err, win.ERROR_EVT_QUERY_RESULT_STALE),
+		errors.Is(err, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION):
+		// The bookmarked event was not found, we retry the subscription from the start.
+		incrementMetric(readErrors, err)
+		return win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
+	default:
+		return 0, err
+	}
 }
 
 func (l *winEventLogExp) openFile(state checkpoint.EventLogState, bookmark win.Bookmark) (win.EvtHandle, error) {
@@ -123,7 +138,7 @@ func (l *winEventLogExp) openFile(state checkpoint.EventLogState, bookmark win.B
 
 	h, err := win.EvtQuery(0, path, "", win.EvtQueryFilePath|win.EvtQueryForwardDirection)
 	if err != nil {
-		return win.NilHandle, errors.Wrapf(err, "failed to get handle to event log file %v", path)
+		return win.NilHandle, fmt.Errorf("failed to get handle to event log file %v: %w", path, err)
 	}
 
 	if bookmark > 0 {
@@ -135,16 +150,16 @@ func (l *winEventLogExp) openFile(state checkpoint.EventLogState, bookmark win.B
 		if err = win.EvtSeek(h, 0, win.EvtHandle(bookmark), win.EvtSeekRelativeToBookmark|win.EvtSeekStrict); err == nil {
 			// Then we advance past the last read event to avoid sending that
 			// event again. This won't fail if we're at the end of the file.
-			err = errors.Wrap(
-				win.EvtSeek(h, 1, win.EvtHandle(bookmark), win.EvtSeekRelativeToBookmark),
-				"failed to seek past bookmarked position")
+			if seekErr := win.EvtSeek(h, 1, win.EvtHandle(bookmark), win.EvtSeekRelativeToBookmark); seekErr != nil {
+				err = fmt.Errorf("failed to seek past bookmarked position: %w", seekErr)
+			}
 		} else {
 			l.log.Warnf("s Failed to seek to bookmarked location in %v (error: %v). "+
 				"Recovering by reading the log from the beginning. (Did the file "+
 				"change since it was last read?)", path, err)
-			err = errors.Wrap(
-				win.EvtSeek(h, 0, 0, win.EvtSeekRelativeToFirst),
-				"failed to seek to beginning of log")
+			if seekErr := win.EvtSeek(h, 0, 0, win.EvtSeekRelativeToFirst); seekErr != nil {
+				err = fmt.Errorf("failed to seek to beginning of log: %w", seekErr)
+			}
 		}
 
 		if err != nil {
@@ -198,6 +213,7 @@ func (l *winEventLogExp) processHandle(h win.EvtHandle) (*Record, error) {
 		evt.RenderErr = append(evt.RenderErr, err.Error())
 	}
 
+	//nolint: godox // keep to have a record of feature disparity between non-experimental vs experimental
 	// TODO: Need to add XML when configured.
 
 	r := &Record{
@@ -224,7 +240,7 @@ func (l *winEventLogExp) processHandle(h win.EvtHandle) (*Record, error) {
 func (l *winEventLogExp) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, error) {
 	bookmark, err := win.NewBookmarkFromEvent(evtHandle)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to create new bookmark from event handle")
+		return "", fmt.Errorf("failed to create new bookmark from event handle: %w", err)
 	}
 	defer bookmark.Close()
 
