@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@test/releaseManager') _
+@Library('apm@current') _
 
 import groovy.transform.Field
 
@@ -22,9 +22,9 @@ pipeline {
     DOCKER_REGISTRY = 'docker.elastic.co'
     GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
     SNAPSHOT = "true"
-    PIPELINE_LOG_LEVEL = "DEBUG"
-    SLACK_CHANNEL = 'UJ2J1AZV2'
-    NOTIFY_TO = 'victor.martinez+package-beats@elastic.co'
+    PIPELINE_LOG_LEVEL = "INFO"
+    SLACK_CHANNEL = '#beats'
+    NOTIFY_TO = 'beats-contrib+package-beats@elastic.co'
   }
   options {
     timeout(time: 4, unit: 'HOURS')
@@ -49,8 +49,6 @@ pipeline {
         anyOf {
           triggeredBy cause: "IssueCommentCause"
           expression {
-            // TODO: for testing purposes
-            return true
             def ret = isUserTrigger() || isUpstreamTrigger()
             if(!ret){
               currentBuild.result = 'NOT_BUILT'
@@ -93,9 +91,7 @@ pipeline {
             dir("${BASE_DIR}"){
               setEnvVar('BEAT_VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
             }
-            //TODO: for testing purposes
-            //setEnvVar('IS_BRANCH_AVAILABLE', isBranchUnifiedReleaseAvailable(env.BRANCH_NAME))
-            setEnvVar('IS_BRANCH_AVAILABLE', isBranchUnifiedReleaseAvailable('main'))
+            setEnvVar('IS_BRANCH_AVAILABLE', isBranchUnifiedReleaseAvailable(env.BRANCH_NAME))
           }
         }
         stage('Build Packages'){
@@ -105,8 +101,6 @@ pipeline {
           }
         }
         stage('Run E2E Tests for Packages'){
-          // TODO: for testing purposes
-          when { expression { return false } }
           options { skipDefaultCheckout() }
           steps {
             runE2ETests()
@@ -135,8 +129,6 @@ pipeline {
               sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
               sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh")
               dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
-              //TODO: for testing purposes
-              withEnv(["BRANCH_NAME=main"]){
               releaseManager(project: 'beats',
                              version: env.BEAT_VERSION,
                              type: 'snapshot',
