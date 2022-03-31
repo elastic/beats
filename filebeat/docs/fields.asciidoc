@@ -20644,15 +20644,6 @@ type: keyword
 
 --
 
-*`checkpoint.trusted_domain`*::
-+
---
-In case of phishing event, the domain, which the attacker was impersonating.
-
-type: keyword
-
---
-
 *`checkpoint.comment`*::
 +
 --
