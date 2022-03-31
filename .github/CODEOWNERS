@@ -124,5 +124,6 @@
 /x-pack/heartbeat/ @elastic/uptime
 /x-pack/metricbeat/ @elastic/elastic-agent-data-plane
 /x-pack/metricbeat/module/ @elastic/integrations
+/x-pack/metricbeat/module/enterprisesearch @elastic/infra-monitoring-ui
 /x-pack/packetbeat/ @elastic/security-external-integrations
 /x-pack/winlogbeat/ @elastic/security-external-integrations
