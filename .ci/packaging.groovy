@@ -157,12 +157,16 @@ pipeline {
   }
 }
 
-def runReleaseManager(def args = [:]) {
+def getBucketUri(type) {
   // It uses the folder structure done in uploadPackagesToGoogleBucket
-  def bucketUri = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
-  if (type.equals('staging')) {
-    bucketUri = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/staging/commits/${env.GIT_BASE_COMMIT}"
-  }
+  // commit for the normal workflow, snapshots (aka SNAPSHOT=true)
+  // staging for the staging workflow, SNAPSHOT=false
+  def folder = type.equals('staging') ? 'staging' : 'commit'
+  return "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/${folder}/${env.GIT_BASE_COMMIT}"
+}
+
+def runReleaseManager(def args = [:]) {
+  def bucketUri = getBucketUri(args.get('type', 'snapshot'))
   deleteDir()
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
   dir("${BASE_DIR}") {
