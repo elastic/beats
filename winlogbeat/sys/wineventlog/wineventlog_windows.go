@@ -507,15 +507,9 @@ func offset(buffer []byte, reader io.Reader) (uint64, error) {
 	bufferPtr := uint64(reflect.ValueOf(&buffer[0]).Pointer())
 	offset := dataPtr - bufferPtr
 
-<<<<<<< HEAD
-	if offset < 0 || offset > uint64(len(buffer)) {
-		return 0, fmt.Errorf("Invalid pointer %x. Cannot dereference an "+
-			"address outside of the buffer [%x:%x].", dataPtr, bufferPtr,
-=======
 	if offset > uint64(len(buffer)) {
 		return 0, fmt.Errorf("invalid pointer %x: cannot dereference an "+
 			"address outside of the buffer [%x:%x]", dataPtr, bufferPtr,
->>>>>>> 34bdc3d468 (winlogbeat: fix event handling for Windows 2022 (#30942))
 			bufferPtr+uint64(len(buffer)))
 	}
 

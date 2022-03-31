@@ -48,6 +48,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 *Filebeat*
 
 - Fix add_kubernetes_metadata matcher: support rotated logs when `resource_type: pod` {pull}30720[30720]
+- Prevent logic race on clearing data during request in httpjson. {pull}30730[30730]
 
 *Filebeat*
 - Allow fixing data duplication on restart when filestream inputs did not have an ID set. Setting an ID for filestream
@@ -63,8 +64,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Packetbeat*
 
+- Prevent panic when querying Npcap version on Windows. {issue}30820[30820] {pull}30821[30821] {pull}30837[30837]
 - packetbeat: Fix timeout error in af_packet capture mode. {issue}30731[30731] {issue}30822[30822] {pull}30882[30882]
-
 
 *Winlogbeat*
 
@@ -110,6 +111,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 
 *Winlogbeat*
+
+- Retry EvtSubscribe from start if fails with strict mode. {issue}29793[29793] {pull}30155[30155]
 
 
 *Elastic Log Driver*
