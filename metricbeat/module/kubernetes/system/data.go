@@ -22,11 +22,13 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
-func eventMapping(content []byte) ([]common.MapStr, error) {
+func eventMapping(content []byte, logger *logp.Logger) ([]common.MapStr, error) {
 	events := []common.MapStr{}
 
 	var summary kubernetes.Summary
@@ -69,7 +71,7 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 		}
 
 		if syscontainer.StartTime != "" {
-			containerEvent.Put("start_time", syscontainer.StartTime)
+			util.ShouldPut(containerEvent, "start_time", syscontainer.StartTime, logger)
 		}
 
 		events = append(events, containerEvent)

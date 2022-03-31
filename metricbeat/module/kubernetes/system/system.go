@@ -90,7 +90,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error doing HTTP request to fetch 'system' Metricset data")
 	}
 
-	events, err := eventMapping(body)
+	events, err := eventMapping(body, m.Logger())
 	if err != nil {
 		return errors.Wrap(err, "error in mapping")
 	}

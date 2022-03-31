@@ -497,3 +497,10 @@ func CreateEvent(event common.MapStr, namespace string) (mb.Event, error) {
 	}
 	return e, err
 }
+
+func ShouldPut(event common.MapStr, field string, value interface{}, logger *logp.Logger) {
+	_, err := event.Put(field, value)
+	if err != nil {
+		logger.Debugf("Failed to put field %v with value %v: %v", field, value, err)
+	}
+}

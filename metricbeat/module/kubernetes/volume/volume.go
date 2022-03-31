@@ -90,7 +90,10 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		return errors.Wrap(err, "error doing HTTP request to fetch 'volume' Metricset data")
 	}
 
-	events, err := eventMapping(body)
+	events, err := eventMapping(body, logger)
+	if err != nil {
+		return err
+	}
 	for _, e := range events {
 		isOpen := reporter.Event(mb.TransformMapStrToEvent("kubernetes", e, nil))
 		if !isOpen {

@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
 // Metricset for apiserver is a prometheus based metricset
@@ -79,7 +80,7 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 					reporter.Error(err)
 					continue
 				}
-				event.Put("request.count", v)
+				util.ShouldPut(event, "request.count", v, m.Logger())
 				event.Delete("request.beforev14")
 			}
 		}
