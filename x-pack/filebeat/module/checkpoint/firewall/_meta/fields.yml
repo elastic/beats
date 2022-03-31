@@ -2435,4 +2435,5 @@
 
     - name: update_status
       type: keyword
+      overwrite: true
       description: Status of database update
