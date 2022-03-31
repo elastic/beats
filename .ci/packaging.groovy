@@ -21,7 +21,6 @@ pipeline {
     DOCKERELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
     DOCKER_REGISTRY = 'docker.elastic.co'
     GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
-    SNAPSHOT = "true"
     PIPELINE_LOG_LEVEL = "INFO"
     SLACK_CHANNEL = '#beats'
     NOTIFY_TO = 'beats-contrib+package-beats@elastic.co'
@@ -115,25 +114,12 @@ pipeline {
             expression { return env.IS_BRANCH_AVAILABLE == "true" }
           }
           environment {
-            // It uses the folder structure done in uploadPackagesToGoogleBucket
-            BUCKET_URI = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
             DRA_OUTPUT = 'release-manager.out'
           }
           steps {
-            dir("${BASE_DIR}") {
-              // TODO: as long as googleStorageDownload does not support recursive copy with **/*
-              dir("build/distributions") {
-                gsutil(command: "-m -q cp -r ${env.BUCKET_URI} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
-                sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
-              }
-              sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
-              sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh")
-              dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
-              releaseManager(project: 'beats',
-                             version: env.BEAT_VERSION,
-                             type: 'snapshot',
-                             artifactsFolder: 'build/distributions',
-                             outputFile: env.DRA_OUTPUT)
+            runReleaseManager(type: 'snapshot', outputFile: env.DRA_OUTPUT)
+            whenFalse(env.BRANCH_NAME.equals('main')) {
+              runReleaseManager(type: 'staging', outputFile: env.DRA_OUTPUT)
             }
           }
           post {
@@ -158,6 +144,31 @@ pipeline {
         }
       }
     }
+  }
+}
+
+def runReleaseManager(def args = [:]) {
+  // It uses the folder structure done in uploadPackagesToGoogleBucket
+  def bucketUri = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/commits/${env.GIT_BASE_COMMIT}"
+  if (type.equals('staging')) {
+    bucketUri = "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/staging/commits/${env.GIT_BASE_COMMIT}"
+  }
+  deleteDir()
+  unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+  dir("${BASE_DIR}") {
+    // TODO: as long as googleStorageDownload does not support recursive copy with **/*
+    dir("build/distributions") {
+      gsutil(command: "-m -q cp -r ${bucketUri} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
+      sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
+    }
+    sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
+    sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh")
+    dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
+    releaseManager(project: 'beats',
+                   version: env.BEAT_VERSION,
+                   type: args.type,
+                   artifactsFolder: 'build/distributions',
+                   outputFile: args.outputFile)
   }
 }
 
@@ -202,16 +213,22 @@ def generateSteps() {
   }
 
   // enable beats-dashboards within the existing worker
-  parallelTasks["beats-dashboards"] = {
-    withGithubNotify(context: "beats-dashboards") {
-      withEnv(["HOME=${env.WORKSPACE}"]) {
-        withBeatsEnv() {
-          sh(label: 'make dependencies.csv', script: 'make build/distributions/dependencies.csv')
-          sh(label: 'make beats-dashboards', script: 'make beats-dashboards')
+  ['snapshot', 'staging'].each { type ->
+    parallelTasks["beats-dashboards-${type}"] = {
+      withGithubNotify(context: "beats-dashboards-${type}") {
+        deleteDir()
+        withEnv(["HOME=${env.WORKSPACE}"]) {
+          withBeatsEnv(type) {
+            sh(label: 'make dependencies.csv', script: 'make build/distributions/dependencies.csv')
+            sh(label: 'make beats-dashboards', script: 'make beats-dashboards')
+            stash(includes: 'build/distributions/**', name: "dependencies-${type}", useDefaultExcludes: false)
+          }
         }
       }
     }
   }
+
+
   parallel(parallelTasks)
 }
 
@@ -221,11 +238,13 @@ def generateArmStep(beat) {
       withEnv(["HOME=${env.WORKSPACE}", 'PLATFORMS=linux/arm64','PACKAGES=docker', "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Arm ${beat}") {
           deleteDir()
-          release()
+          release('snapshot')
           dir("${BASE_DIR}"){
             pushCIDockerImages(arch: 'arm64')
           }
         }
+        deleteDir()
+        release('snapshot')
       }
     }
   }
@@ -237,12 +256,14 @@ def generateLinuxStep(beat) {
       withEnv(["HOME=${env.WORKSPACE}", "PLATFORMS=${linuxPlatforms()}", "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Linux ${beat}") {
           deleteDir()
-          release()
+          release('snapshot')
           dir("${BASE_DIR}"){
             pushCIDockerImages(arch: 'amd64')
           }
         }
         prepareE2ETestForPackage("${beat}")
+        deleteDir()
+        release('staging')
       }
     }
   }
@@ -328,8 +349,8 @@ def prepareE2ETestForPackage(String beat){
   }
 }
 
-def release(){
-  withBeatsEnv(){
+def release(type){
+  withBeatsEnv(type){
     withEnv([
       "DEV=true"
     ]) {
@@ -344,6 +365,9 @@ def release(){
           folder: folder,
           pattern: "build/distributions/*"
         )
+        if (type.equals('stating')) {
+          echo 'TBD: Upload to a different bucket location'
+        }
       }
     }
   }
@@ -388,12 +412,14 @@ def getBeatsName(baseDir) {
   return baseDir.replace('x-pack/', '')
 }
 
-def withBeatsEnv(Closure body) {
+def withBeatsEnv(type, Closure body) {
+  def envVars = [ "PYTHON_ENV=${WORKSPACE}/python-env" ]
+  if (type.equals('snapshot')) {
+    envVars << "SNAPSHOT=true"
+  }
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET_STASH}", credentialsId: "${JOB_GCS_CREDENTIALS}")
   withMageEnv(){
-    withEnv([
-      "PYTHON_ENV=${WORKSPACE}/python-env"
-    ]) {
+    withEnv(envVars) {
       dir("${env.BASE_DIR}"){
         body()
       }
