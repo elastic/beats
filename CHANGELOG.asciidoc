@@ -3,6 +3,139 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.2]]
+=== Beats version 7.17.2
+https://github.com/elastic/beats/compare/v7.17.1...v7.17.2[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+*Filebeat*
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Log errors when parsing and applying config blocks and if the input is disabled. {pull}30534[30534]
+- Ensure that the Reloadable part of beats are initialized before the Manager is started. {issue}30533[30533]
+- Fixes Beats crashing when glibc >= 2.35 is used {issue}30576[30576]
+- Fix dissect trim panics from DELETE (127)(\u007f) character {issue}30657[30657] {pull}30658[30658]
+
+*Auditbeat*
+
+- Fix handling of execve call events which have no argument. {issue}30585[30585] {pull}30586[30586]
+
+*Filebeat*
+- Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
+- auditd: Prevent mapping explosion when truncated EXECVE records are ingested. {pull}30382[30382]
+- elasticsearch: fix duplicate ingest when using a common appender configuration {issue}30428[30428] {pull}30440[30440]
+- Fix ECS version string in threatintel to be consistent with other modules and add event.timezone. {issue}30499[30499] {pull}30570[30570]
+- Add default paths value to MySQL Enterprise module to prevent issues with pipeline installations {pull}30598[30598]
+- Report the starting offset of the line in `log.offset` when using `filestream` instead of the end to be ECS compliant. {pull}30445[30445]
+- Update documentation for accessing `last_response.url.params` in httpjson input. {pull}30739[30739]
+- Fix add_kubernetes_metadata matcher: support rotated logs when `resource_type: pod` {pull}30720[30720]
+- Allow fixing data duplication on restart when filestream inputs did not have an ID set. Setting an ID for filestream
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Enhance metricbeat on openshift documentation {pull}30054[30054]
+- Fix Docker module: rename fields on dashboards. {pull}30500[30500]
+- Add back missing metrics to system/linux. {pull}30774[30774]
+- GCP metrics query instances with aggregatedList API to improve efficiency. {pull}30154[#30153]
+- Fix delay in perfmon counters collection {issue}30686[30686] {pull}30861[#30861]
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+*Filebeat*
+
+- Remove beta flag for some filebeat modules. {pull}14374[14374]
+- Extend documentation about hints annotation for processors {pull}30561[30561]
+
+*Heartbeat*
+
+- Generate summary documents for journeys which exit successfully, but do not emit `journey/end` events {pull}30825[30825]
+
+*Metricbeat*
+
+- Add `kubernetes.container.status.last.reason` metric {pull}30306[30306]
+- Extend documentation about `orchestrator.cluster` fields {pull}30518[30518]
+- Fix overflow in `iostat` metrics {pull}30679[30679]
+- Extend documentation about `kubernetes.node.network.*` fields {pull}30826[30826]
+
+*Packetbeat*
+
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+
+
+
 [[release-notes-7.17.1]]
 === Beats version 7.17.1
 https://github.com/elastic/beats/compare/v7.17.0...v7.17.1[View commits]
