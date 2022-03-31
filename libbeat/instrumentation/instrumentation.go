@@ -34,6 +34,7 @@ import (
 )
 
 func init() {
+	// we need to close the default tracer to prevent the beat sending events to localhost:8200
 	apm.DefaultTracer().Close()
 }
 
