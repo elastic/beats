@@ -38,9 +38,10 @@ func (r *pooledGzipReader) Read(b []byte) (int, error) {
 // In order for the GZIP checksum to be verified, the reader must be
 // fully consumed until the io.EOF.
 //
-// After this call the reader should not be reused because it is return to the pool.
+// After this call the reader should not be reused because it is returned to the pool.
 func (r *pooledGzipReader) Close() error {
 	err := r.Reader.Close()
 	gzipDecoderPool.Put(r.Reader)
+	r.Reader = nil
 	return err
 }
