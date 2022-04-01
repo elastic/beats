@@ -19,6 +19,7 @@ package filestream
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"golang.org/x/text/transform"
@@ -318,6 +319,8 @@ func (inp *filestream) readFromSource(
 				log.Infof("File was truncated. Begin reading file from offset 0. Path=%s", path)
 			case ErrClosed:
 				log.Info("Reader was closed. Closing.")
+			case io.EOF:
+				log.Debugf("EOF has been reached. Closing.")
 			default:
 				log.Errorf("Read line error: %v", err)
 			}
