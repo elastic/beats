@@ -30,8 +30,8 @@ import (
 )
 
 func eventsMapping(r mb.ReporterV2, containersList []types.Container, dedot bool, logger *logp.Logger) {
-	for _, container := range containersList {
-		eventMapping(r, &container, dedot, logger)
+	for i := range containersList {
+		eventMapping(r, &containersList[i], dedot, logger)
 	}
 }
 
