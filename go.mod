@@ -3,8 +3,6 @@ module github.com/elastic/elastic-agent-system-metrics
 go 1.17
 
 require (
-	github.com/elastic/beats/v7 v7.0.0-alpha2.0.20220314190126-c52699616a8a
-	github.com/elastic/elastic-agent-libs v0.1.1
 	github.com/elastic/go-sysinfo v1.7.1
 	github.com/elastic/gosigar v0.14.2
 	github.com/pkg/errors v0.9.1
@@ -20,6 +18,7 @@ require (
 	github.com/dop251/goja v0.0.0-20220405120441-9037c2b61cbf // indirect
 	github.com/dop251/goja_nodejs v0.0.0-20211022123610-8dd9abb0616d // indirect
 	github.com/elastic/elastic-agent-client/v7 v7.0.0-20210922110810-e6f1f402a9ed // indirect
+	github.com/elastic/elastic-agent-libs v0.1.1 // indirect
 	github.com/elastic/go-licenser v0.4.0 // indirect
 	github.com/elastic/go-structform v0.0.9 // indirect
 	github.com/elastic/go-ucfg v0.8.4 // indirect
@@ -33,6 +32,7 @@ require (
 	github.com/jcchavezs/porto v0.4.0 // indirect
 	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901 // indirect
 	github.com/kr/text v0.2.0 // indirect
+	github.com/magefile/mage v1.13.0 // indirect
 	github.com/magefile/mage v1.13.0 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
