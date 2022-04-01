@@ -476,9 +476,6 @@ def notifyStatus(def args = [:]) {
   def analyse = args.get('analyse', false)
   def subject = args.get('subject', '')
   def body = args.get('body', '')
-  // TODO: test begin
-  archiveArtifacts(allowEmptyArchive: true, artifacts: releaseManagerFile)
-  // TODO: test end
   releaseManagerNotification(file: releaseManagerFile,
                              analyse: analyse,
                              slackChannel: "${env.SLACK_CHANNEL}",
