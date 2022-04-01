@@ -95,14 +95,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // Run method provides the Kubernetes event watcher with a reporter with which events can be reported.
-func (m *MetricSet) Run(reporter mb.PushReporter) {
+func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 	now := time.Now()
 	handler := kubernetes.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
-			reporter.Event(generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger()))
+			mapStrEvent := generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger())
+			reporter.Event(mb.TransformMapStrToEvent("kubernetes", mapStrEvent, nil))
 		},
 		UpdateFunc: func(obj interface{}) {
-			reporter.Event(generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger()))
+			mapStrEvent := generateMapStrFromEvent(obj.(*kubernetes.Event), m.dedotConfig, m.Logger())
+			reporter.Event(mb.TransformMapStrToEvent("kubernetes", mapStrEvent, nil))
 		},
 		// ignore events that are deleted
 		DeleteFunc: nil,
@@ -130,7 +132,10 @@ func (m *MetricSet) Run(reporter mb.PushReporter) {
 		Handler: handler,
 	})
 	// start event watcher
-	m.watcher.Start()
+	err := m.watcher.Start()
+	if err != nil {
+		m.Logger().Debugf("Unable to start watcher: %w", err)
+	}
 	<-reporter.Done()
 	m.watcher.Stop()
 }

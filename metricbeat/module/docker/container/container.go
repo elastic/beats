@@ -72,7 +72,7 @@ func (m *MetricSet) Fetch(ctx context.Context, r mb.ReporterV2) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to get docker containers list")
 	}
-	eventsMapping(r, containers, m.dedot)
+	eventsMapping(r, containers, m.dedot, m.Logger())
 
 	return nil
 }
