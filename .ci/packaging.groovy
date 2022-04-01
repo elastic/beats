@@ -99,9 +99,6 @@ pipeline {
         }
         stage('Build Packages'){
           options { skipDefaultCheckout() }
-          when {
-            expression { return false }
-          }
           steps {
             generateSteps()
           }
@@ -128,20 +125,6 @@ pipeline {
             DRA_OUTPUT = 'release-manager.out'
           }
           steps {
-            // TODO
-            script {
-              withEnv(["HOME=${env.WORKSPACE}"]) {
-                ['snapshot', 'staging'].each { type ->
-                  deleteDir()
-                  withBeatsEnv(type) {
-                    sh(label: 'make dependencies.csv', script: 'make build/distributions/dependencies.csv')
-                    sh(label: 'make beats-dashboards', script: 'make beats-dashboards')
-                    stash(includes: 'build/distributions/**', name: "dependencies-${type}", useDefaultExcludes: false)
-                  }
-                }
-              }
-            }
-            // END TODO
             runReleaseManager(type: 'snapshot', outputFile: env.DRA_OUTPUT)
             whenFalse(env.BRANCH_NAME.equals('main')) {
               runReleaseManager(type: 'staging', outputFile: env.DRA_OUTPUT)
@@ -177,11 +160,7 @@ def getBucketUri(type) {
   // commit for the normal workflow, snapshots (aka SNAPSHOT=true)
   // staging for the staging workflow, SNAPSHOT=false
   def folder = type.equals('staging') ? 'staging' : 'commits'
-  // TODO: test
-  withEnv(["GIT_BASE_COMMIT=b7c44bc9c5c5350ea67c6563b204ecc4e1481b32"]) {
   return "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/${folder}/${env.GIT_BASE_COMMIT}"
-  }
-  // TODO: end
 }
 
 def runReleaseManager(def args = [:]) {
@@ -194,11 +173,7 @@ def runReleaseManager(def args = [:]) {
     // TODO: as long as googleStorageDownload does not support recursive copy with **/*
     dir("build/distributions") {
       gsutil(command: "-m -q cp -r ${bucketUri} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
-      // TODO: test
-      withEnv(["GIT_BASE_COMMIT=b7c44bc9c5c5350ea67c6563b204ecc4e1481b32"]) {
       sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
-      }
-      // TODO: end
     }
     sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
     sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh")
