@@ -54,6 +54,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...main[Check the HEAD dif
 
 *Metricbeat*
 
+- Fix delay in perfmon counters collection {issue}30686[30686] {pull}30861[#30861]
 
 *Packetbeat*
 
