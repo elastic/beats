@@ -33,11 +33,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-func init() {
-	// we need to close the default tracer to prevent the beat sending events to localhost:8200
-	apm.DefaultTracer().Close()
-}
-
 // Instrumentation is an interface that can return an APM tracer a net.listener
 type Instrumentation interface {
 	Tracer() *apm.Tracer
@@ -50,12 +45,14 @@ type instrumentation struct {
 }
 
 // Tracer returns the configured tracer
-// If there is not configured tracer, it returns the DefaultTracer, which is always disabled
+// If there is no configured tracer, it returns the DefaultTracer, which is always closed.
 func (t *instrumentation) Tracer() *apm.Tracer {
-	if t.tracer == nil {
-		return apm.DefaultTracer()
+	if t.tracer != nil {
+		return t.tracer
 	}
-	return t.tracer
+	tracer := apm.DefaultTracer()
+	tracer.Close()
+	return tracer
 }
 
 // Listener is only relevant for APM Server sending tracing data to itself
