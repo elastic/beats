@@ -99,6 +99,10 @@ pipeline {
         }
         stage('Build Packages'){
           options { skipDefaultCheckout() }
+          // TODO
+          when {
+            expression { return false }
+          }
           steps {
             generateSteps()
           }
@@ -125,6 +129,18 @@ pipeline {
             DRA_OUTPUT = 'release-manager.out'
           }
           steps {
+            script {
+              withEnv(["HOME=${env.WORKSPACE}"]) {
+                ['snapshot', 'staging'].each { type ->
+                  deleteDir()
+                  withBeatsEnv(type) {
+                    sh(label: 'make dependencies.csv', script: 'make build/distributions/dependencies.csv')
+                    sh(label: 'make beats-dashboards', script: 'make beats-dashboards')
+                    stash(includes: 'build/distributions/**', name: "dependencies-${type}", useDefaultExcludes: false)
+                  }
+                }
+              }
+            }
             runReleaseManager(type: 'snapshot', outputFile: env.DRA_OUTPUT)
             whenFalse(env.BRANCH_NAME.equals('main')) {
               runReleaseManager(type: 'staging', outputFile: env.DRA_OUTPUT)
