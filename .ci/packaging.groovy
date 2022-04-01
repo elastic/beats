@@ -117,17 +117,9 @@ pipeline {
             runE2ETests()
           }
         }
-        stage('DRA') {
+        // TODO remove
+        stage('DRA-prepare') {
           options { skipDefaultCheckout() }
-          // The Unified Release process keeps moving branches as soon as a new
-          // minor version is created, therefore old release branches won't be able
-          // to use the release manager as their definition is removed.
-          when {
-            expression { return env.IS_BRANCH_AVAILABLE == "true" }
-          }
-          environment {
-            DRA_OUTPUT = 'release-manager.out'
-          }
           steps {
             script {
               withEnv(["HOME=${env.WORKSPACE}"]) {
@@ -141,6 +133,20 @@ pipeline {
                 }
               }
             }
+          }
+        }
+        stage('DRA') {
+          options { skipDefaultCheckout() }
+          // The Unified Release process keeps moving branches as soon as a new
+          // minor version is created, therefore old release branches won't be able
+          // to use the release manager as their definition is removed.
+          when {
+            expression { return env.IS_BRANCH_AVAILABLE == "true" }
+          }
+          environment {
+            DRA_OUTPUT = 'release-manager.out'
+          }
+          steps {
             runReleaseManager(type: 'snapshot', outputFile: env.DRA_OUTPUT)
             whenFalse(env.BRANCH_NAME.equals('main')) {
               runReleaseManager(type: 'staging', outputFile: env.DRA_OUTPUT)
@@ -198,7 +204,7 @@ def runReleaseManager(def args = [:]) {
       }
     }
     sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
-    sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh ${type}")
+    sh(label: "prepare-release-manager-artifacts ${type}", script: ".ci/scripts/prepare-release-manager.sh ${type}")
     dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
     // TODO: test
     withEnv(["BRANCH_NAME=main"]) {

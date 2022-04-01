@@ -15,7 +15,7 @@ FINAL_VERSION=$VERSION-SNAPSHOT
 if [ "$TYPE" != "snapshot" ] ; then
   FINAL_VERSION=$VERSION
 fi
-VERSION=$(make get-version)
+echo "Rename dependencies to $FINAL_VERSION"
 mv build/distributions/dependencies.csv \
    build/distributions/dependencies-"$FINAL_VERSION".csv
 
