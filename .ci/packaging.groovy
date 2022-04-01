@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+@Library('apm@test/test-analysis') _
 
 import groovy.transform.Field
 
@@ -49,6 +49,7 @@ pipeline {
         anyOf {
           triggeredBy cause: "IssueCommentCause"
           expression {
+            return true
             def ret = isUserTrigger() || isUpstreamTrigger()
             if(!ret){
               currentBuild.result = 'NOT_BUILT'
@@ -91,7 +92,7 @@ pipeline {
             dir("${BASE_DIR}"){
               setEnvVar('BEAT_VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
             }
-            setEnvVar('IS_BRANCH_AVAILABLE', isBranchUnifiedReleaseAvailable(env.BRANCH_NAME))
+            setEnvVar('IS_BRANCH_AVAILABLE', isBranchUnifiedReleaseAvailable('main'))
           }
         }
         stage('Build Packages'){
@@ -187,11 +188,13 @@ def runReleaseManager(def args = [:]) {
     }
     sh(label: "prepare-release-manager-artifacts ${type}", script: ".ci/scripts/prepare-release-manager.sh ${type}")
     dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
+    withEnv(["BRANCH_NAME=main"]) {
     releaseManager(project: 'beats',
                    version: env.BEAT_VERSION,
                    type: type,
                    artifactsFolder: 'build/distributions',
                    outputFile: args.outputFile)
+    }
   }
 }
 
