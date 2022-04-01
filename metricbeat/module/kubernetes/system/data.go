@@ -34,7 +34,7 @@ func eventMapping(content []byte, logger *logp.Logger) ([]common.MapStr, error) 
 	var summary kubernetes.Summary
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot unmarshal json response: %s", err)
+		return nil, fmt.Errorf("cannot unmarshal json response: %w", err)
 	}
 
 	node := summary.Node

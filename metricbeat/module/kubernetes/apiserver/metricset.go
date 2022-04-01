@@ -18,7 +18,7 @@
 package apiserver
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -53,7 +53,7 @@ func getMetricsetFactory(prometheusMappings *prometheus.MetricsMapping) mb.Metri
 func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 	events, err := m.prometheusClient.GetProcessedMetrics(m.prometheusMappings)
 	if err != nil {
-		return errors.Wrap(err, "error getting metrics")
+		return fmt.Errorf("error getting metrics: %w", err)
 	}
 
 	rcPost14 := false
@@ -73,7 +73,7 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 				if bothInformed, _ := event.HasKey("request.count"); !bothInformed {
 					continue
 				}
-				event.Delete("request.beforev14")
+				util.ShouldDelete(event, "request.beforev14", m.Logger())
 			} else {
 				v, err := event.GetValue("request.beforev14.count")
 				if err != nil {
@@ -81,7 +81,7 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 					continue
 				}
 				util.ShouldPut(event, "request.count", v, m.Logger())
-				event.Delete("request.beforev14")
+				util.ShouldDelete(event, "request.beforev14", m.Logger())
 			}
 		}
 

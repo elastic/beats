@@ -20,8 +20,6 @@ package volume
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -87,7 +85,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	body, err := m.mod.GetKubeletStats(m.http)
 	if err != nil {
-		return errors.Wrap(err, "error doing HTTP request to fetch 'volume' Metricset data")
+		return fmt.Errorf("error doing HTTP request to fetch 'volume' Metricset data: %w", err)
 	}
 
 	events, err := eventMapping(body, logger)

@@ -198,7 +198,10 @@ func NewContainerMetadataEnricher(
 	enricher := buildMetadataEnricher(watcher, nodeWatcher, namespaceWatcher,
 		// update
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
-			pod := r.(*kubernetes.Pod)
+			pod, ok := r.(*kubernetes.Pod)
+			if !ok {
+				base.Logger().Debugf("Error while casting event: %s", ok)
+			}
 			meta := metaGen.Generate(pod)
 
 			statuses := make(map[string]*kubernetes.PodContainerStatus)
@@ -229,8 +232,9 @@ func NewContainerMetadataEnricher(
 					// which is in the form of <container.runtime>://<container.id>
 					split := strings.Index(s.ContainerID, "://")
 					if split != -1 {
-						meta.Put("container.id", s.ContainerID[split+3:])
-						meta.Put("container.runtime", s.ContainerID[:split])
+						ShouldPut(meta, "container.id", s.ContainerID[split+3:], base.Logger())
+
+						ShouldPut(meta, "container.runtime", s.ContainerID[:split], base.Logger())
 					}
 				}
 				id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
@@ -239,7 +243,10 @@ func NewContainerMetadataEnricher(
 		},
 		// delete
 		func(m map[string]common.MapStr, r kubernetes.Resource) {
-			pod := r.(*kubernetes.Pod)
+			pod, ok := r.(*kubernetes.Pod)
+			if !ok {
+				base.Logger().Debugf("Error while casting event: %s", ok)
+			}
 			for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 				id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 				delete(m, id)
@@ -501,6 +508,13 @@ func CreateEvent(event common.MapStr, namespace string) (mb.Event, error) {
 func ShouldPut(event common.MapStr, field string, value interface{}, logger *logp.Logger) {
 	_, err := event.Put(field, value)
 	if err != nil {
-		logger.Debugf("Failed to put field %v with value %v: %v", field, value, err)
+		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)
+	}
+}
+
+func ShouldDelete(event common.MapStr, field string, logger *logp.Logger) {
+	err := event.Delete(field)
+	if err != nil {
+		logger.Debugf("Failed to delete field '%s': %s", field, err)
 	}
 }
