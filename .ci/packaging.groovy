@@ -263,7 +263,7 @@ def generateArmStep(beat) {
           }
         }
         deleteDir()
-        release('snapshot')
+        release('staging')
       }
     }
   }
@@ -403,7 +403,7 @@ def release(type){
                                    sharedPublicly: true)
           }
         } else {
-          log(level: 'INFO', text: "${env.BEATS_FOLDER} for ${type} does not require to upload the artifacts.")
+          log(level: 'INFO', text: "${env.BEATS_FOLDER} for ${type} does not require to upload the staging artifacts.")
         }
       }
     }
