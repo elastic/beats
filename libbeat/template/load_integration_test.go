@@ -171,10 +171,11 @@ func TestESLoader_Load(t *testing.T) {
 
 		// Load Template with same name, but different JSON.name and ensure it is used
 		setup.config.JSON = struct {
-			Enabled bool   `config:"enabled"`
-			Path    string `config:"path"`
-			Name    string `config:"name"`
-		}{Enabled: true, Path: path(t, []string{"testdata", "fields.json"}), Name: nameJSON}
+			Enabled      bool   `config:"enabled"`
+			Path         string `config:"path"`
+			Name         string `config:"name"`
+			IsDataStream bool   `config:"data_stream"`
+		}{Enabled: true, Path: path(t, []string{"testdata", "fields.json"}), Name: nameJSON, IsDataStream: false}
 		setup.load(nil)
 		setup.requireTemplateExists(nameJSON)
 		setup.cleanupTemplate(nameJSON)
