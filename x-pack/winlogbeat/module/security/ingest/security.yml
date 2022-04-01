@@ -2860,6 +2860,23 @@ processors:
           def parts = ctx.process.parent.executable.splitOnToken("\\");
           ctx.process.parent.put("name", parts[-1]);
         }
+        if (ctx?.winlog?.event_data?.ProcessId != null) {
+          if (ctx?.process == null) {
+            HashMap hm = new HashMap();
+            ctx.put("process", hm);
+          }
+          if (ctx?.process?.parent == null) {
+            HashMap hm = new HashMap();
+            ctx.process.put("parent", hm);
+          }
+          if (ctx.winlog.event_data.ProcessId instanceof String) {
+            Long pid = Long.decode(ctx.winlog.event_data.ProcessId);
+            ctx.process.parent.put("pid", pid.longValue());
+          } else {
+            ctx.process.parent.put("pid", ctx.winlog.event_data.ProcessId);
+          }
+          ctx.winlog.event_data.remove("ProcessId");
+        }
         if (ctx?.winlog?.event_data?.CommandLine != null) {
           int start = 0;
           int end = 0;

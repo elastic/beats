@@ -32,7 +32,8 @@
       "name": "wevtutil.exe",
       "parent": {
         "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-        "name": "powershell.exe"
+        "name": "powershell.exe",
+        "pid": 4652
       },
       "pid": 4556
     },
@@ -54,7 +55,6 @@
       "event_data": {
         "CommandLine": "\"C:\\Windows\\system32\\wevtutil.exe\" cl Security",
         "MandatoryLabel": "S-1-16-12288",
-        "ProcessId": "0x122c",
         "SubjectDomainName": "VAGRANT",
         "SubjectLogonId": "0x274a2",
         "SubjectUserName": "vagrant",
