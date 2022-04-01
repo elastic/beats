@@ -36,3 +36,6 @@ find build/distributions -name '*linux-amd64.docker.tar.gz*' -print0 |
     echo "Rename file $file"
     mv "$file" "${file/linux-amd64.docker.tar.gz/docker-image-linux-amd64.tar.gz}"
   done
+
+echo 'List all the files'
+find build/distributions -type f -ls || true
