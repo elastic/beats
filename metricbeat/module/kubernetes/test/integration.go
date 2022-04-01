@@ -79,10 +79,10 @@ func GetKubeProxyConfig(t *testing.T, metricSetName string) map[string]interface
 func GetSchedulerConfig(t *testing.T, metricSetName string) map[string]interface{} {
 	t.Helper()
 	return map[string]interface{}{
-		"module":            "kubernetes",
-		"metricsets":        []string{metricSetName},
-		"host":              "${NODE_NAME}",
-		"hosts":             []string{"http://0.0.0.0:10251"},
+		"module":     "kubernetes",
+		"metricsets": []string{metricSetName},
+		"host":       "${NODE_NAME}",
+		"hosts":      []string{"http://0.0.0.0:10251"},
 	}
 }
 
