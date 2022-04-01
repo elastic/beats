@@ -198,7 +198,7 @@ def runReleaseManager(def args = [:]) {
       }
     }
     sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
-    sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh")
+    sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh ${type}")
     dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
     // TODO: test
     withEnv(["BRANCH_NAME=main"]) {
