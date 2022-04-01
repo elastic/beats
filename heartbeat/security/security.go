@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"os"
 	"os/user"
-	"runtime"
 	"strconv"
 	"syscall"
 
@@ -52,12 +51,9 @@ func init() {
 	// rather than relying on errors from `setcap`
 	setCapabilities()
 
-	switch runtime.GOARCH {
-	case "amd64", "386":
-		err := setSeccompRules()
-		if err != nil {
-			panic(err)
-		}
+	err := setSeccompRules()
+	if err != nil {
+		panic(err)
 	}
 }
 
