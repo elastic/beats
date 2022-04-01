@@ -74,10 +74,8 @@ pipeline {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
           }
         }
-        withMageEnv(version: "${env.GO_VERSION}"){
-          dir("${BASE_DIR}"){
-            setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
-          }
+        dir("${BASE_DIR}"){
+          setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
         }
       }
     }
@@ -404,7 +402,8 @@ def packagingLinux(Map args = [:]) {
                 //'linux/s390x',
                 'windows/amd64',
                 'windows/386',
-                (params.macos ? '' : 'darwin/amd64'),
+                'darwin/amd64',
+                'darwin/arm64'
               ].join(' ')
   withEnv([
     "PLATFORMS=${PLATFORMS}"
