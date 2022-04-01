@@ -161,7 +161,7 @@ def getBucketUri(type) {
   // It uses the folder structure done in uploadPackagesToGoogleBucket
   // commit for the normal workflow, snapshots (aka SNAPSHOT=true)
   // staging for the staging workflow, SNAPSHOT=false
-  def folder = type.equals('staging') ? 'staging' : 'commit'
+  def folder = type.equals('staging') ? 'staging' : 'commits'
   return "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/${folder}/${env.GIT_BASE_COMMIT}"
 }
 
