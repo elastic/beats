@@ -30,7 +30,7 @@ processors:
     ignore_missing: false
     pattern_definitions:
       HAPROXY_DATE: (%{MONTHDAY}[/-]%{MONTH}[/-]%{YEAR}:%{HOUR}:%{MINUTE}:%{SECOND})|%{SYSLOGTIMESTAMP}
-      TLS_PROTO: '(?<tls.version_protocol>TLS|SSL)v%{NUMBER:tls.version:long}'
+      TLS_PROTO: '(?<tls.version_protocol>TLS|SSL)v%{NUMBER:tls.version}'
       TLS_CIPHER: '([A-Z]+([0-9]*)-)+([A-Z]+([0-9]*))'
 - date:
     if: ctx.event.timezone == null
