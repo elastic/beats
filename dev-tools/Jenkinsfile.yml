@@ -12,6 +12,6 @@ when:
     tags: true                 ## for all the tags
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
-    lint:
+    checks:
         make: "make -C dev-tools check"
-        stage: lint
+        stage: checks
