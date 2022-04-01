@@ -176,7 +176,10 @@ def getBucketUri(type) {
   // commit for the normal workflow, snapshots (aka SNAPSHOT=true)
   // staging for the staging workflow, SNAPSHOT=false
   def folder = type.equals('staging') ? 'staging' : 'commits'
+  // TODO: test
+  withEnv(["GIT_BASE_COMMIT=524cda1a27b445a341a145a72931f66395267d8a"]) {
   return "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/${folder}/${env.GIT_BASE_COMMIT}"
+  }
 }
 
 def runReleaseManager(def args = [:]) {
@@ -189,7 +192,10 @@ def runReleaseManager(def args = [:]) {
     // TODO: as long as googleStorageDownload does not support recursive copy with **/*
     dir("build/distributions") {
       gsutil(command: "-m -q cp -r ${bucketUri} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
+      // TODO: test
+      withEnv(["GIT_BASE_COMMIT=524cda1a27b445a341a145a72931f66395267d8a"]) {
       sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
+      }
     }
     sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
     sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh")
