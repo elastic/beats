@@ -44,8 +44,7 @@ func TestHTTPOverNamedPipe(t *testing.T) {
 	})
 
 	go func() {
-		err := http.Serve(l, mux)
-		require.NoError(t, err)
+		_ = http.Serve(l, mux)
 	}()
 
 	c := http.Client{
