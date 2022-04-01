@@ -384,7 +384,7 @@ def release(type){
     ]) {
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dir("${env.BEATS_FOLDER}") {
-        sh(label: "Release ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
+        sh(label: "mage package ${type} ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
         def folder = getBeatsName(env.BEATS_FOLDER)
         uploadPackagesToGoogleBucket(
           credentialsId: env.JOB_GCS_EXT_CREDENTIALS,
@@ -396,12 +396,14 @@ def release(type){
         if (type.equals('staging')) {
           dir("build/distributions") {
             def bucketUri = getBucketUri(type)
-            echo "Copy files to ${bucketUri} if staging"
+            log(level: 'INFO', text: "${env.BEATS_FOLDER} for ${type} requires to upload the artifacts to ${bucketUri}.")
             googleStorageUploadExt(bucket: "${bucketUri}/${folder}",
                                    credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
                                    pattern: "*",
                                    sharedPublicly: true)
           }
+        } else {
+          log(level: 'INFO', text: "${env.BEATS_FOLDER} for ${type} does not require to upload the artifacts.")
         }
       }
     }
