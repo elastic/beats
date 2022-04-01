@@ -26,8 +26,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/disk"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
+	"github.com/elastic/elastic-agent-system-metrics/metric"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/numcpu"
 )
 
 // GetCLKTCK emulates the _SC_CLK_TCK syscall
@@ -120,7 +120,7 @@ func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, err
 
 	queue := float64(aveq) / deltams
 	perSec := func(x uint64) float64 {
-		return common.Round(1000.0*float64(x)/deltams, common.DefaultDecimalPlacesCount)
+		return metric.Round(1000.0 * float64(x) / deltams)
 	}
 
 	result := IOMetric{}
@@ -130,17 +130,17 @@ func (stat *IOStat) CalcIOStatistics(counter disk.IOCountersStat) (IOMetric, err
 	result.WriteRequestCountPerSec = perSec(wrIOs)
 	result.ReadBytesPerSec = perSec(rdBytes)
 	result.WriteBytesPerSec = perSec(wrBytes)
-	result.AvgRequestSize = common.Round(size, common.DefaultDecimalPlacesCount)
-	result.AvgQueueSize = common.Round(queue, common.DefaultDecimalPlacesCount)
-	result.AvgAwaitTime = common.Round(wait, common.DefaultDecimalPlacesCount)
+	result.AvgRequestSize = metric.Round(size)
+	result.AvgQueueSize = metric.Round(queue)
+	result.AvgAwaitTime = metric.Round(wait)
 	if rdIOs > 0 {
-		result.AvgReadAwaitTime = common.Round(float64(rdTicks)/float64(rdIOs), common.DefaultDecimalPlacesCount)
+		result.AvgReadAwaitTime = metric.Round(float64(rdTicks) / float64(rdIOs))
 	}
 	if wrIOs > 0 {
-		result.AvgWriteAwaitTime = common.Round(float64(wrTicks)/float64(wrIOs), common.DefaultDecimalPlacesCount)
+		result.AvgWriteAwaitTime = metric.Round(float64(wrTicks) / float64(wrIOs))
 	}
-	result.AvgServiceTime = common.Round(svct, common.DefaultDecimalPlacesCount)
-	result.BusyPct = common.Round(100.0*float64(ticks)/deltams, common.DefaultDecimalPlacesCount)
+	result.AvgServiceTime = metric.Round(svct)
+	result.BusyPct = metric.Round(100.0 * float64(ticks) / deltams)
 	if result.BusyPct > 100.0 {
 		result.BusyPct = 100.0
 	}

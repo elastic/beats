@@ -18,19 +18,19 @@
 package cgroup
 
 import (
+	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
-	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/opt"
+	"github.com/elastic/elastic-agent-libs/transform/typeconv"
+	"github.com/elastic/elastic-agent-system-metrics/metric"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/numcpu"
 )
 
 // CGStats in an interface wrapper around the V2 and V1 cgroup stat objects
 type CGStats interface {
-	Format() (common.MapStr, error)
+	Format() (mapstr.M, error)
 	CGVersion() CgroupsVersion
 	FillPercentages(prev CGStats, curTime, prevTime time.Time)
 }
@@ -41,11 +41,11 @@ func (stat StatsV1) CGVersion() CgroupsVersion {
 }
 
 //Format converts the stats object to a MapStr that can be sent to Report()
-func (stat StatsV1) Format() (common.MapStr, error) {
-	to := common.MapStr{}
+func (stat StatsV1) Format() (mapstr.M, error) {
+	to := mapstr.M{}
 	err := typeconv.Convert(&to, stat)
 	if err != nil {
-		return to, errors.Wrap(err, "error formatting statsV1 object")
+		return to, fmt.Errorf("error formatting statsV1 object: %w", err)
 	}
 
 	return to, nil
@@ -53,33 +53,33 @@ func (stat StatsV1) Format() (common.MapStr, error) {
 
 // FillPercentages uses a previous CGStats object to fill out the percentage values
 // in the cgroup metrics. The `prev` object must be from the same process.
-// curTime and Prev time should be time.Time objects that corrispond to the "scrape time" of when the metrics were gathered.
-func (curStat *StatsV1) FillPercentages(prev CGStats, curTime, prevTime time.Time) {
+// curTime and Prev time should be time.Time objects that correspond to the "scrape time" of when the metrics were gathered.
+func (stat *StatsV1) FillPercentages(prev CGStats, curTime, prevTime time.Time) {
 	if prev != nil && prev.CGVersion() != CgroupsV1 {
 		return
 	}
-	prevStat := prev.(*StatsV1)
+	prevStat, ok := prev.(*StatsV1)
 
-	if prevStat == nil || curStat == nil || curStat.CPUAccounting == nil || prevStat.CPUAccounting == nil {
+	if !ok || prevStat == nil || stat == nil || stat.CPUAccounting == nil || prevStat.CPUAccounting == nil {
 		return
 	}
 
 	timeDelta := curTime.Sub(prevTime)
 	timeDeltaNanos := timeDelta / time.Nanosecond
-	totalCPUDeltaNanos := int64(curStat.CPUAccounting.Total.NS - prevStat.CPUAccounting.Total.NS)
+	totalCPUDeltaNanos := int64(stat.CPUAccounting.Total.NS - prevStat.CPUAccounting.Total.NS)
 
 	pct := float64(totalCPUDeltaNanos) / float64(timeDeltaNanos)
 	var cpuCount int
-	if len(curStat.CPUAccounting.UsagePerCPU) > 0 {
-		cpuCount = len(curStat.CPUAccounting.UsagePerCPU)
+	if len(stat.CPUAccounting.UsagePerCPU) > 0 {
+		cpuCount = len(stat.CPUAccounting.UsagePerCPU)
 	} else {
 		cpuCount = numcpu.NumCPU()
 	}
 
 	// if you look at the raw cgroup stats, the following normalized value is literally an average of per-cpu numbers.
 	normalizedPct := pct / float64(cpuCount)
-	userCPUDeltaMillis := int64(curStat.CPUAccounting.Stats.User.NS - prevStat.CPUAccounting.Stats.User.NS)
-	systemCPUDeltaMillis := int64(curStat.CPUAccounting.Stats.System.NS - prevStat.CPUAccounting.Stats.System.NS)
+	userCPUDeltaMillis := int64(stat.CPUAccounting.Stats.User.NS - prevStat.CPUAccounting.Stats.User.NS)
+	systemCPUDeltaMillis := int64(stat.CPUAccounting.Stats.System.NS - prevStat.CPUAccounting.Stats.System.NS)
 
 	userPct := float64(userCPUDeltaMillis) / float64(timeDeltaNanos)
 	systemPct := float64(systemCPUDeltaMillis) / float64(timeDeltaNanos)
@@ -87,21 +87,20 @@ func (curStat *StatsV1) FillPercentages(prev CGStats, curTime, prevTime time.Tim
 	normalizedUser := userPct / float64(cpuCount)
 	normalizedSystem := systemPct / float64(cpuCount)
 
-	curStat.CPUAccounting.Total.Pct = opt.FloatWith(common.Round(pct, common.DefaultDecimalPlacesCount))
-	curStat.CPUAccounting.Total.Norm.Pct = opt.FloatWith(common.Round(normalizedPct, common.DefaultDecimalPlacesCount))
-	curStat.CPUAccounting.Stats.User.Pct = opt.FloatWith(common.Round(userPct, common.DefaultDecimalPlacesCount))
-	curStat.CPUAccounting.Stats.User.Norm.Pct = opt.FloatWith(common.Round(normalizedUser, common.DefaultDecimalPlacesCount))
-	curStat.CPUAccounting.Stats.System.Pct = opt.FloatWith(common.Round(systemPct, common.DefaultDecimalPlacesCount))
-	curStat.CPUAccounting.Stats.System.Norm.Pct = opt.FloatWith(common.Round(normalizedSystem, common.DefaultDecimalPlacesCount))
-
+	stat.CPUAccounting.Total.Pct = opt.FloatWith(metric.Round(pctgc))
+	stat.CPUAccounting.Total.Norm.Pct = opt.FloatWith(metric.Round(normalizedPctgc))
+	stat.CPUAccounting.Stats.User.Pct = opt.FloatWith(metric.Round(userPctgc))
+	stat.CPUAccounting.Stats.User.Norm.Pct = opt.FloatWith(metric.Round(normalizedUsergc))
+	stat.CPUAccounting.Stats.System.Pct = opt.FloatWith(metric.Round(systemPctgc))
+	stat.CPUAccounting.Stats.System.Norm.Pct = opt.FloatWith(metric.Round(normalizedSystemgc))
 }
 
 //Format converts the stats object to a MapStr that can be sent to Report()
-func (stat StatsV2) Format() (common.MapStr, error) {
-	to := common.MapStr{}
+func (stat StatsV2) Format() (mapstr.M, error) {
+	to := mapstr.M{}
 	err := typeconv.Convert(&to, stat)
 	if err != nil {
-		return to, errors.Wrap(err, "error formatting statsV2 object")
+		return to, fmt.Errorf("error formatting statsV2 object: %w", err)
 	}
 
 	return to, nil
@@ -115,18 +114,18 @@ func (stat StatsV2) CGVersion() CgroupsVersion {
 // FillPercentages uses a previous CGStats object to fill out the percentage values
 // in the cgroup metrics. The `prev` object must be from the same process.
 // curTime and Prev time should be time.Time objects that corrispond to the "scrape time" of when the metrics were gathered.
-func (curStat *StatsV2) FillPercentages(prev CGStats, curTime, prevTime time.Time) {
+func (stat *StatsV2) FillPercentages(prev CGStats, curTime, prevTime time.Time) {
 	if prev != nil && prev.CGVersion() != CgroupsV2 {
 		return
 	}
-	prevStat := prev.(*StatsV2)
+	prevStat, ok := prev.(*StatsV2)
 
-	if prevStat == nil || curStat == nil || curStat.CPU == nil || prevStat.CPU == nil {
+	if !ok || prevStat == nil || stat == nil || stat.CPU == nil || prevStat.CPU == nil {
 		return
 	}
 	timeDelta := curTime.Sub(prevTime)
 	timeDeltaNanos := timeDelta / time.Nanosecond
-	totalCPUDeltaNanos := int64(curStat.CPU.Stats.Usage.NS - prevStat.CPU.Stats.Usage.NS)
+	totalCPUDeltaNanos := int64(stat.CPU.Stats.Usage.NS - prevStat.CPU.Stats.Usage.NS)
 
 	pct := float64(totalCPUDeltaNanos) / float64(timeDeltaNanos)
 
@@ -134,8 +133,8 @@ func (curStat *StatsV2) FillPercentages(prev CGStats, curTime, prevTime time.Tim
 
 	// if you look at the raw cgroup stats, the following normalized value is literally an average of per-cpu numbers.
 	normalizedPct := pct / float64(cpuCount)
-	userCPUDeltaMillis := int64(curStat.CPU.Stats.User.NS - prevStat.CPU.Stats.User.NS)
-	systemCPUDeltaMillis := int64(curStat.CPU.Stats.System.NS - prevStat.CPU.Stats.System.NS)
+	userCPUDeltaMillis := int64(stat.CPU.Stats.User.NS - prevStat.CPU.Stats.User.NS)
+	systemCPUDeltaMillis := int64(stat.CPU.Stats.System.NS - prevStat.CPU.Stats.System.NS)
 
 	userPct := float64(userCPUDeltaMillis) / float64(timeDeltaNanos)
 	systemPct := float64(systemCPUDeltaMillis) / float64(timeDeltaNanos)
@@ -143,10 +142,10 @@ func (curStat *StatsV2) FillPercentages(prev CGStats, curTime, prevTime time.Tim
 	normalizedUser := userPct / float64(cpuCount)
 	normalizedSystem := systemPct / float64(cpuCount)
 
-	curStat.CPU.Stats.Usage.Pct = opt.FloatWith(common.Round(pct, common.DefaultDecimalPlacesCount))
-	curStat.CPU.Stats.Usage.Norm.Pct = opt.FloatWith(common.Round(normalizedPct, common.DefaultDecimalPlacesCount))
-	curStat.CPU.Stats.User.Pct = opt.FloatWith(common.Round(userPct, common.DefaultDecimalPlacesCount))
-	curStat.CPU.Stats.User.Norm.Pct = opt.FloatWith(common.Round(normalizedUser, common.DefaultDecimalPlacesCount))
-	curStat.CPU.Stats.System.Pct = opt.FloatWith(common.Round(systemPct, common.DefaultDecimalPlacesCount))
-	curStat.CPU.Stats.System.Norm.Pct = opt.FloatWith(common.Round(normalizedSystem, common.DefaultDecimalPlacesCount))
+	stat.CPU.Stats.Usage.Pct = opt.FloatWith(metric.Round(pctgc))
+	stat.CPU.Stats.Usage.Norm.Pct = opt.FloatWith(metric.Round(normalizedPctgc))
+	stat.CPU.Stats.User.Pct = opt.FloatWith(metric.Round(userPctgc))
+	stat.CPU.Stats.User.Norm.Pct = opt.FloatWith(metric.Round(normalizedUsergc))
+	stat.CPU.Stats.System.Pct = opt.FloatWith(metric.Round(systemPctgc))
+	stat.CPU.Stats.System.Norm.Pct = opt.FloatWith(metric.Round(normalizedSystemgc))
 }

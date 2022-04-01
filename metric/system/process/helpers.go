@@ -20,22 +20,22 @@ package process
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
-	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/elastic-agent-libs/opt"
+	"github.com/elastic/elastic-agent-system-metrics/metric"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/numcpu"
 )
 
 // unixTimeMsToTime converts a unix time given in milliseconds since Unix epoch
-// to a common.Time value.
+// to a typeconv.Time value.
 func unixTimeMsToTime(unixTimeMs uint64) string {
-	return common.Time(time.Unix(0, int64(unixTimeMs*1000000))).String()
+	return typeconv.Time(time.Unix(0, int64(unixTimeMs*1000000))).String()
 }
 
-func stripNullByte(buf []byte) string {
+func stripNullByte(buf []byte) string { // nolint: deadcode,unused // it is used in platform specific code
 	return string(buf[0 : len(buf)-1])
 }
 
-func stripNullByteRaw(buf []byte) []byte {
+func stripNullByteRaw(buf []byte) []byte { // nolint: deadcode,unused // it is used in platform specific code
 	return buf[0 : len(buf)-1]
 }
 
@@ -47,7 +47,7 @@ func GetProcMemPercentage(proc ProcState, totalPhyMem uint64) opt.Float {
 
 	perc := (float64(proc.Memory.Rss.Bytes.ValueOr(0)) / float64(totalPhyMem))
 
-	return opt.FloatWith(common.Round(perc, 4))
+	return opt.FloatWith(metric.Round(perc, 4))
 }
 
 // isProcessInSlice looks up proc in the processes slice and returns if
@@ -79,15 +79,15 @@ func GetProcCPUPercentage(s0, s1 ProcState) ProcState {
 	}
 
 	timeDelta := s1.SampleTime.Sub(s0.SampleTime)
-	timeDeltaMillis := timeDelta / time.Millisecond
+	timeDeltaDur := timeDelta / time.Millisecond
 	totalCPUDeltaMillis := int64(s1.CPU.Total.Ticks.ValueOr(0) - s0.CPU.Total.Ticks.ValueOr(0))
 
-	pct := float64(totalCPUDeltaMillis) / float64(timeDeltaMillis)
+	pct := float64(totalCPUDeltaMillis) / float64(timeDeltaDur)
 	normalizedPct := pct / float64(numcpu.NumCPU())
 
-	s1.CPU.Total.Norm.Pct = opt.FloatWith(common.Round(normalizedPct, common.DefaultDecimalPlacesCount))
-	s1.CPU.Total.Pct = opt.FloatWith(common.Round(pct, common.DefaultDecimalPlacesCount))
-	s1.CPU.Total.Value = opt.FloatWith(common.Round(float64(s1.CPU.Total.Ticks.ValueOr(0)), common.DefaultDecimalPlacesCount))
+	s1.CPU.Total.Norm.Pct = opt.FloatWith(metric.Round(normalizedPct))
+	s1.CPU.Total.Pct = opt.FloatWith(metric.Round(pct))
+	s1.CPU.Total.Value = opt.FloatWith(metric.Round(float64(s1.CPU.Total.Ticks.ValueOr(0))))
 
 	return s1
 

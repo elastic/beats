@@ -21,8 +21,7 @@
 package cpu
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/numcpu"
 	sigar "github.com/elastic/gosigar"
 )
 
@@ -53,9 +52,9 @@ type LoadAverages struct {
 // 0 to NumCPU.
 func (m *LoadMetrics) Averages() LoadAverages {
 	return LoadAverages{
-		OneMinute:     common.Round(m.sample.One, common.DefaultDecimalPlacesCount),
-		FiveMinute:    common.Round(m.sample.Five, common.DefaultDecimalPlacesCount),
-		FifteenMinute: common.Round(m.sample.Fifteen, common.DefaultDecimalPlacesCount),
+		OneMinute:     metric.Round(m.sample.One),
+		FiveMinute:    metric.Round(m.sample.Five),
+		FifteenMinute: metric.Round(m.sample.Fifteen),
 	}
 }
 
@@ -64,8 +63,8 @@ func (m *LoadMetrics) Averages() LoadAverages {
 func (m *LoadMetrics) NormalizedAverages() LoadAverages {
 	cpus := numcpu.NumCPU()
 	return LoadAverages{
-		OneMinute:     common.Round(m.sample.One/float64(cpus), common.DefaultDecimalPlacesCount),
-		FiveMinute:    common.Round(m.sample.Five/float64(cpus), common.DefaultDecimalPlacesCount),
-		FifteenMinute: common.Round(m.sample.Fifteen/float64(cpus), common.DefaultDecimalPlacesCount),
+		OneMinute:     metric.Round(m.sample.One / float64(cpus)),
+		FiveMinute:    metric.Round(m.sample.Five / float64(cpus)),
+		FifteenMinute: metric.Round(m.sample.Fifteen / float64(cpus)),
 	}
 }

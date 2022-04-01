@@ -19,6 +19,7 @@ package cgroup
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -26,10 +27,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 var (
@@ -94,25 +93,25 @@ func parseMountinfoLine(line string) (mountinfo, error) {
 
 	mount.mountpoint = fields[4]
 
-	var seperatorIndex int
+	var separatorIndex int
 	for i, value := range fields {
 		if value == "-" {
-			seperatorIndex = i
+			separatorIndex = i
 			break
 		}
 	}
-	if fields[seperatorIndex] != "-" {
+	if fields[separatorIndex] != "-" {
 		return mount, fmt.Errorf("invalid mountinfo line, separator ('-') not "+
 			"found in line='%s'", line)
 	}
 
-	if len(fields)-seperatorIndex-1 < 3 {
+	if len(fields)-separatorIndex-1 < 3 {
 		return mount, fmt.Errorf("invalid mountinfo line, expected at least "+
-			"3 fields after seperator but got %d from line='%s'",
-			len(fields)-seperatorIndex-1, line)
+			"3 fields after separator but got %d from line='%s'",
+			len(fields)-separatorIndex-1, line)
 	}
 
-	fields = fields[seperatorIndex+1:]
+	fields = fields[separatorIndex+1:]
 	mount.filesystemType = fields[0]
 	mount.superOptions = strings.Split(fields[2], ",")
 	return mount, nil
@@ -279,7 +278,7 @@ the container as /sys/fs/cgroup/unified and start the system module with the hos
 
 			cgpaths, err := ioutil.ReadDir(controllerPath)
 			if err != nil {
-				return cPaths, errors.Wrapf(err, "error fetching cgroupV2 controllers for cgroup location '%s' and path line '%s'", r.cgroupMountpoints.V2Loc, line)
+				return cPaths, fmt.Errorf("error fetching cgroupV2 controllers for cgroup location '%s' and path line '%s': %w", r.cgroupMountpoints.V2Loc, line, err)
 			}
 			// In order to produce the same kind of data for cgroups V1 and V2 controllers,
 			// We iterate over the group, and look for controllers, since the V2 unified system doesn't list them under the PID
@@ -300,7 +299,7 @@ the container as /sys/fs/cgroup/unified and start the system module with the hos
 	}
 
 	if sc.Err() != nil {
-		return cPaths, errors.Wrap(sc.Err(), "error scanning cgroup file")
+		return cPaths, fmt.Errorf("error scanning cgroup file: %w", err)
 	}
 
 	return cPaths, nil

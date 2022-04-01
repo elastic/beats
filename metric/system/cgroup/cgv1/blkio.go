@@ -19,15 +19,14 @@ package cgv1
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"unicode"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgcommon"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/cgcommon"
 )
 
 // BlockIOSubsystem contains limits and metrics from the "blkio" subsystem. The
@@ -44,8 +43,8 @@ type BlockIOSubsystem struct {
 
 // TotalIOs wraps the totals for blkio
 type TotalIOs struct {
-	Bytes uint64 `json:"bytes,omitrmpty" struct:"bytes,omitempty"`
-	Ios   uint64 `json:"ios,omitrmpty" struct:"ios,omitempty"`
+	Bytes uint64 `json:"bytes,omitempty" struct:"bytes,omitempty"`
+	Ios   uint64 `json:"ios,omitempty" struct:"ios,omitempty"`
 }
 
 // CFQScheduler contains limits and metrics for the proportional weight time
@@ -114,7 +113,7 @@ type blkioValue struct {
 // cgroup hierarchy to read.
 func (blkio *BlockIOSubsystem) Get(path string) error {
 	if err := blkioThrottle(path, blkio); err != nil {
-		return errors.Wrapf(err, "error reading throttle data from %s", path)
+		return fmt.Errorf("error reading throttle data from %s: %w", path, err)
 	}
 
 	return nil
@@ -136,7 +135,7 @@ func blkioThrottle(path string, blkio *BlockIOSubsystem) error {
 
 	values, err := readBlkioValues(path, "blkio.throttle.io_service_bytes")
 	if err != nil {
-		return errors.Wrap(err, "error reading blkio.throttle.io_service_bytes")
+		return fmt.Errorf("error reading blkio.throttle.io_service_bytes: %w", err)
 	}
 	if values != nil {
 		for id, opValues := range collectOpValues(values) {
@@ -146,7 +145,7 @@ func blkioThrottle(path string, blkio *BlockIOSubsystem) error {
 
 	values, err = readBlkioValues(path, "blkio.throttle.io_serviced")
 	if err != nil {
-		return errors.Wrap(err, "error reading blkio.throttle.io_serviced")
+		return fmt.Errorf("error reading blkio.throttle.io_serviced: %w", err)
 	}
 	if values != nil {
 		for id, opValues := range collectOpValues(values) {
@@ -156,7 +155,7 @@ func blkioThrottle(path string, blkio *BlockIOSubsystem) error {
 
 	values, err = readBlkioValues(path, "blkio.throttle.read_bps_device")
 	if err != nil {
-		return errors.Wrap(err, "error reading blkio.throttle.read_bps_device")
+		return fmt.Errorf("error reading blkio.throttle.read_bps_device: %w", err)
 	}
 	if values != nil {
 		for _, bv := range values {
@@ -166,9 +165,9 @@ func blkioThrottle(path string, blkio *BlockIOSubsystem) error {
 
 	values, err = readBlkioValues(path, "blkio.throttle.write_bps_device")
 	if err != nil {
-		return errors.Wrap(err, "error reading blkio.throttle.write_bps_device")
+		return fmt.Errorf("error reading blkio.throttle.write_bps_device: %w", err)
 	}
-	if values != nil {
+	if len(values) != 0 {
 		for _, bv := range values {
 			getDevice(bv.DeviceID).WriteLimitBPS = bv.Value
 		}
@@ -176,9 +175,9 @@ func blkioThrottle(path string, blkio *BlockIOSubsystem) error {
 
 	values, err = readBlkioValues(path, "blkio.throttle.read_iops_device")
 	if err != nil {
-		return errors.Wrap(err, "error reading blkio.throttle.read_iops_device")
+		return fmt.Errorf("error reading blkio.throttle.read_iops_device: %w", err)
 	}
-	if values != nil {
+	if len(values) != 0 {
 		for _, bv := range values {
 			getDevice(bv.DeviceID).ReadLimitIOPS = bv.Value
 		}
@@ -186,9 +185,9 @@ func blkioThrottle(path string, blkio *BlockIOSubsystem) error {
 
 	values, err = readBlkioValues(path, "blkio.throttle.write_iops_device")
 	if err != nil {
-		return errors.Wrap(err, "error reading blkio.throttle.write_iops_device")
+		return fmt.Errorf("error reading blkio.throttle.write_iops_device: %w", err)
 	}
-	if values != nil {
+	if len(values) != 0 {
 		for _, bv := range values {
 			getDevice(bv.DeviceID).WriteLimitIOPS = bv.Value
 		}

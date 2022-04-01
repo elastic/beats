@@ -18,12 +18,11 @@
 package numcpu
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // getCPU implements NumCPU on linux
@@ -49,12 +48,12 @@ func getCPU() (int, bool, error) {
 		return -1, false, nil
 	}
 	if err != nil {
-		return -1, false, errors.Wrapf(err, "error reading file %s", cpuPath)
+		return -1, false, fmt.Errorf("error reading file %s: %w", cpuPath, err)
 	}
 
 	cpuCount, err := parseCPUList(string(rawFile))
 	if err != nil {
-		return -1, false, errors.Wrapf(err, "error parsing file %s", cpuPath)
+		return -1, false, fmt.Errorf("error parsing file %s: %w", cpuPath, err)
 	}
 	return cpuCount, true, nil
 }
@@ -68,7 +67,7 @@ func parseCPUList(raw string) (int, error) {
 		if strings.Contains(v, "-") {
 			rangeC, err := parseCPURange(v)
 			if err != nil {
-				return 0, errors.Wrapf(err, "error parsing line %s", v)
+				return 0, fmt.Errorf("error parsing line %s: %w", v, err)
 			}
 			count = count + rangeC
 		} else {
@@ -82,7 +81,7 @@ func parseCPURange(cpuRange string) (int, error) {
 	var first, last int
 	_, err := fmt.Sscanf(cpuRange, "%d-%d", &first, &last)
 	if err != nil {
-		return 0, errors.Wrapf(err, "error reading from range %s", cpuRange)
+		return 0, fmt.Errorf("error reading from range %s: %w", cpuRange, err)
 	}
 
 	return (last - first) + 1, nil

@@ -58,7 +58,7 @@ func ParseUint(value []byte) (uint64, error) {
 		intValue, intErr := strconv.ParseInt(strValue, 10, 64)
 		if intErr == nil && intValue < 0 {
 			return 0, nil
-		} else if intErr != nil && intErr.(*strconv.NumError).Err == strconv.ErrRange && intValue < 0 {
+		} else if intErr != nil && intErr.(*strconv.NumError).Err == strconv.ErrRange && intValue < 0 { // nolint: errorlint // keep old behaviour
 			return 0, nil
 		}
 
@@ -77,7 +77,7 @@ func ParseCgroupParamKeyValue(t string) (string, uint64, error) {
 
 	value, err := ParseUint([]byte(parts[1]))
 	if err != nil {
-		return "", 0, fmt.Errorf("unable to convert param value (%q) to uint64: %v", parts[1], err)
+		return "", 0, fmt.Errorf("unable to convert param value (%q) to uint64: %w", parts[1], err)
 	}
 
 	return parts[0], value, nil

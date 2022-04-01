@@ -18,14 +18,14 @@
 package network
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )
 
 // MapProcNetCounters converts the NetworkCountersInfo struct into a MapStr acceptable for sending upstream
-func MapProcNetCounters(raw *sysinfotypes.NetworkCountersInfo) common.MapStr {
+func MapProcNetCounters(raw *sysinfotypes.NetworkCountersInfo) mapstr.M {
 
-	eventByProto := common.MapStr{
+	eventByProto := mapstr.M{
 		"ip":       combineMap(raw.Netstat.IPExt, raw.SNMP.IP),
 		"tcp":      combineMap(raw.Netstat.TCPExt, raw.SNMP.TCP),
 		"udp":      raw.SNMP.UDP,

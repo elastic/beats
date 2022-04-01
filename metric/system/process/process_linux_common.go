@@ -31,12 +31,10 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	"github.com/elastic/beats/v7/libbeat/opt"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/opt"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // Indulging in one non-const global variable for the sake of storing boot time
@@ -50,7 +48,7 @@ const ticks = 100
 func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 	dir, err := os.Open(procStats.Hostfs.ResolveHostFS("proc"))
 	if err != nil {
-		return nil, nil, errors.Wrapf(err, "error reading from procfs %s", procStats.Hostfs.ResolveHostFS("/"))
+		return nil, nil, fmt.Errorf("error reading from procfs %s: %w", procStats.Hostfs.ResolveHostFS("/"), err)
 	}
 	defer dir.Close()
 
@@ -58,7 +56,7 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 
 	names, err := dir.Readdirnames(readAllDirnames)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "error reading directory names")
+		return nil, nil, fmt.Errorf("error reading directory names: %w", err)
 	}
 
 	procMap := make(ProcsMap, 0)
@@ -88,20 +86,20 @@ func FillPidMetrics(hostfs resolve.Resolver, pid int, state ProcState, filter fu
 	var err error
 	state.Memory, err = getMemData(hostfs, pid)
 	if err != nil {
-		return state, errors.Wrapf(err, "error getting memory data for pid %d", pid)
+		return state, fmt.Errorf("error getting memory data for pid %d: %w", pid, err)
 	}
 
 	// CPU Data
 	state.CPU, err = getCPUTime(hostfs, pid)
 	if err != nil {
-		return state, errors.Wrapf(err, "error getting CPU data for pid %d", pid)
+		return state, fmt.Errorf("error getting CPU data for pid %d: %w", pid, err)
 	}
 
 	// CLI args
 	if len(state.Args) == 0 {
 		state.Args, err = getArgs(hostfs, pid)
 		if err != nil {
-			return state, errors.Wrapf(err, "error getting CLI args for pid %d", pid)
+			return state, fmt.Errorf("error getting CLI args for pid %d: %w", pid, err)
 		}
 
 	}
@@ -109,7 +107,7 @@ func FillPidMetrics(hostfs resolve.Resolver, pid int, state ProcState, filter fu
 	// FD metrics
 	state.FD, err = getFDStats(hostfs, pid)
 	if err != nil {
-		return state, errors.Wrapf(err, "error getting FD metrics for pid %d", pid)
+		return state, fmt.Errorf("error getting FD metrics for pid %d: %w", pid, err)
 	}
 
 	if state.Env == nil {
@@ -119,13 +117,13 @@ func FillPidMetrics(hostfs resolve.Resolver, pid int, state ProcState, filter fu
 
 	state.Exe, state.Cwd, err = getProcStringData(hostfs, pid)
 	if err != nil {
-		return state, errors.Wrapf(err, "error getting metadata for pid %d", pid)
+		return state, fmt.Errorf("error getting metadata for pid %d: %w", pid, err)
 	}
 
 	//username
 	state.Username, err = getUser(hostfs, pid)
 	if err != nil {
-		return state, errors.Wrapf(err, "error creating username for pid %d", pid)
+		return state, fmt.Errorf("error creating username for pid %d: %w", pid, err)
 	}
 	return state, nil
 }
@@ -139,7 +137,7 @@ func GetInfoForPid(hostfs resolve.Resolver, pid int) (ProcState, error) {
 		if os.IsNotExist(err) {
 			return ProcState{}, syscall.ESRCH
 		} else {
-			return ProcState{}, errors.Wrapf(err, "error reading procdir %s", path)
+			return ProcState{}, fmt.Errorf("error reading procdir %s: %w", path, err)
 		}
 	}
 
@@ -149,14 +147,14 @@ func GetInfoForPid(hostfs resolve.Resolver, pid int) (ProcState, error) {
 	lIdx := bytes.Index(data, []byte("("))
 	rIdx := bytes.LastIndex(data, []byte(")"))
 	if lIdx < 0 || rIdx < 0 || lIdx >= rIdx || rIdx+2 >= len(data) {
-		return state, fmt.Errorf("failed to extract comm for pid %d from '%v'", pid, string(data))
+		return state, fmt.Errorf("failed to extract comm for pid %d from '%v': %w", pid, string(data), err)
 	}
 	state.Name = string(data[lIdx+1 : rIdx])
 
 	// Extract the rest of the fields that we are interested in.
 	fields := bytes.Fields(data[rIdx+2:])
 	if len(fields) <= 36 {
-		return state, fmt.Errorf("expected more stat fields for pid %d from '%v'", pid, string(data))
+		return state, fmt.Errorf("expected more stat fields for pid %d from '%v': %w", pid, string(data), err)
 	}
 
 	interests := bytes.Join([][]byte{
@@ -174,7 +172,7 @@ func GetInfoForPid(hostfs resolve.Resolver, pid int) (ProcState, error) {
 		&pgid,
 	)
 	if err != nil {
-		return state, fmt.Errorf("failed to parse stat fields for pid %d from '%v': %v", pid, string(data), err)
+		return state, fmt.Errorf("failed to parse stat fields for pid %d from '%v': %w", pid, string(data), err)
 	}
 	state.State = getProcState(procState[0])
 	state.Ppid = opt.IntWith(ppid)
@@ -187,12 +185,12 @@ func GetInfoForPid(hostfs resolve.Resolver, pid int) (ProcState, error) {
 func getProcStringData(hostfs resolve.Resolver, pid int) (string, string, error) {
 	exe, err := os.Readlink(hostfs.Join("proc", strconv.Itoa(pid), "exe"))
 	if err != nil {
-		return "", "", errors.Wrapf(err, "error fetching exe from pid %d", pid)
+		return "", "", fmt.Errorf("error fetching exe from pid %d: %w", pid, err)
 	}
 
 	cwd, err := os.Readlink(hostfs.Join("proc", strconv.Itoa(pid), "cwd"))
 	if err != nil {
-		return "", "", errors.Wrapf(err, "error fetching cwd for pid %d", pid)
+		return "", "", fmt.Errorf("error fetching cwd for pid %d: %w", pid, err)
 	}
 
 	return string(exe), string(cwd), nil
@@ -208,11 +206,11 @@ func dirIsPid(name string) bool {
 func getUser(hostfs resolve.Resolver, pid int) (string, error) {
 	status, err := getProcStatus(hostfs, pid)
 	if err != nil {
-		return "", errors.Wrapf(err, "error fetching user ID for pid %d", pid)
+		return "", fmt.Errorf("error fetching user ID for pid %d: %w", pid, err)
 	}
 	uidValues, ok := status["Uid"]
 	if !ok {
-		return "", fmt.Errorf("Uid not found in proc status")
+		return "", fmt.Errorf("Uid not found in proc status: %w", err)
 	}
 	uidStrings := strings.Fields(uidValues)
 	var userFinal string
@@ -226,13 +224,13 @@ func getUser(hostfs resolve.Resolver, pid int) (string, error) {
 	return userFinal, nil
 }
 
-func getEnvData(hostfs resolve.Resolver, pid int, filter func(string) bool) (common.MapStr, error) {
+func getEnvData(hostfs resolve.Resolver, pid int, filter func(string) bool) (mapstr.M, error) {
 	path := hostfs.Join("proc", strconv.Itoa(pid), "environ")
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error opening file %s", path)
+		return nil, fmt.Errorf("error opening file %s: %w", path, err)
 	}
-	env := common.MapStr{}
+	env := mapstr.M{}
 
 	pairs := bytes.Split(data, []byte{0})
 	for _, kv := range pairs {
@@ -259,20 +257,20 @@ func getMemData(hostfs resolve.Resolver, pid int) (ProcMemInfo, error) {
 	path := hostfs.Join("proc", strconv.Itoa(pid), "statm")
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		return state, errors.Wrapf(err, "error opening file %s", path)
+		return state, fmt.Errorf("error opening file %s: %w", path, err)
 	}
 
 	fields := strings.Fields(string(data))
 
 	size, err := strconv.ParseUint(fields[0], 10, 64)
 	if err != nil {
-		return state, errors.Wrapf(err, "error parsing memory size %s", fields[0])
+		return state, fmt.Errorf("error parsing memory size %s: %w", fields[0], err)
 	}
 	state.Size = opt.UintWith(size << 12)
 
 	rss, err := strconv.ParseUint(fields[1], 10, 64)
 	if err != nil {
-		return state, errors.Wrapf(err, "error parsing memory rss %s", fields[1])
+		return state, fmt.Errorf("error parsing memory rss %s: %w", fields[1], err)
 	}
 	state.Rss.Bytes = opt.UintWith(rss << 12)
 
@@ -288,22 +286,22 @@ func getCPUTime(hostfs resolve.Resolver, pid int) (ProcCPUInfo, error) {
 	pathCPU := hostfs.Join("proc", strconv.Itoa(pid), "stat")
 	data, err := ioutil.ReadFile(pathCPU)
 	if err != nil {
-		return state, errors.Wrapf(err, "error opening file %s", pathCPU)
+		return state, fmt.Errorf("error opening file %s: %w", pathCPU, err)
 	}
 	fields := strings.Fields(string(data))
 
 	user, err := strconv.ParseUint(fields[13], 10, 64)
 	if err != nil {
-		return state, errors.Wrapf(err, "error parsing user CPU times for pid %d", pid)
+		return state, fmt.Errorf("error parsing user CPU times for pid %d: %w", pid, err)
 	}
 	sys, err := strconv.ParseUint(fields[14], 10, 64)
 	if err != nil {
-		return state, errors.Wrapf(err, "error parsing system CPU times for pid %d", pid)
+		return state, fmt.Errorf("error parsing system CPU times for pid %d: %w", pid, err)
 	}
 
 	btime, err := getLinuxBootTime(hostfs)
 	if err != nil {
-		return state, errors.Wrapf(err, "error feting boot time for pid %d", pid)
+		return state, fmt.Errorf("error feting boot time for pid %d: %w", pid, err)
 	}
 
 	// convert to milliseconds from USER_HZ
@@ -314,7 +312,7 @@ func getCPUTime(hostfs resolve.Resolver, pid int) (ProcCPUInfo, error) {
 
 	startTime, err := strconv.ParseUint(fields[21], 10, 64)
 	if err != nil {
-		return state, errors.Wrapf(err, "error parsing start time value %s for pid %d", fields[21], pid)
+		return state, fmt.Errorf("error parsing start time value %s for pid %d: %w", fields[21], pid, err)
 	}
 
 	startTime /= ticks
@@ -329,7 +327,7 @@ func getArgs(hostfs resolve.Resolver, pid int) ([]string, error) {
 	path := hostfs.Join("proc", strconv.Itoa(pid), "cmdline")
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error opening file %s", path)
+		return nil, fmt.Errorf("error opening file %s: %w", path, err)
 	}
 	bbuf := bytes.NewBuffer(data)
 
@@ -353,7 +351,7 @@ func getFDStats(hostfs resolve.Resolver, pid int) (ProcFDInfo, error) {
 	path := hostfs.Join("proc", strconv.Itoa(pid), "limits")
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		return state, errors.Wrapf(err, "error opening file %s", path)
+		return state, fmt.Errorf("error opening file %s: %w", path, err)
 	}
 
 	for _, line := range strings.Split(string(data), "\n") {
@@ -363,13 +361,13 @@ func getFDStats(hostfs resolve.Resolver, pid int) (ProcFDInfo, error) {
 
 				softLimit, err := strconv.ParseUint(fields[3], 10, 64)
 				if err != nil {
-					return state, errors.Wrapf(err, "error parsing limits value %s for pid %d", fields[3], pid)
+					return state, fmt.Errorf("error parsing limits value %s for pid %d: %w", fields[3], pid, err)
 				}
 				state.Limit.Soft = opt.UintWith(softLimit)
 
 				hardLimit, err := strconv.ParseUint(fields[4], 10, 64)
 				if err != nil {
-					return state, errors.Wrapf(err, "error parsing limits value %s for pid %d", fields[3], pid)
+					return state, fmt.Errorf("error parsing limits value %s for pid %d: %w", fields[3], pid, err)
 				}
 				state.Limit.Hard = opt.UintWith(hardLimit)
 			}
@@ -380,7 +378,7 @@ func getFDStats(hostfs resolve.Resolver, pid int) (ProcFDInfo, error) {
 	pathFD := hostfs.Join("proc", strconv.Itoa(pid), "fd")
 	fds, err := ioutil.ReadDir(pathFD)
 	if err != nil {
-		return state, errors.Wrapf(err, "error reading FD directory for pid %d", pid)
+		return state, fmt.Errorf("error reading FD directory for pid %d: %w", pid, err)
 	}
 	state.Open = opt.UintWith(uint64(len(fds)))
 	return state, nil
@@ -396,7 +394,7 @@ func getLinuxBootTime(hostfs resolve.Resolver) (uint64, error) {
 	// grab system boot time
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		return 0, errors.Wrapf(err, "error opening file %s", path)
+		return 0, fmt.Errorf("error opening file %s: %w", path, err)
 	}
 
 	statVals := strings.Split(string(data), "\n")
@@ -405,14 +403,14 @@ func getLinuxBootTime(hostfs resolve.Resolver) (uint64, error) {
 		if strings.HasPrefix(line, "btime") {
 			btime, err := strconv.ParseUint(line[6:], 10, 64)
 			if err != nil {
-				return 0, errors.Wrap(err, "error reading boot time")
+				return 0, fmt.Errorf("error reading boot time: %w", err)
 			}
 			bootTime = btime
 			return btime, nil
 		}
 	}
 
-	return 0, errors.Wrapf(err, "no boot time find in file %s", path)
+	return 0, fmt.Errorf("no boot time find in file %s: %w", path, err)
 }
 
 func getProcStatus(hostfs resolve.Resolver, pid int) (map[string]string, error) {
@@ -420,7 +418,7 @@ func getProcStatus(hostfs resolve.Resolver, pid int) (map[string]string, error) 
 	path := hostfs.Join("proc", strconv.Itoa(pid), "status")
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error opening file %s", path)
+		return nil, fmt.Errorf("error opening file %s: %w", path, err)
 	}
 	for _, line := range strings.Split(string(data), "\n") {
 		fields := strings.SplitN(line, ":", 2)

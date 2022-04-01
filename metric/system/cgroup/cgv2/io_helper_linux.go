@@ -21,11 +21,10 @@
 package cgv2
 
 import (
+	"fmt"
 	"io/fs"
 	"path/filepath"
 	"syscall"
-
-	"github.com/pkg/errors"
 )
 
 // fetchDeviceName will attempt to find a device name associated with a major/minor pair
@@ -44,9 +43,9 @@ func fetchDeviceName(major uint64, minor uint64) (bool, string, error) {
 		if d.Type() != fs.ModeDevice {
 			return nil
 		}
-		fInfo, err := d.Info()
-		if err != nil {
-			return nil
+		fInfo, dirErr := d.Info()
+		if dirErr != nil {
+			return nil // nolint: nilerr // errors are hidden on purpose
 		}
 		infoT, ok := fInfo.Sys().(*syscall.Stat_t)
 		if !ok {
@@ -68,7 +67,7 @@ func fetchDeviceName(major uint64, minor uint64) (bool, string, error) {
 
 	err := filepath.WalkDir("/dev/", walkFunc)
 	if err != nil {
-		return false, "", errors.Wrap(err, "error walking /dev/")
+		return false, "", fmt.Errorf("error walking /dev/: %w", err)
 	}
 
 	return found, devName, nil
