@@ -19,7 +19,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
 	bay "github.com/elastic/bayeux"
@@ -39,6 +38,8 @@ func (in *cometdInput) Run() {
 			defer in.log.Info("Input worker has stopped.")
 			defer in.workerWg.Done()
 			defer in.workerCancel()
+			in.b = bay.Bayeux{}
+			in.creds = bay.GetSalesforceCredentials()
 			if err := in.run(); err != nil {
 				in.log.Error(err)
 				return
@@ -48,9 +49,7 @@ func (in *cometdInput) Run() {
 }
 
 func (in *cometdInput) run() error {
-	b := bay.Bayeux{}
-	creds := bay.GetSalesforceCredentials()
-	in.out = b.Channel(in.out, "-1", creds, in.config.ChannelName)
+	in.out = in.b.Channel(in.out, "-1", in.creds, in.config.ChannelName)
 
 	var event Event
 	for e := range in.out {
@@ -61,7 +60,7 @@ func (in *cometdInput) run() error {
 			}
 
 			// Convert json.RawMessage response to []byte
-			msg, err := json.Marshal(e.Data.Payload)
+			msg, err := e.Data.Payload.MarshalJSON()
 			if err != nil {
 				return fmt.Errorf("JSON error: %v", err)
 			}
@@ -113,13 +112,7 @@ func NewInput(
 	// Wrap input.Context's Done channel with a context.Context. This goroutine
 	// stops with the parent closes the Done channel.
 	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
-	go func() {
-		defer cancelInputCtx()
-		select {
-		case <-inputContext.Done:
-		case <-inputCtx.Done():
-		}
-	}()
+	defer cancelInputCtx()
 
 	// If the input ever needs to be made restartable, then context would need
 	// to be recreated with each restart.
@@ -170,16 +163,10 @@ type cometdInput struct {
 	workerOnce   sync.Once          // Guarantees that the worker goroutine is only started once.
 	workerWg     sync.WaitGroup     // Waits on worker goroutine.
 
-	ackedCount *atomic.Uint32                   // Total number of successfully ACKed messages.
-	Transport  httpcommon.HTTPTransportSettings `config:",inline"`
-	Retry      retryConfig                      `config:"retry"`
+	ackedCount *atomic.Uint32 // Total number of successfully ACKed messages.
 	out        chan bay.TriggerEvent
-}
-
-type retryConfig struct {
-	MaxAttempts *int           `config:"max_attempts"`
-	WaitMin     *time.Duration `config:"wait_min"`
-	WaitMax     *time.Duration `config:"wait_max"`
+	b          bay.Bayeux
+	creds      bay.Credentials
 }
 
 type Event struct {

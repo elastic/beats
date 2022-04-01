@@ -23,8 +23,17 @@ type oAuth2Config struct {
 
 // Validate checks if oauth2 config is valid.
 func (o *oAuth2Config) Validate() error {
-	if o.TokenURL == "" || o.ClientID == "" || o.ClientSecret == "" || o.User == "" || o.Password == "" {
-		return errors.New("both token_url and client credentials must be provided")
+	if o.TokenURL == "" {
+		return errors.New("token_url must be provided")
+	}
+	if o.ClientID == "" {
+		return errors.New("client.id must be provided")
+	}
+	if o.ClientSecret == "" {
+		return errors.New("client.secret must be provided")
+	}
+	if o.User == "" || o.Password == "" {
+		return errors.New("both user and password must be provided")
 	}
 	return nil
 }
