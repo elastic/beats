@@ -211,6 +211,50 @@ func (s *sourceStore) CleanIf(pred func(v Value) bool) {
 	}
 }
 
+// FixUpIdentifiers copies an existing resource to a new ID and marks the previous one
+// for removal.
+func (s *sourceStore) FixUpIdentifiers(getNewID func(v Value) (string, interface{})) {
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	for key, res := range s.store.ephemeralStore.table {
+		if !s.identifier.MatchesInput(key) {
+			continue
+		}
+
+		res.lock.Lock()
+
+		newKey, updatedMeta := getNewID(res)
+		if len(newKey) > 0 && res.internalState.TTL > 0 {
+			if _, ok := s.store.ephemeralStore.table[newKey]; ok {
+				res.lock.Unlock()
+				continue
+			}
+
+			// Pending updates due to events that have not yet been ACKed
+			// are not included in the copy. Collection on
+			// the copy start from the last known ACKed position.
+			// This might lead to data duplication because the harvester
+			// will pickup from the last ACKed position using the new key
+			// and the pending updates will affect the entry with the oldKey.
+			r := res.copyWithNewKey(newKey)
+			r.cursorMeta = updatedMeta
+			r.stored = false
+			s.store.writeState(r)
+
+			// Add the new resource to the ephemeralStore so the rest of the
+			// codebase can have access to the new value
+			s.store.ephemeralStore.table[newKey] = r
+
+			// Remove the old key from the store
+			s.store.UpdateTTL(res, 0) // aka delete. See store.remove for details
+			s.store.log.Infof("migrated entry in registry from '%s' to '%s'", key, newKey)
+		}
+
+		res.lock.Unlock()
+	}
+}
+
 // UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
 // for removal.
 func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interface{})) {
@@ -236,8 +280,9 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 			// Pending updates due to events that have not yet been ACKed
 			// are not included in the copy. Collection on
 			// the copy start from the last known ACKed position.
-			// This might lead to duplicates if configurations are adapted
-			// for inputs with the same ID are changed.
+			// This might lead to data duplication because the harvester
+			// will pickup from the last ACKed position using the new key
+			// and the pending updates will affect the entry with the oldKey.
 			r := res.copyWithNewKey(newKey)
 			r.cursorMeta = updatedMeta
 			r.stored = false
@@ -322,7 +367,7 @@ func (s *store) resetCursor(key string, cur interface{}) error {
 	r.activeCursorOperations = 0
 	r.pendingCursorValue = nil
 	r.pendingUpdate = nil
-	typeconv.Convert(&r.cursor, cur)
+	typeconv.Convert(&r.cursor, cur) //nolint: errcheck // not changing behaviour on this commit
 
 	s.writeState(r)
 
@@ -464,7 +509,8 @@ func (r *resource) copyInto(dst *resource) {
 	dst.pendingCursorValue = nil
 	dst.pendingUpdate = nil
 	dst.cursorMeta = r.cursorMeta
-	dst.lock = unison.MakeMutex()
+	// dst.lock should not be overwritten here because it's supposed to be locked
+	// before this function call and it's important to preserve the previous value.
 }
 
 func (r *resource) copyWithNewKey(key string) *resource {
@@ -491,6 +537,7 @@ func (r *resource) copyWithNewKey(key string) *resource {
 // pendingCursor returns the current published cursor state not yet ACKed.
 //
 // Note: The stateMutex must be locked when calling pendingCursor.
+//nolint: errcheck // not changing behaviour on this commit
 func (r *resource) pendingCursor() interface{} {
 	if r.pendingUpdate != nil {
 		var tmp interface{}
@@ -528,7 +575,7 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 	}
 
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
-		if !strings.HasPrefix(string(key), keyPrefix) {
+		if !strings.HasPrefix(key, keyPrefix) {
 			return true, nil
 		}
 

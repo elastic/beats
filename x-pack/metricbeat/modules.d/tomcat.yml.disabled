@@ -1,5 +1,5 @@
 # Module: tomcat
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-tomcat.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.1/metricbeat-module-tomcat.html
 
 - module: tomcat
   metricsets: ['threading', 'cache', 'memory', 'requests']

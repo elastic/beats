@@ -1,5 +1,5 @@
 # Module: kibana
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-kibana.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.1/metricbeat-module-kibana.html
 
 - module: kibana
   #metricsets:

@@ -15,6 +15,17 @@ in the `paths` option. At the moment only simple file system scanning is
 supported.
 
 [float]
+[[filestream-input-id]]
+===== `id`
+
+A unique identifier for this filestream input. Each filestream input
+must have a unique ID.
+
+WARNING: Changing input ID may cause data duplication because the
+state of the files will be lost and they will be read from the
+beginning again.
+
+[float]
 [[filestream-input-paths]]
 ===== `paths`
 
@@ -295,7 +306,7 @@ rotate files, make sure this option is enabled.
 
 [float]
 [id="{beatname_lc}-input-{type}-close-eof"]
-===== `close.reader.eof`
+===== `close.reader.on_eof`
 
 WARNING: Only use this option if you understand that data loss is a potential
 side effect.

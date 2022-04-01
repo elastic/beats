@@ -26,8 +26,6 @@ stages:
     build:
         mage: "mage build unitTest"
         withModule: true
-        platforms:             ## override default labels in this specific stage.
-            - "windows-2019"
         stage: mandatory
     windows-2019:
         mage: "mage build unitTest"
