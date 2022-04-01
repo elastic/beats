@@ -48,6 +48,8 @@ pipeline {
         anyOf {
           triggeredBy cause: "IssueCommentCause"
           expression {
+            // TODO
+            return true
             def ret = isUserTrigger() || isUpstreamTrigger()
             if(!ret){
               currentBuild.result = 'NOT_BUILT'
@@ -90,17 +92,27 @@ pipeline {
             dir("${BASE_DIR}"){
               setEnvVar('BEAT_VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
             }
-            setEnvVar('IS_BRANCH_AVAILABLE', isBranchUnifiedReleaseAvailable(env.BRANCH_NAME))
+            // TODO
+            //setEnvVar('IS_BRANCH_AVAILABLE', isBranchUnifiedReleaseAvailable(env.BRANCH_NAME))
+            setEnvVar('IS_BRANCH_AVAILABLE', true)
           }
         }
         stage('Build Packages'){
           options { skipDefaultCheckout() }
+          // TODO
+          when {
+            expression { return false }
+          }
           steps {
             generateSteps()
           }
         }
         stage('Run E2E Tests for Packages'){
           options { skipDefaultCheckout() }
+          // TODO
+          when {
+            expression { return false }
+          }
           steps {
             runE2ETests()
           }
@@ -164,7 +176,10 @@ def getBucketUri(type) {
   // commit for the normal workflow, snapshots (aka SNAPSHOT=true)
   // staging for the staging workflow, SNAPSHOT=false
   def folder = type.equals('staging') ? 'staging' : 'commits'
+  // TODO: test
+  withEnv(["GIT_BASE_COMMIT=524cda1a27b445a341a145a72931f66395267d8a"]) {
   return "gs://${env.JOB_GCS_BUCKET}/${env.REPO}/${folder}/${env.GIT_BASE_COMMIT}"
+  }
 }
 
 def runReleaseManager(def args = [:]) {
@@ -177,16 +192,23 @@ def runReleaseManager(def args = [:]) {
     // TODO: as long as googleStorageDownload does not support recursive copy with **/*
     dir("build/distributions") {
       gsutil(command: "-m -q cp -r ${bucketUri} .", credentialsId: env.JOB_GCS_EXT_CREDENTIALS)
+      // TODO: test
+      withEnv(["GIT_BASE_COMMIT=524cda1a27b445a341a145a72931f66395267d8a"]) {
       sh(label: 'move one level up', script: "mv ${env.GIT_BASE_COMMIT}/** .")
+      }
     }
     sh(label: "debug package", script: 'find build/distributions -type f -ls || true')
     sh(label: 'prepare-release-manager-artifacts', script: ".ci/scripts/prepare-release-manager.sh")
     dockerLogin(secret: env.DOCKERELASTIC_SECRET, registry: env.DOCKER_REGISTRY)
+    // TODO: test
+    withEnv(["BRANCH_NAME=main"]) {
     releaseManager(project: 'beats',
                    version: env.BEAT_VERSION,
                    type: type,
                    artifactsFolder: 'build/distributions',
                    outputFile: args.outputFile)
+    // TODO: test
+    }
   }
 }
 
