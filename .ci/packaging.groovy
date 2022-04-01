@@ -22,8 +22,8 @@ pipeline {
     DOCKER_REGISTRY = 'docker.elastic.co'
     GITHUB_CHECK_E2E_TESTS_NAME = 'E2E Tests'
     PIPELINE_LOG_LEVEL = "INFO"
-    SLACK_CHANNEL = 'UJ2J1AZV2'
-    NOTIFY_TO = 'victor.martinez+package-beats@elastic.co'
+    SLACK_CHANNEL = '#beats'
+    NOTIFY_TO = 'beats-contrib+package-beats@elastic.co'
     DRA_OUTPUT = 'release-manager.out'
   }
   options {
@@ -236,7 +236,6 @@ def generateSteps() {
   }
 
   // enable beats-dashboards within the existing worker
-
   parallelTasks["beats-dashboards"] = {
     withGithubNotify(context: "beats-dashboards") {
       withEnv(["HOME=${env.WORKSPACE}"]) {
@@ -251,8 +250,6 @@ def generateSteps() {
       }
     }
   }
-
-
   parallel(parallelTasks)
 }
 
