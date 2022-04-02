@@ -18,7 +18,7 @@ type config struct {
 	LogGroupName              string              `config:"log_group_name"`
 	LogGroupNamePrefix        string              `config:"log_group_name_prefix"`
 	RegionName                string              `config:"region_name"`
-	LogStreams                []string            `config:"log_streams"`
+	LogStreams                []*string            `config:"log_streams"`
 	LogStreamPrefix           string              `config:"log_stream_prefix"`
 	StartPosition             string              `config:"start_position" default:"beginning"`
 	ScanFrequency             time.Duration       `config:"scan_frequency" validate:"min=0,nonzero"`
