@@ -294,7 +294,7 @@ def generateLinuxStep(beat) {
         prepareE2ETestForPackage("${beat}")
 
         // Staging is only needed from branches (main or release branches)
-        if (isBranch()) {
+        //if (isBranch()) {
           // As long as we reuse the same worker to package more than
           // once, the workspace gets corrupted with some permissions
           // therefore let's reset the workspace to a new location
@@ -306,7 +306,7 @@ def generateLinuxStep(beat) {
               release('staging')
             }
           }
-        }
+        //}
       }
     }
   }
