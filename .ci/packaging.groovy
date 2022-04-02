@@ -271,10 +271,10 @@ def generateArmStep(beat) {
           }
         }
         // Staging is only needed from branches (main or release branches)
-        if (isBranch()) {
+        //if (isBranch()) {
           deleteDir()
           release('staging')
-        }
+        //}
       }
     }
   }
