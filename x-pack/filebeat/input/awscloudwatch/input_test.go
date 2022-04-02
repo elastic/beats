@@ -121,41 +121,6 @@ func TestGetStartPosition(t *testing.T) {
 	}
 }
 
-// MockCloudwatchlogsClient struct is used for unit tests.
-type MockCloudwatchlogsClient struct {
-	cloudwatchlogsiface.ClientAPI
-}
-
-func (m *MockCloudwatchlogsClient) FilterLogEventsRequest(input *cloudwatchlogs.FilterLogEventsInput) cloudwatchlogs.FilterLogEventsRequest {
-	events := []cloudwatchlogs.FilteredLogEvent{
-		{
-			EventId:       awssdk.String("id-1"),
-			IngestionTime: awssdk.Int64(1590000000000),
-			LogStreamName: awssdk.String("logStreamName1"),
-			Message:       awssdk.String("test-message-1"),
-			Timestamp:     awssdk.Int64(1590000000000),
-		},
-		{
-			EventId:       awssdk.String("id-2"),
-			IngestionTime: awssdk.Int64(1600000000000),
-			LogStreamName: awssdk.String("logStreamName1"),
-			Message:       awssdk.String("test-message-2"),
-			Timestamp:     awssdk.Int64(1600000000000),
-		},
-	}
-
-	httpReq, _ := http.NewRequest("", "", nil)
-	return cloudwatchlogs.FilterLogEventsRequest{
-		Request: &awssdk.Request{
-			Data: &cloudwatchlogs.FilterLogEventsOutput{
-				Events:    events,
-				NextToken: awssdk.String(""),
-			},
-			HTTPRequest: httpReq,
-		},
-	}
-}
-
 func TestCreateEvent(t *testing.T) {
 	logEvent := cloudwatchlogs.FilteredLogEvent{
 		EventId:       awssdk.String("id-1"),
