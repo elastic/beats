@@ -14,7 +14,6 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/beater"
@@ -136,7 +135,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 
 	logsServiceName := awscommon.CreateServiceName("logs", in.config.AWSConfig.FIPSEnabled, in.config.RegionName)
 	cwConfig := awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, logsServiceName, in.config.RegionName, in.awsConfig)
-	svc := cloudwatchlogs.New(cwConfig)
+	svc := cloudwatchlogs.NewFromConfig(cwConfig)
 
 	logGroupNames, err := getLogGroupNames(svc, in.config.LogGroupNamePrefix, in.config.LogGroupName)
 	if err != nil {
@@ -160,7 +159,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	return in.Receive(svc, cwPoller, ctx, logProcessor, logGroupNames)
 }
 
-func (in *cloudwatchInput) Receive(svc cloudwatchlogsiface.ClientAPI, cwPoller *cloudwatchPoller, ctx context.Context, logProcessor *logProcessor, logGroupNames []string) error {
+func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwatchPoller, ctx context.Context, logProcessor *logProcessor, logGroupNames []string) error {
 	// This loop tries to keep the workers busy as much as possible while
 	// honoring the number in config opposed to a simpler loop that does one
 	// listing, sequentially processes every object and then does another listing
@@ -245,7 +244,7 @@ func parseARN(logGroupARN string) (string, string, error) {
 }
 
 // getLogGroupNames uses DescribeLogGroups API to retrieve all log group names
-func getLogGroupNames(svc cloudwatchlogsiface.ClientAPI, logGroupNamePrefix string, logGroupName string) ([]string, error) {
+func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string, logGroupName string) ([]string, error) {
 	if logGroupNamePrefix == "" {
 		return []string{logGroupName}, nil
 	}
@@ -256,19 +255,16 @@ func getLogGroupNames(svc cloudwatchlogsiface.ClientAPI, logGroupNamePrefix stri
 	}
 
 	// make API request
-	req := svc.DescribeLogGroupsRequest(filterLogEventsInput)
-	p := cloudwatchlogs.NewDescribeLogGroupsPaginator(req)
-	var logGroupNames []string
-	for p.Next(context.TODO()) {
-		page := p.CurrentPage()
-		for _, lg := range page.LogGroups {
-			logGroupNames = append(logGroupNames, *lg.LogGroupName)
-		}
+	logsGroups, err := svc.DescribeLogGroups(context.TODO(), filterLogEventsInput)
+	if err != nil {
+		return nil, errors.Wrap(err, "aws describe log groups request returned an error")
 	}
 
-	if err := p.Err(); err != nil {
-		return logGroupNames, err
+	var logGroupNames []string
+	for _, logGroup := range logsGroups.LogGroups {
+		logGroupNames = append(logGroupNames, *logGroup.LogGroupName)
 	}
+
 	return logGroupNames, nil
 }
 
