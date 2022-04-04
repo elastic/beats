@@ -196,7 +196,7 @@ func TestESLoader_Load(t *testing.T) {
 
 		t.Run("cannot check data stream", func(t *testing.T) {
 			m := getMockElasticsearchClient(t, "GET", "/_data_stream/", 503, []byte("error checking data stream"))
-			setup := newTestSetupWithESClient(t, m, TemplateConfig{Enabled: true})
+			setup := newTestSetupWithESClient(t, m, TemplateConfig{Enabled: true, Overwrite: true})
 
 			beatInfo := beat.Info{Version: "9.9.9"}
 			err := setup.loader.Load(setup.config, beatInfo, nil, false)
@@ -531,15 +531,16 @@ func esMock(t *testing.T, method, endpoint string, code int, body []byte) *httpt
 		}
 
 		if r.Method == method && strings.HasPrefix(r.URL.Path, endpoint) {
+			w.WriteHeader(code)
 			w.Header().Set("Content-Type", "application/json")
 			w.Write(body)
 			return
 		}
 
 		c := 200
-		// if we are checking if the template or the data stream is available,
+		// if we are checking if the data stream is available,
 		// return 404 so the client will try to load it.
-		if r.Method == "GET" || r.Method == "HEAD" {
+		if r.Method == "GET" && strings.HasPrefix(r.URL.Path, "/_data_stream") {
 			c = 404
 		}
 		w.WriteHeader(c)
