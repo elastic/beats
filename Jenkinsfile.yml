@@ -5,6 +5,7 @@ projects:
 changeset:
     ci:
         - "^Jenkinsfile"
+        - "^Jenkinsfile.yml"
         - "^\\.ci/scripts/.*"
     oss:
         - "^go.mod"
